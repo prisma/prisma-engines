@@ -875,6 +875,76 @@ mod update {
         Ok(())
     }
 
+    #[connector_test]
+    async fn fails_update_many_on_to_one(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        // Fails on required to-one
+        assert_error!(
+            runner,
+            r#"mutation {
+              updateOneTestModel(where: { id: 1 }, data: {
+                a: { updateMany: {} }
+              }) {
+                id
+              }
+            }"#,
+            2009,
+            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.updateMany`: Field does not exist on enclosing type."
+        );
+
+        // Fails on optional to-one
+        assert_error!(
+          runner,
+          r#"mutation {
+            updateOneTestModel(where: { id: 1 }, data: {
+              b: { updateMany: {} }
+            }) {
+              id
+            }
+          }"#,
+          2009,
+          "Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.b.BNullableUpdateEnvelopeInput.updateMany`: Field does not exist on enclosing type."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn fails_delete_many_on_to_one(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        // Fails on required to-one
+        assert_error!(
+          runner,
+          r#"mutation {
+            updateOneTestModel(where: { id: 1 }, data: {
+              a: { deleteMany: {} }
+            }) {
+              id
+            }
+          }"#,
+          2009,
+          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.deleteMany`: Field does not exist on enclosing type."
+      );
+
+        // Fails on optional to-one
+        assert_error!(
+        runner,
+        r#"mutation {
+          updateOneTestModel(where: { id: 1 }, data: {
+            b: { deleteMany: {} }
+          }) {
+            id
+          }
+        }"#,
+        2009,
+        "Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.b.BNullableUpdateEnvelopeInput.deleteMany`: Field does not exist on enclosing type."
+      );
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,

@@ -102,11 +102,13 @@ pub fn to_many_composites() -> String {
         type CompositeA {
             a_1          String       @default("a_1 default") @map("a1")
             a_2          Int?
+            a_to_one_b   CompositeB?
             a_to_many_bs CompositeB[]
         }
 
         type CompositeB {
             b_field      Int?         @default(10)
+            b_to_one_c   CompositeC?
             b_to_many_cs CompositeC[]
         }
 
