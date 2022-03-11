@@ -5,9 +5,37 @@ use serde_json::Value;
 use std::collections::BTreeMap;
 use tracing::{
     field::{Field, Visit},
-    Level, Subscriber,
+    level_filters::LevelFilter,
+    Dispatch, Level, Subscriber,
 };
-use tracing_subscriber::Layer;
+use tracing_subscriber::{
+    filter::{filter_fn, FilterExt},
+    layer::SubscriberExt,
+    Layer, Registry,
+};
+
+pub(crate) fn create_log_dispatch(
+    log_queries: bool,
+    log_level: LevelFilter,
+    log_callback: ThreadsafeFunction<String>,
+) -> Dispatch {
+    // We need to filter the messages to send to our callback logging mechanism
+    let filters = if log_queries {
+        // Filter trace query events (for query log) or based in the defined log level
+        filter_fn(|meta| {
+            meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
+        })
+        .or(log_level)
+        .boxed()
+    } else {
+        // Filter based in the defined log level
+        log_level.boxed()
+    };
+
+    let logger = CallbackLayer::new(log_callback).with_filter(filters);
+
+    Dispatch::new(Registry::default().with(logger))
+}
 
 pub struct JsonVisitor<'a> {
     values: BTreeMap<&'a str, Value>,
