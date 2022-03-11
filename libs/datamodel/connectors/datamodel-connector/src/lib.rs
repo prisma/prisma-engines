@@ -157,12 +157,19 @@ pub trait Connector: Send + Sync {
 
         url.query_pairs_mut().clear();
 
+        // Only for PostgreSQL + MySQL
         if let Some(path) = params.get("sslcert").map(|s| s.as_str()).and_then(set_root) {
             params.insert("sslcert".into(), path);
         }
 
+        // Only for PostgreSQL + MySQL
         if let Some(path) = params.get("sslidentity").map(|s| s.as_str()).and_then(set_root) {
             params.insert("sslidentity".into(), path);
+        }
+
+        // Only for MongoDB
+        if let Some(path) = params.get("tlsCAFile").map(|s| s.as_str()).and_then(set_root) {
+            params.insert("tlsCAFile".into(), path);
         }
 
         for (k, v) in params.into_iter() {
