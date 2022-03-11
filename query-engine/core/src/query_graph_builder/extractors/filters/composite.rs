@@ -1,6 +1,9 @@
 use super::extract_filter;
-use crate::{constants::filters, ObjectTag, ParsedInputMap, QueryGraphBuilderError, QueryGraphBuilderResult};
+use crate::{
+    constants::filters, ObjectTag, ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
+};
 use connector::{CompositeCompare, Filter};
+use datamodel::PrismaValue;
 use prisma_models::CompositeFieldRef;
 use std::convert::TryInto;
 
@@ -21,17 +24,15 @@ pub fn parse(input_map: ParsedInputMap, field: &CompositeFieldRef, _reverse: boo
             (filters::NONE, input) => Ok(field.none(extract_filter(input.try_into()?, &field.typ)?)),
             (filters::IS_EMPTY, input) => Ok(field.is_empty(input.try_into()?)),
 
-            // (filters::EVERY, Some(value)) => Ok(field.every_related(extract_filter(value, &field.related_model())?)),
-            // (filters::SOME, Some(value)) => {
-            //     Ok(field.at_least_one_related(extract_filter(value, &field.related_model())?))
-            // }
-            // (filters::NONE, Some(value)) => Ok(field.no_related(extract_filter(value, &field.related_model())?)),
-
             // // To-one composite filters
-            // (filters::IS, Some(value)) => Ok(field.to_one_related(extract_filter(value, &field.related_model())?)),
-            // (filters::IS, None) => Ok(field.one_relation_is_null()),
-            // (filters::IS_NOT, Some(value)) => Ok(field.no_related(extract_filter(value, &field.related_model())?)),
-            // (filters::IS_NOT, None) => Ok(Filter::not(vec![field.one_relation_is_null()])),
+            (filters::IS, ParsedInputValue::Single(PrismaValue::Null)) => Ok(field.equals(PrismaValue::Null)),
+            (filters::IS, input) => Ok(field.is(extract_filter(input.try_into()?, &field.typ)?)),
+
+            (filters::IS_NOT, ParsedInputValue::Single(PrismaValue::Null)) => {
+                Ok(Filter::not(vec![field.equals(PrismaValue::Null)]))
+            }
+            (filters::IS_NOT, input) => Ok(field.is_not(extract_filter(input.try_into()?, &field.typ)?)),
+
             _ => Err(QueryGraphBuilderError::InputError(format!(
                 "Invalid filter key `{}` input combination for composite filter",
                 filter_key

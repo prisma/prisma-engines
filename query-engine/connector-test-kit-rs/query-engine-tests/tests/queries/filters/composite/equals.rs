@@ -19,6 +19,18 @@ mod to_many {
           @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
         );
 
+        // Implicit
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                    findManyTestModel(where: {
+                        to_many_as: [ { a_1: "Test", a_2: 0 } ]
+                    }) {
+                        id
+                    }
+                }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
+        );
+
         insta::assert_snapshot!(
           run_query!(runner, r#"{
                     findManyTestModel(where: {
@@ -33,6 +45,22 @@ mod to_many {
                         id
                     }
                 }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+        );
+
+        // Implicit
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                      findManyTestModel(where: {
+                          NOT: [
+                              {
+                                  to_many_as: [ { a_1: "Test", a_2: 0 } ]
+                              }
+                          ]
+                      }) {
+                          id
+                      }
+                  }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
@@ -132,6 +160,18 @@ mod to_many {
           @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7}]}}"###
         );
 
+        // Implicit
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                  findManyTestModel(where: {
+                      to_many_as: []
+                  }) {
+                      id
+                  }
+              }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7}]}}"###
+        );
+
         insta::assert_snapshot!(
           run_query!(runner, r#"{
                   findManyTestModel(where: {
@@ -149,6 +189,22 @@ mod to_many {
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":8},{"id":9}]}}"###
         );
 
+        // Implicit
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                    findManyTestModel(where: {
+                        NOT: [
+                            {
+                              to_many_as: []
+                            }
+                        ]
+                    }) {
+                        id
+                    }
+                }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":8},{"id":9}]}}"###
+        );
+
         Ok(())
     }
 
@@ -160,11 +216,7 @@ mod to_many {
         assert_error!(
             runner,
             r#"{
-                findManyTestModel(where: {
-                    to_many_as: {
-                        equals: { a_1: "Test", a_2: 0 }
-                    }
-                }) {
+                findManyTestModel(where: { equals: { a_1: "Test", a_2: 0 } }}) {
                     id
                 }
             }"#,
