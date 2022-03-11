@@ -191,7 +191,7 @@ pub(crate) fn log_update_many_vec(coll: &str, filter: &Document, docs: &[Documen
     for doc in docs {
         fmt_doc(&mut buffer, doc, 1).unwrap();
     }
-    
+
     write!(&mut buffer, "])").unwrap();
 
     debug!(target: "mongodb_query_connector::query", query = buffer.as_str(), item_type = "query", is_query = true);
@@ -249,7 +249,7 @@ pub(crate) fn log_insert_many(coll: &str, docs: &[Document], ordered: bool) {
     for doc in docs {
         fmt_doc(&mut buffer, doc, 1).unwrap();
     }
-    
+
     write!(&mut buffer, "], ").unwrap();
     write!(&mut buffer, r#"{{ "ordered": {} }}"#, ordered).unwrap();
 
