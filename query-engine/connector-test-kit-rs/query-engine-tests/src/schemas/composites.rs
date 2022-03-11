@@ -108,6 +108,7 @@ pub fn to_many_composites() -> String {
 
         type CompositeB {
             b_field      Int?         @default(10)
+            b_to_one_c   CompositeC?
             b_to_many_cs CompositeC[]
         }
 
