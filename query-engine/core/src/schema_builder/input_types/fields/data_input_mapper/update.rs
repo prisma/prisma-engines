@@ -235,6 +235,7 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
     append_opt(&mut fields, composite_unset_update_input_field(cf));
     append_opt(&mut fields, composite_upsert_update_input_field(ctx, cf));
     append_opt(&mut fields, composite_update_many_update_input_field(ctx, cf));
+    append_opt(&mut fields, composite_delete_many_update_input_field(ctx, cf));
 
     input_object.set_fields(fields);
 
@@ -370,12 +371,46 @@ fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
     Arc::downgrade(&input_object)
 }
 
+fn composite_delete_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    let name = format!("{}DeleteManyInput", cf.typ.name);
+
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::CompositeEnvelope);
+
+    let input_object = Arc::new(input_object);
+
+    ctx.cache_input_type(ident, input_object.clone());
+
+    // TODO(composite): replace stub where field with actual composite where input
+    let where_field = input_field(args::WHERE, InputType::boolean(), None);
+
+    let fields = vec![where_field];
+
+    input_object.set_fields(fields);
+
+    Arc::downgrade(&input_object)
+}
+
 // Builds an `updateMany` input field. Should only be used in the envelope type.
 fn composite_update_many_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
     if cf.is_list() {
         let update_many = InputType::Object(composite_update_many_object_type(ctx, cf));
 
         Some(input_field(operations::UPDATE_MANY, update_many, None).optional())
+    } else {
+        None
+    }
+}
+
+// Builds a `deleteMany` input field. Should only be used in the envelope type.
+fn composite_delete_many_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+    if cf.is_list() {
+        let delete_many = InputType::Object(composite_delete_many_object_type(ctx, cf));
+
+        Some(input_field(operations::DELETE_MANY, delete_many, None).optional())
     } else {
         None
     }

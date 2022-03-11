@@ -98,6 +98,19 @@ impl IntoUpdateOperation for CompositeWriteOperation {
 
                 vec![UpdateOperation::update_many(path, elem_alias, updates)]
             }
+            CompositeWriteOperation::DeleteMany { filter: _ } => {
+                let elem_alias = format!("{}_item", path.identifier());
+
+                let filter = doc! {
+                    "$filter": {
+                        "input": path.dollar_path(true),
+                        "as": &elem_alias,
+                        "cond": { "$eq": [true, false] } // TODO: Stub predicate until read filters are done
+                    }
+                };
+
+                vec![UpdateOperation::generic(path, filter)]
+            }
         };
 
         Ok(docs)

@@ -106,6 +106,10 @@ impl WriteOperation {
         })
     }
 
+    pub fn composite_delete_many(filter: Filter) -> Self {
+        Self::Composite(CompositeWriteOperation::DeleteMany { filter })
+    }
+
     pub fn as_scalar(&self) -> Option<&ScalarWriteOperation> {
         if let Self::Scalar(v) = self {
             Some(v)
@@ -173,6 +177,9 @@ pub enum CompositeWriteOperation {
     UpdateMany {
         filter: Filter,
         update: Box<CompositeWriteOperation>,
+    },
+    DeleteMany {
+        filter: Filter,
     },
 }
 

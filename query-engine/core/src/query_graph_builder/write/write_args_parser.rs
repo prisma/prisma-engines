@@ -150,10 +150,19 @@ fn parse_composite_envelope(
         operations::UPDATE => parse_composite_updates(cf, value.try_into()?, path)?,
         operations::UPSERT => parse_composite_upsert(cf, value.try_into()?, path)?,
         operations::UPDATE_MANY => parse_composite_update_many(cf, value.try_into()?, path)?,
+        operations::DELETE_MANY => parse_composite_delete_many(value.try_into()?)?,
         _ => unimplemented!(),
     };
 
     Ok(write_op)
+}
+
+fn parse_composite_delete_many(mut value: ParsedInputMap) -> QueryGraphBuilderResult<WriteOperation> {
+    let filter = value.remove(args::WHERE).unwrap();
+    // TODO(composite): replace stub bool filter with actual composite read filter
+    let filter = Filter::BoolFilter(filter.try_into()?);
+
+    Ok(WriteOperation::composite_delete_many(filter))
 }
 
 fn parse_composite_update_many(
