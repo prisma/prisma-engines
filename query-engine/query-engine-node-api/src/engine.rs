@@ -1,4 +1,5 @@
-use crate::{error::ApiError, logger::CallbackLayer};
+use crate::error::ApiError;
+use crate::logger;
 use datamodel::{dml::Datamodel, ValidatedConfiguration};
 use napi::threadsafe_function::ThreadsafeFunction;
 use opentelemetry::global;
@@ -15,11 +16,7 @@ use std::{
 use tokio::sync::RwLock;
 use tracing::{instrument::WithSubscriber, warn, Dispatch, Level};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
-use tracing_subscriber::{
-    filter::{filter_fn, FilterExt, LevelFilter},
-    layer::SubscriberExt,
-    Layer, Registry,
-};
+use tracing_subscriber::filter::LevelFilter;
 
 /// The main engine, that can be cloned between threads when using JavaScript
 /// promises.
@@ -169,31 +166,8 @@ impl QueryEngine {
 
         Ok(Self {
             inner: Arc::new(RwLock::new(Inner::Builder(builder))),
-            logger: Self::create_log_dispatch(log_queries, log_level, log_callback),
+            logger: logger::create_log_dispatch(log_queries, log_level, log_callback),
         })
-    }
-
-    pub fn create_log_dispatch(
-        log_queries: bool,
-        log_level: LevelFilter,
-        log_callback: ThreadsafeFunction<String>,
-    ) -> Dispatch {
-        // We need to filter the messages to send to our callback logging mechanism
-        let filters = if log_queries {
-            // Filter trace query events (for query log) or based in the defined log level
-            filter_fn(|meta| {
-                meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
-            })
-            .or(log_level)
-            .boxed()
-        } else {
-            // Filter based in the defined log level
-            log_level.boxed()
-        };
-
-        let logger = CallbackLayer::new(log_callback).with_filter(filters);
-
-        Dispatch::new(Registry::default().with(logger))
     }
 
     /// Connect to the database, allow queries to be run.
