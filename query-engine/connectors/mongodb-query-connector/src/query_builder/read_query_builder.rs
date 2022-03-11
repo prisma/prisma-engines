@@ -2,8 +2,9 @@ use crate::{
     cursor::{CursorBuilder, CursorData},
     filter::convert_filter,
     join::JoinStage,
+    logger::log_read_query as log_query,
     orderby::OrderByBuilder,
-    vacuum_cursor, BsonTransform, IntoBson, logger::log_read_query as log_query,
+    vacuum_cursor, BsonTransform, IntoBson,
 };
 use connector_interface::{AggregationSelection, Filter, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;

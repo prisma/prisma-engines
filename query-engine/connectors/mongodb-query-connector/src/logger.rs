@@ -176,7 +176,7 @@ pub(crate) fn log_insert_one(coll: &str, doc: &Document) {
     debug!(target: "mongodb_query_connector::query", query = buffer.as_str(), item_type = "query", is_query = true);
 }
 
-pub(crate) fn log_update_many_vec(coll: &str, filter: &Document, docs: &Vec<Document>) {    
+pub(crate) fn log_update_many_vec(coll: &str, filter: &Document, docs: &Vec<Document>) {
     let mut buffer = String::new();
 
     write!(&mut buffer, "db.{}.updateMany(", coll).unwrap();
@@ -187,7 +187,7 @@ pub(crate) fn log_update_many_vec(coll: &str, filter: &Document, docs: &Vec<Docu
     } else {
         write!(&mut buffer, ", [").unwrap();
     }
-    
+
     for doc in docs {
         fmt_doc(&mut buffer, doc, 1).unwrap();
     }
@@ -201,7 +201,7 @@ pub(crate) fn log_update_many(coll: &str, filter: &Document, doc: &Document) {
 
     write!(&mut buffer, "db.{}.updateMany(", coll).unwrap();
     fmt_doc(&mut buffer, filter, 1).unwrap();
-    
+
     if cfg!(debug_assertions) {
         writeln!(&mut buffer, ", ").unwrap();
     } else {
@@ -217,13 +217,13 @@ pub(crate) fn log_update_one(coll: &str, filter: &Document, doc: &Document) {
 
     write!(&mut buffer, "db.{}.updateOne(", coll).unwrap();
     fmt_doc(&mut buffer, filter, 1).unwrap();
-    
+
     if cfg!(debug_assertions) {
         writeln!(&mut buffer, ", ").unwrap();
     } else {
         write!(&mut buffer, ", ").unwrap();
     }
-    
+
     fmt_doc(&mut buffer, doc, 1).unwrap();
 
     write!(&mut buffer, ")").unwrap();

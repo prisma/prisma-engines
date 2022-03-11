@@ -5,13 +5,13 @@ mod error;
 mod filter;
 mod interface;
 mod join;
+mod logger;
 mod orderby;
 mod output_meta;
 mod projection;
 mod query_builder;
 mod root_queries;
 mod value;
-mod logger;
 
 use error::MongoError;
 use mongodb::{
