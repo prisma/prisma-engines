@@ -165,6 +165,10 @@ pub trait Connector: Send + Sync {
             params.insert("sslidentity".into(), path);
         }
 
+        if let Some(path) = params.get("tlsCAFile").map(|s| s.as_str()).and_then(set_root) {
+            params.insert("tlsCAFile".into(), path);
+        }
+
         for (k, v) in params.into_iter() {
             url.query_pairs_mut().append_pair(&k, &v);
         }

@@ -92,6 +92,43 @@ fn absolute_sqlite_paths_are_not_modified() {
 }
 
 #[test]
+fn mongo_relative_tlscafile_can_be_modified() {
+    let schema = indoc!(
+        r#"
+        datasource boo {
+          provider = "mongodb"
+          url = "mongodb://localhost:420/?foo=bar&tlsCAFile=we%2Fare%2Fhere.key"
+        }"#
+    );
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0].load_url_with_config_dir(Path::new("/path/to/prisma"), from_env);
+
+    assert_eq!(
+        "mongodb://localhost:420/?foo=bar&tlsCAFile=%2Fpath%2Fto%2Fprisma%2Fwe%2Fare%2Fhere.key",
+        url.unwrap()
+    )
+}
+
+#[test]
+fn mongo_absolute_tlscafile_should_not_be_modified() {
+    let schema = indoc!(
+        r#"
+        datasource boo {
+          provider = "mongodb"
+          url = "mongodb://localhost:420/?foo=bar&tlsCAFile=%2Fwe%2Fare%2Fhere.key"
+        }"#
+    );
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0]
+        .load_url_with_config_dir(Path::new("/path/to/prisma"), from_env)
+        .unwrap();
+
+    assert_eq!("mongodb://localhost:420/?foo=bar&tlsCAFile=%2Fwe%2Fare%2Fhere.key", url)
+}
+
+#[test]
 fn postgres_relative_sslidentity_can_be_modified() {
     let schema = indoc!(
         r#"
