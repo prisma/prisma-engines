@@ -28,6 +28,15 @@ impl TestApi {
             (db_name, rt.block_on(Quaint::new(&cs)).unwrap())
         } else if tags.contains(Tags::Postgres) {
             let (db_name, q, _) = rt.block_on(args.create_postgres_database());
+            if tags.contains(Tags::CockroachDb) {
+                rt.block_on(q.raw_cmd(
+                    r#"
+                    SET default_int_size = 4;
+                    SET serial_normalization = 'sql_sequence';
+                    "#,
+                ))
+                .unwrap();
+            }
             (db_name, q)
         } else if tags.contains(Tags::Mssql) {
             let (q, _cs) = rt.block_on(args.create_mssql_database());

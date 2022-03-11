@@ -366,12 +366,12 @@ fn citext_to_text_and_back_works(api: TestApi) {
 fn foreign_key_renaming_to_default_works(api: TestApi) {
     let setup = r#"
         CREATE TABLE "food" (
-            id SERIAL PRIMARY KEY
+            id BIGSERIAL PRIMARY KEY
         );
 
         CREATE TABLE "Dog" (
-            id SERIAL PRIMARY KEY,
-            favourite_food_id INTEGER NOT NULL,
+            id BIGSERIAL PRIMARY KEY,
+            favourite_food_id BIGINT NOT NULL,
             CONSTRAINT "favouriteFood" FOREIGN KEY ("favourite_food_id")
                     REFERENCES "food"("id")
                     ON DELETE RESTRICT
@@ -388,13 +388,13 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
         }
 
         model Dog {
-            id                  Int @id @default(autoincrement())
-            favourite_food_id   Int
+            id                  BigInt @id @default(autoincrement())
+            favourite_food_id   BigInt
             favouriteFood       food @relation(fields: [favourite_food_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
         }
 
         model food {
-            id      Int @id @default(autoincrement())
+            id      BigInt @id @default(autoincrement())
             dogs    Dog[]
         }
     "#;

@@ -481,7 +481,7 @@ fn existing_enums_are_picked_up(api: TestApi) {
         CREATE TYPE "Genre" AS ENUM ('SKA', 'PUNK');
 
         CREATE TABLE "prisma-tests"."Band" (
-            id SERIAL PRIMARY KEY,
+            id BIGSERIAL PRIMARY KEY,
             name TEXT NOT NULL,
             genre "Genre" NOT NULL
         );
@@ -496,7 +496,7 @@ fn existing_enums_are_picked_up(api: TestApi) {
         }
 
         model Band {
-            id Int @id @default(autoincrement())
+            id BigInt @id @default(autoincrement())
             name String
             genre Genre
         }
