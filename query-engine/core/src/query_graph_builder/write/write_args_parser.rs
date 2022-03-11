@@ -4,7 +4,7 @@ use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
     ObjectTag,
 };
-use connector::{DatasourceFieldName, Filter, WriteArgs, WriteOperation};
+use connector::{DatasourceFieldName, WriteArgs, WriteOperation};
 use prisma_models::{
     CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier,
 };
@@ -150,19 +150,11 @@ fn parse_composite_envelope(
         operations::UPDATE => parse_composite_updates(cf, value.try_into()?, path)?,
         operations::UPSERT => parse_composite_upsert(cf, value.try_into()?, path)?,
         operations::UPDATE_MANY => parse_composite_update_many(cf, value.try_into()?, path)?,
-        operations::DELETE_MANY => parse_composite_delete_many(value.try_into()?)?,
+        operations::DELETE_MANY => parse_composite_delete_many(cf, value.try_into()?)?,
         _ => unimplemented!(),
     };
 
     Ok(write_op)
-}
-
-fn parse_composite_delete_many(mut value: ParsedInputMap) -> QueryGraphBuilderResult<WriteOperation> {
-    let filter = value.remove(args::WHERE).unwrap();
-    // TODO(composite): replace stub bool filter with actual composite read filter
-    let filter = Filter::BoolFilter(filter.try_into()?);
-
-    Ok(WriteOperation::composite_delete_many(filter))
 }
 
 fn parse_composite_update_many(
@@ -170,13 +162,25 @@ fn parse_composite_update_many(
     mut value: ParsedInputMap,
     path: &mut Vec<DatasourceFieldName>,
 ) -> QueryGraphBuilderResult<WriteOperation> {
-    let filter = value.remove(args::WHERE).unwrap();
-    // TODO(composite): replace stub bool filter with actual composite read filter
-    let filter = Filter::BoolFilter(filter.try_into()?);
-    let update: ParsedInputMap = value.remove(args::DATA).unwrap().try_into()?;
-    let update = parse_composite_updates(cf, update, path)?.try_into_composite().unwrap();
+    let where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()?;
+    let filter = extract_filter(where_map, &cf.typ)?;
+
+    let update_map: ParsedInputMap = value.remove(args::DATA).unwrap().try_into()?;
+    let update = parse_composite_updates(cf, update_map, path)?
+        .try_into_composite()
+        .unwrap();
 
     Ok(WriteOperation::composite_update_many(filter, update))
+}
+
+fn parse_composite_delete_many(
+    cf: &CompositeFieldRef,
+    mut value: ParsedInputMap,
+) -> QueryGraphBuilderResult<WriteOperation> {
+    let where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()?;
+    let filter = extract_filter(where_map, &cf.typ)?;
+
+    Ok(WriteOperation::composite_delete_many(filter))
 }
 
 fn parse_composite_upsert(

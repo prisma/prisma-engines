@@ -3,7 +3,7 @@ use super::{
     into_expression::IntoUpdateExpression,
 };
 
-use connector_interface::FieldPath;
+use connector_interface::{FieldPath, Filter};
 use mongodb::bson::{doc, Document};
 
 #[derive(Debug, Clone)]
@@ -29,10 +29,16 @@ impl UpdateOperation {
         })
     }
 
-    pub fn update_many(field_path: FieldPath, elem_alias: String, updates: Vec<UpdateOperation>) -> Self {
+    pub fn update_many(
+        field_path: FieldPath,
+        filter: Filter,
+        elem_alias: String,
+        updates: Vec<UpdateOperation>,
+    ) -> Self {
         Self::UpdateMany(UpdateMany {
-            elem_alias,
             field_path,
+            filter,
+            elem_alias,
             updates,
         })
     }
@@ -84,6 +90,8 @@ impl Upsert {
 pub(crate) struct UpdateMany {
     /// The field path to which this set expression should be applied
     pub field_path: FieldPath,
+    /// The composite predicates on which updates should be applied
+    pub filter: Filter,
     /// The list of updates to apply to each item of the to-many embed
     pub updates: Vec<UpdateOperation>,
     /// The alias that refers to each element of the to-many embed
