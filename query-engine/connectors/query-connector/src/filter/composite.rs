@@ -33,6 +33,9 @@ pub enum CompositeCondition {
 
     /// To-one composite only - the composite must fulfill the filter.
     Is(Filter),
+
+    /// To-one composite only - the composite must not fulfill the filter.
+    IsNot(Filter),
 }
 
 impl CompositeCompare for CompositeFieldRef {
@@ -76,6 +79,17 @@ impl CompositeCompare for CompositeFieldRef {
         CompositeFilter {
             field: self.clone(),
             condition: Box::new(CompositeCondition::Is(filter.into())),
+        }
+        .into()
+    }
+
+    fn is_not<T>(&self, filter: T) -> Filter
+    where
+        T: Into<Filter>,
+    {
+        CompositeFilter {
+            field: self.clone(),
+            condition: Box::new(CompositeCondition::IsNot(filter.into())),
         }
         .into()
     }

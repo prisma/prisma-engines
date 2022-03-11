@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
-    filter::{convert_filter, MongoFilter},
-    logger, output_meta,
+    filter::{convert_filter, FilterPrefix, MongoFilter},
+    output_meta,
     query_builder::MongoReadQueryBuilder,
     root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
@@ -144,7 +144,7 @@ pub async fn update_records<'conn>(
             .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
             .collect::<crate::Result<Vec<_>>>()?
     } else {
-        let filter = convert_filter(record_filter.filter, false, false)?;
+        let filter = convert_filter(record_filter.filter, false, false, FilterPrefix::default())?;
         find_ids(coll.clone(), session, model, filter).await?
     };
 
@@ -206,7 +206,7 @@ pub async fn delete_records<'conn>(
             .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
             .collect::<crate::Result<Vec<_>>>()?
     } else {
-        let filter = convert_filter(record_filter.filter, false, false)?;
+        let filter = convert_filter(record_filter.filter, false, false, FilterPrefix::default())?;
         find_ids(coll.clone(), session, model, filter).await?
     };
 

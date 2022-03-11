@@ -1,6 +1,6 @@
 use crate::{
     cursor::{CursorBuilder, CursorData},
-    filter::convert_filter,
+    filter::{convert_filter, FilterPrefix},
     join::JoinStage,
     logger::log_read_query as log_query,
     orderby::OrderByBuilder,
@@ -167,7 +167,7 @@ impl MongoReadQueryBuilder {
         let query = match args.filter {
             Some(filter) => {
                 // If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
-                let (filter, filter_joins) = convert_filter(filter, false, false)?.render();
+                let (filter, filter_joins) = convert_filter(filter, false, false, FilterPrefix::default())?.render();
                 if !filter_joins.is_empty() {
                     joins.extend(filter_joins);
                     post_filters.push(filter);
@@ -545,7 +545,7 @@ impl MongoReadQueryBuilder {
     /// Adds aggregation filters based on a having scalar filter.
     pub fn with_having(mut self, having: Option<Filter>) -> crate::Result<Self> {
         if let Some(filter) = having {
-            let (filter_doc, _) = convert_filter(filter, false, true)?.render();
+            let (filter_doc, _) = convert_filter(filter, false, true, FilterPrefix::default())?.render();
             self.aggregation_filters.push(filter_doc);
         }
 
