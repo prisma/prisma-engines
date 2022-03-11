@@ -1,6 +1,5 @@
-use crate::IntoBson;
-
 use super::{expression::*, operation::*};
+use crate::{filter, IntoBson};
 
 use mongodb::bson::{doc, Bson};
 
@@ -86,6 +85,8 @@ impl IntoUpdateExpression for UpdateMany {
         // A reference to that alias
         let ref_elem_alias = format!("$${}", &elem_alias);
 
+        let (filter_doc, _) = filter::convert_filter(self.filter.clone(), true, false)?.render();
+
         // Builds a `$mergeObjects` operation to perform updates on each element of the to-many embeds.
         // The `FieldPath` used for the `$mergeObjects` is the alias constructed above, since we'll merge against
         // each elements of the to-many embeds. eg:
@@ -98,7 +99,7 @@ impl IntoUpdateExpression for UpdateMany {
                 "as": &elem_alias,
                 "in": {
                     "$cond": {
-                        "if": doc! { "$eq": [true, true] }, // TODO: stub predicate until read filters are done,
+                        "if": filter_doc,
                         "then": doc! { "$mergeObjects": [&ref_elem_alias, merge_doc.into_bson()?] },
                         "else": Bson::String(ref_elem_alias)
                     }

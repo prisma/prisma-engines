@@ -92,20 +92,21 @@ impl IntoUpdateOperation for CompositeWriteOperation {
 
                 vec![UpdateOperation::upsert(path, set, updates)]
             }
-            CompositeWriteOperation::UpdateMany { filter: _, update } => {
+            CompositeWriteOperation::UpdateMany { filter, update } => {
                 let elem_alias = format!("{}_item", path.identifier());
                 let updates = (*update).into_update_operations(field, FieldPath::new_from_alias(&elem_alias))?;
 
-                vec![UpdateOperation::update_many(path, elem_alias, updates)]
+                vec![UpdateOperation::update_many(path, filter, elem_alias, updates)]
             }
-            CompositeWriteOperation::DeleteMany { filter: _ } => {
+            CompositeWriteOperation::DeleteMany { filter } => {
                 let elem_alias = format!("{}_item", path.identifier());
+                let (filter_doc, _) = filter::convert_filter(filter, true, false)?.render();
 
                 let filter = doc! {
                     "$filter": {
                         "input": path.dollar_path(true),
                         "as": &elem_alias,
-                        "cond": { "$eq": [true, false] } // TODO: Stub predicate until read filters are done
+                        "cond": filter_doc
                     }
                 };
 

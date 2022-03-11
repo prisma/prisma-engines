@@ -154,8 +154,6 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
     }
 
     fn map_composite(&self, ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField {
-        dbg!(&cf);
-        dbg!(&self.with_unset_operation);
         // Shorthand object (equivalent to the "set" operation).
         let shorthand_type = InputType::Object(create::composite_create_object_type(ctx, cf));
 
@@ -410,11 +408,12 @@ fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
 
     ctx.cache_input_type(ident, input_object.clone());
 
+    let where_object_type = objects::filter_objects::where_object_type(ctx, &cf.typ);
+    let where_field = input_field(args::WHERE, InputType::object(where_object_type), None);
+
     // `unset` is removed within updateMany because we currently can't make it work
     let update_object_type = composite_update_object_type(ctx, cf, false);
     let data_field = input_field(args::DATA, InputType::Object(update_object_type), None);
-    // TODO(composite): replace stub where field with actual composite where input
-    let where_field = input_field(args::WHERE, InputType::boolean(), None);
 
     let fields = vec![where_field, data_field];
 
@@ -436,8 +435,8 @@ fn composite_delete_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
 
     ctx.cache_input_type(ident, input_object.clone());
 
-    // TODO(composite): replace stub where field with actual composite where input
-    let where_field = input_field(args::WHERE, InputType::boolean(), None);
+    let where_object_type = objects::filter_objects::where_object_type(ctx, &cf.typ);
+    let where_field = input_field(args::WHERE, InputType::object(where_object_type), None);
 
     let fields = vec![where_field];
 
