@@ -1,4 +1,7 @@
-use crate::error::{ConnectorError, ErrorKind};
+use crate::{
+    error::{ConnectorError, ErrorKind},
+    Filter,
+};
 use chrono::Utc;
 use indexmap::{map::Keys, IndexMap};
 use prisma_models::{
@@ -96,6 +99,17 @@ impl WriteOperation {
         })
     }
 
+    pub fn composite_update_many(filter: Filter, update: CompositeWriteOperation) -> Self {
+        Self::Composite(CompositeWriteOperation::UpdateMany {
+            filter,
+            update: Box::new(update),
+        })
+    }
+
+    pub fn composite_delete_many(filter: Filter) -> Self {
+        Self::Composite(CompositeWriteOperation::DeleteMany { filter })
+    }
+
     pub fn as_scalar(&self) -> Option<&ScalarWriteOperation> {
         if let Self::Scalar(v) = self {
             Some(v)
@@ -160,6 +174,13 @@ pub enum CompositeWriteOperation {
         set: Box<CompositeWriteOperation>,
         update: Box<CompositeWriteOperation>,
     },
+    UpdateMany {
+        filter: Filter,
+        update: Box<CompositeWriteOperation>,
+    },
+    DeleteMany {
+        filter: Filter,
+    },
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -169,7 +190,8 @@ pub struct NestedWrite {
 
 #[derive(Debug, Clone, Default)]
 pub struct FieldPath {
-    path: Vec<String>,
+    pub alias: Option<String>,
+    pub path: Vec<String>,
 }
 
 impl FieldPath {
@@ -180,20 +202,56 @@ impl FieldPath {
         path
     }
 
+    pub fn new_from_alias(alias: &str) -> Self {
+        Self {
+            alias: Some(alias.to_owned()),
+            path: vec![],
+        }
+    }
+
     pub fn add_segment(&mut self, field: &Field) {
         self.path.push(field.db_name().to_owned());
     }
 
-    pub fn path(&self) -> String {
-        self.path.join(".")
+    /// Removes the nth first segments of the path
+    pub fn drain(&mut self, n: usize) {
+        self.path.drain(0..n);
     }
 
-    pub fn dollar_path(&self) -> String {
-        format!("${}", self.path())
+    pub fn path(&self, include_alias: bool) -> String {
+        let rendered_path = self.path.join(".");
+
+        if !include_alias {
+            return rendered_path;
+        }
+
+        if let Some(alias) = &self.alias {
+            if self.path.is_empty() {
+                alias.to_owned()
+            } else {
+                format!("${}.{}", alias, rendered_path)
+            }
+        } else {
+            rendered_path
+        }
+    }
+
+    pub fn dollar_path(&self, include_alias: bool) -> String {
+        format!("${}", self.path(include_alias))
     }
 
     pub fn identifier(&self) -> String {
-        self.path.join("_")
+        let rendered_path = self.path.join("_");
+
+        if let Some(alias) = &self.alias {
+            if self.path.is_empty() {
+                alias.to_owned()
+            } else {
+                format!("{}_{}", alias, rendered_path)
+            }
+        } else {
+            rendered_path
+        }
     }
 }
 
