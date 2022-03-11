@@ -142,4 +142,11 @@ impl<'db> IndexWalker<'db> {
             model_attributes: &self.db.types.model_attributes[&self.model_id],
         }
     }
+
+    /// The field the model was defined on, if any.
+    pub fn source_field(self) -> Option<ScalarFieldWalker<'db>> {
+        self.index_attribute
+            .source_field
+            .map(|field_id| self.model().scalar_field(field_id))
+    }
 }

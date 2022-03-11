@@ -50,7 +50,7 @@ impl<'a> Reformatter<'a> {
                 let datasource = datasources.pop();
                 let missing_fields = Self::find_all_missing_fields(schema_ast, &datamodel, datasource.as_ref());
                 let missing_field_attributes =
-                    Self::find_all_missing_attributes(schema_ast, &datamodel, datasource.as_ref());
+                    find_all_missing_attributes(schema_ast, &db, &datamodel, datasource.as_ref());
                 let missing_relation_attribute_args = find_all_missing_relation_attribute_args(&db);
 
                 Reformatter {
@@ -94,40 +94,6 @@ impl<'a> Reformatter<'a> {
         }
 
         result
-    }
-
-    fn find_all_missing_attributes(
-        schema_ast: &SchemaAst,
-        datamodel: &dml::Datamodel,
-        datasource: Option<&Datasource>,
-    ) -> Vec<MissingFieldAttribute> {
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
-
-        let mut missing_field_attributes = Vec::new();
-        for model in datamodel.models() {
-            let ast_model = schema_ast.find_model(&model.name).unwrap();
-            for field in model.fields() {
-                let new_ast_field = lowerer.lower_field(model, field, datamodel);
-
-                if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
-                    for attribute in new_ast_field.attributes {
-                        if !original_field
-                            .attributes
-                            .iter()
-                            .any(|d| d.name.name == attribute.name.name)
-                        {
-                            missing_field_attributes.push(MissingFieldAttribute {
-                                model: model.name.clone(),
-                                field: field.name().to_string(),
-                                attribute,
-                            })
-                        }
-                    }
-                }
-            }
-        }
-
-        missing_field_attributes
     }
 
     fn reformat_internal(self, indent_width: usize) -> Result<String, &'a str> {
@@ -932,6 +898,65 @@ fn push_inline_relation_missing_arguments(
                 },
             };
             args.push(missing_arg);
+        }
+    }
+}
+
+fn find_all_missing_attributes(
+    schema_ast: &SchemaAst,
+    db: &ParserDatabase,
+    datamodel: &dml::Datamodel,
+    datasource: Option<&Datasource>,
+) -> Vec<MissingFieldAttribute> {
+    let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
+
+    let mut missing_field_attributes = Vec::new();
+    for model in datamodel.models() {
+        let ast_model = schema_ast.find_model(&model.name).unwrap();
+        for field in model.fields() {
+            let new_ast_field = lowerer.lower_field(model, field, datamodel);
+
+            if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
+                let relation_attribute = new_ast_field
+                    .attributes
+                    .iter()
+                    .find(|attr| attr.name.name == "relation");
+                if let Some(relation_attribute) = relation_attribute {
+                    if !original_field.attributes.iter().any(|d| d.name.name == "relation") {
+                        missing_field_attributes.push(MissingFieldAttribute {
+                            model: model.name.clone(),
+                            field: field.name().to_string(),
+                            attribute: relation_attribute.clone(),
+                        })
+                    }
+                }
+            }
+        }
+    }
+
+    push_missing_unique_attributes(db, &mut missing_field_attributes);
+
+    missing_field_attributes
+}
+
+fn push_missing_unique_attributes(db: &ParserDatabase, attributes: &mut Vec<MissingFieldAttribute>) {
+    // Missing `@unique`s.
+    let missing_unique_indexes = db
+        .walk_models()
+        .flat_map(|model| model.indexes())
+        .filter(|idx| idx.ast_attribute().is_none());
+
+    for missing_unique in missing_unique_indexes {
+        if let Some(field) = missing_unique.source_field() {
+            attributes.push(MissingFieldAttribute {
+                model: missing_unique.model().name().to_owned(),
+                field: field.name().to_owned(),
+                attribute: ast::Attribute {
+                    name: ast::Identifier::new("unique"),
+                    arguments: ast::ArgumentsList::default(),
+                    span: Span::empty(),
+                },
+            })
         }
     }
 }
