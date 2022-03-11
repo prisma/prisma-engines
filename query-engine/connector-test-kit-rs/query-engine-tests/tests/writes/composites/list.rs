@@ -1100,35 +1100,66 @@ mod update {
           }"#,
           2009,
           "Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.updateMany.CompositeAUpdateManyInput.data.CompositeAWithoutUnsetUpdateInput.to_one_b.CompositeBNullableWithoutUnsetUpdateEnvelopeInput.unset`: Field does not exist on enclosing type."
-      );
+        );
 
         // No unset in upsert in updateMany
         assert_error!(
-        runner,
-        r#"mutation {
-          updateOneTestModel(where: { id: 1 }, data: {
-            to_many_as: {
-              updateMany: {
-                where: true,
-                data: {
-                  to_one_b: {
-                    upsert: {
-                      set: {},
-                      update: {
-                        b_to_one_c: { unset: true }
+          runner,
+          r#"mutation {
+            updateOneTestModel(where: { id: 1 }, data: {
+              to_many_as: {
+                updateMany: {
+                  where: true,
+                  data: {
+                    to_one_b: {
+                      upsert: {
+                        set: {},
+                        update: {
+                          b_to_one_c: { unset: true }
+                        }
                       }
                     }
                   }
                 }
               }
+            }) {
+              id
             }
-          }) {
-            id
-          }
-        }"#,
-        2009,
-        "Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.updateMany.CompositeAUpdateManyInput.data.CompositeAWithoutUnsetUpdateInput.to_one_b.CompositeBNullableWithoutUnsetUpdateEnvelopeInput.upsert.CompositeBWithoutUnsetUpsertInput.update.CompositeBWithoutUnsetUpdateInput.b_to_one_c.CompositeCCreateInput.unset`: Field does not exist on enclosing type."
-    );
+          }"#,
+          2009,
+          "Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.updateMany.CompositeAUpdateManyInput.data.CompositeAWithoutUnsetUpdateInput.to_one_b.CompositeBNullableWithoutUnsetUpdateEnvelopeInput.upsert.CompositeBWithoutUnsetUpsertInput.update.CompositeBWithoutUnsetUpdateInput.b_to_one_c.CompositeCCreateInput.unset`: Field does not exist on enclosing type."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn delete_many_explicit(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+                  id: 1
+                  to_many_as: [{ a_1: "a1", a_2: 0 }, { a_1: "a1", a_2: 1 }, { a_1: "a2", a_2: 2 }]
+                }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(where: { id: 1 }, data: {
+              to_many_as: {
+                deleteMany: { where: true }
+              }
+            }) {
+              id
+              to_many_as {
+                a_1
+                a_2
+              }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[]}}}"###
+        );
 
         Ok(())
     }
