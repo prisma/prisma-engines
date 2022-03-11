@@ -620,11 +620,11 @@
 <span id="618">618</span>
 <span id="619">619</span>
 <span id="620">620</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::logger</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cursor</span>::{<span class="ident">CursorBuilder</span>, <span class="ident">CursorData</span>},
     <span class="ident">filter::convert_filter</span>,
     <span class="ident">join::JoinStage</span>,
+    <span class="ident">logger::log_read_query</span> <span class="kw">as</span> <span class="ident">log_query</span>,
     <span class="ident">orderby::OrderByBuilder</span>,
     <span class="ident">vacuum_cursor</span>, <span class="ident">BsonTransform</span>, <span class="ident">IntoBson</span>,
 };
