@@ -1,17 +1,17 @@
-use super::MongoReadQuery;
+use crate::query_builder::MongoReadQuery;
 use itertools::Itertools;
 use mongodb::{
     bson::{Bson, Document},
     options::FindOptions,
 };
 use std::fmt::Write;
+use tracing::debug;
 
 // Bare-bones logging impl for debugging.
-pub fn log_query(coll_name: &str, query: &MongoReadQuery) {
+pub(crate) fn log_read_query(coll_name: &str, query: &MongoReadQuery) {
     let mut buffer = String::new();
     fmt_query(&mut buffer, coll_name, query).unwrap();
-
-    tracing::debug!("{}", buffer);
+    debug!(target: "mongodb_query_connector::query", query = buffer.as_str(), item_type = "query", is_query = true);
 }
 
 macro_rules! write_indented {
@@ -129,4 +129,38 @@ fn fmt_val(buffer: &mut String, val: &Bson, depth: usize) -> std::fmt::Result {
         Bson::JavaScriptCode(_) => todo!(),
         Bson::JavaScriptCodeWithScope(_) => todo!(),
     }
+}
+
+pub(crate) fn log_insert_query(col: &str, doc: &Document) {
+    let mut buffer = String::new();
+
+    write!(&mut buffer, "db.{}.insertOne(", col).unwrap();
+    fmt_doc(&mut buffer, doc, 1).unwrap();
+    write!(&mut buffer, ")").unwrap();
+
+    debug!(target: "mongodb_query_connector::query", query = buffer.as_str(), item_type = "query", is_query = true);
+}
+
+pub(crate) fn log_update_query(col: &str, filter: &Document, docs: &Vec<Document>) {
+    let mut buffer = String::new();
+
+    write!(&mut buffer, "db.{}.updateMany(", col).unwrap();
+    fmt_doc(&mut buffer, filter, 1).unwrap();
+    write!(&mut buffer, ", [").unwrap();
+    for doc in docs {
+        fmt_doc(&mut buffer, doc, 1).unwrap();
+    }
+    write!(&mut buffer, "])").unwrap();
+
+    debug!(target: "mongodb_query_connector::query", query = buffer.as_str(), item_type = "query", is_query = true);
+}
+
+pub(crate) fn log_delete_query(col: &str, filter: &Document) {
+    let mut buffer = String::new();
+
+    write!(&mut buffer, "db.{}.deleteMany(", col).unwrap();
+    fmt_doc(&mut buffer, filter, 1).unwrap();
+    write!(&mut buffer, ")").unwrap();
+
+    debug!(target: "mongodb_query_connector::query", query = buffer.as_str(), item_type = "query", is_query = true);
 }

@@ -1,10 +1,9 @@
-use super::logger::*;
 use crate::{
     cursor::{CursorBuilder, CursorData},
     filter::convert_filter,
     join::JoinStage,
     orderby::OrderByBuilder,
-    vacuum_cursor, BsonTransform, IntoBson,
+    vacuum_cursor, BsonTransform, IntoBson, logger::log_read_query as log_query,
 };
 use connector_interface::{AggregationSelection, Filter, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;

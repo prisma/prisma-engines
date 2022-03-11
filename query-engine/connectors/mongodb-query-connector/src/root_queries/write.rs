@@ -4,8 +4,9 @@ use crate::{
     output_meta,
     query_builder::MongoReadQueryBuilder,
     root_queries::raw::{MongoCommand, MongoOperation},
-    IntoBson,
+    IntoBson, logger::{log_insert_query, log_update_query, log_delete_query},
 };
+
 use connector_interface::*;
 use mongodb::{
     bson::{doc, Document},
@@ -15,6 +16,7 @@ use mongodb::{
 };
 use prisma_models::{ModelRef, PrismaValue, SelectionResult};
 use std::{collections::HashMap, convert::TryInto};
+use std::fmt::Write;
 use update_utils::{IntoUpdateDocumentExtension, IntoUpdateOperationExtension};
 
 /// Create a single record to the database resulting in a
@@ -52,6 +54,8 @@ pub async fn create_record<'conn>(
         let bson = (&field, value).into_bson()?;
         doc.insert(field.db_name().to_owned(), bson);
     }
+
+    log_insert_query(coll.name(), &doc);
 
     let insert_result = coll.insert_one_with_session(doc, None, session).await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
@@ -100,6 +104,8 @@ pub async fn create_records<'conn>(
     // the operation and throw an error afterwards that we must handle.
     let options = Some(InsertManyOptions::builder().ordered(!skip_duplicates).build());
 
+    // TODO: Insert many
+    dbg!("Insert many...");
     match coll.insert_many_with_session(docs, options, session).await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
         Err(err) if skip_duplicates => match err.kind.as_ref() {
@@ -167,6 +173,7 @@ pub async fn update_records<'conn>(
     }
 
     if !update_docs.is_empty() {
+        log_update_query(coll.name(), &filter, &update_docs);
         coll.update_many_with_session(filter, update_docs, None, session)
             .await?;
     }
@@ -208,6 +215,8 @@ pub async fn delete_records<'conn>(
     }
 
     let filter = doc! { id_field.db_name(): { "$in": ids } };
+    // TODO: delete query
+    log_delete_query(coll.name(), &filter);
     let delete_result = coll.delete_many_with_session(filter, None, session).await?;
 
     Ok(delete_result.deleted_count as usize)
