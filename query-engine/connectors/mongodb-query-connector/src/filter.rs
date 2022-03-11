@@ -42,9 +42,11 @@ pub(crate) fn convert_filter(
     filter: Filter,
     invert: bool,
     is_having_filter: bool,
-    prefix: FilterPrefix,
+    prefix: impl Into<FilterPrefix>,
 ) -> crate::Result<MongoFilter> {
+    let prefix = prefix.into();
     let filter = fold_compounds(filter);
+
     let filter_pair = match filter {
         Filter::And(filters) if invert => coerce_empty(false, "$or", filters, invert, is_having_filter, prefix)?,
         Filter::And(filters) => coerce_empty(true, "$and", filters, invert, is_having_filter, prefix)?,
@@ -593,5 +595,11 @@ impl From<&CompositeFieldRef> for FilterPrefix {
         Self {
             parts: vec![cf.db_name().to_owned()],
         }
+    }
+}
+
+impl From<String> for FilterPrefix {
+    fn from(alias: String) -> Self {
+        Self { parts: vec![alias] }
     }
 }
