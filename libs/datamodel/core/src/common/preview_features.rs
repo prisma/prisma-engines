@@ -1,4 +1,3 @@
-use once_cell::sync::Lazy;
 use serde::{Serialize, Serializer};
 use std::fmt;
 use PreviewFeature::*;
@@ -71,75 +70,81 @@ features!(
 // features are valid in which place in the datamodel.
 
 /// Generator preview features
-pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
-    FeatureMap::default()
-        .with_active(vec![
-            FilterJson,
-            ReferentialIntegrity,
-            MongoDb,
-            InteractiveTransactions,
-            FullTextSearch,
-            FullTextIndex,
-            DataProxy,
-            ExtendedIndexes,
-            Cockroachdb,
-            Tracing,
-        ])
-        .with_deprecated(vec![
-            AtomicNumberOperations,
-            AggregateApi,
-            Middlewares,
-            NamedConstraints,
-            NativeTypes,
-            Distinct,
-            ConnectOrCreate,
-            TransactionApi,
-            UncheckedScalarInputs,
-            GroupBy,
-            CreateMany,
-            MicrosoftSqlServer,
-            SelectRelationCount,
-            OrderByAggregateGroup,
-            OrderByRelation,
-            ReferentialActions,
-            NApi,
-        ])
-});
+pub const GENERATOR: FeatureMap = FeatureMap::new()
+    .with_active(&[
+        FilterJson,
+        ReferentialIntegrity,
+        MongoDb,
+        InteractiveTransactions,
+        FullTextSearch,
+        FullTextIndex,
+        DataProxy,
+        ExtendedIndexes,
+        Cockroachdb,
+        Tracing,
+    ])
+    .with_deprecated(&[
+        AtomicNumberOperations,
+        AggregateApi,
+        Middlewares,
+        NamedConstraints,
+        NativeTypes,
+        Distinct,
+        ConnectOrCreate,
+        TransactionApi,
+        UncheckedScalarInputs,
+        GroupBy,
+        CreateMany,
+        MicrosoftSqlServer,
+        SelectRelationCount,
+        OrderByAggregateGroup,
+        OrderByRelation,
+        ReferentialActions,
+        NApi,
+    ]);
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct FeatureMap {
     /// Valid, visible features.
-    active: Vec<PreviewFeature>,
+    active: &'static [PreviewFeature],
 
     /// Deprecated features.
-    deprecated: Vec<PreviewFeature>,
+    deprecated: &'static [PreviewFeature],
 
     /// Hidden preview features are valid features, but are not propagated into the tooling
     /// (as autocomplete or similar) or into error messages (eg. showing a list of valid features).
-    hidden: Vec<PreviewFeature>,
+    hidden: &'static [PreviewFeature],
 }
 
 impl FeatureMap {
+    const fn new() -> Self {
+        FeatureMap {
+            active: &[],
+            deprecated: &[],
+            hidden: &[],
+        }
+    }
+
     pub fn active_features(&self) -> &[PreviewFeature] {
-        &self.active
+        self.active
     }
 
     pub fn hidden_features(&self) -> &[PreviewFeature] {
-        &self.hidden
+        self.hidden
     }
 
-    fn with_active(mut self, active: Vec<PreviewFeature>) -> Self {
+    const fn with_active(mut self, active: &'static [PreviewFeature]) -> Self {
         self.active = active;
         self
     }
 
     #[allow(dead_code)]
-    fn with_hidden(mut self, hidden: Vec<PreviewFeature>) -> Self {
+    const fn with_hidden(mut self, hidden: &'static [PreviewFeature]) -> Self {
         self.hidden = hidden;
         self
     }
 
-    fn with_deprecated(mut self, deprecated: Vec<PreviewFeature>) -> Self {
+    const fn with_deprecated(mut self, deprecated: &'static [PreviewFeature]) -> Self {
         self.deprecated = deprecated;
         self
     }
