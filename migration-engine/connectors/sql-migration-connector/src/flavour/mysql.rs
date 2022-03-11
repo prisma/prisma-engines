@@ -74,7 +74,18 @@ impl MysqlFlavour {
 
 impl SqlFlavour for MysqlFlavour {
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        with_connection(&mut self.state, |_, _, connection| async move {
+        with_connection(&mut self.state, |params, _, connection| async move {
+            // We do not acquire advisory locks on PlanetScale instances.
+            //
+            // Advisory locking is supported on vitess (docs:
+            // https://vitess.io/docs/12.0/design-docs/query-serving/locking-functions/), but
+            // PlanetScale errors if the lock is held for longer than 20 seconds, making it
+            // impractical. The recommended planetscale workflow with branching should open
+            // fewer chances for race conditions to happen — that's the reasoning.
+            if is_planetscale(&params.connector_params.connection_string) {
+                return Ok(());
+            }
+
             // https://dev.mysql.com/doc/refman/8.0/en/locking-functions.html
             let query = format!("SELECT GET_LOCK('prisma_migrate', {})", ADVISORY_LOCK_TIMEOUT.as_secs());
             Ok(connection.raw_cmd(&query).await?)
@@ -611,4 +622,9 @@ fn convert_server_error(circumstances: BitFlags<Circumstances>, error: &my::Erro
     } else {
         None
     }
+}
+
+/// This bit of logic was given to us by a PlanetScale engineer.
+fn is_planetscale(connection_string: &str) -> bool {
+    connection_string.contains(".psdb.cloud")
 }
