@@ -205,7 +205,15 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
             (TypeIdentifier::BigInt, PrismaValue::Float(dec)) => Bson::Int64(dec.to_i64().convert(expl::MONGO_I64)?),
 
             // Float
-            (TypeIdentifier::Float, PrismaValue::Float(dec)) => Bson::Double(dec.to_f64().convert(expl::MONGO_DOUBLE)?),
+            (TypeIdentifier::Float, PrismaValue::Float(dec)) => {
+                // We don't have native support for float numbers (yet)
+                // so we need to do this, see https://docs.rs/bigdecimal/latest/bigdecimal/index.html
+                let dec_str = dec.to_string();
+                let f64_val = dec_str.parse::<f64>().ok();
+                let converted = f64_val.convert(expl::MONGO_DOUBLE)?;
+
+                Bson::Double(converted)
+            }
             (TypeIdentifier::Float, PrismaValue::Int(i)) => Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)?),
             (TypeIdentifier::Float, PrismaValue::BigInt(i)) => Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)?),
 
