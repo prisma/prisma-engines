@@ -481,9 +481,6 @@ mod update {
         Ok(())
     }
 
-    // TODO(mongo, precision): Suffers from precision issues on Float
-    // These precision issues should be gone once the floating point fixes effort is done
-    // Note: These precision issues are created within Prisma's MongoDB connector, not within MongoDB.
     #[connector_test(schema(schema_6), only(MongoDb))]
     async fn update_apply_number_ops_for_float_mongo(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1 }"#).await?;

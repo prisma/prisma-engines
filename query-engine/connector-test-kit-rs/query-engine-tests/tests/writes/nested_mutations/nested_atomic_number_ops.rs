@@ -392,9 +392,6 @@ mod atomic_number_ops {
         Ok(())
     }
 
-    // TODO(mongo, precision): Suffers from precision issues on Float
-    // These precision issues should be gone once the floating point fixes effort is done
-    // Note: These precision issues are created within Prisma's MongoDB connector, not within MongoDB.
     #[connector_test(schema(schema_3), only(MongoDb))]
     async fn nested_update_float_ops_mongo(runner: Runner) -> TestResult<()> {
         create_test_model(&runner, 1, None, None).await?;
