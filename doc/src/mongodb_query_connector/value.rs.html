@@ -450,6 +450,14 @@
 <span id="448">448</span>
 <span id="449">449</span>
 <span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">output_meta</span>::{<span class="ident">CompositeOutputMeta</span>, <span class="ident">OutputMeta</span>, <span class="ident">ScalarOutputMeta</span>},
     <span class="ident">IntoBson</span>, <span class="ident">MongoError</span>,
@@ -657,7 +665,15 @@
             (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">dec</span>.<span class="ident">to_i64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I64</span>)<span class="question-mark">?</span>),
 
             <span class="comment">// Float</span>
-            (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">dec</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
+            (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) =&gt; {
+                <span class="comment">// We don&#39;t have native support for float numbers (yet)</span>
+                <span class="comment">// so we need to do this, see https://docs.rs/bigdecimal/latest/bigdecimal/index.html</span>
+                <span class="kw">let</span> <span class="ident">dec_str</span> <span class="op">=</span> <span class="ident">dec</span>.<span class="ident">to_string</span>();
+                <span class="kw">let</span> <span class="ident">f64_val</span> <span class="op">=</span> <span class="ident">dec_str</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>().<span class="ident">ok</span>();
+                <span class="kw">let</span> <span class="ident">converted</span> <span class="op">=</span> <span class="ident">f64_val</span>.<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>;
+
+                <span class="ident">Bson::Double</span>(<span class="ident">converted</span>)
+            }
             (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
             (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
 
