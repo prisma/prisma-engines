@@ -340,7 +340,4 @@ mod is {
 
         Ok(())
     }
-
-    // Tests:
-    // - Using relation hops.
 }

@@ -216,7 +216,7 @@ mod to_many {
         assert_error!(
             runner,
             r#"{
-                findManyTestModel(where: { equals: { a_1: "Test", a_2: 0 } }}) {
+                findManyTestModel(where: { to_many_as: { equals: { a_1: "Test", a_2: 0 } }}) {
                     id
                 }
             }"#,
@@ -228,7 +228,7 @@ mod to_many {
     }
 }
 
-#[test_suite(schema(to_one_composites))]
+#[test_suite(schema(to_one_composites), only(MongoDb))]
 mod to_one {
     #[connector_test]
     async fn basic(runner: Runner) -> TestResult<()> {

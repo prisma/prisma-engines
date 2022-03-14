@@ -109,6 +109,49 @@ async fn create_to_one_test_data(runner: &Runner) -> TestResult<()> {
     Ok(())
 }
 
+/// Basic to-many test data.
+#[rustfmt::skip]
+async fn create_combination_test_data(runner: &Runner) -> TestResult<()> {
+    // A few with full data
+    create_row(runner, r#"{
+        id: 1,
+        to_many_as: [ { a_1: "foo1", a_2: 1 },  { a_1: "foo2", a_2: 10 },  { a_1: "oof", a_2: 100 } ]
+        to_one_b: { b_field: 1, b_to_many_cs: [ { c_field: 10 }, { c_field: 20 }, { c_field: 30 }] }
+    }"#).await?;
+
+    create_row(runner, r#"{
+        id: 2,
+        to_many_as: [ { a_1: "test1", a_2: 1 }, { a_1: "test2", a_2: 10 }, { a_1: "test3", a_2: 100 } ]
+        to_one_b: { b_field: -1, b_to_many_cs: [ { c_field: 10 }, { c_field: -10 } ] }
+    }"#).await?;
+
+    create_row(runner, r#"{
+        id: 3,
+        to_many_as: [ { a_1: "oof", a_2: 100 }, { a_1: "ofo", a_2: 100 },  { a_1: "oof", a_2: -10 } ]
+        to_one_b: { b_field: 10, b_to_many_cs: [ { c_field: 0 }, { c_field: 100 } ] }
+    }"#).await?;
+
+    create_row(runner, r#"{
+        id: 4,
+        to_many_as: [ { a_1: "test", a_2: -5 }, { a_1: "Test", a_2: 0 } ]
+        to_one_b: { b_field: -100, b_to_many_cs: [ { c_field: 10 } ] }
+    }"#).await?;
+
+    // A few with empty as, but some b
+    create_row(runner, r#"{ id: 6, to_many_as: [], to_one_b: { b_field: 2, b_to_many_cs: [ { c_field: 100} ] } }"#).await?;
+    create_row(runner, r#"{ id: 7, to_many_as: [], to_one_b: { b_field: -2, b_to_many_cs: [ { c_field: -10} ] } }"#).await?;
+
+    // A few with empty as and no b
+    create_row(runner, r#"{ id: 8, to_many_as: [], to_one_b: null }"#).await?;
+    create_row(runner, r#"{ id: 9, to_many_as: [], to_one_b: null }"#).await?;
+
+    // A few with no list and no b - this will cause undefined fields!
+    create_row(runner, r#"{ id: 10 }"#).await?;
+    create_row(runner, r#"{ id: 11 }"#).await?;
+
+    Ok(())
+}
+
 async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
     runner
         .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
