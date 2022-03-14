@@ -378,6 +378,7 @@ fn populate_fields(
         let most_common_type = percentages.find_most_common();
 
         let field_type = match &most_common_type {
+            Some(_) if percentages.has_type_variety() => FieldType::Json,
             Some(field_type) => field_type.to_owned(),
             None => FieldType::Json,
         };

@@ -41,7 +41,7 @@ fn mixed_id_types() {
     let expected = expect![[r#"
         model A {
           /// Multiple data types found: String: 33.3%, ObjectId: 33.3%, Int32: 33.3% out of 3 sampled entries
-          id  Int      @id @map("_id")
+          id  Json     @id @map("_id")
           foo Boolean?
         }
     "#]];
@@ -65,19 +65,21 @@ fn mixing_types() {
         model A {
           id    String @id @default(auto()) @map("_id") @db.ObjectId
           /// Multiple data types found: String: 50%, Int32: 50% out of 3 sampled entries
-          first Int?
+          first Json?
         }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
     res.assert_warning_code(101);
-    res.assert_warning("The following fields had data stored in multiple types. The most common type was chosen. If loading data with a type that does not match the one in the data model, the client will crash. Please see the issue: https://github.com/prisma/prisma/issues/9654");
+    res.assert_warning(
+        "The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type.",
+    );
 
     res.assert_warning_affected(&json!([{
         "model": "A",
         "field": "first",
-        "tpe": "Int32",
+        "tpe": "Document",
     }]));
 }
 
@@ -100,38 +102,9 @@ fn mixing_types_with_the_same_base_type() {
 
     let expected = expect![[r#"
         model A {
-          id    String    @id @default(auto()) @map("_id") @db.ObjectId
-          /// Multiple data types found: Date: 50%, Timestamp: 50% out of 3 sampled entries
-          first DateTime?
-        }
-    "#]];
-
-    expected.assert_eq(res.datamodel());
-
-    res.assert_warning_affected(&json!([{
-        "model": "A",
-        "field": "first",
-        "tpe": "Timestamp",
-    }]));
-}
-
-#[test]
-fn the_most_common_type_wins() {
-    let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
-        let collection = db.collection("A");
-        let docs = vec![doc! {"first": "Musti"}, doc! {"first": "Naukio"}, doc! {"first": false}];
-
-        collection.insert_many(docs, None).await.unwrap();
-
-        Ok(())
-    });
-
-    let expected = expect![[r#"
-        model A {
           id    String @id @default(auto()) @map("_id") @db.ObjectId
-          /// Multiple data types found: String: 66.7%, Boolean: 33.3% out of 3 sampled entries
-          first String
+          /// Multiple data types found: Date: 50%, Timestamp: 50% out of 3 sampled entries
+          first Json?
         }
     "#]];
 
@@ -140,6 +113,6 @@ fn the_most_common_type_wins() {
     res.assert_warning_affected(&json!([{
         "model": "A",
         "field": "first",
-        "tpe": "String",
+        "tpe": "Document",
     }]));
 }
