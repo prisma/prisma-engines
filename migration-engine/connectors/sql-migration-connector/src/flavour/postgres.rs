@@ -119,7 +119,11 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     fn connector_type(&self) -> &'static str {
-        "postgresql"
+        if self.is_cockroach {
+            "cockroachdb"
+        } else {
+            "postgresql"
+        }
     }
 
     fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
