@@ -39,6 +39,7 @@ pub fn parse(input_map: ParsedInputMap, field: &CompositeFieldRef, _reverse: boo
             ))),
         }
     } else {
-        todo!()
+        // Equality shorthand
+        Ok(field.equals(ParsedInputValue::Map(input_map).try_into()?))
     }
 }

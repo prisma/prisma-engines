@@ -495,7 +495,6 @@ fn to_regex(
 
 fn composite_filter(filter: CompositeFilter, invert: bool, prefix: FilterPrefix) -> crate::Result<MongoFilter> {
     let field = filter.field;
-    let composite_name = field.db_name();
 
     let filter_doc = match *filter.condition {
         CompositeCondition::Every(filter) => {
@@ -536,23 +535,27 @@ fn composite_filter(filter: CompositeFilter, invert: bool, prefix: FilterPrefix)
 
         CompositeCondition::Is(filter) => {
             let (nested_filter, _) =
-                convert_filter(filter, invert, false, prefix.append_cloned(field.db_name()))?.render();
+                convert_filter(filter, invert, false, prefix.clone().append_cloned(field.db_name()))?.render();
 
             return Ok(MongoFilter::Composite(nested_filter));
         }
 
         CompositeCondition::IsNot(filter) => {
             let (nested_filter, _) =
-                convert_filter(filter, !invert, false, prefix.append_cloned(field.db_name()))?.render();
+                convert_filter(filter, !invert, false, prefix.clone().append_cloned(field.db_name()))?.render();
 
             return Ok(MongoFilter::Composite(nested_filter));
         }
     };
 
+    let field_filter_name = prefix.render_with(field.db_name().into());
+
     if invert {
-        Ok(MongoFilter::Composite(doc! { composite_name: { "$not": filter_doc }}))
+        Ok(MongoFilter::Composite(
+            doc! { field_filter_name: { "$not": filter_doc }},
+        ))
     } else {
-        Ok(MongoFilter::Composite(doc! { composite_name: filter_doc }))
+        Ok(MongoFilter::Composite(doc! { field_filter_name: filter_doc }))
     }
 }
 

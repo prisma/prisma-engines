@@ -227,3 +227,65 @@ mod to_many {
         Ok(())
     }
 }
+
+#[test_suite(schema(to_one_composites))]
+mod to_one {
+    #[connector_test]
+    async fn basic(runner: Runner) -> TestResult<()> {
+        create_to_one_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                    findManyTestModel(where: {
+                        a: {
+                            a_1: "foo1"
+                            a_2: 1
+                            b: { b_field: "b_nested_1", c: { c_field: "c_field default" } }
+                        }
+                    }) {
+                        id
+                    }
+                }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                      findManyTestModel(where: {
+                          NOT: [{ a: {
+                              a_1: "foo1"
+                              a_2: 1
+                              b: { b_field: "b_nested_1", c: { c_field: "c_field default" } }
+                          } }]
+                      }) {
+                          id
+                      }
+                  }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3},{"id":4},{"id":5},{"id":6}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn field_order_matters(runner: Runner) -> TestResult<()> {
+        create_to_one_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                    findManyTestModel(where: {
+                        a: {
+                            a_2: 1
+                            a_1: "foo1"
+                            b: { b_field: "b_nested_1", c: { c_field: "c_field default" } }
+                        }
+                    }) {
+                        id
+                    }
+                }"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        Ok(())
+    }
+}

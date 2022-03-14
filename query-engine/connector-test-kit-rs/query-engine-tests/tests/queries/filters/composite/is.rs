@@ -166,6 +166,22 @@ mod is {
 
         insta::assert_snapshot!(
           run_query!(runner, r#"{
+                        findManyTestModel(where: {
+                            a: {
+                                isNot: {
+                                    a_1: { contains: "oo" }
+                                    a_2: { lt: 10 }
+                                }
+                            }
+                        }) {
+                            id
+                        }
+                    }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5},{"id":6}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
                       findManyTestModel(where: {
                           NOT: [
                               {
@@ -186,11 +202,145 @@ mod is {
           @r###"{"data":{"findManyTestModel":[{"id":3},{"id":5}]}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                          findManyTestModel(where: {
+                              a: {
+                                  isNot: {
+                                      OR: [
+                                          { a_1: { contains: "oo" } },
+                                          { a_2: { lt: 10 } }
+                                      ]
+                                  }
+                              }
+                          }) {
+                              id
+                          }
+                      }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":3},{"id":5}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn multiple_hops(runner: Runner) -> TestResult<()> {
+        create_to_one_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                    findManyTestModel(where: {
+                        a: {
+                            is: {
+                                b: {
+                                    is: { b_field: "test" }
+                                }
+                            }
+                        }
+                    }) {
+                        id
+                    }
+                }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                      findManyTestModel(where: {
+                          NOT: [
+                            {
+                                a: {
+                                    is: {
+                                        b: {
+                                            is: { b_field: "test" }
+                                        }
+                                    }
+                                }
+                            }
+                          ]
+                      }) {
+                          id
+                      }
+                  }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":5},{"id":6}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                      findManyTestModel(where: {
+                          a: {
+                              is: {
+                                  b: {
+                                      is: {
+                                          OR: [
+                                              { b_field: "test" },
+                                              { c: { c_field: "c_field default" } },
+                                          ]
+                                      }
+                                  }
+                              }
+                          }
+                      }) {
+                          id
+                      }
+                  }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":6}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+            findManyTestModel(
+              where: {
+                a: {
+                  is: {
+                    NOT: [
+                      {
+                        b: {
+                          is: {
+                            OR: [
+                              { b_field: "test" }
+                              { c: { c_field: "c_field default" } }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ) {
+              id
+            }
+          }
+          "#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn insensitive_must_work(runner: Runner) -> TestResult<()> {
+        create_to_one_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                    findManyTestModel(where: {
+                        a: {
+                            is: {
+                                a_1: { contains: "Test", mode: insensitive }
+                            }
+                        }
+                    }) {
+                        id
+                    }
+                }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        );
+
         Ok(())
     }
 
     // Tests:
     // - Using relation hops.
-    // - Insensitive
-    // -
 }
