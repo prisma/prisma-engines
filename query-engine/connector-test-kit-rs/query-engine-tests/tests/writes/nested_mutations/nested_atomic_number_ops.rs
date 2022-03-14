@@ -437,17 +437,17 @@ mod atomic_number_ops {
         );
         insta::assert_snapshot!(
           query_nested_number_ops(&runner, 2, "optFloat", "divide", "2").await?,
-          @r###"{"optFloat":5.500000000000001}"###
+          @r###"{"optFloat":5.5}"###
         );
 
         // Set
         insta::assert_snapshot!(
           query_nested_number_ops(&runner, 1, "optFloat", "set", "5.1").await?,
-          @r###"{"optFloat":5.100000000000001}"###
+          @r###"{"optFloat":5.1}"###
         );
         insta::assert_snapshot!(
           query_nested_number_ops(&runner, 2, "optFloat", "set", "5.1").await?,
-          @r###"{"optFloat":5.100000000000001}"###
+          @r###"{"optFloat":5.1}"###
         );
 
         // Set null

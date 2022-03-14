@@ -506,7 +506,7 @@ mod update {
         );
         insta::assert_snapshot!(
           query_number_operation(&runner, "2", "optFloat", "decrement", "4.6").await?,
-          @r###"{"data":{"updateOneTestModel":{"optFloat":5.500000000000001}}}"###
+          @r###"{"data":{"updateOneTestModel":{"optFloat":5.5}}}"###
         );
 
         // Multiply
