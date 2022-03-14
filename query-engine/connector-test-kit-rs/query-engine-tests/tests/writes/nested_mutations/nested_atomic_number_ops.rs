@@ -417,7 +417,7 @@ mod atomic_number_ops {
         );
         insta::assert_snapshot!(
           query_nested_number_ops(&runner, 2, "optFloat", "decrement", "4.6").await?,
-          @r###"{"optFloat":5.500000000000001}"###
+          @r###"{"optFloat":5.5}"###
         );
 
         // Multiply
