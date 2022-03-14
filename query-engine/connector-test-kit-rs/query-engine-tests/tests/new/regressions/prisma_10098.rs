@@ -36,4 +36,25 @@ mod mongodb {
 
         Ok(())
     }
+
+    #[connector_test]
+    async fn lte_works_with_floating_numbers(runner: Runner) -> TestResult<()> {
+        runner
+            .query(r#"mutation { createOneCourse(data: {}) { id } }"#)
+            .await?
+            .assert_success();
+
+        assert_query!(
+            runner,
+            r#"query {
+            aggregateCourse(where: {
+              rating: {
+                lte: 3.5
+              }
+            }) { _count {id} }}"#,
+            r#"{"data":{"aggregateCourse":{"_count":{"id":1}}}}"#
+        );
+
+        Ok(())
+    }
 }
