@@ -3,8 +3,7 @@ use crate::{
     constants::filters, ObjectTag, ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{CompositeCompare, Filter};
-use datamodel::PrismaValue;
-use prisma_models::CompositeFieldRef;
+use prisma_models::{CompositeFieldRef, PrismaValue};
 use std::convert::TryInto;
 
 pub fn parse(input_map: ParsedInputMap, field: &CompositeFieldRef, _reverse: bool) -> QueryGraphBuilderResult<Filter> {
