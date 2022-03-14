@@ -51,7 +51,7 @@ fn dirty_data() {
     let expected = expect![[r#"
         type CatAddress {
           /// Multiple data types found: String: 66.7%, Int32: 33.3% out of 3 sampled entries
-          number String
+          number Json
           street String
         }
 
@@ -67,7 +67,7 @@ fn dirty_data() {
     res.assert_warning_affected(&json!([{
         "compositeType": "CatAddress",
         "field": "number",
-        "tpe": "String",
+        "tpe": "Document",
     }]));
 }
 
