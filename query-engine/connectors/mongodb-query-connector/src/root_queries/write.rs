@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     filter::{convert_filter, FilterPrefix, MongoFilter},
-    output_meta,
+    logger, output_meta,
     query_builder::MongoReadQueryBuilder,
     root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
