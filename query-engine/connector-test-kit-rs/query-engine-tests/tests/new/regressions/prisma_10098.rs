@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), only(MongoDb))]
 mod mongodb {
     use indoc::indoc;
 
