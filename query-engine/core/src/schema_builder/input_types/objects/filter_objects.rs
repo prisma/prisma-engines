@@ -1,5 +1,6 @@
 use super::*;
 use constants::filters;
+use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 use std::sync::Arc;
 
 #[tracing::instrument(skip(ctx, model, include_aggregates))]
@@ -44,9 +45,13 @@ pub(crate) fn scalar_filter_object_type(
     weak_ref
 }
 
-#[tracing::instrument(skip(ctx, model))]
-pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(format!("{}WhereInput", model.name), PRISMA_NAMESPACE);
+#[tracing::instrument(skip(ctx, container))]
+pub(crate) fn where_object_type<T>(ctx: &mut BuilderContext, container: T) -> InputObjectTypeWeakRef
+where
+    T: Into<ParentContainer>,
+{
+    let container = container.into();
+    let ident = Identifier::new(format!("{}WhereInput", container.name()), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -71,10 +76,10 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
         .optional(),
     ];
 
-    let input_fields = model.fields().all.iter().filter_map(|f| match f {
-        ModelField::Composite(_) => None,
-        f => Some(input_fields::filter_input_field(ctx, f, false)),
-    });
+    let input_fields = container
+        .fields()
+        .into_iter()
+        .map(|f| input_fields::filter_input_field(ctx, &f, false));
 
     fields.extend(input_fields);
 
@@ -93,7 +98,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     let input_object = Arc::new(x);
     ctx.cache_input_type(ident, input_object.clone());
 
-    //TODO (dom) this can probably be collapsed into just uniques and pks
+    // TODO (dom): This can probably be collapsed into just uniques and pks
     // Single unique or ID fields.
     let unique_fields: Vec<ScalarFieldRef> = model.fields().scalar().into_iter().filter(|f| f.unique()).collect();
 
@@ -168,5 +173,44 @@ fn compound_field_unique_object_type(
         .collect();
 
     input_object.set_fields(object_fields);
+    Arc::downgrade(&input_object)
+}
+
+/// Object used for full composite equality, e.g. `{ field: "value", field2: 123 } == { field: "value" }`.
+/// If the composite is a list, only lists are allowed for comparison, no shorthands are used.
+pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    let ident = Identifier::new(format!("{}ObjectEqualityInput", cf.typ.name), PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let mut fields = vec![];
+
+    let input_fields = cf.typ.fields().into_iter().map(|f| match f {
+        ModelField::Scalar(sf) => input_field(sf.name.clone(), map_scalar_input_type_for_field(ctx, &sf), None)
+            .optional_if(!sf.is_required())
+            .nullable_if(!sf.is_required() && !sf.is_list()),
+
+        ModelField::Composite(cf) => {
+            let mut types = vec![];
+
+            if cf.is_list() {
+                types.push(InputType::list(InputType::object(composite_equality_object(ctx, cf))));
+            } else {
+                types.push(InputType::object(composite_equality_object(ctx, cf)));
+            }
+
+            input_field(cf.name.clone(), types, None)
+                .optional_if(!cf.is_required())
+                .nullable_if(!cf.is_required() && !cf.is_list())
+        }
+
+        ModelField::Relation(_) => unimplemented!(),
+    });
+
+    fields.extend(input_fields);
+    input_object.set_fields(fields);
+
     Arc::downgrade(&input_object)
 }

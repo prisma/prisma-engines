@@ -156,3 +156,30 @@ pub trait JsonCompare {
     where
         T: Into<PrismaValue>;
 }
+
+/// Comparison methods for composite fields.
+pub trait CompositeCompare {
+    fn every<T>(&self, filter: T) -> Filter
+    where
+        T: Into<Filter>;
+
+    fn some<T>(&self, filter: T) -> Filter
+    where
+        T: Into<Filter>;
+
+    fn none<T>(&self, filter: T) -> Filter
+    where
+        T: Into<Filter>;
+
+    fn is<T>(&self, filter: T) -> Filter
+    where
+        T: Into<Filter>;
+
+    fn is_not<T>(&self, filter: T) -> Filter
+    where
+        T: Into<Filter>;
+
+    fn is_empty(&self, b: bool) -> Filter;
+
+    fn equals(&self, val: PrismaValue) -> Filter;
+}

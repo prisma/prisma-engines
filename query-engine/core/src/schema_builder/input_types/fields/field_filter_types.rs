@@ -3,7 +3,7 @@ use super::*;
 use crate::constants::json_null;
 use constants::{aggregations, filters};
 use datamodel_connector::ConnectorCapability;
-use prisma_models::{dml::DefaultValue, PrismaValue};
+use prisma_models::{dml::DefaultValue, CompositeFieldRef, PrismaValue};
 
 /// Builds filter types for the given model field.
 #[tracing::instrument(skip(ctx, field, include_aggregates))]
@@ -13,13 +13,29 @@ pub(crate) fn get_field_filter_types(
     include_aggregates: bool,
 ) -> Vec<InputType> {
     match field {
-        ModelField::Relation(rf) => {
-            let mut types = vec![InputType::object(full_relation_filter(ctx, rf))];
-            types.extend(mto1_relation_filter_shorthand_types(ctx, rf));
-            types
+        ModelField::Relation(rf) if rf.is_list() => {
+            vec![InputType::object(to_many_relation_filter_object(ctx, rf))]
         }
-        ModelField::Composite(_) => vec![InputType::int()], // [Composites] todo
+
+        ModelField::Relation(rf) => {
+            vec![
+                InputType::object(to_one_relation_filter_object(ctx, rf)),
+                to_one_relation_filter_shorthand_types(ctx, rf),
+            ]
+        }
+
+        ModelField::Composite(cf) if cf.is_list() => vec![
+            InputType::object(to_many_composite_filter_object(ctx, cf)),
+            InputType::list(to_one_composite_filter_shorthand_types(ctx, cf)),
+        ],
+
+        ModelField::Composite(cf) => vec![
+            InputType::object(to_one_composite_filter_object(ctx, cf)),
+            to_one_composite_filter_shorthand_types(ctx, cf),
+        ],
+
         ModelField::Scalar(sf) if field.is_list() => vec![InputType::object(scalar_list_filter_type(ctx, sf))],
+
         ModelField::Scalar(sf) => {
             let mut types = vec![InputType::object(full_scalar_filter_type(
                 ctx,
@@ -32,10 +48,6 @@ pub(crate) fn get_field_filter_types(
 
             if sf.type_identifier != TypeIdentifier::Json {
                 types.push(map_scalar_input_type_for_field(ctx, sf)); // Scalar equality shorthand
-
-                if !sf.is_required() {
-                    types.push(InputType::null()); // Scalar null-equality shorthand
-                }
             }
 
             types
@@ -44,31 +56,19 @@ pub(crate) fn get_field_filter_types(
 }
 
 /// Builds shorthand relation equality (`is`) filter for to-one: `where: { relation_field: { ... } }` (no `is` in between).
-/// If the field is also not required, null is also added as possible type.
 #[tracing::instrument(skip(ctx, rf))]
-fn mto1_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Vec<InputType> {
-    let mut types = vec![];
-
-    if !rf.is_list() {
-        let related_model = rf.related_model();
-        let related_input_type = filter_objects::where_object_type(ctx, &related_model);
-        types.push(InputType::object(related_input_type));
-
-        if !rf.is_required() {
-            types.push(InputType::null());
-        }
-    }
-
-    types
-}
-
-#[tracing::instrument(skip(ctx, rf))]
-fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
+fn to_one_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputType {
     let related_model = rf.related_model();
     let related_input_type = filter_objects::where_object_type(ctx, &related_model);
-    let list = if rf.is_list() { "List" } else { "" };
+
+    InputType::object(related_input_type)
+}
+
+fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
+    let related_model = rf.related_model();
+    let related_input_type = filter_objects::where_object_type(ctx, &related_model);
     let ident = Identifier::new(
-        format!("{}{}RelationFilter", capitalize(&related_model.name), list),
+        format!("{}ListRelationFilter", capitalize(&related_model.name)),
         PRISMA_NAMESPACE,
     );
 
@@ -76,22 +76,111 @@ fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
     let object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, object.clone());
 
-    let fields = if rf.is_list() {
-        vec![
-            input_field(filters::EVERY, InputType::object(related_input_type.clone()), None).optional(),
-            input_field(filters::SOME, InputType::object(related_input_type.clone()), None).optional(),
-            input_field(filters::NONE, InputType::object(related_input_type), None).optional(),
-        ]
-    } else {
-        vec![
-            input_field(filters::IS, InputType::object(related_input_type.clone()), None)
-                .optional()
-                .nullable_if(!rf.is_required()),
-            input_field(filters::IS_NOT, InputType::object(related_input_type), None)
-                .optional()
-                .nullable_if(!rf.is_required()),
-        ]
-    };
+    let fields = vec![
+        input_field(filters::EVERY, InputType::object(related_input_type.clone()), None).optional(),
+        input_field(filters::SOME, InputType::object(related_input_type.clone()), None).optional(),
+        input_field(filters::NONE, InputType::object(related_input_type), None).optional(),
+    ];
+
+    object.set_fields(fields);
+    Arc::downgrade(&object)
+}
+
+#[tracing::instrument(skip(ctx, rf))]
+fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
+    let related_model = rf.related_model();
+    let related_input_type = filter_objects::where_object_type(ctx, &related_model);
+    let ident = Identifier::new(
+        format!("{}RelationFilter", capitalize(&related_model.name)),
+        PRISMA_NAMESPACE,
+    );
+
+    return_cached_input!(ctx, &ident);
+    let object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, object.clone());
+
+    let fields = vec![
+        input_field(filters::IS, InputType::object(related_input_type.clone()), None)
+            .optional()
+            .nullable_if(!rf.is_required()),
+        input_field(filters::IS_NOT, InputType::object(related_input_type), None)
+            .optional()
+            .nullable_if(!rf.is_required()),
+    ];
+
+    object.set_fields(fields);
+    Arc::downgrade(&object)
+}
+
+/// Builds shorthand composite equality (`equals`) filter for to-one: `where: { composite_field: { ... } }` (no `equals` in between).
+fn to_one_composite_filter_shorthand_types(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputType {
+    let equality_object_type = filter_objects::composite_equality_object(ctx, cf);
+
+    InputType::object(equality_object_type)
+}
+
+#[tracing::instrument(skip(ctx, cf))]
+fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    let ident = Identifier::new(format!("{}CompositeFilter", capitalize(&cf.typ.name)), PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let mut object = init_input_object_type(ident.clone());
+    object.require_exactly_one_field();
+    object.set_tag(ObjectTag::CompositeEnvelope);
+
+    let object = Arc::new(object);
+
+    ctx.cache_input_type(ident, object.clone());
+
+    let composite_where_object = filter_objects::where_object_type(ctx, &cf.typ);
+    let composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
+
+    let fields = vec![
+        input_field(filters::EQUALS, InputType::object(composite_equals_object), None)
+            .optional()
+            .nullable_if(!cf.is_required()),
+        input_field(filters::IS, InputType::object(composite_where_object.clone()), None)
+            .optional()
+            .nullable_if(!cf.is_required()),
+        input_field(filters::IS_NOT, InputType::object(composite_where_object), None)
+            .optional()
+            .nullable_if(!cf.is_required()),
+    ];
+
+    object.set_fields(fields);
+    Arc::downgrade(&object)
+}
+
+#[tracing::instrument(skip(ctx, cf))]
+fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    let ident = Identifier::new(
+        format!("{}CompositeListFilter", capitalize(&cf.typ.name)),
+        PRISMA_NAMESPACE,
+    );
+    return_cached_input!(ctx, &ident);
+
+    let mut object = init_input_object_type(ident.clone());
+    object.require_exactly_one_field();
+    object.set_tag(ObjectTag::CompositeEnvelope);
+
+    let object = Arc::new(object);
+    ctx.cache_input_type(ident, object.clone());
+
+    let composite_where_object = filter_objects::where_object_type(ctx, &cf.typ);
+    let composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
+
+    let fields = vec![
+        input_field(
+            filters::EQUALS,
+            InputType::list(InputType::object(composite_equals_object)),
+            None,
+        )
+        .optional(),
+        input_field(filters::EVERY, InputType::object(composite_where_object.clone()), None).optional(),
+        input_field(filters::SOME, InputType::object(composite_where_object.clone()), None).optional(),
+        input_field(filters::NONE, InputType::object(composite_where_object), None).optional(),
+        input_field(filters::IS_EMPTY, InputType::boolean(), None).optional(),
+    ];
 
     object.set_fields(fields);
     Arc::downgrade(&object)

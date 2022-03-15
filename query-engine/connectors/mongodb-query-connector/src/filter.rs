@@ -1,14 +1,16 @@
 use crate::{error::MongoError, join::JoinStage, IntoBson};
 use connector_interface::{
-    AggregationFilter, Filter, OneRelationIsNullFilter, QueryMode, RelationCondition, RelationFilter, ScalarCompare,
-    ScalarCondition, ScalarFilter, ScalarListFilter, ScalarProjection,
+    AggregationFilter, CompositeCondition, CompositeFilter, Filter, OneRelationIsNullFilter, QueryMode,
+    RelationCondition, RelationFilter, ScalarCompare, ScalarCondition, ScalarFilter, ScalarListFilter,
+    ScalarProjection,
 };
 use mongodb::bson::{doc, Bson, Document, Regex};
-use prisma_models::{PrismaValue, ScalarFieldRef};
+use prisma_models::{CompositeFieldRef, PrismaValue, ScalarFieldRef};
 
 #[derive(Debug)]
 pub(crate) enum MongoFilter {
     Scalar(Document),
+    Composite(Document),
     Relation(MongoRelationFilter),
 }
 
@@ -17,6 +19,7 @@ impl MongoFilter {
         match self {
             Self::Scalar(document) => (document, vec![]),
             Self::Relation(rf) => (rf.filter, rf.joins),
+            Self::Composite(document) => (document, vec![]),
         }
     }
 
@@ -35,26 +38,31 @@ pub(crate) struct MongoRelationFilter {
 }
 
 /// Builds a MongoDB query filter from a Prisma filter.
-pub(crate) fn convert_filter(filter: Filter, invert: bool, is_having_filter: bool) -> crate::Result<MongoFilter> {
+pub(crate) fn convert_filter(
+    filter: Filter,
+    invert: bool,
+    is_having_filter: bool,
+    prefix: FilterPrefix,
+) -> crate::Result<MongoFilter> {
     let filter = fold_compounds(filter);
     let filter_pair = match filter {
-        Filter::And(filters) if invert => coerce_empty(false, "$or", filters, invert, is_having_filter)?,
-        Filter::And(filters) => coerce_empty(true, "$and", filters, invert, is_having_filter)?,
+        Filter::And(filters) if invert => coerce_empty(false, "$or", filters, invert, is_having_filter, prefix)?,
+        Filter::And(filters) => coerce_empty(true, "$and", filters, invert, is_having_filter, prefix)?,
 
-        Filter::Or(filters) if invert => coerce_empty(true, "$and", filters, invert, is_having_filter)?,
-        Filter::Or(filters) => coerce_empty(false, "$or", filters, invert, is_having_filter)?,
+        Filter::Or(filters) if invert => coerce_empty(true, "$and", filters, invert, is_having_filter, prefix)?,
+        Filter::Or(filters) => coerce_empty(false, "$or", filters, invert, is_having_filter, prefix)?,
 
-        Filter::Not(filters) if invert => coerce_empty(false, "$or", filters, !invert, is_having_filter)?,
-        Filter::Not(filters) => coerce_empty(true, "$and", filters, !invert, is_having_filter)?,
+        Filter::Not(filters) if invert => coerce_empty(false, "$or", filters, !invert, is_having_filter, prefix)?,
+        Filter::Not(filters) => coerce_empty(true, "$and", filters, !invert, is_having_filter, prefix)?,
 
-        Filter::Scalar(sf) => scalar_filter(sf, invert, true, is_having_filter)?,
+        Filter::Scalar(sf) => scalar_filter(sf, invert, true, is_having_filter, prefix)?,
         Filter::Empty => MongoFilter::Scalar(doc! {}),
-        Filter::ScalarList(slf) => scalar_list_filter(slf, invert)?,
+        Filter::ScalarList(slf) => scalar_list_filter(slf, invert, prefix)?,
         Filter::OneRelationIsNull(filter) => one_is_null(filter, invert),
-        Filter::Relation(rfilter) => relation_filter(rfilter, invert)?,
-        // Filter::BoolFilter(b) => {} // Potentially not doable.
-        Filter::Aggregation(filter) => aggregation_filter(filter, invert)?,
-        _ => todo!("Incomplete filter implementation."),
+        Filter::Relation(rfilter) => relation_filter(rfilter, invert, prefix)?,
+        Filter::Aggregation(filter) => aggregation_filter(filter, invert, prefix)?,
+        Filter::Composite(filter) => composite_filter(filter, invert, prefix)?,
+        Filter::BoolFilter(_) => unimplemented!("MongoDB boolean filter."),
     };
 
     Ok(filter_pair)
@@ -93,20 +101,21 @@ fn coerce_empty(
     filters: Vec<Filter>,
     invert: bool,
     is_having_filter: bool,
+    prefix: FilterPrefix,
 ) -> crate::Result<MongoFilter> {
     if filters.is_empty() {
-        // We need to create a truthy or falsey expression for empty AND / OR queries.
-        // _id always exists. So matching on exist/not exists creates our truthy/falsey expressions.
-
+        // We need to create a truthy or falsey expression for empty filter queries, e.g. AND / OR / NOT.
+        // We abuse the fact that we can create an always failing or succeeding condition with logical `and` and `or` operators,
+        // for example "a field exists or doesn't exist" is always true, "a field exists and doesn't exist" is always false.
         let doc = if truthy {
-            doc! { "_id": { "$exists": 1 }}
+            doc! { "$or": [ { "__prisma_marker": { "$exists": 1 }}, { "__prisma_marker": { "$exists": 0 }} ] }
         } else {
-            doc! { "_id": { "$exists": 0 }}
+            doc! { "$and": [ { "__prisma_marker": { "$exists": 1 }}, { "__prisma_marker": { "$exists": 0 }} ] }
         };
 
         Ok(MongoFilter::Scalar(doc))
     } else {
-        fold_filters(operation, filters, invert, is_having_filter)
+        fold_filters(operation, filters, invert, is_having_filter, prefix)
     }
 }
 
@@ -115,10 +124,11 @@ fn fold_filters(
     filters: Vec<Filter>,
     invert: bool,
     is_having_filter: bool,
+    prefix: FilterPrefix,
 ) -> crate::Result<MongoFilter> {
     let filters = filters
         .into_iter()
-        .map(|f| Ok(convert_filter(f, invert, is_having_filter)?.render()))
+        .map(|f| Ok(convert_filter(f, invert, is_having_filter, prefix.clone())?.render()))
         .collect::<crate::Result<Vec<_>>>()?;
 
     let (filters, joins) = fold_nested(filters);
@@ -141,6 +151,7 @@ fn scalar_filter(
     invert: bool,
     include_field_wrapper: bool,
     is_having_filter: bool,
+    prefix: FilterPrefix,
 ) -> crate::Result<MongoFilter> {
     let field = match filter.projection {
         connector_interface::ScalarProjection::Single(sf) => sf,
@@ -165,6 +176,8 @@ fn scalar_filter(
         true => format!("_id.{}", field.db_name()),
         false => field.db_name().to_string(),
     };
+
+    let field_name = prefix.render_with(field_name);
 
     if include_field_wrapper {
         Ok(MongoFilter::Scalar(doc! { field_name: filter }))
@@ -274,40 +287,41 @@ fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition)
 }
 
 /// Filters available on list fields.
-fn scalar_list_filter(filter: ScalarListFilter, invert: bool) -> crate::Result<MongoFilter> {
+fn scalar_list_filter(filter: ScalarListFilter, invert: bool, prefix: FilterPrefix) -> crate::Result<MongoFilter> {
     let field = filter.field;
+    let prefixed = prefix.render_with(field.db_name().into());
 
     // Of course Mongo needs special filters for the inverted case, everything else would be too easy.
     let filter_doc = if invert {
         match filter.condition {
             // "Contains element" -> "Does not contain element"
             connector_interface::ScalarListCondition::Contains(val) => {
-                doc! { field.db_name(): { "$elemMatch": { "$not": { "$eq": (&field, val).into_bson()? }}}}
+                doc! { prefixed: { "$elemMatch": { "$not": { "$eq": (&field, val).into_bson()? }}}}
             }
 
             // "Contains all elements" -> "Does not contain any of the elements"
             connector_interface::ScalarListCondition::ContainsEvery(vals) => {
-                doc! { field.db_name(): { "$nin": (&field, PrismaValue::List(vals)).into_bson()? }}
+                doc! { prefixed: { "$nin": (&field, PrismaValue::List(vals)).into_bson()? }}
             }
 
             // "Contains some of the elements" -> "Does not contain some of the elements"
             connector_interface::ScalarListCondition::ContainsSome(vals) => {
-                doc! { field.db_name(): { "$elemMatch": { "$not": { "$in": (&field, PrismaValue::List(vals)).into_bson()? }}}}
+                doc! { prefixed: { "$elemMatch": { "$not": { "$in": (&field, PrismaValue::List(vals)).into_bson()? }}}}
             }
 
             // Empty -> not empty and vice versa
             connector_interface::ScalarListCondition::IsEmpty(check_for_empty) => {
                 if check_for_empty && !invert {
-                    doc! { field.db_name(): { "$size": 0 }}
+                    doc! { prefixed: { "$size": 0 }}
                 } else {
-                    doc! { field.db_name(): { "$not": { "$size": 0 }}}
+                    doc! { prefixed: { "$not": { "$size": 0 }}}
                 }
             }
         }
     } else {
         match filter.condition {
             connector_interface::ScalarListCondition::Contains(val) => {
-                doc! { field.db_name(): (&field, val).into_bson()? }
+                doc! { prefixed: (&field, val).into_bson()? }
             }
 
             connector_interface::ScalarListCondition::ContainsEvery(vals) if vals.is_empty() => {
@@ -316,7 +330,7 @@ fn scalar_list_filter(filter: ScalarListFilter, invert: bool) -> crate::Result<M
             }
 
             connector_interface::ScalarListCondition::ContainsEvery(vals) => {
-                doc! { field.db_name(): { "$all": (&field, PrismaValue::List(vals)).into_bson()? }}
+                doc! { prefixed: { "$all": (&field, PrismaValue::List(vals)).into_bson()? }}
             }
 
             connector_interface::ScalarListCondition::ContainsSome(vals) if vals.is_empty() => {
@@ -325,14 +339,14 @@ fn scalar_list_filter(filter: ScalarListFilter, invert: bool) -> crate::Result<M
             }
 
             connector_interface::ScalarListCondition::ContainsSome(vals) => {
-                doc! { "$or": vals.into_iter().map(|val| Ok(doc! { field.db_name(): (&field, val).into_bson()? }) ).collect::<crate::Result<Vec<_>>>()?}
+                doc! { "$or": vals.into_iter().map(|val| Ok(doc! { prefixed.clone(): (&field, val).into_bson()? }) ).collect::<crate::Result<Vec<_>>>()?}
             }
 
             connector_interface::ScalarListCondition::IsEmpty(empty) => {
                 if empty {
-                    doc! { field.db_name(): { "$size": 0 }}
+                    doc! { prefixed: { "$size": 0 }}
                 } else {
-                    doc! { field.db_name(): { "$not": { "$size": 0 }}}
+                    doc! { prefixed: { "$not": { "$size": 0 }}}
                 }
             }
         }
@@ -357,15 +371,22 @@ fn one_is_null(filter: OneRelationIsNullFilter, invert: bool) -> MongoFilter {
 }
 
 /// Builds a Mongo relation filter depth-first.
-fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoFilter> {
+fn relation_filter(filter: RelationFilter, invert: bool, prefix: FilterPrefix) -> crate::Result<MongoFilter> {
     let from_field = filter.field;
     let relation_name = &from_field.relation().name;
     let nested_filter = *filter.nested_filter;
 
     // Tmp condition check while mongo is getting fully tested.
     let is_empty = matches!(nested_filter, Filter::Empty);
-    let (nested_filter, nested_joins) =
-        convert_filter(nested_filter, requires_invert(&filter.condition), false)?.render();
+
+    // EveryRelatedRecord requires an inherent invert for Mongo.
+    let (nested_filter, nested_joins) = convert_filter(
+        nested_filter,
+        matches!(&filter.condition, RelationCondition::EveryRelatedRecord),
+        false,
+        prefix,
+    )?
+    .render();
 
     let mut join_stage = JoinStage::new(from_field);
     join_stage.extend_nested(nested_joins);
@@ -406,22 +427,17 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
     }
 }
 
-/// Checks if the given relation filter condition needs an inherent invert for MongoDB.
-fn requires_invert(rf: &RelationCondition) -> bool {
-    matches!(rf, RelationCondition::EveryRelatedRecord)
-}
-
-fn aggregation_filter(filter: AggregationFilter, invert: bool) -> crate::Result<MongoFilter> {
+fn aggregation_filter(filter: AggregationFilter, invert: bool, prefix: FilterPrefix) -> crate::Result<MongoFilter> {
     match filter {
-        AggregationFilter::Count(filter) => aggregate_conditions("count", *filter, invert),
-        AggregationFilter::Average(filter) => aggregate_conditions("avg", *filter, invert),
-        AggregationFilter::Sum(filter) => aggregate_conditions("sum", *filter, invert),
-        AggregationFilter::Min(filter) => aggregate_conditions("min", *filter, invert),
-        AggregationFilter::Max(filter) => aggregate_conditions("max", *filter, invert),
+        AggregationFilter::Count(filter) => aggregate_conditions("count", *filter, invert, prefix),
+        AggregationFilter::Average(filter) => aggregate_conditions("avg", *filter, invert, prefix),
+        AggregationFilter::Sum(filter) => aggregate_conditions("sum", *filter, invert, prefix),
+        AggregationFilter::Min(filter) => aggregate_conditions("min", *filter, invert, prefix),
+        AggregationFilter::Max(filter) => aggregate_conditions("max", *filter, invert, prefix),
     }
 }
 
-fn aggregate_conditions(op: &str, filter: Filter, invert: bool) -> crate::Result<MongoFilter> {
+fn aggregate_conditions(op: &str, filter: Filter, invert: bool, prefix: FilterPrefix) -> crate::Result<MongoFilter> {
     let sf = match filter {
         Filter::Scalar(sf) => sf,
         _ => unimplemented!(),
@@ -431,10 +447,11 @@ fn aggregate_conditions(op: &str, filter: Filter, invert: bool) -> crate::Result
         ScalarProjection::Compound(_) => {
             unimplemented!("Compound aggregate projections are unsupported.")
         }
+
         ScalarProjection::Single(field) => field.clone(),
     };
 
-    let (filter, _) = scalar_filter(sf, invert, false, false)?.render();
+    let (filter, _) = scalar_filter(sf, invert, false, false, prefix)?.render();
 
     Ok(MongoFilter::Scalar(
         doc! { format!("{}_{}", op, field.db_name()): filter },
@@ -474,4 +491,107 @@ fn to_regex(
         ),
         options,
     }))
+}
+
+fn composite_filter(filter: CompositeFilter, invert: bool, prefix: FilterPrefix) -> crate::Result<MongoFilter> {
+    let field = filter.field;
+
+    let filter_doc = match *filter.condition {
+        CompositeCondition::Every(filter) => {
+            let is_empty = matches!(filter, Filter::Empty);
+
+            // `Every` filter requires inherent invert because of how the filters are implemented on Mongo.
+            let (nested_filter, _) = convert_filter(filter, true, false, FilterPrefix::default())?.render();
+
+            if is_empty {
+                doc! { "$not": { "$all": [{ "$elemMatch": { "__prisma_truthy_marker": { "$exists": 1 }} }] }}
+            } else {
+                doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
+            }
+        }
+
+        CompositeCondition::Some(filter) => {
+            let (nested_filter, _) = convert_filter(filter, false, false, FilterPrefix::default())?.render();
+            doc! { "$elemMatch": nested_filter }
+        }
+
+        CompositeCondition::None(filter) => {
+            let (nested_filter, _) = convert_filter(filter, false, false, FilterPrefix::default())?.render();
+
+            doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
+        }
+
+        CompositeCondition::Equals(value) => {
+            doc! { "$eq": (&field, value).into_bson()? }
+        }
+
+        CompositeCondition::Empty(should_be_empty) => {
+            if should_be_empty {
+                doc! { "$size": 0 }
+            } else {
+                doc! { "$not": { "$size": 0 }}
+            }
+        }
+
+        CompositeCondition::Is(filter) => {
+            let (nested_filter, _) =
+                convert_filter(filter, invert, false, prefix.append_cloned(field.db_name()))?.render();
+
+            return Ok(MongoFilter::Composite(nested_filter));
+        }
+
+        CompositeCondition::IsNot(filter) => {
+            let (nested_filter, _) =
+                convert_filter(filter, !invert, false, prefix.append_cloned(field.db_name()))?.render();
+
+            return Ok(MongoFilter::Composite(nested_filter));
+        }
+    };
+
+    let field_filter_name = prefix.render_with(field.db_name().into());
+
+    if invert {
+        Ok(MongoFilter::Composite(
+            doc! { field_filter_name: { "$not": filter_doc }},
+        ))
+    } else {
+        Ok(MongoFilter::Composite(doc! { field_filter_name: filter_doc }))
+    }
+}
+
+#[derive(Clone, Default)]
+pub(crate) struct FilterPrefix {
+    parts: Vec<String>,
+}
+
+impl FilterPrefix {
+    pub fn append_cloned<T>(&self, elem: T) -> Self
+    where
+        T: Into<String>,
+    {
+        let mut new = self.clone();
+
+        new.parts.push(elem.into());
+        new
+    }
+
+    pub fn render(self) -> String {
+        self.parts.join(".")
+    }
+
+    pub fn render_with(self, target: String) -> String {
+        if self.parts.is_empty() {
+            target
+        } else {
+            format!("{}.{}", self.render(), target)
+        }
+    }
+}
+
+impl From<&CompositeFieldRef> for FilterPrefix {
+    fn from(cf: &CompositeFieldRef) -> Self {
+        Self {
+            parts: vec![cf.db_name().to_owned()],
+        }
+    }
 }

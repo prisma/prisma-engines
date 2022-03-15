@@ -5,7 +5,16 @@ use datamodel_connector::ConnectorCapability;
 
 pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField, include_aggregates: bool) -> InputField {
     let types = field_filter_types::get_field_filter_types(ctx, field, include_aggregates);
-    input_field(field.name().to_owned(), types, None).optional()
+    let nullable = !field.is_required()
+        && !field.is_list()
+        && match field {
+            ModelField::Scalar(sf) => sf.type_identifier != TypeIdentifier::Json,
+            _ => true,
+        };
+
+    input_field(field.name().to_owned(), types, None)
+        .optional()
+        .nullable_if(nullable)
 }
 
 pub(crate) fn nested_create_one_input_field(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputField {
