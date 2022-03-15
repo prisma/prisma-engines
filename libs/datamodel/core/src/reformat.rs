@@ -49,8 +49,7 @@ impl<'a> Reformatter<'a> {
                 let schema_ast = db.ast();
                 let datasource = datasources.pop();
                 let missing_fields = Self::find_all_missing_fields(schema_ast, &datamodel, datasource.as_ref());
-                let missing_field_attributes =
-                    find_all_missing_attributes(schema_ast, &db, &datamodel, datasource.as_ref());
+                let missing_field_attributes = find_all_missing_attributes(&db);
                 let missing_relation_attribute_args = find_all_missing_relation_attribute_args(&db);
 
                 Reformatter {
@@ -902,38 +901,13 @@ fn push_inline_relation_missing_arguments(
     }
 }
 
-fn find_all_missing_attributes(
-    schema_ast: &SchemaAst,
-    db: &ParserDatabase,
-    datamodel: &dml::Datamodel,
-    datasource: Option<&Datasource>,
-) -> Vec<MissingFieldAttribute> {
-    let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
-
+fn find_all_missing_attributes(db: &ParserDatabase) -> Vec<MissingFieldAttribute> {
     let mut missing_field_attributes = Vec::new();
-    for model in datamodel.models() {
-        let ast_model = schema_ast.find_model(&model.name).unwrap();
-        for field in model.fields() {
-            let new_ast_field = lowerer.lower_field(model, field, datamodel);
-
-            if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
-                let relation_attribute = new_ast_field
-                    .attributes
-                    .iter()
-                    .find(|attr| attr.name.name == "relation");
-                if let Some(relation_attribute) = relation_attribute {
-                    if !original_field.attributes.iter().any(|d| d.name.name == "relation") {
-                        missing_field_attributes.push(MissingFieldAttribute {
-                            model: model.name.clone(),
-                            field: field.name().to_string(),
-                            attribute: relation_attribute.clone(),
-                        })
-                    }
-                }
-            }
+    for relation in db.walk_relations() {
+        if let walkers::RefinedRelationWalker::Inline(inline_relation) = relation.refine() {
+            push_missing_relation_attribute(inline_relation, &mut missing_field_attributes);
         }
     }
-
     push_missing_unique_attributes(db, &mut missing_field_attributes);
 
     missing_field_attributes
@@ -954,6 +928,67 @@ fn push_missing_unique_attributes(db: &ParserDatabase, attributes: &mut Vec<Miss
                 attribute: ast::Attribute {
                     name: ast::Identifier::new("unique"),
                     arguments: ast::ArgumentsList::default(),
+                    span: Span::empty(),
+                },
+            })
+        }
+    }
+}
+
+fn push_missing_relation_attribute(
+    inline_relation: walkers::InlineRelationWalker<'_>,
+    missing_attributes: &mut Vec<MissingFieldAttribute>,
+) {
+    if let Some(forward) = inline_relation.forward_relation_field() {
+        if forward.relation_attribute().is_some() {
+            return;
+        }
+
+        // the `fields: [...]` argument.
+        let fields: Option<ast::Argument> = match inline_relation.referencing_fields() {
+            walkers::ReferencingFields::Concrete(_) => None,
+            walkers::ReferencingFields::NA => None, // error somewhere else
+            walkers::ReferencingFields::Inferred(fields) => Some(ast::Argument {
+                name: Some(ast::Identifier::new("fields")),
+                value: ast::Expression::Array(
+                    fields
+                        .into_iter()
+                        .map(|f| ast::Expression::ConstantValue(f.name, Span::empty()))
+                        .collect(),
+                    Span::empty(),
+                ),
+                span: Span::empty(),
+            }),
+        };
+
+        // the `references: [...]` argument
+        let references: Option<ast::Argument> = if forward.referenced_fields().is_none() {
+            Some(ast::Argument {
+                name: Some(ast::Identifier::new("references")),
+                value: ast::Expression::Array(
+                    inline_relation
+                        .referenced_fields()
+                        .map(|f| ast::Expression::ConstantValue(f.name().to_owned(), Span::empty()))
+                        .collect(),
+                    Span::empty(),
+                ),
+                span: Span::empty(),
+            })
+        } else {
+            None
+        };
+
+        if let (Some(fields), Some(references)) = (fields, references) {
+            missing_attributes.push(MissingFieldAttribute {
+                model: forward.model().name().to_owned(),
+                field: forward.name().to_owned(),
+                attribute: ast::Attribute {
+                    name: ast::Identifier::new("relation"),
+                    arguments: ast::ArgumentsList {
+                        arguments: vec![fields, references],
+                        empty_arguments: Vec::new(),
+                        trailing_comma: None,
+                    },
                     span: Span::empty(),
                 },
             })
