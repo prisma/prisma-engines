@@ -622,7 +622,7 @@
 <span id="620">620</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cursor</span>::{<span class="ident">CursorBuilder</span>, <span class="ident">CursorData</span>},
-    <span class="ident">filter::convert_filter</span>,
+    <span class="ident">filter</span>::{<span class="ident">convert_filter</span>, <span class="ident">FilterPrefix</span>},
     <span class="ident">join::JoinStage</span>,
     <span class="ident">logger::log_read_query</span> <span class="kw">as</span> <span class="ident">log_query</span>,
     <span class="ident">orderby::OrderByBuilder</span>,
@@ -789,7 +789,7 @@
         <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">filter</span> {
             <span class="prelude-val">Some</span>(<span class="ident">filter</span>) =&gt; {
                 <span class="comment">// If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.</span>
-                <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">filter_joins</span>) <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>.<span class="ident">render</span>();
+                <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">filter_joins</span>) <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>.<span class="ident">render</span>();
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">filter_joins</span>.<span class="ident">is_empty</span>() {
                     <span class="ident">joins</span>.<span class="ident">extend</span>(<span class="ident">filter_joins</span>);
                     <span class="ident">post_filters</span>.<span class="ident">push</span>(<span class="ident">filter</span>);
@@ -1167,7 +1167,7 @@
     <span class="doccomment">/// Adds aggregation filters based on a having scalar filter.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_having</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">having</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span> <span class="ident">having</span> {
-            <span class="kw">let</span> (<span class="ident">filter_doc</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>.<span class="ident">render</span>();
+            <span class="kw">let</span> (<span class="ident">filter_doc</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>.<span class="ident">render</span>();
             <span class="self">self</span>.<span class="ident">aggregation_filters</span>.<span class="ident">push</span>(<span class="ident">filter_doc</span>);
         }
 

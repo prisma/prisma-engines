@@ -761,6 +761,7 @@
 <span id="759">759</span>
 <span id="760">760</span>
 <span id="761">761</span>
+<span id="762">762</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model_extensions</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">connector_interface::filter</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
@@ -894,6 +895,7 @@
             <span class="ident">Filter::Aggregation</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
             <span class="ident">Filter::ScalarList</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
             <span class="ident">Filter::Empty</span> =&gt; <span class="ident">ConditionTree::NoCondition</span>,
+            <span class="ident">Filter::Composite</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;SQL connectors do not support composites yet.&quot;</span>),
         }
     }
 }

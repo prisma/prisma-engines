@@ -477,17 +477,139 @@
 <span id="475">475</span>
 <span id="476">476</span>
 <span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::MongoError</span>, <span class="ident">join::JoinStage</span>, <span class="ident">IntoBson</span>};
 <span class="kw">use</span> <span class="ident">connector_interface</span>::{
-    <span class="ident">AggregationFilter</span>, <span class="ident">Filter</span>, <span class="ident">OneRelationIsNullFilter</span>, <span class="ident">QueryMode</span>, <span class="ident">RelationCondition</span>, <span class="ident">RelationFilter</span>, <span class="ident">ScalarCompare</span>,
-    <span class="ident">ScalarCondition</span>, <span class="ident">ScalarFilter</span>, <span class="ident">ScalarListFilter</span>, <span class="ident">ScalarProjection</span>,
+    <span class="ident">AggregationFilter</span>, <span class="ident">CompositeCondition</span>, <span class="ident">CompositeFilter</span>, <span class="ident">Filter</span>, <span class="ident">OneRelationIsNullFilter</span>, <span class="ident">QueryMode</span>,
+    <span class="ident">RelationCondition</span>, <span class="ident">RelationFilter</span>, <span class="ident">ScalarCompare</span>, <span class="ident">ScalarCondition</span>, <span class="ident">ScalarFilter</span>, <span class="ident">ScalarListFilter</span>,
+    <span class="ident">ScalarProjection</span>,
 };
 <span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">doc</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>, <span class="ident">Regex</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>};
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">CompositeFieldRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">MongoFilter</span> {
     <span class="ident">Scalar</span>(<span class="ident">Document</span>),
+    <span class="ident">Composite</span>(<span class="ident">Document</span>),
     <span class="ident">Relation</span>(<span class="ident">MongoRelationFilter</span>),
 }
 
@@ -496,6 +618,7 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">document</span>) =&gt; (<span class="ident">document</span>, <span class="macro">vec!</span>[]),
             <span class="ident"><span class="self">Self</span>::Relation</span>(<span class="ident">rf</span>) =&gt; (<span class="ident">rf</span>.<span class="ident">filter</span>, <span class="ident">rf</span>.<span class="ident">joins</span>),
+            <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">document</span>) =&gt; (<span class="ident">document</span>, <span class="macro">vec!</span>[]),
         }
     }
 
@@ -514,26 +637,31 @@
 }
 
 <span class="doccomment">/// Builds a MongoDB query filter from a Prisma filter.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">convert_filter</span>(<span class="ident">filter</span>: <span class="ident">Filter</span>, <span class="ident">invert</span>: <span class="ident">bool</span>, <span class="ident">is_having_filter</span>: <span class="ident">bool</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">convert_filter</span>(
+    <span class="ident">filter</span>: <span class="ident">Filter</span>,
+    <span class="ident">invert</span>: <span class="ident">bool</span>,
+    <span class="ident">is_having_filter</span>: <span class="ident">bool</span>,
+    <span class="ident">prefix</span>: <span class="ident">FilterPrefix</span>,
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">fold_compounds</span>(<span class="ident">filter</span>);
     <span class="kw">let</span> <span class="ident">filter_pair</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">filter</span> {
-        <span class="ident">Filter::And</span>(<span class="ident">filters</span>) <span class="kw">if</span> <span class="ident">invert</span> =&gt; <span class="ident">coerce_empty</span>(<span class="bool-val">false</span>, <span class="string">&quot;$or&quot;</span>, <span class="ident">filters</span>, <span class="ident">invert</span>, <span class="ident">is_having_filter</span>)<span class="question-mark">?</span>,
-        <span class="ident">Filter::And</span>(<span class="ident">filters</span>) =&gt; <span class="ident">coerce_empty</span>(<span class="bool-val">true</span>, <span class="string">&quot;$and&quot;</span>, <span class="ident">filters</span>, <span class="ident">invert</span>, <span class="ident">is_having_filter</span>)<span class="question-mark">?</span>,
+        <span class="ident">Filter::And</span>(<span class="ident">filters</span>) <span class="kw">if</span> <span class="ident">invert</span> =&gt; <span class="ident">coerce_empty</span>(<span class="bool-val">false</span>, <span class="string">&quot;$or&quot;</span>, <span class="ident">filters</span>, <span class="ident">invert</span>, <span class="ident">is_having_filter</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>,
+        <span class="ident">Filter::And</span>(<span class="ident">filters</span>) =&gt; <span class="ident">coerce_empty</span>(<span class="bool-val">true</span>, <span class="string">&quot;$and&quot;</span>, <span class="ident">filters</span>, <span class="ident">invert</span>, <span class="ident">is_having_filter</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>,
 
-        <span class="ident">Filter::Or</span>(<span class="ident">filters</span>) <span class="kw">if</span> <span class="ident">invert</span> =&gt; <span class="ident">coerce_empty</span>(<span class="bool-val">true</span>, <span class="string">&quot;$and&quot;</span>, <span class="ident">filters</span>, <span class="ident">invert</span>, <span class="ident">is_having_filter</span>)<span class="question-mark">?</span>,
-        <span class="ident">Filter::Or</span>(<span class="ident">filters</span>) =&gt; <span class="ident">coerce_empty</span>(<span class="bool-val">false</span>, <span class="string">&quot;$or&quot;</span>, <span class="ident">filters</span>, <span class="ident">invert</span>, <span class="ident">is_having_filter</span>)<span class="question-mark">?</span>,
+        <span class="ident">Filter::Or</span>(<span class="ident">filters</span>) <span class="kw">if</span> <span class="ident">invert</span> =&gt; <span class="ident">coerce_empty</span>(<span class="bool-val">true</span>, <span class="string">&quot;$and&quot;</span>, <span class="ident">filters</span>, <span class="ident">invert</span>, <span class="ident">is_having_filter</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>,
+        <span class="ident">Filter::Or</span>(<span class="ident">filters</span>) =&gt; <span class="ident">coerce_empty</span>(<span class="bool-val">false</span>, <span class="string">&quot;$or&quot;</span>, <span class="ident">filters</span>, <span class="ident">invert</span>, <span class="ident">is_having_filter</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>,
 
-        <span class="ident">Filter::Not</span>(<span class="ident">filters</span>) <span class="kw">if</span> <span class="ident">invert</span> =&gt; <span class="ident">coerce_empty</span>(<span class="bool-val">false</span>, <span class="string">&quot;$or&quot;</span>, <span class="ident">filters</span>, <span class="op">!</span><span class="ident">invert</span>, <span class="ident">is_having_filter</span>)<span class="question-mark">?</span>,
-        <span class="ident">Filter::Not</span>(<span class="ident">filters</span>) =&gt; <span class="ident">coerce_empty</span>(<span class="bool-val">true</span>, <span class="string">&quot;$and&quot;</span>, <span class="ident">filters</span>, <span class="op">!</span><span class="ident">invert</span>, <span class="ident">is_having_filter</span>)<span class="question-mark">?</span>,
+        <span class="ident">Filter::Not</span>(<span class="ident">filters</span>) <span class="kw">if</span> <span class="ident">invert</span> =&gt; <span class="ident">coerce_empty</span>(<span class="bool-val">false</span>, <span class="string">&quot;$or&quot;</span>, <span class="ident">filters</span>, <span class="op">!</span><span class="ident">invert</span>, <span class="ident">is_having_filter</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>,
+        <span class="ident">Filter::Not</span>(<span class="ident">filters</span>) =&gt; <span class="ident">coerce_empty</span>(<span class="bool-val">true</span>, <span class="string">&quot;$and&quot;</span>, <span class="ident">filters</span>, <span class="op">!</span><span class="ident">invert</span>, <span class="ident">is_having_filter</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>,
 
-        <span class="ident">Filter::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">scalar_filter</span>(<span class="ident">sf</span>, <span class="ident">invert</span>, <span class="bool-val">true</span>, <span class="ident">is_having_filter</span>)<span class="question-mark">?</span>,
+        <span class="ident">Filter::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">scalar_filter</span>(<span class="ident">sf</span>, <span class="ident">invert</span>, <span class="bool-val">true</span>, <span class="ident">is_having_filter</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>,
         <span class="ident">Filter::Empty</span> =&gt; <span class="ident">MongoFilter::Scalar</span>(<span class="macro">doc!</span> {}),
-        <span class="ident">Filter::ScalarList</span>(<span class="ident">slf</span>) =&gt; <span class="ident">scalar_list_filter</span>(<span class="ident">slf</span>, <span class="ident">invert</span>)<span class="question-mark">?</span>,
+        <span class="ident">Filter::ScalarList</span>(<span class="ident">slf</span>) =&gt; <span class="ident">scalar_list_filter</span>(<span class="ident">slf</span>, <span class="ident">invert</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>,
         <span class="ident">Filter::OneRelationIsNull</span>(<span class="ident">filter</span>) =&gt; <span class="ident">one_is_null</span>(<span class="ident">filter</span>, <span class="ident">invert</span>),
-        <span class="ident">Filter::Relation</span>(<span class="ident">rfilter</span>) =&gt; <span class="ident">relation_filter</span>(<span class="ident">rfilter</span>, <span class="ident">invert</span>)<span class="question-mark">?</span>,
-        <span class="comment">// Filter::BoolFilter(b) =&gt; {} // Potentially not doable.</span>
-        <span class="ident">Filter::Aggregation</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregation_filter</span>(<span class="ident">filter</span>, <span class="ident">invert</span>)<span class="question-mark">?</span>,
-        <span class="kw">_</span> =&gt; <span class="macro">todo!</span>(<span class="string">&quot;Incomplete filter implementation.&quot;</span>),
+        <span class="ident">Filter::Relation</span>(<span class="ident">rfilter</span>) =&gt; <span class="ident">relation_filter</span>(<span class="ident">rfilter</span>, <span class="ident">invert</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>,
+        <span class="ident">Filter::Aggregation</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregation_filter</span>(<span class="ident">filter</span>, <span class="ident">invert</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>,
+        <span class="ident">Filter::Composite</span>(<span class="ident">filter</span>) =&gt; <span class="ident">composite_filter</span>(<span class="ident">filter</span>, <span class="ident">invert</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>,
+        <span class="ident">Filter::BoolFilter</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;MongoDB boolean filter.&quot;</span>),
     };
 
     <span class="prelude-val">Ok</span>(<span class="ident">filter_pair</span>)
@@ -572,20 +700,21 @@
     <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
     <span class="ident">invert</span>: <span class="ident">bool</span>,
     <span class="ident">is_having_filter</span>: <span class="ident">bool</span>,
+    <span class="ident">prefix</span>: <span class="ident">FilterPrefix</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">filters</span>.<span class="ident">is_empty</span>() {
-        <span class="comment">// We need to create a truthy or falsey expression for empty AND / OR queries.</span>
-        <span class="comment">// _id always exists. So matching on exist/not exists creates our truthy/falsey expressions.</span>
-
+        <span class="comment">// We need to create a truthy or falsey expression for empty filter queries, e.g. AND / OR / NOT.</span>
+        <span class="comment">// We abuse the fact that we can create an always failing or succeeding condition with logical `and` and `or` operators,</span>
+        <span class="comment">// for example &quot;a field exists or doesn&#39;t exist&quot; is always true, &quot;a field exists and doesn&#39;t exist&quot; is always false.</span>
         <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">truthy</span> {
-            <span class="macro">doc!</span> { <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$exists&quot;</span>: <span class="number">1</span> }}
+            <span class="macro">doc!</span> { <span class="string">&quot;$or&quot;</span>: [ { <span class="string">&quot;__prisma_marker&quot;</span>: { <span class="string">&quot;$exists&quot;</span>: <span class="number">1</span> }}, { <span class="string">&quot;__prisma_marker&quot;</span>: { <span class="string">&quot;$exists&quot;</span>: <span class="number">0</span> }} ] }
         } <span class="kw">else</span> {
-            <span class="macro">doc!</span> { <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$exists&quot;</span>: <span class="number">0</span> }}
+            <span class="macro">doc!</span> { <span class="string">&quot;$and&quot;</span>: [ { <span class="string">&quot;__prisma_marker&quot;</span>: { <span class="string">&quot;$exists&quot;</span>: <span class="number">1</span> }}, { <span class="string">&quot;__prisma_marker&quot;</span>: { <span class="string">&quot;$exists&quot;</span>: <span class="number">0</span> }} ] }
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">MongoFilter::Scalar</span>(<span class="ident">doc</span>))
     } <span class="kw">else</span> {
-        <span class="ident">fold_filters</span>(<span class="ident">operation</span>, <span class="ident">filters</span>, <span class="ident">invert</span>, <span class="ident">is_having_filter</span>)
+        <span class="ident">fold_filters</span>(<span class="ident">operation</span>, <span class="ident">filters</span>, <span class="ident">invert</span>, <span class="ident">is_having_filter</span>, <span class="ident">prefix</span>)
     }
 }
 
@@ -594,10 +723,11 @@
     <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
     <span class="ident">invert</span>: <span class="ident">bool</span>,
     <span class="ident">is_having_filter</span>: <span class="ident">bool</span>,
+    <span class="ident">prefix</span>: <span class="ident">FilterPrefix</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">filters</span>
         .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">convert_filter</span>(<span class="ident">f</span>, <span class="ident">invert</span>, <span class="ident">is_having_filter</span>)<span class="question-mark">?</span>.<span class="ident">render</span>()))
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">convert_filter</span>(<span class="ident">f</span>, <span class="ident">invert</span>, <span class="ident">is_having_filter</span>, <span class="ident">prefix</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>.<span class="ident">render</span>()))
         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
     <span class="kw">let</span> (<span class="ident">filters</span>, <span class="ident">joins</span>) <span class="op">=</span> <span class="ident">fold_nested</span>(<span class="ident">filters</span>);
@@ -620,6 +750,7 @@
     <span class="ident">invert</span>: <span class="ident">bool</span>,
     <span class="ident">include_field_wrapper</span>: <span class="ident">bool</span>,
     <span class="ident">is_having_filter</span>: <span class="ident">bool</span>,
+    <span class="ident">prefix</span>: <span class="ident">FilterPrefix</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">filter</span>.<span class="ident">projection</span> {
         <span class="ident">connector_interface::ScalarProjection::Single</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>,
@@ -644,6 +775,8 @@
         <span class="bool-val">true</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;_id.{}&quot;</span>, <span class="ident">field</span>.<span class="ident">db_name</span>()),
         <span class="bool-val">false</span> =&gt; <span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_string</span>(),
     };
+
+    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">render_with</span>(<span class="ident">field_name</span>);
 
     <span class="kw">if</span> <span class="ident">include_field_wrapper</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">MongoFilter::Scalar</span>(<span class="macro">doc!</span> { <span class="ident">field_name</span>: <span class="ident">filter</span> }))
@@ -753,40 +886,41 @@
 }
 
 <span class="doccomment">/// Filters available on list fields.</span>
-<span class="kw">fn</span> <span class="ident">scalar_list_filter</span>(<span class="ident">filter</span>: <span class="ident">ScalarListFilter</span>, <span class="ident">invert</span>: <span class="ident">bool</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">scalar_list_filter</span>(<span class="ident">filter</span>: <span class="ident">ScalarListFilter</span>, <span class="ident">invert</span>: <span class="ident">bool</span>, <span class="ident">prefix</span>: <span class="ident">FilterPrefix</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">field</span>;
+    <span class="kw">let</span> <span class="ident">prefixed</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">render_with</span>(<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">into</span>());
 
     <span class="comment">// Of course Mongo needs special filters for the inverted case, everything else would be too easy.</span>
     <span class="kw">let</span> <span class="ident">filter_doc</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">invert</span> {
         <span class="kw">match</span> <span class="ident">filter</span>.<span class="ident">condition</span> {
             <span class="comment">// &quot;Contains element&quot; -&gt; &quot;Does not contain element&quot;</span>
             <span class="ident">connector_interface::ScalarListCondition::Contains</span>(<span class="ident">val</span>) =&gt; {
-                <span class="macro">doc!</span> { <span class="ident">field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$elemMatch&quot;</span>: { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$eq&quot;</span>: (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">val</span>).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }}}}
+                <span class="macro">doc!</span> { <span class="ident">prefixed</span>: { <span class="string">&quot;$elemMatch&quot;</span>: { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$eq&quot;</span>: (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">val</span>).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }}}}
             }
 
             <span class="comment">// &quot;Contains all elements&quot; -&gt; &quot;Does not contain any of the elements&quot;</span>
             <span class="ident">connector_interface::ScalarListCondition::ContainsEvery</span>(<span class="ident">vals</span>) =&gt; {
-                <span class="macro">doc!</span> { <span class="ident">field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$nin&quot;</span>: (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }}
+                <span class="macro">doc!</span> { <span class="ident">prefixed</span>: { <span class="string">&quot;$nin&quot;</span>: (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }}
             }
 
             <span class="comment">// &quot;Contains some of the elements&quot; -&gt; &quot;Does not contain some of the elements&quot;</span>
             <span class="ident">connector_interface::ScalarListCondition::ContainsSome</span>(<span class="ident">vals</span>) =&gt; {
-                <span class="macro">doc!</span> { <span class="ident">field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$elemMatch&quot;</span>: { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$in&quot;</span>: (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }}}}
+                <span class="macro">doc!</span> { <span class="ident">prefixed</span>: { <span class="string">&quot;$elemMatch&quot;</span>: { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$in&quot;</span>: (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }}}}
             }
 
             <span class="comment">// Empty -&gt; not empty and vice versa</span>
             <span class="ident">connector_interface::ScalarListCondition::IsEmpty</span>(<span class="ident">check_for_empty</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">check_for_empty</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">invert</span> {
-                    <span class="macro">doc!</span> { <span class="ident">field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$size&quot;</span>: <span class="number">0</span> }}
+                    <span class="macro">doc!</span> { <span class="ident">prefixed</span>: { <span class="string">&quot;$size&quot;</span>: <span class="number">0</span> }}
                 } <span class="kw">else</span> {
-                    <span class="macro">doc!</span> { <span class="ident">field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$size&quot;</span>: <span class="number">0</span> }}}
+                    <span class="macro">doc!</span> { <span class="ident">prefixed</span>: { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$size&quot;</span>: <span class="number">0</span> }}}
                 }
             }
         }
     } <span class="kw">else</span> {
         <span class="kw">match</span> <span class="ident">filter</span>.<span class="ident">condition</span> {
             <span class="ident">connector_interface::ScalarListCondition::Contains</span>(<span class="ident">val</span>) =&gt; {
-                <span class="macro">doc!</span> { <span class="ident">field</span>.<span class="ident">db_name</span>(): (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">val</span>).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }
+                <span class="macro">doc!</span> { <span class="ident">prefixed</span>: (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">val</span>).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }
             }
 
             <span class="ident">connector_interface::ScalarListCondition::ContainsEvery</span>(<span class="ident">vals</span>) <span class="kw">if</span> <span class="ident">vals</span>.<span class="ident">is_empty</span>() =&gt; {
@@ -795,7 +929,7 @@
             }
 
             <span class="ident">connector_interface::ScalarListCondition::ContainsEvery</span>(<span class="ident">vals</span>) =&gt; {
-                <span class="macro">doc!</span> { <span class="ident">field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$all&quot;</span>: (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }}
+                <span class="macro">doc!</span> { <span class="ident">prefixed</span>: { <span class="string">&quot;$all&quot;</span>: (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }}
             }
 
             <span class="ident">connector_interface::ScalarListCondition::ContainsSome</span>(<span class="ident">vals</span>) <span class="kw">if</span> <span class="ident">vals</span>.<span class="ident">is_empty</span>() =&gt; {
@@ -804,14 +938,14 @@
             }
 
             <span class="ident">connector_interface::ScalarListCondition::ContainsSome</span>(<span class="ident">vals</span>) =&gt; {
-                <span class="macro">doc!</span> { <span class="string">&quot;$or&quot;</span>: <span class="ident">vals</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="macro">doc!</span> { <span class="ident">field</span>.<span class="ident">db_name</span>(): (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">val</span>).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }) ).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>}
+                <span class="macro">doc!</span> { <span class="string">&quot;$or&quot;</span>: <span class="ident">vals</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="macro">doc!</span> { <span class="ident">prefixed</span>.<span class="ident">clone</span>(): (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">val</span>).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }) ).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>}
             }
 
             <span class="ident">connector_interface::ScalarListCondition::IsEmpty</span>(<span class="ident">empty</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">empty</span> {
-                    <span class="macro">doc!</span> { <span class="ident">field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$size&quot;</span>: <span class="number">0</span> }}
+                    <span class="macro">doc!</span> { <span class="ident">prefixed</span>: { <span class="string">&quot;$size&quot;</span>: <span class="number">0</span> }}
                 } <span class="kw">else</span> {
-                    <span class="macro">doc!</span> { <span class="ident">field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$size&quot;</span>: <span class="number">0</span> }}}
+                    <span class="macro">doc!</span> { <span class="ident">prefixed</span>: { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$size&quot;</span>: <span class="number">0</span> }}}
                 }
             }
         }
@@ -836,15 +970,22 @@
 }
 
 <span class="doccomment">/// Builds a Mongo relation filter depth-first.</span>
-<span class="kw">fn</span> <span class="ident">relation_filter</span>(<span class="ident">filter</span>: <span class="ident">RelationFilter</span>, <span class="ident">invert</span>: <span class="ident">bool</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">relation_filter</span>(<span class="ident">filter</span>: <span class="ident">RelationFilter</span>, <span class="ident">invert</span>: <span class="ident">bool</span>, <span class="ident">prefix</span>: <span class="ident">FilterPrefix</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">from_field</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">field</span>;
     <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">from_field</span>.<span class="ident">relation</span>().<span class="ident">name</span>;
     <span class="kw">let</span> <span class="ident">nested_filter</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">filter</span>.<span class="ident">nested_filter</span>;
 
     <span class="comment">// Tmp condition check while mongo is getting fully tested.</span>
     <span class="kw">let</span> <span class="ident">is_empty</span> <span class="op">=</span> <span class="macro">matches!</span>(<span class="ident">nested_filter</span>, <span class="ident">Filter::Empty</span>);
-    <span class="kw">let</span> (<span class="ident">nested_filter</span>, <span class="ident">nested_joins</span>) <span class="op">=</span>
-        <span class="ident">convert_filter</span>(<span class="ident">nested_filter</span>, <span class="ident">requires_invert</span>(<span class="kw-2">&amp;</span><span class="ident">filter</span>.<span class="ident">condition</span>), <span class="bool-val">false</span>)<span class="question-mark">?</span>.<span class="ident">render</span>();
+
+    <span class="comment">// EveryRelatedRecord requires an inherent invert for Mongo.</span>
+    <span class="kw">let</span> (<span class="ident">nested_filter</span>, <span class="ident">nested_joins</span>) <span class="op">=</span> <span class="ident">convert_filter</span>(
+        <span class="ident">nested_filter</span>,
+        <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="ident">filter</span>.<span class="ident">condition</span>, <span class="ident">RelationCondition::EveryRelatedRecord</span>),
+        <span class="bool-val">false</span>,
+        <span class="ident">prefix</span>,
+    )<span class="question-mark">?</span>
+    .<span class="ident">render</span>();
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">join_stage</span> <span class="op">=</span> <span class="ident">JoinStage::new</span>(<span class="ident">from_field</span>);
     <span class="ident">join_stage</span>.<span class="ident">extend_nested</span>(<span class="ident">nested_joins</span>);
@@ -885,22 +1026,17 @@
     }
 }
 
-<span class="doccomment">/// Checks if the given relation filter condition needs an inherent invert for MongoDB.</span>
-<span class="kw">fn</span> <span class="ident">requires_invert</span>(<span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationCondition</span>) -&gt; <span class="ident">bool</span> {
-    <span class="macro">matches!</span>(<span class="ident">rf</span>, <span class="ident">RelationCondition::EveryRelatedRecord</span>)
-}
-
-<span class="kw">fn</span> <span class="ident">aggregation_filter</span>(<span class="ident">filter</span>: <span class="ident">AggregationFilter</span>, <span class="ident">invert</span>: <span class="ident">bool</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">aggregation_filter</span>(<span class="ident">filter</span>: <span class="ident">AggregationFilter</span>, <span class="ident">invert</span>: <span class="ident">bool</span>, <span class="ident">prefix</span>: <span class="ident">FilterPrefix</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">filter</span> {
-        <span class="ident">AggregationFilter::Count</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="string">&quot;count&quot;</span>, <span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">invert</span>),
-        <span class="ident">AggregationFilter::Average</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="string">&quot;avg&quot;</span>, <span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">invert</span>),
-        <span class="ident">AggregationFilter::Sum</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="string">&quot;sum&quot;</span>, <span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">invert</span>),
-        <span class="ident">AggregationFilter::Min</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="string">&quot;min&quot;</span>, <span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">invert</span>),
-        <span class="ident">AggregationFilter::Max</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="string">&quot;max&quot;</span>, <span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">invert</span>),
+        <span class="ident">AggregationFilter::Count</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="string">&quot;count&quot;</span>, <span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">invert</span>, <span class="ident">prefix</span>),
+        <span class="ident">AggregationFilter::Average</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="string">&quot;avg&quot;</span>, <span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">invert</span>, <span class="ident">prefix</span>),
+        <span class="ident">AggregationFilter::Sum</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="string">&quot;sum&quot;</span>, <span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">invert</span>, <span class="ident">prefix</span>),
+        <span class="ident">AggregationFilter::Min</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="string">&quot;min&quot;</span>, <span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">invert</span>, <span class="ident">prefix</span>),
+        <span class="ident">AggregationFilter::Max</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="string">&quot;max&quot;</span>, <span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">invert</span>, <span class="ident">prefix</span>),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">aggregate_conditions</span>(<span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">filter</span>: <span class="ident">Filter</span>, <span class="ident">invert</span>: <span class="ident">bool</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">aggregate_conditions</span>(<span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">filter</span>: <span class="ident">Filter</span>, <span class="ident">invert</span>: <span class="ident">bool</span>, <span class="ident">prefix</span>: <span class="ident">FilterPrefix</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">sf</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">filter</span> {
         <span class="ident">Filter::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>,
         <span class="kw">_</span> =&gt; <span class="macro">unimplemented!</span>(),
@@ -910,10 +1046,11 @@
         <span class="ident">ScalarProjection::Compound</span>(<span class="kw">_</span>) =&gt; {
             <span class="macro">unimplemented!</span>(<span class="string">&quot;Compound aggregate projections are unsupported.&quot;</span>)
         }
+
         <span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>.<span class="ident">clone</span>(),
     };
 
-    <span class="kw">let</span> (<span class="ident">filter</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">scalar_filter</span>(<span class="ident">sf</span>, <span class="ident">invert</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>.<span class="ident">render</span>();
+    <span class="kw">let</span> (<span class="ident">filter</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">scalar_filter</span>(<span class="ident">sf</span>, <span class="ident">invert</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>.<span class="ident">render</span>();
 
     <span class="prelude-val">Ok</span>(<span class="ident">MongoFilter::Scalar</span>(
         <span class="macro">doc!</span> { <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">op</span>, <span class="ident">field</span>.<span class="ident">db_name</span>()): <span class="ident">filter</span> },
@@ -953,6 +1090,109 @@
         ),
         <span class="ident">options</span>,
     }))
+}
+
+<span class="kw">fn</span> <span class="ident">composite_filter</span>(<span class="ident">filter</span>: <span class="ident">CompositeFilter</span>, <span class="ident">invert</span>: <span class="ident">bool</span>, <span class="ident">prefix</span>: <span class="ident">FilterPrefix</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">field</span>;
+
+    <span class="kw">let</span> <span class="ident">filter_doc</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">filter</span>.<span class="ident">condition</span> {
+        <span class="ident">CompositeCondition::Every</span>(<span class="ident">filter</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">is_empty</span> <span class="op">=</span> <span class="macro">matches!</span>(<span class="ident">filter</span>, <span class="ident">Filter::Empty</span>);
+
+            <span class="comment">// `Every` filter requires inherent invert because of how the filters are implemented on Mongo.</span>
+            <span class="kw">let</span> (<span class="ident">nested_filter</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>.<span class="ident">render</span>();
+
+            <span class="kw">if</span> <span class="ident">is_empty</span> {
+                <span class="macro">doc!</span> { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$all&quot;</span>: [{ <span class="string">&quot;$elemMatch&quot;</span>: { <span class="string">&quot;__prisma_truthy_marker&quot;</span>: { <span class="string">&quot;$exists&quot;</span>: <span class="number">1</span> }} }] }}
+            } <span class="kw">else</span> {
+                <span class="macro">doc!</span> { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$all&quot;</span>: [{ <span class="string">&quot;$elemMatch&quot;</span>: <span class="ident">nested_filter</span> }] }}
+            }
+        }
+
+        <span class="ident">CompositeCondition::Some</span>(<span class="ident">filter</span>) =&gt; {
+            <span class="kw">let</span> (<span class="ident">nested_filter</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>.<span class="ident">render</span>();
+            <span class="macro">doc!</span> { <span class="string">&quot;$elemMatch&quot;</span>: <span class="ident">nested_filter</span> }
+        }
+
+        <span class="ident">CompositeCondition::None</span>(<span class="ident">filter</span>) =&gt; {
+            <span class="kw">let</span> (<span class="ident">nested_filter</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>.<span class="ident">render</span>();
+
+            <span class="macro">doc!</span> { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$all&quot;</span>: [{ <span class="string">&quot;$elemMatch&quot;</span>: <span class="ident">nested_filter</span> }] }}
+        }
+
+        <span class="ident">CompositeCondition::Equals</span>(<span class="ident">value</span>) =&gt; {
+            <span class="macro">doc!</span> { <span class="string">&quot;$eq&quot;</span>: (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>()<span class="question-mark">?</span> }
+        }
+
+        <span class="ident">CompositeCondition::Empty</span>(<span class="ident">should_be_empty</span>) =&gt; {
+            <span class="kw">if</span> <span class="ident">should_be_empty</span> {
+                <span class="macro">doc!</span> { <span class="string">&quot;$size&quot;</span>: <span class="number">0</span> }
+            } <span class="kw">else</span> {
+                <span class="macro">doc!</span> { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$size&quot;</span>: <span class="number">0</span> }}
+            }
+        }
+
+        <span class="ident">CompositeCondition::Is</span>(<span class="ident">filter</span>) =&gt; {
+            <span class="kw">let</span> (<span class="ident">nested_filter</span>, <span class="kw">_</span>) <span class="op">=</span>
+                <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="ident">invert</span>, <span class="bool-val">false</span>, <span class="ident">prefix</span>.<span class="ident">append_cloned</span>(<span class="ident">field</span>.<span class="ident">db_name</span>()))<span class="question-mark">?</span>.<span class="ident">render</span>();
+
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">MongoFilter::Composite</span>(<span class="ident">nested_filter</span>));
+        }
+
+        <span class="ident">CompositeCondition::IsNot</span>(<span class="ident">filter</span>) =&gt; {
+            <span class="kw">let</span> (<span class="ident">nested_filter</span>, <span class="kw">_</span>) <span class="op">=</span>
+                <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="op">!</span><span class="ident">invert</span>, <span class="bool-val">false</span>, <span class="ident">prefix</span>.<span class="ident">append_cloned</span>(<span class="ident">field</span>.<span class="ident">db_name</span>()))<span class="question-mark">?</span>.<span class="ident">render</span>();
+
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">MongoFilter::Composite</span>(<span class="ident">nested_filter</span>));
+        }
+    };
+
+    <span class="kw">let</span> <span class="ident">field_filter_name</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">render_with</span>(<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">into</span>());
+
+    <span class="kw">if</span> <span class="ident">invert</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">MongoFilter::Composite</span>(
+            <span class="macro">doc!</span> { <span class="ident">field_filter_name</span>: { <span class="string">&quot;$not&quot;</span>: <span class="ident">filter_doc</span> }},
+        ))
+    } <span class="kw">else</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">MongoFilter::Composite</span>(<span class="macro">doc!</span> { <span class="ident">field_filter_name</span>: <span class="ident">filter_doc</span> }))
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">FilterPrefix</span> {
+    <span class="ident">parts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">FilterPrefix</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_cloned</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">elem</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
+
+        <span class="ident">new</span>.<span class="ident">parts</span>.<span class="ident">push</span>(<span class="ident">elem</span>.<span class="ident">into</span>());
+        <span class="ident">new</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
+        <span class="self">self</span>.<span class="ident">parts</span>.<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_with</span>(<span class="self">self</span>, <span class="ident">target</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">parts</span>.<span class="ident">is_empty</span>() {
+            <span class="ident">target</span>
+        } <span class="kw">else</span> {
+            <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.<span class="ident">render</span>(), <span class="ident">target</span>)
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FilterPrefix</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">parts</span>: <span class="macro">vec!</span>[<span class="ident">cf</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>()],
+        }
+    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>

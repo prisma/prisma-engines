@@ -205,6 +205,15 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::objects</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">constants</span>::{<span class="ident">args</span>, <span class="ident">operations</span>};
@@ -212,7 +221,16 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">filter_input_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ModelField</span>, <span class="ident">include_aggregates</span>: <span class="ident">bool</span>) -&gt; <span class="ident">InputField</span> {
     <span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="ident">field_filter_types::get_field_filter_types</span>(<span class="ident">ctx</span>, <span class="ident">field</span>, <span class="ident">include_aggregates</span>);
-    <span class="ident">input_field</span>(<span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(), <span class="ident">types</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>()
+    <span class="kw">let</span> <span class="ident">nullable</span> <span class="op">=</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">is_required</span>()
+        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">is_list</span>()
+        <span class="op">&amp;&amp;</span> <span class="kw">match</span> <span class="ident">field</span> {
+            <span class="ident">ModelField::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">type_identifier</span> <span class="op">!</span><span class="op">=</span> <span class="ident">TypeIdentifier::Json</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">true</span>,
+        };
+
+    <span class="ident">input_field</span>(<span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(), <span class="ident">types</span>, <span class="prelude-val">None</span>)
+        .<span class="ident">optional</span>()
+        .<span class="ident">nullable_if</span>(<span class="ident">nullable</span>)
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">nested_create_one_input_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">parent_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>) -&gt; <span class="ident">InputField</span> {

@@ -202,18 +202,31 @@
 <span id="200">200</span>
 <span id="201">201</span>
 <span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Filtering types to select records from the database</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The creation of the types should be done with</span>
 <span class="doccomment">//! [ScalarCompare](/query-connector/trait.ScalarCompare.html) and</span>
 <span class="doccomment">//! [RelationCompare](/query-connector/trait.RelationCompare.html).</span>
+<span class="doccomment">//! [CompositeCompare](/query-connector/trait.RelationCompare.html).</span>
 
+<span class="kw">mod</span> <span class="ident">composite</span>;
 <span class="kw">mod</span> <span class="ident">into_filter</span>;
 <span class="kw">mod</span> <span class="ident">json</span>;
 <span class="kw">mod</span> <span class="ident">list</span>;
 <span class="kw">mod</span> <span class="ident">relation</span>;
 <span class="kw">mod</span> <span class="ident">scalar</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">composite</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">into_filter</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">json</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">list</span>::<span class="kw-2">*</span>;
@@ -229,6 +242,7 @@
     <span class="ident">ScalarList</span>(<span class="ident">ScalarListFilter</span>),
     <span class="ident">OneRelationIsNull</span>(<span class="ident">OneRelationIsNullFilter</span>),
     <span class="ident">Relation</span>(<span class="ident">RelationFilter</span>),
+    <span class="ident">Composite</span>(<span class="ident">CompositeFilter</span>),
     <span class="ident">BoolFilter</span>(<span class="ident">bool</span>),
     <span class="ident">Aggregation</span>(<span class="ident">AggregationFilter</span>),
     <span class="ident">Empty</span>,
@@ -402,6 +416,12 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Filter</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Filter::BoolFilter</span>(<span class="ident">b</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CompositeFilter</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Filter</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">cf</span>: <span class="ident">CompositeFilter</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">Filter::Composite</span>(<span class="ident">cf</span>)
     }
 }
 </code></pre></div>

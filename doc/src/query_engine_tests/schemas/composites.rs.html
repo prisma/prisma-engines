@@ -168,6 +168,7 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 
 <span class="doccomment">/// All types Prisma supports on a composite.</span>
@@ -270,8 +271,9 @@
         }
 
         type CompositeA {
-            a_1 String @default(&quot;a_1 default&quot;) @map(&quot;a1&quot;)
-            a_2 Int?
+            a_1          String       @default(&quot;a_1 default&quot;) @map(&quot;a1&quot;)
+            a_2          Int?
+            a_to_many_bs CompositeB[]
         }
 
         type CompositeB {

@@ -300,7 +300,40 @@
 <span id="298">298</span>
 <span id="299">299</span>
 <span id="300">300</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">filter_fold</span>;
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">composite</span>;
+<span class="kw">mod</span> <span class="ident">filter_fold</span>;
 <span class="kw">mod</span> <span class="ident">filter_grouping</span>;
 <span class="kw">mod</span> <span class="ident">relation</span>;
 <span class="kw">mod</span> <span class="ident">scalar</span>;
@@ -311,10 +344,14 @@
     <span class="ident">query_document</span>::{<span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>},
     <span class="ident">QueryGraphBuilderError</span>, <span class="ident">QueryGraphBuilderResult</span>,
 };
-<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">filter::Filter</span>, <span class="ident">QueryMode</span>, <span class="ident">RelationCompare</span>, <span class="ident">ScalarCompare</span>, <span class="ident">ScalarCondition</span>, <span class="ident">ScalarProjection</span>};
+<span class="kw">use</span> <span class="ident">connector</span>::{
+    <span class="ident">filter::Filter</span>, <span class="ident">CompositeCompare</span>, <span class="ident">QueryMode</span>, <span class="ident">RelationCompare</span>, <span class="ident">ScalarCompare</span>, <span class="ident">ScalarCondition</span>, <span class="ident">ScalarProjection</span>,
+};
 <span class="kw">use</span> <span class="ident">filter_fold</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">filter_grouping</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">Field</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">ScalarFieldRef</span>};
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{
+    <span class="ident">prelude::ParentContainer</span>, <span class="ident">CompositeFieldRef</span>, <span class="ident">Field</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">ScalarFieldRef</span>,
+};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">convert::TryInto</span>, <span class="ident">str::FromStr</span>};
 
 <span class="doccomment">/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.</span>
@@ -370,11 +407,19 @@
 <span class="doccomment">/// | OR   | return empty list | validate single filter | validate all filters |</span>
 <span class="doccomment">/// | AND  | return all items  | validate single filter | validate all filters |</span>
 <span class="doccomment">/// | NOT  | return all items  | validate single filter | validate all filters |</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">value_map</span>, <span class="ident">model</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_filter</span>(<span class="ident">value_map</span>: <span class="ident">ParsedInputMap</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_filter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value_map</span>: <span class="ident">ParsedInputMap</span>, <span class="ident">container</span>: <span class="ident">T</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ParentContainer</span><span class="op">&gt;</span>,
+{
+    <span class="kw">let</span> <span class="ident">container</span> <span class="op">=</span> <span class="ident">container</span>.<span class="ident">into</span>();
+
     <span class="comment">// We define an internal function so we can track the recursion depth. Empty</span>
     <span class="comment">// filters at the root layer cannot always be removed.</span>
-    <span class="kw">fn</span> <span class="ident">extract_filter</span>(<span class="ident">value_map</span>: <span class="ident">ParsedInputMap</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">depth</span>: <span class="ident">usize</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">extract_filter</span>(
+        <span class="ident">value_map</span>: <span class="ident">ParsedInputMap</span>,
+        <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>,
+        <span class="ident">depth</span>: <span class="ident">usize</span>,
+    ) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">value_map</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">value</span>)<span class="op">|</span> {
@@ -384,11 +429,13 @@
                         <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
                             <span class="ident">ParsedInputValue::List</span>(<span class="ident">values</span>) =&gt; <span class="ident">values</span>
                                 .<span class="ident">into_iter</span>()
-                                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">extract_filter</span>(<span class="ident">val</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">model</span>, <span class="ident">depth</span> <span class="op">+</span> <span class="number">1</span>))
+                                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">extract_filter</span>(<span class="ident">val</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">container</span>, <span class="ident">depth</span> <span class="op">+</span> <span class="number">1</span>))
                                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
 
                             <span class="comment">// Single map to vec coercion</span>
-                            <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>) =&gt; <span class="ident">extract_filter</span>(<span class="ident">map</span>, <span class="ident">model</span>, <span class="ident">depth</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">res</span>])<span class="question-mark">?</span>,
+                            <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>) =&gt; {
+                                <span class="ident">extract_filter</span>(<span class="ident">map</span>, <span class="ident">container</span>, <span class="ident">depth</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">res</span>])<span class="question-mark">?</span>
+                            }
 
                             <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
                         };
@@ -420,10 +467,10 @@
                         }
                     }
                     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_all</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>)<span class="question-mark">?</span> {
-                            <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">extract_relation_filters</span>(<span class="ident">rf</span>, <span class="ident">value</span>),
-                            <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">extract_scalar_filters</span>(<span class="ident">sf</span>, <span class="ident">value</span>),
-                            <span class="ident">Field::Composite</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]), <span class="comment">// [Composites] todo</span>
+                        <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">container</span>.<span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">expect</span>(<span class="string">&quot;Invalid field passed validation.&quot;</span>) {
+                            <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">extract_relation_filters</span>(<span class="kw-2">&amp;</span><span class="ident">rf</span>, <span class="ident">value</span>),
+                            <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">extract_scalar_filters</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>, <span class="ident">value</span>),
+                            <span class="ident">Field::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">extract_composite_filters</span>(<span class="kw-2">&amp;</span><span class="ident">cf</span>, <span class="ident">value</span>),
                         }<span class="question-mark">?</span>;
 
                         <span class="comment">// strip empty filters</span>
@@ -450,7 +497,7 @@
         }
     }
 
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">extract_filter</span>(<span class="ident">value_map</span>, <span class="ident">model</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">extract_filter</span>(<span class="ident">value_map</span>, <span class="kw-2">&amp;</span><span class="ident">container</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">merge_search_filters</span>(<span class="ident">filter</span>);
 
     <span class="prelude-val">Ok</span>(<span class="ident">filter</span>)
@@ -599,6 +646,23 @@
         <span class="string">&quot;insensitive&quot;</span> =&gt; <span class="ident">QueryMode::Insensitive</span>,
         <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
     })
+}
+
+<span class="doccomment">/// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { &lt;field&gt;: &lt;value&gt; }.</span>
+<span class="doccomment">/// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).</span>
+<span class="kw">fn</span> <span class="ident">extract_composite_filters</span>(
+    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>,
+    <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>,
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">match</span> <span class="ident">value</span> {
+        <span class="ident">ParsedInputValue::Single</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">val</span>)]), <span class="comment">// Todo: Do we want to do coercions here? (list, object)</span>
+        <span class="ident">ParsedInputValue::List</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">PrismaValue::List</span>(<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>))]),
+        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">filter_map</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">composite::parse</span>(<span class="ident">filter_map</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>]),
+        <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+            <span class="string">&quot;Invalid composite filter input: {:?}&quot;</span>,
+            <span class="ident">x</span>
+        ))),
+    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>

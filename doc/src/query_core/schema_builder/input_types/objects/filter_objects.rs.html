@@ -172,8 +172,53 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">constants::filters</span>;
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">prelude::ParentContainer</span>, <span class="ident">CompositeFieldRef</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="ident">include_aggregates</span>))]</span>
@@ -218,9 +263,13 @@
     <span class="ident">weak_ref</span>
 }
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">ctx</span>, <span class="ident">model</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">where_object_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="macro">format!</span>(<span class="string">&quot;{}WhereInput&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>), <span class="ident">PRISMA_NAMESPACE</span>);
+<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">ctx</span>, <span class="ident">container</span>))]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">where_object_type</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">container</span>: <span class="ident">T</span>) -&gt; <span class="ident">InputObjectTypeWeakRef</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ParentContainer</span><span class="op">&gt;</span>,
+{
+    <span class="kw">let</span> <span class="ident">container</span> <span class="op">=</span> <span class="ident">container</span>.<span class="ident">into</span>();
+    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="macro">format!</span>(<span class="string">&quot;{}WhereInput&quot;</span>, <span class="ident">container</span>.<span class="ident">name</span>()), <span class="ident">PRISMA_NAMESPACE</span>);
     <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
 
     <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>()));
@@ -245,10 +294,10 @@
         .<span class="ident">optional</span>(),
     ];
 
-    <span class="kw">let</span> <span class="ident">input_fields</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">all</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
-        <span class="ident">ModelField::Composite</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-        <span class="ident">f</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">input_fields::filter_input_field</span>(<span class="ident">ctx</span>, <span class="ident">f</span>, <span class="bool-val">false</span>)),
-    });
+    <span class="kw">let</span> <span class="ident">input_fields</span> <span class="op">=</span> <span class="ident">container</span>
+        .<span class="ident">fields</span>()
+        .<span class="ident">into_iter</span>()
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">input_fields::filter_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="bool-val">false</span>));
 
     <span class="ident">fields</span>.<span class="ident">extend</span>(<span class="ident">input_fields</span>);
 
@@ -267,7 +316,7 @@
     <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">x</span>);
     <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
 
-    <span class="comment">//TODO (dom) this can probably be collapsed into just uniques and pks</span>
+    <span class="comment">// TODO (dom): This can probably be collapsed into just uniques and pks</span>
     <span class="comment">// Single unique or ID fields.</span>
     <span class="kw">let</span> <span class="ident">unique_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">scalar</span>().<span class="ident">into_iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">unique</span>()).<span class="ident">collect</span>();
 
@@ -342,6 +391,45 @@
         .<span class="ident">collect</span>();
 
     <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">object_fields</span>);
+    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+}
+
+<span class="doccomment">/// Object used for full composite equality, e.g. `{ field: &quot;value&quot;, field2: 123 } == { field: &quot;value&quot; }`.</span>
+<span class="doccomment">/// If the composite is a list, only lists are allowed for comparison, no shorthands are used.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">composite_equality_object</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
+    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="macro">format!</span>(<span class="string">&quot;{}ObjectEqualityInput&quot;</span>, <span class="ident">cf</span>.<span class="ident">typ</span>.<span class="ident">name</span>), <span class="ident">PRISMA_NAMESPACE</span>);
+    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+
+    <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>()));
+    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
+
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+
+    <span class="kw">let</span> <span class="ident">input_fields</span> <span class="op">=</span> <span class="ident">cf</span>.<span class="ident">typ</span>.<span class="ident">fields</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
+        <span class="ident">ModelField::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">input_field</span>(<span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">map_scalar_input_type_for_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">sf</span>), <span class="prelude-val">None</span>)
+            .<span class="ident">optional_if</span>(<span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>())
+            .<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_list</span>()),
+
+        <span class="ident">ModelField::Composite</span>(<span class="ident">cf</span>) =&gt; {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">types</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+
+            <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() {
+                <span class="ident">types</span>.<span class="ident">push</span>(<span class="ident">InputType::list</span>(<span class="ident">InputType::object</span>(<span class="ident">composite_equality_object</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>))));
+            } <span class="kw">else</span> {
+                <span class="ident">types</span>.<span class="ident">push</span>(<span class="ident">InputType::object</span>(<span class="ident">composite_equality_object</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>)));
+            }
+
+            <span class="ident">input_field</span>(<span class="ident">cf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">types</span>, <span class="prelude-val">None</span>)
+                .<span class="ident">optional_if</span>(<span class="op">!</span><span class="ident">cf</span>.<span class="ident">is_required</span>())
+                .<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">cf</span>.<span class="ident">is_required</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">cf</span>.<span class="ident">is_list</span>())
+        }
+
+        <span class="ident">ModelField::Relation</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
+    });
+
+    <span class="ident">fields</span>.<span class="ident">extend</span>(<span class="ident">input_fields</span>);
+    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
+
     <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
 }
 </code></pre></div>
