@@ -535,14 +535,14 @@ fn composite_filter(filter: CompositeFilter, invert: bool, prefix: FilterPrefix)
 
         CompositeCondition::Is(filter) => {
             let (nested_filter, _) =
-                convert_filter(filter, invert, false, prefix.clone().append_cloned(field.db_name()))?.render();
+                convert_filter(filter, invert, false, prefix.append_cloned(field.db_name()))?.render();
 
             return Ok(MongoFilter::Composite(nested_filter));
         }
 
         CompositeCondition::IsNot(filter) => {
             let (nested_filter, _) =
-                convert_filter(filter, !invert, false, prefix.clone().append_cloned(field.db_name()))?.render();
+                convert_filter(filter, !invert, false, prefix.append_cloned(field.db_name()))?.render();
 
             return Ok(MongoFilter::Composite(nested_filter));
         }
