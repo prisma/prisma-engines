@@ -392,9 +392,6 @@ mod atomic_number_ops {
         Ok(())
     }
 
-    // TODO(mongo, precision): Suffers from precision issues on Float
-    // These precision issues should be gone once the floating point fixes effort is done
-    // Note: These precision issues are created within Prisma's MongoDB connector, not within MongoDB.
     #[connector_test(schema(schema_3), only(MongoDb))]
     async fn nested_update_float_ops_mongo(runner: Runner) -> TestResult<()> {
         create_test_model(&runner, 1, None, None).await?;
@@ -417,7 +414,7 @@ mod atomic_number_ops {
         );
         insta::assert_snapshot!(
           query_nested_number_ops(&runner, 2, "optFloat", "decrement", "4.6").await?,
-          @r###"{"optFloat":5.500000000000001}"###
+          @r###"{"optFloat":5.5}"###
         );
 
         // Multiply
@@ -437,17 +434,17 @@ mod atomic_number_ops {
         );
         insta::assert_snapshot!(
           query_nested_number_ops(&runner, 2, "optFloat", "divide", "2").await?,
-          @r###"{"optFloat":5.500000000000001}"###
+          @r###"{"optFloat":5.5}"###
         );
 
         // Set
         insta::assert_snapshot!(
           query_nested_number_ops(&runner, 1, "optFloat", "set", "5.1").await?,
-          @r###"{"optFloat":5.100000000000001}"###
+          @r###"{"optFloat":5.1}"###
         );
         insta::assert_snapshot!(
           query_nested_number_ops(&runner, 2, "optFloat", "set", "5.1").await?,
-          @r###"{"optFloat":5.100000000000001}"###
+          @r###"{"optFloat":5.1}"###
         );
 
         // Set null
