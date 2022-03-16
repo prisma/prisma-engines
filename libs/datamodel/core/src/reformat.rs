@@ -1,37 +1,28 @@
 mod helpers;
 
-use crate::{dml, load_sources, Datasource, Diagnostics, ParserDatabase};
+use crate::{Diagnostics, ParserDatabase};
 use datamodel_connector::Span;
-use enumflags2::BitFlags;
 use helpers::*;
 use parser_database::walkers;
 use pest::{iterators::Pair, Parser};
 use schema_ast::{
-    ast::{self, SchemaAst},
+    ast,
     parser::{PrismaDatamodelParser, Rule},
     renderer::*,
 };
 
-/// Returns either the reformatted schema, or the original input if we can't reformat (invalid
-/// syntax, etc.).
+/// Returns either the reformatted schema, or the original input if we can't reformat. This happens
+/// if and only if the source does not parse to a valid AST.
 pub fn reformat(source: &str, indent_width: usize) -> Result<String, &str> {
     Reformatter::new(source).reformat_internal(indent_width)
 }
 
-fn parse_datamodel_for_formatter(
-    ast: ast::SchemaAst,
-) -> Result<(ParserDatabase, dml::Datamodel, Vec<Datasource>), Diagnostics> {
+fn parse_datamodel_for_formatter(input: &str) -> Result<ParserDatabase, Diagnostics> {
+    let ast = crate::parse_schema_ast(input)?;
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let datasources = load_sources(&ast, Default::default(), &mut diagnostics);
     let db = parser_database::ParserDatabase::new(ast, &mut diagnostics);
     diagnostics.to_result()?;
-    let (connector, referential_integrity) = datasources
-        .get(0)
-        .map(|ds| (ds.active_connector, ds.referential_integrity()))
-        .unwrap_or((&datamodel_connector::EmptyDatamodelConnector, Default::default()));
-
-    let datamodel = crate::transform::ast_to_dml::LiftAstToDml::new(&db, connector, referential_integrity).lift();
-    Ok((db, datamodel, datasources))
+    Ok(db)
 }
 
 struct Reformatter<'a> {
@@ -43,12 +34,9 @@ struct Reformatter<'a> {
 
 impl<'a> Reformatter<'a> {
     fn new(input: &'a str) -> Self {
-        let info = crate::parse_schema_ast(input).and_then(parse_datamodel_for_formatter);
-        match info {
-            Ok((db, datamodel, mut datasources)) => {
-                let schema_ast = db.ast();
-                let datasource = datasources.pop();
-                let missing_fields = Self::find_all_missing_fields(schema_ast, &datamodel, datasource.as_ref());
+        match parse_datamodel_for_formatter(input) {
+            Ok(db) => {
+                let missing_fields = find_all_missing_fields(&db);
                 let missing_field_attributes = find_all_missing_attributes(&db);
                 let missing_relation_attribute_args = find_all_missing_relation_attribute_args(&db);
 
@@ -66,33 +54,6 @@ impl<'a> Reformatter<'a> {
                 missing_fields: Vec::new(),
             },
         }
-    }
-
-    // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
-    fn find_all_missing_fields(
-        schema_ast: &SchemaAst,
-        datamodel: &dml::Datamodel,
-        datasource: Option<&Datasource>,
-    ) -> Vec<MissingField> {
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
-        let mut result = Vec::new();
-
-        for model in datamodel.models() {
-            let ast_model = schema_ast.find_model(&model.name).unwrap();
-
-            for field in model.fields() {
-                if !ast_model.fields.iter().any(|f| f.name.name == field.name()) {
-                    let ast_field = lowerer.lower_field(model, field, datamodel);
-
-                    result.push(MissingField {
-                        model: model.name.clone(),
-                        field: ast_field,
-                    });
-                }
-            }
-        }
-
-        result
     }
 
     fn reformat_internal(self, indent_width: usize) -> Result<String, &'a str> {
@@ -993,5 +954,153 @@ fn push_missing_relation_attribute(
                 },
             })
         }
+    }
+}
+
+// this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
+fn find_all_missing_fields(db: &ParserDatabase) -> Vec<MissingField> {
+    let mut result = Vec::new();
+
+    for relation in db.walk_relations() {
+        if let Some(inline) = relation.refine().as_inline() {
+            push_missing_fields(inline, &mut result);
+        }
+    }
+
+    result
+}
+
+fn push_missing_fields(relation: walkers::InlineRelationWalker<'_>, missing_fields: &mut Vec<MissingField>) {
+    push_missing_relation_fields(relation, missing_fields);
+    push_missing_scalar_fields(relation, missing_fields);
+}
+
+fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, missing_fields: &mut Vec<MissingField>) {
+    if inline.back_relation_field().is_none() {
+        let mut attributes = Vec::new();
+
+        if inline.referencing_model().is_ignored() {
+            attributes.push(ast::Attribute {
+                name: ast::Identifier::new("ignore"),
+                arguments: Default::default(),
+                span: Span::empty(),
+            })
+        }
+
+        missing_fields.push(MissingField {
+            model: inline.referenced_model().name().to_owned(),
+            field: ast::Field {
+                field_type: ast::FieldType::Supported(ast::Identifier::new(inline.referencing_model().name())),
+                name: ast::Identifier::new(inline.referencing_model().name()),
+                arity: ast::FieldArity::List,
+                attributes,
+                documentation: None,
+                span: Span::empty(),
+                is_commented_out: false,
+            },
+        })
+    }
+
+    if inline.forward_relation_field().is_none() {
+        missing_fields.push(MissingField {
+            model: inline.referencing_model().name().to_owned(),
+            field: ast::Field {
+                field_type: ast::FieldType::Supported(ast::Identifier::new(inline.referenced_model().name())),
+                name: ast::Identifier::new(inline.referenced_model().name()),
+                arity: inline.forward_relation_field_arity(),
+                attributes: vec![ast::Attribute {
+                    name: ast::Identifier::new("relation"),
+                    arguments: ast::ArgumentsList {
+                        arguments: vec![
+                            ast::Argument {
+                                name: Some(ast::Identifier::new("fields")),
+                                value: ast::Expression::Array(
+                                    match inline.referencing_fields() {
+                                        walkers::ReferencingFields::Concrete(fields) => fields
+                                            .map(|f| ast::Expression::ConstantValue(f.name().to_owned(), Span::empty()))
+                                            .collect(),
+                                        walkers::ReferencingFields::Inferred(fields) => fields
+                                            .into_iter()
+                                            .map(|f| ast::Expression::ConstantValue(f.name, Span::empty()))
+                                            .collect(),
+                                        walkers::ReferencingFields::NA => Vec::new(),
+                                    },
+                                    Span::empty(),
+                                ),
+                                span: Span::empty(),
+                            },
+                            ast::Argument {
+                                name: Some(ast::Identifier::new("references")),
+                                value: ast::Expression::Array(
+                                    inline
+                                        .referenced_fields()
+                                        .map(|f| ast::Expression::ConstantValue(f.name().to_owned(), Span::empty()))
+                                        .collect(),
+                                    Span::empty(),
+                                ),
+                                span: Span::empty(),
+                            },
+                        ],
+                        empty_arguments: Vec::new(),
+                        trailing_comma: None,
+                    },
+                    span: Span::empty(),
+                }],
+                documentation: None,
+                span: Span::empty(),
+                is_commented_out: false,
+            },
+        })
+    }
+}
+
+fn push_missing_scalar_fields(inline: walkers::InlineRelationWalker<'_>, missing_fields: &mut Vec<MissingField>) {
+    let missing_scalar_fields = match inline.referencing_fields() {
+        walkers::ReferencingFields::Inferred(inferred_fields) => inferred_fields,
+        _ => return,
+    };
+
+    // Filter out duplicate fields
+    let missing_scalar_fields = missing_scalar_fields.iter().filter(|missing| {
+        !inline
+            .referencing_model()
+            .scalar_fields()
+            .any(|sf| sf.name() == missing.name)
+    });
+
+    for field in missing_scalar_fields {
+        let field_type = if let Some(ft) = field.tpe.as_builtin_scalar() {
+            ft
+        } else {
+            return;
+        };
+
+        let mut attributes: Vec<ast::Attribute> = Vec::new();
+        if let Some((datasource_name, type_name, _args, _span)) = field.blueprint.raw_native_type() {
+            let expected_attr_name = format!("{datasource_name}.{type_name}");
+            attributes.push(
+                field
+                    .blueprint
+                    .ast_field()
+                    .attributes
+                    .iter()
+                    .find(|attr| attr.name.name == expected_attr_name)
+                    .unwrap()
+                    .clone(),
+            );
+        }
+
+        missing_fields.push(MissingField {
+            model: inline.referencing_model().name().to_owned(),
+            field: ast::Field {
+                field_type: ast::FieldType::Supported(ast::Identifier::new(field_type.as_str())),
+                name: ast::Identifier::new(&field.name),
+                arity: inline.forward_relation_field_arity(),
+                attributes,
+                documentation: None,
+                span: Span::empty(),
+                is_commented_out: false,
+            },
+        })
     }
 }

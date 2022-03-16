@@ -563,7 +563,7 @@ fn must_add_back_relation_fields_for_self_relations() {
           id    Int     @id
           sonId Int?
           son   Human?  @relation(fields: [sonId], references: [id])
-          Human Human[] @relation("HumanToHuman")
+          Human Human[]
         }
     "#]];
 
@@ -622,7 +622,7 @@ fn add_backrelation_for_unambiguous_self_relations_in_presence_of_unrelated_othe
           motherId    Int
           mother      User       @relation(fields: motherId, references: id)
           subscribers Follower[]
-          User        User[]     @relation("UserToUser")
+          User        User[]
         }
 
         model Follower {
@@ -1235,7 +1235,7 @@ fn issue_10118() {
 }
 
 #[test]
-fn embedded_relations_should_not_add_anything_in_reformat() {
+fn mongodb_inline_relations_reformat_as_expected() {
     let schema = indoc! {r#"
         datasource db {
           provider = "mongodb"
@@ -1276,7 +1276,9 @@ fn embedded_relations_should_not_add_anything_in_reformat() {
         }
 
         model B {
-          id String @id @default(auto()) @map("_id") @db.ObjectId
+          id  String  @id @default(auto()) @map("_id") @db.ObjectId
+          A   A?      @relation(fields: [aId], references: [id])
+          aId String? @db.ObjectId
         }
     "#]];
 
