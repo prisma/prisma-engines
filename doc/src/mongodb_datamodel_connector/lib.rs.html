@@ -123,6 +123,7 @@
 <span id="121">121</span>
 <span id="122">122</span>
 <span id="123">123</span>
+<span id="124">124</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
 <span class="kw">mod</span> <span class="ident">validations</span>;
 
@@ -194,6 +195,7 @@
 
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
             <span class="ident">validations::index_is_not_defined_multiple_times_to_same_fields</span>(<span class="ident">index</span>, <span class="ident">errors</span>);
+            <span class="ident">validations::unique_cannot_be_defined_to_id_field</span>(<span class="ident">index</span>, <span class="ident">errors</span>);
         }
     }
 
