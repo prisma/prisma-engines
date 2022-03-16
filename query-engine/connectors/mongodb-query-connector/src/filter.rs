@@ -443,7 +443,7 @@ fn one_is_null(filter: OneRelationIsNullFilter, invert: bool, prefix: FilterPref
 fn relation_filter(filter: RelationFilter, invert: bool, prefix: FilterPrefix) -> crate::Result<MongoFilter> {
     let from_field = filter.field;
     let relation_name = &from_field.relation().name;
-    let field_name = prefix.clone().render_with(relation_name.to_owned());
+    let field_name = prefix.render_with(relation_name.to_owned());
     let nested_filter = *filter.nested_filter;
     // Tmp condition check while mongo is getting fully tested.
     let is_empty_filter = matches!(nested_filter, Filter::Empty);
