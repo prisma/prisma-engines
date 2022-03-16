@@ -160,3 +160,32 @@ pub(crate) fn index_is_not_defined_multiple_times_to_same_fields(index: IndexWal
         *attr.span(),
     ))
 }
+
+/// A field cannot have `@id` and `@unique` attributes at the same time.
+pub(crate) fn unique_cannot_be_defined_to_id_field(index: IndexWalker<'_>, errors: &mut Diagnostics) {
+    let attr = if let Some(attribute) = index.ast_attribute() {
+        attribute
+    } else {
+        return;
+    };
+
+    if !index.is_unique() {
+        return;
+    }
+
+    if index.fields().len() != 1 {
+        return;
+    }
+
+    let field = index.fields().next().unwrap();
+
+    if !field.is_single_pk() {
+        return;
+    }
+
+    errors.push_error(DatamodelError::new_attribute_validation_error(
+        "An id field cannot hold an additional unique constraint with the current connector.",
+        "unique",
+        *attr.span(),
+    ));
+}

@@ -451,3 +451,18 @@ fn mssql_allows_compound_id_sort_argument() {
     let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
+
+#[test]
+fn mongodb_compound_unique_can_have_id_as_part_of_it() {
+    let dml = indoc! {r#"
+        model User {
+          id String @id @map("_id") @test.ObjectId
+          di Int
+
+          @@unique([id, di])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    assert!(datamodel::parse_schema(&schema).is_ok());
+}
