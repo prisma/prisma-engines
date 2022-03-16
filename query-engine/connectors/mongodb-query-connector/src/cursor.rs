@@ -50,8 +50,9 @@ impl CursorBuilder {
 
         for (field, value) in cursor {
             let bson = (&field, value).into_bson()?;
+            let field_name = format!("${}", field.db_name());
 
-            cursor_filters.push(doc! { field.db_name(): { "$eq": bson }});
+            cursor_filters.push(doc! { "$eq": [field_name, bson]});
         }
 
         let cursor_filter = doc! { "$and": cursor_filters };
@@ -181,7 +182,7 @@ fn map_orderby_condition(order_data: &OrderByData, reverse: bool, include_eq: bo
 
     // order_expr
 
-    doc! { "$expr": order_doc }
+    order_doc
 }
 
 fn map_equality_condition(order_data: &OrderByData) -> Document {
@@ -207,6 +208,6 @@ fn map_equality_condition(order_data: &OrderByData) -> Document {
     // } else {
 
     // Todo: Verify this actually does everything we want already.
-    doc! { "$expr": { "$eq": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] } }
+    doc! { "$eq": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
     // }
 }
