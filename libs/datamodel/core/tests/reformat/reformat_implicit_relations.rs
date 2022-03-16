@@ -1235,7 +1235,7 @@ fn issue_10118() {
 }
 
 #[test]
-fn embedded_relations_should_not_add_anything_in_reformat() {
+fn mongodb_inline_relations_reformat_as_expected() {
     let schema = indoc! {r#"
         datasource db {
           provider = "mongodb"
@@ -1276,7 +1276,8 @@ fn embedded_relations_should_not_add_anything_in_reformat() {
         }
 
         model B {
-          id String @id @default(auto()) @map("_id") @db.ObjectId
+          id  String  @id @default(auto()) @map("_id") @db.ObjectId
+          aId String? @db.ObjectId
         }
     "#]];
 

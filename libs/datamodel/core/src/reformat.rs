@@ -12,8 +12,8 @@ use schema_ast::{
     renderer::*,
 };
 
-/// Returns either the reformatted schema, or the original input if we can't reformat (invalid
-/// syntax, etc.).
+/// Returns either the reformatted schema, or the original input if we can't reformat. This happens
+/// if and only if the source does not parse to a valid AST.
 pub fn reformat(source: &str, indent_width: usize) -> Result<String, &str> {
     Reformatter::new(source).reformat_internal(indent_width)
 }
@@ -48,7 +48,7 @@ impl<'a> Reformatter<'a> {
             Ok((db, datamodel, mut datasources)) => {
                 let schema_ast = db.ast();
                 let datasource = datasources.pop();
-                let missing_fields = Self::find_all_missing_fields(schema_ast, &datamodel, datasource.as_ref());
+                let missing_fields = find_all_missing_fields(schema_ast, &datamodel, &db, datasource.as_ref());
                 let missing_field_attributes = find_all_missing_attributes(&db);
                 let missing_relation_attribute_args = find_all_missing_relation_attribute_args(&db);
 
@@ -66,33 +66,6 @@ impl<'a> Reformatter<'a> {
                 missing_fields: Vec::new(),
             },
         }
-    }
-
-    // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
-    fn find_all_missing_fields(
-        schema_ast: &SchemaAst,
-        datamodel: &dml::Datamodel,
-        datasource: Option<&Datasource>,
-    ) -> Vec<MissingField> {
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
-        let mut result = Vec::new();
-
-        for model in datamodel.models() {
-            let ast_model = schema_ast.find_model(&model.name).unwrap();
-
-            for field in model.fields() {
-                if !ast_model.fields.iter().any(|f| f.name.name == field.name()) {
-                    let ast_field = lowerer.lower_field(model, field, datamodel);
-
-                    result.push(MissingField {
-                        model: model.name.clone(),
-                        field: ast_field,
-                    });
-                }
-            }
-        }
-
-        result
     }
 
     fn reformat_internal(self, indent_width: usize) -> Result<String, &'a str> {
@@ -990,6 +963,99 @@ fn push_missing_relation_attribute(
                         trailing_comma: None,
                     },
                     span: Span::empty(),
+                },
+            })
+        }
+    }
+}
+
+// this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
+fn find_all_missing_fields(
+    schema_ast: &SchemaAst,
+    datamodel: &dml::Datamodel,
+    db: &ParserDatabase,
+    datasource: Option<&Datasource>,
+) -> Vec<MissingField> {
+    let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
+    let mut result = Vec::new();
+
+    for model in datamodel.models() {
+        let ast_model = schema_ast.find_model(&model.name).unwrap();
+
+        for field in model.fields() {
+            if field.is_scalar_field() {
+                continue;
+            }
+
+            if !ast_model.fields.iter().any(|f| f.name.name == field.name()) {
+                let ast_field = lowerer.lower_field(model, field, datamodel);
+
+                result.push(MissingField {
+                    model: model.name.clone(),
+                    field: ast_field,
+                });
+            }
+        }
+    }
+
+    push_missing_scalar_fields(db, &mut result);
+
+    result
+}
+
+fn push_missing_scalar_fields(db: &ParserDatabase, missing_fields: &mut Vec<MissingField>) {
+    for relation in db.walk_relations() {
+        let inline = if let Some(inline) = relation.refine().as_inline() {
+            inline
+        } else {
+            continue;
+        };
+
+        let missing_scalar_fields = match inline.referencing_fields() {
+            walkers::ReferencingFields::Inferred(inferred_fields) => inferred_fields,
+            _ => continue,
+        };
+
+        // Filter out duplicate fields
+        let missing_scalar_fields = missing_scalar_fields.iter().filter(|missing| {
+            !inline
+                .referencing_model()
+                .scalar_fields()
+                .any(|sf| sf.name() == missing.name)
+        });
+
+        for field in missing_scalar_fields {
+            let field_type = if let Some(ft) = field.tpe.as_builtin_scalar() {
+                ft
+            } else {
+                continue;
+            };
+
+            let mut attributes: Vec<ast::Attribute> = Vec::new();
+            if let Some((datasource_name, type_name, _args, _span)) = field.blueprint.raw_native_type() {
+                let expected_attr_name = format!("{datasource_name}.{type_name}");
+                attributes.push(
+                    field
+                        .blueprint
+                        .ast_field()
+                        .attributes
+                        .iter()
+                        .find(|attr| attr.name.name == expected_attr_name)
+                        .unwrap()
+                        .clone(),
+                );
+            }
+
+            missing_fields.push(MissingField {
+                model: inline.referencing_model().name().to_owned(),
+                field: ast::Field {
+                    field_type: ast::FieldType::Supported(ast::Identifier::new(field_type.as_str())),
+                    name: ast::Identifier::new(&field.name),
+                    arity: inline.forward_relation_field_arity(),
+                    attributes,
+                    documentation: None,
+                    span: Span::empty(),
+                    is_commented_out: false,
                 },
             })
         }
