@@ -1189,7 +1189,7 @@ fn mongodb_no_unique_index_for_id() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": An id field cannot hold an additional unique constraint with the current connector.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The same field cannot be an id and unique on MongoDB.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel User {
@@ -1214,7 +1214,7 @@ fn mongodb_no_unique_index_for_id_model_attribute() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": An id field cannot hold an additional unique constraint with the current connector.[0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The same field cannot be an id and unique on MongoDB.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m

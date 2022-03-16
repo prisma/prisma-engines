@@ -184,7 +184,7 @@ pub(crate) fn unique_cannot_be_defined_to_id_field(index: IndexWalker<'_>, error
     }
 
     errors.push_error(DatamodelError::new_attribute_validation_error(
-        "An id field cannot hold an additional unique constraint with the current connector.",
+        "The same field cannot be an id and unique on MongoDB.",
         "unique",
         *attr.span(),
     ));
