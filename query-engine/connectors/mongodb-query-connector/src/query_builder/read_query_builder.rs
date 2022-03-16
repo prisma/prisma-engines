@@ -167,7 +167,7 @@ impl MongoReadQueryBuilder {
         let query = match args.filter {
             Some(filter) => {
                 // If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
-                let (filter, filter_joins) = convert_filter(filter, false, false, FilterPrefix::default())?.render();
+                let (filter, filter_joins) = convert_filter(filter, false, FilterPrefix::default())?.render();
                 if !filter_joins.is_empty() {
                     joins.extend(filter_joins);
                     post_filters.push(filter);
@@ -259,7 +259,7 @@ impl MongoReadQueryBuilder {
 
         // Initial $matches
         if let Some(query) = self.query {
-            stages.push(doc! { "$match": query })
+            stages.push(doc! { "$match": { "$expr": query } })
         };
 
         // Joins ($lookup)
@@ -281,7 +281,11 @@ impl MongoReadQueryBuilder {
         stages.extend(self.order_aggregate_projections);
 
         // Post-join $matches
-        stages.extend(self.join_filters.into_iter().map(|filter| doc! { "$match": filter }));
+        stages.extend(
+            self.join_filters
+                .into_iter()
+                .map(|filter| doc! { "$match": { "$expr": filter } }),
+        );
 
         // If the query is a group by, then skip, take, sort all apply to the _groups_, not the documents
         // before. If it is a plain aggregation, then the aggregate stages need to be _after_ these, because
@@ -295,7 +299,7 @@ impl MongoReadQueryBuilder {
                 self.aggregation_filters
                     .clone()
                     .into_iter()
-                    .map(|filter| doc! { "$match": filter }),
+                    .map(|filter| doc! { "$match": { "$expr": filter } }),
             );
         }
 
@@ -332,7 +336,7 @@ impl MongoReadQueryBuilder {
             stages.extend(
                 self.aggregation_filters
                     .into_iter()
-                    .map(|filter| doc! { "$match": filter }),
+                    .map(|filter| doc! { "$match": { "$expr": filter } }),
             );
         }
 
@@ -384,7 +388,7 @@ impl MongoReadQueryBuilder {
         let mut outer_stages = vec![];
 
         // First match the cursor, then add required ordering joins.
-        outer_stages.push(doc! { "$match": cursor_data.cursor_filter });
+        outer_stages.push(doc! { "$match": { "$expr": cursor_data.cursor_filter } });
         outer_stages.extend(order_join_stages);
 
         outer_stages.extend(self.order_aggregate_projections.clone());
@@ -545,7 +549,13 @@ impl MongoReadQueryBuilder {
     /// Adds aggregation filters based on a having scalar filter.
     pub fn with_having(mut self, having: Option<Filter>) -> crate::Result<Self> {
         if let Some(filter) = having {
-            let (filter_doc, _) = convert_filter(filter, false, true, FilterPrefix::default())?.render();
+            // Having filters can only appear in group by queries.
+            // All group by fields go into the "_id" key of the result document.
+            // As it is the only place where the flat scalars are contained for the group,
+            // we need to refer to that object.
+            let prefix = FilterPrefix::from("_id");
+            let (filter_doc, _) = convert_filter(filter, false, prefix)?.render();
+
             self.aggregation_filters.push(filter_doc);
         }
 

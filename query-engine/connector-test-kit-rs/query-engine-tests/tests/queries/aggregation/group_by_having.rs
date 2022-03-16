@@ -342,25 +342,24 @@ mod aggregation_group_by_having {
             @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0,"decimal":"0"}},{"string":"group2","_min":{"float":0.0,"int":0,"decimal":"0"}}]}}"###
         );
 
-        match_connector_result!(
-            runner,
-            r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-              float: { _min: { not: { equals: 0 }}}
-              int: { _min: { not: { equals: 0 }}}
-              decimal: { _min: { not: { equals: "0" }}}
-            }) {
-              string
-              _min {
-                float
-                int
-                decimal
+        insta::assert_snapshot!(
+          run_query!(
+              &runner,
+              r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+                float: { _min: { not: { equals: 0 }}}
+                int: { _min: { not: { equals: 0 }}}
+                decimal: { _min: { not: { equals: "0" }}}
+              }) {
+                string
+                _min {
+                  float
+                  int
+                  decimal
+                }
               }
-            }
-          }"#,
-          // Since MongoDB doesn't have the concept of `NULL` `not equals 10` includes `null` records
-          // The result _is_ empty on SQL though
-          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group3","_min":{"float":null,"int":null,"decimal":null}}]}}"#],
-          _ => vec![r#"{"data":{"groupByTestModel":[]}}"#]
+            }"#
+          ),
+          @r###"{"data":{"groupByTestModel":[]}}"###
         );
 
         // Group 1 and 2 returned
@@ -429,25 +428,24 @@ mod aggregation_group_by_having {
             @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10,"decimal":"10"}},{"string":"group2","_max":{"float":10.0,"int":10,"decimal":"10"}}]}}"###
         );
 
-        match_connector_result!(
-            runner,
-            r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-              float: { _max: { not: { equals: 10 }}}
-              int: { _max: { not: { equals: 10 }}}
-              decimal: { _max: { not: { equals: "10" }}}
-            }) {
-              string
-              _max {
-                float
-                int
-                decimal
+        insta::assert_snapshot!(
+          run_query!(
+              &runner,
+              r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+                float: { _max: { not: { equals: 10 }}}
+                int: { _max: { not: { equals: 10 }}}
+                decimal: { _max: { not: { equals: "10" }}}
+              }) {
+                string
+                _max {
+                  float
+                  int
+                  decimal
+                }
               }
-            }
-          }"#,
-          // Since MongoDB doesn't have the concept of `NULL` `not equals 10` includes `null` records
-          // The result _is_ empty on SQL though
-          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group3","_max":{"float":null,"int":null,"decimal":null}}]}}"#],
-          _ => vec![r#"{"data":{"groupByTestModel":[]}}"#]
+            }"#
+          ),
+          @r###"{"data":{"groupByTestModel":[]}}"###
         );
 
         // Group 1 and 2 returned

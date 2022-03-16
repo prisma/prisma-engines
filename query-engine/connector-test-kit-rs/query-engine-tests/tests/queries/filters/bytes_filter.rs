@@ -68,12 +68,9 @@ mod bytes_filter_spec {
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
-        match_connector_result!(
-            &runner,
-            r#"query { findManyTestModel(where: { bytes: { not: { in: ["dGVzdA=="] }}}) { id }}"#,
-            // Mongo selects `null` fields as well.
-            MongoDb(_) => vec![r#"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"#],
-            _ => vec![r#"{"data":{"findManyTestModel":[{"id":2}]}}"#]
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { not: { in: ["dGVzdA=="] }}}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         Ok(())
