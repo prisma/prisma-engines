@@ -1,6 +1,7 @@
 use super::{expression::*, operation::*};
 use crate::{filter, IntoBson};
 
+use itertools::Itertools;
 use mongodb::bson::{doc, Bson};
 
 pub(crate) trait IntoUpdateExpression {
@@ -43,33 +44,42 @@ impl IntoUpdateExpressions for Upsert {
         // Maps the `Set` expression so that it's only executed if the field should be set. eg:
         // From: { $set: { {field_path}: {some_expression} } }
         // To:   { $set: { $cond: { if: {cond}, then: {some_expression}, else: "${field_path}"  } } }
-        // where {cond} is the expression is the `cond` variable above
+        // where {cond} is the expression passed to `into_conditional_set`
         expressions.push(
             Set::from(self.set)
                 .into_conditional_set(doc! { "$eq": [&should_set_ref_id, true] })
                 .into(),
         );
 
-        let mut updates = vec![];
-
         for op in self.updates {
             match op {
-                UpdateOperation::Generic(generic) => {
-                    // Maps the `Set` expression so that it's only executed if the field should be updated. eg:
-                    // From: { $set: { {field_path}: {some_expression} } }
-                    // To:   { $set: { $cond: { if: {cond}, then: {some_expression}, else: "${field_path}"  } } }
-                    // where {cond} is the expression is the `cond` variable above
-                    let set = Set::from(generic).into_conditional_set(doc! { "$eq": [&should_set_ref_id, false] });
-
-                    updates.push(set.into());
+                // Since `Upsert` operations are transformed into a list of conditional sets,
+                // there's no need to transform them twice so we just append them to the list of expressions.
+                UpdateOperation::Upsert(upsert) => {
+                    expressions.extend(upsert.into_update_expressions()?);
                 }
                 operation => {
-                    updates.extend(operation.into_update_expressions()?);
+                    let exprs = operation
+                        .into_update_expressions()?
+                        .into_iter()
+                        .map(|expr| {
+                            // Maps the `Set` expression so that it's only executed if the field should be updated. eg:
+                            // From: { $set: { {field_path}: {some_expression} } }
+                            // To:   { $set: { $cond: { if: {cond}, then: {some_expression}, else: "${field_path}"  } } }
+                            // where {cond} is the expression passed to `into_conditional_set`
+                            let set = expr
+                                .try_into_set()
+                                .expect("all upsert's update expressions should be `Set`s")
+                                .into_conditional_set(doc! { "$eq": [&should_set_ref_id, false] });
+
+                            UpdateExpression::from(set)
+                        })
+                        .collect_vec();
+
+                    expressions.extend(exprs);
                 }
             }
         }
-
-        expressions.extend(updates);
 
         // Removes the custom field previously added
         expressions.push(doc! { "$unset": Bson::String(should_set_id) }.into());
