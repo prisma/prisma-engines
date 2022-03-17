@@ -9,7 +9,6 @@ pub mod type_names {
     pub const DOUBLE: &str = "Double";
     pub const LONG: &str = "Long";
     pub const INT: &str = "Int";
-    pub const ARRAY: &str = "Array";
     pub const BIN_DATA: &str = "BinData";
     pub const OBJECT_ID: &str = "ObjectId";
     pub const BOOL: &str = "Bool";
@@ -52,16 +51,14 @@ pub(crate) const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::without_args(DATE, &[ScalarType::DateTime]),
     NativeTypeConstructor::without_args(TIMESTAMP, &[ScalarType::DateTime]),
     NativeTypeConstructor::without_args(DECIMAL, &[ScalarType::Decimal]),
-    NativeTypeConstructor::with_args(ARRAY, 1, all_types()),
 ];
 
-pub(crate) fn mongo_type_from_input(name: &str, args: &[String], span: Span) -> crate::Result<MongoDbType> {
+pub(crate) fn mongo_type_from_input(name: &str, span: Span) -> crate::Result<MongoDbType> {
     let mongo_type = match name {
         STRING => MongoDbType::String,
         DOUBLE => MongoDbType::Double,
         LONG => MongoDbType::Long,
         INT => MongoDbType::Int,
-        ARRAY => parse_array_type(args, span)?,
         BIN_DATA => MongoDbType::BinData,
         OBJECT_ID => MongoDbType::ObjectId,
         BOOL => MongoDbType::Bool,
@@ -72,30 +69,4 @@ pub(crate) fn mongo_type_from_input(name: &str, args: &[String], span: Span) -> 
     };
 
     Ok(mongo_type)
-}
-
-const fn all_types() -> &'static [ScalarType] {
-    &[
-        ScalarType::Int,
-        ScalarType::BigInt,
-        ScalarType::Float,
-        ScalarType::Boolean,
-        ScalarType::String,
-        ScalarType::DateTime,
-        ScalarType::Json,
-        ScalarType::Bytes,
-        ScalarType::Decimal,
-    ]
-}
-
-fn parse_array_type(args: &[String], span: Span) -> crate::Result<MongoDbType> {
-    if args.len() != 1 {
-        let err = DatamodelError::new_argument_count_mismatch_error(ARRAY, 1, args.len(), span);
-        return Err(err);
-    }
-
-    let type_arg = args.iter().next().unwrap();
-    let inner_type = mongo_type_from_input(type_arg.as_str(), &[], span)?;
-
-    Ok(MongoDbType::Array(Box::new(inner_type)))
 }
