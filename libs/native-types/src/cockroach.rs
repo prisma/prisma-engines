@@ -25,7 +25,6 @@ pub enum CockroachType {
     Bit(Option<u32>),
     VarBit(Option<u32>),
     Uuid,
-    Json,
     JsonB,
 }
 

@@ -31,7 +31,6 @@ const BOOLEAN_TYPE_NAME: &str = "Boolean";
 const BIT_TYPE_NAME: &str = "Bit";
 const VAR_BIT_TYPE_NAME: &str = "VarBit";
 const UUID_TYPE_NAME: &str = "Uuid";
-const JSON_TYPE_NAME: &str = "Json";
 const JSON_B_TYPE_NAME: &str = "JsonB";
 
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
@@ -57,7 +56,6 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, &[ScalarType::String]),
     NativeTypeConstructor::with_optional_args(VAR_BIT_TYPE_NAME, 1, &[ScalarType::String]),
     NativeTypeConstructor::without_args(UUID_TYPE_NAME, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(JSON_TYPE_NAME, &[ScalarType::Json]),
     NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, &[ScalarType::Json]),
 ];
 
@@ -157,7 +155,6 @@ impl Connector for CockroachDatamodelConnector {
             Time(_) => ScalarType::DateTime,
             Timetz(_) => ScalarType::DateTime,
             //Json
-            Json => ScalarType::Json,
             JsonB => ScalarType::Json,
             //Bytes
             ByteA => ScalarType::Bytes,
@@ -255,7 +252,6 @@ impl Connector for CockroachDatamodelConnector {
             BIT_TYPE_NAME => Bit(parse_one_opt_u32(args, BIT_TYPE_NAME, span)?),
             VAR_BIT_TYPE_NAME => VarBit(parse_one_opt_u32(args, VAR_BIT_TYPE_NAME, span)?),
             UUID_TYPE_NAME => Uuid,
-            JSON_TYPE_NAME => Json,
             JSON_B_TYPE_NAME => JsonB,
             _ => return Err(DatamodelError::new_native_type_parser_error(name, span)),
         };
@@ -285,7 +281,6 @@ impl Connector for CockroachDatamodelConnector {
             Bit(x) => (BIT_TYPE_NAME, arg_vec_from_opt(x)),
             VarBit(x) => (VAR_BIT_TYPE_NAME, arg_vec_from_opt(x)),
             Uuid => (UUID_TYPE_NAME, vec![]),
-            Json => (JSON_TYPE_NAME, vec![]),
             JsonB => (JSON_B_TYPE_NAME, vec![]),
             Inet => (INET_TYPE_NAME, vec![]),
             Citext => (CITEXT_TYPE_NAME, vec![]),
