@@ -388,7 +388,7 @@ fn populate_fields(
         }
 
         if percentages.data.len() > 1 {
-            undecided_types.push((container.clone(), field_name.to_string(), field_type.to_string()));
+            undecided_types.push((container.clone(), field_name.to_string()));
         }
 
         let arity = if field_type.is_array() {

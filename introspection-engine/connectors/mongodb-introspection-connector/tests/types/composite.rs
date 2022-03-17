@@ -67,7 +67,7 @@ fn dirty_data() {
     res.assert_warning_affected(&json!([{
         "compositeType": "CatAddress",
         "field": "number",
-        "tpe": "Document",
+        "tpe": "Json",
     }]));
 }
 
