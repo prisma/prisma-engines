@@ -202,9 +202,9 @@ impl FieldPath {
         path
     }
 
-    pub fn new_from_alias(alias: &str) -> Self {
+    pub fn new_from_alias(alias: impl Into<String>) -> Self {
         Self {
-            alias: Some(alias.to_owned()),
+            alias: Some(alias.into()),
             path: vec![],
         }
     }

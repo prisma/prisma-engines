@@ -1,6 +1,7 @@
 use super::expression::*;
 use crate::IntoBson;
 
+use itertools::Itertools;
 use mongodb::bson::{doc, Bson, Document};
 
 impl IntoBson for Set {
@@ -39,6 +40,37 @@ impl IntoBson for MergeDocument {
     }
 }
 
+impl IntoBson for MergeObjects {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let input: Bson = if self.keys_to_unset.is_empty() {
+            self.field_path().dollar_path(true).into()
+        } else {
+            let ands = self
+                .keys_to_unset
+                .iter()
+                .map(|target| doc! { "$ne": ["$$elem.k", target] })
+                .collect_vec();
+
+            doc! {
+              "$arrayToObject": {
+                "$filter": {
+                  "input": { "$objectToArray": self.field_path().dollar_path(true) },
+                  "as": "elem",
+                  "cond": { "$and": ands }
+                }
+              }
+            }
+            .into()
+        };
+
+        let doc = doc! {
+            "$mergeObjects": [input, self.document.into_bson()?]
+        };
+
+        Ok(Bson::from(doc))
+    }
+}
+
 impl IntoBson for UpdateExpression {
     fn into_bson(self) -> crate::Result<Bson> {
         match self {
@@ -46,6 +78,7 @@ impl IntoBson for UpdateExpression {
             UpdateExpression::IfThenElse(if_then_else) => if_then_else.into_bson(),
             UpdateExpression::MergeDocument(merge_doc) => merge_doc.into_bson(),
             UpdateExpression::Generic(bson) => Ok(bson),
+            UpdateExpression::MergeObjects(merge_objects) => merge_objects.into_bson(),
         }
     }
 }

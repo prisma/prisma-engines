@@ -4,11 +4,22 @@ use connector_interface::FieldPath;
 use indexmap::IndexMap;
 use mongodb::bson::{doc, Bson, Document};
 
+/// `UpdateExpression` is an intermediary AST that's used to represent MongoDB expressions.
+/// It is meant to be transformed into `BSON`.
+/// Only add new variants _if_ the expression needs to retain semantic information when transformed into `BSON` or another `UpdateExpression`.
+/// Otherwise, use `Generic`.
 #[derive(Debug, Clone)]
 pub(crate) enum UpdateExpression {
+    /// A `$set` expression
     Set(Set),
+    /// A `$cond` expression
     IfThenElse(IfThenElse),
+    /// A `$mergeObjects` expression
+    MergeObjects(MergeObjects),
+    /// A document `{ ... }` expression
+    /// (used to retain semantic information on the values (as opposed to a generic Bson::Document))
     MergeDocument(MergeDocument),
+    /// Anything else
     Generic(Bson),
 }
 
@@ -40,8 +51,8 @@ impl UpdateExpression {
         }
     }
 
-    pub(crate) fn as_merge_document_mut(&mut self) -> Option<&mut MergeDocument> {
-        if let Self::MergeDocument(ref mut v) = self {
+    pub(crate) fn as_merge_objects_mut(&mut self) -> Option<&mut MergeObjects> {
+        if let Self::MergeObjects(ref mut v) = self {
             Some(v)
         } else {
             None
@@ -51,7 +62,7 @@ impl UpdateExpression {
 
 #[derive(Debug, Clone)]
 pub(crate) struct Set {
-    /// The field path to which this set expression should be applied
+    /// The field path to which this $set expression should be applied
     pub field_path: FieldPath,
     /// The inner expression that should be set
     pub expression: Box<UpdateExpression>,
@@ -111,16 +122,46 @@ impl MergeDocument {
     pub(crate) fn inner_mut(&mut self) -> &mut IndexMap<String, UpdateExpression> {
         &mut self.inner
     }
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct MergeObjects {
+    /// The field path to which this $mergeObjects expression should be applied
+    pub(crate) field_path: FieldPath,
+    /// Hack: keys of the document located in `field_path` to unset
+    pub(crate) keys_to_unset: Vec<String>,
+    /// Document against which it should be merged
+    pub(crate) document: MergeDocument,
+}
+
+impl MergeObjects {
+    pub(crate) fn new(field_path: FieldPath) -> Self {
+        Self {
+            field_path,
+            document: MergeDocument::default(),
+            keys_to_unset: vec![],
+        }
+    }
+
+    /// Get a reference to the merge objects's field path.
+    pub(crate) fn field_path(&self) -> &FieldPath {
+        &self.field_path
+    }
+
+    /// Get a mutable reference to the merge objects's doc.
+    pub(crate) fn doc_mut(&mut self) -> &mut IndexMap<String, UpdateExpression> {
+        self.document.inner_mut()
+    }
 
     pub(crate) fn insert_set(&mut self, set: Set) {
         let set_expr = set.expression.clone();
-        let (path, inner_doc) = self.fill_empty_documents(set.field_path());
+        let (path, inner_merge) = self.fill_empty_documents(set.field_path());
 
-        inner_doc.inner_mut().insert(path.to_owned(), *set_expr);
+        inner_merge.doc_mut().insert(path.to_owned(), *set_expr);
     }
 
     pub(crate) fn insert_upsert(&mut self, mut upsert: operation::Upsert, depth: usize) -> crate::Result<()> {
-        let mut updates_doc = MergeDocument::default();
+        let mut merge_doc = MergeObjects::new(upsert.field_path);
 
         for op in upsert.updates {
             match op {
@@ -128,19 +169,22 @@ impl MergeDocument {
                     let mut set = generic.into_update_expression()?.try_into_set().unwrap();
                     set.field_path.drain(depth + 1);
 
-                    updates_doc.insert_set(set);
+                    merge_doc.insert_set(set);
                 }
                 operation::UpdateOperation::UpdateMany(update_many) => {
                     let mut set = update_many.into_update_expression()?.try_into_set().unwrap();
                     set.field_path.drain(depth + 1);
 
-                    updates_doc.insert_set(set);
+                    merge_doc.insert_set(set);
                 }
                 operation::UpdateOperation::Upsert(upsert) => {
-                    let mut inner_doc = MergeDocument::default();
-                    inner_doc.insert_upsert(upsert, depth + 1)?;
+                    let mut inner_merge = MergeObjects::new(upsert.field_path.clone());
+                    inner_merge.insert_upsert(upsert, depth + 1)?;
 
-                    updates_doc.inner.extend(inner_doc);
+                    merge_doc.doc_mut().extend(inner_merge.document);
+                }
+                operation::UpdateOperation::Unset(unset) => {
+                    merge_doc.insert_unset(unset);
                 }
             }
         }
@@ -148,16 +192,22 @@ impl MergeDocument {
         let new_if = UpdateExpression::if_then_else(
             doc! { "$eq": [operation::Upsert::render_should_set_condition(&upsert.set.field_path().clone()), true] },
             upsert.set.expression.clone(),
-            updates_doc,
+            merge_doc,
         );
 
         if depth > 0 {
             upsert.set.field_path.drain(depth);
         }
 
-        self.inner_mut().insert(upsert.set.field_path().path(false), new_if);
+        self.doc_mut().insert(upsert.set.field_path().path(false), new_if);
 
         Ok(())
+    }
+
+    pub(crate) fn insert_unset(&mut self, unset: operation::Unset) {
+        let (target, _) = unset.field_path().path.split_last().unwrap();
+
+        self.keys_to_unset.push(target.clone());
     }
 
     /// Given a mutable `Document` and a `FieldPath`, fills nested empty documents to the mutable `Document`.
@@ -165,24 +215,24 @@ impl MergeDocument {
     /// ```text
     /// ["a", "b", "c"] -> ("c", doc! { "a": { "b": {} } })
     /// ```
-    pub(crate) fn fill_empty_documents<'a, 'b>(
-        &'a mut self,
-        field_path: &'b FieldPath,
-    ) -> (&'b String, &'a mut MergeDocument) {
-        let (last, segments) = field_path.path.split_last().unwrap();
+    fn fill_empty_documents<'a, 'b>(&'a mut self, field_path: &'b FieldPath) -> (&'b String, &'a mut MergeObjects) {
+        let (target, segments) = field_path.path.split_last().unwrap();
 
-        let inner_doc = segments.iter().fold(self, |acc, segment| {
-            let inner_doc = acc
-                .inner_mut()
+        let inner_merge = segments.iter().enumerate().fold(self, |acc, (i, segment)| {
+            let mut merge_path = field_path.clone();
+            merge_path.drain(i);
+
+            let inner_merge = acc
+                .doc_mut()
                 .entry(segment.to_string())
-                .or_insert(MergeDocument::default().into())
-                .as_merge_document_mut()
+                .or_insert(MergeObjects::new(merge_path).into())
+                .as_merge_objects_mut()
                 .unwrap();
 
-            inner_doc
+            inner_merge
         });
 
-        (last, inner_doc)
+        (target, inner_merge)
     }
 }
 
@@ -213,5 +263,10 @@ impl From<IfThenElse> for UpdateExpression {
 impl From<MergeDocument> for UpdateExpression {
     fn from(merge_doc: MergeDocument) -> Self {
         Self::MergeDocument(merge_doc)
+    }
+}
+impl From<MergeObjects> for UpdateExpression {
+    fn from(merge_objects: MergeObjects) -> Self {
+        Self::MergeObjects(merge_objects)
     }
 }

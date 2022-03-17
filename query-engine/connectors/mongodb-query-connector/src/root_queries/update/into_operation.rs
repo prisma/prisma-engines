@@ -74,7 +74,7 @@ impl IntoUpdateOperation for CompositeWriteOperation {
                 let mut ops = Vec::with_capacity(1);
 
                 if should_unset {
-                    ops.push(UpdateOperation::generic(path, Bson::String("$$REMOVE".to_owned())))
+                    ops.push(UpdateOperation::unset(path));
                 }
 
                 ops

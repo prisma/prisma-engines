@@ -16,6 +16,7 @@ impl IntoUpdateExpressions for UpdateOperation {
         match self {
             UpdateOperation::Generic(generic) => Ok(vec![generic.into_update_expression()?]),
             UpdateOperation::UpdateMany(update_many) => Ok(vec![update_many.into_update_expression()?]),
+            UpdateOperation::Unset(unset) => Ok(vec![unset.into_update_expression()?]),
             UpdateOperation::Upsert(upsert) => upsert.into_update_expressions(),
         }
     }
@@ -91,7 +92,7 @@ impl IntoUpdateExpression for UpdateMany {
         // The `FieldPath` used for the `$mergeObjects` is the alias constructed above, since we'll merge against
         // each elements of the to-many embeds. eg:
         // { "$mergeObjects": ["$$some_field_item", { ... }] }
-        let merge_doc = self.build_merge_doc()?;
+        let merge_objects = self.into_merge_objects_expr()?;
 
         let map_expr = doc! {
             "$map": {
@@ -100,7 +101,7 @@ impl IntoUpdateExpression for UpdateMany {
                 "in": {
                     "$cond": {
                         "if": filter_doc,
-                        "then": doc! { "$mergeObjects": [&ref_elem_alias, merge_doc.into_bson()?] },
+                        "then": merge_objects.into_bson()?,
                         "else": Bson::String(ref_elem_alias)
                     }
                 }
@@ -108,5 +109,11 @@ impl IntoUpdateExpression for UpdateMany {
         };
 
         Ok(UpdateExpression::set(field_path, map_expr))
+    }
+}
+
+impl IntoUpdateExpression for Unset {
+    fn into_update_expression(self) -> crate::Result<UpdateExpression> {
+        Ok(UpdateExpression::set(self.field_path, Bson::from("$$REMOVE")))
     }
 }
