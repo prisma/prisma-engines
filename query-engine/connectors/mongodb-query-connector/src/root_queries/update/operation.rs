@@ -1,5 +1,5 @@
 use super::{
-    expression::{self, MergeDocument},
+    expression::{self},
     into_expression::IntoUpdateExpression,
 };
 
@@ -127,7 +127,7 @@ impl UpdateMany {
                     merge_objects.insert_set(set);
                 }
                 UpdateOperation::Upsert(upsert) => {
-                    merge_objects.insert_upsert(upsert.clone(), 0)?;
+                    merge_objects.insert_upsert(upsert)?;
                 }
                 UpdateOperation::Unset(unset) => {
                     merge_objects.insert_unset(unset);

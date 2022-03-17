@@ -213,9 +213,13 @@ impl FieldPath {
         self.path.push(field.db_name().to_owned());
     }
 
-    /// Removes the nth first segments of the path
-    pub fn drain(&mut self, n: usize) {
-        self.path.drain(0..n);
+    /// Keep only the last element of the path
+    pub fn keep_only_target(&mut self) {
+        self.path.drain(0..self.path.len() - 1);
+    }
+
+    pub fn take(&mut self, n: usize) {
+        self.path = self.path[0..n].to_vec();
     }
 
     pub fn path(&self, include_alias: bool) -> String {

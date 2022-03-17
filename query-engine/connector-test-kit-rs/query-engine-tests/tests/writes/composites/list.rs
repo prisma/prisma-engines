@@ -710,7 +710,7 @@ mod update {
             updateOneTestModel(where: { id: 1 }, data: {
               to_many_as: {
                 updateMany: {
-                  where: true,
+                  where: { a_1: "a1_new" },
                   data: {
                     a_1: { set: "a1_updated" },
                     a_2: { set: 1 },
@@ -737,7 +737,7 @@ mod update {
             updateOneTestModel(where: { id: 1 }, data: {
               to_many_as: {
                 updateMany: {
-                  where: true,
+                  where: { a_1: "a1_updated" },
                   data: {
                     a_to_one_b: {
                       upsert: {
@@ -780,7 +780,7 @@ mod update {
             updateOneTestModel(where: { id: 1 }, data: {
               to_many_as: {
                 updateMany: {
-                  where: true,
+                  where: { a_to_one_b: { is: { b_field: 0 } } },
                   data: {
                     a_2: { increment: 1 },
                     a_to_one_b: {
@@ -814,7 +814,7 @@ mod update {
             updateOneTestModel(where: { id: 1 }, data: {
               to_many_as: {
                 updateMany: {
-                  where: true,
+                  where: { a_to_one_b: { is: { b_field: 1 } } },
                   data: {
                     a_to_one_b: {
                       upsert: {
@@ -849,7 +849,7 @@ mod update {
             updateOneTestModel(where: { id: 1 }, data: {
               to_many_as: {
                 updateMany: {
-                  where: true,
+                  where: { a_to_one_b: { is: { b_to_many_cs: { every: { c_field: 1 } } } } },
                   data: {
                     a_to_one_b: {
                       upsert: {
@@ -857,7 +857,7 @@ mod update {
                         update: {
                           b_to_many_cs: {
                             updateMany: {
-                              where: true,
+                              where: { c_field: 1 },
                               data: { c_field: { multiply: 2 } }
                             }
                           }
@@ -887,14 +887,14 @@ mod update {
             updateOneTestModel(where: { id: 1 }, data: {
               to_many_as: {
                 updateMany: {
-                  where: true,
+                  where: { a_to_one_b: { is: { b_to_many_cs: {  every: { c_field: 2 } } } } },
                   data: {
                     a_to_one_b: {
                       upsert: {
                         set: { b_field: 0 },
                         update: {
                           b_to_many_cs: {
-                            deleteMany: { where: true }
+                            deleteMany: { where: { c_field: 2 } }
                           }
                         }
                       }
@@ -914,6 +914,32 @@ mod update {
             }
           }"#),
           @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_to_one_b":{"b_to_many_cs":[]}}]}}}"###
+        );
+
+        // `unset` within `updateMany`
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(where: { id: 1 }, data: {
+              to_many_as: {
+                updateMany: {
+                  where: { a_1: "a1_updated" },
+                  data: {
+                    a_to_one_b: { unset: true }
+                  }
+                }
+              }
+            }) {
+              id
+              to_many_as {
+                a_to_one_b {
+                  b_to_many_cs {
+                    c_field
+                  }
+                }
+              }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_to_one_b":null}]}}}"###
         );
 
         Ok(())
@@ -964,10 +990,12 @@ mod update {
                       b_field: { multiply: 3 }
                       b_to_many_cs: {
                         updateMany: {
-                          where: true
+                          where: { c_field: 1, c_to_many_as: { some: { a_1: "a1_new" } } }
                           data: {
                             c_field: { decrement: 1 }
-                            c_to_many_as: { push: { a_1: "a_1_pushed", a_2: 2 } }
+                            c_to_many_as: {
+                              push: { a_1: "a_1_pushed", a_2: 2 }
+                            }
                           }
                         }
                       }
@@ -998,13 +1026,14 @@ mod update {
         // Nested upsert within updateMany
         // Nested updateMany within upsert
         // Nested updateMany within updateMany
+        // Nested unset within updateMany
         let query = r#"mutation {
           updateOneTestModel(
             where: { id: 1 }
             data: {
               to_many_as: {
                 updateMany: {
-                  where: true
+                  where: { a_2: { gte: 0 } }
                   data: {
                     a_1: { set: "a1_updated" }
                     a_2: { increment: 1 }
@@ -1018,15 +1047,16 @@ mod update {
                           b_field: { increment: 1 }
                           b_to_many_cs: {
                             updateMany: {
-                              where: true
+                              where: { c_to_many_as: { none: { a_2: 10 } } }
                               data: {
                                 c_field: { increment: 2 },
                                 c_to_many_as: {
                                   updateMany: {
-                                    where: true,
+                                    where: { a_2: { gte: 0 } },
                                     data: {
                                       a_1: "a1_updated",
                                       a_2: { set: 1337 },
+                                      a_to_one_b: { unset: true }
                                     }
                                   }
                                 }
@@ -1052,6 +1082,7 @@ mod update {
                   c_to_many_as {
                     a_1
                     a_2
+                    a_to_one_b { b_field }
                   }
                 }
               }
@@ -1063,59 +1094,98 @@ mod update {
         // upsert set
         insta::assert_snapshot!(
           run_query!(&runner, query),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":1,"a_to_one_b":{"b_field":0,"b_to_many_cs":[{"c_field":0,"c_to_many_as":[{"a_1":"a1_new","a_2":0}]}]}}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":1,"a_to_one_b":{"b_field":0,"b_to_many_cs":[{"c_field":0,"c_to_many_as":[{"a_1":"a1_new","a_2":0,"a_to_one_b":{"b_field":0}}]}]}}]}}}"###
         );
 
         // upsert update
         insta::assert_snapshot!(
           run_query!(&runner, query),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":2,"a_to_one_b":{"b_field":1,"b_to_many_cs":[{"c_field":2,"c_to_many_as":[{"a_1":"a1_updated","a_2":1337}]}]}}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":2,"a_to_one_b":{"b_field":1,"b_to_many_cs":[{"c_field":2,"c_to_many_as":[{"a_1":"a1_updated","a_2":1337,"a_to_one_b":null}]}]}}]}}}"###
         );
 
         Ok(())
     }
 
-    // Unset should be impossible within an updateMany
-    #[connector_test]
-    async fn fails_update_many_unset(runner: Runner) -> TestResult<()> {
-        create_test_data(&runner).await?;
+    fn to_many_nested_to_one() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              #id(id, Int, @id)
+              to_many_as CompositeA[] @map("top_a")
+          }
+  
+          type CompositeA {
+              a_field    Int        @map("a_int")
+              a_to_one_b CompositeB @map("to_one_b")
+          }
 
-        // No unset in updateMany
-        assert_error!(
-          runner,
-          r#"mutation {
-            updateOneTestModel(
-              where: { id: 1 }
-              data: {
-                to_many_as: {
-                  updateMany: {
-                    where: true,
-                    data: {
-                      a_to_one_b: { unset: true }
-                    }
-                  }
-                }
-              }
-            ) { id }
-          }"#,
-          2009,
-          "Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.updateMany.CompositeAUpdateManyInput.data.CompositeAWithoutUnsetUpdateInput.a_to_one_b.CompositeBNullableWithoutUnsetUpdateEnvelopeInput.unset`: Field does not exist on enclosing type."
-        );
+          type CompositeB {
+            b_field        Int         @map("b_int") @default(0)
+            b_to_one_c     CompositeC  @map("to_one_c")
+            b_to_one_c_opt CompositeC? @map("to_one_c_opt")
+          }
 
-        // No unset in upsert in updateMany
-        assert_error!(
-          runner,
-          r#"mutation {
+          type CompositeC {
+            c_field        Int         @map("c_int") @default(0)
+            c_to_one_d_opt CompositeD? @map("to_one_d")
+            c_to_one_e_opt CompositeE? @map("to_one_e")
+          }
+
+          type CompositeD {
+            d_field Int @map("d_int") @default(0)
+          }
+
+          type CompositeE {
+            e_field Int @map("e_int") @default(0)
+          }
+          "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(to_many_nested_to_one))]
+    async fn update_many_nested_updates(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+          id: 1,
+          to_many_as: [
+            {
+              a_field: 0,
+              a_to_one_b: {
+                b_field: 0,
+                b_to_one_c: {
+                  c_field: 0,
+                  c_to_one_d_opt: { d_field: 1 },
+                  c_to_one_e_opt: { e_field: 1 },
+                },
+                b_to_one_c_opt: {
+                  c_field: 0,
+                  c_to_one_d_opt: { d_field: 1 },
+                  c_to_one_e_opt: { e_field: 1 },
+                },
+              },
+            }
+          ]
+        }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
             updateOneTestModel(where: { id: 1 }, data: {
               to_many_as: {
                 updateMany: {
-                  where: true,
+                  where: { a_field: 0 },
                   data: {
+                    a_field: 1,
                     a_to_one_b: {
-                      upsert: {
-                        set: {},
-                        update: {
-                          b_to_one_c: { unset: true }
+                      update: {
+                        b_field: 1,
+                        b_to_one_c: {
+                          update: {
+                            c_field: 1
+                          }
                         }
                       }
                     }
@@ -1124,10 +1194,291 @@ mod update {
               }
             }) {
               id
+              to_many_as {
+                a_field
+                a_to_one_b {
+                  b_field
+                  b_to_one_c {
+                    c_field
+                    c_to_one_d_opt { d_field }
+                    c_to_one_e_opt { e_field }
+                  }
+                }
+              }
             }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_field":1,"a_to_one_b":{"b_field":1,"b_to_one_c":{"c_field":1,"c_to_one_d_opt":{"d_field":1},"c_to_one_e_opt":{"e_field":1}}}}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(to_many_nested_to_one))]
+    async fn unset_in_update_many(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+              id: 1,
+              to_many_as: [
+                {
+                  a_field: 0,
+                  a_to_one_b: {
+                    b_field: 0,
+                    b_to_one_c: {
+                      c_field: 0,
+                      c_to_one_d_opt: { d_field: 1 },
+                      c_to_one_e_opt: { e_field: 1 },
+                    },
+                    b_to_one_c_opt: {
+                      c_field: 0,
+                      c_to_one_d_opt: { d_field: 1 },
+                      c_to_one_e_opt: { e_field: 1 },
+                    },
+                  },
+                }
+              ]
+            }"#,
+        )
+        .await?;
+        create_row(
+            &runner,
+            r#"{
+            id: 2,
+            to_many_as: [
+              {
+                a_field: 0,
+                a_to_one_b: {
+                  b_field: 0,
+                  b_to_one_c: {
+                    c_field: 1,
+                    c_to_one_d_opt: { d_field: 1 },
+                    c_to_one_e_opt: { e_field: 1 },
+                  },
+                  b_to_one_c_opt: {
+                    c_field: 0,
+                    c_to_one_d_opt: { d_field: 1 },
+                    c_to_one_e_opt: { e_field: 1 },
+                  },
+                },
+              }
+            ]
           }"#,
-          2009,
-          "Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.updateMany.CompositeAUpdateManyInput.data.CompositeAWithoutUnsetUpdateInput.a_to_one_b.CompositeBNullableWithoutUnsetUpdateEnvelopeInput.upsert.CompositeBWithoutUnsetUpsertInput.update.CompositeBWithoutUnsetUpdateInput.b_to_one_c.CompositeCCreateInput.unset`: Field does not exist on enclosing type."
+        )
+        .await?;
+
+        // (nested multiple unsets + scalar update) within updateMany
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(where: { id: 1 }, data: {
+              to_many_as: {
+                updateMany: {
+                  where: { a_field: 0 },
+                  data: {
+                    a_field: 1,
+                    a_to_one_b: {
+                      update: {
+                        b_field: 1,
+                        b_to_one_c: {
+                          update: {
+                            c_field: 1,
+                            c_to_one_d_opt: { unset: true },
+                            c_to_one_e_opt: { unset: true },
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }) {
+              id
+              to_many_as {
+                a_field
+                a_to_one_b {
+                  b_field
+                  b_to_one_c {
+                    c_field
+                    c_to_one_d_opt { d_field }
+                    c_to_one_e_opt { e_field }
+                  }
+                }
+              }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_field":1,"a_to_one_b":{"b_field":1,"b_to_one_c":{"c_field":1,"c_to_one_d_opt":null,"c_to_one_e_opt":null}}}]}}}"###
+        );
+
+        // (nested multiple unsets without any other updates) within updateMany
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(where: { id: 2 }, data: {
+              to_many_as: {
+                updateMany: {
+                  where: { a_field: 0 },
+                  data: {
+                    a_to_one_b: {
+                      update: {
+                        b_to_one_c: {
+                          update: {
+                            c_to_one_d_opt: { unset: true },
+                            c_to_one_e_opt: { unset: true },
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }) {
+              id
+              to_many_as {
+                a_field
+                a_to_one_b {
+                  b_field
+                  b_to_one_c {
+                    c_field
+                    c_to_one_d_opt { d_field }
+                    c_to_one_e_opt { e_field }
+                  }
+                }
+              }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"id":2,"to_many_as":[{"a_field":0,"a_to_one_b":{"b_field":0,"b_to_one_c":{"c_field":1,"c_to_one_d_opt":null,"c_to_one_e_opt":null}}}]}}}"###
+        );
+
+        // (nested multiple unsets + scalar updates) within upsert within updateMany
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(where: { id: 1 }, data: {
+              to_many_as: {
+                updateMany: {
+                  where: { a_field: 1 },
+                  data: {
+                    a_field: 2,
+                    a_to_one_b: {
+                      update: {
+                        b_field: 2,
+                        b_to_one_c_opt: {
+                          upsert: {
+                            set: { c_field: 0 },
+                            update: {
+                              c_field: 2,
+                              c_to_one_d_opt: { unset: true },
+                              c_to_one_e_opt: { unset: true },
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }) {
+              id
+              to_many_as {
+                a_field
+                a_to_one_b {
+                  b_field
+                  b_to_one_c_opt {
+                    c_field
+                    c_to_one_d_opt { d_field }
+                    c_to_one_e_opt { e_field }
+                  }
+                }
+              }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_field":2,"a_to_one_b":{"b_field":2,"b_to_one_c_opt":{"c_field":2,"c_to_one_d_opt":null,"c_to_one_e_opt":null}}}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(to_many_nested_to_one))]
+    async fn update_many_nested_upserts(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+          id: 1,
+          to_many_as: [
+            {
+              a_field: 0,
+              a_to_one_b: {
+                b_field: 0,
+                b_to_one_c: {
+                  c_field: 0,
+                  c_to_one_d_opt: { d_field: 0 },
+                  c_to_one_e_opt: { e_field: 0 },
+                },
+                b_to_one_c_opt: {
+                  c_field: 0,
+                  c_to_one_d_opt: { d_field: 0 },
+                  c_to_one_e_opt: { e_field: 0 },
+                },
+              },
+            }
+          ]
+        }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(where: { id: 1 }, data: {
+              to_many_as: {
+                updateMany: {
+                  where: { a_field: 0 },
+                  data: {
+                    a_field: 1,
+                    a_to_one_b: {
+                      update: {
+                        b_field: 1,
+                        b_to_one_c_opt: {
+                          upsert: {
+                            set: { c_field: 0 },
+                            update: {
+                              c_field: 1,
+                              c_to_one_d_opt: {
+                                upsert: {
+                                  set: { d_field: 0 },
+                                  update: {
+                                    d_field: 1
+                                  }
+                                }
+                              },
+                              c_to_one_e_opt: {
+                                upsert: {
+                                  set: { e_field: 0 },
+                                  update: {
+                                    e_field: 1
+                                  }
+                                }
+                              },
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }) {
+              id
+              to_many_as {
+                a_field
+                a_to_one_b {
+                  b_field
+                  b_to_one_c_opt {
+                    c_field
+                    c_to_one_d_opt { d_field }
+                    c_to_one_e_opt { e_field }
+                  }
+                }
+              }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_field":1,"a_to_one_b":{"b_field":1,"b_to_one_c_opt":{"c_field":1,"c_to_one_d_opt":{"d_field":1},"c_to_one_e_opt":{"e_field":1}}}}]}}}"###
         );
 
         Ok(())
@@ -1139,7 +1490,11 @@ mod update {
             &runner,
             r#"{
                   id: 1
-                  to_many_as: [{ a_1: "a1", a_2: 0 }, { a_1: "a1", a_2: 1 }, { a_1: "a2", a_2: 2 }],
+                  to_many_as: [
+                    { a_1: "a_1", a_2: 0, a_to_one_b: { b_field: 0, b_to_many_cs: [{ c_field: 0 }, { c_field: 0 }] } },
+                    { a_1: "a_2", a_2: 1, a_to_one_b: { b_field: 1, b_to_many_cs: [{ c_field: 1 }, { c_field: 2 }] } },
+                    { a_1: "a_3", a_2: 2, a_to_one_b: { b_field: 2, b_to_many_cs: [{ c_field: 0 }, { c_field: 0 }] } },
+                  ],
                   to_one_b: {
                     b_to_many_cs: [{ c_field: 0 }, { c_field: 1 }, { c_field: 3 }]
                   }
@@ -1152,17 +1507,34 @@ mod update {
           run_query!(&runner, r#"mutation {
             updateOneTestModel(where: { id: 1 }, data: {
               to_many_as: {
-                deleteMany: { where: true }
+                deleteMany: {
+                  where: {
+                    a_to_one_b: {
+                      is: {
+                        b_field: { not: 1 }
+                        b_to_many_cs: {
+                          every: { c_field: 0 }
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }) {
               id
               to_many_as {
                 a_1
                 a_2
+                a_to_one_b {
+                  b_field
+                  b_to_many_cs {
+                    c_field
+                  }
+                }
               }
             }
           }"#),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a_2","a_2":1,"a_to_one_b":{"b_field":1,"b_to_many_cs":[{"c_field":1},{"c_field":2}]}}]}}}"###
         );
 
         // `deleteMany` within `upsert`
@@ -1174,7 +1546,7 @@ mod update {
                   set: {},
                   update: {
                     b_to_many_cs: {
-                      deleteMany: { where: true }
+                      deleteMany: { where: { c_field: { gt: 0 } } }
                     }
                   }
                 }
@@ -1188,7 +1560,7 @@ mod update {
               }
             }
           }"#),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_one_b":{"b_to_many_cs":[]}}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_one_b":{"b_to_many_cs":[{"c_field":0}]}}}}"###
         );
 
         Ok(())

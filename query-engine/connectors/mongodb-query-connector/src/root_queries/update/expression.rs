@@ -127,11 +127,13 @@ impl MergeDocument {
 #[derive(Debug, Clone)]
 pub(crate) struct MergeObjects {
     /// The field path to which this $mergeObjects expression should be applied
+    /// { $mergeObjects: [<field_path>, ...] }
     pub(crate) field_path: FieldPath,
+    /// Document against which it should be merged
+    /// { $mergeObjects: [..., <document>] }
+    pub(crate) document: MergeDocument,
     /// Hack: keys of the document located in `field_path` to unset
     pub(crate) keys_to_unset: Vec<String>,
-    /// Document against which it should be merged
-    pub(crate) document: MergeDocument,
 }
 
 impl MergeObjects {
@@ -155,35 +157,38 @@ impl MergeObjects {
 
     pub(crate) fn insert_set(&mut self, set: Set) {
         let set_expr = set.expression.clone();
-        let (path, inner_merge) = self.fill_empty_documents(set.field_path());
+        let (target, inner_merge) = self.fill_nested_merge_objects(set.field_path());
 
-        inner_merge.doc_mut().insert(path.to_owned(), *set_expr);
+        inner_merge.doc_mut().insert(target.to_owned(), *set_expr);
     }
 
-    pub(crate) fn insert_upsert(&mut self, mut upsert: operation::Upsert, depth: usize) -> crate::Result<()> {
-        let mut merge_doc = MergeObjects::new(upsert.field_path);
+    pub(crate) fn insert_upsert(&mut self, upsert: operation::Upsert) -> crate::Result<()> {
+        let field_path = upsert.field_path().clone();
+        let mut merge_doc = MergeObjects::new(field_path.clone());
+        let (target, inner_merge) = self.fill_nested_merge_objects(&field_path);
 
         for op in upsert.updates {
             match op {
                 operation::UpdateOperation::Generic(generic) => {
                     let mut set = generic.into_update_expression()?.try_into_set().unwrap();
-                    set.field_path.drain(depth + 1);
+                    set.field_path.keep_only_target();
 
                     merge_doc.insert_set(set);
                 }
                 operation::UpdateOperation::UpdateMany(update_many) => {
                     let mut set = update_many.into_update_expression()?.try_into_set().unwrap();
-                    set.field_path.drain(depth + 1);
+                    set.field_path.keep_only_target();
 
                     merge_doc.insert_set(set);
                 }
-                operation::UpdateOperation::Upsert(upsert) => {
-                    let mut inner_merge = MergeObjects::new(upsert.field_path.clone());
-                    inner_merge.insert_upsert(upsert, depth + 1)?;
+                operation::UpdateOperation::Upsert(mut upsert) => {
+                    upsert.field_path.keep_only_target();
 
-                    merge_doc.doc_mut().extend(inner_merge.document);
+                    merge_doc.insert_upsert(upsert)?;
                 }
-                operation::UpdateOperation::Unset(unset) => {
+                operation::UpdateOperation::Unset(mut unset) => {
+                    unset.field_path.keep_only_target();
+
                     merge_doc.insert_unset(unset);
                 }
             }
@@ -191,36 +196,47 @@ impl MergeObjects {
 
         let new_if = UpdateExpression::if_then_else(
             doc! { "$eq": [operation::Upsert::render_should_set_condition(&upsert.set.field_path().clone()), true] },
-            upsert.set.expression.clone(),
+            upsert.set.expression,
             merge_doc,
         );
 
-        if depth > 0 {
-            upsert.set.field_path.drain(depth);
-        }
-
-        self.doc_mut().insert(upsert.set.field_path().path(false), new_if);
+        inner_merge.doc_mut().insert(target.to_owned(), new_if);
 
         Ok(())
     }
 
     pub(crate) fn insert_unset(&mut self, unset: operation::Unset) {
-        let (target, _) = unset.field_path().path.split_last().unwrap();
+        let (target, inner_merge) = self.fill_nested_merge_objects(unset.field_path());
 
-        self.keys_to_unset.push(target.clone());
+        inner_merge.keys_to_unset.push(target.clone());
     }
 
-    /// Given a mutable `Document` and a `FieldPath`, fills nested empty documents to the mutable `Document`.
-    /// Returns a mutable reference to the most nested document along side the key to insert a value.
+    /// Given a mut ref to a `MergeObjects` and a `FieldPath`, fills nested empty `MergeObjects` unless one is already present.
+    /// Returns a mut ref to the most nested `MergeObjects` along side the key to insert a value inside its `MergeDocument`.
+    ///
     /// ```text
-    /// ["a", "b", "c"] -> ("c", doc! { "a": { "b": {} } })
+    /// ["a", "b", "c"] ->
+    /// (
+    ///   "c", <- key to insert into the most nested `MergeObjects`'s MergeDocument
+    ///   MergeObjects(["a"],
+    ///     doc! {
+    ///       "a": MergeObjects(["a", "b"],
+    ///         doc! { "b": MergeObjects(["a","b","c"], <- Mutable reference to this MergeObjects
+    ///           doc! {}
+    ///         )
+    ///     })
+    ///   })
+    /// )
     /// ```
-    fn fill_empty_documents<'a, 'b>(&'a mut self, field_path: &'b FieldPath) -> (&'b String, &'a mut MergeObjects) {
+    fn fill_nested_merge_objects<'a, 'b>(
+        &'a mut self,
+        field_path: &'b FieldPath,
+    ) -> (&'b String, &'a mut MergeObjects) {
         let (target, segments) = field_path.path.split_last().unwrap();
 
-        let inner_merge = segments.iter().enumerate().fold(self, |acc, (i, segment)| {
+        let inner_merge = segments.iter().enumerate().fold(self, |acc, (depth, segment)| {
             let mut merge_path = field_path.clone();
-            merge_path.drain(i);
+            merge_path.take(depth + 1);
 
             let inner_merge = acc
                 .doc_mut()
