@@ -11,7 +11,8 @@ use tracing::debug;
 pub(crate) fn log_read_query(coll_name: &str, query: &MongoReadQuery) {
     let mut buffer = String::new();
     fmt_query(&mut buffer, coll_name, query).unwrap();
-    debug!(target: "mongodb_query_connector::query", query = buffer.as_str(), item_type = "query", is_query = true);
+    let params: Vec<i32> = Vec::new();
+    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %buffer, params = ?params);
 }
 
 macro_rules! write_indented {
@@ -173,7 +174,8 @@ pub(crate) fn log_insert_one(coll: &str, doc: &Document) {
     fmt_doc(&mut buffer, doc, 1).unwrap();
     write!(&mut buffer, ")").unwrap();
 
-    debug!(target: "mongodb_query_connector::query", query = buffer.as_str(), item_type = "query", is_query = true);
+    let params: Vec<i32> = Vec::new();
+    debug!(target: "mongodb_query_connector::query", query = %buffer, item_type = "query", is_query = true, params = ?params);
 }
 
 pub(crate) fn log_update_many_vec(coll: &str, filter: &Document, docs: &[Document]) {
@@ -194,7 +196,8 @@ pub(crate) fn log_update_many_vec(coll: &str, filter: &Document, docs: &[Documen
 
     write!(&mut buffer, "])").unwrap();
 
-    debug!(target: "mongodb_query_connector::query", query = buffer.as_str(), item_type = "query", is_query = true);
+    let params: Vec<i32> = Vec::new();
+    debug!(target: "mongodb_query_connector::query", query = %buffer, item_type = "query", is_query = true, params = ?params);
 }
 
 pub(crate) fn log_update_many(coll: &str, filter: &Document, doc: &Document) {
@@ -228,7 +231,8 @@ pub(crate) fn log_update_one(coll: &str, filter: &Document, doc: &Document) {
     fmt_doc(&mut buffer, doc, 1).unwrap();
     write!(&mut buffer, ")").unwrap();
 
-    debug!(target: "mongodb_query_connector::query", query = buffer.as_str(), item_type = "query", is_query = true);
+    let params: Vec<i32> = Vec::new();
+    debug!(target: "mongodb_query_connector::query", query = %buffer, item_type = "query", is_query = true, params = ?params);
 }
 
 pub(crate) fn log_delete_many(coll: &str, filter: &Document) {
@@ -238,7 +242,8 @@ pub(crate) fn log_delete_many(coll: &str, filter: &Document) {
     fmt_doc(&mut buffer, filter, 1).unwrap();
     write!(&mut buffer, ")").unwrap();
 
-    debug!(target: "mongodb_query_connector::query", query = buffer.as_str(), item_type = "query", is_query = true);
+    let params: Vec<i32> = Vec::new();
+    debug!(target: "mongodb_query_connector::query", query = %buffer, item_type = "query", is_query = true, params = ?params);
 }
 
 pub(crate) fn log_insert_many(coll: &str, docs: &[Document], ordered: bool) {
@@ -253,5 +258,6 @@ pub(crate) fn log_insert_many(coll: &str, docs: &[Document], ordered: bool) {
     write!(&mut buffer, "], ").unwrap();
     write!(&mut buffer, r#"{{ "ordered": {} }}"#, ordered).unwrap();
 
-    debug!(target: "mongodb_query_connector::query", query = buffer.as_str(), item_type = "query", is_query = true);
+    let params: Vec<i32> = Vec::new();
+    debug!(target: "mongodb_query_connector::query", query = %buffer, item_type = "query", is_query = true, params = ?params);
 }
