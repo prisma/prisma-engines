@@ -255,7 +255,7 @@ fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
-    let mut mapper = UpdateDataInputFieldMapper::new_checked();
+    let mapper = UpdateDataInputFieldMapper::new_checked();
     let fields = mapper.map_all(ctx, cf.typ.fields());
 
     input_object.set_fields(fields);
