@@ -417,7 +417,13 @@ impl SqlRenderer for PostgresFlavour {
 
 fn render_column_type(col: &ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'static, str> {
     let t = col.column_type();
-    let is_autoincrement = col.is_autoincrement();
+
+    let is_unique_rowid = col
+        .default()
+        .map(|d| matches!(d.kind(), DefaultKind::DbGenerated(s) if s == "unique_rowid()"))
+        .unwrap_or(false);
+
+    let is_autoincrement = col.is_autoincrement() && !(is_unique_rowid && flavour.is_cockroachdb());
 
     if let ColumnTypeFamily::Enum(name) = &t.family {
         return format!("\"{}\"{}", name, if t.arity.is_list() { "[]" } else { "" }).into();

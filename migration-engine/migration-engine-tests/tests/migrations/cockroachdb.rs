@@ -240,3 +240,17 @@ fn primary_key_column_type_migrations_are_unexecutable(api: TestApi) {
         table.assert_pk(|pk| pk.assert_columns(&["name", "passportNumber"]))
     });
 }
+
+#[test_connector(tags(CockroachDb))]
+fn unique_rowid_is_autoincrement(api: TestApi) {
+    // https://github.com/prisma/prisma/issues/12244
+
+    let dm1 = r#"
+        model order {
+          orderId BigInt @id @default(dbgenerated("unique_rowid()"))
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+    api.schema_push_w_datasource(dm1).send().assert_no_steps();
+}
