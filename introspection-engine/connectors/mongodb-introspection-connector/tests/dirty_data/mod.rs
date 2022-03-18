@@ -79,7 +79,7 @@ fn mixing_types() {
     res.assert_warning_affected(&json!([{
         "model": "A",
         "field": "first",
-        "tpe": "Document",
+        "tpe": "Json",
     }]));
 }
 
@@ -113,6 +113,6 @@ fn mixing_types_with_the_same_base_type() {
     res.assert_warning_affected(&json!([{
         "model": "A",
         "field": "first",
-        "tpe": "Document",
+        "tpe": "Json",
     }]));
 }
