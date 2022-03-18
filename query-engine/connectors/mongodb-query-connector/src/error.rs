@@ -17,6 +17,7 @@ pub enum MongoError {
     #[error("Failed to convert '{}' to '{}'.", from, to)]
     ConversionError { from: String, to: String },
 
+    // Unhandled conversion error. Mostly used for `#[non-exhaustive]` flagged Mongo errors.
     #[error("Unhandled conversion error: {0}.")]
     UnhandledConversionError(anyhow::Error),
 
