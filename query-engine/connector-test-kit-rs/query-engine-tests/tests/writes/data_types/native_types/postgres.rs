@@ -223,7 +223,6 @@ mod postgres {
               #id(id, String, @id, @default(cuid()))
               bool  Boolean @test.Boolean
               byteA Bytes   @test.ByteA
-              json  Json    @test.Json
               jsonb Json    @test.JsonB
             }"#
         };
@@ -240,17 +239,15 @@ mod postgres {
               data: {
                 bool: true
                 byteA: "dGVzdA=="
-                json: "{}"
                 jsonb: "{\"a\": \"b\"}"
               }
             ) {
               bool
               byteA
-              json
               jsonb
             }
           }"#),
-          @r###"{"data":{"createOneModel":{"bool":true,"byteA":"dGVzdA==","json":"{}","jsonb":"{\"a\":\"b\"}"}}}"###
+          @r###"{"data":{"createOneModel":{"bool":true,"byteA":"dGVzdA==","jsonb":"{\"a\":\"b\"}"}}}"###
         );
 
         Ok(())
