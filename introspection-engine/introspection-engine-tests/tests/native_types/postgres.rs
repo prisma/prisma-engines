@@ -154,3 +154,30 @@ async fn native_type_array_columns_feature_on(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(CockroachDb))]
+async fn cdb_char_is_a_char(api: &TestApi) -> TestResult {
+    // https://github.com/prisma/prisma/issues/12281
+
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("Blog", move |t| {
+                t.inject_custom("id Integer Primary Key");
+                t.inject_custom(r#"ch "char" DEFAULT 'Y'::"char" NOT NULL"#);
+            });
+        })
+        .await?;
+
+    let result = api.introspect_dml().await?;
+
+    let expected = expect![[r#"
+        model Blog {
+          id Int    @id
+          ch String @default(dbgenerated("'Y':::STRING::\"char\"")) @db.Char
+        }
+    "#]];
+
+    expected.assert_eq(&result);
+
+    Ok(())
+}

@@ -872,6 +872,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "citext" | "_citext" => (String, Some(PostgresType::Citext)),
         "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_maximum_length))),
         "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_maximum_length))),
+        "char" | "_char" => (String, Some(PostgresType::Char(precision.character_maximum_length))),
         "date" | "_date" => (DateTime, Some(PostgresType::Date)),
         "bytea" | "_bytea" => (Binary, Some(PostgresType::ByteA)),
         "json" | "_json" => (Json, Some(PostgresType::Json)),
