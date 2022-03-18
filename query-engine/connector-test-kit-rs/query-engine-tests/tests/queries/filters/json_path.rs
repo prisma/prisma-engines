@@ -16,6 +16,17 @@ mod json_path {
         schema.to_owned()
     }
 
+    fn cdb_json() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+                #id(id, Int, @id)
+                json Json @test.JsonB
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
     #[connector_test]
     async fn no_path_without_filter(runner: Runner) -> TestResult<()> {
         assert_error!(
@@ -515,7 +526,7 @@ mod json_path {
         Ok(())
     }
 
-    #[connector_test(schema(pg_json), only(CockroachDb))]
+    #[connector_test(schema(cdb_json), only(CockroachDb))]
     async fn cockroach_errors_on_json_gt_lt(runner: Runner) -> TestResult<()> {
         let query = format!(
             r#"query {{
