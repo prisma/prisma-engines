@@ -325,7 +325,7 @@ fn scalar_list_filter(filter: ScalarListFilter, invert: bool, prefix: FilterPref
         match filter.condition {
             // "Contains element" -> "Does not contain element"
             connector_interface::ScalarListCondition::Contains(val) => {
-                doc! { "$not": { "$in": [(&field, val).into_bson()?, field_name] } }
+                doc! { "$not": { "$in": [(&field, val).into_bson()?, coerce_as_array(&field_name)] } }
             }
 
             // "Contains all elements" -> "Does not contain any of the elements"
@@ -372,7 +372,7 @@ fn scalar_list_filter(filter: ScalarListFilter, invert: bool, prefix: FilterPref
     } else {
         match filter.condition {
             connector_interface::ScalarListCondition::Contains(val) => {
-                doc! { "$in": [(&field, val).into_bson()?, field_name] }
+                doc! { "$in": [(&field, val).into_bson()?, coerce_as_array(&field_name)] }
             }
 
             connector_interface::ScalarListCondition::ContainsEvery(vals) if vals.is_empty() => {
@@ -419,6 +419,14 @@ fn scalar_list_filter(filter: ScalarListFilter, invert: bool, prefix: FilterPref
                 }
             }
         }
+    };
+
+    let filter_doc = doc! {
+        "$and": [
+            filter_doc,
+            // Always ignore undefined scalar lists
+            { "$ne": [coerce_as_null(&field_name), null] }
+        ]
     };
 
     Ok(MongoFilter::Scalar(filter_doc))
