@@ -232,7 +232,7 @@
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Handled</span> {
-            <span class="ident">collection</span>: <span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+            <span class="ident">collection</span>: <span class="ident">model</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>(),
             <span class="ident">operation</span>: <span class="ident">MongoOperation::Find</span>(<span class="ident">filter</span>, <span class="ident">options</span>),
         })
     }
@@ -246,7 +246,7 @@
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">MongoCommand::Handled</span> {
-            <span class="ident">collection</span>: <span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+            <span class="ident">collection</span>: <span class="ident">model</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>(),
             <span class="ident">operation</span>: <span class="ident">MongoOperation::Aggregate</span>(<span class="ident">pipeline</span>, <span class="ident">options</span>),
         })
     }
