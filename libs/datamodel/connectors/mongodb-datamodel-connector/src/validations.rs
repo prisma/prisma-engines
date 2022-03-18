@@ -189,3 +189,29 @@ pub(crate) fn unique_cannot_be_defined_to_id_field(index: IndexWalker<'_>, error
         *attr.span(),
     ));
 }
+
+/// A field name cannot contain the `.` character and it cannot start with `$`.
+pub(crate) fn field_name_uses_valid_characters(field: ScalarFieldWalker<'_>, errors: &mut Diagnostics) {
+    let name = match field.mapped_name() {
+        Some(name) => name,
+        None => return,
+    };
+
+    let span = field.ast_field().span_for_attribute("map").unwrap();
+
+    if name.starts_with('$') {
+        errors.push_error(DatamodelError::new_attribute_validation_error(
+            "The field name cannot start with a `$` character",
+            "map",
+            span,
+        ));
+    }
+
+    if name.contains('.') {
+        errors.push_error(DatamodelError::new_attribute_validation_error(
+            "The field name cannot contain a `.` character",
+            "map",
+            span,
+        ));
+    }
+}
