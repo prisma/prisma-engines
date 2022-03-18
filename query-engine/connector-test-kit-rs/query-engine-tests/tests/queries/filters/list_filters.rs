@@ -420,6 +420,17 @@ mod enum_lists {
             .await?
             .assert_success();
 
+        runner
+            .query(indoc! { r#"
+              mutation {
+                createOneTestModel(data: {
+                  id: 3,
+                }) { id }
+            }
+            "#})
+            .await?
+            .assert_success();
+
         Ok(())
     }
 }
