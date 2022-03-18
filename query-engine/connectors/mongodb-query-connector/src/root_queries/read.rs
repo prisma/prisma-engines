@@ -1,5 +1,8 @@
 use super::*;
-use crate::{output_meta, query_builder::MongoReadQueryBuilder, vacuum_cursor, IntoBson};
+use crate::{
+    error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
+    vacuum_cursor, IntoBson,
+};
 use connector_interface::{Filter, QueryArguments, RelAggregationSelection};
 use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
 use prisma_models::*;
@@ -99,7 +102,11 @@ pub async fn get_related_m2m_record_ids<'conn>(
     let id_field = pick_singular_id(&model);
     let ids = from_record_ids
         .iter()
-        .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
+        .map(|p| {
+            (&id_field, p.values().next().unwrap())
+                .into_bson()
+                .decorate_with_scalar_field_info(&id_field)
+        })
         .collect::<crate::Result<Vec<_>>>()?;
 
     let filter = doc! { id_field.db_name(): { "$in": ids } };

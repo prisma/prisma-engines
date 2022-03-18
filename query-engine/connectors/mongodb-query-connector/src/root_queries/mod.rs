@@ -6,7 +6,9 @@ pub mod write;
 
 mod update_utils;
 
-use crate::{output_meta::OutputMetaMapping, value::value_from_bson};
+use crate::{
+    error::DecorateErrorWithFieldInformationExtension, output_meta::OutputMetaMapping, value::value_from_bson,
+};
 use mongodb::bson::Bson;
 use mongodb::bson::Document;
 use prisma_models::*;
@@ -18,7 +20,7 @@ fn document_to_record(mut doc: Document, fields: &[String], meta_mapping: &Outpu
     for field in fields {
         let bson = doc.remove(field).unwrap_or(Bson::Null);
         let mapping = meta_mapping.get(field).expect("Incorrect meta type mapping.");
-        let val = value_from_bson(bson, mapping)?;
+        let val = value_from_bson(bson, mapping).decorate_with_field_name(field)?;
 
         values.push(val);
     }

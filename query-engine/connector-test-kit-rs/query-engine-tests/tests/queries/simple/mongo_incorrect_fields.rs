@@ -39,6 +39,24 @@ mod mongo_incorrect_fields {
         Ok(())
     }
 
+    #[connector_test]
+    async fn correct_error_for_type_mismatch(runner: Runner) -> TestResult<()> {
+        // Insert `field` as Int even though the schema expects a `String`
+        run_query!(
+            &runner,
+            run_command_raw(json!({ "insert": "TestModel", "documents": [{ "_id": 1, "field": 1 }] }))
+        );
+
+        assert_error!(
+            &runner,
+            r#"{ findManyTestModel { id field } }"#,
+            2023,
+            "Inconsistent column data: Failed to convert '1' to 'String' for the field 'field'."
+        );
+
+        Ok(())
+    }
+
     fn run_command_raw(command: serde_json::Value) -> String {
         let command = command.to_string().replace("\"", "\\\"");
 

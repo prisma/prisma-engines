@@ -1,5 +1,6 @@
 use super::*;
 use crate::{
+    error::DecorateErrorWithFieldInformationExtension,
     filter::{convert_filter, FilterPrefix, MongoFilter},
     logger, output_meta,
     query_builder::MongoReadQueryBuilder,
@@ -50,7 +51,8 @@ pub async fn create_record<'conn>(
             .try_into()
             .expect("Create calls can only use PrismaValue write expressions (right now).");
 
-        let bson = (&field, value).into_bson()?;
+        let bson = (&field, value).into_bson().decorate_with_field_info(&field)?;
+
         doc.insert(field.db_name().to_owned(), bson);
     }
 
@@ -91,7 +93,8 @@ pub async fn create_records<'conn>(
                     .try_into()
                     .expect("Create calls can only use PrismaValue write expressions (right now).");
 
-                let bson = (field, value).into_bson()?;
+                let bson = (field, value).into_bson().decorate_with_field_info(&field)?;
+
                 doc.insert(field_name.to_string(), bson);
             }
 
@@ -141,7 +144,11 @@ pub async fn update_records<'conn>(
     let ids: Vec<Bson> = if let Some(selectors) = record_filter.selectors {
         selectors
             .into_iter()
-            .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
+            .map(|p| {
+                (&id_field, p.values().next().unwrap())
+                    .into_bson()
+                    .decorate_with_scalar_field_info(&id_field)
+            })
             .collect::<crate::Result<Vec<_>>>()?
     } else {
         let filter = convert_filter(record_filter.filter, false, false, FilterPrefix::default())?;
@@ -167,7 +174,10 @@ pub async fn update_records<'conn>(
 
     for (field, write_op) in fields {
         let field_path = FieldPath::new_from_segment(&field);
-        let update_ops = write_op.into_update_ops(&field, field_path)?.into_update_docs()?;
+        let update_ops = write_op
+            .into_update_ops(&field, field_path)?
+            .into_update_docs()
+            .decorate_with_field_info(&field)?;
 
         update_docs.extend(update_ops);
     }
@@ -203,7 +213,11 @@ pub async fn delete_records<'conn>(
     let ids = if let Some(selectors) = record_filter.selectors {
         selectors
             .into_iter()
-            .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
+            .map(|p| {
+                (&id_field, p.values().next().unwrap())
+                    .into_bson()
+                    .decorate_with_scalar_field_info(&id_field)
+            })
             .collect::<crate::Result<Vec<_>>>()?
     } else {
         let filter = convert_filter(record_filter.filter, false, false, FilterPrefix::default())?;
@@ -267,14 +281,19 @@ pub async fn m2m_connect<'conn>(
     let parent_id_field = pick_singular_id(&parent_model);
 
     let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
-    let parent_id = (&parent_id_field, parent_id).into_bson()?;
+    let parent_id = (&parent_id_field, parent_id)
+        .into_bson()
+        .decorate_with_scalar_field_info(&parent_id_field)?;
 
     let parent_filter = doc! { "_id": { "$eq": parent_id.clone() } };
     let child_ids = child_ids
         .iter()
         .map(|child_id| {
             let (selection, value) = child_id.pairs.get(0).unwrap();
-            (selection, value.clone()).into_bson()
+
+            (selection, value.clone())
+                .into_bson()
+                .decorate_with_selected_field_info(&selection)
         })
         .collect::<crate::Result<Vec<_>>>()?;
 
@@ -318,14 +337,19 @@ pub async fn m2m_disconnect<'conn>(
     let parent_id_field = pick_singular_id(&parent_model);
 
     let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
-    let parent_id = (&parent_id_field, parent_id).into_bson()?;
+    let parent_id = (&parent_id_field, parent_id)
+        .into_bson()
+        .decorate_with_scalar_field_info(&parent_id_field)?;
 
     let parent_filter = doc! { "_id": { "$eq": parent_id.clone() } };
     let child_ids = child_ids
         .iter()
         .map(|child_id| {
             let (field, value) = child_id.pairs.get(0).unwrap();
-            (field, value.clone()).into_bson()
+
+            (field, value.clone())
+                .into_bson()
+                .decorate_with_selected_field_info(&field)
         })
         .collect::<crate::Result<Vec<_>>>()?;
 

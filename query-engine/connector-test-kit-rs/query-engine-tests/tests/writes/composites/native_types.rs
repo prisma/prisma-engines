@@ -35,7 +35,7 @@ mod on_composites {
             &runner,
             r#"mutation { createOneTestModel(data: { id: 1, to_one: { field: "nope" } }) { id } }"#,
             2023,
-            "Malformed ObjectID"
+            "Malformed ObjectID: invalid character 'n' was found at index 0 in the provided hex string: \"nope\" for the field 'to_one'."
         );
 
         Ok(())
