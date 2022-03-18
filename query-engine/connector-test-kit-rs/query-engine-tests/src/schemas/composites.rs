@@ -136,22 +136,25 @@ pub fn mixed_composites() -> String {
             to_one_rel_id Int?
             to_one_rel RelatedModel? @relation(name: "ToOne", fields: [to_one_rel_id], references: [id])
 
-            to_many_rel RelatedModel[] @relation(name: "ToMany")
+            #m2m(to_many_rel, RelatedModel[], id, Int, ToMany)
         }
 
         type CompositeA {
             a_1 String @default("a_1 default") @map("a1")
             a_2 Int?
             other_composites CompositeB[]
+            scalar_list  String[]
         }
 
         type CompositeB {
-            b_field        String      @default("b_field default")
-            to_other_com   CompositeC? @map("nested_c")
+            b_field      String      @default("b_field default")
+            to_other_com CompositeC? @map("nested_c")
+            scalar_list  String[]
         }
 
         type CompositeC {
-          c_field String @default("c_field default")
+          c_field     String @default("c_field default")
+          scalar_list String[]
         }
 
         model RelatedModel {
@@ -161,7 +164,7 @@ pub fn mixed_composites() -> String {
             to_many_com  CompositeB[] @map("to_many_composite")
 
             test_model TestModel? @relation(name: "ToOne")
-            many_test_model TestModel[] @relation(name: "ToMany")
+            #m2m(many_test_model, TestModel[], id, Int, ToMany)
         }
 
         "#
