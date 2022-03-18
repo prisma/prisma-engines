@@ -109,7 +109,7 @@ async fn create_to_one_test_data(runner: &Runner) -> TestResult<()> {
     Ok(())
 }
 
-/// Basic to-many test data.
+/// Composite combination test data.
 #[rustfmt::skip]
 async fn create_combination_test_data(runner: &Runner) -> TestResult<()> {
     // A few with full data
@@ -148,6 +148,140 @@ async fn create_combination_test_data(runner: &Runner) -> TestResult<()> {
     // A few with no list and no b - this will cause undefined fields!
     create_row(runner, r#"{ id: 10 }"#).await?;
     create_row(runner, r#"{ id: 11 }"#).await?;
+
+    Ok(())
+}
+
+/// Composite/Relation combination test data.
+#[rustfmt::skip]
+async fn create_relation_combination_test_data(runner: &Runner) -> TestResult<()> {
+    // A few with full data
+    create_row(runner, r#"{
+        id: 1,
+        to_one_rel: {
+            create: {
+                id: 1
+                to_one_com: { a_1: "test", a_2: 10, scalar_list: ["a", "b", "c"], other_composites: [ { b_field: "foo", scalar_list: ["1", "2"], }, { b_field: "oof", scalar_list: ["1"] } ] }
+                to_many_com: [ { b_field: "foo", scalar_list: [], }, { b_field: "oof", scalar_list: ["123"], } ]
+            }
+        }
+        to_many_rel: {
+            create: [
+                {
+                    id: 2
+                    to_one_com: { a_1: "test", a_2: 10, other_composites: [ { b_field: "foo" }, { b_field: "oof" } ] }
+                    to_many_com: [ { b_field: "ayaya" }, { b_field: "ofo" } ]
+                },
+                {
+                    id: 3
+                    to_one_com: { a_1: "Test", a_2: -10, other_composites: [ { b_field: "foo" }, { b_field: "oof" } ] }
+                    to_many_com: [ { b_field: "ding" }, { b_field: "dong" } ]
+                }
+            ]
+        }
+    }"#).await?;
+
+    create_row(runner, r#"{
+        id: 2,
+        to_one_rel: {
+            create: {
+                id: 4
+                to_one_com: { a_1: "hello world", a_2: -5, scalar_list: ["a", "b"], other_composites: [ { b_field: "shardbearer malenia", scalar_list: [] }, { b_field: "is", scalar_list: [] }, { b_field: "overtuned", scalar_list: [] } ] }
+                to_many_com: [ { b_field: "test", scalar_list: ["hello"] }, { b_field: "oof", scalar_list: ["hello", "world"] } ]
+            }
+        }
+        to_many_rel: {
+            create: [
+                {
+                    id: 5
+                    to_one_com: { a_1: "tset", a_2: 123, other_composites: [ { b_field: "foo" }, { b_field: "test" } ] }
+                    to_many_com: [ { b_field: "ayaya" }, { b_field: "ofo" } ]
+                },
+                {
+                    id: 6
+                    to_one_com: { a_1: "Test", a_2: -10, other_composites: [ { b_field: "foo" }, { b_field: "oof" } ] }
+                    to_many_com: [ { b_field: "ding" }, { b_field: "dong" } ]
+                }
+            ]
+        }
+    }"#).await?;
+
+    create_row(runner, r#"{
+        id: 3,
+        to_one_rel: {
+            create: {
+                id: 7
+                to_one_com: { a_1: "world", a_2: 0, scalar_list: [], other_composites: [ { b_field: "shardbearer mogh", scalar_list: ["a"] }, { b_field: "is", scalar_list: ["b"] }, { b_field: "perfect", scalar_list: ["c"] } ] }
+                to_many_com: [ { b_field: "fof" }, { b_field: "ofo" } ]
+            }
+        }
+        to_many_rel: {
+            create: [
+                {
+                    id: 8
+                    to_one_com: { a_1: "test", a_2: 11, other_composites: [ { b_field: "fo" }, { b_field: "of" } ] }
+                    to_many_com: [ { b_field: "ayaya" }, { b_field: "ofo" } ]
+                },
+                {
+                    id: 9
+                    to_one_com: { a_1: "Test", a_2: -10, other_composites: [ { b_field: "foof" }, { b_field: "ofoo" } ] }
+                    to_many_com: [ { b_field: "ding" }, { b_field: "dong" } ]
+                }
+            ]
+        }
+    }"#).await?;
+
+    // One with empty / null composites
+    create_row(runner, r#"{
+        id: 4,
+        to_one_rel: {
+            create: {
+                id: 10
+                to_one_com: null
+                to_many_com: []
+            }
+        }
+        to_many_rel: {
+            create: [
+                {
+                    id: 11
+                    to_one_com: null
+                    to_many_com: []
+                },
+                {
+                    id: 12
+                    to_one_com: null
+                    to_many_com: []
+                }
+            ]
+        }
+    }"#).await?;
+
+    // One with undefined composites
+    create_row(runner, r#"{
+        id: 5,
+        to_one_rel: {
+            create: {
+                id: 13
+            }
+        }
+        to_many_rel: {
+            create: [
+                {
+                    id: 14
+                },
+                {
+                    id: 15
+                }
+            ]
+        }
+    }"#).await?;
+
+
+    // One with no related records
+    create_row(runner, r#"{
+        id: 6,
+    }"#).await?;
 
     Ok(())
 }
