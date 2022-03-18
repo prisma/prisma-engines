@@ -196,6 +196,42 @@ mod raw_mongo {
         Ok(())
     }
 
+    fn schema_mapped() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+            #id(id, Int, @id)
+            field       String
+
+            @@map("test_model")
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // findRaw & aggregateRaw should work with mapped models
+    #[connector_test(schema(schema_mapped))]
+    async fn find_aggregate_raw_mapped_model(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            run_command_raw(
+                json!({ "insert": "test_model", "documents": [{ "_id": 1, "field": "A" }, { "_id": 2, "field": "B" }, { "_id": 3, "field": "C" }] }),
+            )
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, aggregate_raw(None, None)),
+          @r###"{"data":{"aggregateTestModelRaw":[{"_id":1,"field":"A"},{"_id":2,"field":"B"},{"_id":3,"field":"C"}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, find_raw(None, None)),
+          @r###"{"data":{"findTestModelRaw":[{"_id":1,"field":"A"},{"_id":2,"field":"B"},{"_id":3,"field":"C"}]}}"###
+        );
+
+        Ok(())
+    }
+
     fn find_raw(filter: Option<serde_json::Value>, options: Option<serde_json::Value>) -> String {
         let filter = filter.map(|q| format!(r#"filter: "{}""#, q.to_string().replace("\"", "\\\"")));
         let options = options.map(|o| format!(r#"options: "{}""#, o.to_string().replace("\"", "\\\"")));

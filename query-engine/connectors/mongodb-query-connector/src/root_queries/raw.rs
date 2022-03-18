@@ -49,7 +49,7 @@ impl MongoCommand {
             .transpose()?;
 
         Ok(Self::Handled {
-            collection: model.name.clone(),
+            collection: model.db_name().to_owned(),
             operation: MongoOperation::Find(filter, options),
         })
     }
@@ -63,7 +63,7 @@ impl MongoCommand {
             .transpose()?;
 
         Ok(MongoCommand::Handled {
-            collection: model.name.clone(),
+            collection: model.db_name().to_owned(),
             operation: MongoOperation::Aggregate(pipeline, options),
         })
     }
