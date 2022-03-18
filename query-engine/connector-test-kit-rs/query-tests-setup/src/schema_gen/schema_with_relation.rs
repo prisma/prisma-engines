@@ -116,16 +116,17 @@ pub fn schema_with_relation(
         FULL_ID_OPTIONS.to_vec()
     };
 
-    let simple = std::env::var("SIMPLE_TEST_MODE").is_ok();
+    // Reduces the amount of generated tests when `true`
+    let simple_test_mode = std::env::var("SIMPLE_TEST_MODE").is_ok();
     let mut datamodels: Vec<DatamodelWithParams> = vec![];
     let mut required_capabilities: Vec<Vec<ConnectorCapability>> = vec![];
 
     for parent_id in id_options.iter() {
         for child_id in id_options.iter() {
             // Based on Id and relation fields
-            for child_ref_to_parent in child_references(simple, parent_id, on_parent, on_child) {
+            for child_ref_to_parent in child_references(simple_test_mode, parent_id, on_parent, on_child) {
                 for parent_ref_to_child in
-                    parent_references(simple, child_id, &child_ref_to_parent, on_parent, on_child)
+                    parent_references(simple_test_mode, child_id, &child_ref_to_parent, on_parent, on_child)
                 {
                     // TODO: The RelationReference.render() equality is a hack. Implement PartialEq instead
                     let is_virtual_req_rel_field =
