@@ -65,6 +65,7 @@ impl Connector for MongoDbDatamodelConnector {
             validations::auto_attribute_must_be_an_id(field, errors);
             validations::dbgenerated_attribute_is_not_allowed(field, errors);
             validations::disallow_array_native_types(field, errors);
+            validations::field_name_uses_valid_characters(field, errors);
         }
 
         for index in model.indexes() {
