@@ -39,6 +39,11 @@ pub(crate) fn validate_enum_name(ast_enum: &ast::Enum, diagnostics: &mut Diagnos
 // https://github.com/prisma/prisma/blob/master/src/packages/client/src/generation/generateClient.ts#L443
 const RESERVED_NAMES: &[&str] = &[
     "PrismaClient",
+    'Prisma',
+    'Datasource',
+    'Middleware',
+    'LogLevel',
+    'Generator',
     // JavaScript keywords
     "break",
     "case",
