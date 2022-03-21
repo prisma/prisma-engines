@@ -1085,6 +1085,7 @@
 <span id="1083">1083</span>
 <span id="1084">1084</span>
 <span id="1085">1085</span>
+<span id="1086">1086</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -1959,6 +1960,7 @@
         <span class="string">&quot;citext&quot;</span> <span class="op">|</span> <span class="string">&quot;_citext&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Citext</span>)),
         <span class="string">&quot;varchar&quot;</span> <span class="op">|</span> <span class="string">&quot;_varchar&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarChar</span>(<span class="ident">precision</span>.<span class="ident">character_maximum_length</span>))),
         <span class="string">&quot;bpchar&quot;</span> <span class="op">|</span> <span class="string">&quot;_bpchar&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Char</span>(<span class="ident">precision</span>.<span class="ident">character_maximum_length</span>))),
+        <span class="string">&quot;char&quot;</span> <span class="op">|</span> <span class="string">&quot;_char&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Char</span>(<span class="ident">precision</span>.<span class="ident">character_maximum_length</span>))),
         <span class="string">&quot;date&quot;</span> <span class="op">|</span> <span class="string">&quot;_date&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Date</span>)),
         <span class="string">&quot;bytea&quot;</span> <span class="op">|</span> <span class="string">&quot;_bytea&quot;</span> =&gt; (<span class="ident">Binary</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::ByteA</span>)),
         <span class="string">&quot;json&quot;</span> <span class="op">|</span> <span class="string">&quot;_json&quot;</span> =&gt; (<span class="ident">Json</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Json</span>)),
