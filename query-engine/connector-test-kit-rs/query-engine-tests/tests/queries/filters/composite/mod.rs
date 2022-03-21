@@ -161,21 +161,65 @@ async fn create_relation_combination_test_data(runner: &Runner) -> TestResult<()
         to_one_rel: {
             create: {
                 id: 1
-                to_one_com: { a_1: "test", a_2: 10, scalar_list: ["a", "b", "c"], other_composites: [ { b_field: "foo", scalar_list: ["1", "2"], }, { b_field: "oof", scalar_list: ["1"] } ] }
-                to_many_com: [ { b_field: "foo", scalar_list: [], }, { b_field: "oof", scalar_list: ["123"], } ]
+                to_one_com: {
+                    a_1: "test",
+                    a_2: 10,
+                    scalar_list: ["a", "b", "c"],
+                    a_to_other_com: { c_field: "foo" },
+                    other_composites: [
+                        { b_field: "foo", scalar_list: ["1", "2"], to_other_com: { c_field: "test" } },
+                        { b_field: "oof", scalar_list: ["1"],      to_other_com: { c_field: "Test" } }
+                    ]
+                }
+                to_many_com: [
+                    {
+                        b_field: "foo",
+                        scalar_list: [],
+                        to_other_com: { c_field: "a" },
+                        to_other_coms: []
+                    },
+                    {
+                        b_field: "oof",
+                        scalar_list: ["123"],
+                        to_other_com: { c_field: "b" },
+                        to_other_coms: [ { c_field: "foo" } ]
+                    }
+                ]
             }
         }
         to_many_rel: {
             create: [
                 {
                     id: 2
-                    to_one_com: { a_1: "test", a_2: 10, other_composites: [ { b_field: "foo" }, { b_field: "oof" } ] }
-                    to_many_com: [ { b_field: "ayaya" }, { b_field: "ofo" } ]
+                    to_one_com: {
+                        a_1: "test",
+                        a_2: 10,
+                        scalar_list: [],
+                        other_composites: [
+                            { b_field: "foo" },
+                            { b_field: "oof" }
+                        ]
+                    }
+                    to_many_com: [
+                        { b_field: "ayaya" },
+                        { b_field: "ofo" }
+                    ]
                 },
                 {
                     id: 3
-                    to_one_com: { a_1: "Test", a_2: -10, other_composites: [ { b_field: "foo" }, { b_field: "oof" } ] }
-                    to_many_com: [ { b_field: "ding" }, { b_field: "dong" } ]
+                    to_one_com: {
+                        a_1: "Test",
+                        a_2: -10,
+                        scalar_list: [],
+                        other_composites: [
+                            { b_field: "foo" },
+                            { b_field: "oof" }
+                        ]
+                    }
+                    to_many_com: [
+                        { b_field: "ding" },
+                        { b_field: "dong" }
+                    ]
                 }
             ]
         }
@@ -186,21 +230,62 @@ async fn create_relation_combination_test_data(runner: &Runner) -> TestResult<()
         to_one_rel: {
             create: {
                 id: 4
-                to_one_com: { a_1: "hello world", a_2: -5, scalar_list: ["a", "b"], other_composites: [ { b_field: "shardbearer malenia", scalar_list: [] }, { b_field: "is", scalar_list: [] }, { b_field: "overtuned", scalar_list: [] } ] }
-                to_many_com: [ { b_field: "test", scalar_list: ["hello"] }, { b_field: "oof", scalar_list: ["hello", "world"] } ]
+                to_one_com: {
+                    a_1: "hello world",
+                    a_2: -5,
+                    scalar_list: ["a", "b"],
+                    a_to_other_com: { c_field: "oof" },
+                    other_composites: [
+                        { b_field: "Shardbearer malenia", scalar_list: [], to_other_com: { c_field: "test" } },
+                        { b_field: "is", scalar_list: [], to_other_com: { c_field: "foo" } },
+                        { b_field: "overtuned", scalar_list: [], to_other_com: { c_field: "oof" } }
+                    ]
+                }
+                to_many_com: [
+                    {
+                        b_field: "test",
+                        scalar_list: ["hello"],
+                        to_other_com: { c_field: "test" },
+                        to_other_coms: [ { c_field: "oof" } ] },
+                    {
+                        b_field: "oof",
+                        scalar_list: ["hello", "world"],
+                        to_other_com: { c_field: "foo" },
+                        to_other_coms: [ { c_field: "foof" } ]
+                    }
+                ]
             }
         }
         to_many_rel: {
             create: [
                 {
                     id: 5
-                    to_one_com: { a_1: "tset", a_2: 123, other_composites: [ { b_field: "foo" }, { b_field: "test" } ] }
-                    to_many_com: [ { b_field: "ayaya" }, { b_field: "ofo" } ]
+                    to_one_com: {
+                        a_1: "tset",
+                        a_2: 123,
+                        scalar_list: ["foo", "oof"],
+                        other_composites: [ { b_field: "foo" }, { b_field: "test" } ]
+                    }
+                    to_many_com: [
+                        { b_field: "ayaya" },
+                        { b_field: "ofo" }
+                    ]
                 },
                 {
                     id: 6
-                    to_one_com: { a_1: "Test", a_2: -10, other_composites: [ { b_field: "foo" }, { b_field: "oof" } ] }
-                    to_many_com: [ { b_field: "ding" }, { b_field: "dong" } ]
+                    to_one_com: {
+                        a_1: "Test",
+                        a_2: -10,
+                        scalar_list: ["foo", "bar", "baz"],
+                        other_composites: [
+                            { b_field: "foo" },
+                            { b_field: "oof" }
+                        ]
+                    }
+                    to_many_com: [
+                        { b_field: "ding" },
+                        { b_field: "dong" }
+                    ]
                 }
             ]
         }
@@ -211,21 +296,64 @@ async fn create_relation_combination_test_data(runner: &Runner) -> TestResult<()
         to_one_rel: {
             create: {
                 id: 7
-                to_one_com: { a_1: "world", a_2: 0, scalar_list: [], other_composites: [ { b_field: "shardbearer mogh", scalar_list: ["a"] }, { b_field: "is", scalar_list: ["b"] }, { b_field: "perfect", scalar_list: ["c"] } ] }
-                to_many_com: [ { b_field: "fof" }, { b_field: "ofo" } ]
+                to_one_com: {
+                    a_1: "world",
+                    a_2: 0,
+                    scalar_list: [],
+                    a_to_other_com: { c_field: "ofo", scalar_list: [] },
+                    other_composites: [
+                        { b_field: "shardbearer mogh", to_other_com: { c_field: "test" }  },
+                        { b_field: "is", scalar_list: ["b"], to_other_com: { c_field: "Test" }  },
+                        { b_field: "perfect", scalar_list: ["c"], to_other_com: { c_field: "nope" }  }
+                    ]
+                }
+                to_many_com: [
+                    {
+                        b_field: "fof",
+                        to_other_com: { c_field: "test" },
+                        to_other_coms: [ { c_field: "nope" } ]
+                    },
+                    {
+                        b_field: "ofo",
+                        to_other_com: { c_field: "Test" },
+                        to_other_coms: [ { c_field: "test" } ]
+                    }
+                ]
             }
         }
         to_many_rel: {
             create: [
                 {
                     id: 8
-                    to_one_com: { a_1: "test", a_2: 11, other_composites: [ { b_field: "fo" }, { b_field: "of" } ] }
-                    to_many_com: [ { b_field: "ayaya" }, { b_field: "ofo" } ]
+                    to_one_com: {
+                        a_1: "test",
+                        a_2: 11,
+                        scalar_list: [],
+                        other_composites: [
+                            { b_field: "fo" },
+                            { b_field: "of" }
+                        ]
+                    }
+                    to_many_com: [
+                        { b_field: "ayaya" },
+                        { b_field: "ofo" }
+                    ]
                 },
                 {
                     id: 9
-                    to_one_com: { a_1: "Test", a_2: -10, other_composites: [ { b_field: "foof" }, { b_field: "ofoo" } ] }
-                    to_many_com: [ { b_field: "ding" }, { b_field: "dong" } ]
+                    to_one_com: {
+                        a_1: "Test",
+                        a_2: -10,
+                        scalar_list: ["foo"],
+                        other_composites: [
+                            { b_field: "foof" },
+                            { b_field: "ofoo" }
+                        ]
+                    }
+                    to_many_com: [
+                        { b_field: "ding" },
+                        { b_field: "dong" }
+                    ]
                 }
             ]
         }
