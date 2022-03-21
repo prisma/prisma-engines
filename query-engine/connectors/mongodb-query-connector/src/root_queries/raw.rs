@@ -35,8 +35,7 @@ impl MongoCommand {
             (Some("findRaw"), Some(m)) => Self::find(m, inputs),
             (Some("aggregateRaw"), Some(m)) => Self::aggregate(m, inputs),
             (Some("runCommandRaw"), _) => Self::raw(inputs),
-            // This is more of an internal guard in case new raw queries are added. It shouldn't happen
-            (_, _) => Err(MongoError::UnhandledError("Unexpected MongoDB raw query".to_string())),
+            _ => unreachable!("Unexpected MongoDB raw query"),
         }
     }
 

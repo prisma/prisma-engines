@@ -17,9 +17,9 @@ pub enum MongoError {
     #[error("Failed to convert '{}' to '{}'.", from, to)]
     ConversionError { from: String, to: String },
 
-    /// Unhandled behavior error.
-    #[error("Unhandled behavior: {0}.")]
-    UnhandledError(String),
+    // Unhandled conversion error. Mostly used for `#[non-exhaustive]` flagged Mongo errors.
+    #[error("Unhandled conversion error: {0}.")]
+    UnhandledConversionError(anyhow::Error),
 
     /// ObjectID specific conversion error.
     #[error("Malformed ObjectID: {0}.")]
@@ -61,7 +61,7 @@ impl MongoError {
     pub fn into_connector_error(self) -> ConnectorError {
         match self {
             MongoError::Unsupported(feature) => ConnectorError::from_kind(ErrorKind::UnsupportedFeature(feature)),
-            MongoError::UnhandledError(reason) => ConnectorError::from_kind(ErrorKind::RawApiError(reason)),
+            MongoError::UnhandledConversionError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err)),
             MongoError::UuidError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
             MongoError::JsonError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
             MongoError::BsonDeserializationError(err) => {
@@ -211,7 +211,7 @@ impl From<extjson::de::Error> for MongoError {
                 to: "BSON".to_string(),
             },
             // Needed because `extjson::de::Error` is flagged as #[non_exhaustive]
-            err => MongoError::UnhandledError(format!("{:?}", err)),
+            err => MongoError::UnhandledConversionError(err.into()),
         }
     }
 }
