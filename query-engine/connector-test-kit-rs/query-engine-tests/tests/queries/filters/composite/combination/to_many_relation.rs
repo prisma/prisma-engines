@@ -169,10 +169,8 @@ mod to_many_rel {
                   to_many_rel: {
                       none: {
                           to_one_com: {
-                              equals: {
-                                  a_1: {
-                                    equals: "test"
-                                  }
+                              is: {
+                                  a_1: "test"
                               }
                           }
                       }
@@ -250,7 +248,7 @@ mod to_many_rel {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":6}]}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":6}]}}"###
         );
 
         Ok(())
