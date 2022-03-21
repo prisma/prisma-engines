@@ -256,7 +256,17 @@ fn visit_scalar_field_attributes<'db>(
         ctx.validate_visited_arguments();
     }
 
+    // @ahihi
+    if ctx.visit_optional_single_attr("ahihi") {
+        visit_field_ahihi(field_id, model_attributes, ctx);
+        ctx.validate_visited_arguments();
+    }
+
     ctx.validate_visited_attributes();
+}
+
+fn visit_field_ahihi(_field_id: ast::FieldId, _model_attributes: &mut ModelAttributes, _ctx: &mut Context<'_>) {
+    // Some logics here ...
 }
 
 fn visit_field_unique(field_id: ast::FieldId, model_attributes: &mut ModelAttributes, ctx: &mut Context<'_>) {

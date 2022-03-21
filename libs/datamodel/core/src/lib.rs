@@ -143,6 +143,7 @@ fn parse_datamodel_internal(
 ) -> Result<Validated<(Configuration, dml::Datamodel)>, diagnostics::Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = schema_ast::parser::parse_schema(datamodel_string, &mut diagnostics);
+    println!("DEBUG: {:?}", ast);
 
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
