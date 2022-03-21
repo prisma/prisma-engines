@@ -124,7 +124,6 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
-<span id="125">125</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
 <span class="kw">mod</span> <span class="ident">validations</span>;
 
@@ -191,7 +190,6 @@
             <span class="ident">validations::objectid_type_required_with_auto_attribute</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
             <span class="ident">validations::auto_attribute_must_be_an_id</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
             <span class="ident">validations::dbgenerated_attribute_is_not_allowed</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
-            <span class="ident">validations::disallow_array_native_types</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
             <span class="ident">validations::field_name_uses_valid_characters</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
         }
 
@@ -219,7 +217,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">parse_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">mongo_type</span> <span class="op">=</span> <span class="ident">mongo_type_from_input</span>(<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">span</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">mongo_type</span> <span class="op">=</span> <span class="ident">mongo_type_from_input</span>(<span class="ident">name</span>, <span class="ident">span</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">mongo_type</span>.<span class="ident">to_json</span>()))
     }

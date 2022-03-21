@@ -190,33 +190,6 @@
 <span id="188">188</span>
 <span id="189">189</span>
 <span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">parser_database</span>::{
         <span class="ident">ast</span>::{<span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
@@ -224,8 +197,6 @@
     },
     <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>,
 };
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mongodb_types::type_names</span>;
 
 <span class="doccomment">/// If `@default(auto())`, then also `@db.ObjectId`</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">objectid_type_required_with_auto_attribute</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
@@ -280,31 +251,6 @@
         <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
     );
     <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
-}
-
-<span class="doccomment">/// We decided to go from `@db.Array(ObjectId)` to `@db.ObjectId`.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">disallow_array_native_types</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
-    <span class="kw">let</span> (<span class="ident">ds_name</span>, <span class="ident">type_name</span>, <span class="ident">args</span>, <span class="ident">span</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">raw_native_type</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">nt</span>) =&gt; <span class="ident">nt</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
-    };
-
-    <span class="kw">if</span> <span class="ident">type_name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">type_names::ARRAY</span> {
-        <span class="kw">return</span>;
-    }
-
-    <span class="comment">// `db.Array` expects exactly 1 argument, which is validated before this code path.</span>
-    <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
-
-    <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
-        <span class="kw-2">&amp;</span><span class="macro">format!</span>(
-            <span class="string">&quot;Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.&quot;</span>,
-            <span class="ident">type_names::ARRAY</span>
-        ),
-        <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-        <span class="ident">field</span>.<span class="ident">name</span>(),
-        <span class="ident">span</span>,
-    ));
 }
 
 <span class="doccomment">/// The _id name check is superfluous because it&#39;s not a valid schema field at the moment.</span>
