@@ -102,9 +102,9 @@ fn mixing_types_with_the_same_base_type() {
 
     let expected = expect![[r#"
         model A {
-          id    String @id @default(auto()) @map("_id") @db.ObjectId
+          id    String    @id @default(auto()) @map("_id") @db.ObjectId
           /// Multiple data types found: DateTime (Date): 50%, DateTime (Timestamp): 50% out of 3 sampled entries
-          first Json?
+          first DateTime?
         }
     "#]];
 
@@ -113,6 +113,6 @@ fn mixing_types_with_the_same_base_type() {
     res.assert_warning_affected(&json!([{
         "model": "A",
         "field": "first",
-        "tpe": "Json",
+        "tpe": "DateTime (Timestamp)",
     }]));
 }
