@@ -235,7 +235,7 @@ fn soft_resets_work_on_mysql(api: TestApi) {
             r#"
             DROP USER IF EXISTS 'softresetstestuser'@'%';
             CREATE USER 'softresetstestuser'@'%' IDENTIFIED BY '1234batman';
-            GRANT USAGE, CREATE ON TABLE `{0}`.* TO 'softresetstestuser'@'%';
+            GRANT SELECT, USAGE, CREATE ON TABLE `{0}`.* TO 'softresetstestuser'@'%';
             GRANT DROP ON TABLE `{0}`.`Cat` TO 'softresetstestuser'@'%';
             GRANT DROP ON TABLE `{0}`.`_prisma_migrations` TO 'softresetstestuser'@'%';
             FLUSH PRIVILEGES;

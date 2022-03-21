@@ -1,5 +1,9 @@
-use indoc::indoc;
+use datamodel::dml::Datamodel;
+use indoc::{formatdoc, indoc};
+use introspection_connector::{IntrospectionConnector, IntrospectionContext};
 use introspection_engine_tests::test_api::*;
+use sql_introspection_connector::SqlIntrospectionConnector;
+use url::Url;
 
 #[test_connector(tags(Mysql))]
 async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
@@ -353,6 +357,70 @@ async fn date_time_defaults_mariadb(api: &TestApi) -> TestResult {
     "#]];
 
     expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql8), exclude(Vitess))]
+async fn missing_select_rights(api: &TestApi) -> TestResult {
+    let setup = formatdoc!(
+        r#"
+        CREATE TABLE `A` (
+            id INT PRIMARY KEY auto_increment,
+            val INT NOT NULL,
+            data VARCHAR(20) NULL
+        );
+
+        CREATE INDEX `test_index` ON `A` (`data`);
+        CREATE UNIQUE INDEX `test_unique` ON `A` (`val`);
+
+        DROP USER IF EXISTS 'jeffrey'@'%';
+        CREATE USER 'jeffrey'@'%' IDENTIFIED BY 'password';
+        GRANT USAGE, CREATE ON TABLE `{}`.* TO 'jeffrey'@'%';
+        FLUSH PRIVILEGES;
+    "#,
+        api.schema_name()
+    );
+
+    api.raw_cmd(&setup).await;
+
+    let expected = expect![[r#"
+        model A {
+          id   Int     @id @default(autoincrement())
+          val  Int     @unique(map: "test_unique")
+          data String? @db.VarChar(20)
+
+          @@index([data], map: "test_index")
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    let mut url: Url = api.connection_string().parse()?;
+    url.set_username("jeffrey").unwrap();
+    url.set_password(Some("password")).unwrap();
+
+    let conn = SqlIntrospectionConnector::new(url.as_ref(), Default::default()).await?;
+
+    let datasource = formatdoc!(
+        r#"
+        datasource db {{
+          provider = "mysql"
+          url      = "{url}"
+        }}
+    "#
+    );
+
+    let config = datamodel::parse_configuration(&datasource).unwrap();
+
+    let ctx = IntrospectionContext {
+        source: config.subject.datasources.into_iter().next().unwrap(),
+        composite_type_depth: Default::default(),
+        preview_features: Default::default(),
+    };
+
+    let res = conn.introspect(&Datamodel::new(), ctx).await.unwrap();
+    assert!(res.data_model.is_empty());
 
     Ok(())
 }
