@@ -6,8 +6,6 @@ use datamodel_connector::{
     DatamodelError, Diagnostics,
 };
 
-use crate::mongodb_types::type_names;
-
 /// If `@default(auto())`, then also `@db.ObjectId`
 pub(super) fn objectid_type_required_with_auto_attribute(field: ScalarFieldWalker<'_>, errors: &mut Diagnostics) {
     if !field.default_value().map(|val| val.is_auto()).unwrap_or(false) {
@@ -61,31 +59,6 @@ pub(super) fn dbgenerated_attribute_is_not_allowed(field: ScalarFieldWalker<'_>,
         field.ast_field().span,
     );
     errors.push_error(err);
-}
-
-/// We decided to go from `@db.Array(ObjectId)` to `@db.ObjectId`.
-pub(super) fn disallow_array_native_types(field: ScalarFieldWalker<'_>, errors: &mut Diagnostics) {
-    let (ds_name, type_name, args, span) = match field.raw_native_type() {
-        Some(nt) => nt,
-        None => return,
-    };
-
-    if type_name != type_names::ARRAY {
-        return;
-    }
-
-    // `db.Array` expects exactly 1 argument, which is validated before this code path.
-    let arg = args.get(0).unwrap();
-
-    errors.push_error(DatamodelError::new_field_validation_error(
-        &format!(
-            "Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.",
-            type_names::ARRAY
-        ),
-        field.model().name(),
-        field.name(),
-        span,
-    ));
 }
 
 /// The _id name check is superfluous because it's not a valid schema field at the moment.

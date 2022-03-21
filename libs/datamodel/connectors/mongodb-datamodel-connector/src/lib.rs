@@ -64,7 +64,6 @@ impl Connector for MongoDbDatamodelConnector {
             validations::objectid_type_required_with_auto_attribute(field, errors);
             validations::auto_attribute_must_be_an_id(field, errors);
             validations::dbgenerated_attribute_is_not_allowed(field, errors);
-            validations::disallow_array_native_types(field, errors);
             validations::field_name_uses_valid_characters(field, errors);
         }
 
@@ -92,7 +91,7 @@ impl Connector for MongoDbDatamodelConnector {
     }
 
     fn parse_native_type(&self, name: &str, args: Vec<String>, span: Span) -> Result<NativeTypeInstance> {
-        let mongo_type = mongo_type_from_input(name, &args, span)?;
+        let mongo_type = mongo_type_from_input(name, span)?;
 
         Ok(NativeTypeInstance::new(name, args, mongo_type.to_json()))
     }
