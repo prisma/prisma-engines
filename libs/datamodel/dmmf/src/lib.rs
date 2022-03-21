@@ -3,14 +3,14 @@ pub use to_dmmf::render_to_dmmf;
 pub use to_dmmf::render_to_dmmf_value;
 
 fn is_false(val: &bool) -> bool {
-    *val == false
+    !(*val)
 }
 
 fn is_false_or_none(val: &Option<bool>) -> bool {
-    return match val {
-        Some(p) => is_false(&p),
+    match val {
+        Some(p) => is_false(p),
         None => true,
-    };
+    }
 }
 
 
