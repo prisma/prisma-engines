@@ -1,40 +1,23 @@
+//! A lot of those tests are fairly basic - the test matrix is complicated as it is, so these tests strive to cover
+//! the API surface expected to be hit most (complexity with little hops) and makes sure that more complex hop combinations
+//! do not immediately produce syntax errors / invalid queries.
+
 use super::*;
 
-#[test_suite(schema(to_many_composites), only(MongoDb))]
-mod composite_combination {
-    // Over to-one to to-many (both composites)
-    #[connector_test]
-    async fn com_to_one_2_to_many(runner: Runner) -> TestResult<()> {
-        create_combination_test_data(&runner).await?;
-
-        insta::assert_snapshot!(
-          run_query!(runner, r#"{
-              findManyTestModel(where: {
-                  to_one_b: {
-                      is: {
-                          b_to_many_cs: {
-                              every: {
-                                  c_field: { gt: 0 }
-                              }
-                          }
-                      }
-                  }
-              }) {
-                  id
-              }
-          }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":6},{"id":8},{"id":9},{"id":10},{"id":11}]}}"###
-        );
-
-        Ok(())
-    }
-}
-
+// [X] To-one-rel -> to-one-com
+// [X] To-one-rel -> to-one-com -> to-one-com
+// [X] To-one-rel -> to-one-com -> to-many-com
+// [X] To-one-rel -> to-one-com -> scalar list
+//
+// [X] To-one-rel -> to-many-com
+// [X] To-one-rel -> to-many-com -> to-one-com
+// [X] To-one-rel -> to-many-com -> to-many-com
+// [X] To-one-rel -> to-many-com -> scalar list
 #[test_suite(schema(mixed_composites), only(MongoDb))]
-mod relation_combination {
-    // Over to-one relation to a to-one composite
+mod to_one_rel {
+    // To-one-rel -> to-one-com
     #[connector_test]
-    async fn over_to_one_rel_to_one(runner: Runner) -> TestResult<()> {
+    async fn to_to_one_com_basic(runner: Runner) -> TestResult<()> {
         create_relation_combination_test_data(&runner).await?;
 
         insta::assert_snapshot!(
@@ -150,9 +133,10 @@ mod relation_combination {
         Ok(())
     }
 
+    // To-one-rel -> to-one-com
     // Over to-one relation to a to-one composite, multiple conditions
     #[connector_test]
-    async fn over_to_one_rel_to_one_multiple(runner: Runner) -> TestResult<()> {
+    async fn to_to_one_com_multiple(runner: Runner) -> TestResult<()> {
         create_relation_combination_test_data(&runner).await?;
 
         // Implicit AND
@@ -226,9 +210,10 @@ mod relation_combination {
         Ok(())
     }
 
-    // Over to-one relation to a to-one composite, multiple conditions
+    // To-one-rel -> to-one-com
+    // Over to-one relation to a to-one composite, logical conditions
     #[connector_test]
-    async fn over_to_one_rel_to_one_logical_cond(runner: Runner) -> TestResult<()> {
+    async fn to_to_one_com_logical_cond(runner: Runner) -> TestResult<()> {
         create_relation_combination_test_data(&runner).await?;
 
         // Implicit AND
@@ -301,9 +286,185 @@ mod relation_combination {
         Ok(())
     }
 
+    // Scalar lists over to-one relation and to-one composite.
+    // To-one-rel -> to-one-com -> scalar list
+    #[connector_test]
+    async fn to_to_one_scalar_list(runner: Runner) -> TestResult<()> {
+        create_relation_combination_test_data(&runner).await?;
+
+        // Todo (to-clarify): This considers null and undefined scalar lists as empty.
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+              findManyTestModel(where: {
+                  to_one_rel: {
+                      is: {
+                          to_one_com: {
+                              is: {
+                                  scalar_list: {
+                                      isEmpty: true
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }) {
+                  id
+              }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5}]}}"###
+        );
+
+        // Undefined lists are NOT considered.
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                findManyTestModel(where: {
+                    to_one_rel: {
+                        is: {
+                            to_one_com: {
+                                is: {
+                                    scalar_list: {
+                                        isEmpty: false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }) {
+                    id
+                }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        // This DOES consider undefined due to how the query must be build with the not condition.
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                findManyTestModel(where: {
+                    to_one_rel: {
+                        isNot: {
+                            to_one_com: {
+                                is: {
+                                    scalar_list: {
+                                        isEmpty: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }) {
+                    id
+                }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // To-one-rel -> to-one-com -> to-one-com
+    #[connector_test]
+    async fn to_to_one_com_to_to_one_com(runner: Runner) -> TestResult<()> {
+        create_relation_combination_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+              findManyTestModel(where: {
+                  to_one_rel: {
+                      is: {
+                          to_one_com: {
+                              is: {
+                                  a_to_other_com: { is: { c_field: { contains: "oo" } } }
+                              }
+                          }
+                      }
+                  }
+              }) {
+                  id
+              }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                findManyTestModel(where: {
+                    to_one_rel: {
+                        is: {
+                            to_one_com: {
+                                is: {
+                                    a_to_other_com: { isNot: { c_field: { contains: "oo" } } }
+                                }
+                            }
+                        }
+                    }
+                }) {
+                    id
+                }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // To-one-rel -> to-one-com -> to-many-com
+    #[connector_test]
+    async fn to_to_one_com_to_to_many_com(runner: Runner) -> TestResult<()> {
+        create_relation_combination_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+              findManyTestModel(where: {
+                  to_one_rel: {
+                      is: {
+                          to_one_com: {
+                              is: {
+                                  other_composites: {
+                                      some: {
+                                          b_field: { contains: "Shardbearer", mode: insensitive }
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }) {
+                  id
+              }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                findManyTestModel(where: {
+                    to_one_rel: {
+                        is: {
+                            to_one_com: {
+                                isNot: {
+                                    other_composites: {
+                                        some: {
+                                            b_field: { contains: "Shardbearer", mode: insensitive }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }) {
+                    id
+                }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":5}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // To-one-rel -> to-many-com
     // Over to-one relation to a to-many composite
     #[connector_test]
-    async fn over_to_one_rel_to_many(runner: Runner) -> TestResult<()> {
+    async fn to_to_many_com_basic(runner: Runner) -> TestResult<()> {
         create_relation_combination_test_data(&runner).await?;
 
         // Equals
@@ -458,80 +619,7 @@ mod relation_combination {
         Ok(())
     }
 
-    // Scalar lists over to-one relation and to-one composite.
-    #[connector_test]
-    async fn scalar_lists_to_one_to_one(runner: Runner) -> TestResult<()> {
-        create_relation_combination_test_data(&runner).await?;
-
-        // Todo (to-clarify): This considers null and undefined scalar lists as empty.
-        insta::assert_snapshot!(
-          run_query!(runner, r#"{
-              findManyTestModel(where: {
-                  to_one_rel: {
-                      is: {
-                          to_one_com: {
-                              is: {
-                                  scalar_list: {
-                                      isEmpty: true
-                                  }
-                              }
-                          }
-                      }
-                  }
-              }) {
-                  id
-              }
-          }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5}]}}"###
-        );
-
-        // Undefined lists are NOT considered.
-        insta::assert_snapshot!(
-          run_query!(runner, r#"{
-                findManyTestModel(where: {
-                    to_one_rel: {
-                        is: {
-                            to_one_com: {
-                                is: {
-                                    scalar_list: {
-                                        isEmpty: false
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }) {
-                    id
-                }
-            }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
-        );
-
-        // This DOES consider undefined due to how the query must be build with the not condition.
-        insta::assert_snapshot!(
-          run_query!(runner, r#"{
-                findManyTestModel(where: {
-                    to_one_rel: {
-                        isNot: {
-                            to_one_com: {
-                                is: {
-                                    scalar_list: {
-                                        isEmpty: true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }) {
-                    id
-                }
-            }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6}]}}"###
-        );
-
-        Ok(())
-    }
-
+    // To-one-rel -> to-many-com -> scalar list
     // Scalar lists over to-one relation and to-many composite.
     #[connector_test]
     async fn scalar_lists_to_one_to_many(runner: Runner) -> TestResult<()> {
@@ -661,6 +749,98 @@ mod relation_combination {
                   }
               }"#),
           @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4},{"id":5}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // To-one-rel -> to-many-com -> to-one-com
+    #[connector_test]
+    async fn to_to_many_com_to_to_one_com(runner: Runner) -> TestResult<()> {
+        create_relation_combination_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+              findManyTestModel(where: {
+                  to_one_rel: {
+                      is: {
+                        to_many_com: {
+                              every: {
+                                  to_other_com: { is: { c_field: { contains: "test", mode: insensitive } } }
+                              }
+                          }
+                      }
+                  }
+              }) {
+                  id
+              }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                findManyTestModel(where: {
+                    to_one_rel: {
+                        isNot: {
+                          to_many_com: {
+                                every: {
+                                    to_other_com: { is: { c_field: { contains: "test", mode: insensitive } } }
+                                }
+                            }
+                        }
+                    }
+                }) {
+                    id
+                }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // To-one-rel -> to-many-com -> to-many-com
+    #[connector_test]
+    async fn to_to_many_com_to_to_many_com(runner: Runner) -> TestResult<()> {
+        create_relation_combination_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+              findManyTestModel(where: {
+                  to_one_rel: {
+                      is: {
+                        to_many_com: {
+                              every: {
+                                to_other_coms: { every: { c_field: { contains: "oo" } } }
+                              }
+                          }
+                      }
+                  }
+              }) {
+                  id
+              }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":5}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                findManyTestModel(where: {
+                    to_one_rel: {
+                        isNot: {
+                          to_many_com: {
+                                every: {
+                                    to_other_com: { is: { c_field: { contains: "test", mode: insensitive } } }
+                                }
+                            }
+                        }
+                    }
+                }) {
+                    id
+                }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6}]}}"###
         );
 
         Ok(())
