@@ -191,6 +191,32 @@
 <span id="189">189</span>
 <span id="190">190</span>
 <span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">parser_database</span>::{
         <span class="ident">ast</span>::{<span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
@@ -381,6 +407,32 @@
         <span class="string">&quot;unique&quot;</span>,
         <span class="kw-2">*</span><span class="ident">attr</span>.<span class="ident">span</span>(),
     ));
+}
+
+<span class="doccomment">/// A field name cannot contain the `.` character and it cannot start with `$`.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_name_uses_valid_characters</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
+    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">mapped_name</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    };
+
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span_for_attribute</span>(<span class="string">&quot;map&quot;</span>).<span class="ident">unwrap</span>();
+
+    <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&#39;$&#39;</span>) {
+        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+            <span class="string">&quot;The field name cannot start with a `$` character&quot;</span>,
+            <span class="string">&quot;map&quot;</span>,
+            <span class="ident">span</span>,
+        ));
+    }
+
+    <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">contains</span>(<span class="string">&#39;.&#39;</span>) {
+        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+            <span class="string">&quot;The field name cannot contain a `.` character&quot;</span>,
+            <span class="string">&quot;map&quot;</span>,
+            <span class="ident">span</span>,
+        ));
+    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_datamodel_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>

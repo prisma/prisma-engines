@@ -124,6 +124,7 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
+<span id="125">125</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
 <span class="kw">mod</span> <span class="ident">validations</span>;
 
@@ -191,6 +192,7 @@
             <span class="ident">validations::auto_attribute_must_be_an_id</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
             <span class="ident">validations::dbgenerated_attribute_is_not_allowed</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
             <span class="ident">validations::disallow_array_native_types</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
+            <span class="ident">validations::field_name_uses_valid_characters</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
         }
 
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
