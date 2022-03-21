@@ -2,6 +2,18 @@ mod to_dmmf;
 pub use to_dmmf::render_to_dmmf;
 pub use to_dmmf::render_to_dmmf_value;
 
+fn is_false(val: &bool) -> bool {
+    *val == false
+}
+
+fn is_false_or_none(val: &Option<bool>) -> bool {
+    return match val {
+        Some(p) => is_false(&p),
+        None => true,
+    };
+}
+
+
 // This is a simple JSON serialization using Serde.
 // The JSON format follows the DMMF spec.
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -9,10 +21,15 @@ pub use to_dmmf::render_to_dmmf_value;
 pub struct Field {
     pub name: String,
     pub kind: String,
+    #[serde(skip_serializing_if = "is_false")]
     pub is_list: bool,
+    #[serde(skip_serializing_if = "is_false")]
     pub is_required: bool,
+    #[serde(skip_serializing_if = "is_false")]
     pub is_unique: bool,
+    #[serde(skip_serializing_if = "is_false")]
     pub is_id: bool,
+    #[serde(skip_serializing_if = "is_false")]
     pub is_read_only: bool,
     #[serde(rename = "type")]
     pub field_type: String,
@@ -27,9 +44,9 @@ pub struct Field {
     pub relation_to_fields: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub relation_on_delete: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "is_false_or_none")]
     pub is_generated: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "is_false_or_none")]
     pub is_updated_at: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
