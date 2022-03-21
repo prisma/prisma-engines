@@ -89,7 +89,7 @@ serde_json = { version = "1.0.48", optional = true, features = ["float_roundtrip
 native-tls = { version = "0.2", optional = true }
 bit-vec = { version = "0.6.1", optional = true }
 bytes = { version = "1.0", optional = true }
-mobc = { version = "0.7.1", optional = true }
+mobc = { git = "https://github.com/prisma/mobc",  rev = "b0cc92f92bce2b06c503c985a322028cc9c20484", optional = true }
 serde = { version = "1.0", optional = true }
 
 [dev-dependencies]
