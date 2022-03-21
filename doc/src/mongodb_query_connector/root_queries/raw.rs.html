@@ -180,7 +180,6 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
-<span id="181">181</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::MongoError</span>, <span class="ident">vacuum_cursor</span>, <span class="ident">BsonTransform</span>};
 <span class="kw">use</span> <span class="ident">datamodel::dml::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
@@ -218,8 +217,7 @@
             (<span class="prelude-val">Some</span>(<span class="string">&quot;findRaw&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident"><span class="self">Self</span>::find</span>(<span class="ident">m</span>, <span class="ident">inputs</span>),
             (<span class="prelude-val">Some</span>(<span class="string">&quot;aggregateRaw&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident"><span class="self">Self</span>::aggregate</span>(<span class="ident">m</span>, <span class="ident">inputs</span>),
             (<span class="prelude-val">Some</span>(<span class="string">&quot;runCommandRaw&quot;</span>), <span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::raw</span>(<span class="ident">inputs</span>),
-            <span class="comment">// This is more of an internal guard in case new raw queries are added. It shouldn&#39;t happen</span>
-            (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">MongoError::UnhandledError</span>(<span class="string">&quot;Unexpected MongoDB raw query&quot;</span>.<span class="ident">to_string</span>())),
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unexpected MongoDB raw query&quot;</span>),
         }
     }
 
