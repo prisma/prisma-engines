@@ -127,7 +127,7 @@ mod to_one_rel {
                         id
                     }
                 }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":5},{"id":6}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":5}]}}"###
         );
 
         Ok(())
@@ -292,7 +292,6 @@ mod to_one_rel {
     async fn to_to_one_scalar_list(runner: Runner) -> TestResult<()> {
         create_relation_combination_test_data(&runner).await?;
 
-        // Todo (to-clarify): This considers null and undefined scalar lists as empty.
         insta::assert_snapshot!(
           run_query!(runner, r#"{
               findManyTestModel(where: {
@@ -311,7 +310,7 @@ mod to_one_rel {
                   id
               }
           }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
         );
 
         // Undefined lists are NOT considered.
@@ -355,7 +354,7 @@ mod to_one_rel {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":5},{"id":6}]}}"###
         );
 
         Ok(())
@@ -473,7 +472,18 @@ mod to_one_rel {
                 findManyTestModel(where: {
                     to_one_rel: {
                         is: {
-                            to_many_com: [ { b_field: "fof" }, { b_field: "ofo" } ]
+                            to_many_com: [
+                                    {
+                                        b_field: "fof",
+                                        to_other_com: { c_field: "test" },
+                                        to_other_coms: [ { c_field: "nope" } ]
+                                    },
+                                    {
+                                        b_field: "ofo",
+                                        to_other_com: { c_field: "Test" },
+                                        to_other_coms: [ { c_field: "test" } ]
+                                    }
+                                ]
                         }
                     }
                 }) {
@@ -488,7 +498,18 @@ mod to_one_rel {
                   findManyTestModel(where: {
                       to_one_rel: {
                           isNot: {
-                              to_many_com: [ { b_field: "fof" }, { b_field: "ofo" } ]
+                              to_many_com: [
+                                    {
+                                        b_field: "fof",
+                                        to_other_com: { c_field: "test" },
+                                        to_other_coms: [ { c_field: "nope" } ]
+                                    },
+                                    {
+                                        b_field: "ofo",
+                                        to_other_com: { c_field: "Test" },
+                                        to_other_coms: [ { c_field: "test" } ]
+                                    }
+                                ]
                           }
                       }
                   }) {
@@ -664,7 +685,7 @@ mod to_one_rel {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4},{"id":5}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":3},{"id":6}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -685,7 +706,7 @@ mod to_one_rel {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4},{"id":5}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":3},{"id":4},{"id":5}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -706,7 +727,7 @@ mod to_one_rel {
                       id
                   }
               }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4},{"id":5}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":6}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -727,7 +748,7 @@ mod to_one_rel {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4},{"id":5}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -748,7 +769,7 @@ mod to_one_rel {
                       id
                   }
               }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4},{"id":5}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":3},{"id":4},{"id":5},{"id":6}]}}"###
         );
 
         Ok(())
