@@ -77,6 +77,13 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         let mut enums = vec![];
         for table_name in &table_names {
             let (table, enms) = self.get_table(table_name, &mut columns, &mut indexes, &mut fks);
+
+            // If we cannot query any of the columns, do not add the table to
+            // the data model...
+            if table.columns.is_empty() {
+                continue;
+            }
+
             tables.push(table);
             enums.extend(enms.into_iter());
         }
@@ -219,9 +226,19 @@ impl<'a> SqlSchemaDescriber<'a> {
         foreign_keys: &mut BTreeMap<String, Vec<ForeignKey>>,
     ) -> (Table, Vec<Enum>) {
         let (columns, enums) = columns.remove(name).unwrap_or((vec![], vec![]));
-        let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
+        let (mut indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
 
         let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
+
+        // In certain cases we cannot query any columns, but we can still list
+        // indices. This leads to a very broken result, so we instead just take
+        // these indices out from the data model.
+        indices.retain(|_, index| {
+            index
+                .columns
+                .iter()
+                .all(|left| columns.iter().any(|right| right.name == left.name))
+        });
 
         (
             Table {
@@ -458,6 +475,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
             ";
+
         let rows = self.conn.query_raw(sql, &[schema_name.into()]).await?;
 
         for row in rows {

@@ -93,6 +93,10 @@ impl TestApi {
         }
     }
 
+    pub fn connection_string(&self) -> &str {
+        &self.connection_string
+    }
+
     pub async fn list_databases(&self) -> Result<Vec<String>> {
         Ok(self.api.list_databases().await?)
     }
