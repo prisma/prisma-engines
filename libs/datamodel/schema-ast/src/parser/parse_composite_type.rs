@@ -23,42 +23,42 @@ pub(crate) fn parse_composite_type(token: &Token<'_>, diagnostics: &mut Diagnost
                 let err = match attr.name.name.as_str() {
                     "map" => {
                         DatamodelError::new_validation_error(
-                            "A type definition is not persisted in the database, therefore it does not need a mapped database name."
+                            "The name of a composite type is not persisted in the database, therefore it does not need a mapped database name."
                                 .to_owned(),
                             current.as_span().into(),
                         )
                     }
                     "unique" => {
                         DatamodelError::new_validation_error(
-                            "A type definition is not persisted in the database, a unique constraint should be defined in the model containing the embed."
+                            "A unique constraint should be defined in the model containing the embed."
                                 .to_owned(),
                             current.as_span().into(),
                         )
                     }
                     "index" => {
                         DatamodelError::new_validation_error(
-                            "A type definition is not persisted in the database, an index should be defined in the model containing the embed."
+                            "An index should be defined in the model containing the embed."
                                 .to_owned(),
                             current.as_span().into(),
                         )
                     }
                     "fulltext" => {
                         DatamodelError::new_validation_error(
-                            "A type definition is not persisted in the database, a fulltext index should be defined in the model containing the embed."
+                            "A fulltext index should be defined in the model containing the embed."
                                 .to_owned(),
                             current.as_span().into(),
                         )
                     }
                     "id" => {
                         DatamodelError::new_validation_error(
-                            "A type definition is not persisted in the database, please define the id field from the model."
+                            "A composite type cannot define an id."
                                 .to_owned(),
                             current.as_span().into(),
                         )
                     }
                     _ => {
                         DatamodelError::new_validation_error(
-                            "A type definition is not persisted in the database, therefore it cannot have block-level attributes."
+                            "A composite type cannot have block-level attributes."
                                 .to_owned(),
                             current.as_span().into(),
                         )

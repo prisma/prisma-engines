@@ -772,7 +772,7 @@ fn block_level_map_not_allowed() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: A type definition is not persisted in the database, therefore it does not need a mapped database name.[0m
+        [1;91merror[0m: [1mError validating: The name of a composite type is not persisted in the database, therefore it does not need a mapped database name.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m
@@ -803,7 +803,7 @@ fn block_level_unique_not_allowed() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: A type definition is not persisted in the database, a unique constraint should be defined in the model containing the embed.[0m
+        [1;91merror[0m: [1mError validating: A unique constraint should be defined in the model containing the embed.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m
@@ -834,7 +834,7 @@ fn block_level_index_not_allowed() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: A type definition is not persisted in the database, an index should be defined in the model containing the embed.[0m
+        [1;91merror[0m: [1mError validating: An index should be defined in the model containing the embed.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m
@@ -865,7 +865,7 @@ fn block_level_fulltext_not_allowed() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: A type definition is not persisted in the database, a fulltext index should be defined in the model containing the embed.[0m
+        [1;91merror[0m: [1mError validating: A fulltext index should be defined in the model containing the embed.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m
@@ -896,7 +896,7 @@ fn block_level_id_not_allowed() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: A type definition is not persisted in the database, please define the id field from the model.[0m
+        [1;91merror[0m: [1mError validating: A composite type cannot define an id.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m
