@@ -667,6 +667,13 @@
 <span id="665">665</span>
 <span id="666">666</span>
 <span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">name</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">name::Name</span>;
@@ -964,6 +971,13 @@
     <span class="kw">fn</span> <span class="ident">has_type_variety</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span>
     }
+
+    <span class="doccomment">/// All instances we found were either of `Date` or `Timestamp` type.</span>
+    <span class="kw">fn</span> <span class="ident">all_types_are_datetimes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">data</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">typ</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">typ</span>, <span class="ident">FieldType::Date</span> <span class="op">|</span> <span class="ident">FieldType::Timestamp</span>))
+    }
 }
 
 <span class="kw">fn</span> <span class="ident">new_composite_type</span>(<span class="ident">type_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">CompositeType</span> {
@@ -1047,9 +1061,9 @@
         <span class="kw">let</span> <span class="ident">most_common_type</span> <span class="op">=</span> <span class="ident">percentages</span>.<span class="ident">find_most_common</span>();
 
         <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">most_common_type</span> {
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">percentages</span>.<span class="ident">has_type_variety</span>() =&gt; <span class="ident">FieldType::Json</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">field_type</span>) =&gt; <span class="ident">field_type</span>.<span class="ident">to_owned</span>(),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">FieldType::Json</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">field_type</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">percentages</span>.<span class="ident">has_type_variety</span>() =&gt; <span class="ident">field_type</span>.<span class="ident">to_owned</span>(),
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">percentages</span>.<span class="ident">all_types_are_datetimes</span>() =&gt; <span class="ident">FieldType::Timestamp</span>,
+            <span class="kw">_</span> =&gt; <span class="ident">FieldType::Json</span>,
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FieldType::Unsupported</span>(<span class="ident">r#type</span>) <span class="op">=</span> <span class="ident">field_type</span> {
@@ -1057,7 +1071,7 @@
         }
 
         <span class="kw">if</span> <span class="ident">percentages</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-            <span class="ident">undecided_types</span>.<span class="ident">push</span>((<span class="ident">container</span>.<span class="ident">clone</span>(), <span class="ident">field_name</span>.<span class="ident">to_string</span>()));
+            <span class="ident">undecided_types</span>.<span class="ident">push</span>((<span class="ident">container</span>.<span class="ident">clone</span>(), <span class="ident">field_name</span>.<span class="ident">to_string</span>(), <span class="ident">field_type</span>.<span class="ident">to_string</span>()));
         }
 
         <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">field_type</span>.<span class="ident">is_array</span>() {
