@@ -216,6 +216,9 @@ pub enum ErrorKind {
     )]
     PoolTimeout { max_open: u64, in_use: u64, timeout: u64 },
 
+    #[error("The connection pool has been closed")]
+    PoolClosed {},
+
     #[error("Timed out during query execution.")]
     SocketTimeout,
 
