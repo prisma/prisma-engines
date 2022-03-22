@@ -425,9 +425,11 @@ mod to_many_rel {
                           to_many_com: {
                               some: {
                                 to_other_com: {
-                                    c_field: {
-                                        equals: "test",
-                                        mode: insensitive
+                                    is: {
+                                        c_field: {
+                                            equals: "test",
+                                            mode: insensitive
+                                        }
                                     }
                                 }
                               }
@@ -438,7 +440,7 @@ mod to_many_rel {
                   id
               }
           }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3},{"id":6}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":6}]}}"###
         );
 
         Ok(())
