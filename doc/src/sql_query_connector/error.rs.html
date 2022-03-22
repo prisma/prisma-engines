@@ -597,7 +597,6 @@
             },
 
             <span class="ident">QuaintKind::MissingFullTextSearchIndex</span> =&gt; <span class="ident"><span class="self">Self</span>::MissingFullTextSearchIndex</span>,
-
             <span class="ident">e</span> @ <span class="ident">QuaintKind::ConnectionError</span>(<span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::ConnectionError</span>(<span class="ident">e</span>),
             <span class="ident">QuaintKind::ColumnReadFailure</span>(<span class="ident">e</span>) =&gt; <span class="ident"><span class="self">Self</span>::ColumnReadFailure</span>(<span class="ident">e</span>),
             <span class="ident">QuaintKind::ColumnNotFound</span> { <span class="ident">column</span> } =&gt; <span class="ident">SqlError::ColumnDoesNotExist</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">column</span>)),
@@ -620,6 +619,7 @@
             <span class="ident">e</span> @ <span class="ident">QuaintKind::ConnectTimeout</span> =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
             <span class="ident">e</span> @ <span class="ident">QuaintKind::SocketTimeout</span> =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
             <span class="ident">e</span> @ <span class="ident">QuaintKind::PoolTimeout</span> { .. } =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::PoolClosed</span> { .. } =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
             <span class="ident">e</span> @ <span class="ident">QuaintKind::TlsError</span> { .. } =&gt; <span class="ident"><span class="self">Self</span>::ConnectionError</span>(<span class="ident">e</span>),
         }
     }
