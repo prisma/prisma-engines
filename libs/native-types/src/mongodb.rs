@@ -17,6 +17,7 @@ pub enum MongoDbType {
     Timestamp,
     Long,
     Decimal,
+    Json,
     // Deprecated:
     // DbPointer
     // Undefined

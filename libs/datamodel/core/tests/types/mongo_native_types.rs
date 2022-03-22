@@ -5,6 +5,25 @@ use native_types::MongoDbType;
 use crate::{common::*, with_header, Provider};
 
 #[test]
+fn valid_json_usage_in_model() {
+    let dml = indoc! {r#"
+        model A {
+          id Int  @id            @map("_id")
+          a  Json @test.Json
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let (_, datamodel) = datamodel::parse_schema(&schema).unwrap();
+
+    let model = datamodel.assert_has_model("A");
+
+    let nt = model.assert_has_scalar_field("a").assert_native_type();
+    let mongo_type: MongoDbType = nt.deserialize_native_type();
+    assert_eq!(MongoDbType::Json, mongo_type);
+}
+
+#[test]
 fn valid_object_id_usage_in_model() {
     let dml = indoc! {r#"
         model A {
@@ -1364,6 +1383,128 @@ fn invalid_decimal_usage_in_type() {
         [1;94m   | [0m
         [1;94m17 | [0m  f  Boolean  @test.Decimal
         [1;94m18 | [0m  g  Int      @[1;91mtest.Decimal[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn invalid_json_usage_in_model() {
+    let dml = indoc! {r#"
+        model A {
+          id Int      @id          @map("_id")
+          a  Int      @test.Json
+          b  Float    @test.Json
+          c  Bytes    @test.Json
+          d  Boolean  @test.Json
+          e  DateTime @test.Json
+          f  Decimal  @test.Json
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mNative type Json is not compatible with declared field type Int, expected field type Json.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m  id Int      @id          @map("_id")
+        [1;94m13 | [0m  a  Int      @[1;91mtest.Json[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mNative type Json is not compatible with declared field type Float, expected field type Json.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m  a  Int      @test.Json
+        [1;94m14 | [0m  b  Float    @[1;91mtest.Json[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mNative type Json is not compatible with declared field type Bytes, expected field type Json.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m  b  Float    @test.Json
+        [1;94m15 | [0m  c  Bytes    @[1;91mtest.Json[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mNative type Json is not compatible with declared field type Boolean, expected field type Json.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m  c  Bytes    @test.Json
+        [1;94m16 | [0m  d  Boolean  @[1;91mtest.Json[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mNative type Json is not compatible with declared field type DateTime, expected field type Json.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m  d  Boolean  @test.Json
+        [1;94m17 | [0m  e  DateTime @[1;91mtest.Json[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mNative type Json is not compatible with declared field type Decimal, expected field type Json.[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
+        [1;94m   | [0m
+        [1;94m17 | [0m  e  DateTime @test.Json
+        [1;94m18 | [0m  f  Decimal  @[1;91mtest.Json[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn invalid_json_usage_in_type() {
+    let dml = indoc! {r#"
+        type B {
+          a  Int      @test.Json
+          b  Float    @test.Json
+          c  Bytes    @test.Json
+          d  Boolean  @test.Json
+          e  DateTime @test.Json
+          f  Decimal  @test.Json
+        }
+
+        model A {
+          id Int @id @map("_id")
+          b  B
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mNative type Json is not compatible with declared field type Int, expected field type Json.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mtype B {
+        [1;94m12 | [0m  a  Int      @[1;91mtest.Json[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mNative type Json is not compatible with declared field type Float, expected field type Json.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m  a  Int      @test.Json
+        [1;94m13 | [0m  b  Float    @[1;91mtest.Json[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mNative type Json is not compatible with declared field type Bytes, expected field type Json.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m  b  Float    @test.Json
+        [1;94m14 | [0m  c  Bytes    @[1;91mtest.Json[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mNative type Json is not compatible with declared field type Boolean, expected field type Json.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m  c  Bytes    @test.Json
+        [1;94m15 | [0m  d  Boolean  @[1;91mtest.Json[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mNative type Json is not compatible with declared field type DateTime, expected field type Json.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m  d  Boolean  @test.Json
+        [1;94m16 | [0m  e  DateTime @[1;91mtest.Json[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mNative type Json is not compatible with declared field type Decimal, expected field type Json.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m  e  DateTime @test.Json
+        [1;94m17 | [0m  f  Decimal  @[1;91mtest.Json[0m
         [1;94m   | [0m
     "#]];
 
