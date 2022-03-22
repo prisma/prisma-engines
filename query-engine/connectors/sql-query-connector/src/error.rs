@@ -271,7 +271,6 @@ impl From<quaint::error::Error> for SqlError {
             },
 
             QuaintKind::MissingFullTextSearchIndex => Self::MissingFullTextSearchIndex,
-
             e @ QuaintKind::ConnectionError(_) => Self::ConnectionError(e),
             QuaintKind::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
             QuaintKind::ColumnNotFound { column } => SqlError::ColumnDoesNotExist(format!("{}", column)),
@@ -294,6 +293,7 @@ impl From<quaint::error::Error> for SqlError {
             e @ QuaintKind::ConnectTimeout => SqlError::ConnectionError(e),
             e @ QuaintKind::SocketTimeout => SqlError::ConnectionError(e),
             e @ QuaintKind::PoolTimeout { .. } => SqlError::ConnectionError(e),
+            e @ QuaintKind::PoolClosed { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::TlsError { .. } => Self::ConnectionError(e),
         }
     }

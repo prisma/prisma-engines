@@ -1599,6 +1599,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
+ "url",
  "user-facing-errors",
 ]
 
@@ -2121,7 +2122,7 @@ dependencies = [
 [[package]]
 name = "mobc"
 version = "0.7.3"
-source = "git+https://github.com/prisma/mobc?rev=b0cc92f92bce2b06c503c985a322028cc9c20484#b0cc92f92bce2b06c503c985a322028cc9c20484"
+source = "git+https://github.com/prisma/mobc?tag=1.0.0#75c68f1054b30e4aa22180c95eca1ccad96868cc"
 dependencies = [
  "async-trait",
  "futures-channel",
@@ -2129,6 +2130,7 @@ dependencies = [
  "futures-timer",
  "futures-util",
  "log",
+ "thiserror",
  "tokio",
 ]
 
@@ -3133,7 +3135,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#5de38c4322d5f4b45433d593ce63babb261f1a64"
+source = "git+https://github.com/prisma/quaint#479e08a41b13902028906bc05f778688c06a3f18"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -4798,7 +4800,7 @@ version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f559b464de2e2bdabcac6a210d12e9b5a5973c251e102c44c585c71d51bd78e"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if 0.1.10",
  "rand 0.8.4",
  "static_assertions",
 ]
