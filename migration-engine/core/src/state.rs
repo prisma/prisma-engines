@@ -56,14 +56,16 @@ impl EngineState {
         path: &str,
         f: ConnectorRequest<O>,
     ) -> CoreResult<O> {
+        let config_dir = std::path::Path::new(path).parent();
         let schema = std::fs::read_to_string(path)
             .map_err(|err| ConnectorError::from_source(err, "Falied to read Prisma schema."))?;
-        self.with_connector_for_schema(&schema, f).await
+        self.with_connector_for_schema(&schema, config_dir, f).await
     }
 
     async fn with_connector_for_schema<O: Send + 'static>(
         &self,
         schema: &str,
+        config_dir: Option<&Path>,
         f: ConnectorRequest<O>,
     ) -> CoreResult<O> {
         let (response_sender, response_receiver) = tokio::sync::oneshot::channel::<CoreResult<O>>();
@@ -84,7 +86,7 @@ impl EngineState {
                 Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
             },
             None => {
-                let mut connector = crate::schema_to_connector(schema)?;
+                let mut connector = crate::schema_to_connector(schema, config_dir)?;
                 connector.set_host(self.host.clone());
                 let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
                 tokio::spawn(async move {
@@ -152,7 +154,7 @@ impl EngineState {
             }
             DatasourceParam::SchemaPath(PathContainer { path }) => self.with_connector_from_schema_path(path, f).await,
             DatasourceParam::SchemaString(SchemaContainer { schema }) => {
-                self.with_connector_for_schema(schema, f).await
+                self.with_connector_for_schema(schema, None, f).await
             }
         }
     }
@@ -167,7 +169,7 @@ impl EngineState {
             return Err(ConnectorError::from_msg("Missing --datamodel".to_owned()));
         };
 
-        self.with_connector_for_schema(schema, f).await
+        self.with_connector_for_schema(schema, None, f).await
     }
 }
 
