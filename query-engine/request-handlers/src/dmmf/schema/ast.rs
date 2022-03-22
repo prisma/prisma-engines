@@ -2,6 +2,10 @@ use indexmap::IndexMap;
 use query_core::Deprecation;
 use serde::{Deserialize, Serialize};
 
+fn is_false(val: &bool) -> bool {
+    !(*val)
+}
+
 #[derive(Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DmmfSchema {
@@ -15,6 +19,7 @@ pub struct DmmfSchema {
 pub struct DmmfOutputField {
     pub name: String,
     pub args: Vec<DmmfInputField>,
+    #[serde(skip_serializing_if = "is_false")]
     pub is_nullable: bool,
     pub output_type: DmmfTypeReference,
 
@@ -48,7 +53,9 @@ pub struct DmmfOutputType {
 #[serde(rename_all = "camelCase")]
 pub struct DmmfInputField {
     pub name: String,
+    #[serde(skip_serializing_if = "is_false")]
     pub is_required: bool,
+    #[serde(skip_serializing_if = "is_false")]
     pub is_nullable: bool,
     pub input_types: Vec<DmmfTypeReference>,
 
@@ -65,6 +72,7 @@ pub struct DmmfTypeReference {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub namespace: Option<String>,
     pub location: TypeLocation,
+    #[serde(skip_serializing_if = "is_false")]
     pub is_list: bool,
 }
 

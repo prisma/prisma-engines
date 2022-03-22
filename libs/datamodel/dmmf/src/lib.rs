@@ -66,9 +66,8 @@ pub struct Model {
     pub name: String,
     pub db_name: Option<String>,
     pub fields: Vec<Field>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "is_false_or_none")]
     pub is_generated: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
     pub primary_key: Option<PrimaryKey>,
     pub unique_fields: Vec<Vec<String>>,
