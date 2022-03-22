@@ -29,20 +29,20 @@ pub(crate) fn unsupported_type(affected: &[(Name, String, &str)]) -> Warning {
     }
 }
 
-pub(crate) fn undecided_field_type(affected: &[(Name, String)]) -> Warning {
+pub(crate) fn undecided_field_type(affected: &[(Name, String, String)]) -> Warning {
     let affected = serde_json::Value::Array({
         affected
             .iter()
-            .map(|(name, field)| match name {
+            .map(|(name, field, typ)| match name {
                 Name::Model(name) => json!({
                     "model": name,
                     "field": field,
-                    "tpe": "Json",
+                    "tpe": typ,
                 }),
                 Name::CompositeType(name) => json!({
                     "compositeType": name,
                     "field": field,
-                    "tpe": "Json",
+                    "tpe": typ,
                 }),
             })
             .collect()

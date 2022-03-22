@@ -40,7 +40,7 @@ fn mixed_id_types() {
 
     let expected = expect![[r#"
         model A {
-          /// Multiple data types found: String: 33.3%, ObjectId: 33.3%, Int32: 33.3% out of 3 sampled entries
+          /// Multiple data types found: String: 33.3%, String (ObjectId): 33.3%, Int: 33.3% out of 3 sampled entries
           id  Json     @id @map("_id")
           foo Boolean?
         }
@@ -64,7 +64,7 @@ fn mixing_types() {
     let expected = expect![[r#"
         model A {
           id    String @id @default(auto()) @map("_id") @db.ObjectId
-          /// Multiple data types found: String: 50%, Int32: 50% out of 3 sampled entries
+          /// Multiple data types found: String: 50%, Int: 50% out of 3 sampled entries
           first Json?
         }
     "#]];
@@ -102,9 +102,9 @@ fn mixing_types_with_the_same_base_type() {
 
     let expected = expect![[r#"
         model A {
-          id    String @id @default(auto()) @map("_id") @db.ObjectId
-          /// Multiple data types found: Date: 50%, Timestamp: 50% out of 3 sampled entries
-          first Json?
+          id    String    @id @default(auto()) @map("_id") @db.ObjectId
+          /// Multiple data types found: DateTime (Date): 50%, DateTime (Timestamp): 50% out of 3 sampled entries
+          first DateTime?
         }
     "#]];
 
@@ -113,6 +113,6 @@ fn mixing_types_with_the_same_base_type() {
     res.assert_warning_affected(&json!([{
         "model": "A",
         "field": "first",
-        "tpe": "Json",
+        "tpe": "DateTime (Timestamp)",
     }]));
 }

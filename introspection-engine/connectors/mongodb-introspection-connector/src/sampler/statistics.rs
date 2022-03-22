@@ -295,6 +295,13 @@ impl FieldPercentages {
     fn has_type_variety(&self) -> bool {
         self.data.len() > 1
     }
+
+    /// All instances we found were either of `Date` or `Timestamp` type.
+    fn all_types_are_datetimes(&self) -> bool {
+        self.data
+            .iter()
+            .all(|(typ, _)| matches!(typ, FieldType::Date | FieldType::Timestamp))
+    }
 }
 
 fn new_composite_type(type_name: &str) -> CompositeType {
@@ -378,9 +385,9 @@ fn populate_fields(
         let most_common_type = percentages.find_most_common();
 
         let field_type = match &most_common_type {
-            Some(_) if percentages.has_type_variety() => FieldType::Json,
-            Some(field_type) => field_type.to_owned(),
-            None => FieldType::Json,
+            Some(field_type) if !percentages.has_type_variety() => field_type.to_owned(),
+            Some(_) if percentages.all_types_are_datetimes() => FieldType::Timestamp,
+            _ => FieldType::Json,
         };
 
         if let FieldType::Unsupported(r#type) = field_type {
@@ -388,7 +395,7 @@ fn populate_fields(
         }
 
         if percentages.data.len() > 1 {
-            undecided_types.push((container.clone(), field_name.to_string()));
+            undecided_types.push((container.clone(), field_name.to_string(), field_type.to_string()));
         }
 
         let arity = if field_type.is_array() {
