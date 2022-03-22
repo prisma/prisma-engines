@@ -907,3 +907,94 @@ fn block_level_id_not_allowed() {
 
     expected.assert_eq(&error);
 }
+
+#[test]
+fn id_field_attribute_not_allowed() {
+    let schema = indoc! {r#"
+        type A {
+          field Int @id
+        }
+
+        model B {
+          id Int @id
+          a  A
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Defining `@id` attribute for a field in a composite type is not allowed.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mtype A {
+        [1;94m12 | [0m  [1;91mfield Int @id[0m
+        [1;94m13 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn unique_field_attribute_not_allowed() {
+    let schema = indoc! {r#"
+        type A {
+          field Int @unique
+        }
+
+        model B {
+          id Int @id
+          a  A
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Defining `@unique` attribute for a field in a composite type is not allowed.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mtype A {
+        [1;94m12 | [0m  [1;91mfield Int @unique[0m
+        [1;94m13 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn realation_field_attribute_not_allowed() {
+    let schema = indoc! {r#"
+        type C {
+          val String
+        }
+
+        type A {
+          c C[] @relation("foo")
+        }
+
+        model B {
+          id Int @id
+          a  A
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Defining `@relation` attribute for a field in a composite type is not allowed.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0mtype A {
+        [1;94m16 | [0m  [1;91mc C[] @relation("foo")[0m
+        [1;94m17 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}

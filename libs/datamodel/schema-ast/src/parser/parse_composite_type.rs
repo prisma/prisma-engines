@@ -68,7 +68,26 @@ pub(crate) fn parse_composite_type(token: &Token<'_>, diagnostics: &mut Diagnost
                 diagnostics.push_error(err);
             }
             Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {
-                Ok(field) => fields.push(field),
+                Ok(field) => {
+                    for attr in field.attributes.iter() {
+                        let error = match attr.name.name.as_str() {
+                            "relation" | "unique" | "id" => {
+                                let name = attr.name.name.as_str();
+
+                                let msg = format!(
+                                    "Defining `@{name}` attribute for a field in a composite type is not allowed."
+                                );
+
+                                DatamodelError::new_validation_error(msg, current.as_span().into())
+                            }
+                            _ => continue,
+                        };
+
+                        diagnostics.push_error(error);
+                    }
+
+                    fields.push(field)
+                }
                 Err(err) => diagnostics.push_error(err),
             },
             Rule::comment_block => comment = parse_comment_block(&current),
