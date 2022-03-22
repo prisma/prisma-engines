@@ -173,6 +173,7 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
+<span id="174">174</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -205,6 +206,7 @@
 
             <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">composite_type</span>.<span class="ident">fields</span>() {
                 <span class="ident">composite_types::validate_default_value</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
+                <span class="ident">fields::validate_native_type_arguments</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
             }
         }
     }

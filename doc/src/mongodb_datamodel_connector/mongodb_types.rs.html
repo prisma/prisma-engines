@@ -72,6 +72,10 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">DatamodelError</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">ScalarType</span>, <span class="ident">Span</span>};
 <span class="kw">use</span> <span class="ident">native_types::MongoDbType</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
@@ -89,6 +93,7 @@
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DATE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Date&quot;</span>;
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TIMESTAMP</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Timestamp&quot;</span>;
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DECIMAL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Decimal&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">JSON</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Json&quot;</span>;
 }
 
 <span class="kw">static</span> <span class="ident">DEFAULT_MAPPING</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ScalarType</span>, <span class="ident">MongoDbType</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
@@ -101,6 +106,7 @@
         (<span class="ident">ScalarType::String</span>, <span class="ident">MongoDbType::String</span>),
         (<span class="ident">ScalarType::DateTime</span>, <span class="ident">MongoDbType::Timestamp</span>),
         (<span class="ident">ScalarType::Bytes</span>, <span class="ident">MongoDbType::BinData</span>),
+        (<span class="ident">ScalarType::Json</span>, <span class="ident">MongoDbType::Json</span>),
     ]
     .<span class="ident">into_iter</span>()
     .<span class="ident">collect</span>()
@@ -125,6 +131,7 @@
     <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DATE</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
     <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">TIMESTAMP</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
     <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DECIMAL</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Decimal</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">JSON</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Json</span>]),
 ];
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mongo_type_from_input</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span> {
@@ -139,6 +146,7 @@
         <span class="ident">DATE</span> =&gt; <span class="ident">MongoDbType::Date</span>,
         <span class="ident">TIMESTAMP</span> =&gt; <span class="ident">MongoDbType::Timestamp</span>,
         <span class="ident">DECIMAL</span> =&gt; <span class="ident">MongoDbType::Decimal</span>,
+        <span class="ident">JSON</span> =&gt; <span class="ident">MongoDbType::Json</span>,
         <span class="ident">name</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_native_type_name_unknown</span>(<span class="string">&quot;MongoDB&quot;</span>, <span class="ident">name</span>, <span class="ident">span</span>)),
     };
 
