@@ -5,14 +5,14 @@
 use super::*;
 
 // [x] To-many-rel -> to-one-com (every, some, none, equals)
-// [ ] To-many-rel -> to-one-com -> to-one-com
-// [ ] To-many-rel -> to-one-com -> to-many-com
-// [ ] To-many-rel -> to-one-com -> scalar list
+// [X] To-many-rel -> to-one-com -> to-one-com
+// [X] To-many-rel -> to-one-com -> to-many-com
+// [X] To-many-rel -> to-one-com -> scalar list
 //
-// [ ] To-many-rel -> to-many-com
-// [ ] To-many-rel -> to-many-com -> to-one-com
-// [ ] To-many-rel -> to-many-com -> to-many-com
-// [ ] To-many-rel -> to-many-com -> scalar list
+// [X] To-many-rel -> to-many-com
+// [X] To-many-rel -> to-many-com -> to-one-com
+// [X] To-many-rel -> to-many-com -> to-many-com
+// [X] To-many-rel -> to-many-com -> scalar list
 #[test_suite(schema(mixed_composites), only(MongoDb))]
 mod to_many_rel {
     // To-many-rel -> to-one-com
@@ -249,6 +249,256 @@ mod to_many_rel {
                 }
             }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":6}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // To-many-rel -> to-one-com -> to-one-com
+    #[connector_test]
+    async fn to_to_one_com_to_to_one_com_to_to_one_com(runner: Runner) -> TestResult<()> {
+        create_relation_combination_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+              findManyTestModel(where: {
+                  to_many_rel: {
+                      every: {
+                          to_one_com: {
+                              is: {
+                                a_to_other_com: { is: { c_field: { contains: "salad" } } }
+                              }
+                          }
+                      }
+                  }
+              }) {
+                  id
+              }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":6}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                findManyTestModel(where: {
+                    to_many_rel: {
+                        every: {
+                            to_one_com: {
+                                isNot: {
+                                  a_to_other_com: { is: { c_field: { contains: "salad" } } }
+                                }
+                            }
+                        }
+                    }
+                }) {
+                    id
+                }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3},{"id":6}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // To-many-rel -> to-one-com -> to-many-com
+    #[connector_test]
+    async fn to_to_one_com_to_to_many_com(runner: Runner) -> TestResult<()> {
+        create_relation_combination_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+              findManyTestModel(where: {
+                  to_many_rel: {
+                      every: {
+                          to_one_com: {
+                              is: {
+                                other_composites: { every: { b_field: { contains: "oo" } } }
+                              }
+                          }
+                      }
+                  }
+              }) {
+                  id
+              }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":3},{"id":4},{"id":5},{"id":6}]}}"###
+        );
+
+        // The `every` prevents any match with actual values.
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                findManyTestModel(where: {
+                    to_many_rel: {
+                        every: {
+                            to_one_com: {
+                                isNot: {
+                                  other_composites: { every: { b_field: { contains: "oo" } } }
+                                }
+                            }
+                        }
+                    }
+                }) {
+                    id
+                }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // To-many-rel -> to-many-com
+    #[connector_test]
+    async fn to_to_many_com(runner: Runner) -> TestResult<()> {
+        create_relation_combination_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+              findManyTestModel(where: {
+                  to_many_rel: {
+                      every: {
+                          to_many_com: {
+                              every: {
+                                  b_field: { contains: "oo" }
+                              }
+                          }
+                      }
+                  }
+              }) {
+                  id
+              }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5},{"id":6}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                findManyTestModel(where: {
+                    to_many_rel: {
+                        every: {
+                            to_many_com: {
+                                none: {
+                                    b_field: { contains: "oo" }
+                                }
+                            }
+                        }
+                    }
+                }) {
+                    id
+                }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":5},{"id":6}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+                  findManyTestModel(where: {
+                      to_many_rel: {
+                          every: {
+                              to_many_com: {
+                                  some: {
+                                      b_field: { contains: "oo" }
+                                  }
+                              }
+                          }
+                      }
+                  }) {
+                      id
+                  }
+              }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":3},{"id":6}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // To-many-rel -> to-many-com -> to-one-com
+    #[connector_test]
+    async fn to_to_many_com_to_to_one_com(runner: Runner) -> TestResult<()> {
+        create_relation_combination_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+              findManyTestModel(where: {
+                  to_many_rel: {
+                      every: {
+                          to_many_com: {
+                              some: {
+                                to_other_com: {
+                                    c_field: {
+                                        equals: "test",
+                                        mode: insensitive
+                                    }
+                                }
+                              }
+                          }
+                      }
+                  }
+              }) {
+                  id
+              }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3},{"id":6}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // To-many-rel -> to-many-com -> to-many-com
+    #[connector_test]
+    async fn to_to_many_com_to_to_many_com(runner: Runner) -> TestResult<()> {
+        create_relation_combination_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+              findManyTestModel(where: {
+                  to_many_rel: {
+                      every: {
+                          to_many_com: {
+                              some: {
+                                to_other_coms: {
+                                    every: {
+                                        c_field: { contains: "test", mode: insensitive }
+                                    }
+                                }
+                              }
+                          }
+                      }
+                  }
+              }) {
+                  id
+              }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3},{"id":6}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // To-many-rel -> to-many-com -> scalar list
+    #[connector_test]
+    async fn to_to_many_com_to_to_many_com_to_scalar_list(runner: Runner) -> TestResult<()> {
+        create_relation_combination_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{
+              findManyTestModel(where: {
+                  to_many_rel: {
+                      every: {
+                          to_many_com: {
+                              every: {
+                                  scalar_list: {
+                                      has: "foo"
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }) {
+                  id
+              }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4},{"id":5},{"id":6}]}}"###
         );
 
         Ok(())

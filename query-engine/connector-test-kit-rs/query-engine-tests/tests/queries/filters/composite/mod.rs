@@ -175,13 +175,11 @@ async fn create_relation_combination_test_data(runner: &Runner) -> TestResult<()
                     {
                         b_field: "foo",
                         scalar_list: [],
-                        to_other_com: { c_field: "a" },
                         to_other_coms: []
                     },
                     {
                         b_field: "oof",
                         scalar_list: ["123"],
-                        to_other_com: { c_field: "b" },
                         to_other_coms: [ { c_field: "foo" } ]
                     }
                 ]
@@ -195,14 +193,25 @@ async fn create_relation_combination_test_data(runner: &Runner) -> TestResult<()
                         a_1: "test",
                         a_2: 10,
                         scalar_list: [],
+                        a_to_other_com: { c_field: "salad" },
                         other_composites: [
                             { b_field: "foo" },
                             { b_field: "oof" }
                         ]
                     }
                     to_many_com: [
-                        { b_field: "ayaya" },
-                        { b_field: "ofo" }
+                        {
+                            b_field: "ayaya",
+                            scalar_list: ["test", "tset"],
+                            to_other_com: { c_field: "oida" },
+                            to_other_coms: []
+                        },
+                        {
+                            b_field: "ofo",
+                            scalar_list: ["bar"],
+                            to_other_com: { c_field: "nope" },
+                            to_other_coms: []
+                        }
                     ]
                 },
                 {
@@ -211,14 +220,25 @@ async fn create_relation_combination_test_data(runner: &Runner) -> TestResult<()
                         a_1: "Test",
                         a_2: -10,
                         scalar_list: [],
+                        a_to_other_com: { c_field: "wurst salad" },
                         other_composites: [
                             { b_field: "foo" },
                             { b_field: "oof" }
                         ]
                     }
                     to_many_com: [
-                        { b_field: "ding" },
-                        { b_field: "dong" }
+                        {
+                            b_field: "ding",
+                            scalar_list: ["hello", "world"],
+                            to_other_com: { c_field: "fof" },
+                            to_other_coms: [{ c_field: "test" }, { c_field: "oof" }]
+                        },
+                        {
+                            b_field: "dong",
+                            scalar_list: ["foo", "bar"],
+                            to_other_com: { c_field: "foo" },
+                            to_other_coms: [{ c_field: "Test" }, { c_field: "ofo" }]
+                        }
                     ]
                 }
             ]
@@ -264,11 +284,22 @@ async fn create_relation_combination_test_data(runner: &Runner) -> TestResult<()
                         a_1: "tset",
                         a_2: 123,
                         scalar_list: ["foo", "oof"],
+                        a_to_other_com: { c_field: "test" },
                         other_composites: [ { b_field: "foo" }, { b_field: "test" } ]
                     }
                     to_many_com: [
-                        { b_field: "ayaya" },
-                        { b_field: "ofo" }
+                        {
+                            b_field: "foo",
+                            scalar_list: ["foo", "bar"],
+                            to_other_com: { c_field: "test" },
+                            to_other_coms: [{ c_field: "ofofoo" }, { c_field: "foo?" }]
+                        },
+                        {
+                            b_field: "ofo",
+                            scalar_list: ["foo"],
+                            to_other_com: { c_field: "Test" },
+                            to_other_coms: [{ c_field: "Test" }]
+                        }
                     ]
                 },
                 {
@@ -276,6 +307,7 @@ async fn create_relation_combination_test_data(runner: &Runner) -> TestResult<()
                     to_one_com: {
                         a_1: "Test",
                         a_2: -10,
+                        a_to_other_com: { c_field: "foo" },
                         scalar_list: ["foo", "bar", "baz"],
                         other_composites: [
                             { b_field: "foo" },
@@ -283,8 +315,18 @@ async fn create_relation_combination_test_data(runner: &Runner) -> TestResult<()
                         ]
                     }
                     to_many_com: [
-                        { b_field: "ding" },
-                        { b_field: "dong" }
+                        {
+                            b_field: "ding",
+                            scalar_list: ["test", "foo"],
+                            to_other_com: { c_field: "foo" },
+                            to_other_coms: [{ c_field: "bar" }, { c_field: "foo!" }]
+                        },
+                        {
+                            b_field: "dong",
+                            scalar_list: ["foo", "bar"],
+                            to_other_com: { c_field: "test" },
+                            to_other_coms: [{ c_field: "test" }, { c_field: "Test" }]
+                        }
                     ]
                 }
             ]
@@ -329,14 +371,24 @@ async fn create_relation_combination_test_data(runner: &Runner) -> TestResult<()
                         a_1: "test",
                         a_2: 11,
                         scalar_list: [],
+                        a_to_other_com: { c_field: "1" },
                         other_composites: [
-                            { b_field: "fo" },
-                            { b_field: "of" }
+                            { b_field: "foo" },
+                            { b_field: "oof" }
                         ]
                     }
                     to_many_com: [
-                        { b_field: "ayaya" },
-                        { b_field: "ofo" }
+                        {
+                            b_field: "oof",
+                            scalar_list: ["test", "bar"],
+                            to_other_com: { c_field: "FOO" },
+                            to_other_coms: [{ c_field: "test" }]
+                        },
+                        {
+                            b_field: "foof",
+                            scalar_list: ["wurst"],
+                            to_other_com: { c_field: "OOF" },
+                            to_other_coms: [] }
                     ]
                 },
                 {
@@ -345,14 +397,24 @@ async fn create_relation_combination_test_data(runner: &Runner) -> TestResult<()
                         a_1: "Test",
                         a_2: -10,
                         scalar_list: ["foo"],
+                        a_to_other_com: { c_field: "2" },
                         other_composites: [
                             { b_field: "foof" },
                             { b_field: "ofoo" }
                         ]
                     }
                     to_many_com: [
-                        { b_field: "ding" },
-                        { b_field: "dong" }
+                        {
+                            b_field: "dood",
+                            scalar_list: ["foo"],
+                            to_other_com: { c_field: "foo" },
+                            to_other_coms: [{ c_field: "woo" }, { c_field: "sah" }]  },
+                        {
+                            b_field: "doot",
+                            scalar_list: ["dood"],
+                            to_other_com: { c_field: "oof" },
+                            to_other_coms: [{ c_field: "test" }, { c_field: "TEST" }]
+                        }
                     ]
                 }
             ]
