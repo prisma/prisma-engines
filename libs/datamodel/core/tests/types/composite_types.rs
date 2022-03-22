@@ -581,32 +581,6 @@ fn composite_types_must_have_at_least_one_visible_field() {
 }
 
 #[test]
-fn composite_types_cannot_have_block_attributes() {
-    let datamodel = r#"
-        type Address {
-            name String?
-
-            @@unique([name])
-        }
-    "#;
-
-    let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: Composite types cannot have block attributes.[0m
-          [1;94m-->[0m  [4mschema.prisma:5[0m
-        [1;94m   | [0m
-        [1;94m 4 | [0m
-        [1;94m 5 | [0m            [1;91m@@unique([name])[0m
-        [1;94m 6 | [0m        }
-        [1;94m   | [0m
-    "#]];
-    let found = parse_schema_ast(datamodel)
-        .unwrap_err()
-        .to_pretty_string("schema.prisma", datamodel);
-
-    expected.assert_eq(&found);
-}
-
-#[test]
 fn composite_types_can_nest() {
     let schema = r#"
         datasource db {
@@ -777,4 +751,250 @@ fn unsupported_should_work() {
     datamodel
         .assert_has_composite_type("A")
         .assert_has_unsupported_field("field");
+}
+
+#[test]
+fn block_level_map_not_allowed() {
+    let schema = indoc! {r#"
+        type A {
+          field Int
+
+          @@map("foo")
+        }
+
+        model B {
+          id Int @id
+          a  A
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: The name of a composite type is not persisted in the database, therefore it does not need a mapped database name.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@map("foo")[0m
+        [1;94m15 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn block_level_unique_not_allowed() {
+    let schema = indoc! {r#"
+        type A {
+          field Int
+
+          @@unique([field])
+        }
+
+        model B {
+          id Int @id
+          a  A
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: A unique constraint should be defined in the model containing the embed.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@unique([field])[0m
+        [1;94m15 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn block_level_index_not_allowed() {
+    let schema = indoc! {r#"
+        type A {
+          field Int
+
+          @@index([field])
+        }
+
+        model B {
+          id Int @id
+          a  A
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: An index should be defined in the model containing the embed.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@index([field])[0m
+        [1;94m15 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn block_level_fulltext_not_allowed() {
+    let schema = indoc! {r#"
+        type A {
+          field Int
+
+          @@fulltext([field])
+        }
+
+        model B {
+          id Int @id
+          a  A
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: A fulltext index should be defined in the model containing the embed.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@fulltext([field])[0m
+        [1;94m15 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn block_level_id_not_allowed() {
+    let schema = indoc! {r#"
+        type A {
+          field Int
+
+          @@id([field])
+        }
+
+        model B {
+          id Int @id
+          a  A
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: A composite type cannot define an id.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m
+        [1;94m14 | [0m  [1;91m@@id([field])[0m
+        [1;94m15 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn id_field_attribute_not_allowed() {
+    let schema = indoc! {r#"
+        type A {
+          field Int @id
+        }
+
+        model B {
+          id Int @id
+          a  A
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Defining `@id` attribute for a field in a composite type is not allowed.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mtype A {
+        [1;94m12 | [0m  [1;91mfield Int @id[0m
+        [1;94m13 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn unique_field_attribute_not_allowed() {
+    let schema = indoc! {r#"
+        type A {
+          field Int @unique
+        }
+
+        model B {
+          id Int @id
+          a  A
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Defining `@unique` attribute for a field in a composite type is not allowed.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mtype A {
+        [1;94m12 | [0m  [1;91mfield Int @unique[0m
+        [1;94m13 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn realation_field_attribute_not_allowed() {
+    let schema = indoc! {r#"
+        type C {
+          val String
+        }
+
+        type A {
+          c C[] @relation("foo")
+        }
+
+        model B {
+          id Int @id
+          a  A
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Defining `@relation` attribute for a field in a composite type is not allowed.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0mtype A {
+        [1;94m16 | [0m  [1;91mc C[] @relation("foo")[0m
+        [1;94m17 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
 }
