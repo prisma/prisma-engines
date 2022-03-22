@@ -30,6 +30,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
 
             for field in composite_type.fields() {
                 composite_types::validate_default_value(field, ctx);
+                fields::validate_native_type_arguments(field, ctx);
             }
         }
     }

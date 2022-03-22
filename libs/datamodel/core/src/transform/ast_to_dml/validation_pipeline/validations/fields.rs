@@ -16,6 +16,7 @@ use crate::{
     },
 };
 use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
+use parser_database::walkers::TypedFieldWalker;
 
 pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ctx: &mut Context<'_>) {
     let model = field.model();
@@ -118,7 +119,9 @@ pub(crate) fn validate_length_used_with_correct_types(
     ));
 }
 
-pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {
+pub(super) fn validate_native_type_arguments<'db>(field: impl Into<TypedFieldWalker<'db>>, ctx: &mut Context<'db>) {
+    let field = field.into();
+
     let connector_name = ctx
         .datasource
         .map(|ds| ds.active_provider.clone())
@@ -185,8 +188,11 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_>, ctx: 
             .map(|s| s.as_str())
             .collect::<Vec<_>>()
             .join(" or ");
+
         let err = DatamodelError::new_incompatible_native_type(type_name, scalar_type.as_str(), &expected_types, span);
+
         ctx.push_error(err);
+
         return;
     }
 
