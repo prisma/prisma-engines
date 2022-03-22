@@ -61,6 +61,7 @@ pub mod filters {
     pub const GREATER_THAN_OR_EQUAL: &str = "gte";
     pub const IN: &str = "in";
     pub const SEARCH: &str = "search";
+    pub const IS_SET: &str = "isSet";
 
     // legacy filter
     pub const NOT_IN: &str = "notIn";

@@ -23,7 +23,7 @@ mod composite_combination {
                   id
               }
           }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":6},{"id":8},{"id":9},{"id":10},{"id":11}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":6}]}}"###
         );
 
         Ok(())

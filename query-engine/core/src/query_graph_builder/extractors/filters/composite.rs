@@ -16,6 +16,7 @@ pub fn parse(input_map: ParsedInputMap, field: &CompositeFieldRef, _reverse: boo
         match (filter_key.as_ref(), value) {
             // Common composite filters.
             (filters::EQUALS, input) => Ok(field.equals(input.try_into()?)),
+            (filters::IS_SET, input) => Ok(field.is_set(input.try_into()?)),
 
             // To-many composite filters.
             (filters::EVERY, input) => Ok(field.every(extract_filter(input.try_into()?, &field.typ)?)),
@@ -23,7 +24,7 @@ pub fn parse(input_map: ParsedInputMap, field: &CompositeFieldRef, _reverse: boo
             (filters::NONE, input) => Ok(field.none(extract_filter(input.try_into()?, &field.typ)?)),
             (filters::IS_EMPTY, input) => Ok(field.is_empty(input.try_into()?)),
 
-            // // To-one composite filters
+            // To-one composite filters
             (filters::IS, ParsedInputValue::Single(PrismaValue::Null)) => Ok(field.equals(PrismaValue::Null)),
             (filters::IS, input) => Ok(field.is(extract_filter(input.try_into()?, &field.typ)?)),
 
