@@ -1,4 +1,4 @@
-use crate::{ast, types, ParserDatabase, ScalarFieldType};
+use crate::{ast, types, ParserDatabase, ScalarFieldType, ScalarType};
 use diagnostics::Span;
 
 /// A composite type, introduced with the `type` keyword in the schema.
@@ -116,6 +116,19 @@ impl<'db> CompositeTypeFieldWalker<'db> {
     /// The type of the field, e.g. `String` in `streetName String?`.
     pub fn r#type(self) -> &'db ScalarFieldType {
         &self.field.r#type
+    }
+
+    /// The type of the field in case it is a scalar type (not an enum, not a composite type).
+    pub fn scalar_type(self) -> Option<ScalarType> {
+        let mut r#type = self.r#type();
+
+        loop {
+            match r#type {
+                ScalarFieldType::BuiltInScalar(scalar) => return Some(*scalar),
+                ScalarFieldType::Alias(alias_id) => r#type = &self.db.types.type_aliases[alias_id],
+                _ => return None,
+            }
+        }
     }
 
     /// The `@default()` AST attribute on the field, if any.

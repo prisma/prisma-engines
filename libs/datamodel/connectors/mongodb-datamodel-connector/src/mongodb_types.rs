@@ -15,6 +15,7 @@ pub mod type_names {
     pub const DATE: &str = "Date";
     pub const TIMESTAMP: &str = "Timestamp";
     pub const DECIMAL: &str = "Decimal";
+    pub const JSON: &str = "Json";
 }
 
 static DEFAULT_MAPPING: Lazy<HashMap<ScalarType, MongoDbType>> = Lazy::new(|| {
@@ -27,6 +28,7 @@ static DEFAULT_MAPPING: Lazy<HashMap<ScalarType, MongoDbType>> = Lazy::new(|| {
         (ScalarType::String, MongoDbType::String),
         (ScalarType::DateTime, MongoDbType::Timestamp),
         (ScalarType::Bytes, MongoDbType::BinData),
+        (ScalarType::Json, MongoDbType::Json),
     ]
     .into_iter()
     .collect()
@@ -51,6 +53,7 @@ pub(crate) const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::without_args(DATE, &[ScalarType::DateTime]),
     NativeTypeConstructor::without_args(TIMESTAMP, &[ScalarType::DateTime]),
     NativeTypeConstructor::without_args(DECIMAL, &[ScalarType::Decimal]),
+    NativeTypeConstructor::without_args(JSON, &[ScalarType::Json]),
 ];
 
 pub(crate) fn mongo_type_from_input(name: &str, span: Span) -> crate::Result<MongoDbType> {
@@ -65,6 +68,7 @@ pub(crate) fn mongo_type_from_input(name: &str, span: Span) -> crate::Result<Mon
         DATE => MongoDbType::Date,
         TIMESTAMP => MongoDbType::Timestamp,
         DECIMAL => MongoDbType::Decimal,
+        JSON => MongoDbType::Json,
         name => return Err(DatamodelError::new_native_type_name_unknown("MongoDB", name, span)),
     };
 
