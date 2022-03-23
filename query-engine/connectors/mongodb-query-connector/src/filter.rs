@@ -698,7 +698,7 @@ fn composite_filter(
     Ok(MongoFilter::Composite(filter_doc))
 }
 
-/// Renders a `$regexMatch` expression
+/// Renders a `$regexMatch` expression.
 fn regex_match(
     field_name: &str,
     field: &ScalarFieldRef,
