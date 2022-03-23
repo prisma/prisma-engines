@@ -51,24 +51,32 @@ fn convert_filter_internal(
     invert_undefined_exclusion: bool,
     prefix: impl Into<FilterPrefix>,
 ) -> crate::Result<MongoFilter> {
+    dbg!(&filter);
+
     let prefix = prefix.into();
     let filter = fold_compounds(filter);
 
     let filter_pair = match filter {
-        Filter::And(filters) if invert => coerce_empty(false, "$or", filters, invert, prefix)?,
-        Filter::And(filters) => coerce_empty(true, "$and", filters, invert, prefix)?,
+        Filter::And(filters) if invert => {
+            coerce_empty(false, "$or", filters, invert, invert_undefined_exclusion, prefix)?
+        }
+        Filter::And(filters) => coerce_empty(true, "$and", filters, invert, invert_undefined_exclusion, prefix)?,
 
-        Filter::Or(filters) if invert => coerce_empty(true, "$and", filters, invert, prefix)?,
-        Filter::Or(filters) => coerce_empty(false, "$or", filters, invert, prefix)?,
+        Filter::Or(filters) if invert => {
+            coerce_empty(true, "$and", filters, invert, invert_undefined_exclusion, prefix)?
+        }
+        Filter::Or(filters) => coerce_empty(false, "$or", filters, invert, invert_undefined_exclusion, prefix)?,
 
-        Filter::Not(filters) if invert => coerce_empty(false, "$or", filters, !invert, prefix)?,
-        Filter::Not(filters) => coerce_empty(true, "$and", filters, !invert, prefix)?,
+        Filter::Not(filters) if invert => {
+            coerce_empty(false, "$or", filters, !invert, !invert_undefined_exclusion, prefix)?
+        }
+        Filter::Not(filters) => coerce_empty(true, "$and", filters, !invert, !invert_undefined_exclusion, prefix)?,
 
         Filter::Scalar(sf) => scalar_filter(sf, invert, invert_undefined_exclusion, prefix)?,
         Filter::Empty => MongoFilter::Scalar(doc! {}),
         Filter::ScalarList(slf) => scalar_list_filter(slf, invert, invert_undefined_exclusion, prefix)?,
         Filter::OneRelationIsNull(filter) => one_is_null(filter, invert, prefix),
-        Filter::Relation(rfilter) => relation_filter(rfilter, invert, prefix)?,
+        Filter::Relation(rfilter) => relation_filter(rfilter.invert(invert), prefix)?,
         Filter::Aggregation(filter) => aggregation_filter(filter, invert, invert_undefined_exclusion)?,
         Filter::Composite(filter) => composite_filter(filter, invert, invert_undefined_exclusion, prefix)?,
         Filter::BoolFilter(_) => unimplemented!("MongoDB boolean filter."),
@@ -109,6 +117,7 @@ fn coerce_empty(
     operation: &str,
     filters: Vec<Filter>,
     invert: bool,
+    invert_undefined_exclusion: bool,
     prefix: FilterPrefix,
 ) -> crate::Result<MongoFilter> {
     if filters.is_empty() {
@@ -119,7 +128,7 @@ fn coerce_empty(
 
         Ok(MongoFilter::Scalar(stub_condition))
     } else {
-        fold_filters(operation, filters, invert, prefix)
+        fold_filters(operation, filters, invert, invert_undefined_exclusion, prefix)
     }
 }
 
@@ -127,11 +136,12 @@ fn fold_filters(
     operation: &str,
     filters: Vec<Filter>,
     invert: bool,
+    invert_undefined_exclusion: bool,
     prefix: FilterPrefix,
 ) -> crate::Result<MongoFilter> {
     let filters = filters
         .into_iter()
-        .map(|f| Ok(convert_filter(f, invert, prefix.clone())?.render()))
+        .map(|f| Ok(convert_filter_internal(f, invert, invert_undefined_exclusion, prefix.clone())?.render()))
         .collect::<crate::Result<Vec<_>>>()?;
 
     let (filters, joins) = fold_nested(filters);
@@ -469,12 +479,11 @@ fn one_is_null(filter: OneRelationIsNullFilter, invert: bool, prefix: FilterPref
 }
 
 /// Builds a Mongo relation filter depth-first.
-fn relation_filter(filter: RelationFilter, invert: bool, prefix: FilterPrefix) -> crate::Result<MongoFilter> {
+fn relation_filter(filter: RelationFilter, prefix: FilterPrefix) -> crate::Result<MongoFilter> {
     let from_field = filter.field;
-    let is_to_one_rel = !from_field.is_list();
-    let relation_name = &from_field.relation().name;
-    let field_name = prefix.render_with(relation_name.to_owned());
     let nested_filter = *filter.nested_filter;
+    let is_to_one = !from_field.is_list();
+    let field_name = prefix.render_with(from_field.relation().name.to_owned());
     // Tmp condition check while mongo is getting fully tested.
     let is_empty_filter = matches!(nested_filter, Filter::Empty);
 
@@ -495,7 +504,7 @@ fn relation_filter(filter: RelationFilter, invert: bool, prefix: FilterPrefix) -
 
             some
         }
-        connector_interface::RelationCondition::NoRelatedRecord => {
+        connector_interface::RelationCondition::NoRelatedRecord if is_to_one => {
             if is_empty_filter {
                 // Doesn't need coercing the array since joins always return arrays
                 doc! { "$eq": [render_size(&field_name, false), 0] }
@@ -506,18 +515,26 @@ fn relation_filter(filter: RelationFilter, invert: bool, prefix: FilterPrefix) -
 
                 // If the relation is a to-one, ensure the array is of size 1
                 // This filters out undefined to-one relations
-                if is_to_one_rel {
-                    doc! {
-                        "$and": [
-                            none,
-                            // Additionally, we ensure that the array has a single element.
-                            // It doesn't need to be coerced to an empty array since the join guarantees it will exist
-                            { "$eq": [render_size(&field_name, false), 1] }
-                        ]
-                    }
-                } else {
-                    none
+                doc! {
+                    "$and": [
+                        none,
+                        // Additionally, we ensure that the array has a single element.
+                        // It doesn't need to be coerced to an empty array since the join guarantees it will exist
+                        { "$eq": [render_size(&field_name, false), 1] }
+                    ]
                 }
+            }
+        }
+        connector_interface::RelationCondition::NoRelatedRecord => {
+            if is_empty_filter {
+                // Doesn't need coercing the array since joins always return arrays
+                doc! { "$eq": [render_size(&field_name, false), 0] }
+            } else {
+                let (none, nested_joins) = render_none(&field_name, nested_filter, true, false)?;
+
+                join_stage.extend_nested(nested_joins);
+
+                none
             }
         }
         connector_interface::RelationCondition::ToOneRelatedRecord => {
@@ -538,11 +555,7 @@ fn relation_filter(filter: RelationFilter, invert: bool, prefix: FilterPrefix) -
         }
     };
 
-    if invert {
-        Ok(MongoFilter::relation(doc! { "$not": filter_doc }, vec![join_stage]))
-    } else {
-        Ok(MongoFilter::relation(filter_doc, vec![join_stage]))
-    }
+    Ok(MongoFilter::relation(filter_doc, vec![join_stage]))
 }
 
 fn aggregation_filter(
