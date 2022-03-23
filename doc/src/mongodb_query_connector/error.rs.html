@@ -217,12 +217,81 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector_interface::error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>, <span class="ident">MultiError</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">mongodb</span>::{
     <span class="ident">bson</span>::{<span class="self">self</span>, <span class="ident">extjson</span>},
     <span class="ident">error</span>::{<span class="ident">CommandError</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DriverError</span>},
 };
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">CompositeFieldRef</span>, <span class="ident">Field</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">SelectedField</span>};
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 <span class="kw">use</span> <span class="ident">user_facing_errors::query_engine::DatabaseConstraint</span>;
@@ -239,10 +308,21 @@
     <span class="comment">// Unhandled conversion error. Mostly used for `#[non-exhaustive]` flagged Mongo errors.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unhandled conversion error: {0}.&quot;</span>)]</span>
     <span class="ident">UnhandledConversionError</span>(<span class="ident">anyhow::Error</span>),
+    <span class="doccomment">/// Conversion error related to a datamodel field.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Failed to convert &#39;{}&#39; to &#39;{}&#39; for the field &#39;{}&#39;.&quot;</span>, <span class="ident">from</span>, <span class="ident">to</span>, <span class="ident">field_name</span>)]</span>
+    <span class="ident">FieldConversionError</span> {
+        <span class="ident">field_name</span>: <span class="ident">String</span>,
+        <span class="ident">from</span>: <span class="ident">String</span>,
+        <span class="ident">to</span>: <span class="ident">String</span>,
+    },
 
     <span class="doccomment">/// ObjectID specific conversion error.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Malformed ObjectID: {0}.&quot;</span>)]</span>
     <span class="ident">MalformedObjectId</span>(<span class="ident">String</span>),
+
+    <span class="doccomment">/// ObjectID specific conversion error related to a datamodel field.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Malformed ObjectID: {} for the field &#39;{}&#39;.&quot;</span>, <span class="ident">reason</span>, <span class="ident">field_name</span>)]</span>
+    <span class="ident">FieldMalformedObjectId</span> { <span class="ident">field_name</span>: <span class="ident">String</span>, <span class="ident">reason</span>: <span class="ident">String</span> },
 
     <span class="doccomment">/// Raw Mongo driver error</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
@@ -277,6 +357,21 @@
         }
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decorate_with_field_name</span>(<span class="self">self</span>, <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">field_name</span>.<span class="ident">to_owned</span>();
+
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">MongoError::ConversionError</span> { <span class="ident">from</span>, <span class="ident">to</span> } =&gt; <span class="ident">MongoError::FieldConversionError</span> { <span class="ident">field_name</span>, <span class="ident">from</span>, <span class="ident">to</span> },
+            <span class="ident">MongoError::MalformedObjectId</span>(<span class="ident">oid</span>) =&gt; <span class="ident">MongoError::FieldMalformedObjectId</span> {
+                <span class="ident">field_name</span>,
+                <span class="ident">reason</span>: <span class="ident">oid</span>,
+            },
+            <span class="ident">err</span> =&gt; <span class="ident">err</span>,
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">MongoError</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_connector_error</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">MongoError::Unsupported</span>(<span class="ident">feature</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::UnsupportedFeature</span>(<span class="ident">feature</span>)),
@@ -300,7 +395,15 @@
                 <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))
             }
 
+            <span class="ident">err</span> @ <span class="ident">MongoError::FieldConversionError</span> { .. } =&gt; {
+                <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))
+            }
+
             <span class="ident">err</span> @ <span class="ident">MongoError::MalformedObjectId</span>(<span class="kw">_</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>())),
+
+            <span class="ident">err</span> @ <span class="ident">MongoError::FieldMalformedObjectId</span> { .. } =&gt; {
+                <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))
+            }
 
             <span class="ident">MongoError::DriverError</span>(<span class="ident">err</span>) =&gt; <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">kind</span>.<span class="ident">as_ref</span>() {
                 <span class="ident">mongodb::error::ErrorKind::InvalidArgument</span> { .. } =&gt; {
@@ -432,6 +535,39 @@
             <span class="comment">// Needed because `extjson::de::Error` is flagged as #[non_exhaustive]</span>
             <span class="ident">err</span> =&gt; <span class="ident">MongoError::UnhandledConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
         }
+    }
+}
+
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DecorateErrorWithFieldInformationExtension</span> {
+    <span class="kw">fn</span> <span class="ident">decorate_with_field_info</span>(<span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">decorate_with_selected_field_info</span>(<span class="self">self</span>, <span class="ident">selected_field</span>: <span class="kw-2">&amp;</span><span class="ident">SelectedField</span>) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">decorate_with_scalar_field_info</span>(<span class="self">self</span>, <span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">decorate_with_field_name</span>(<span class="self">self</span>, <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">decorate_with_composite_field_info</span>(<span class="self">self</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="self">Self</span>;
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DecorateErrorWithFieldInformationExtension</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">decorate_with_field_info</span>(<span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">decorate_with_field_name</span>(<span class="ident">field</span>.<span class="ident">name</span>()))
+    }
+
+    <span class="kw">fn</span> <span class="ident">decorate_with_selected_field_info</span>(<span class="self">self</span>, <span class="ident">selected_field</span>: <span class="kw-2">&amp;</span><span class="ident">SelectedField</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">match</span> <span class="ident">selected_field</span> {
+            <span class="ident">SelectedField::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="self">self</span>.<span class="ident">decorate_with_scalar_field_info</span>(<span class="ident">sf</span>),
+            <span class="ident">SelectedField::Composite</span>(<span class="ident">composite_sel</span>) =&gt; <span class="self">self</span>.<span class="ident">decorate_with_composite_field_info</span>(<span class="kw-2">&amp;</span><span class="ident">composite_sel</span>.<span class="ident">field</span>),
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">decorate_with_scalar_field_info</span>(<span class="self">self</span>, <span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">decorate_with_field_name</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">name</span>))
+    }
+
+    <span class="kw">fn</span> <span class="ident">decorate_with_field_name</span>(<span class="self">self</span>, <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">decorate_with_field_name</span>(<span class="ident">field_name</span>))
+    }
+
+    <span class="kw">fn</span> <span class="ident">decorate_with_composite_field_info</span>(<span class="self">self</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">decorate_with_field_name</span>(<span class="kw-2">&amp;</span><span class="ident">cf</span>.<span class="ident">name</span>))
     }
 }
 </code></pre></div>
