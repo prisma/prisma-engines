@@ -671,7 +671,13 @@ fn composite_filter(
         }
 
         CompositeCondition::IsNot(filter) => {
-            let (nested_filter, _) = convert_filter(filter, !invert, prefix.append_cloned(field.db_name()))?.render();
+            let (nested_filter, _) = convert_filter_internal(
+                filter,
+                !invert,
+                invert_undefined_exclusion,
+                prefix.append_cloned(field.db_name()),
+            )?
+            .render();
 
             return Ok(MongoFilter::Composite(nested_filter));
         }

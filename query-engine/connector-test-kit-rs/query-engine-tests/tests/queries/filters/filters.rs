@@ -129,7 +129,7 @@ mod filter_spec {
         match_connector_result!(
           &runner,
           user_uniques_query(r#"(where: { optional: { in: null }})"#),
-          // MongoDB exclude undefined fields
+          // MongoDB excludes undefined fields
           MongoDb(_) => vec![r#"{"data":{"findManyUser":[]}}"#],
           _ => vec![r#"{"data":{"findManyUser":[{"unique":1},{"unique":2},{"unique":3},{"unique":4}]}}"#]
         );
