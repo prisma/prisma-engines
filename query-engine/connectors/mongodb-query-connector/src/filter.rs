@@ -68,9 +68,9 @@ fn convert_filter_internal(
         Filter::Or(filters) => coerce_empty(false, "$or", filters, invert, invert_undefined_exclusion, prefix)?,
 
         Filter::Not(filters) if invert => {
-            coerce_empty(false, "$or", filters, !invert, !invert_undefined_exclusion, prefix)?
+            coerce_empty(false, "$or", filters, !invert, invert_undefined_exclusion, prefix)?
         }
-        Filter::Not(filters) => coerce_empty(true, "$and", filters, !invert, !invert_undefined_exclusion, prefix)?,
+        Filter::Not(filters) => coerce_empty(true, "$and", filters, !invert, invert_undefined_exclusion, prefix)?,
 
         Filter::Scalar(sf) => scalar_filter(sf, invert, invert_undefined_exclusion, prefix)?,
         Filter::Empty => MongoFilter::Scalar(doc! {}),
