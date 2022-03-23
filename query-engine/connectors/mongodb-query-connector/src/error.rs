@@ -4,6 +4,7 @@ use mongodb::{
     bson::{self, extjson},
     error::{CommandError, Error as DriverError},
 };
+use prisma_models::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
 use regex::Regex;
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
@@ -20,10 +21,21 @@ pub enum MongoError {
     // Unhandled conversion error. Mostly used for `#[non-exhaustive]` flagged Mongo errors.
     #[error("Unhandled conversion error: {0}.")]
     UnhandledConversionError(anyhow::Error),
+    /// Conversion error related to a datamodel field.
+    #[error("Failed to convert '{}' to '{}' for the field '{}'.", from, to, field_name)]
+    FieldConversionError {
+        field_name: String,
+        from: String,
+        to: String,
+    },
 
     /// ObjectID specific conversion error.
     #[error("Malformed ObjectID: {0}.")]
     MalformedObjectId(String),
+
+    /// ObjectID specific conversion error related to a datamodel field.
+    #[error("Malformed ObjectID: {} for the field '{}'.", reason, field_name)]
+    FieldMalformedObjectId { field_name: String, reason: String },
 
     /// Raw Mongo driver error
     #[error("{0}")]
@@ -58,6 +70,21 @@ impl MongoError {
         }
     }
 
+    pub fn decorate_with_field_name(self, field_name: &str) -> Self {
+        let field_name = field_name.to_owned();
+
+        match self {
+            MongoError::ConversionError { from, to } => MongoError::FieldConversionError { field_name, from, to },
+            MongoError::MalformedObjectId(oid) => MongoError::FieldMalformedObjectId {
+                field_name,
+                reason: oid,
+            },
+            err => err,
+        }
+    }
+}
+
+impl MongoError {
     pub fn into_connector_error(self) -> ConnectorError {
         match self {
             MongoError::Unsupported(feature) => ConnectorError::from_kind(ErrorKind::UnsupportedFeature(feature)),
@@ -81,7 +108,15 @@ impl MongoError {
                 ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
             }
 
+            err @ MongoError::FieldConversionError { .. } => {
+                ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
+            }
+
             err @ MongoError::MalformedObjectId(_) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
+
+            err @ MongoError::FieldMalformedObjectId { .. } => {
+                ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
+            }
 
             MongoError::DriverError(err) => match err.kind.as_ref() {
                 mongodb::error::ErrorKind::InvalidArgument { .. } => {
@@ -213,5 +248,38 @@ impl From<extjson::de::Error> for MongoError {
             // Needed because `extjson::de::Error` is flagged as #[non_exhaustive]
             err => MongoError::UnhandledConversionError(err.into()),
         }
+    }
+}
+
+pub trait DecorateErrorWithFieldInformationExtension {
+    fn decorate_with_field_info(self, field: &Field) -> Self;
+    fn decorate_with_selected_field_info(self, selected_field: &SelectedField) -> Self;
+    fn decorate_with_scalar_field_info(self, sf: &ScalarFieldRef) -> Self;
+    fn decorate_with_field_name(self, field_name: &str) -> Self;
+    fn decorate_with_composite_field_info(self, cf: &CompositeFieldRef) -> Self;
+}
+
+impl<T> DecorateErrorWithFieldInformationExtension for crate::Result<T> {
+    fn decorate_with_field_info(self, field: &Field) -> Self {
+        self.map_err(|err| err.decorate_with_field_name(field.name()))
+    }
+
+    fn decorate_with_selected_field_info(self, selected_field: &SelectedField) -> Self {
+        match selected_field {
+            SelectedField::Scalar(sf) => self.decorate_with_scalar_field_info(sf),
+            SelectedField::Composite(composite_sel) => self.decorate_with_composite_field_info(&composite_sel.field),
+        }
+    }
+
+    fn decorate_with_scalar_field_info(self, sf: &ScalarFieldRef) -> Self {
+        self.map_err(|err| err.decorate_with_field_name(&sf.name))
+    }
+
+    fn decorate_with_field_name(self, field_name: &str) -> Self {
+        self.map_err(|err| err.decorate_with_field_name(field_name))
+    }
+
+    fn decorate_with_composite_field_info(self, cf: &CompositeFieldRef) -> Self {
+        self.map_err(|err| err.decorate_with_field_name(&cf.name))
     }
 }
