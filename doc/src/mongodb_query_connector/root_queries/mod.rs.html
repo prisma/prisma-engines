@@ -42,11 +42,11 @@
 <span id="40">40</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Top level queries to satisfy the connector interface operations.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">aggregate</span>;
-<span class="kw">mod</span> <span class="ident">raw</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">read</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">write</span>;
 
-<span class="kw">mod</span> <span class="ident">update_utils</span>;
+<span class="kw">mod</span> <span class="ident">raw</span>;
+<span class="kw">mod</span> <span class="ident">update</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::DecorateErrorWithFieldInformationExtension</span>, <span class="ident">output_meta::OutputMetaMapping</span>, <span class="ident">value::value_from_bson</span>,

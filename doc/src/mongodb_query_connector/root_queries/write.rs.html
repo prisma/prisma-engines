@@ -428,10 +428,6 @@
 <span id="426">426</span>
 <span id="427">427</span>
 <span id="428">428</span>
-<span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::DecorateErrorWithFieldInformationExtension</span>,
@@ -451,7 +447,7 @@
 };
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">SelectionResult</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">convert::TryInto</span>};
-<span class="kw">use</span> <span class="ident">update_utils</span>::{<span class="ident">IntoUpdateDocumentExtension</span>, <span class="ident">IntoUpdateOperationExtension</span>};
+<span class="kw">use</span> <span class="ident">update::IntoUpdateDocumentExtension</span>;
 
 <span class="doccomment">/// Create a single record to the database resulting in a</span>
 <span class="doccomment">/// `RecordProjection` as an identifier pointing to the just-created document.</span>
@@ -585,7 +581,7 @@
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
     } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">record_filter</span>.<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">record_filter</span>.<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>;
         <span class="ident">find_ids</span>(<span class="ident">coll</span>.<span class="ident">clone</span>(), <span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">filter</span>).<span class="kw">await</span><span class="question-mark">?</span>
     };
 
@@ -608,12 +604,8 @@
 
     <span class="kw">for</span> (<span class="ident">field</span>, <span class="ident">write_op</span>) <span class="kw">in</span> <span class="ident">fields</span> {
         <span class="kw">let</span> <span class="ident">field_path</span> <span class="op">=</span> <span class="ident">FieldPath::new_from_segment</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>);
-        <span class="kw">let</span> <span class="ident">update_ops</span> <span class="op">=</span> <span class="ident">write_op</span>
-            .<span class="ident">into_update_ops</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">field_path</span>)<span class="question-mark">?</span>
-            .<span class="ident">into_update_docs</span>()
-            .<span class="ident">decorate_with_field_info</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>)<span class="question-mark">?</span>;
 
-        <span class="ident">update_docs</span>.<span class="ident">extend</span>(<span class="ident">update_ops</span>);
+        <span class="ident">update_docs</span>.<span class="ident">extend</span>(<span class="ident">write_op</span>.<span class="ident">into_update_docs</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">field_path</span>)<span class="question-mark">?</span>);
     }
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">update_docs</span>.<span class="ident">is_empty</span>() {
@@ -654,7 +646,7 @@
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
     } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">record_filter</span>.<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">record_filter</span>.<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>;
         <span class="ident">find_ids</span>(<span class="ident">coll</span>.<span class="ident">clone</span>(), <span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">filter</span>).<span class="kw">await</span><span class="question-mark">?</span>
     };
 

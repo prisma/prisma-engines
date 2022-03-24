@@ -107,6 +107,36 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::compare::RelationCompare</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::RelationField</span>;
@@ -124,6 +154,22 @@
     <span class="doccomment">/// E.g. if all related records or only some need</span>
     <span class="doccomment">/// to fulfill `nested_filter`.</span>
     <span class="kw">pub</span> <span class="ident">condition</span>: <span class="ident">RelationCondition</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">RelationFilter</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert</span>(<span class="self">self</span>, <span class="ident">invert</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">if</span> <span class="ident">invert</span> {
+            <span class="kw">let</span> <span class="ident">is_to_one</span> <span class="op">=</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">field</span>.<span class="ident">is_list</span>();
+
+            <span class="self">Self</span> {
+                <span class="ident">field</span>: <span class="self">self</span>.<span class="ident">field</span>,
+                <span class="ident">nested_filter</span>: <span class="self">self</span>.<span class="ident">nested_filter</span>,
+                <span class="ident">condition</span>: <span class="self">self</span>.<span class="ident">condition</span>.<span class="ident">invert</span>(<span class="ident">invert</span>, <span class="ident">is_to_one</span>),
+            }
+        } <span class="kw">else</span> {
+            <span class="self">self</span>
+        }
+    }
 }
 
 <span class="doccomment">/// Filter that is solely responsible for checking if</span>
@@ -155,6 +201,20 @@
 <span class="kw">impl</span> <span class="ident">RelationCondition</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert_of_subselect</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">RelationCondition::EveryRelatedRecord</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert</span>(<span class="self">self</span>, <span class="ident">invert</span>: <span class="ident">bool</span>, <span class="ident">to_one</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">if</span> <span class="ident">invert</span> {
+            <span class="kw">match</span> <span class="self">self</span> {
+                <span class="ident">RelationCondition::EveryRelatedRecord</span> =&gt; <span class="ident">RelationCondition::NoRelatedRecord</span>,
+                <span class="ident">RelationCondition::AtLeastOneRelatedRecord</span> =&gt; <span class="ident">RelationCondition::NoRelatedRecord</span>,
+                <span class="ident">RelationCondition::NoRelatedRecord</span> <span class="kw">if</span> <span class="ident">to_one</span> =&gt; <span class="ident">RelationCondition::ToOneRelatedRecord</span>,
+                <span class="ident">RelationCondition::NoRelatedRecord</span> =&gt; <span class="ident">RelationCondition::AtLeastOneRelatedRecord</span>,
+                <span class="ident">RelationCondition::ToOneRelatedRecord</span> =&gt; <span class="ident">RelationCondition::NoRelatedRecord</span>,
+            }
+        } <span class="kw">else</span> {
+            <span class="self">self</span>
+        }
     }
 }
 

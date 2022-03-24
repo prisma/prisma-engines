@@ -401,6 +401,13 @@
 <span id="399">399</span>
 <span id="400">400</span>
 <span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">constants</span>::{<span class="ident">aggregations</span>, <span class="ident">filters</span>, <span class="ident">json_null</span>},
     <span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>, <span class="ident">QueryGraphBuilderError</span>, <span class="ident">QueryGraphBuilderResult</span>,
@@ -730,6 +737,13 @@
 
         <span class="ident">filters::SEARCH</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_search</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
         <span class="ident">filters::SEARCH</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">search</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+
+        <span class="ident">filters::IS_SET</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
+            <span class="kw">let</span> <span class="ident">is_set</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+
+            <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">is_set</span>(<span class="op">!</span><span class="ident">is_set</span>)])
+        }
+        <span class="ident">filters::IS_SET</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">is_set</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)]),
 
         <span class="comment">// List-specific filters</span>
         <span class="ident">filters::HAS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_element</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),

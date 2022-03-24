@@ -112,6 +112,17 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::compare::CompositeCompare</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">CompositeFieldRef</span>, <span class="ident">PrismaValue</span>};
@@ -150,6 +161,9 @@
 
     <span class="doccomment">/// To-one composite only - the composite must not fulfill the filter.</span>
     <span class="ident">IsNot</span>(<span class="ident">Filter</span>),
+
+    <span class="doccomment">/// Checks whether or not the composite field exists (is `undefined` or not)</span>
+    <span class="ident">IsSet</span>(<span class="ident">bool</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">CompositeCompare</span> <span class="kw">for</span> <span class="ident">CompositeFieldRef</span> {
@@ -212,6 +226,14 @@
         <span class="ident">CompositeFilter</span> {
             <span class="ident">field</span>: <span class="self">self</span>.<span class="ident">clone</span>(),
             <span class="ident">condition</span>: <span class="ident">Box::new</span>(<span class="ident">CompositeCondition::Empty</span>(<span class="ident">b</span>)),
+        }
+        .<span class="ident">into</span>()
+    }
+
+    <span class="kw">fn</span> <span class="ident">is_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Filter</span> {
+        <span class="ident">CompositeFilter</span> {
+            <span class="ident">field</span>: <span class="self">self</span>.<span class="ident">clone</span>(),
+            <span class="ident">condition</span>: <span class="ident">Box::new</span>(<span class="ident">CompositeCondition::IsSet</span>(<span class="ident">b</span>)),
         }
         .<span class="ident">into</span>()
     }

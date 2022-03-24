@@ -44,6 +44,7 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
+<span id="45">45</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::extract_filter</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">constants::filters</span>, <span class="ident">ObjectTag</span>, <span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>, <span class="ident">QueryGraphBuilderError</span>, <span class="ident">QueryGraphBuilderResult</span>,
@@ -62,6 +63,7 @@
         <span class="kw">match</span> (<span class="ident">filter_key</span>.<span class="ident">as_ref</span>(), <span class="ident">value</span>) {
             <span class="comment">// Common composite filters.</span>
             (<span class="ident">filters::EQUALS</span>, <span class="ident">input</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)),
+            (<span class="ident">filters::IS_SET</span>, <span class="ident">input</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">field</span>.<span class="ident">is_set</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)),
 
             <span class="comment">// To-many composite filters.</span>
             (<span class="ident">filters::EVERY</span>, <span class="ident">input</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">field</span>.<span class="ident">every</span>(<span class="ident">extract_filter</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">typ</span>)<span class="question-mark">?</span>)),
@@ -69,7 +71,7 @@
             (<span class="ident">filters::NONE</span>, <span class="ident">input</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">field</span>.<span class="ident">none</span>(<span class="ident">extract_filter</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">typ</span>)<span class="question-mark">?</span>)),
             (<span class="ident">filters::IS_EMPTY</span>, <span class="ident">input</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">field</span>.<span class="ident">is_empty</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)),
 
-            <span class="comment">// // To-one composite filters</span>
+            <span class="comment">// To-one composite filters</span>
             (<span class="ident">filters::IS</span>, <span class="ident">ParsedInputValue::Single</span>(<span class="ident">PrismaValue::Null</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">PrismaValue::Null</span>)),
             (<span class="ident">filters::IS</span>, <span class="ident">input</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">field</span>.<span class="ident">is</span>(<span class="ident">extract_filter</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">typ</span>)<span class="question-mark">?</span>)),
 

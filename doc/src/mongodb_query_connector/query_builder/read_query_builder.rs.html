@@ -620,6 +620,16 @@
 <span id="618">618</span>
 <span id="619">619</span>
 <span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cursor</span>::{<span class="ident">CursorBuilder</span>, <span class="ident">CursorData</span>},
     <span class="ident">filter</span>::{<span class="ident">convert_filter</span>, <span class="ident">FilterPrefix</span>},
@@ -789,7 +799,7 @@
         <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">filter</span> {
             <span class="prelude-val">Some</span>(<span class="ident">filter</span>) =&gt; {
                 <span class="comment">// If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.</span>
-                <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">filter_joins</span>) <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>.<span class="ident">render</span>();
+                <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">filter_joins</span>) <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>.<span class="ident">render</span>();
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">filter_joins</span>.<span class="ident">is_empty</span>() {
                     <span class="ident">joins</span>.<span class="ident">extend</span>(<span class="ident">filter_joins</span>);
                     <span class="ident">post_filters</span>.<span class="ident">push</span>(<span class="ident">filter</span>);
@@ -881,7 +891,7 @@
 
         <span class="comment">// Initial $matches</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">query</span> {
-            <span class="ident">stages</span>.<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: <span class="ident">query</span> })
+            <span class="ident">stages</span>.<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: { <span class="string">&quot;$expr&quot;</span>: <span class="ident">query</span> } })
         };
 
         <span class="comment">// Joins ($lookup)</span>
@@ -903,7 +913,11 @@
         <span class="ident">stages</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">order_aggregate_projections</span>);
 
         <span class="comment">// Post-join $matches</span>
-        <span class="ident">stages</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">join_filters</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: <span class="ident">filter</span> }));
+        <span class="ident">stages</span>.<span class="ident">extend</span>(
+            <span class="self">self</span>.<span class="ident">join_filters</span>
+                .<span class="ident">into_iter</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: { <span class="string">&quot;$expr&quot;</span>: <span class="ident">filter</span> } }),
+        );
 
         <span class="comment">// If the query is a group by, then skip, take, sort all apply to the _groups_, not the documents</span>
         <span class="comment">// before. If it is a plain aggregation, then the aggregate stages need to be _after_ these, because</span>
@@ -917,7 +931,7 @@
                 <span class="self">self</span>.<span class="ident">aggregation_filters</span>
                     .<span class="ident">clone</span>()
                     .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: <span class="ident">filter</span> }),
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: { <span class="string">&quot;$expr&quot;</span>: <span class="ident">filter</span> } }),
             );
         }
 
@@ -954,7 +968,7 @@
             <span class="ident">stages</span>.<span class="ident">extend</span>(
                 <span class="self">self</span>.<span class="ident">aggregation_filters</span>
                     .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: <span class="ident">filter</span> }),
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: { <span class="string">&quot;$expr&quot;</span>: <span class="ident">filter</span> } }),
             );
         }
 
@@ -1006,7 +1020,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">outer_stages</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
         <span class="comment">// First match the cursor, then add required ordering joins.</span>
-        <span class="ident">outer_stages</span>.<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: <span class="ident">cursor_data</span>.<span class="ident">cursor_filter</span> });
+        <span class="ident">outer_stages</span>.<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: { <span class="string">&quot;$expr&quot;</span>: <span class="ident">cursor_data</span>.<span class="ident">cursor_filter</span> } });
         <span class="ident">outer_stages</span>.<span class="ident">extend</span>(<span class="ident">order_join_stages</span>);
 
         <span class="ident">outer_stages</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">order_aggregate_projections</span>.<span class="ident">clone</span>());
@@ -1167,7 +1181,13 @@
     <span class="doccomment">/// Adds aggregation filters based on a having scalar filter.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_having</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">having</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span> <span class="ident">having</span> {
-            <span class="kw">let</span> (<span class="ident">filter_doc</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>.<span class="ident">render</span>();
+            <span class="comment">// Having filters can only appear in group by queries.</span>
+            <span class="comment">// All group by fields go into the &quot;_id&quot; key of the result document.</span>
+            <span class="comment">// As it is the only place where the flat scalars are contained for the group,</span>
+            <span class="comment">// we need to refer to that object.</span>
+            <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">FilterPrefix::from</span>(<span class="string">&quot;_id&quot;</span>);
+            <span class="kw">let</span> (<span class="ident">filter_doc</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="ident">prefix</span>)<span class="question-mark">?</span>.<span class="ident">render</span>();
+
             <span class="self">self</span>.<span class="ident">aggregation_filters</span>.<span class="ident">push</span>(<span class="ident">filter_doc</span>);
         }
 

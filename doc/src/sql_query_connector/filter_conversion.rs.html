@@ -762,6 +762,8 @@
 <span id="760">760</span>
 <span id="761">761</span>
 <span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model_extensions</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">connector_interface::filter</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
@@ -1374,6 +1376,7 @@
             <span class="ident">comparable</span>.<span class="ident">not_matches</span>(<span class="ident">query</span>)
         }
         <span class="ident">ScalarCondition::JsonCompare</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+        <span class="ident">ScalarCondition::IsSet</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
     };
 
     <span class="ident">ConditionTree::single</span>(<span class="ident">condition</span>)
@@ -1487,6 +1490,7 @@
             <span class="ident">comparable</span>.<span class="ident">not_matches</span>(<span class="ident">query</span>)
         }
         <span class="ident">ScalarCondition::JsonCompare</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+        <span class="ident">ScalarCondition::IsSet</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
     };
 
     <span class="ident">ConditionTree::single</span>(<span class="ident">condition</span>)

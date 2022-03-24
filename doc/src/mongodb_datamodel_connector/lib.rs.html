@@ -124,6 +124,7 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
+<span id="125">125</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
 <span class="kw">mod</span> <span class="ident">validations</span>;
 
@@ -152,6 +153,7 @@
     <span class="ident">ConnectorCapability::MongoDbQueryRaw</span>,
     <span class="ident">ConnectorCapability::DefaultValueAuto</span>,
     <span class="ident">ConnectorCapability::TwoWayEmbeddedManyToManyRelation</span>,
+    <span class="ident">ConnectorCapability::UndefinedType</span>,
 ];
 
 <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span>;

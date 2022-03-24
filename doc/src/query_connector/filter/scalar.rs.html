@@ -770,6 +770,32 @@
 <span id="768">768</span>
 <span id="769">769</span>
 <span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Filter</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">compare::ScalarCompare</span>, <span class="ident">JsonFilterPath</span>, <span class="ident">JsonTargetType</span>};
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ModelProjection</span>, <span class="ident">PrismaListValue</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>};
@@ -920,6 +946,7 @@
     <span class="ident">JsonCompare</span>(<span class="ident">JsonCondition</span>),
     <span class="ident">Search</span>(<span class="ident">PrismaValue</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarProjection</span><span class="op">&gt;</span>),
     <span class="ident">NotSearch</span>(<span class="ident">PrismaValue</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarProjection</span><span class="op">&gt;</span>),
+    <span class="ident">IsSet</span>(<span class="ident">bool</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
@@ -958,6 +985,7 @@
                 }
                 <span class="ident"><span class="self">Self</span>::Search</span>(<span class="ident">v</span>, <span class="ident">fields</span>) =&gt; <span class="ident"><span class="self">Self</span>::NotSearch</span>(<span class="ident">v</span>, <span class="ident">fields</span>),
                 <span class="ident"><span class="self">Self</span>::NotSearch</span>(<span class="ident">v</span>, <span class="ident">fields</span>) =&gt; <span class="ident"><span class="self">Self</span>::Search</span>(<span class="ident">v</span>, <span class="ident">fields</span>),
+                <span class="ident"><span class="self">Self</span>::IsSet</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::IsSet</span>(<span class="op">!</span><span class="ident">v</span>),
             }
         } <span class="kw">else</span> {
             <span class="self">self</span>
@@ -1155,6 +1183,14 @@
             <span class="ident">mode</span>: <span class="ident">QueryMode::Default</span>,
         })
     }
+
+    <span class="kw">fn</span> <span class="ident">is_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Filter</span> {
+        <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
+            <span class="ident">projection</span>: <span class="ident">ScalarProjection::Single</span>(<span class="ident">Arc::clone</span>(<span class="self">self</span>)),
+            <span class="ident">condition</span>: <span class="ident">ScalarCondition::IsSet</span>(<span class="ident">val</span>),
+            <span class="ident">mode</span>: <span class="ident">QueryMode::Default</span>,
+        })
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">ScalarCompare</span> <span class="kw">for</span> <span class="ident">ModelProjection</span> {
@@ -1347,6 +1383,14 @@
             <span class="ident">mode</span>: <span class="ident">QueryMode::Default</span>,
         })
     }
+
+    <span class="kw">fn</span> <span class="ident">is_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Filter</span> {
+        <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
+            <span class="ident">projection</span>: <span class="ident">ScalarProjection::Compound</span>(<span class="self">self</span>.<span class="ident">scalar_fields</span>().<span class="ident">collect</span>()),
+            <span class="ident">condition</span>: <span class="ident">ScalarCondition::IsSet</span>(<span class="ident">val</span>),
+            <span class="ident">mode</span>: <span class="ident">QueryMode::Default</span>,
+        })
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">ScalarCompare</span> <span class="kw">for</span> <span class="ident">FieldSelection</span> {
@@ -1536,6 +1580,14 @@
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">projection</span>: <span class="ident">ScalarProjection::Compound</span>(<span class="self">self</span>.<span class="ident">as_scalar_fields</span>().<span class="ident">expect</span>(<span class="string">&quot;Todo composites in filters.&quot;</span>)),
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::NotSearch</span>(<span class="ident">val</span>.<span class="ident">into</span>(), <span class="macro">vec!</span>[]),
+            <span class="ident">mode</span>: <span class="ident">QueryMode::Default</span>,
+        })
+    }
+
+    <span class="kw">fn</span> <span class="ident">is_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Filter</span> {
+        <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
+            <span class="ident">projection</span>: <span class="ident">ScalarProjection::Compound</span>(<span class="self">self</span>.<span class="ident">as_scalar_fields</span>().<span class="ident">expect</span>(<span class="string">&quot;Todo composites in filters.&quot;</span>)),
+            <span class="ident">condition</span>: <span class="ident">ScalarCondition::IsSet</span>(<span class="ident">val</span>),
             <span class="ident">mode</span>: <span class="ident">QueryMode::Default</span>,
         })
     }

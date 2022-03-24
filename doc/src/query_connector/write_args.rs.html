@@ -441,7 +441,80 @@
 <span id="439">439</span>
 <span id="440">440</span>
 <span id="441">441</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>};
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>},
+    <span class="ident">Filter</span>,
+};
 <span class="kw">use</span> <span class="ident">chrono::Utc</span>;
 <span class="kw">use</span> <span class="ident">indexmap</span>::{<span class="ident">map::Keys</span>, <span class="ident">IndexMap</span>};
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{
@@ -500,6 +573,10 @@
         <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">ScalarWriteOperation::Set</span>(<span class="ident">pv</span>))
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_unset</span>(<span class="ident">should_unset</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">ScalarWriteOperation::Unset</span>(<span class="ident">should_unset</span>))
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_add</span>(<span class="ident">pv</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">ScalarWriteOperation::Add</span>(<span class="ident">pv</span>))
     }
@@ -537,6 +614,17 @@
             <span class="ident">set</span>: <span class="ident">Box::new</span>(<span class="ident">set</span>),
             <span class="ident">update</span>: <span class="ident">Box::new</span>(<span class="ident">update</span>),
         })
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_update_many</span>(<span class="ident">filter</span>: <span class="ident">Filter</span>, <span class="ident">update</span>: <span class="ident">CompositeWriteOperation</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">CompositeWriteOperation::UpdateMany</span> {
+            <span class="ident">filter</span>,
+            <span class="ident">update</span>: <span class="ident">Box::new</span>(<span class="ident">update</span>),
+        })
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_delete_many</span>(<span class="ident">filter</span>: <span class="ident">Filter</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">CompositeWriteOperation::DeleteMany</span> { <span class="ident">filter</span> })
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarWriteOperation</span><span class="op">&gt;</span> {
@@ -580,6 +668,9 @@
     <span class="doccomment">/// Write plain value to field.</span>
     <span class="ident">Set</span>(<span class="ident">PrismaValue</span>),
 
+    <span class="doccomment">/// Unsets a field (only for MongoDB for now)</span>
+    <span class="ident">Unset</span>(<span class="ident">bool</span>),
+
     <span class="doccomment">/// Add value to field.</span>
     <span class="ident">Add</span>(<span class="ident">PrismaValue</span>),
 
@@ -603,6 +694,13 @@
         <span class="ident">set</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">CompositeWriteOperation</span><span class="op">&gt;</span>,
         <span class="ident">update</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">CompositeWriteOperation</span><span class="op">&gt;</span>,
     },
+    <span class="ident">UpdateMany</span> {
+        <span class="ident">filter</span>: <span class="ident">Filter</span>,
+        <span class="ident">update</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">CompositeWriteOperation</span><span class="op">&gt;</span>,
+    },
+    <span class="ident">DeleteMany</span> {
+        <span class="ident">filter</span>: <span class="ident">Filter</span>,
+    },
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
@@ -612,7 +710,8 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FieldPath</span> {
-    <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">FieldPath</span> {
@@ -623,20 +722,60 @@
         <span class="ident">path</span>
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_alias</span>(<span class="ident">alias</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">alias</span>: <span class="prelude-val">Some</span>(<span class="ident">alias</span>.<span class="ident">into</span>()),
+            <span class="ident">path</span>: <span class="macro">vec!</span>[],
+        }
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_segment</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>) {
         <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>());
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>)
+    <span class="doccomment">/// Keep only the last element of the path</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keep_last</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">drain</span>(<span class="number">0</span>..<span class="self">self</span>.<span class="ident">path</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dollar_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="self">self</span>.<span class="ident">path</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) {
+        <span class="self">self</span>.<span class="ident">path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>[<span class="number">0</span>..<span class="ident">n</span>].<span class="ident">to_vec</span>();
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">include_alias</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
+        <span class="kw">let</span> <span class="ident">rendered_path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>);
+
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">include_alias</span> {
+            <span class="kw">return</span> <span class="ident">rendered_path</span>;
+        }
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">alias</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">alias</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">is_empty</span>() {
+                <span class="ident">alias</span>.<span class="ident">to_owned</span>()
+            } <span class="kw">else</span> {
+                <span class="macro">format!</span>(<span class="string">&quot;${}.{}&quot;</span>, <span class="ident">alias</span>, <span class="ident">rendered_path</span>)
+            }
+        } <span class="kw">else</span> {
+            <span class="ident">rendered_path</span>
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dollar_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">include_alias</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="self">self</span>.<span class="ident">path</span>(<span class="ident">include_alias</span>))
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>)
+        <span class="kw">let</span> <span class="ident">rendered_path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>);
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">alias</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">alias</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">is_empty</span>() {
+                <span class="ident">alias</span>.<span class="ident">to_owned</span>()
+            } <span class="kw">else</span> {
+                <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">alias</span>, <span class="ident">rendered_path</span>)
+            }
+        } <span class="kw">else</span> {
+            <span class="ident">rendered_path</span>
+        }
     }
 }
 
@@ -880,6 +1019,7 @@
         <span class="ident">ScalarWriteOperation::Substract</span>(<span class="ident">rhs</span>) =&gt; <span class="ident">val</span> <span class="op">-</span> <span class="ident">rhs</span>,
         <span class="ident">ScalarWriteOperation::Multiply</span>(<span class="ident">rhs</span>) =&gt; <span class="ident">val</span> <span class="op">*</span> <span class="ident">rhs</span>,
         <span class="ident">ScalarWriteOperation::Divide</span>(<span class="ident">rhs</span>) =&gt; <span class="ident">val</span> <span class="op">/</span> <span class="ident">rhs</span>,
+        <span class="ident">ScalarWriteOperation::Unset</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
     }
 }
 </code></pre></div>

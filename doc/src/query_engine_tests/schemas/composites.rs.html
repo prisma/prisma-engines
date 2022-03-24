@@ -169,6 +169,13 @@
 <span id="167">167</span>
 <span id="168">168</span>
 <span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 
 <span class="doccomment">/// All types Prisma supports on a composite.</span>
@@ -273,11 +280,13 @@
         type CompositeA {
             a_1          String       @default(&quot;a_1 default&quot;) @map(&quot;a1&quot;)
             a_2          Int?
+            a_to_one_b   CompositeB?
             a_to_many_bs CompositeB[]
         }
 
         type CompositeB {
             b_field      Int?         @default(10)
+            b_to_one_c   CompositeC?
             b_to_many_cs CompositeC[]
         }
 
@@ -303,24 +312,29 @@
             to_many_com  CompositeB[] @map(&quot;to_many_composite&quot;)
 
             to_one_rel_id Int?
-            to_one_rel RelatedModel? @relation(name: &quot;ToOne&quot;, fields: [to_one_rel_id], references: [id])
+            to_one_rel    RelatedModel? @relation(name: &quot;ToOne&quot;, fields: [to_one_rel_id], references: [id])
 
-            to_many_rel RelatedModel[] @relation(name: &quot;ToMany&quot;)
+            #m2m(to_many_rel, RelatedModel[], id, Int, ToMany)
         }
 
         type CompositeA {
-            a_1 String @default(&quot;a_1 default&quot;) @map(&quot;a1&quot;)
-            a_2 Int?
+            a_1              String       @default(&quot;a_1 default&quot;) @map(&quot;a1&quot;)
+            a_2              Int?
+            a_to_other_com   CompositeC?
             other_composites CompositeB[]
+            scalar_list      String[]
         }
 
         type CompositeB {
-            b_field        String      @default(&quot;b_field default&quot;)
-            to_other_com   CompositeC? @map(&quot;nested_c&quot;)
+            b_field       String       @default(&quot;b_field default&quot;)
+            to_other_com  CompositeC?  @map(&quot;nested_c&quot;)
+            to_other_coms CompositeC[]
+            scalar_list   String[]
         }
 
         type CompositeC {
-          c_field String @default(&quot;c_field default&quot;)
+          c_field     String @default(&quot;c_field default&quot;)
+          scalar_list String[]
         }
 
         model RelatedModel {
@@ -330,7 +344,7 @@
             to_many_com  CompositeB[] @map(&quot;to_many_composite&quot;)
 
             test_model TestModel? @relation(name: &quot;ToOne&quot;)
-            many_test_model TestModel[] @relation(name: &quot;ToMany&quot;)
+            #m2m(many_test_model, TestModel[], id, Int, ToMany)
         }
 
         &quot;#</span>
