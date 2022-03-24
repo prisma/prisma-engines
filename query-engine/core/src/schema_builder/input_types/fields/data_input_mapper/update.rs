@@ -193,6 +193,10 @@ fn update_operations_object_type(
         fields.push(input_field(operations::DIVIDE, typ, None).optional());
     }
 
+    if ctx.has_capability(ConnectorCapability::UndefinedType) && !sf.is_required() {
+        fields.push(input_field(operations::UNSET, InputType::boolean(), None).optional());
+    }
+
     obj.set_fields(fields);
 
     Arc::downgrade(&obj)

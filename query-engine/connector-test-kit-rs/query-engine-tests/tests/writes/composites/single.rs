@@ -484,7 +484,8 @@ mod update {
             &runner,
             r#"{
           id: 1
-          a: { b: { c: { b: { c: {}} } } }
+          field: "1",
+          a: { b: { c: { c_opt: "nested_1", b: { c: {}} } } }
           b: { c: {} }
         }"#,
         )
@@ -521,6 +522,52 @@ mod update {
           @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":null,"b":{"c":{"b":null}}},"b":null}}}"###
         );
 
+        // Nested scalar
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                a: {
+                  update: { b: { update: { c: { update: { c_opt: { unset: true } } } } } }
+                }
+              }
+            ) {
+              a {
+                a_1
+                a_2
+                b {
+                  c {
+                    c_opt
+                  }
+                }
+              }
+            }
+          }
+          "#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":null,"b":{"c":{"c_opt":null}}}}}}"###
+        );
+
+        // Top-level scalar
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(where: { id: 1 }, data: { field: { unset: true } }) {
+              field
+              a {
+                a_1
+                a_2
+                b {
+                  c {
+                    c_opt
+                  }
+                }
+              }
+            }
+          }
+          "#),
+          @r###"{"data":{"updateOneTestModel":{"field":null,"a":{"a_1":"a_1 default","a_2":null,"b":{"c":{"c_opt":null}}}}}}"###
+        );
+
         Ok(())
     }
 
@@ -541,10 +588,23 @@ mod update {
           @r###"{"data":{"updateOneTestModel":{"b":{"b_field":"b1"}}}}"###
         );
 
+        // Optional scalar
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneTestModel(
+            where: { id: 1 },
+            data: { a: { update: { a_2: { unset: false } } } }
+          ) {
+            a {
+              a_2
+            }
+          }}"#),
+          @r###"{"data":{"updateOneTestModel":{"b":{"b_field":"b1"}}}}"###
+        );
+
         Ok(())
     }
 
-    // Ensures unset is only available on optional field of type composite
+    // Ensures unset is only available on optional scalars/to-one composite
     #[connector_test]
     async fn ensure_unset_unavailable_on_fields(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
