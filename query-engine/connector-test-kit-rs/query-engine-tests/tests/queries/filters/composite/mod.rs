@@ -3,6 +3,7 @@ pub mod equals;
 pub mod every;
 pub mod is;
 pub mod is_empty;
+pub mod is_set;
 pub mod none;
 pub mod some;
 
@@ -94,16 +95,16 @@ async fn create_to_many_nested_test_data(runner: &Runner) -> TestResult<()> {
 #[rustfmt::skip]
 async fn create_to_one_test_data(runner: &Runner) -> TestResult<()> {
     // A few with full data
-    create_row(runner, r#"{ id: 1, a: { a_1: "foo1", a_2: 1, b: { b_field: "b_nested_1", c: {} }}, b: { b_field: "b_1", c: {} } }"#).await?;
-    create_row(runner, r#"{ id: 2, a: { a_1: "foo2", a_2: 2, b: { b_field: "b_nested_2", c: {} }}, b: { b_field: "b_2", c: {} } }"#).await?;
+    create_row(runner, r#"{ id: 1, field: "1", a: { a_1: "foo1", a_2: 1, b: { b_field: "b_nested_1", c: {} }}, b: { b_field: "b_1", c: {} } }"#).await?;
+    create_row(runner, r#"{ id: 2, field: "2", a: { a_1: "foo2", a_2: 2, b: { b_field: "b_nested_2", c: {} }}, b: { b_field: "b_2", c: {} } }"#).await?;
 
     // Optional root `b` (undefined)
     create_row(runner, r#"{ id: 3, a: { a_1: "test", a_2: 10,  b: { b_field: "test", c: {} }} }"#).await?;
     create_row(runner, r#"{ id: 4, a: { a_1: "ofo",  a_2: -100, b: { b_field: "test", c: {} }} }"#).await?;
 
     // Explicit `null` root `b`
-    create_row(runner, r#"{ id: 5, a: { a_1: "nope", a_2: 99,  b: { b_field: "bar", c: {} }}, b: null }"#).await?;
-    create_row(runner, r#"{ id: 6, a: { a_1: "epon", a_2: -1,  b: { b_field: "rab", c: {} }}, b: null }"#).await?;
+    create_row(runner, r#"{ id: 5, field: null, a: { a_1: "nope", a_2: 99,  b: { b_field: "bar", c: {} }}, b: null }"#).await?;
+    create_row(runner, r#"{ id: 6, field: null, a: { a_1: "epon", a_2: -1,  b: { b_field: "rab", c: {} }}, b: null }"#).await?;
 
 
     Ok(())

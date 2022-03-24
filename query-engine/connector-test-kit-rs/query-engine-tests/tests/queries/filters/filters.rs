@@ -126,9 +126,12 @@ mod filter_spec {
     async fn in_null(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        insta::assert_snapshot!(
-          &user_uniques(&runner, r#"(where: { optional: { in: null }})"#).await?,
-          @r###"{"data":{"findManyUser":[{"unique":1},{"unique":2},{"unique":3},{"unique":4}]}}"###
+        match_connector_result!(
+          &runner,
+          user_uniques_query(r#"(where: { optional: { in: null }})"#),
+          // MongoDB excludes undefined fields
+          MongoDb(_) => vec![r#"{"data":{"findManyUser":[]}}"#],
+          _ => vec![r#"{"data":{"findManyUser":[{"unique":1},{"unique":2},{"unique":3},{"unique":4}]}}"#]
         );
 
         Ok(())
@@ -352,10 +355,12 @@ mod filter_spec {
         Ok(())
     }
 
+    fn user_uniques_query(filter: &str) -> String {
+        format!(r#"query {{ findManyUser{} {{ unique }} }}"#, filter)
+    }
+
     async fn user_uniques(runner: &Runner, filter: &str) -> TestResult<String> {
-        let result = runner
-            .query(format!(r#"query {{ findManyUser{} {{ unique }} }}"#, filter))
-            .await?;
+        let result = runner.query(user_uniques_query(filter)).await?;
 
         result.assert_success();
         Ok(result.to_string())

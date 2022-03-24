@@ -18,7 +18,7 @@ mod every {
                   id
               }
           }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6},{"id":7}]}}"###
         );
 
         Ok(())
@@ -38,7 +38,7 @@ mod every {
                   id
               }
           }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":6},{"id":7}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -68,7 +68,7 @@ mod every {
                 id
               }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":6},{"id":7}]}}"###
         );
 
         // `OR` with empty filter returns is a falsey condition, so no records fulfill the condition by default.
@@ -80,7 +80,7 @@ mod every {
               id
             }
           }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -89,7 +89,7 @@ mod every {
                 id
               }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7}]}}"###
         );
 
         // `NOT` with empty filter returns is a truthy condition, so all record fulfill the condition by default.
@@ -99,7 +99,7 @@ mod every {
                 id
               }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":6},{"id":7}]}}"###
         );
 
         Ok(())
@@ -123,7 +123,7 @@ mod every {
                   id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":6},{"id":7}]}}"###
         );
 
         // Explicit AND
@@ -142,7 +142,7 @@ mod every {
                     id
                   }
               }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":6},{"id":7}]}}"###
         );
 
         Ok(())
@@ -164,7 +164,7 @@ mod every {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4},{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4},{"id":5},{"id":6},{"id":7}]}}"###
         );
 
         Ok(())
@@ -195,7 +195,7 @@ mod every {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6},{"id":7},{"id":8},{"id":9},{"id":10}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6},{"id":7},{"id":10}]}}"###
         );
 
         Ok(())
@@ -220,7 +220,7 @@ mod every {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":5},{"id":6},{"id":7}]}}"###
         );
 
         Ok(())
@@ -246,7 +246,7 @@ mod every {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":5},{"id":6},{"id":7}]}}"###
         );
 
         Ok(())

@@ -51,7 +51,7 @@ mod some {
                       id
                   }
               }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7}]}}"###
         );
 
         Ok(())
