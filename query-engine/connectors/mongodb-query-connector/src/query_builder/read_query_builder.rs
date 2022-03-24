@@ -48,9 +48,6 @@ impl PipelineQuery {
         on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
-        println!("------ Aggregate stages ------");
-        println!("{}", serde_json::to_string_pretty(&self.stages)?);
-
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
         let cursor = on_collection
             .aggregate_with_session(self.stages, opts, with_session)

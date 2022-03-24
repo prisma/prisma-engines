@@ -51,8 +51,6 @@ fn convert_filter_internal(
     invert_undefined_exclusion: bool,
     prefix: impl Into<FilterPrefix>,
 ) -> crate::Result<MongoFilter> {
-    dbg!(&filter);
-
     let prefix = prefix.into();
     let filter = fold_compounds(filter);
 
