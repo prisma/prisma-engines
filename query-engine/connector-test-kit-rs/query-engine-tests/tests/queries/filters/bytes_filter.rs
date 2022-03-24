@@ -3,7 +3,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::common_nullable_types))]
 mod bytes_filter_spec {
-    use query_engine_tests::{match_connector_result, run_query};
+    use query_engine_tests::run_query;
 
     #[connector_test]
     async fn basic_where(runner: Runner) -> TestResult<()> {
@@ -36,9 +36,12 @@ mod bytes_filter_spec {
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: null }) { id }}"#),
-          @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        match_connector_result!(
+          &runner,
+          r#"query { findManyTestModel(where: { bytes: null }) { id }}"#,
+          // MongoDB excludes undefined fields
+          MongoDb(_) => vec![r#"{"data":{"findManyTestModel":[]}}"#],
+          _ => vec![r#"{"data":{"findManyTestModel":[{"id":3}]}}"#]
         );
 
         Ok(())
@@ -68,12 +71,9 @@ mod bytes_filter_spec {
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
-        match_connector_result!(
-            &runner,
-            r#"query { findManyTestModel(where: { bytes: { not: { in: ["dGVzdA=="] }}}) { id }}"#,
-            // Mongo selects `null` fields as well.
-            MongoDb(_) => vec![r#"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"#],
-            _ => vec![r#"{"data":{"findManyTestModel":[{"id":2}]}}"#]
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { not: { in: ["dGVzdA=="] }}}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         Ok(())

@@ -26,6 +26,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::MongoDbQueryRaw,
     ConnectorCapability::DefaultValueAuto,
     ConnectorCapability::TwoWayEmbeddedManyToManyRelation,
+    ConnectorCapability::UndefinedType,
 ];
 
 type Result<T> = std::result::Result<T, DatamodelError>;

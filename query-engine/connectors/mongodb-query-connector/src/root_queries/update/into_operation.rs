@@ -23,31 +23,43 @@ impl IntoUpdateOperation for ScalarWriteOperation {
         let dollar_field_path = field_path.dollar_path(true);
 
         let doc = match self {
-            ScalarWriteOperation::Add(rhs) if field.is_list() => render_push_update_doc(rhs, field, field_path)?,
+            ScalarWriteOperation::Add(rhs) if field.is_list() => Some(render_push_update_doc(rhs, field, field_path)?),
             // We use $literal to enable the set of empty object, which is otherwise considered a syntax error
-            ScalarWriteOperation::Set(rhs) => {
-                UpdateOperation::generic(field_path, doc! { "$literal": (field, rhs).into_bson()? })
-            }
-            ScalarWriteOperation::Add(rhs) => UpdateOperation::generic(
+            ScalarWriteOperation::Set(rhs) => Some(UpdateOperation::generic(
+                field_path,
+                doc! { "$literal": (field, rhs).into_bson()? },
+            )),
+            ScalarWriteOperation::Add(rhs) => Some(UpdateOperation::generic(
                 field_path,
                 doc! { "$add": [dollar_field_path, (field, rhs).into_bson()?] },
-            ),
-            ScalarWriteOperation::Substract(rhs) => UpdateOperation::generic(
+            )),
+            ScalarWriteOperation::Substract(rhs) => Some(UpdateOperation::generic(
                 field_path,
                 doc! { "$subtract": [dollar_field_path, (field, rhs).into_bson()?] },
-            ),
-            ScalarWriteOperation::Multiply(rhs) => UpdateOperation::generic(
+            )),
+            ScalarWriteOperation::Multiply(rhs) => Some(UpdateOperation::generic(
                 field_path,
                 doc! { "$multiply": [dollar_field_path, (field, rhs).into_bson()?] },
-            ),
-            ScalarWriteOperation::Divide(rhs) => UpdateOperation::generic(
+            )),
+            ScalarWriteOperation::Divide(rhs) => Some(UpdateOperation::generic(
                 field_path,
                 doc! { "$divide": [dollar_field_path, (field, rhs).into_bson()?] },
-            ),
+            )),
+            ScalarWriteOperation::Unset(should_unset) => {
+                if should_unset {
+                    Some(UpdateOperation::unset(field_path))
+                } else {
+                    None
+                }
+            }
             ScalarWriteOperation::Field(_) => unimplemented!(),
         };
 
-        Ok(vec![doc])
+        if let Some(doc) = doc {
+            Ok(vec![doc])
+        } else {
+            Ok(vec![])
+        }
     }
 }
 
@@ -100,7 +112,7 @@ impl IntoUpdateOperation for CompositeWriteOperation {
             }
             CompositeWriteOperation::DeleteMany { filter } => {
                 let elem_alias = format!("{}_item", path.identifier());
-                let (filter_doc, _) = filter::convert_filter(filter, true, false, elem_alias.clone())?.render();
+                let (filter_doc, _) = filter::convert_filter(filter, true, format!("${}", &elem_alias))?.render();
 
                 let filter = doc! {
                     "$filter": {

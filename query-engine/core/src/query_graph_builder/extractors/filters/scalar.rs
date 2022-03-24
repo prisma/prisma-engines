@@ -328,6 +328,13 @@ fn parse_internal_scalar(
         filters::SEARCH if reverse => Ok(vec![field.not_search(as_prisma_value(input)?)]),
         filters::SEARCH => Ok(vec![field.search(as_prisma_value(input)?)]),
 
+        filters::IS_SET if reverse => {
+            let is_set: bool = input.try_into()?;
+
+            Ok(vec![field.is_set(!is_set)])
+        }
+        filters::IS_SET => Ok(vec![field.is_set(input.try_into()?)]),
+
         // List-specific filters
         filters::HAS => Ok(vec![field.contains_element(as_prisma_value(input)?)]),
         filters::HAS_EVERY => Ok(vec![field.contains_every_element(as_prisma_value_list(input)?)]),

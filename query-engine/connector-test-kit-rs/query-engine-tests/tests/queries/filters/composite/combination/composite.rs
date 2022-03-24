@@ -1,7 +1,7 @@
 use super::*;
 
 #[test_suite(schema(to_many_composites), only(MongoDb))]
-mod combination {
+mod composite_combination {
     // Over to-one to to-many (both composites)
     #[connector_test]
     async fn com_to_one_2_to_many(runner: Runner) -> TestResult<()> {
@@ -23,7 +23,7 @@ mod combination {
                   id
               }
           }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":6},{"id":8},{"id":9},{"id":10},{"id":11}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":6}]}}"###
         );
 
         Ok(())
