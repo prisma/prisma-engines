@@ -359,7 +359,7 @@ fn full_scalar_filter_type(
         }
     }
 
-    if ctx.has_capability(ConnectorCapability::UndefinedType) && !list {
+    if ctx.has_capability(ConnectorCapability::UndefinedType) && (list || nullable) {
         fields.push(is_set_input_field());
     }
 

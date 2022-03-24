@@ -251,6 +251,18 @@ mod is_set_to_one {
         Ok(())
     }
 
+    #[connector_test]
+    async fn fails_on_required(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            r#"{ findManyTestModel(where: { a: { isSet: true } }) { id } }"#,
+            2009,
+            "Query.findManyTestModel.where.TestModelWhereInput.a.ACompositeFilter.isSet"
+        );
+
+        Ok(())
+    }
+
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
             .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
@@ -505,6 +517,18 @@ mod is_set_scalar {
             }
           ) { id } }"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn fails_on_required(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            r#"{ findManyTestModel(where: { id: { isSet: true } }) { id } }"#,
+            2009,
+            "Query.findManyTestModel.where.TestModelWhereInput.id.IntFilter.isSet`: Field does not exist on enclosing type"
         );
 
         Ok(())
