@@ -351,6 +351,8 @@
 <span id="349">349</span>
 <span id="350">350</span>
 <span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A container to manage 0 or more migration connectors, based on request contents.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Why this rather than using connectors directly? We must be able to use the migration engine</span>
@@ -409,14 +411,16 @@
         <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">f</span>: <span class="ident">ConnectorRequest</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">config_dir</span> <span class="op">=</span> <span class="ident">std::path::Path::new</span>(<span class="ident">path</span>).<span class="ident">parent</span>();
         <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">std::fs::read_to_string</span>(<span class="ident">path</span>)
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ConnectorError::from_source</span>(<span class="ident">err</span>, <span class="string">&quot;Falied to read Prisma schema.&quot;</span>))<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">with_connector_for_schema</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">with_connector_for_schema</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>, <span class="ident">config_dir</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_connector_for_schema</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">config_dir</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Path</span><span class="op">&gt;</span>,
         <span class="ident">f</span>: <span class="ident">ConnectorRequest</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">response_sender</span>, <span class="ident">response_receiver</span>) <span class="op">=</span> <span class="ident">tokio::sync::oneshot::channel</span>::<span class="op">&lt;</span><span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>();
@@ -437,7 +441,7 @@
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;tokio mpsc send error&quot;</span>.<span class="ident">to_owned</span>())),
             },
             <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::schema_to_connector</span>(<span class="ident">schema</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::schema_to_connector</span>(<span class="ident">schema</span>, <span class="ident">config_dir</span>)<span class="question-mark">?</span>;
                 <span class="ident">connector</span>.<span class="ident">set_host</span>(<span class="self">self</span>.<span class="ident">host</span>.<span class="ident">clone</span>());
                 <span class="kw">let</span> (<span class="ident">erased_sender</span>, <span class="kw-2">mut</span> <span class="ident">erased_receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>::<span class="op">&lt;</span><span class="ident">ErasedConnectorRequest</span><span class="op">&gt;</span>(<span class="number">12</span>);
                 <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
@@ -505,7 +509,7 @@
             }
             <span class="ident">DatasourceParam::SchemaPath</span>(<span class="ident">PathContainer</span> { <span class="ident">path</span> }) =&gt; <span class="self">self</span>.<span class="ident">with_connector_from_schema_path</span>(<span class="ident">path</span>, <span class="ident">f</span>).<span class="kw">await</span>,
             <span class="ident">DatasourceParam::SchemaString</span>(<span class="ident">SchemaContainer</span> { <span class="ident">schema</span> }) =&gt; {
-                <span class="self">self</span>.<span class="ident">with_connector_for_schema</span>(<span class="ident">schema</span>, <span class="ident">f</span>).<span class="kw">await</span>
+                <span class="self">self</span>.<span class="ident">with_connector_for_schema</span>(<span class="ident">schema</span>, <span class="prelude-val">None</span>, <span class="ident">f</span>).<span class="kw">await</span>
             }
         }
     }
@@ -520,7 +524,7 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;Missing --datamodel&quot;</span>.<span class="ident">to_owned</span>()));
         };
 
-        <span class="self">self</span>.<span class="ident">with_connector_for_schema</span>(<span class="ident">schema</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">with_connector_for_schema</span>(<span class="ident">schema</span>, <span class="prelude-val">None</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
 }
 
