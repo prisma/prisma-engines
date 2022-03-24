@@ -467,7 +467,14 @@ fn render_column_type(col: &ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<
         PostgresType::Real => "REAL".into(),
         PostgresType::DoublePrecision => "DOUBLE PRECISION".into(),
         PostgresType::VarChar(length) => format!("VARCHAR{}", render(length)).into(),
-        PostgresType::Char(length) => format!("CHAR{}", render(length)).into(),
+        PostgresType::Char(length) => {
+            // https://www.cockroachlabs.com/docs/stable/string.html
+            if flavour.is_cockroachdb() && length.is_none() {
+                r#""char""#.into()
+            } else {
+                format!("CHAR{}", render(length)).into()
+            }
+        }
         PostgresType::Text => "TEXT".into(),
         PostgresType::ByteA => "BYTEA".into(),
         PostgresType::Date => "DATE".into(),
