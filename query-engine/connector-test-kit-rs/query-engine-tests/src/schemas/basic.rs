@@ -31,7 +31,7 @@ pub fn user() -> String {
 }
 
 /// Test model containing all possible Prisma scalar types, nullable.
-/// Excludes capability-dependent types (e.g. JSON).
+/// Excludes capability-dependent types (e.g. JSON, Decimal).
 pub fn common_nullable_types() -> String {
     let schema = indoc! {
         "model TestModel {
@@ -40,7 +40,6 @@ pub fn common_nullable_types() -> String {
             int     Int?
             bInt    BigInt?
             float   Float?
-            decimal Decimal?
             bytes   Bytes?
             bool    Boolean?
             dt      DateTime?

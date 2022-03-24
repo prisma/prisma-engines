@@ -178,6 +178,10 @@ dev-vitess_8_0: start-vitess_8_0
 # Local dev commands #
 ######################
 
+# Quick schema validation of whatever you have in the dev_datamodel.prisma file.
+validate:
+	cargo run --bin test-cli -- validate-datamodel dev_datamodel.prisma
+
 qe:
 	cargo run --bin query-engine -- --enable-playground --enable-raw-queries
 

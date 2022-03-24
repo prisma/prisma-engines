@@ -87,6 +87,7 @@ capabilities!(
     FullTextSearchWithIndex,
     AdvancedJsonNullability, // Database distinguishes between their null type and JSON null.
     UndefinedType,           // Database distinguishes `null` and `undefined`
+    DecimalType,             // Connector supports Prisma Decimal type.
 );
 
 /// Contains all capabilities that the connector is able to serve.
