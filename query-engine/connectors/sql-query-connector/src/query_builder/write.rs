@@ -156,6 +156,8 @@ pub fn update_many(
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e / field.value(rhs).into()
                 }
+
+                ScalarWriteOperation::Unset(_) => unreachable!("Unset is not supported on SQL connectors"),
             };
 
             acc.set(name, value)

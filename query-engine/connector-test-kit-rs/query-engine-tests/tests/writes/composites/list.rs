@@ -1018,6 +1018,7 @@ mod update {
 
         type CompositeC {
           c_field        Int         @map("c_int") @default(0)
+          c_opt_field    Int?        @map("c_opt_int") @default(0)
           c_to_one_d_opt CompositeD? @map("to_one_d")
           c_to_one_e_opt CompositeE? @map("to_one_e")
         }
@@ -1173,6 +1174,7 @@ mod update {
                         b_to_one_c: {
                           update: {
                             c_field: 1,
+                            c_opt_field: { unset: true }
                             c_to_one_d_opt: { unset: true },
                             c_to_one_e_opt: { unset: true },
                           }
@@ -1190,6 +1192,7 @@ mod update {
                   b_field
                   b_to_one_c {
                     c_field
+                    c_opt_field
                     c_to_one_d_opt { d_field }
                     c_to_one_e_opt { e_field }
                   }
@@ -1197,7 +1200,7 @@ mod update {
               }
             }
           }"#),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_field":1,"a_to_one_b":{"b_field":1,"b_to_one_c":{"c_field":1,"c_to_one_d_opt":null,"c_to_one_e_opt":null}}}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_field":1,"a_to_one_b":{"b_field":1,"b_to_one_c":{"c_field":1,"c_opt_field":null,"c_to_one_d_opt":null,"c_to_one_e_opt":null}}}]}}}"###
         );
 
         // (nested multiple unsets without any other updates) within updateMany
@@ -1212,6 +1215,7 @@ mod update {
                       update: {
                         b_to_one_c: {
                           update: {
+                            c_opt_field: { unset: true }
                             c_to_one_d_opt: { unset: true },
                             c_to_one_e_opt: { unset: true },
                           }
@@ -1229,6 +1233,7 @@ mod update {
                   b_field
                   b_to_one_c {
                     c_field
+                    c_opt_field
                     c_to_one_d_opt { d_field }
                     c_to_one_e_opt { e_field }
                   }
@@ -1236,7 +1241,7 @@ mod update {
               }
             }
           }"#),
-          @r###"{"data":{"updateOneTestModel":{"id":2,"to_many_as":[{"a_field":0,"a_to_one_b":{"b_field":0,"b_to_one_c":{"c_field":1,"c_to_one_d_opt":null,"c_to_one_e_opt":null}}}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":2,"to_many_as":[{"a_field":0,"a_to_one_b":{"b_field":0,"b_to_one_c":{"c_field":1,"c_opt_field":null,"c_to_one_d_opt":null,"c_to_one_e_opt":null}}}]}}}"###
         );
 
         // (nested multiple unsets + scalar updates) within upsert within updateMany
@@ -1256,6 +1261,7 @@ mod update {
                             set: { c_field: 0 },
                             update: {
                               c_field: 2,
+                              c_opt_field: { unset: true }
                               c_to_one_d_opt: { unset: true },
                               c_to_one_e_opt: { unset: true },
                             }
@@ -1274,6 +1280,7 @@ mod update {
                   b_field
                   b_to_one_c_opt {
                     c_field
+                    c_opt_field
                     c_to_one_d_opt { d_field }
                     c_to_one_e_opt { e_field }
                   }
@@ -1281,7 +1288,7 @@ mod update {
               }
             }
           }"#),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_field":2,"a_to_one_b":{"b_field":2,"b_to_one_c_opt":{"c_field":2,"c_to_one_d_opt":null,"c_to_one_e_opt":null}}}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_field":2,"a_to_one_b":{"b_field":2,"b_to_one_c_opt":{"c_field":2,"c_opt_field":null,"c_to_one_d_opt":null,"c_to_one_e_opt":null}}}]}}}"###
         );
 
         Ok(())

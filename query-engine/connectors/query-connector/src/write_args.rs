@@ -60,6 +60,10 @@ impl WriteOperation {
         Self::Scalar(ScalarWriteOperation::Set(pv))
     }
 
+    pub fn scalar_unset(should_unset: bool) -> Self {
+        Self::Scalar(ScalarWriteOperation::Unset(should_unset))
+    }
+
     pub fn scalar_add(pv: PrismaValue) -> Self {
         Self::Scalar(ScalarWriteOperation::Add(pv))
     }
@@ -150,6 +154,9 @@ pub enum ScalarWriteOperation {
 
     /// Write plain value to field.
     Set(PrismaValue),
+
+    /// Unsets a field (only for MongoDB for now)
+    Unset(bool),
 
     /// Add value to field.
     Add(PrismaValue),
@@ -499,5 +506,6 @@ pub fn apply_expression(val: PrismaValue, scalar_write: ScalarWriteOperation) ->
         ScalarWriteOperation::Substract(rhs) => val - rhs,
         ScalarWriteOperation::Multiply(rhs) => val * rhs,
         ScalarWriteOperation::Divide(rhs) => val / rhs,
+        ScalarWriteOperation::Unset(_) => unimplemented!(),
     }
 }

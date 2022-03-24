@@ -78,6 +78,7 @@ fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue) -> Result<WriteOperati
 
             let write_op = match operation.as_str() {
                 operations::SET => WriteOperation::scalar_set(value),
+                operations::UNSET => WriteOperation::scalar_unset(*value.as_boolean().unwrap()),
                 operations::INCREMENT => WriteOperation::scalar_add(value),
                 operations::DECREMENT => WriteOperation::scalar_substract(value),
                 operations::MULTIPLY => WriteOperation::scalar_multiply(value),
