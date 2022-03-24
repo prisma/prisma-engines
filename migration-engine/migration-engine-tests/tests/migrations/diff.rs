@@ -4,7 +4,7 @@ use migration_core::{
     migration_connector::MigrationConnector,
 };
 use migration_engine_tests::test_api::*;
-use quaint::prelude::Queryable;
+use quaint::{prelude::Queryable, single::Quaint};
 use std::sync::Arc;
 
 #[test_connector(tags(Sqlite))]
@@ -205,6 +205,54 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
     let expected_printed_messages = expect![[r#"
         [
             "-- DropTable\nPRAGMA foreign_keys=off;\nDROP TABLE \"cows\";\nPRAGMA foreign_keys=on;\n\n-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n    \"meows\" BOOLEAN DEFAULT true\n);\n",
+        ]
+    "#]];
+    expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
+}
+
+#[test_connector(tags(Sqlite))]
+fn from_schema_datasource_relative(mut api: TestApi) {
+    let host = Arc::new(TestConnectorHost::default());
+    api.connector.set_host(host.clone());
+
+    let tmpdir = tempfile::tempdir().unwrap();
+    let prisma_dir = tmpdir.path().join("prisma");
+    std::fs::create_dir_all(&prisma_dir).unwrap();
+    let schema_path = prisma_dir.join("schema.prisma");
+    let schema = r#"
+        datasource db {
+          provider = "sqlite"
+          url = "file:./dev.db"
+        }
+    "#;
+
+    std::fs::write(&schema_path, schema).unwrap();
+
+    let expected_sqlite_path = prisma_dir.join("dev.db");
+
+    tok(async {
+        let path = expected_sqlite_path.to_str().unwrap();
+        let quaint = Quaint::new(&format!("file:{path}")).await.unwrap();
+        quaint.raw_cmd("CREATE TABLE foo (id INT PRIMARY KEY)").await.unwrap();
+    });
+
+    assert!(expected_sqlite_path.exists());
+
+    let params = DiffParams {
+        exit_code: None,
+        from: DiffTarget::SchemaDatasource(SchemaContainer {
+            schema: schema_path.to_string_lossy().into_owned(),
+        }),
+        script: true,
+        shadow_database_url: None,
+        to: DiffTarget::Empty,
+    };
+
+    api.diff(params).unwrap();
+
+    let expected_printed_messages = expect![[r#"
+        [
+            "-- DropTable\nPRAGMA foreign_keys=off;\nDROP TABLE \"foo\";\nPRAGMA foreign_keys=on;\n",
         ]
     "#]];
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());

@@ -79,7 +79,8 @@ async fn json_rpc_diff_target_to_connector(
         DiffTarget::Empty => Ok(None),
         DiffTarget::SchemaDatasource(SchemaContainer { schema }) => {
             let schema_contents = read_prisma_schema_from_path(schema)?;
-            let mut connector = crate::schema_to_connector(&schema_contents)?;
+            let schema_dir = std::path::Path::new(schema).parent();
+            let mut connector = crate::schema_to_connector(&schema_contents, schema_dir)?;
             let schema = connector
                 .database_schema_from_diff_target(McDiff::Database, None)
                 .await?;
