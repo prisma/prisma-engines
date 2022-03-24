@@ -221,7 +221,7 @@ impl FieldPath {
     }
 
     /// Keep only the last element of the path
-    pub fn keep_only_target(&mut self) {
+    pub fn keep_last(&mut self) {
         self.path.drain(0..self.path.len() - 1);
     }
 

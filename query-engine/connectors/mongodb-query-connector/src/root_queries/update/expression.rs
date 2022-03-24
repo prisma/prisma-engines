@@ -171,23 +171,23 @@ impl MergeObjects {
             match op {
                 operation::UpdateOperation::Generic(generic) => {
                     let mut set = generic.into_update_expression()?.try_into_set().unwrap();
-                    set.field_path.keep_only_target();
+                    set.field_path.keep_last();
 
                     merge_doc.insert_set(set);
                 }
                 operation::UpdateOperation::UpdateMany(update_many) => {
                     let mut set = update_many.into_update_expression()?.try_into_set().unwrap();
-                    set.field_path.keep_only_target();
+                    set.field_path.keep_last();
 
                     merge_doc.insert_set(set);
                 }
                 operation::UpdateOperation::Upsert(mut upsert) => {
-                    upsert.field_path.keep_only_target();
+                    upsert.field_path.keep_last();
 
                     merge_doc.insert_upsert(upsert)?;
                 }
                 operation::UpdateOperation::Unset(mut unset) => {
-                    unset.field_path.keep_only_target();
+                    unset.field_path.keep_last();
 
                     merge_doc.insert_unset(unset);
                 }

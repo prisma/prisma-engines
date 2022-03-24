@@ -178,9 +178,6 @@ pub async fn update_records<'conn>(
         update_docs.extend(write_op.into_update_docs(&field, field_path)?);
     }
 
-    println!("--------- Update documents ---------");
-    println!("{}", serde_json::to_string_pretty(&update_docs)?);
-
     if !update_docs.is_empty() {
         logger::log_update_many_vec(coll.name(), &filter, &update_docs);
         coll.update_many_with_session(filter, update_docs, None, session)
