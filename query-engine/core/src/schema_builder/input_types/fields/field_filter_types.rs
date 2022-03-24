@@ -121,7 +121,11 @@ fn to_one_composite_filter_shorthand_types(ctx: &mut BuilderContext, cf: &Compos
 
 #[tracing::instrument(skip(ctx, cf))]
 fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(format!("{}CompositeFilter", capitalize(&cf.typ.name)), PRISMA_NAMESPACE);
+    let nullable = if cf.is_optional() { "Nullable" } else { "" };
+    let ident = Identifier::new(
+        format!("{}{}CompositeFilter", capitalize(&cf.typ.name), nullable),
+        PRISMA_NAMESPACE,
+    );
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
@@ -135,7 +139,7 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldR
     let composite_where_object = filter_objects::where_object_type(ctx, &cf.typ);
     let composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
 
-    let fields = vec![
+    let mut fields = vec![
         input_field(filters::EQUALS, InputType::object(composite_equals_object), None)
             .optional()
             .nullable_if(!cf.is_required()),
@@ -146,6 +150,10 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldR
             .optional()
             .nullable_if(!cf.is_required()),
     ];
+
+    if ctx.has_capability(ConnectorCapability::UndefinedType) && cf.is_optional() {
+        fields.push(is_set_input_field());
+    }
 
     object.set_fields(fields);
     Arc::downgrade(&object)
@@ -169,7 +177,7 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
     let composite_where_object = filter_objects::where_object_type(ctx, &cf.typ);
     let composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
 
-    let fields = vec![
+    let mut fields = vec![
         input_field(
             filters::EQUALS,
             InputType::list(InputType::object(composite_equals_object)),
@@ -181,6 +189,11 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
         input_field(filters::NONE, InputType::object(composite_where_object), None).optional(),
         input_field(filters::IS_EMPTY, InputType::boolean(), None).optional(),
     ];
+
+    // TODO: Remove from required lists once we have optional lists
+    if ctx.has_capability(ConnectorCapability::UndefinedType) {
+        fields.push(is_set_input_field());
+    }
 
     object.set_fields(fields);
     Arc::downgrade(&object)
@@ -346,8 +359,16 @@ fn full_scalar_filter_type(
         }
     }
 
+    if ctx.has_capability(ConnectorCapability::UndefinedType) && (list || nullable) {
+        fields.push(is_set_input_field());
+    }
+
     object.set_fields(fields);
     Arc::downgrade(&object)
+}
+
+fn is_set_input_field() -> InputField {
+    input_field(filters::IS_SET, InputType::boolean(), None).optional()
 }
 
 fn equality_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<Item = InputField> {

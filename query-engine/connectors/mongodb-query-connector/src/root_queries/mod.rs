@@ -1,10 +1,10 @@
 //! Top level queries to satisfy the connector interface operations.
 pub mod aggregate;
-mod raw;
 pub mod read;
 pub mod write;
 
-mod update_utils;
+mod raw;
+mod update;
 
 use crate::{
     error::DecorateErrorWithFieldInformationExtension, output_meta::OutputMetaMapping, value::value_from_bson,

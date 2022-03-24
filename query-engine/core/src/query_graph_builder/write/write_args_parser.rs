@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    constants::{json_null, operations},
+    constants::{args, json_null, operations},
     query_document::{ParsedInputMap, ParsedInputValue},
     ObjectTag,
 };
@@ -78,6 +78,7 @@ fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue) -> Result<WriteOperati
 
             let write_op = match operation.as_str() {
                 operations::SET => WriteOperation::scalar_set(value),
+                operations::UNSET => WriteOperation::scalar_unset(*value.as_boolean().unwrap()),
                 operations::INCREMENT => WriteOperation::scalar_add(value),
                 operations::DECREMENT => WriteOperation::scalar_substract(value),
                 operations::MULTIPLY => WriteOperation::scalar_multiply(value),
@@ -149,10 +150,38 @@ fn parse_composite_envelope(
         operations::UNSET => parse_composite_unset(value.try_into()?),
         operations::UPDATE => parse_composite_updates(cf, value.try_into()?, path)?,
         operations::UPSERT => parse_composite_upsert(cf, value.try_into()?, path)?,
+        operations::UPDATE_MANY => parse_composite_update_many(cf, value.try_into()?, path)?,
+        operations::DELETE_MANY => parse_composite_delete_many(cf, value.try_into()?)?,
         _ => unimplemented!(),
     };
 
     Ok(write_op)
+}
+
+fn parse_composite_update_many(
+    cf: &CompositeFieldRef,
+    mut value: ParsedInputMap,
+    path: &mut Vec<DatasourceFieldName>,
+) -> QueryGraphBuilderResult<WriteOperation> {
+    let where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()?;
+    let filter = extract_filter(where_map, &cf.typ)?;
+
+    let update_map: ParsedInputMap = value.remove(args::DATA).unwrap().try_into()?;
+    let update = parse_composite_updates(cf, update_map, path)?
+        .try_into_composite()
+        .unwrap();
+
+    Ok(WriteOperation::composite_update_many(filter, update))
+}
+
+fn parse_composite_delete_many(
+    cf: &CompositeFieldRef,
+    mut value: ParsedInputMap,
+) -> QueryGraphBuilderResult<WriteOperation> {
+    let where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()?;
+    let filter = extract_filter(where_map, &cf.typ)?;
+
+    Ok(WriteOperation::composite_delete_many(filter))
 }
 
 fn parse_composite_upsert(

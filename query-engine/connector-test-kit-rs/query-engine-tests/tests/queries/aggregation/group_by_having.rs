@@ -343,22 +343,21 @@ mod aggregation_group_by_having {
         );
 
         match_connector_result!(
-            runner,
-            r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-              float: { _min: { not: { equals: 0 }}}
-              int: { _min: { not: { equals: 0 }}}
-              decimal: { _min: { not: { equals: "0" }}}
-            }) {
-              string
-              _min {
-                float
-                int
-                decimal
-              }
+          &runner,
+          r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+            float: { _min: { not: { equals: 0 }}}
+            int: { _min: { not: { equals: 0 }}}
+            decimal: { _min: { not: { equals: "0" }}}
+          }) {
+            string
+            _min {
+              float
+              int
+              decimal
             }
-          }"#,
-          // Since MongoDB doesn't have the concept of `NULL` `not equals 10` includes `null` records
-          // The result _is_ empty on SQL though
+          }
+        }"#,
+          // MongoDB returns null for aggregations on undefined fields, so it's included
           MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group3","_min":{"float":null,"int":null,"decimal":null}}]}}"#],
           _ => vec![r#"{"data":{"groupByTestModel":[]}}"#]
         );
@@ -430,22 +429,21 @@ mod aggregation_group_by_having {
         );
 
         match_connector_result!(
-            runner,
-            r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-              float: { _max: { not: { equals: 10 }}}
-              int: { _max: { not: { equals: 10 }}}
-              decimal: { _max: { not: { equals: "10" }}}
-            }) {
-              string
-              _max {
-                float
-                int
-                decimal
-              }
+          &runner,
+          r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+            float: { _max: { not: { equals: 10 }}}
+            int: { _max: { not: { equals: 10 }}}
+            decimal: { _max: { not: { equals: "10" }}}
+          }) {
+            string
+            _max {
+              float
+              int
+              decimal
             }
-          }"#,
-          // Since MongoDB doesn't have the concept of `NULL` `not equals 10` includes `null` records
-          // The result _is_ empty on SQL though
+          }
+        }"#,
+          // MongoDB returns null for aggregations on undefined fields, so it's included
           MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group3","_max":{"float":null,"int":null,"decimal":null}}]}}"#],
           _ => vec![r#"{"data":{"groupByTestModel":[]}}"#]
         );

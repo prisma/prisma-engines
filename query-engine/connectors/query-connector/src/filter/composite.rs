@@ -36,6 +36,9 @@ pub enum CompositeCondition {
 
     /// To-one composite only - the composite must not fulfill the filter.
     IsNot(Filter),
+
+    /// Checks whether or not the composite field exists (is `undefined` or not)
+    IsSet(bool),
 }
 
 impl CompositeCompare for CompositeFieldRef {
@@ -98,6 +101,14 @@ impl CompositeCompare for CompositeFieldRef {
         CompositeFilter {
             field: self.clone(),
             condition: Box::new(CompositeCondition::Empty(b)),
+        }
+        .into()
+    }
+
+    fn is_set(&self, b: bool) -> Filter {
+        CompositeFilter {
+            field: self.clone(),
+            condition: Box::new(CompositeCondition::IsSet(b)),
         }
         .into()
     }

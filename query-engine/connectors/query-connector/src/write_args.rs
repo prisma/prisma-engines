@@ -1,4 +1,7 @@
-use crate::error::{ConnectorError, ErrorKind};
+use crate::{
+    error::{ConnectorError, ErrorKind},
+    Filter,
+};
 use chrono::Utc;
 use indexmap::{map::Keys, IndexMap};
 use prisma_models::{
@@ -57,6 +60,10 @@ impl WriteOperation {
         Self::Scalar(ScalarWriteOperation::Set(pv))
     }
 
+    pub fn scalar_unset(should_unset: bool) -> Self {
+        Self::Scalar(ScalarWriteOperation::Unset(should_unset))
+    }
+
     pub fn scalar_add(pv: PrismaValue) -> Self {
         Self::Scalar(ScalarWriteOperation::Add(pv))
     }
@@ -94,6 +101,17 @@ impl WriteOperation {
             set: Box::new(set),
             update: Box::new(update),
         })
+    }
+
+    pub fn composite_update_many(filter: Filter, update: CompositeWriteOperation) -> Self {
+        Self::Composite(CompositeWriteOperation::UpdateMany {
+            filter,
+            update: Box::new(update),
+        })
+    }
+
+    pub fn composite_delete_many(filter: Filter) -> Self {
+        Self::Composite(CompositeWriteOperation::DeleteMany { filter })
     }
 
     pub fn as_scalar(&self) -> Option<&ScalarWriteOperation> {
@@ -137,6 +155,9 @@ pub enum ScalarWriteOperation {
     /// Write plain value to field.
     Set(PrismaValue),
 
+    /// Unsets a field (only for MongoDB for now)
+    Unset(bool),
+
     /// Add value to field.
     Add(PrismaValue),
 
@@ -160,6 +181,13 @@ pub enum CompositeWriteOperation {
         set: Box<CompositeWriteOperation>,
         update: Box<CompositeWriteOperation>,
     },
+    UpdateMany {
+        filter: Filter,
+        update: Box<CompositeWriteOperation>,
+    },
+    DeleteMany {
+        filter: Filter,
+    },
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -169,7 +197,8 @@ pub struct NestedWrite {
 
 #[derive(Debug, Clone, Default)]
 pub struct FieldPath {
-    path: Vec<String>,
+    pub alias: Option<String>,
+    pub path: Vec<String>,
 }
 
 impl FieldPath {
@@ -180,20 +209,60 @@ impl FieldPath {
         path
     }
 
+    pub fn new_from_alias(alias: impl Into<String>) -> Self {
+        Self {
+            alias: Some(alias.into()),
+            path: vec![],
+        }
+    }
+
     pub fn add_segment(&mut self, field: &Field) {
         self.path.push(field.db_name().to_owned());
     }
 
-    pub fn path(&self) -> String {
-        self.path.join(".")
+    /// Keep only the last element of the path
+    pub fn keep_last(&mut self) {
+        self.path.drain(0..self.path.len() - 1);
     }
 
-    pub fn dollar_path(&self) -> String {
-        format!("${}", self.path())
+    pub fn take(&mut self, n: usize) {
+        self.path = self.path[0..n].to_vec();
+    }
+
+    pub fn path(&self, include_alias: bool) -> String {
+        let rendered_path = self.path.join(".");
+
+        if !include_alias {
+            return rendered_path;
+        }
+
+        if let Some(alias) = &self.alias {
+            if self.path.is_empty() {
+                alias.to_owned()
+            } else {
+                format!("${}.{}", alias, rendered_path)
+            }
+        } else {
+            rendered_path
+        }
+    }
+
+    pub fn dollar_path(&self, include_alias: bool) -> String {
+        format!("${}", self.path(include_alias))
     }
 
     pub fn identifier(&self) -> String {
-        self.path.join("_")
+        let rendered_path = self.path.join("_");
+
+        if let Some(alias) = &self.alias {
+            if self.path.is_empty() {
+                alias.to_owned()
+            } else {
+                format!("{}_{}", alias, rendered_path)
+            }
+        } else {
+            rendered_path
+        }
     }
 }
 
@@ -437,5 +506,6 @@ pub fn apply_expression(val: PrismaValue, scalar_write: ScalarWriteOperation) ->
         ScalarWriteOperation::Substract(rhs) => val - rhs,
         ScalarWriteOperation::Multiply(rhs) => val * rhs,
         ScalarWriteOperation::Divide(rhs) => val / rhs,
+        ScalarWriteOperation::Unset(_) => unimplemented!(),
     }
 }
