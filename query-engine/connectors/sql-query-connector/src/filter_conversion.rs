@@ -610,6 +610,7 @@ fn default_scalar_filter(
             comparable.not_matches(query)
         }
         ScalarCondition::JsonCompare(_) => unreachable!(),
+        ScalarCondition::IsSet(_) => unreachable!(),
     };
 
     ConditionTree::single(condition)
@@ -723,6 +724,7 @@ fn insensitive_scalar_filter(
             comparable.not_matches(query)
         }
         ScalarCondition::JsonCompare(_) => unreachable!(),
+        ScalarCondition::IsSet(_) => unreachable!(),
     };
 
     ConditionTree::single(condition)

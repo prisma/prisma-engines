@@ -45,7 +45,7 @@ mod to_many {
                         id
                     }
                 }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":6},{"id":7}]}}"###
         );
 
         // Implicit
@@ -61,7 +61,7 @@ mod to_many {
                           id
                       }
                   }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":6},{"id":7}]}}"###
         );
 
         Ok(())
@@ -186,7 +186,7 @@ mod to_many {
                       id
                   }
               }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5}]}}"###
         );
 
         // Implicit
@@ -202,7 +202,7 @@ mod to_many {
                         id
                     }
                 }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5}]}}"###
         );
 
         Ok(())

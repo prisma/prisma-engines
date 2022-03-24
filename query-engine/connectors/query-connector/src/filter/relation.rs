@@ -17,6 +17,22 @@ pub struct RelationFilter {
     pub condition: RelationCondition,
 }
 
+impl RelationFilter {
+    pub fn invert(self, invert: bool) -> Self {
+        if invert {
+            let is_to_one = !self.field.is_list();
+
+            Self {
+                field: self.field,
+                nested_filter: self.nested_filter,
+                condition: self.condition.invert(invert, is_to_one),
+            }
+        } else {
+            self
+        }
+    }
+}
+
 /// Filter that is solely responsible for checking if
 /// a to-one related record is null.
 /// Todo there's no good, obvious reason why this is a separate filter.
@@ -46,6 +62,20 @@ pub enum RelationCondition {
 impl RelationCondition {
     pub fn invert_of_subselect(self) -> bool {
         matches!(self, RelationCondition::EveryRelatedRecord)
+    }
+
+    pub fn invert(self, invert: bool, to_one: bool) -> Self {
+        if invert {
+            match self {
+                RelationCondition::EveryRelatedRecord => RelationCondition::NoRelatedRecord,
+                RelationCondition::AtLeastOneRelatedRecord => RelationCondition::NoRelatedRecord,
+                RelationCondition::NoRelatedRecord if to_one => RelationCondition::ToOneRelatedRecord,
+                RelationCondition::NoRelatedRecord => RelationCondition::AtLeastOneRelatedRecord,
+                RelationCondition::ToOneRelatedRecord => RelationCondition::NoRelatedRecord,
+            }
+        } else {
+            self
+        }
     }
 }
 

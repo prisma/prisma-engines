@@ -148,6 +148,7 @@ pub enum ScalarCondition {
     JsonCompare(JsonCondition),
     Search(PrismaValue, Vec<ScalarProjection>),
     NotSearch(PrismaValue, Vec<ScalarProjection>),
+    IsSet(bool),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -186,6 +187,7 @@ impl ScalarCondition {
                 }
                 Self::Search(v, fields) => Self::NotSearch(v, fields),
                 Self::NotSearch(v, fields) => Self::Search(v, fields),
+                Self::IsSet(v) => Self::IsSet(!v),
             }
         } else {
             self
@@ -383,6 +385,14 @@ impl ScalarCompare for ScalarFieldRef {
             mode: QueryMode::Default,
         })
     }
+
+    fn is_set(&self, val: bool) -> Filter {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            condition: ScalarCondition::IsSet(val),
+            mode: QueryMode::Default,
+        })
+    }
 }
 
 impl ScalarCompare for ModelProjection {
@@ -575,6 +585,14 @@ impl ScalarCompare for ModelProjection {
             mode: QueryMode::Default,
         })
     }
+
+    fn is_set(&self, val: bool) -> Filter {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
+            condition: ScalarCondition::IsSet(val),
+            mode: QueryMode::Default,
+        })
+    }
 }
 
 impl ScalarCompare for FieldSelection {
@@ -764,6 +782,14 @@ impl ScalarCompare for FieldSelection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
             condition: ScalarCondition::NotSearch(val.into(), vec![]),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn is_set(&self, val: bool) -> Filter {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::IsSet(val),
             mode: QueryMode::Default,
         })
     }

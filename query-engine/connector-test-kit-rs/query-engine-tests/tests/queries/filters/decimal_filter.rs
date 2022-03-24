@@ -36,9 +36,12 @@ mod decimal_filter_spec {
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { decimal: null }) { id }}"#),
-          @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        match_connector_result!(
+          &runner,
+          r#"query { findManyTestModel(where: { decimal: null }) { id }}"#,
+          // MongoDB excludes undefined fields
+          MongoDb(_) => vec![r#"{"data":{"findManyTestModel":[]}}"#],
+          _ => vec![r#"{"data":{"findManyTestModel":[{"id":3}]}}"#]
         );
 
         Ok(())

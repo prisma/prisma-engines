@@ -66,6 +66,8 @@ pub trait ScalarCompare {
     fn not_search<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>;
+
+    fn is_set(&self, val: bool) -> Filter;
 }
 
 /// Comparison methods for relational fields.
@@ -180,6 +182,8 @@ pub trait CompositeCompare {
         T: Into<Filter>;
 
     fn is_empty(&self, b: bool) -> Filter;
+
+    fn is_set(&self, b: bool) -> Filter;
 
     fn equals(&self, val: PrismaValue) -> Filter;
 }
