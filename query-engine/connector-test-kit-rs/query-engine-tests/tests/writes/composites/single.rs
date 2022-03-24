@@ -598,7 +598,7 @@ mod update {
               a_2
             }
           }}"#),
-          @r###"{"data":{"updateOneTestModel":{"b":{"b_field":"b1"}}}}"###
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_2":2}}}}"###
         );
 
         Ok(())
@@ -608,16 +608,6 @@ mod update {
     #[connector_test]
     async fn ensure_unset_unavailable_on_fields(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
-
-        assert_error!(
-            runner,
-            r#"mutation { updateOneTestModel(
-              where: { id: 1 },
-              data: { field: { unset: true } }
-            ) { id }}"#,
-            2009,
-            "Mutation.updateOneTestModel.data.TestModelUpdateInput.field.NullableStringFieldUpdateOperationsInput.unset`: Field does not exist on enclosing type"
-        );
 
         assert_error!(
           runner,
