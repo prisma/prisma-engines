@@ -188,7 +188,7 @@ pub fn warning_enriched_with_updated_at(affected: &[ModelAndField]) -> Warning {
     Warning {
         code: 13,
         message:
-            "These DateTime fields were enriched with `@updatedAt` information taken from the previous Prisma schema."
+            "The attribute `@updatedAt` has been re-added (as it was present in the previous state of the Prisma schema) to the DateTime fields below."
                 .into(),
         affected: serde_json::to_value(&affected).unwrap(),
     }
