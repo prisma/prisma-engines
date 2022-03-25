@@ -343,12 +343,12 @@ fn decimal() {
     });
 
     let expected = expect![[r#"
-        model A {
-          id     String   @id @default(auto()) @map("_id") @db.ObjectId
-          first  Decimal
-          second Decimal?
-          third  Decimal?
-        }
+      model A {
+        id     String                     @id @default(auto()) @map("_id") @db.ObjectId
+        first  Unsupported("Decimal128")
+        second Unsupported("Decimal128")?
+        third  Unsupported("Decimal128")?
+      }
     "#]];
 
     expected.assert_eq(res.datamodel());
