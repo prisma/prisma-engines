@@ -57,7 +57,6 @@ pub fn common_numeric_types() -> String {
             int     Int
             bInt    BigInt
             float   Float
-            decimal Decimal
         }"
     };
 
@@ -72,7 +71,6 @@ pub fn common_text_and_numeric_types() -> String {
             int     Int
             bInt    BigInt
             float   Float
-            decimal Decimal
             string  String
         }"
     };
@@ -88,7 +86,6 @@ pub fn common_text_and_numeric_types_optional() -> String {
             int     Int?
             bInt    BigInt?
             float   Float?
-            decimal Decimal?
             string  String?
         }"
     };
@@ -106,7 +103,6 @@ pub fn common_types() -> String {
             int     Int
             bInt    BigInt
             float   Float
-            decimal Decimal
             bytes   Bytes
             bool    Boolean
             dt      DateTime
@@ -126,7 +122,6 @@ pub fn common_list_types() -> String {
             int     Int[]
             bInt    BigInt[]
             float   Float[]
-            decimal Decimal[]
             bytes   Bytes[]
             bool    Boolean[]
             dt      DateTime[]

@@ -13,7 +13,6 @@ mod lists {
         list_query(&runner, "int", "equals", r#"[1, 2, 3]"#, vec![1]).await?;
         list_query(&runner, "float", "equals", r#"[1.1, 2.2, 3.3]"#, vec![1]).await?;
         list_query(&runner, "bInt", "equals", r#"["100", "200", "300"]"#, vec![1]).await?;
-        list_query(&runner, "decimal", "equals", r#"["11.11", "22.22", "33.33"]"#, vec![1]).await?;
         list_query(&runner, "bool", "equals", r#"[true]"#, vec![1]).await?;
         list_query(&runner, "bytes", "equals", r#"["dGVzdA==", "dA=="]"#, vec![1]).await?;
         list_query(
@@ -36,7 +35,6 @@ mod lists {
         list_query(&runner, "int", "has", "2", vec![1]).await?;
         list_query(&runner, "float", "has", "1.1", vec![1]).await?;
         list_query(&runner, "bInt", "has", r#""200""#, vec![1]).await?;
-        list_query(&runner, "decimal", "has", "33.33", vec![1]).await?;
         list_query(&runner, "dt", "has", r#""2018-12-05T12:34:23.000Z""#, vec![1]).await?;
         list_query(&runner, "bool", "has", "true", vec![1]).await?;
         list_query(&runner, "bytes", "has", r#""dGVzdA==""#, vec![1]).await?;
@@ -52,7 +50,6 @@ mod lists {
         list_query(&runner, "int", "hasSome", r#"[2, 10]"#, vec![1]).await?;
         list_query(&runner, "float", "hasSome", r#"[1.1, 5.5]"#, vec![1]).await?;
         list_query(&runner, "bInt", "hasSome", r#"["200", "5000"]"#, vec![1]).await?;
-        list_query(&runner, "decimal", "hasSome", r#"[55.55, 33.33]"#, vec![1]).await?;
         list_query(&runner, "bool", "hasSome", r#"[true, false]"#, vec![1]).await?;
         list_query(&runner, "string", "hasSome", r#"[]"#, vec![]).await?;
 
@@ -93,9 +90,6 @@ mod lists {
         list_query(&runner, "bInt", "hasEvery", r#"["200", "5000"]"#, vec![]).await?;
         list_query(&runner, "bInt", "hasEvery", r#"["200"]"#, vec![1]).await?;
 
-        list_query(&runner, "decimal", "hasEvery", r#"[55.55, 33.33]"#, vec![]).await?;
-        list_query(&runner, "decimal", "hasEvery", r#"[33.33]"#, vec![1]).await?;
-
         list_query(&runner, "dt", "hasEvery", r#"["2018-12-05T12:34:23.000Z"]"#, vec![1]).await?;
         list_query(
             &runner,
@@ -130,7 +124,6 @@ mod lists {
         list_query(&runner, "int", "isEmpty", "true", vec![2]).await?;
         list_query(&runner, "float", "isEmpty", "true", vec![2]).await?;
         list_query(&runner, "bInt", "isEmpty", "true", vec![2]).await?;
-        list_query(&runner, "decimal", "isEmpty", "true", vec![2]).await?;
         list_query(&runner, "dt", "isEmpty", "true", vec![2]).await?;
         list_query(&runner, "bool", "isEmpty", "true", vec![2]).await?;
 
@@ -138,7 +131,6 @@ mod lists {
         list_query(&runner, "int", "isEmpty", "false", vec![1]).await?;
         list_query(&runner, "float", "isEmpty", "false", vec![1]).await?;
         list_query(&runner, "bInt", "isEmpty", "false", vec![1]).await?;
-        list_query(&runner, "decimal", "isEmpty", "false", vec![1]).await?;
         list_query(&runner, "dt", "isEmpty", "false", vec![1]).await?;
         list_query(&runner, "bool", "isEmpty", "false", vec![1]).await?;
 
@@ -179,7 +171,6 @@ mod lists {
                   int:     [1, 2, 3],
                   float:   [1.1, 2.2, 3.3],
                   bInt:    ["100", "200", "300"],
-                  decimal: ["11.11", "22.22", "33.33"],
                   dt:      ["1969-01-01T10:33:59.000Z", "2018-12-05T12:34:23.000Z"],
                   bool:    [true],
                   bytes:   ["dGVzdA==", "dA=="],
@@ -198,10 +189,107 @@ mod lists {
                   int:     [],
                   float:   [],
                   bInt:    [],
-                  decimal: [],
                   dt:      [],
                   bool:    [],
                   bytes:   []
+                }) { id }
+            }
+            "#})
+            .await?
+            .assert_success();
+
+        Ok(())
+    }
+}
+
+#[test_suite(schema(schema), capabilities(ScalarLists, DecimalType))]
+mod decimal_lists {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
+    pub fn schema() -> String {
+        let schema = indoc! {
+            "model TestModel {
+                #id(id, Int, @id)
+                decimal Decimal[]
+            }"
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test]
+    async fn equality(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+        list_query(&runner, "decimal", "equals", r#"["11.11", "22.22", "33.33"]"#, vec![1]).await?;
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn has(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+        list_query(&runner, "decimal", "has", "33.33", vec![1]).await?;
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn has_some(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+        list_query(&runner, "decimal", "hasSome", r#"[55.55, 33.33]"#, vec![1]).await?;
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn has_every(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+
+        list_query(&runner, "decimal", "hasEvery", r#"[55.55, 33.33]"#, vec![]).await?;
+        list_query(&runner, "decimal", "hasEvery", r#"[33.33]"#, vec![1]).await?;
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn is_empty(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+
+        list_query(&runner, "decimal", "isEmpty", "true", vec![2]).await?;
+        list_query(&runner, "decimal", "isEmpty", "false", vec![1]).await?;
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn has_every_empty(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { decimal: { hasEvery: [] }}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        Ok(())
+    }
+
+    async fn test_data(runner: &Runner) -> TestResult<()> {
+        runner
+            .query(indoc::indoc! { r#"
+              mutation {
+                createOneTestModel(data: {
+                  id:      1,
+                  decimal: ["11.11", "22.22", "33.33"],
+                }) { id }
+              }
+            "#})
+            .await?
+            .assert_success();
+
+        runner
+            .query(indoc! { r#"
+              mutation {
+                createOneTestModel(data: {
+                  id:      2,
+                  decimal: [],
                 }) { id }
             }
             "#})

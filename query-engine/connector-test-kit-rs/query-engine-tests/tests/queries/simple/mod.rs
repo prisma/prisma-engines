@@ -5,4 +5,3 @@ mod m2m;
 mod mongo_incorrect_fields;
 mod multi_field_unique;
 mod raw_mongo;
-mod scalar_list;
