@@ -6,6 +6,8 @@ use crate::{
 };
 use diagnostics::Span;
 
+use super::IndexFieldWalker;
+
 /// A scalar field, as part of a model.
 #[derive(Debug, Copy, Clone)]
 pub struct ScalarFieldWalker<'db> {
@@ -133,11 +135,11 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// The `@default()` attribute of the field, if any.
     pub fn default_value(self) -> Option<DefaultValueWalker<'db>> {
-        self.attributes().default.as_ref().map(|d| DefaultValueWalker {
+        self.attributes().default.as_ref().map(|default| DefaultValueWalker {
             model_id: self.model_id,
             field_id: self.field_id,
             db: self.db,
-            default: d,
+            default,
         })
     }
 
@@ -274,9 +276,10 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
         self.args().length
     }
 
-    /// The underlying scalar field.
+    /// The underlying field.
     ///
     /// ```ignore
+    /// // either this
     /// model Test {
     ///   id          Int @id
     ///   name        String
@@ -286,14 +289,112 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
     ///   @@index([name])
     /// }
     ///
+    /// // or this
+    /// type A {
+    ///   field String
+    ///   ^^^^^^^^^^^^
+    /// }
+    ///
+    /// model Test {
+    ///   id Int @id
+    ///   a  A
+    ///
+    ///   @@index([a.field])
+    /// }
     /// ```
-    pub fn as_scalar_field(self) -> ScalarFieldWalker<'db> {
-        ScalarFieldWalker {
-            model_id: self.model_id,
-            field_id: self.args().field_id,
-            db: self.db,
-            scalar_field: &self.db.types.scalar_fields[&(self.model_id, self.args().field_id)],
+    pub fn as_index_field(self) -> IndexFieldWalker<'db> {
+        let path = &self.args().path;
+        let field_id = path.field_in_index();
+
+        match path.type_holding_the_indexed_field() {
+            None => {
+                let field_id = path.field_in_index();
+                let walker = self.db.walk_model(self.model_id).scalar_field(field_id);
+
+                IndexFieldWalker::new(walker)
+            }
+            Some(ctid) => {
+                let walker = self.db.walk_composite_type(ctid).field(field_id);
+                IndexFieldWalker::new(walker)
+            }
         }
+    }
+
+    /// Gives the full path from the current model to the field included in the index.
+    /// For example, if the field is through two composite types:
+    ///
+    /// ```ignore
+    /// type A {
+    ///   field Int
+    /// }
+    ///
+    /// type B {
+    ///   a A
+    /// }
+    ///
+    /// model C {
+    ///   id Int @id
+    ///   b  B
+    ///
+    ///   @@index([b.a.field])
+    /// }
+    /// ```
+    ///
+    /// The method would return a vector from model to the final field:
+    ///
+    /// ```ignore
+    /// vec![("b", None), ("a", Some("B")), ("field", Some("A"))];
+    /// ```
+    ///
+    /// The first part of the tuple is the name of the field, the second part is
+    /// the name of the composite type.
+    ///
+    /// This method prefers the prisma side naming, and should not be used when
+    /// writing to the database.
+    pub fn as_path_to_indexed_field(self) -> Vec<(&'db str, Option<&'db str>)> {
+        let path = &self.args().path;
+        let root = self.db.ast[self.model_id][path.root()].name.name.as_str();
+
+        let mut result = vec![(root, None)];
+
+        for (ctid, field_id) in path.path() {
+            let ct = &self.db.ast[*ctid];
+            let field = ct[*field_id].name.name.as_str();
+
+            result.push((field, Some(ct.name.name.as_str())));
+        }
+
+        result
+    }
+
+    /// Similar to the method [`as_path_to_indexed_field`], but prefers the
+    /// mapped names and is to be used when defining indices in the database.
+    ///
+    /// [`as_path_to_indexed_field`]: struct.ScalarFieldAttributeWalker
+    pub fn as_mapped_path_to_indexed_field(self) -> Vec<(&'db str, Option<&'db str>)> {
+        let path = &self.args().path;
+        let root = {
+            let mapped = &self.db.types.scalar_fields[&(self.model_id, path.root())].mapped_name;
+
+            mapped
+                .and_then(|id| self.db.interner.get(id))
+                .unwrap_or_else(|| self.db.ast[self.model_id][path.root()].name.name.as_str())
+        };
+
+        let mut result = vec![(root, None)];
+
+        for (ctid, field_id) in path.path() {
+            let ct = &self.db.ast[*ctid];
+
+            let field = &self.db.types.composite_type_fields[&(*ctid, *field_id)]
+                .mapped_name
+                .and_then(|id| self.db.interner.get(id))
+                .unwrap_or_else(|| ct[*field_id].name.name.as_str());
+
+            result.push((field, Some(ct.name.name.as_str())));
+        }
+
+        result
     }
 
     /// The sort order (asc or desc) on the field.

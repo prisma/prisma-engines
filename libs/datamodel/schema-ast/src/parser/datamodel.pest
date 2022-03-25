@@ -96,6 +96,7 @@ doc_content = @{ (!NEWLINE ~ ANY)* }
 // ######################################
 maybe_empty_identifier = @{ ( "_" | "-" | ASCII_ALPHANUMERIC)* }
 non_empty_identifier = @{ ASCII_ALPHANUMERIC ~ maybe_empty_identifier }
+path_identifier = @{ ASCII_ALPHANUMERIC ~ maybe_empty_identifier ~ ("." ~ non_empty_identifier)* }
 
 WHITESPACE = @{ SPACE_SEPARATOR | "\t" } // tabs are also whitespace
 NEWLINE = { "\n" | "\r\n" | "\r" }
@@ -139,4 +140,4 @@ string_raw = { (!("\\" | "\"" | NEWLINE ) ~ ANY)+ }
 string_content = ${ (string_raw | string_escape )* }
 string_literal = { "\"" ~ string_content ~ "\"" }
 
-constant_literal = @{ non_empty_identifier }
+constant_literal = @{ path_identifier }

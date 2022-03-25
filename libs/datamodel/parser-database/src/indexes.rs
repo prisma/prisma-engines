@@ -1,7 +1,7 @@
 use crate::{
     context::Context,
     relations::{OneToOneRelationFields, RelationAttributes},
-    types::{FieldWithArgs, IndexAttribute, IndexType},
+    types::{FieldWithArgs, IndexAttribute, IndexFieldPath, IndexType},
 };
 
 /// Prisma forces a 1:1 relation to be unique from the defining side. If the
@@ -65,7 +65,7 @@ pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
                 fields: referencing_fields
                     .iter()
                     .map(|f| FieldWithArgs {
-                        field_id: *f,
+                        path: IndexFieldPath::new(*f),
                         sort_order: None,
                         length: None,
                     })

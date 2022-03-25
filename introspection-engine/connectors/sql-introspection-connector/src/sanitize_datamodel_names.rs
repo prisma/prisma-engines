@@ -166,7 +166,16 @@ fn sanitize_pk_field_names(fields: &mut [PrimaryKeyField]) {
 fn sanitize_index_field_names(fields: &mut [IndexField]) {
     fields
         .iter_mut()
-        .map(|mut field| field.name = sanitize_string(&field.name))
+        .map(|field| {
+            let path = field
+                .path
+                .first()
+                .cloned()
+                .map(|(f, _)| (sanitize_string(&f), None))
+                .unwrap();
+
+            field.path = vec![path];
+        })
         .collect()
 }
 

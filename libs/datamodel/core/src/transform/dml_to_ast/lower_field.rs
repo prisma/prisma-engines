@@ -121,10 +121,16 @@ impl<'a> LowerDmlToAst<'a> {
             if model.field_is_unique_and_defined_on_field(&sf.name) {
                 let mut arguments = Vec::new();
                 if let Some(idx) = model.indices.iter().find(|i| {
-                    i.is_unique()
-                        && i.defined_on_field
-                        && i.fields.len() == 1
-                        && i.fields.first().unwrap().name == field.name()
+                    let path = &i.fields.first().unwrap().path;
+
+                    // A composite field index cannot be defined in field, so
+                    // we can do a dumb comparison.
+                    let names_match = path
+                        .first()
+                        .map(|(field_name, _)| field_name == field.name())
+                        .unwrap_or(false);
+
+                    i.is_unique() && i.defined_on_field && i.fields.len() == 1 && names_match
                 }) {
                     self.push_field_index_arguments(model, idx, &mut arguments)
                 }

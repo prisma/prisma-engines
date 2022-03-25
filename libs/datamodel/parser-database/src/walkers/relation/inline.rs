@@ -112,7 +112,8 @@ impl<'db> InlineRelationWalker<'db> {
                         .unique_criterias()
                         .find(|c| c.is_strict_criteria())
                         .into_iter()
-                        .flat_map(|c| c.fields()),
+                        .flat_map(|c| c.fields())
+                        .filter_map(|f| f.as_scalar_field()),
                 )
             })
     }

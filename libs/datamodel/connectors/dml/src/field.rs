@@ -130,6 +130,13 @@ impl Field {
         }
     }
 
+    pub fn as_composite_field(&self) -> Option<&CompositeField> {
+        match self {
+            Field::CompositeField(cf) => Some(cf),
+            _ => None,
+        }
+    }
+
     pub fn is_relation(&self) -> bool {
         matches!(self, Field::RelationField(_))
     }

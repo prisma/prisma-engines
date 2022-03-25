@@ -327,6 +327,20 @@ impl<'db> Context<'db> {
         self.names.model_fields.get(&(model_id, name)).cloned()
     }
 
+    /// Find a specific field in a specific composite type.
+    pub(crate) fn find_composite_type_field(
+        &self,
+        composite_type_id: ast::CompositeTypeId,
+        field_name: &str,
+    ) -> Option<ast::FieldId> {
+        let name = self.interner.lookup(field_name)?;
+
+        self.names
+            .composite_type_fields
+            .get(&(composite_type_id, name))
+            .cloned()
+    }
+
     /// Starts validating the arguments for an attribute, checking for duplicate arguments in the
     /// process. Returns whether the attribute is valid enough to be usable.
     fn set_attribute(&mut self, attribute_id: ast::AttributeId, attribute: &'db ast::Attribute) -> bool {

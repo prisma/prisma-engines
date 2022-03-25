@@ -69,9 +69,9 @@ impl<'a> Statistics<'a> {
     pub(super) fn into_datamodel(self, warnings: &mut Vec<Warning>) -> Datamodel {
         let mut data_model = Datamodel::new();
         let mut indices = self.indices;
-        let (mut models, types) = populate_fields(&self.models, self.samples, warnings);
+        let (mut models, mut types) = populate_fields(&self.models, self.samples, warnings);
 
-        add_indices_to_models(&mut models, &mut indices, warnings);
+        add_indices_to_models(&mut models, &mut types, &mut indices, warnings);
         add_missing_ids_to_models(&mut models);
 
         for (_, model) in models.into_iter() {
@@ -577,6 +577,8 @@ fn filter_out_empty_types(
 
 fn add_indices_to_models(
     models: &mut BTreeMap<String, Model>,
+    // TODO: here we go!
+    _types: &mut BTreeMap<String, CompositeType>,
     indices: &mut BTreeMap<String, Vec<IndexWalker<'_>>>,
     warnings: &mut Vec<Warning>,
 ) {
@@ -624,14 +626,46 @@ fn add_indices_to_models(
 
             let fields = index
                 .fields()
-                .map(|f| IndexField {
-                    name: sanitize_string(f.name()).unwrap_or_else(|| f.name().to_string()),
-                    sort_order: match f.property {
-                        IndexFieldProperty::Text => None,
-                        IndexFieldProperty::Ascending => Some(SortOrder::Asc),
-                        IndexFieldProperty::Descending => Some(SortOrder::Desc),
-                    },
-                    length: None,
+                .map(|f| {
+                    let mut path = Vec::new();
+                    let mut splitted_name = f.name().split('.');
+                    let mut next_type = None;
+
+                    if let Some(field_name) = splitted_name.next() {
+                        next_type = model
+                            .fields()
+                            .find(|f| f.database_name() == Some(field_name) || f.name() == field_name)
+                            .and_then(|f| match f {
+                                Field::CompositeField(cf) => Some(cf.composite_type.as_str()),
+                                _ => None,
+                            });
+
+                        let name = sanitize_string(field_name).unwrap_or_else(|| field_name.to_owned());
+
+                        path.push((name, None));
+                    }
+
+                    for field_name in splitted_name {
+                        match next_type {
+                            Some(ct) => {
+                                let name = sanitize_string(field_name).unwrap_or_else(|| field_name.to_owned());
+                                path.push((name, Some(ct.to_owned())));
+                            }
+                            None => {
+                                todo!("We must create a new composite type and a field if it is not there yet");
+                            }
+                        }
+                    }
+
+                    IndexField {
+                        path,
+                        sort_order: match f.property {
+                            IndexFieldProperty::Text => None,
+                            IndexFieldProperty::Ascending => Some(SortOrder::Asc),
+                            IndexFieldProperty::Descending => Some(SortOrder::Desc),
+                        },
+                        length: None,
+                    }
                 })
                 .collect();
 

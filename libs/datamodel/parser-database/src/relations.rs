@@ -350,7 +350,8 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
                             .ast_indexes
                             .iter()
                             .any(|(_, idx)| {
-                                idx.is_unique() && &idx.fields.iter().map(|f| f.field_id).collect::<Vec<_>>() == fields
+                                idx.is_unique()
+                                    && &idx.fields.iter().map(|f| f.path.field_in_index()).collect::<Vec<_>>() == fields
                             });
                     if fields_are_unique {
                         RelationAttributes::OneToOne(OneToOneRelationFields::Forward(evidence.field_id))

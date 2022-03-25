@@ -164,8 +164,16 @@ fn merge_pre_3_0_index_names(old_data_model: &Datamodel, new_data_model: &mut Da
             for index in &model.indices {
                 if let Some(old_index) = old_model.indices.iter().find(|old| {
                     old.name == index.db_name
-                        && old.fields.iter().map(|f| &f.name).collect::<Vec<_>>()
-                            == index.fields.iter().map(|f| &f.name).collect::<Vec<_>>()
+                        && old
+                            .fields
+                            .iter()
+                            .map(|f| &f.path.first().unwrap().0)
+                            .collect::<Vec<_>>()
+                            == index
+                                .fields
+                                .iter()
+                                .map(|f| &f.path.first().unwrap().0)
+                                .collect::<Vec<_>>()
                 }) {
                     retained_legacy_index_name_args
                         .push(ModelAndIndex::new(&model.name, old_index.name.as_ref().unwrap()))

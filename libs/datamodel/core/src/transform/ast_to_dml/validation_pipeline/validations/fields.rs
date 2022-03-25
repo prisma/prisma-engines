@@ -104,7 +104,7 @@ pub(crate) fn validate_length_used_with_correct_types(
         return;
     }
 
-    if let Some(r#type) = attr.as_scalar_field().scalar_field_type().as_builtin_scalar() {
+    if let Some(r#type) = attr.as_index_field().scalar_field_type().as_builtin_scalar() {
         if [ScalarType::String, ScalarType::Bytes].iter().any(|t| t == &r#type) {
             return;
         }

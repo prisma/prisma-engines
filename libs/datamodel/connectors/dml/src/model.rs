@@ -1,8 +1,9 @@
+use indoc::formatdoc;
+
 use crate::default_value::DefaultKind;
 use crate::field::{Field, FieldType, RelationField, ScalarField};
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
-use indoc::formatdoc;
 use std::fmt;
 
 /// Represents a model in a prisma schema.
@@ -64,16 +65,27 @@ impl IndexDefinition {
 ///A field in an index that optionally defines a sort order and length limit.
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexField {
-    pub name: String,
+    pub path: Vec<(String, Option<String>)>,
     pub sort_order: Option<SortOrder>,
     pub length: Option<u32>,
 }
 
 impl IndexField {
     /// Tests only
-    pub fn new(name: &str) -> Self {
+    pub fn new_in_model(name: &str) -> Self {
         IndexField {
-            name: name.to_string(),
+            path: vec![(name.into(), None)],
+            sort_order: None,
+            length: None,
+        }
+    }
+
+    pub fn new_in_path(path: &[(&str, Option<&str>)]) -> Self {
+        IndexField {
+            path: path
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.map(|v| v.to_string())))
+                .collect(),
             sort_order: None,
             length: None,
         }
@@ -360,7 +372,8 @@ impl Model {
                     let fields: Vec<_> = id
                         .fields
                         .iter()
-                        .map(|f| self.find_scalar_field(&f.name).unwrap())
+                        .map(|f| &f.path.first().unwrap().0)
+                        .map(|name| self.find_scalar_field(name).unwrap())
                         .collect();
                     let no_fields_are_ineligible = !fields.iter().any(|f| in_eligible(f));
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
@@ -377,19 +390,24 @@ impl Model {
         result
     }
 
-    pub fn field_is_indexed(&self, field_name: &str) -> bool {
-        let field = self.find_field(field_name).unwrap();
+    pub fn field_is_indexed(&self, name: &str) -> bool {
+        let field = self.find_field(name).unwrap();
 
         if self.field_is_primary(field.name()) || self.field_is_unique(field.name()) {
             return true;
         }
 
-        let is_first_in_index = self
-            .indices
-            .iter()
-            .any(|index| index.fields.first().unwrap().name == field_name);
+        let is_first_in_index = self.indices.iter().any(|index| {
+            index
+                .fields
+                .iter()
+                .flat_map(|f| &f.path)
+                .last()
+                .map(|(field_name, _)| field_name == name)
+                .unwrap_or(false)
+        });
 
-        let is_first_in_primary_key = matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, ..}) if fields.first().unwrap().name == field_name);
+        let is_first_in_primary_key = matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, ..}) if fields.first().unwrap().name == name);
 
         is_first_in_index || is_first_in_primary_key
     }
@@ -419,14 +437,30 @@ impl Model {
     }
 
     pub fn field_is_unique(&self, name: &str) -> bool {
-        self.indices
-            .iter()
-            .any(|i| i.is_unique() && i.fields.len() == 1 && i.fields.first().unwrap().name == name)
+        self.indices.iter().any(|i| {
+            let names_match = i
+                .fields
+                .iter()
+                .flat_map(|f| &f.path)
+                .last()
+                .map(|(field_name, _)| field_name == name)
+                .unwrap_or(false);
+
+            i.is_unique() && i.fields.len() == 1 && names_match
+        })
     }
 
     pub fn field_is_unique_and_defined_on_field(&self, name: &str) -> bool {
         self.indices.iter().any(|i| {
-            i.is_unique() && i.fields.len() == 1 && i.fields.first().unwrap().name == name && i.defined_on_field
+            let names_match = i
+                .fields
+                .iter()
+                .flat_map(|f| &f.path)
+                .last()
+                .map(|(field_name, _)| field_name == name)
+                .unwrap_or(false);
+
+            i.is_unique() && i.fields.len() == 1 && names_match && i.defined_on_field
         })
     }
 

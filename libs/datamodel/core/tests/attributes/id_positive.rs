@@ -150,7 +150,7 @@ fn should_allow_unique_and_id_on_same_field() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("Model_id_key".to_string()),
-        fields: vec![IndexField::new("id")],
+        fields: vec![IndexField::new_in_model("id")],
         tpe: IndexType::Unique,
         defined_on_field: true,
         algorithm: None,

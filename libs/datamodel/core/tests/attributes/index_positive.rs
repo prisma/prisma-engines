@@ -18,7 +18,10 @@ fn basic_index_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_firstName_lastName_idx".to_string()),
-        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
+        fields: vec![
+            IndexField::new_in_model("firstName"),
+            IndexField::new_in_model("lastName"),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
@@ -46,7 +49,7 @@ fn indexes_on_enum_fields_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_role_idx".to_string()),
-        fields: vec![IndexField::new("role")],
+        fields: vec![IndexField::new_in_model("role")],
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
@@ -71,7 +74,10 @@ fn the_name_argument_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("MyIndexName".to_string()),
-        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
+        fields: vec![
+            IndexField::new_in_model("firstName"),
+            IndexField::new_in_model("lastName"),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
@@ -100,7 +106,10 @@ fn the_map_argument_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("MyIndexName".to_string()),
-        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
+        fields: vec![
+            IndexField::new_in_model("firstName"),
+            IndexField::new_in_model("lastName"),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
@@ -126,7 +135,10 @@ fn multiple_index_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_firstName_lastName_idx".to_string()),
-        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
+        fields: vec![
+            IndexField::new_in_model("firstName"),
+            IndexField::new_in_model("lastName"),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
@@ -135,7 +147,10 @@ fn multiple_index_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("MyIndexName".to_string()),
-        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
+        fields: vec![
+            IndexField::new_in_model("firstName"),
+            IndexField::new_in_model("lastName"),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
@@ -185,7 +200,10 @@ fn index_accepts_three_different_notations() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("OtherIndexName".to_string()),
-        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
+        fields: vec![
+            IndexField::new_in_model("firstName"),
+            IndexField::new_in_model("lastName"),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
@@ -194,7 +212,10 @@ fn index_accepts_three_different_notations() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("MyIndexName".to_string()),
-        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
+        fields: vec![
+            IndexField::new_in_model("firstName"),
+            IndexField::new_in_model("lastName"),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
@@ -203,7 +224,10 @@ fn index_accepts_three_different_notations() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("User_firstName_lastName_idx".to_string()),
-        fields: vec![IndexField::new("firstName"), IndexField::new("lastName")],
+        fields: vec![
+            IndexField::new_in_model("firstName"),
+            IndexField::new_in_model("lastName"),
+        ],
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
@@ -225,7 +249,7 @@ fn mysql_allows_unique_length_prefix() {
         name: None,
         db_name: Some("A_id_key".to_string()),
         fields: vec![IndexField {
-            name: "id".to_string(),
+            path: vec![("id".to_string(), None)],
             sort_order: None,
             length: Some(30),
         }],
@@ -430,7 +454,7 @@ fn hash_index_works_on_postgres() {
     schema.assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("A_a_idx".to_string()),
-        fields: vec![IndexField::new("a")],
+        fields: vec![IndexField::new_in_model("a")],
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: Some(IndexAlgorithm::Hash),
@@ -454,7 +478,7 @@ fn mysql_fulltext_index() {
     parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("A_a_b_idx".to_string()),
-        fields: vec![IndexField::new("a"), IndexField::new("b")],
+        fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
         tpe: IndexType::Fulltext,
         algorithm: None,
         defined_on_field: false,
@@ -478,7 +502,7 @@ fn mysql_fulltext_index_map() {
     parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("my_text_index".to_string()),
-        fields: vec![IndexField::new("a"), IndexField::new("b")],
+        fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
         tpe: IndexType::Fulltext,
         algorithm: None,
         defined_on_field: false,
@@ -502,7 +526,7 @@ fn fulltext_index_mongodb() {
     parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("A_a_b_idx".to_string()),
-        fields: vec![IndexField::new("a"), IndexField::new("b")],
+        fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
         tpe: IndexType::Fulltext,
         algorithm: None,
         defined_on_field: false,
@@ -527,7 +551,7 @@ fn duplicate_index_different_sort_order_mongodb() {
         name: None,
         db_name: Some("aaa".to_string()),
         fields: vec![IndexField {
-            name: String::from("a"),
+            path: vec![("a".to_string(), None)],
             sort_order: Some(SortOrder::Asc),
             length: None,
         }],
@@ -540,7 +564,7 @@ fn duplicate_index_different_sort_order_mongodb() {
         name: None,
         db_name: Some("bbb".to_string()),
         fields: vec![IndexField {
-            name: String::from("a"),
+            path: vec![("a".to_string(), None)],
             sort_order: Some(SortOrder::Desc),
             length: None,
         }],
@@ -568,9 +592,9 @@ fn fulltext_index_sort_mongodb() {
         name: None,
         db_name: Some("A_a_b_idx".to_string()),
         fields: vec![
-            IndexField::new("a"),
+            IndexField::new_in_model("a"),
             IndexField {
-                name: "b".to_string(),
+                path: vec![("b".to_string(), None)],
                 sort_order: Some(SortOrder::Desc),
                 length: None,
             },
@@ -603,7 +627,7 @@ fn multiple_fulltext_indexes_allowed_per_model_in_mysql() {
         .assert_has_index(IndexDefinition {
             name: None,
             db_name: Some("A_a_b_idx".to_string()),
-            fields: vec![IndexField::new("a"), IndexField::new("b")],
+            fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
             tpe: IndexType::Fulltext,
             algorithm: None,
             defined_on_field: false,
@@ -612,10 +636,10 @@ fn multiple_fulltext_indexes_allowed_per_model_in_mysql() {
             name: None,
             db_name: Some("A_a_b_c_d_idx".to_string()),
             fields: vec![
-                IndexField::new("a"),
-                IndexField::new("b"),
-                IndexField::new("c"),
-                IndexField::new("d"),
+                IndexField::new_in_model("a"),
+                IndexField::new_in_model("b"),
+                IndexField::new_in_model("c"),
+                IndexField::new_in_model("d"),
             ],
             tpe: IndexType::Fulltext,
             algorithm: None,

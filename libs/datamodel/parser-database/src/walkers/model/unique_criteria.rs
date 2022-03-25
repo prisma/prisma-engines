@@ -1,8 +1,6 @@
-use crate::types::FieldWithArgs;
-use crate::{
-    ast,
-    {walkers::ScalarFieldWalker, ParserDatabase},
-};
+use crate::{ast, types::FieldWithArgs, walkers::IndexFieldWalker, ParserDatabase};
+
+use super::ModelWalker;
 
 /// Describes any unique criteria in a model. Can either be a primary
 /// key, or a unique index.
@@ -14,12 +12,20 @@ pub struct UniqueCriteriaWalker<'db> {
 }
 
 impl<'db> UniqueCriteriaWalker<'db> {
-    pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db {
-        self.fields.iter().map(move |field| ScalarFieldWalker {
-            model_id: self.model_id,
-            field_id: field.field_id,
-            db: self.db,
-            scalar_field: &self.db.types.scalar_fields[&(self.model_id, field.field_id)],
+    pub fn fields(self) -> impl ExactSizeIterator<Item = IndexFieldWalker<'db>> + 'db {
+        self.fields.iter().map(move |field| {
+            let field_id = field.path.field_in_index();
+
+            match field.path.type_holding_the_indexed_field() {
+                None => {
+                    let walker = self.model().scalar_field(field_id);
+                    IndexFieldWalker::new(walker)
+                }
+                Some(ctid) => {
+                    let walker = self.db.walk_composite_type(ctid).field(field_id);
+                    IndexFieldWalker::new(walker)
+                }
+            }
         })
     }
 
@@ -33,5 +39,9 @@ impl<'db> UniqueCriteriaWalker<'db> {
 
     pub fn has_unsupported_fields(self) -> bool {
         self.fields().any(|field| field.is_unsupported())
+    }
+
+    fn model(self) -> ModelWalker<'db> {
+        self.db.walk_model(self.model_id)
     }
 }

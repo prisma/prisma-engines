@@ -49,7 +49,7 @@ impl<'db> ModelWalker<'db> {
             .any(|idx| idx.fields().next().map(|f| f.field_id()) == Some(field_id))
             || self
                 .primary_key()
-                .filter(|pk| pk.fields().next().map(|f| f.field_id) == Some(field_id))
+                .filter(|pk| pk.fields().next().map(|f| f.field_id()) == Some(field_id))
                 .is_some()
     }
 
@@ -100,15 +100,20 @@ impl<'db> ModelWalker<'db> {
             .unwrap_or_else(|| &self.db.ast[self.model_id].name.name)
     }
 
+    /// Get the database name of the scalar field.
+    pub fn get_field_database_name(self, field_id: ast::FieldId) -> &'db str {
+        self.db.types.scalar_fields[&(self.model_id, field_id)]
+            .mapped_name
+            .map(|id| &self.db[id])
+            .unwrap_or_else(|| &self.db.ast[self.model_id][field_id].name.name)
+    }
+
     /// Get the database names of the constrained scalar fields.
     #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
-    pub fn get_field_database_names<'a>(&'a self, fields: &'a [ast::FieldId]) -> impl Iterator<Item = &'db str> + 'a {
-        fields.iter().map(move |&field_id| {
-            self.db.types.scalar_fields[&(self.model_id, field_id)]
-                .mapped_name
-                .map(|id| &self.db[id])
-                .unwrap_or_else(|| &self.db.ast[self.model_id][field_id].name.name)
-        })
+    pub fn get_field_database_names(self, fields: &'db [ast::FieldId]) -> impl Iterator<Item = &'db str> + '_ {
+        fields
+            .iter()
+            .map(move |&field_id| self.get_field_database_name(field_id))
     }
 
     /// Used in validation. True only if the model has a single field id.

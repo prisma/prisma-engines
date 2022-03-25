@@ -170,7 +170,7 @@ pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> Inde
                     (sort_order, c.length)
                 };
                 IndexField {
-                    name: c.name().to_string(),
+                    path: vec![(c.name().to_string(), None)],
                     sort_order,
                     length,
                 }
@@ -512,8 +512,8 @@ pub fn replace_index_field_names(target: &mut Vec<IndexField>, old_name: &str, n
     target
         .iter_mut()
         .map(|field| {
-            if field.name == old_name {
-                field.name = new_name.to_string()
+            if field.path.first().map(|p| p.0.as_str()) == Some(old_name) {
+                field.path = vec![(new_name.to_string(), None)];
             }
         })
         .for_each(drop);

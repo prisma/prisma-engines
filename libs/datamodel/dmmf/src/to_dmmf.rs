@@ -133,7 +133,13 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
             .indices
             .iter()
             .filter_map(|i| {
-                (i.is_unique() && !i.defined_on_field).then(|| i.fields.clone().into_iter().map(|f| f.name).collect())
+                (i.is_unique() && !i.defined_on_field).then(|| {
+                    i.fields
+                        .clone()
+                        .into_iter()
+                        .map(|f| f.path.into_iter().map(|(field, _)| field).collect::<Vec<_>>().join("."))
+                        .collect()
+                })
             })
             .collect(),
         unique_indexes: model
@@ -143,7 +149,12 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
                 (i.is_unique() && !i.defined_on_field).then(|| UniqueIndex {
                     name: i.name.clone(),
                     //TODO(extended indices) add field options here
-                    fields: i.fields.clone().into_iter().map(|f| f.name).collect(),
+                    fields: i
+                        .fields
+                        .clone()
+                        .into_iter()
+                        .map(|f| f.path.into_iter().map(|(field, _)| field).collect::<Vec<_>>().join("."))
+                        .collect(),
                 })
             })
             .collect(),

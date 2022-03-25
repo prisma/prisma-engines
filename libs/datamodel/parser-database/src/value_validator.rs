@@ -1,7 +1,7 @@
 //! See [ValueValidator](./struct.ValueValidator.html).
 
 use crate::{
-    ast::{self, Expression, Span},
+    ast::{self, Span},
     relations::ReferentialAction,
     types::SortOrder,
 };
@@ -108,8 +108,8 @@ impl<'a> ValueValidator<'a> {
 
     fn as_func(&self) -> Result<(&'a str, Option<SortOrder>, Option<u32>), DatamodelError> {
         match &self.value {
-            Expression::ConstantValue(field_name, _) => Ok((field_name, None, None)),
-            Expression::Function(field_name, args, _) => {
+            ast::Expression::ConstantValue(field_name, _) => Ok((field_name, None, None)),
+            ast::Expression::Function(field_name, args, _) => {
                 let (sort, length) = ValueValidator::field_args(&args.arguments)?;
                 Ok((field_name, sort, length))
             }
@@ -118,7 +118,6 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
-    /// Unwraps the wrapped value as a constant literal.
     fn field_args(args: &[ast::Argument]) -> Result<(Option<SortOrder>, Option<u32>), DatamodelError> {
         let sort = args
             .iter()
@@ -136,7 +135,7 @@ impl<'a> ValueValidator<'a> {
             .iter()
             .find(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == Some("length"))
             .map(|arg| match &arg.value {
-                Expression::NumericValue(s, _) => s
+                ast::Expression::NumericValue(s, _) => s
                     .parse::<u32>()
                     .map_err(|_| DatamodelError::new_parser_error("valid integer".to_owned(), arg.span)),
                 _ => Err(DatamodelError::new_parser_error("valid integer".to_owned(), arg.span)),
