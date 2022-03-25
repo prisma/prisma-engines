@@ -79,6 +79,11 @@ mod aggregation_count {
           @r###"{"data":{"aggregateTestModel":{"_count":{"_all":0,"string":0,"int":0}}}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ aggregateTestModel { _count { string _all int } } }"#),
+          @r###"{"data":{"aggregateTestModel":{"_count":{"string":0,"_all":0,"int":0}}}}"###
+        );
+
         Ok(())
     }
 
