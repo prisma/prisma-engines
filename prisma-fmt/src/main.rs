@@ -39,10 +39,13 @@ pub enum FmtOpts {
     ReferentialActions,
     /// Specifies preview features mode
     PreviewFeatures,
+    /// Artificially panic (for testing the CLI)
+    DebugPanic,
 }
 
 fn main() {
     match FmtOpts::from_args() {
+        FmtOpts::DebugPanic => panic!("This is the debugPanic artificial panic"),
         FmtOpts::Lint => plug(lint::run),
         FmtOpts::Format(opts) => format::run(opts),
         FmtOpts::NativeTypes => plug(native::run),
