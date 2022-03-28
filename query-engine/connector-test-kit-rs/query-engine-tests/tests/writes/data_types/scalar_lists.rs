@@ -304,7 +304,7 @@ mod scalar_lists {
 }
 
 #[test_suite(schema(schema), capabilities(ScalarLists, DecimalType))]
-mod decimal_scalar_lists {
+mod dec_scalar_lists {
     use indoc::indoc;
     use query_engine_tests::run_query;
 
@@ -374,14 +374,14 @@ mod decimal_scalar_lists {
     #[connector_test]
     async fn create_mut_work_with_list_vals(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {{
-            createOneScalarModel(data: {{
+          run_query!(&runner, r#"mutation {
+            createOneScalarModel(data: {
               id: 1
-              decimals:  ["1.234", "1.45"]
-            }}) {{
+              decimals: ["1.234", "1.45"]
+            }) {
               decimals
-            }}
-          }}"#),
+            }
+          }"#),
           @r###"{"data":{"createOneScalarModel":{"decimals":["1.234","1.45"]}}}"###
         );
 
@@ -395,7 +395,7 @@ mod decimal_scalar_lists {
           run_query!(&runner, r#"mutation {
             createOneScalarModel(data: {
               id: 1
-              decimals:  []
+              decimals: []
             }) {
               decimals
             }
