@@ -11,6 +11,18 @@ use std::collections::HashMap;
 ///
 /// When lifting, the AST is converted to the Datamodel data structure, and
 /// additional semantics are attached.
+///
+/// ## Guarantees
+///
+/// For a parsed, validated and standardised datamodel, the following guarantees hold:
+///
+/// - Each referenced model or enum does exist.
+/// - Each related field has a backwards related field on the related type with equal relation
+/// name. If the user did not specify any, a backwards field will be generated.
+/// - All relations are named.
+/// - All relations have a valid list of `to_fields` on the referencing side. An empty list
+/// indicates the back relation field. If the user does not give any `references` argument, the
+/// `to_fields` will point to the related types id fields.
 pub(crate) struct LiftAstToDml<'a> {
     db: &'a db::ParserDatabase,
     connector: &'static dyn Connector,
