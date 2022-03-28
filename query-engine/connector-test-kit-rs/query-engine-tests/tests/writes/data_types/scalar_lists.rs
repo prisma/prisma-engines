@@ -320,7 +320,8 @@ mod dec_scalar_lists {
     }
 
     // "Scalar lists" should "be behave like regular values for create and update operations"
-    #[connector_test]
+    // Skipped for CockroachDB, lools like this is concat is also broken.
+    #[connector_test(exclude(CockroachDb))]
     async fn behave_like_regular_val_for_create_and_update(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, format!(r#"mutation {{
