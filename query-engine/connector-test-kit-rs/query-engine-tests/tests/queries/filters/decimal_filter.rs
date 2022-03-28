@@ -141,9 +141,7 @@ mod decimal_filter_spec {
             .query(indoc! { r#"
                 mutation { createOneTestModel(data: {
                     id: 1,
-                    bInt: 5,
                     decimal: "5.5",
-                    bytes: "dGVzdA==",
                 }) { id }}"# })
             .await?
             .assert_success();
@@ -152,9 +150,7 @@ mod decimal_filter_spec {
             .query(indoc! { r#"
                 mutation { createOneTestModel(data: {
                     id: 2,
-                    bInt: 1,
                     decimal: "1",
-                    bytes: "dA==",
                 }) { id }}"# })
             .await?
             .assert_success();

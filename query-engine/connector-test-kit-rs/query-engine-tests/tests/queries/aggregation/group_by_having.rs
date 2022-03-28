@@ -377,9 +377,9 @@ mod decimal_aggregation_group_by_having {
 
     #[connector_test]
     async fn having_avg_scalar_filter(runner: Runner) -> TestResult<()> {
-        create_row(&runner, r#"{ id: 1, int: 10, decimal: "10", string: "group1" }"#).await?;
-        create_row(&runner, r#"{ id: 2, int: 6,  decimal: "6", string: "group1" }"#).await?;
-        create_row(&runner, r#"{ id: 3, int: 3,  decimal: "5", string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 1, decimal: "10", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, decimal: "6", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 3, decimal: "5", string: "group2" }"#).await?;
         create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
         create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
         create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
@@ -522,8 +522,6 @@ mod decimal_aggregation_group_by_having {
                   }) {
                     string
                     _min {
-                      float
-                      int
                       decimal
                     }
                   }
