@@ -626,6 +626,18 @@
 <span id="624">624</span>
 <span id="625">625</span>
 <span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">IndexField</span>, <span class="ident">PrimaryKeyField</span>},
@@ -639,6 +651,18 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// When lifting, the AST is converted to the Datamodel data structure, and</span>
 <span class="doccomment">/// additional semantics are attached.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Guarantees</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// For a parsed, validated and standardised datamodel, the following guarantees hold:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// - Each referenced model or enum does exist.</span>
+<span class="doccomment">/// - Each related field has a backwards related field on the related type with equal relation</span>
+<span class="doccomment">/// name. If the user did not specify any, a backwards field will be generated.</span>
+<span class="doccomment">/// - All relations are named.</span>
+<span class="doccomment">/// - All relations have a valid list of `to_fields` on the referencing side. An empty list</span>
+<span class="doccomment">/// indicates the back relation field. If the user does not give any `references` argument, the</span>
+<span class="doccomment">/// `to_fields` will point to the related types id fields.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">LiftAstToDml</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">db::ParserDatabase</span>,
     <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
