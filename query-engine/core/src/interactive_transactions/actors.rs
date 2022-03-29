@@ -149,6 +149,7 @@ impl ITXServer {
     }
 }
 
+#[derive(Clone)]
 pub struct ITXClient {
     send: Sender<TxOpRequest>,
     tx_id: TxId,

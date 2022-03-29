@@ -66,18 +66,22 @@ impl TransactionActorManager {
         self.clients.write().await.insert(tx_id, client);
     }
 
+    async fn get_client(&self, tx_id: &TxId) -> crate::Result<ITXClient> {
+        if let Some(client) = self.clients.read().await.get(tx_id) {
+            Ok(client.clone())
+        } else {
+            Err(TransactionError::NotFound.into())
+        }
+    }
+
     pub async fn execute(
         &self,
         tx_id: &TxId,
         operation: Operation,
         trace_id: Option<String>,
     ) -> crate::Result<ResponseData> {
-        if let Some(client) = self.clients.read().await.get(tx_id) {
-            let resp = client.execute(operation, trace_id).await;
-            resp
-        } else {
-            Err(TransactionError::NotFound.into())
-        }
+        let client = self.get_client(tx_id).await?;
+        client.execute(operation, trace_id).await
     }
 
     pub async fn batch_execute(
@@ -86,28 +90,19 @@ impl TransactionActorManager {
         operations: Vec<Operation>,
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
-        if let Some(client) = self.clients.read().await.get(tx_id) {
-            client.batch_execute(operations, trace_id).await
-        } else {
-            Err(TransactionError::NotFound.into())
-        }
+        let client = self.get_client(tx_id).await?;
+        client.batch_execute(operations, trace_id).await
     }
 
     pub async fn commit_tx(&self, tx_id: &TxId) -> crate::Result<()> {
-        if let Some(client) = self.clients.read().await.get(tx_id) {
-            client.commit().await?;
-            Ok(())
-        } else {
-            Err(TransactionError::NotFound.into())
-        }
+        let client = self.get_client(tx_id).await?;
+        client.commit().await?;
+        Ok(())
     }
 
     pub async fn rollback_tx(&self, tx_id: &TxId) -> crate::Result<()> {
-        if let Some(client) = self.clients.read().await.get(tx_id) {
-            client.rollback().await?;
-            Ok(())
-        } else {
-            Err(TransactionError::NotFound.into())
-        }
+        let client = self.get_client(tx_id).await?;
+        client.rollback().await?;
+        Ok(())
     }
 }
