@@ -233,8 +233,8 @@ mod raw_mongo {
     }
 
     fn find_raw(filter: Option<serde_json::Value>, options: Option<serde_json::Value>) -> String {
-        let filter = filter.map(|q| format!(r#"filter: "{}""#, q.to_string().replace("\"", "\\\"")));
-        let options = options.map(|o| format!(r#"options: "{}""#, o.to_string().replace("\"", "\\\"")));
+        let filter = filter.map(|q| format!(r#"filter: "{}""#, q.to_string().replace('\"', "\\\"")));
+        let options = options.map(|o| format!(r#"options: "{}""#, o.to_string().replace('\"', "\\\"")));
 
         match (filter, options) {
             (None, None) => r#"query { findTestModelRaw }"#.to_string(),
@@ -251,11 +251,11 @@ mod raw_mongo {
     fn aggregate_raw(pipeline: Option<Vec<serde_json::Value>>, options: Option<serde_json::Value>) -> String {
         let pipeline = pipeline.map(|p| {
             p.into_iter()
-                .map(|stage| format!(r#""{}""#, stage.to_string().replace("\"", "\\\"")))
+                .map(|stage| format!(r#""{}""#, stage.to_string().replace('\"', "\\\"")))
                 .collect::<Vec<_>>()
         });
         let pipeline = pipeline.map(|p| format!(r#"pipeline: [{}]"#, p.join(", ")));
-        let options = options.map(|o| format!(r#"options: "{}""#, o.to_string().replace("\"", "\\\"")));
+        let options = options.map(|o| format!(r#"options: "{}""#, o.to_string().replace('\"', "\\\"")));
 
         match (pipeline, options) {
             (None, None) => r#"query { aggregateTestModelRaw }"#.to_string(),
@@ -270,7 +270,7 @@ mod raw_mongo {
     }
 
     fn run_command_raw(command: serde_json::Value) -> String {
-        let command = command.to_string().replace("\"", "\\\"");
+        let command = command.to_string().replace('\"', "\\\"");
 
         format!(r#"mutation {{ runCommandRaw(command: "{}") }}"#, command)
     }
