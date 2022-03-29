@@ -41,10 +41,10 @@ fn empty_aggregation(selections: Vec<AggregationSelection>) -> Vec<AggregationRo
             AggregationSelection::Count { all, fields } => {
                 if *all {
                     row.push(AggregationResult::Count(None, PrismaValue::Int(0)));
-                } else {
-                    for field in fields {
-                        row.push(AggregationResult::Count(Some(field.clone()), PrismaValue::Int(0)));
-                    }
+                }
+
+                for field in fields {
+                    row.push(AggregationResult::Count(Some(field.clone()), PrismaValue::Int(0)));
                 }
             }
             AggregationSelection::Average(fields) => {

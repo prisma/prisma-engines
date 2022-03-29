@@ -72,6 +72,21 @@ mod aggregation_count {
         Ok(())
     }
 
+    #[connector_test]
+    async fn count_empty_result(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ aggregateTestModel { _count { _all string int } } }"#),
+          @r###"{"data":{"aggregateTestModel":{"_count":{"_all":0,"string":0,"int":0}}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ aggregateTestModel { _count { string _all int } } }"#),
+          @r###"{"data":{"aggregateTestModel":{"_count":{"string":0,"_all":0,"int":0}}}}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
             .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
