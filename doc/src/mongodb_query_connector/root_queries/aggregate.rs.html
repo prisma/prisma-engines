@@ -202,10 +202,10 @@
             <span class="ident">AggregationSelection::Count</span> { <span class="ident">all</span>, <span class="ident">fields</span> } =&gt; {
                 <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">all</span> {
                     <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Count</span>(<span class="prelude-val">None</span>, <span class="ident">PrismaValue::Int</span>(<span class="number">0</span>)));
-                } <span class="kw">else</span> {
-                    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Count</span>(<span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">clone</span>()), <span class="ident">PrismaValue::Int</span>(<span class="number">0</span>)));
-                    }
+                }
+
+                <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
+                    <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Count</span>(<span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">clone</span>()), <span class="ident">PrismaValue::Int</span>(<span class="number">0</span>)));
                 }
             }
             <span class="ident">AggregationSelection::Average</span>(<span class="ident">fields</span>) =&gt; {
