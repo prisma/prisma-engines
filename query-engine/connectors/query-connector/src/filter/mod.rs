@@ -173,6 +173,14 @@ impl Filter {
     pub fn max(condition: Filter) -> Self {
         Self::Aggregation(AggregationFilter::Max(Box::new(condition)))
     }
+
+    pub fn as_scalar(&self) -> Option<&ScalarFilter> {
+        if let Self::Scalar(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
 }
 
 impl From<ScalarFilter> for Filter {

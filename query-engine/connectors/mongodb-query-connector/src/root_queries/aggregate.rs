@@ -14,9 +14,9 @@ pub async fn aggregate<'conn>(
 ) -> crate::Result<Vec<AggregationRow>> {
     let is_group_by = !group_by.is_empty();
     let coll = database.collection(&model.db_name());
+
     let query = MongoReadQueryBuilder::from_args(query_arguments)?
-        .with_groupings(group_by, &selections)
-        .with_having(having)?
+        .with_groupings(group_by, &selections, having)?
         .build()?;
 
     let docs = query.execute(coll, session).await?;
