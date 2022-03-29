@@ -376,12 +376,10 @@ mod aggr_group_by_having {
               having: { int: { _max: { gt: 1 } } }
             ) { string }
           }"#,
-          // Result order is not deterministic on MongoDB
-          MongoDb(_) => vec![
+          _ => vec![
             r#"{"data":{"groupByTestModel":[{"string":"group1"},{"string":"group2"}]}}"#,
             r#"{"data":{"groupByTestModel":[{"string":"group2"},{"string":"group1"}]}}"#,
-          ],
-          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group2"},{"string":"group1"}]}}"#]
+          ]
         );
 
         match_connector_result!(
@@ -394,12 +392,10 @@ mod aggr_group_by_having {
               }
             ) { string }
           }"#,
-          // Result order is not deterministic on MongoDB
-          MongoDb(_) => vec![
+          _ => vec![
             r#"{"data":{"groupByTestModel":[{"string":"group1"},{"string":"group2"}]}}"#,
             r#"{"data":{"groupByTestModel":[{"string":"group2"},{"string":"group1"}]}}"#,
-          ],
-          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group2"},{"string":"group1"}]}}"#]
+          ]
         );
 
         Ok(())
