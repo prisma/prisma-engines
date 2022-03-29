@@ -70,7 +70,7 @@ fn convert_filter_internal(
         }
         Filter::Not(filters) => coerce_empty(true, "$and", filters, !invert, invert_undefined_exclusion, prefix)?,
 
-        Filter::Scalar(sf) => scalar_filter(sf, invert, invert_undefined_exclusion, prefix)?,
+        Filter::Scalar(sf) => scalar_filter(sf, invert, invert_undefined_exclusion, false, prefix)?,
         Filter::Empty => MongoFilter::Scalar(doc! {}),
         Filter::ScalarList(slf) => scalar_list_filter(slf, invert, invert_undefined_exclusion, prefix)?,
         Filter::OneRelationIsNull(filter) => one_is_null(filter, invert, prefix),
@@ -161,6 +161,8 @@ fn scalar_filter(
     filter: ScalarFilter,
     invert: bool,
     invert_undefined_exclusion: bool,
+    // Whether the scalar filter comes from an `AggregationFilter::Count(_)`
+    is_count: bool,
     prefix: FilterPrefix,
 ) -> crate::Result<MongoFilter> {
     let field = match filter.projection {
@@ -179,6 +181,7 @@ fn scalar_filter(
             prefix,
             filter.condition.invert(invert),
             invert_undefined_exclusion,
+            is_count,
         )?,
         QueryMode::Insensitive => insensitive_scalar_filter(&field, prefix, filter.condition.invert(invert))?,
     };
@@ -192,14 +195,16 @@ fn default_scalar_filter(
     prefix: FilterPrefix,
     condition: ScalarCondition,
     invert_undefined_exclusion: bool,
+    // Whether the scalar filter comes from an `AggregationFilter::Count(_)`
+    is_count: bool,
 ) -> crate::Result<Document> {
     let field_name = prefix.render_with(field.db_name().to_owned());
     let is_set_cond = matches!(&condition, ScalarCondition::IsSet(_));
 
     let filter_doc = match condition {
-        ScalarCondition::Equals(val) => doc! { "$eq": [&field_name, (field, val).into_bson()?] },
+        ScalarCondition::Equals(val) => doc! { "$eq": [&field_name, (field, val, is_count).into_bson()?] },
         ScalarCondition::NotEquals(val) => {
-            doc! { "$ne": [&field_name, (field, val).into_bson()?] }
+            doc! { "$ne": [&field_name, (field, val, is_count).into_bson()?] }
         }
         ScalarCondition::Contains(val) => regex_match(&field_name, field, ".*", val, ".*", false)?,
         ScalarCondition::NotContains(val) => {
@@ -213,10 +218,18 @@ fn default_scalar_filter(
         ScalarCondition::NotEndsWith(val) => {
             doc! { "$not": regex_match(&field_name, field, "", val, "$", false)? }
         }
-        ScalarCondition::LessThan(val) => doc! { "$lt": [&field_name, (field, val).into_bson()?] },
-        ScalarCondition::LessThanOrEquals(val) => doc! { "$lte": [&field_name, (field, val).into_bson()?] },
-        ScalarCondition::GreaterThan(val) => doc! { "$gt": [&field_name, (field, val).into_bson()?] },
-        ScalarCondition::GreaterThanOrEquals(val) => doc! { "$gte": [&field_name, (field, val).into_bson()?] },
+        ScalarCondition::LessThan(val) => {
+            doc! { "$lt": [&field_name, (field, val, is_count).into_bson()?] }
+        }
+        ScalarCondition::LessThanOrEquals(val) => {
+            doc! { "$lte": [&field_name, (field, val, is_count).into_bson()?] }
+        }
+        ScalarCondition::GreaterThan(val) => {
+            doc! { "$gt": [&field_name, (field, val, is_count).into_bson()?] }
+        }
+        ScalarCondition::GreaterThanOrEquals(val) => {
+            doc! { "$gte": [&field_name, (field, val, is_count).into_bson()?] }
+        }
         // Todo: The nested list unpack looks like a bug somewhere.
         //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
         ScalarCondition::In(vals) => match vals.split_first() {
@@ -229,7 +242,7 @@ fn default_scalar_filter(
                         bson_values.extend(
                             inner
                                 .into_iter()
-                                .map(|val| (field, val).into_bson())
+                                .map(|val| (field, val, is_count).into_bson())
                                 .collect::<crate::Result<Vec<_>>>()?,
                         )
                     }
@@ -237,12 +250,12 @@ fn default_scalar_filter(
 
                 doc! { "$in": [&field_name, bson_values] }
             }
-            _ => doc! { "$in": [&field_name, (field, PrismaValue::List(vals)).into_bson()?] },
+            _ => doc! { "$in": [&field_name, (field, PrismaValue::List(vals), is_count).into_bson()?] },
         },
         ScalarCondition::NotIn(vals) => {
             let bson_values = vals
                 .into_iter()
-                .map(|val| (field, val).into_bson())
+                .map(|val| (field, val, is_count).into_bson())
                 .collect::<crate::Result<Vec<_>>>()?;
 
             doc! { "$not": { "$in": [&field_name, bson_values] } }
@@ -591,7 +604,7 @@ fn aggregate_conditions(
     // Therefore, we make sure the additional target in `scalar_filter` won't be rendered.
     prefix.ignore_target(true);
 
-    let (filter, _) = scalar_filter(sf, invert, invert_undefined_exclusion, prefix)?.render();
+    let (filter, _) = scalar_filter(sf, invert, invert_undefined_exclusion, op == "count", prefix)?.render();
 
     Ok(MongoFilter::Scalar(filter))
 }
