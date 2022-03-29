@@ -93,7 +93,7 @@ pub fn get_config(ctx: CallContext) -> napi::Result<JsUnknown> {
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
     }
 
-    let serialized = datamodel::json::mcf::config_to_mcf_json_value(&config);
+    let serialized = datamodel::mcf::config_to_mcf_json_value(&config);
     let s = serde_json::to_string(&serialized).unwrap();
 
     ctx.env.adjust_external_memory(s.len() as i64)?;

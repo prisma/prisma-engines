@@ -119,5 +119,5 @@ fn datasource_should_not_allow_arbitrary_parameters() {
 
 fn render_schema_json(schema: &str) -> String {
     let config = parse_configuration(schema);
-    datamodel::json::mcf::render_sources_to_json(&config.datasources)
+    datamodel::mcf::render_sources_to_json(&config.datasources)
 }
