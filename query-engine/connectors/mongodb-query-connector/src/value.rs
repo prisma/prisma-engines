@@ -84,7 +84,7 @@ impl IntoBson for (&ScalarFieldRef, PrismaValue, bool) {
     fn into_bson(self) -> crate::Result<Bson> {
         let (sf, value, is_count_aggregation) = self;
 
-        // If we're transforming the result of a `_count` for a field that's not numerical,
+        // If we're transforming the value of a `_count` filter for a field that's not numerical,
         // we force the `TypeIdentifier` to be `Int` to prevent panics.
         if is_count_aggregation && !sf.is_numeric() {
             (&TypeIdentifier::Int, value).into_bson()
