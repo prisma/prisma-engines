@@ -274,12 +274,10 @@ impl RelationFieldAsserts for dml::RelationField {
 
 impl DatamodelAsserts for dml::Datamodel {
     fn assert_has_model(&self, t: &str) -> &dml::Model {
-        self.find_model(&t.to_owned())
-            .unwrap_or_else(|| panic!("Model {} not found", t))
+        self.find_model(t).unwrap_or_else(|| panic!("Model {} not found", t))
     }
     fn assert_has_enum(&self, t: &str) -> &dml::Enum {
-        self.find_enum(&t.to_owned())
-            .unwrap_or_else(|| panic!("Enum {} not found", t))
+        self.find_enum(t).unwrap_or_else(|| panic!("Enum {} not found", t))
     }
 
     fn assert_has_composite_type(&self, t: &str) -> &dml::CompositeType {
@@ -290,12 +288,12 @@ impl DatamodelAsserts for dml::Datamodel {
 
 impl ModelAsserts for dml::Model {
     fn assert_has_scalar_field(&self, t: &str) -> &dml::ScalarField {
-        self.find_scalar_field(&t.to_owned())
+        self.find_scalar_field(t)
             .unwrap_or_else(|| panic!("Field {} not found", t))
     }
 
     fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField {
-        self.find_relation_field(&t.to_owned())
+        self.find_relation_field(t)
             .unwrap_or_else(|| panic!("Field {} not found", t))
     }
 

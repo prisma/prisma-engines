@@ -278,7 +278,7 @@ fn escaped_characters_in_string_defaults(api: TestApi) {
             "sideNames"     TEXT DEFAULT E'top\ndown'
         );
     "#;
-    api.raw_cmd(&init);
+    api.raw_cmd(init);
     let schema = api.describe();
     let table = schema.table_bang("Fruit");
 
