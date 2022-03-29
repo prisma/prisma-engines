@@ -372,6 +372,7 @@
 <span id="370">370</span>
 <span id="371">371</span>
 <span id="372">372</span>
+<span id="373">373</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">execute_many_operations</span>, <span class="ident">execute_single_operation</span>, <span class="ident">OpenTx</span>, <span class="ident">Operation</span>, <span class="ident">TxId</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">QuerySchemaRef</span>, <span class="ident">ResponseData</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">sync::Arc</span>};
@@ -523,6 +524,7 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ITXClient</span> {
     <span class="ident">send</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">TxOpRequest</span><span class="op">&gt;</span>,
     <span class="ident">tx_id</span>: <span class="ident">TxId</span>,
