@@ -187,7 +187,7 @@ pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &Composite
 
     let mut fields = vec![];
 
-    let input_fields = cf.typ.fields().into_iter().map(|f| match f {
+    let input_fields = cf.typ.fields().iter().map(|f| match f {
         ModelField::Scalar(sf) => input_field(sf.name.clone(), map_scalar_input_type_for_field(ctx, &sf), None)
             .optional_if(!sf.is_required())
             .nullable_if(!sf.is_required() && !sf.is_list()),

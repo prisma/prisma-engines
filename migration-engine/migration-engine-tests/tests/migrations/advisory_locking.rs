@@ -17,7 +17,7 @@ fn advisory_locking_works(mut api: TestApi) {
     );
 
     let output = first_me
-        .create_migration("01initial".into(), &dm, &migrations_directory)
+        .create_migration("01initial", &dm, &migrations_directory)
         .draft(true)
         .send_sync();
 
