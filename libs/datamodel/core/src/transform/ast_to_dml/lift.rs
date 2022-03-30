@@ -164,7 +164,7 @@ impl<'a> LiftAstToDml<'a> {
                                     let field_type = self.lift_scalar_field_type(
                                         field.blueprint.ast_field(),
                                         &field.tpe,
-                                        field.blueprint.as_scalar_field().unwrap(),
+                                        field.blueprint,
                                     );
                                     let mut scalar_field = dml::ScalarField::new_generated(&field.name, field_type);
                                     scalar_field.arity = if relation_field.arity.is_required() {

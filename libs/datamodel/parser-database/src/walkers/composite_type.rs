@@ -199,6 +199,9 @@ impl<'db> CompositeTypeFieldWalker<'db> {
 
     /// The final database name of the field. See crate docs for explanations on database names.
     pub(crate) fn database_name(self) -> &'db str {
-        self.default_mapped_name().unwrap_or_else(|| self.name())
+        self.field
+            .mapped_name
+            .map(|id| &self.db[id])
+            .unwrap_or_else(|| self.name())
     }
 }

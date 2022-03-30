@@ -69,7 +69,7 @@ pub struct InferredField<'db> {
     pub name: String,
     pub arity: ast::FieldArity,
     pub tpe: ScalarFieldType,
-    pub blueprint: IndexFieldWalker<'db>,
+    pub blueprint: ScalarFieldWalker<'db>,
 }
 
 /// The scalar fields on the concrete side of the relation.

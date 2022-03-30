@@ -89,6 +89,60 @@ fn simple_composite_fulltext() {
 }
 
 #[test]
+fn composite_index_with_default() {
+    let schema = indoc! {r#"
+        type A {
+          field String @default("meow")
+        }
+
+        model B {
+          id Int @id @map("_id")
+          a  A
+
+          @@index([a.field])
+        }
+    "#};
+
+    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &["mongoDb"]));
+
+    datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("B_field_idx".to_string()),
+        fields: vec![IndexField::new_in_path(&[("a", None), ("field", Some("A"))])],
+        tpe: IndexType::Normal,
+        algorithm: None,
+        defined_on_field: false,
+    });
+}
+
+#[test]
+fn composite_index_with_map() {
+    let schema = indoc! {r#"
+        type A {
+          field String @map("meow")
+        }
+
+        model B {
+          id Int @id @map("_id")
+          a  A
+
+          @@index([a.field])
+        }
+    "#};
+
+    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &["mongoDb"]));
+
+    datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("B_meow_idx".to_string()),
+        fields: vec![IndexField::new_in_path(&[("a", None), ("field", Some("A"))])],
+        tpe: IndexType::Normal,
+        algorithm: None,
+        defined_on_field: false,
+    });
+}
+
+#[test]
 fn reformat() {
     let schema = indoc! {r#"
         type A {
@@ -313,6 +367,68 @@ fn a_bonkers_definition_4() {
         [1;94m   | [0m
         [1;94m18 | [0m
         [1;94m19 | [0m  [1;91m@@index([....])[0m
+        [1;94m20 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn a_bonkers_definition_5() {
+    let schema = indoc! {r#"
+        type A {
+          field String
+        }
+
+        model B {
+          id Int @id @map("_id")
+          a  A
+
+          @@index([a .field])
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
+        [1;94m   | [0m
+        [1;94m18 | [0m
+        [1;94m19 | [0m  [1;91m@@index([a .field])[0m
+        [1;94m20 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn a_bonkers_definition_6() {
+    let schema = indoc! {r#"
+        type A {
+          field String
+        }
+
+        model B {
+          id Int @id @map("_id")
+          a  A
+
+          @@index([a something .field])
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
+        [1;94m   | [0m
+        [1;94m18 | [0m
+        [1;94m19 | [0m  [1;91m@@index([a something .field])[0m
         [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];

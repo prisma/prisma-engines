@@ -70,6 +70,9 @@ impl<'db> InlineRelationWalker<'db> {
                                 pascal_case(field.name())
                             );
 
+                            // we cannot have composite fields in a relation for now.
+                            let field = field.as_scalar_field().unwrap();
+
                             if let Some(existing_field) =
                                 self.referencing_model().scalar_fields().find(|sf| sf.name() == name)
                             {
