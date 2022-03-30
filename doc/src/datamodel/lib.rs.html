@@ -294,6 +294,8 @@
 <span id="292">292</span>
 <span id="293">293</span>
 <span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This crate is responsible for parsing, rendering and formatting a Prisma Schema.</span>
 <span class="doccomment">//! A Prisma Schema consists out of two parts:</span>
 <span class="doccomment">//! 1. The `Datamodel` part refers to the model and enum definitions.</span>
@@ -311,7 +313,7 @@
 <span class="doccomment">//! * `dml`: contains the models representing the Datamodel part of a Prisma schema</span>
 <span class="doccomment">//! * `configuration`: contains the models representing the Datasources and Generators of a Prisma schema</span>
 <span class="doccomment">//! * `transform`: contains the logic to turn an AST into models and vice versa</span>
-<span class="doccomment">//! * `json`: contains the logic to turn models into their JSON/DMMF representation</span>
+<span class="doccomment">//! * `mcf`: contains the logic to turn generators and datasources into their JSON representation</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The flow between the layers is depicted in the following diagram.</span>
 <span class="doccomment">//!&lt;pre&gt;</span>
@@ -346,7 +348,9 @@
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">common</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dml</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">json</span>;
+
+<span class="doccomment">/// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a JSON representation.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">mcf</span>;
 
 <span class="kw">mod</span> <span class="ident">configuration</span>;
 <span class="kw">mod</span> <span class="ident">reformat</span>;
