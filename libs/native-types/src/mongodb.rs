@@ -16,7 +16,6 @@ pub enum MongoDbType {
     Int,
     Timestamp,
     Long,
-    Decimal,
     Json,
     // Deprecated:
     // DbPointer
@@ -24,6 +23,7 @@ pub enum MongoDbType {
     // Symbol
 
     // Unsupported:
+    // Decimal,
     // MinKey,
     // MaxKey,
     // Object,
