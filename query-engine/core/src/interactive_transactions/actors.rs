@@ -10,6 +10,8 @@ use tokio::{
     },
     time::{self, Duration},
 };
+use tracing::Dispatch;
+use tracing_futures::WithSubscriber;
 
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 
@@ -252,6 +254,19 @@ impl ITXClient {
     }
 }
 
+// Warning!!! This is not pretty. When the actors are spawned with the node-api
+// They lose the current subscriber because it is not a global subscriber
+// and are no longer able to send logs. This fix gets the current dispatcher
+// and clones it out so that we can use `WithSubscriber` with it.
+fn get_current_dispatcher() -> Dispatch {
+    let mut dispatcher = tracing::Dispatch::default();
+    tracing::dispatcher::get_default(|current| {
+        dispatcher = current.clone();
+    });
+
+    dispatcher
+}
+
 pub fn spawn_itx_actor(
     query_schema: QuerySchemaRef,
     tx_id: TxId,
@@ -269,50 +284,54 @@ pub fn spawn_itx_actor(
     };
 
     let mut server = ITXServer::new(tx_id, CachedTx::Open(value), timeout, rx_from_client, query_schema);
+    let dispatcher = get_current_dispatcher();
 
-    tokio::task::spawn(async move {
-        let sleep = time::sleep(timeout);
-        tokio::pin!(sleep);
+    tokio::task::spawn(
+        async move {
+            let sleep = time::sleep(timeout);
+            tokio::pin!(sleep);
 
-        loop {
-            tokio::select! {
-                _ = &mut sleep => {
-                    trace!("[{}] interactive transaction timed out", server.id.to_string());
-                    let _ = server.rollback(true).await;
-                    break;
-                }
-                msg = server.receive.recv() => {
-                    if let Some(op) = msg {
-                        let run_state = server.process_msg(op).await;
+            loop {
+                tokio::select! {
+                    _ = &mut sleep => {
+                        trace!("[{}] interactive transaction timed out", server.id.to_string());
+                        let _ = server.rollback(true).await;
+                        break;
+                    }
+                    msg = server.receive.recv() => {
+                        if let Some(op) = msg {
+                            let run_state = server.process_msg(op).await;
 
-                        if run_state == RunState::Finished {
-                            break
+                            if run_state == RunState::Finished {
+                                break
+                            }
                         }
                     }
                 }
             }
-        }
 
-        trace!("[{}] completed with {}", server.id.to_string(), server.cached_tx);
-        let eviction_sleep = time::sleep(Duration::from_secs(cache_eviction_secs));
-        tokio::pin!(eviction_sleep);
+            trace!("[{}] completed with {}", server.id.to_string(), server.cached_tx);
+            let eviction_sleep = time::sleep(Duration::from_secs(cache_eviction_secs));
+            tokio::pin!(eviction_sleep);
 
-        loop {
-            tokio::select! {
-                _ = &mut eviction_sleep => {
-                    break;
-                }
-                msg = server.receive.recv() => {
-                    if let Some(op) = msg {
-                            server.process_eviction_state_msg(op).await;
-                        }
+            loop {
+                tokio::select! {
+                    _ = &mut eviction_sleep => {
+                        break;
                     }
+                    msg = server.receive.recv() => {
+                        if let Some(op) = msg {
+                                server.process_eviction_state_msg(op).await;
+                            }
+                        }
+                }
             }
-        }
 
-        let _ = send_done.send(server.id.clone()).await;
-        trace!("[{}] has stopped with {}", server.id.to_string(), server.cached_tx);
-    });
+            let _ = send_done.send(server.id.clone()).await;
+            trace!("[{}] has stopped with {}", server.id.to_string(), server.cached_tx);
+        }
+        .with_subscriber(dispatcher),
+    );
 
     client
 }
