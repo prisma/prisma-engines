@@ -5,6 +5,7 @@ use crate::{
     Datasource,
 };
 use enumflags2::BitFlags;
+use itertools::Itertools;
 
 pub struct LowerDmlToAst<'a> {
     pub datasource: Option<&'a Datasource>,
@@ -200,11 +201,13 @@ impl<'a> LowerDmlToAst<'a> {
                     args.extend(ordering);
                 }
 
+                let name = f.path.iter().map(|(name, _)| name).join(".");
+
                 if args.is_empty() {
-                    ast::Expression::ConstantValue(f.name.clone(), ast::Span::empty())
+                    ast::Expression::ConstantValue(name, ast::Span::empty())
                 } else {
                     ast::Expression::Function(
-                        f.name.clone(),
+                        name,
                         ast::ArgumentsList {
                             arguments: args,
                             ..Default::default()

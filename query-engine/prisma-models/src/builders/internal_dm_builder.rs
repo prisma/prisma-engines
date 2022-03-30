@@ -222,9 +222,15 @@ fn index_builders(model: &dml::Model) -> Vec<IndexBuilder> {
         .indices
         .iter()
         .filter(|i| i.fields.len() > 1 && model.is_compound_index_supported(i)) // @@unique for 1 field are transformed to is_unique instead
+        .filter(|i| i.fields.iter().all(|f| f.path.len() <= 1)) // TODO: we do not take indices with composite fields for now
         .map(|i| IndexBuilder {
             name: i.name.clone(),
-            fields: i.fields.clone().into_iter().map(|f| f.name).collect(),
+            fields: i
+                .fields
+                .clone()
+                .into_iter()
+                .map(|mut f| f.path.pop().unwrap().0)
+                .collect(),
             typ: match i.tpe {
                 dml::IndexType::Unique => IndexType::Unique,
                 dml::IndexType::Normal => IndexType::Normal,

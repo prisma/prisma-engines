@@ -71,7 +71,12 @@ pub fn index_name_matches(idx: &IndexDefinition, model: &Model, connector: &dyn 
     let column_names: Vec<&str> = idx
         .fields
         .iter()
-        .map(|field| model.find_scalar_field(&field.name).unwrap().final_database_name())
+        .map(|field| {
+            model
+                .find_scalar_field(&field.path.first().unwrap().0)
+                .unwrap()
+                .final_database_name()
+        })
         .collect();
 
     let expected = if idx.is_unique() {

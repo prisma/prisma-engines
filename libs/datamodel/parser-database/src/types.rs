@@ -105,6 +105,11 @@ impl ScalarFieldType {
             _ => None,
         }
     }
+
+    /// Is the type of the field `Unsupported("...")`?
+    pub fn is_unsupported(self) -> bool {
+        matches!(self, Self::Unsupported(_))
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -242,7 +247,12 @@ impl IndexAttribute {
     }
 
     pub(crate) fn fields_match(&self, other: &[ast::FieldId]) -> bool {
-        self.fields.len() == other.len() && self.fields.iter().zip(other.iter()).all(|(a, b)| a.field_id == *b)
+        self.fields.len() == other.len()
+            && self
+                .fields
+                .iter()
+                .zip(other.iter())
+                .all(|(a, b)| a.path.field_in_index() == *b)
     }
 }
 
@@ -257,13 +267,140 @@ pub(crate) struct IdAttribute {
 
 impl IdAttribute {
     pub(crate) fn fields_match(&self, other: &[ast::FieldId]) -> bool {
-        self.fields.len() == other.len() && self.fields.iter().zip(other.iter()).all(|(a, b)| a.field_id == *b)
+        self.fields.len() == other.len()
+            && self
+                .fields
+                .iter()
+                .zip(other.iter())
+                .all(|(a, b)| a.path.field_in_index() == *b)
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+/// Defines a path to a field that is not directly in the model.
+///
+/// ```ignore
+/// type A {
+///   field String
+/// }
+///
+/// model A {
+///   id Int @id
+///   a  A
+///
+///   @@index([a.field])
+///   //       ^this thing here, path separated with `.`
+/// }
+/// ```
+#[derive(Debug, Clone, PartialEq)]
+pub struct IndexFieldPath {
+    /// The field in the model that starts the path to the final field included
+    /// in the index. The type of this field has to be a composite type.
+    ///
+    /// ```ignore
+    /// type A {
+    ///   field String
+    /// }
+    ///
+    /// model A {
+    ///   id Int @id
+    ///   a  A
+    /// //^this one is the root
+    ///   @@index([a.field])
+    /// }
+    /// ```
+    root: ast::FieldId,
+    /// Path from the root, one composite type at a time. The final item is the
+    /// field that gets included in the index.
+    ///
+    /// ```ignore
+    /// type A {
+    ///   field String
+    /// }
+    ///
+    /// model A {
+    ///   id Int @id
+    ///   a  A
+    ///   @@index([a.field])
+    /// //           ^this one is the path. in this case a vector of one element
+    /// }
+    /// ```
+    path: Vec<(ast::CompositeTypeId, ast::FieldId)>,
+}
+
+impl IndexFieldPath {
+    pub(crate) fn new(root: ast::FieldId) -> Self {
+        Self { root, path: Vec::new() }
+    }
+
+    pub(crate) fn push_field(&mut self, ctid: ast::CompositeTypeId, field_id: ast::FieldId) {
+        self.path.push((ctid, field_id));
+    }
+
+    /// The starting point of the index path. If the indexed field is not in a
+    /// composite type, returns the same value as [`field_in_index`].
+    ///
+    /// ```ignore
+    /// type A {
+    ///   field String
+    /// }
+    ///
+    /// model A {
+    ///   id Int @id
+    ///   a  A
+    /// //^here
+    ///
+    ///   @@index([a.field])
+    /// }
+    /// ```
+    ///
+    /// [`field_in_index`]: struct IndexFieldPath#method.field_in_index
+    pub fn root(&self) -> ast::FieldId {
+        self.root
+    }
+
+    /// The path after [`root`]. Empty if the field is not pointing to a
+    /// composite type.
+    ///
+    /// ```ignore
+    /// type A {
+    ///   field String
+    /// //^the path is a vector of one element, pointing to this field.
+    /// }
+    ///
+    /// model A {
+    ///   id Int @id
+    ///   a  A
+    ///
+    ///   @@index([a.field])
+    /// }
+    /// ```
+    ///
+    /// [`root`]: struct IndexFieldPath#method.root
+    pub fn path(&self) -> &[(ast::CompositeTypeId, ast::FieldId)] {
+        &self.path
+    }
+
+    /// The field that gets included in the index. Can either be in the model,
+    /// or in a composite type embedded in the model. Returns the same value as
+    /// the [`root`] method if the field is in a model rather than in a
+    /// composite type.
+    ///
+    /// [`root`]: struct IndexFieldPath#method.root
+    pub fn field_in_index(&self) -> ast::FieldId {
+        self.path.last().map(|(_, field_id)| *field_id).unwrap_or(self.root)
+    }
+
+    /// If the indexed field is in a composite type embedded to the model, gives
+    /// a pointer to the type. Use this method to determine the type of the
+    /// index field.
+    pub fn type_holding_the_indexed_field(&self) -> Option<ast::CompositeTypeId> {
+        self.path.last().map(|(ctid, _)| *ctid)
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct FieldWithArgs {
-    pub(crate) field_id: ast::FieldId,
+    pub(crate) path: IndexFieldPath,
     pub(crate) sort_order: Option<SortOrder>,
     pub(crate) length: Option<u32>,
 }

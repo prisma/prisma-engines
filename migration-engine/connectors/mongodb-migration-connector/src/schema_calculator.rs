@@ -17,7 +17,16 @@ pub(crate) fn calculate(datamodel: &ValidatedSchema) -> MongoSchema {
             let name = index.constraint_name(&connector);
             let fields = index
                 .scalar_field_attributes()
-                .map(|field| (field.as_scalar_field().database_name(), field.sort_order()))
+                .map(|field| {
+                    let path = field
+                        .as_mapped_path_to_indexed_field()
+                        .into_iter()
+                        .map(|(f, _)| f.to_owned())
+                        .collect::<Vec<_>>()
+                        .join(".");
+
+                    (path, field.sort_order())
+                })
                 .map(|(name, sort_order)| {
                     let property = match sort_order {
                         Some(SortOrder::Desc) => IndexFieldProperty::Descending,
@@ -25,10 +34,7 @@ pub(crate) fn calculate(datamodel: &ValidatedSchema) -> MongoSchema {
                         _ => IndexFieldProperty::Ascending,
                     };
 
-                    IndexField {
-                        name: name.to_string(),
-                        property,
-                    }
+                    IndexField { name, property }
                 })
                 .collect();
 

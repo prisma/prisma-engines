@@ -16,9 +16,8 @@ impl<'db> IndexWalkerExt<'db> for IndexWalker<'db> {
 
         let model = self.model();
         let model_db_name = model.database_name();
-        let field_db_names: Vec<&str> = model
-            .get_field_database_names(&self.fields().map(|f| f.field_id()).collect::<Vec<_>>())
-            .collect();
+
+        let field_db_names = self.fields().map(|f| f.database_name()).collect::<Vec<_>>();
 
         if self.is_unique() {
             ConstraintNames::unique_index_name(model_db_name, &field_db_names, connector).into()
@@ -119,6 +118,26 @@ pub trait ScalarFieldWalkerExt {
 }
 
 impl ScalarFieldWalkerExt for ScalarFieldWalker<'_> {
+    fn native_type_instance(&self, connector: &dyn Connector) -> Option<NativeTypeInstance> {
+        self.raw_native_type().and_then(|(_, name, args, _)| {
+            connector
+                .parse_native_type(name, args.to_owned(), self.ast_field().span)
+                .ok()
+        })
+    }
+}
+
+impl ScalarFieldWalkerExt for CompositeTypeFieldWalker<'_> {
+    fn native_type_instance(&self, connector: &dyn Connector) -> Option<NativeTypeInstance> {
+        self.raw_native_type().and_then(|(_, name, args, _)| {
+            connector
+                .parse_native_type(name, args.to_owned(), self.ast_field().span)
+                .ok()
+        })
+    }
+}
+
+impl ScalarFieldWalkerExt for IndexFieldWalker<'_> {
     fn native_type_instance(&self, connector: &dyn Connector) -> Option<NativeTypeInstance> {
         self.raw_native_type().and_then(|(_, name, args, _)| {
             connector

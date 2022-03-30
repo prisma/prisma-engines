@@ -264,7 +264,7 @@ impl Connector for MySqlDatamodelConnector {
 
         for index in model.indexes() {
             for field in index.scalar_field_attributes() {
-                if let Some(native_type) = field.as_scalar_field().native_type_instance(self) {
+                if let Some(native_type) = field.as_index_field().native_type_instance(self) {
                     if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type.name.as_str()) {
                         // Length defined, so we allow the index.
                         if field.length().is_some() {
@@ -295,7 +295,7 @@ impl Connector for MySqlDatamodelConnector {
 
         if let Some(pk) = model.primary_key() {
             for id_field in pk.scalar_field_attributes() {
-                if let Some(native_type_instance) = id_field.as_scalar_field().native_type_instance(self) {
+                if let Some(native_type_instance) = id_field.as_index_field().native_type_instance(self) {
                     if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION
                         .contains(&native_type_instance.name.as_str())
                     {

@@ -55,11 +55,9 @@ impl<'ast, 'db> PrimaryKeyWalker<'db> {
 
     /// The scalar fields constrained by the id.
     pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db {
-        self.attribute.fields.iter().map(move |field| ScalarFieldWalker {
-            model_id: self.model_id,
-            field_id: field.field_id,
-            db: self.db,
-            scalar_field: &self.db.types.scalar_fields[&(self.model_id, field.field_id)],
+        self.attribute.fields.iter().map(move |field| {
+            let field_id = field.path.field_in_index();
+            self.model().scalar_field(field_id)
         })
     }
 
@@ -80,7 +78,12 @@ impl<'ast, 'db> PrimaryKeyWalker<'db> {
     /// Do the constrained fields match exactly these?
     pub(crate) fn contains_exactly_fields_by_id(self, fields: &[ast::FieldId]) -> bool {
         self.attribute.fields.len() == fields.len()
-            && self.attribute.fields.iter().zip(fields).all(|(a, b)| a.field_id == *b)
+            && self
+                .attribute
+                .fields
+                .iter()
+                .zip(fields)
+                .all(|(a, b)| a.path.field_in_index() == *b)
     }
 
     /// Do the constrained fields match exactly these?

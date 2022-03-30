@@ -45,7 +45,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
             columns: pk
                 .scalar_field_attributes()
                 .map(|field| sql::PrimaryKeyColumn {
-                    name: field.as_scalar_field().database_name().to_owned(),
+                    name: field.as_index_field().database_name().to_owned(),
                     length: field.length(),
                     sort_order: field.sort_order().map(|so| match so {
                         SortOrder::Asc => sql::SQLSortOrder::Asc,
@@ -65,7 +65,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
                 let columns = index
                     .scalar_field_attributes()
                     .map(|sf| sql::IndexColumn {
-                        name: sf.as_scalar_field().database_name().into(),
+                        name: sf.as_index_field().database_name().to_owned(),
                         sort_order: sf.sort_order().map(|s| match s {
                             SortOrder::Asc => sql::SQLSortOrder::Asc,
                             SortOrder::Desc => sql::SQLSortOrder::Desc,

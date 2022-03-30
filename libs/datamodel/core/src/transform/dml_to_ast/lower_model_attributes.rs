@@ -6,6 +6,7 @@ use crate::{
     dml::{self, Ignorable, IndexDefinition, IndexType, Model, SortOrder, WithDatabaseName},
 };
 use ::dml::model::IndexAlgorithm;
+use itertools::Itertools;
 
 impl<'a> LowerDmlToAst<'a> {
     /// Internal: Lowers a model's attributes.
@@ -115,8 +116,15 @@ impl<'a> LowerDmlToAst<'a> {
                 ast::Span::empty(),
             ))]
         } else {
+            let fields = index_def
+                .fields
+                .clone()
+                .into_iter()
+                .map(|f| f.path.into_iter().map(|(field, _)| field).join("."))
+                .collect::<Vec<_>>();
+
             vec![ast::Argument::new_unnamed(ast::Expression::Array(
-                LowerDmlToAst::field_array(&index_def.fields.clone().into_iter().map(|f| f.name).collect::<Vec<_>>()),
+                LowerDmlToAst::field_array(&fields),
                 ast::Span::empty(),
             ))]
         }

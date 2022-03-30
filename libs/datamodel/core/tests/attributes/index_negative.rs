@@ -44,7 +44,7 @@ fn must_error_when_unknown_fields_are_used() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating model "User": The index definition refers to the unknown fields foo, bar.[0m
+        [1;91merror[0m: [1mError validating model "User": The index definition refers to the unknown fields: foo, bar.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m

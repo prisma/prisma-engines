@@ -73,10 +73,16 @@ impl<'db> CompositeTypeWalker<'db> {
 /// A field in a composite type.
 #[derive(Clone, Copy)]
 pub struct CompositeTypeFieldWalker<'db> {
-    ctid: ast::CompositeTypeId,
-    field_id: ast::FieldId,
-    field: &'db types::CompositeTypeField,
-    db: &'db ParserDatabase,
+    pub(super) ctid: ast::CompositeTypeId,
+    pub(super) field_id: ast::FieldId,
+    pub(super) field: &'db types::CompositeTypeField,
+    pub(super) db: &'db ParserDatabase,
+}
+
+impl<'db> PartialEq for CompositeTypeFieldWalker<'db> {
+    fn eq(&self, other: &Self) -> bool {
+        self.ctid == other.ctid && self.field_id == other.field_id
+    }
 }
 
 impl<'db> CompositeTypeFieldWalker<'db> {
@@ -101,6 +107,11 @@ impl<'db> CompositeTypeFieldWalker<'db> {
     /// The name contained in the `@map()` attribute of the field, if any.
     pub fn mapped_name(self) -> Option<&'db str> {
         self.field.mapped_name.map(|id| &self.db[id])
+    }
+
+    /// The ID of the field in the AST.
+    pub fn field_id(self) -> ast::FieldId {
+        self.field_id
     }
 
     /// The name of the field.
@@ -176,5 +187,21 @@ impl<'db> CompositeTypeFieldWalker<'db> {
             .as_ref()
             .and_then(|d| d.mapped_name)
             .map(|id| &self.db[id])
+    }
+
+    /// Get the database name of the composite field.
+    pub fn get_field_database_name(self, field_id: ast::FieldId) -> &'db str {
+        self.db.types.composite_type_fields[&(self.ctid, field_id)]
+            .mapped_name
+            .map(|id| &self.db[id])
+            .unwrap_or_else(|| &self.db.ast[self.ctid][field_id].name.name)
+    }
+
+    /// The final database name of the field. See crate docs for explanations on database names.
+    pub(crate) fn database_name(self) -> &'db str {
+        self.field
+            .mapped_name
+            .map(|id| &self.db[id])
+            .unwrap_or_else(|| self.name())
     }
 }

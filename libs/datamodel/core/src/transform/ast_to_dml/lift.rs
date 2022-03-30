@@ -351,15 +351,15 @@ impl<'a> LiftAstToDml<'a> {
             fields: pk
                 .scalar_field_attributes()
                 .map(|field|
-                    //TODO (extended indexes) here it is ok to pass sort and length with out a preview flag
-                    // check since this is coming from the ast and the parsing would reject the args without
-                    // the flag set
-                    // When we start using the extra args here could be a place to fill in the defaults.
-                    PrimaryKeyField {
-                    name: field.as_scalar_field().name().to_owned(),
-                    sort_order: field.sort_order().map(parser_database_sort_order_to_dml_sort_order),
-                    length: field.length(),
-                })
+                     //TODO (extended indexes) here it is ok to pass sort and length with out a preview flag
+                     // check since this is coming from the ast and the parsing would reject the args without
+                     // the flag set
+                     // When we start using the extra args here could be a place to fill in the defaults.
+                     PrimaryKeyField {
+                         name: field.as_index_field().as_scalar_field().unwrap().name().to_owned(),
+                         sort_order: field.sort_order().map(parser_database_sort_order_to_dml_sort_order),
+                         length: field.length(),
+                     })
                 .collect(),
             defined_on_field: pk.is_defined_on_field(),
         });
@@ -369,10 +369,21 @@ impl<'a> LiftAstToDml<'a> {
             .map(|idx| {
                 let fields = idx
                     .scalar_field_attributes()
-                    .map(|field| IndexField {
-                        name: field.as_scalar_field().name().to_owned(),
-                        sort_order: field.sort_order().map(parser_database_sort_order_to_dml_sort_order),
-                        length: field.length(),
+                    .map(|field| {
+                        let path = field
+                            .as_path_to_indexed_field()
+                            .into_iter()
+                            .map(|(a, b)| (a.to_owned(), b.map(|s| s.to_owned())))
+                            .collect();
+
+                        let sort_order = field.sort_order().map(parser_database_sort_order_to_dml_sort_order);
+                        let length = field.length();
+
+                        IndexField {
+                            path,
+                            sort_order,
+                            length,
+                        }
                     })
                     .collect();
 

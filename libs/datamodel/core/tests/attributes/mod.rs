@@ -1,5 +1,6 @@
 mod arg_parsing;
 mod builtin_attributes;
+mod composite_index;
 mod constraint_names;
 mod constraint_names_negative;
 mod constraint_names_positive;

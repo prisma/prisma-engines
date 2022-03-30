@@ -3,12 +3,14 @@ mod id;
 mod map;
 mod native_types;
 
+use std::borrow::Cow;
+
 use crate::{
     ast::{self, WithName, WithSpan},
     context::Context,
     types::{
-        EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexType, ModelAttributes, RelationField,
-        ScalarField, ScalarFieldType, SortOrder,
+        EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexFieldPath, IndexType, ModelAttributes,
+        RelationField, ScalarField, ScalarFieldType, SortOrder,
     },
     DatamodelError, StringId, ValueValidator,
 };
@@ -304,7 +306,7 @@ fn visit_field_unique(field_id: ast::FieldId, model_attributes: &mut ModelAttrib
         IndexAttribute {
             r#type: IndexType::Unique,
             fields: vec![FieldWithArgs {
-                field_id,
+                path: IndexFieldPath::new(field_id),
                 sort_order,
                 length,
             }],
@@ -423,7 +425,13 @@ fn model_fulltext(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut 
         ..Default::default()
     };
 
-    common_index_validations(&mut index_attribute, model_id, ctx);
+    common_index_validations(
+        &mut index_attribute,
+        model_id,
+        FieldResolvingSetup::FollowComposites,
+        ctx,
+    );
+
     let mapped_name = match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
@@ -449,7 +457,13 @@ fn model_index(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Con
         ..Default::default()
     };
 
-    common_index_validations(&mut index_attribute, model_id, ctx);
+    common_index_validations(
+        &mut index_attribute,
+        model_id,
+        FieldResolvingSetup::FollowComposites,
+        ctx,
+    );
+
     let name = get_name_argument(ctx);
 
     let mapped_name = match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
@@ -514,7 +528,13 @@ fn model_unique(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Co
         r#type: IndexType::Unique,
         ..Default::default()
     };
-    common_index_validations(&mut index_attribute, model_id, ctx);
+
+    common_index_validations(
+        &mut index_attribute,
+        model_id,
+        FieldResolvingSetup::FollowComposites,
+        ctx,
+    );
 
     let current_attribute = ctx.current_attribute();
     let current_attribute_id = ctx.current_attribute_id();
@@ -558,7 +578,12 @@ fn model_unique(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Co
     data.ast_indexes.push((current_attribute_id, index_attribute));
 }
 
-fn common_index_validations(index_data: &mut IndexAttribute, model_id: ast::ModelId, ctx: &mut Context<'_>) {
+fn common_index_validations(
+    index_data: &mut IndexAttribute,
+    model_id: ast::ModelId,
+    resolving: FieldResolvingSetup,
+    ctx: &mut Context<'_>,
+) {
     let current_attribute = ctx.current_attribute();
     let fields = match ctx.visit_default_arg("fields") {
         Ok(fields) => fields,
@@ -567,7 +592,7 @@ fn common_index_validations(index_data: &mut IndexAttribute, model_id: ast::Mode
         }
     };
 
-    match resolve_field_array_with_args(&fields, current_attribute.span, model_id, ctx) {
+    match resolve_field_array_with_args(&fields, current_attribute.span, model_id, resolving, ctx) {
         Ok(fields) => {
             index_data.fields = fields;
         }
@@ -577,11 +602,24 @@ fn common_index_validations(index_data: &mut IndexAttribute, model_id: ast::Mode
             relation_fields,
         }) => {
             if !unresolvable_fields.is_empty() {
+                let fields = unresolvable_fields
+                    .iter()
+                    .map(|(top_id, field_name)| match top_id {
+                        ast::TopId::CompositeType(ctid) => {
+                            let composite_type = &ctx.ast[*ctid].name.name;
+
+                            Cow::from(format!("{field_name} in type {composite_type}"))
+                        }
+                        ast::TopId::Model(_) => Cow::from(*field_name),
+                        _ => unreachable!(),
+                    })
+                    .collect::<Vec<_>>();
+
                 ctx.push_error({
                     let message: &str = &format!(
-                        "The {}index definition refers to the unknown fields {}.",
+                        "The {}index definition refers to the unknown fields: {}.",
                         if index_data.is_unique() { "unique " } else { "" },
-                        unresolvable_fields.join(", "),
+                        fields.join(", "),
                     );
                     let model_name = ctx.ast[model_id].name();
                     DatamodelError::new_model_validation_error(message, model_name, current_attribute.span)
@@ -637,11 +675,27 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
                 relation_fields,
             }) => {
                 if !unresolvable_fields.is_empty() {
-                    ctx.push_error(DatamodelError::new_validation_error(format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {}", unresolvable_fields.join(", ")), fields.span()))
+                    let unresolvable_fields = unresolvable_fields
+                        .into_iter()
+                        .map(|(_, field)| field)
+                        .collect::<Vec<_>>()
+                        .join(", ");
+
+                    let msg = format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {unresolvable_fields}");
+
+                    ctx.push_error(DatamodelError::new_validation_error(msg, fields.span()))
                 }
 
                 if !relation_fields.is_empty() {
-                    ctx.push_error(DatamodelError::new_validation_error(format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), fields.span()));
+                    let relation_fields = relation_fields
+                        .into_iter()
+                        .map(|(f, _)| f.name())
+                        .collect::<Vec<_>>()
+                        .join(", ");
+
+                    let msg = format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {relation_fields}");
+
+                    ctx.push_error(DatamodelError::new_validation_error(msg, fields.span()));
                 }
 
                 Vec::new()
@@ -665,11 +719,18 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
                 unknown_fields,
             }) => {
                 if !unknown_fields.is_empty() {
+                    let model_name = ctx.ast[relation_field.referenced_model].name();
+
+                    let field_names = unknown_fields
+                        .into_iter()
+                        .map(|(_, field_name)| field_name)
+                        .collect::<Vec<_>>()
+                        .join(", ");
+
                     let msg = format!(
-                        "The argument `references` must refer only to existing fields in the related model `{}`. The following fields do not exist in the related model: {}",
-                        ctx.ast[relation_field.referenced_model].name(),
-                        unknown_fields.join(", "),
+                        "The argument `references` must refer only to existing fields in the related model `{model_name}`. The following fields do not exist in the related model: {field_names}",
                     );
+
                     ctx.push_error(DatamodelError::new_validation_error(msg, attr.span));
                 }
 
@@ -739,11 +800,12 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
     relation_field.mapped_name = fk_name;
 }
 
+#[derive(Debug)]
 enum FieldResolutionError<'ast> {
     AlreadyDealtWith,
     ProblematicFields {
         /// Fields that do not exist on the model.
-        unknown_fields: Vec<&'ast str>,
+        unknown_fields: Vec<(ast::TopId, &'ast str)>,
         /// Fields that exist on the model but are relation fields.
         relation_fields: Vec<(&'ast ast::Field, ast::FieldId)>,
     },
@@ -772,11 +834,16 @@ fn resolve_field_array_without_args<'db>(
     let ast_model = &ctx.ast[model_id];
 
     for field_name in constant_array {
+        if field_name.contains('.') {
+            unknown_fields.push((ast::TopId::Model(model_id), field_name));
+            continue;
+        }
+
         // Does the field exist?
         let field_id = if let Some(field_id) = ctx.find_model_field(model_id, field_name) {
             field_id
         } else {
-            unknown_fields.push(field_name);
+            unknown_fields.push((ast::TopId::Model(model_id), field_name));
             continue;
         };
 
@@ -812,6 +879,18 @@ fn resolve_field_array_without_args<'db>(
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+enum FieldResolvingSetup {
+    OnlyTopLevel,
+    FollowComposites,
+}
+
+impl FieldResolvingSetup {
+    fn follow_composites(self) -> bool {
+        matches!(self, Self::FollowComposites)
+    }
+}
+
 /// Takes an attribute argument, validates it as an array of fields with potentially args,
 /// then resolves  the constant literal as field names on the model. The error variant
 /// contains the fields that are not in the model.
@@ -819,6 +898,7 @@ fn resolve_field_array_with_args<'db>(
     values: &ValueValidator<'db>,
     attribute_span: ast::Span,
     model_id: ast::ModelId,
+    resolving: FieldResolvingSetup,
     ctx: &mut Context<'db>,
 ) -> Result<Vec<FieldWithArgs>, FieldResolutionError<'db>> {
     let constant_array = match values.as_field_array_with_args() {
@@ -832,37 +912,109 @@ fn resolve_field_array_with_args<'db>(
     let mut field_ids = Vec::with_capacity(constant_array.len());
     let mut unknown_fields = Vec::new();
     let mut relation_fields = Vec::new();
+
     let ast_model = &ctx.ast[model_id];
 
-    for (field_name, _, _) in &constant_array {
-        // Does the field exist?
-        let field_id = if let Some(field_id) = ctx.find_model_field(model_id, field_name) {
-            field_id
+    'fields: for (field_name, _, _) in &constant_array {
+        let path = if field_name.contains('.') {
+            if !resolving.follow_composites() {
+                unknown_fields.push((ast::TopId::Model(model_id), *field_name));
+                continue 'fields;
+            }
+
+            let field_count = field_name.split('.').count();
+            let mut path_in_schema = field_name.split('.').enumerate();
+
+            let (mut path, mut next_type) = match path_in_schema.next() {
+                Some((_, field_shard)) => {
+                    let field_id = match ctx.find_model_field(model_id, field_shard) {
+                        Some(field_id) => field_id,
+                        None => {
+                            unknown_fields.push((ast::TopId::Model(model_id), field_shard));
+                            continue 'fields;
+                        }
+                    };
+
+                    if !ctx.types.scalar_fields.contains_key(&(model_id, field_id)) {
+                        relation_fields.push((&ctx.ast[model_id][field_id], field_id));
+                        continue 'fields;
+                    }
+
+                    match &ctx.types.scalar_fields[&(model_id, field_id)].r#type {
+                        ScalarFieldType::CompositeType(ctid) => (IndexFieldPath::new(field_id), *ctid),
+                        _ => {
+                            unknown_fields.push((ast::TopId::Model(model_id), field_name));
+                            continue 'fields;
+                        }
+                    }
+                }
+                None => {
+                    // TODO: See if we need to actually error here, or if this
+                    // case is handled earlier.
+                    continue 'fields;
+                }
+            };
+
+            for (i, field_shard) in path_in_schema {
+                let field_id = match ctx.find_composite_type_field(next_type, field_shard) {
+                    Some(field_id) => field_id,
+                    None => {
+                        unknown_fields.push((ast::TopId::CompositeType(next_type), field_shard));
+                        continue 'fields;
+                    }
+                };
+
+                path.push_field(next_type, field_id);
+
+                match &ctx.types.composite_type_fields[&(next_type, field_id)].r#type {
+                    ScalarFieldType::CompositeType(ctid) => {
+                        next_type = *ctid;
+                    }
+                    _ if i < field_count - 1 => {
+                        unknown_fields.push((ast::TopId::Model(model_id), field_name));
+                        continue 'fields;
+                    }
+                    _ => (),
+                }
+            }
+
+            path
+        } else if let Some(field_id) = ctx.find_model_field(model_id, field_name) {
+            // Is the field a scalar field?
+            if !ctx.types.scalar_fields.contains_key(&(model_id, field_id)) {
+                relation_fields.push((&ctx.ast[model_id][field_id], field_id));
+                continue;
+            } else {
+                IndexFieldPath::new(field_id)
+            }
         } else {
-            unknown_fields.push(*field_name);
+            unknown_fields.push((ast::TopId::Model(model_id), field_name));
             continue;
         };
 
-        // Is the field a scalar field?
-        if !ctx.types.scalar_fields.contains_key(&(model_id, field_id)) {
-            relation_fields.push((&ctx.ast[model_id][field_id], field_id));
-            continue;
-        }
-
         // Is the field used twice?
-        if field_ids.contains(&field_id) {
+        if field_ids.contains(&path) {
+            let path_str = match path.type_holding_the_indexed_field() {
+                None => Cow::from(*field_name),
+                Some(ctid) => {
+                    let field_id = path.field_in_index();
+                    let field_name = &ctx.ast[ctid][field_id].name.name;
+                    let composite_type = &ctx.ast[ctid].name.name;
+
+                    Cow::from(format!("{field_name} in type {composite_type}"))
+                }
+            };
+
             ctx.push_error(DatamodelError::new_model_validation_error(
-                &format!(
-                    "The unique index definition refers to the field {} multiple times.",
-                    ast_model[field_id].name()
-                ),
+                &format!("The unique index definition refers to the field {path_str} multiple times.",),
                 ast_model.name(),
                 attribute_span,
             ));
+
             return Err(FieldResolutionError::AlreadyDealtWith);
         }
 
-        field_ids.push(field_id);
+        field_ids.push(path);
     }
 
     if !unknown_fields.is_empty() || !relation_fields.is_empty() {
@@ -874,8 +1026,8 @@ fn resolve_field_array_with_args<'db>(
         let fields_with_args = constant_array
             .into_iter()
             .zip(field_ids)
-            .map(|((_, sort_order, length), field_id)| FieldWithArgs {
-                field_id,
+            .map(|((_, sort_order, length), field_location)| FieldWithArgs {
+                path: field_location,
                 sort_order,
                 length,
             })
