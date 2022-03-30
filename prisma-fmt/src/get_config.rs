@@ -67,7 +67,7 @@ fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConf
             })?;
     }
 
-    Ok(datamodel::json::mcf::config_to_mcf_json_value(&config))
+    Ok(datamodel::mcf::config_to_mcf_json_value(&config))
 }
 
 #[cfg(test)]

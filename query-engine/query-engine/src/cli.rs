@@ -120,7 +120,7 @@ impl CliCommand {
                 .resolve_datasource_urls_from_env(&[], |key| env::var(key).ok())?;
         }
 
-        let json = datamodel::json::mcf::config_to_mcf_json_value(config);
+        let json = datamodel::mcf::config_to_mcf_json_value(config);
         let serialized = serde_json::to_string(&json)?;
 
         println!("{}", serialized);

@@ -15,7 +15,7 @@
 //! * `dml`: contains the models representing the Datamodel part of a Prisma schema
 //! * `configuration`: contains the models representing the Datasources and Generators of a Prisma schema
 //! * `transform`: contains the logic to turn an AST into models and vice versa
-//! * `json`: contains the logic to turn models into their JSON/DMMF representation
+//! * `mcf`: contains the logic to turn generators and datasources into their JSON representation
 //!
 //! The flow between the layers is depicted in the following diagram.
 //!<pre>
@@ -50,7 +50,9 @@
 
 pub mod common;
 pub mod dml;
-pub mod json;
+
+/// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a JSON representation.
+pub mod mcf;
 
 mod configuration;
 mod reformat;
