@@ -5,6 +5,15 @@ use chrono::DateTime;
 #[test]
 fn should_set_default_for_all_scalar_types() {
     let dml = r#"
+    datasource test {
+        provider = "postgresql"
+        url = "postgresql://"
+    }
+
+    generator js {
+        provider = "prisma-client-js"
+    }
+
     model Model {
         id Int @id
         int Int @default(3)
@@ -14,6 +23,7 @@ fn should_set_default_for_all_scalar_types() {
         dateTime DateTime @default("2019-06-17T14:20:57Z")
         bytes    Bytes @default("aGVsbG8gd29ybGQ=")
         json     Json  @default("{ \"a\": [\"b\"] }")
+        decimal  Decimal  @default("121.10299000124800000001")
     }
     "#;
 
@@ -53,6 +63,12 @@ fn should_set_default_for_all_scalar_types() {
         .assert_base_type(&ScalarType::Json)
         .assert_default_value(DefaultValue::new_single(PrismaValue::Json(
             r#"{ "a": ["b"] }"#.to_owned(),
+        )));
+    user_model
+        .assert_has_scalar_field("decimal")
+        .assert_base_type(&ScalarType::Decimal)
+        .assert_default_value(DefaultValue::new_single(PrismaValue::Float(
+            r#"121.10299000124800000001"#.parse().unwrap(),
         )));
 }
 
