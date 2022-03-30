@@ -173,5 +173,5 @@ fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>) -> bool {
             names_match && lengths_match && orders_match
         })
         && first.index_type() == second.index_type()
-        && first.algorithm() == second.algorithm()
+        && first.algorithm().unwrap_or_default() == second.algorithm().unwrap_or_default()
 }
