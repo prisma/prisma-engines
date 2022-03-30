@@ -350,6 +350,7 @@
 <span id="348">348</span>
 <span id="349">349</span>
 <span id="350">350</span>
+<span id="351">351</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
     <span class="ident">parser_database::walkers::ModelWalker</span>,
@@ -452,6 +453,7 @@
     <span class="ident">ConnectorCapability::WritableAutoincField</span>,
     <span class="ident">ConnectorCapability::UsingHashIndex</span>,
     <span class="ident">ConnectorCapability::ImplicitManyToManyRelation</span>,
+    <span class="ident">ConnectorCapability::DecimalType</span>,
 ];
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresDatamodelConnector</span>;

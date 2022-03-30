@@ -139,10 +139,6 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel::dml</span>::{<span class="self">self</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ScalarType</span>};
 <span class="kw">use</span> <span class="ident">mongodb::bson::Bson</span>;
 <span class="kw">use</span> <span class="ident">native_types::MongoDbType</span>;
@@ -161,7 +157,6 @@
     <span class="ident">Int32</span>,
     <span class="ident">Timestamp</span>,
     <span class="ident">Int64</span>,
-    <span class="ident">Decimal</span>,
     <span class="ident">Json</span>,
     <span class="ident">Document</span>(<span class="ident">String</span>),
     <span class="ident">Array</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">FieldType</span><span class="op">&gt;</span>),
@@ -194,7 +189,7 @@
             <span class="ident">Bson::ObjectId</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::ObjectId</span>),
             <span class="ident">Bson::DateTime</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Date</span>),
             <span class="ident">Bson::Symbol</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;Symbol&quot;</span>)),
-            <span class="ident">Bson::Decimal128</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Decimal</span>),
+            <span class="ident">Bson::Decimal128</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;Decimal128&quot;</span>)),
             <span class="ident">Bson::Undefined</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;Undefined&quot;</span>)),
             <span class="ident">Bson::MaxKey</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;MaxKey&quot;</span>)),
             <span class="ident">Bson::MinKey</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;MinKey&quot;</span>)),
@@ -220,7 +215,6 @@
             <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Int&quot;</span>),
             <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;DateTime (Timestamp)&quot;</span>),
             <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;BigInt&quot;</span>),
-            <span class="ident">FieldType::Decimal</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Decimal&quot;</span>),
             <span class="ident">FieldType::Json</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Json&quot;</span>),
             <span class="ident">FieldType::Document</span>(<span class="ident">s</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>),
             <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Array({})&quot;</span>, <span class="ident">r#type</span>),
@@ -249,7 +243,6 @@
             <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Decimal</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::Json</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::Document</span>(<span class="ident">name</span>) =&gt; <span class="ident">dml::CompositeTypeFieldType::CompositeType</span>(<span class="ident">name</span>),
             <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="ident">dml::CompositeTypeFieldType::from</span>(<span class="kw-2">*</span><span class="ident">r#type</span>),
@@ -278,7 +271,6 @@
             <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Decimal</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::Json</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::Document</span>(<span class="ident">name</span>) =&gt; <span class="ident">dml::FieldType::CompositeType</span>(<span class="ident">name</span>),
             <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="ident">dml::FieldType::from</span>(<span class="kw-2">*</span><span class="ident">r#type</span>),

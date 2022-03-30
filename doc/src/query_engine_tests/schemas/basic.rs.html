@@ -172,12 +172,6 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 
 <span class="doccomment">/// Most basic datamodel containing only a model with ID</span>
@@ -211,7 +205,7 @@
 }
 
 <span class="doccomment">/// Test model containing all possible Prisma scalar types, nullable.</span>
-<span class="doccomment">/// Excludes capability-dependent types (e.g. JSON).</span>
+<span class="doccomment">/// Excludes capability-dependent types (e.g. JSON, Decimal).</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_nullable_types</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">&quot;model TestModel {
@@ -220,7 +214,6 @@
             int     Int?
             bInt    BigInt?
             float   Float?
-            decimal Decimal?
             bytes   Bytes?
             bool    Boolean?
             dt      DateTime?
@@ -238,7 +231,6 @@
             int     Int
             bInt    BigInt
             float   Float
-            decimal Decimal
         }&quot;</span>
     };
 
@@ -253,7 +245,6 @@
             int     Int
             bInt    BigInt
             float   Float
-            decimal Decimal
             string  String
         }&quot;</span>
     };
@@ -269,7 +260,6 @@
             int     Int?
             bInt    BigInt?
             float   Float?
-            decimal Decimal?
             string  String?
         }&quot;</span>
     };
@@ -287,7 +277,6 @@
             int     Int
             bInt    BigInt
             float   Float
-            decimal Decimal
             bytes   Bytes
             bool    Boolean
             dt      DateTime
@@ -307,7 +296,6 @@
             int     Int[]
             bInt    BigInt[]
             float   Float[]
-            decimal Decimal[]
             bytes   Bytes[]
             bool    Boolean[]
             dt      DateTime[]

@@ -64,7 +64,6 @@
 <span id="62">62</span>
 <span id="63">63</span>
 <span id="64">64</span>
-<span id="65">65</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 
 <span class="doccomment">/// User &lt;-1---m-&gt; posts</span>
@@ -115,10 +114,9 @@
             #id(id, Int, @id)
             float    Float
             int      Int
-            decimal      Decimal
             string   String
-            b_id Int?
-            b    B?   @relation(fields: [b_id], references: [id])
+            b_id     Int?
+            b        B?     @relation(fields: [b_id], references: [id])
         }
 
         model B {
