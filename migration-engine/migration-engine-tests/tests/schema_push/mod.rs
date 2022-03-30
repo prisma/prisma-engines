@@ -435,3 +435,21 @@ fn mysql_should_diff_column_ordering_correctly_issue_10983(api: TestApi) {
     api.raw_cmd(ddl);
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
+
+#[test_connector(preview_features("extendedIndexes"))]
+fn issue_repro_extended_indexes(api: TestApi) {
+    // https://github.com/prisma/prisma/issues/11631
+
+    let dm = indoc! {r#"
+         model HouseholdTaxSettings {
+          householdId String 
+          taxYear     Int
+        
+          @@unique([householdId, taxYear])
+          @@index([householdId])
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_executable();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
+}

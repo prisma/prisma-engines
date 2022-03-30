@@ -255,6 +255,7 @@ impl SqlRenderer for PostgresFlavour {
             is_unique: index.index_type().is_unique(),
             table_reference: index.table().name().into(),
             using: index.algorithm().map(|algo| match algo {
+                //todo we should think about not rendering this if it is the db default anyways
                 SQLIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
                 SQLIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,
             }),

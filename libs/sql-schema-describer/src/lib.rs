@@ -247,6 +247,12 @@ pub enum SQLIndexAlgorithm {
     Hash,
 }
 
+impl Default for SQLIndexAlgorithm {
+    fn default() -> Self {
+        Self::BTree
+    }
+}
+
 impl AsRef<str> for SQLIndexAlgorithm {
     fn as_ref(&self) -> &str {
         match self {
