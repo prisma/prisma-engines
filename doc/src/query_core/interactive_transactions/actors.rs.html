@@ -373,6 +373,25 @@
 <span id="371">371</span>
 <span id="372">372</span>
 <span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">execute_many_operations</span>, <span class="ident">execute_single_operation</span>, <span class="ident">OpenTx</span>, <span class="ident">Operation</span>, <span class="ident">TxId</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">QuerySchemaRef</span>, <span class="ident">ResponseData</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">sync::Arc</span>};
@@ -385,6 +404,8 @@
     },
     <span class="ident">time</span>::{<span class="self">self</span>, <span class="ident">Duration</span>},
 };
+<span class="kw">use</span> <span class="ident">tracing::Dispatch</span>;
+<span class="kw">use</span> <span class="ident">tracing_futures::WithSubscriber</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CachedTx</span>, <span class="ident">TransactionError</span>, <span class="ident">TxOpRequest</span>, <span class="ident">TxOpRequestMsg</span>, <span class="ident">TxOpResponse</span>};
 
@@ -627,6 +648,19 @@
     }
 }
 
+<span class="comment">// Warning!!! This is not pretty. When the actors are spawned with the node-api</span>
+<span class="comment">// They lose the current subscriber because it is not a global subscriber</span>
+<span class="comment">// and are no longer able to send logs. This fix gets the current dispatcher</span>
+<span class="comment">// and clones it out so that we can use `WithSubscriber` with it.</span>
+<span class="kw">fn</span> <span class="ident">get_current_dispatcher</span>() -&gt; <span class="ident">Dispatch</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">tracing::Dispatch::default</span>();
+    <span class="ident">tracing::dispatcher::get_default</span>(<span class="op">|</span><span class="ident">current</span><span class="op">|</span> {
+        <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">clone</span>();
+    });
+
+    <span class="ident">dispatcher</span>
+}
+
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_itx_actor</span>(
     <span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>,
     <span class="ident">tx_id</span>: <span class="ident">TxId</span>,
@@ -644,50 +678,54 @@
     };
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">ITXServer::new</span>(<span class="ident">tx_id</span>, <span class="ident">CachedTx::Open</span>(<span class="ident">value</span>), <span class="ident">timeout</span>, <span class="ident">rx_from_client</span>, <span class="ident">query_schema</span>);
+    <span class="kw">let</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">get_current_dispatcher</span>();
 
-    <span class="ident">tokio::task::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">let</span> <span class="ident">sleep</span> <span class="op">=</span> <span class="ident">time::sleep</span>(<span class="ident">timeout</span>);
-        <span class="macro">tokio::pin!</span>(<span class="ident">sleep</span>);
+    <span class="ident">tokio::task::spawn</span>(
+        <span class="kw">async</span> <span class="kw">move</span> {
+            <span class="kw">let</span> <span class="ident">sleep</span> <span class="op">=</span> <span class="ident">time::sleep</span>(<span class="ident">timeout</span>);
+            <span class="macro">tokio::pin!</span>(<span class="ident">sleep</span>);
 
-        <span class="kw">loop</span> {
-            <span class="macro">tokio::select!</span> {
-                <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">sleep</span> =&gt; {
-                    <span class="macro">trace!</span>(<span class="string">&quot;[{}] interactive transaction timed out&quot;</span>, <span class="ident">server</span>.<span class="ident">id</span>.<span class="ident">to_string</span>());
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">server</span>.<span class="ident">rollback</span>(<span class="bool-val">true</span>).<span class="kw">await</span>;
-                    <span class="kw">break</span>;
-                }
-                <span class="ident">msg</span> <span class="op">=</span> <span class="ident">server</span>.<span class="ident">receive</span>.<span class="ident">recv</span>() =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">op</span>) <span class="op">=</span> <span class="ident">msg</span> {
-                        <span class="kw">let</span> <span class="ident">run_state</span> <span class="op">=</span> <span class="ident">server</span>.<span class="ident">process_msg</span>(<span class="ident">op</span>).<span class="kw">await</span>;
+            <span class="kw">loop</span> {
+                <span class="macro">tokio::select!</span> {
+                    <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">sleep</span> =&gt; {
+                        <span class="macro">trace!</span>(<span class="string">&quot;[{}] interactive transaction timed out&quot;</span>, <span class="ident">server</span>.<span class="ident">id</span>.<span class="ident">to_string</span>());
+                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">server</span>.<span class="ident">rollback</span>(<span class="bool-val">true</span>).<span class="kw">await</span>;
+                        <span class="kw">break</span>;
+                    }
+                    <span class="ident">msg</span> <span class="op">=</span> <span class="ident">server</span>.<span class="ident">receive</span>.<span class="ident">recv</span>() =&gt; {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">op</span>) <span class="op">=</span> <span class="ident">msg</span> {
+                            <span class="kw">let</span> <span class="ident">run_state</span> <span class="op">=</span> <span class="ident">server</span>.<span class="ident">process_msg</span>(<span class="ident">op</span>).<span class="kw">await</span>;
 
-                        <span class="kw">if</span> <span class="ident">run_state</span> <span class="op">==</span> <span class="ident">RunState::Finished</span> {
-                            <span class="kw">break</span>
+                            <span class="kw">if</span> <span class="ident">run_state</span> <span class="op">==</span> <span class="ident">RunState::Finished</span> {
+                                <span class="kw">break</span>
+                            }
                         }
                     }
                 }
             }
-        }
 
-        <span class="macro">trace!</span>(<span class="string">&quot;[{}] completed with {}&quot;</span>, <span class="ident">server</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(), <span class="ident">server</span>.<span class="ident">cached_tx</span>);
-        <span class="kw">let</span> <span class="ident">eviction_sleep</span> <span class="op">=</span> <span class="ident">time::sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">cache_eviction_secs</span>));
-        <span class="macro">tokio::pin!</span>(<span class="ident">eviction_sleep</span>);
+            <span class="macro">trace!</span>(<span class="string">&quot;[{}] completed with {}&quot;</span>, <span class="ident">server</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(), <span class="ident">server</span>.<span class="ident">cached_tx</span>);
+            <span class="kw">let</span> <span class="ident">eviction_sleep</span> <span class="op">=</span> <span class="ident">time::sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">cache_eviction_secs</span>));
+            <span class="macro">tokio::pin!</span>(<span class="ident">eviction_sleep</span>);
 
-        <span class="kw">loop</span> {
-            <span class="macro">tokio::select!</span> {
-                <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">eviction_sleep</span> =&gt; {
-                    <span class="kw">break</span>;
-                }
-                <span class="ident">msg</span> <span class="op">=</span> <span class="ident">server</span>.<span class="ident">receive</span>.<span class="ident">recv</span>() =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">op</span>) <span class="op">=</span> <span class="ident">msg</span> {
-                            <span class="ident">server</span>.<span class="ident">process_eviction_state_msg</span>(<span class="ident">op</span>).<span class="kw">await</span>;
-                        }
+            <span class="kw">loop</span> {
+                <span class="macro">tokio::select!</span> {
+                    <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">eviction_sleep</span> =&gt; {
+                        <span class="kw">break</span>;
                     }
+                    <span class="ident">msg</span> <span class="op">=</span> <span class="ident">server</span>.<span class="ident">receive</span>.<span class="ident">recv</span>() =&gt; {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">op</span>) <span class="op">=</span> <span class="ident">msg</span> {
+                                <span class="ident">server</span>.<span class="ident">process_eviction_state_msg</span>(<span class="ident">op</span>).<span class="kw">await</span>;
+                            }
+                        }
+                }
             }
-        }
 
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">send_done</span>.<span class="ident">send</span>(<span class="ident">server</span>.<span class="ident">id</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
-        <span class="macro">trace!</span>(<span class="string">&quot;[{}] has stopped with {}&quot;</span>, <span class="ident">server</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(), <span class="ident">server</span>.<span class="ident">cached_tx</span>);
-    });
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">send_done</span>.<span class="ident">send</span>(<span class="ident">server</span>.<span class="ident">id</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
+            <span class="macro">trace!</span>(<span class="string">&quot;[{}] has stopped with {}&quot;</span>, <span class="ident">server</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(), <span class="ident">server</span>.<span class="ident">cached_tx</span>);
+        }
+        .<span class="ident">with_subscriber</span>(<span class="ident">dispatcher</span>),
+    );
 
     <span class="ident">client</span>
 }
