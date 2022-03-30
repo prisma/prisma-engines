@@ -1,10 +1,24 @@
- model User {
-     id Int @id
-     firstName String @map("fst_name")
-     lastName String @map("lst_name")
-     age Int
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb://"
+}
 
-    @@index([firstName, lastName, age])
-    @@map("users")
- }
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb", "extendedIndexes"]
+}
 
+type Embed {
+  foo Int @map("bar")
+}
+
+model User {
+  id        Int    @id @map("_id")
+  firstName String @map("fst_name")
+  lastName  String @map("lst_name")
+  age       Int
+  embed     Embed
+
+  @@index([firstName, lastName, age, embed.foo])
+  @@map("users")
+}

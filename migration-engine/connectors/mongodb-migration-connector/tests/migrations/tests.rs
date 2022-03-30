@@ -42,4 +42,9 @@ scenarios! {
   multi_column_mixed_fulltext_indexes_can_be_changed
   pushing_without_preview_flag_should_not_touch_fts_indexes
   unique_to_index
+  composite_indexes_can_be_created
+  composite_indexes_can_be_created_descending
+  composite_indexes_can_be_changed_from_descending_to_ascending
+  composite_indexes_can_be_dropped
+  composite_indexes_can_be_renamed
 }

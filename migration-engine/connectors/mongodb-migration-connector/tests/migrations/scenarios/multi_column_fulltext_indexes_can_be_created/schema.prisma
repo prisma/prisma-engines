@@ -1,17 +1,22 @@
- datasource db {
-   provider = "mongodb"
-   url      = "mongodb://"
- }
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb://"
+}
 
- generator js {
-   provider        = "prisma-client-js"
-   previewFeatures = ["extendedIndexes", "fullTextIndex"]
- }
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["extendedIndexes", "fullTextIndex"]
+}
 
- model User {
-   id        String @id @map("_id") @db.ObjectId
-   firstName String
-   lastName  String
+type Address {
+  street String
+}
 
-   @@fulltext([firstName, lastName])
- }
+model User {
+  id        String  @id @map("_id") @db.ObjectId
+  firstName String
+  lastName  String
+  address   Address
+
+  @@fulltext([firstName, lastName, address.street])
+}

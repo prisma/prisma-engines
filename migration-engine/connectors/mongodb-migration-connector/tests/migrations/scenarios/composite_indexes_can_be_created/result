@@ -1,11 +1,11 @@
-[+] Collection `users`
-[+] Index `users_fst_name_lst_name_age_bar_idx` on ({"fst_name":1,"lst_name":1,"age":1,"embed.bar":1})
+[+] Collection `User`
+[+] Index `User_number_idx` on ({"address.number":1})
 
 ------
 
 {
   "collections": {
-    "users": {
+    "User": {
       "indexes": [
         {
           "name": "_id_",
@@ -15,13 +15,10 @@
           }
         },
         {
-          "name": "users_fst_name_lst_name_age_bar_idx",
+          "name": "User_number_idx",
           "is_unique": false,
           "keys": {
-            "fst_name": 1,
-            "lst_name": 1,
-            "age": 1,
-            "embed.bar": 1
+            "address.number": 1
           }
         }
       ],

@@ -1,5 +1,5 @@
-[+] Collection `User`
-[+] Fulltext index `User_firstName_lastName_street_idx` on ({"firstName":"text","lastName":"text","address.street":"text"})
+[-] Index `UserExistingIndex`
+[+] Index `User_number_idx` on ({"address.number":1})
 
 ------
 
@@ -15,15 +15,21 @@
           }
         },
         {
-          "name": "User_firstName_lastName_street_idx",
+          "name": "User_number_idx",
           "is_unique": false,
           "keys": {
-            "_fts": "text",
-            "_ftsx": 1
+            "address.number": 1
           }
         }
       ],
-      "documents": []
+      "documents": [
+        {
+          "_id": 1,
+          "address": {
+            "number": 1234
+          }
+        }
+      ]
     }
   }
 }

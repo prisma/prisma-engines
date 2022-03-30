@@ -1,0 +1,19 @@
+{
+  "User": {
+     "documents": [
+        {
+          "_id": 1,
+          "address": { "number": 1234 }
+        }
+     ],
+     "indexes": [
+        {
+          "name": "UserExistingIndex",
+          "is_unique": false,
+          "keys": {
+            "address.number": -1
+          }
+        }
+    ]
+  }
+}

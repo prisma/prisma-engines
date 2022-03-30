@@ -1,15 +1,29 @@
- model User {
-     id Int @id
-     firstName String
-     lastName String
-     age Int
-
-    // changing the order, here
-    @@index([lastName, firstName, age], map: "UserExistingIndex")
- }
-
- model Post {
-     id Int @id
-     title String
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb://"
 }
 
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb", "extendedIndexes"]
+}
+
+type Address {
+  number Int
+}
+
+model User {
+  id        Int     @id @map("_id")
+  firstName String
+  lastName  String
+  age       Int
+  address   Address
+
+  // changing the order, here
+  @@index([lastName, firstName, age, address.number], map: "UserExistingIndex")
+}
+
+model Post {
+  id    Int    @id @map("_id")
+  title String
+}
