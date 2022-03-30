@@ -450,19 +450,6 @@ fn issue_repro_extended_indexes(api: TestApi) {
         }
     "#};
 
-    let ddl = r#"
-       CREATE TABLE "HouseholdTaxSettings" (
-            "householdId" TEXT NOT NULL,
-            "taxYear" INTEGER NOT NULL
-        );
-        
-        -- CreateIndex
-        CREATE INDEX "HouseholdTaxSettings_householdId_idx" ON "HouseholdTaxSettings"("householdId");
-        
-        -- CreateIndex
-        CREATE UNIQUE INDEX "HouseholdTaxSettings_householdId_taxYear_key" ON "HouseholdTaxSettings"("householdId", "taxYear");
-    "#;
-
-    api.raw_cmd(ddl);
+    api.schema_push_w_datasource(dm).send().assert_executable();
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
