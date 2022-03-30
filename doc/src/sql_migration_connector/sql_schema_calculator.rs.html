@@ -481,7 +481,7 @@
             <span class="ident">columns</span>: <span class="ident">pk</span>
                 .<span class="ident">scalar_field_attributes</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">sql::PrimaryKeyColumn</span> {
-                    <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">as_scalar_field</span>().<span class="ident">database_name</span>().<span class="ident">to_owned</span>(),
+                    <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">database_name</span>().<span class="ident">to_owned</span>(),
                     <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>(),
                     <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">so</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">so</span> {
                         <span class="ident">SortOrder::Asc</span> =&gt; <span class="ident">sql::SQLSortOrder::Asc</span>,
@@ -501,7 +501,7 @@
                 <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">index</span>
                     .<span class="ident">scalar_field_attributes</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sql::IndexColumn</span> {
-                        <span class="ident">name</span>: <span class="ident">sf</span>.<span class="ident">as_scalar_field</span>().<span class="ident">database_name</span>().<span class="ident">into</span>(),
+                        <span class="ident">name</span>: <span class="ident">sf</span>.<span class="ident">as_index_field</span>().<span class="ident">database_name</span>().<span class="ident">to_owned</span>(),
                         <span class="ident">sort_order</span>: <span class="ident">sf</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">s</span> {
                             <span class="ident">SortOrder::Asc</span> =&gt; <span class="ident">sql::SQLSortOrder::Asc</span>,
                             <span class="ident">SortOrder::Desc</span> =&gt; <span class="ident">sql::SQLSortOrder::Desc</span>,

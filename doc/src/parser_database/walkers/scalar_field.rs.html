@@ -308,6 +308,107 @@
 <span id="306">306</span>
 <span id="307">307</span>
 <span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="ident">DefaultAttribute</span>, <span class="ident">FieldWithArgs</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>},
@@ -315,6 +416,8 @@
     <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>,
 };
 <span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
+
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::IndexFieldWalker</span>;
 
 <span class="doccomment">/// A scalar field, as part of a model.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
@@ -443,11 +546,11 @@
 
     <span class="doccomment">/// The `@default()` attribute of the field, if any.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_value</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">DefaultValueWalker</span> {
+        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="ident">DefaultValueWalker</span> {
             <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
             <span class="ident">field_id</span>: <span class="self">self</span>.<span class="ident">field_id</span>,
             <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-            <span class="ident">default</span>: <span class="ident">d</span>,
+            <span class="ident">default</span>,
         })
     }
 
@@ -584,9 +687,10 @@
         <span class="self">self</span>.<span class="ident">args</span>().<span class="ident">length</span>
     }
 
-    <span class="doccomment">/// The underlying scalar field.</span>
+    <span class="doccomment">/// The underlying field.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// // either this</span>
     <span class="doccomment">/// model Test {</span>
     <span class="doccomment">///   id          Int @id</span>
     <span class="doccomment">///   name        String</span>
@@ -596,14 +700,112 @@
     <span class="doccomment">///   @@index([name])</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// // or this</span>
+    <span class="doccomment">/// type A {</span>
+    <span class="doccomment">///   field String</span>
+    <span class="doccomment">///   ^^^^^^^^^^^^</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// model Test {</span>
+    <span class="doccomment">///   id Int @id</span>
+    <span class="doccomment">///   a  A</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///   @@index([a.field])</span>
+    <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar_field</span>(<span class="self">self</span>) -&gt; <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="ident">ScalarFieldWalker</span> {
-            <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
-            <span class="ident">field_id</span>: <span class="self">self</span>.<span class="ident">args</span>().<span class="ident">field_id</span>,
-            <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-            <span class="ident">scalar_field</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>[<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">model_id</span>, <span class="self">self</span>.<span class="ident">args</span>().<span class="ident">field_id</span>)],
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_index_field</span>(<span class="self">self</span>) -&gt; <span class="ident">IndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span>().<span class="ident">path</span>;
+        <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">field_in_index</span>();
+
+        <span class="kw">match</span> <span class="ident">path</span>.<span class="ident">type_holding_the_indexed_field</span>() {
+            <span class="prelude-val">None</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">field_in_index</span>();
+                <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">model_id</span>).<span class="ident">scalar_field</span>(<span class="ident">field_id</span>);
+
+                <span class="ident">IndexFieldWalker::new</span>(<span class="ident">walker</span>)
+            }
+            <span class="prelude-val">Some</span>(<span class="ident">ctid</span>) =&gt; {
+                <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_composite_type</span>(<span class="ident">ctid</span>).<span class="ident">field</span>(<span class="ident">field_id</span>);
+                <span class="ident">IndexFieldWalker::new</span>(<span class="ident">walker</span>)
+            }
         }
+    }
+
+    <span class="doccomment">/// Gives the full path from the current model to the field included in the index.</span>
+    <span class="doccomment">/// For example, if the field is through two composite types:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// type A {</span>
+    <span class="doccomment">///   field Int</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// type B {</span>
+    <span class="doccomment">///   a A</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// model C {</span>
+    <span class="doccomment">///   id Int @id</span>
+    <span class="doccomment">///   b  B</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///   @@index([b.a.field])</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The method would return a vector from model to the final field:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// vec![(&quot;b&quot;, None), (&quot;a&quot;, Some(&quot;B&quot;)), (&quot;field&quot;, Some(&quot;A&quot;))];</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The first part of the tuple is the name of the field, the second part is</span>
+    <span class="doccomment">/// the name of the composite type.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method prefers the prisma side naming, and should not be used when</span>
+    <span class="doccomment">/// writing to the database.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_path_to_indexed_field</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span>().<span class="ident">path</span>;
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="ident">path</span>.<span class="ident">root</span>()].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>();
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">root</span>, <span class="prelude-val">None</span>)];
+
+        <span class="kw">for</span> (<span class="ident">ctid</span>, <span class="ident">field_id</span>) <span class="kw">in</span> <span class="ident">path</span>.<span class="ident">path</span>() {
+            <span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">ctid</span>];
+            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ct</span>[<span class="kw-2">*</span><span class="ident">field_id</span>].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>();
+
+            <span class="ident">result</span>.<span class="ident">push</span>((<span class="ident">field</span>, <span class="prelude-val">Some</span>(<span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())));
+        }
+
+        <span class="ident">result</span>
+    }
+
+    <span class="doccomment">/// Similar to the method [`as_path_to_indexed_field`], but prefers the</span>
+    <span class="doccomment">/// mapped names and is to be used when defining indices in the database.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`as_path_to_indexed_field`]: struct.ScalarFieldAttributeWalker</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mapped_path_to_indexed_field</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span>().<span class="ident">path</span>;
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="ident">mapped</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>[<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">model_id</span>, <span class="ident">path</span>.<span class="ident">root</span>())].<span class="ident">mapped_name</span>;
+
+            <span class="ident">mapped</span>
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">interner</span>.<span class="ident">get</span>(<span class="ident">id</span>))
+                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="ident">path</span>.<span class="ident">root</span>()].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())
+        };
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">root</span>, <span class="prelude-val">None</span>)];
+
+        <span class="kw">for</span> (<span class="ident">ctid</span>, <span class="ident">field_id</span>) <span class="kw">in</span> <span class="ident">path</span>.<span class="ident">path</span>() {
+            <span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">ctid</span>];
+
+            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">composite_type_fields</span>[<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">ctid</span>, <span class="kw-2">*</span><span class="ident">field_id</span>)]
+                .<span class="ident">mapped_name</span>
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">interner</span>.<span class="ident">get</span>(<span class="ident">id</span>))
+                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ct</span>[<span class="kw-2">*</span><span class="ident">field_id</span>].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>());
+
+            <span class="ident">result</span>.<span class="ident">push</span>((<span class="ident">field</span>, <span class="prelude-val">Some</span>(<span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())));
+        }
+
+        <span class="ident">result</span>
     }
 
     <span class="doccomment">/// The sort order (asc or desc) on the field.</span>

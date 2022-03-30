@@ -273,6 +273,17 @@
 <span id="271">271</span>
 <span id="272">272</span>
 <span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Datamodel</span>, <span class="ident">Enum</span>, <span class="ident">EnumValue</span>, <span class="ident">Field</span>, <span class="ident">Function</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKey</span>, <span class="ident">UniqueIndex</span>};
 <span class="kw">use</span> <span class="ident">bigdecimal::ToPrimitive</span>;
 <span class="kw">use</span> <span class="ident">datamodel::dml</span>::{<span class="self">self</span>, <span class="ident">CompositeTypeFieldType</span>, <span class="ident">FieldType</span>, <span class="ident">Ignorable</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarType</span>};
@@ -408,7 +419,13 @@
             .<span class="ident">indices</span>
             .<span class="ident">iter</span>()
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
-                (<span class="ident">i</span>.<span class="ident">is_unique</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">i</span>.<span class="ident">defined_on_field</span>).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">fields</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>).<span class="ident">collect</span>())
+                (<span class="ident">i</span>.<span class="ident">is_unique</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">i</span>.<span class="ident">defined_on_field</span>).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> {
+                    <span class="ident">i</span>.<span class="ident">fields</span>
+                        .<span class="ident">clone</span>()
+                        .<span class="ident">into_iter</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">path</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">field</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>))
+                        .<span class="ident">collect</span>()
+                })
             })
             .<span class="ident">collect</span>(),
         <span class="ident">unique_indexes</span>: <span class="ident">model</span>
@@ -418,7 +435,12 @@
                 (<span class="ident">i</span>.<span class="ident">is_unique</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">i</span>.<span class="ident">defined_on_field</span>).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">UniqueIndex</span> {
                     <span class="ident">name</span>: <span class="ident">i</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
                     <span class="comment">//TODO(extended indices) add field options here</span>
-                    <span class="ident">fields</span>: <span class="ident">i</span>.<span class="ident">fields</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>).<span class="ident">collect</span>(),
+                    <span class="ident">fields</span>: <span class="ident">i</span>
+                        .<span class="ident">fields</span>
+                        .<span class="ident">clone</span>()
+                        .<span class="ident">into_iter</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">path</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">field</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>))
+                        .<span class="ident">collect</span>(),
                 })
             })
             .<span class="ident">collect</span>(),

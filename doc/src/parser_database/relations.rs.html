@@ -455,6 +455,7 @@
 <span id="453">453</span>
 <span id="454">454</span>
 <span id="455">455</span>
+<span id="456">456</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">interner::StringId</span>,
@@ -807,7 +808,8 @@
                             .<span class="ident">ast_indexes</span>
                             .<span class="ident">iter</span>()
                             .<span class="ident">any</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">idx</span>)<span class="op">|</span> {
-                                <span class="ident">idx</span>.<span class="ident">is_unique</span>() <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">idx</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">field_id</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">fields</span>
+                                <span class="ident">idx</span>.<span class="ident">is_unique</span>()
+                                    <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">idx</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">path</span>.<span class="ident">field_in_index</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">fields</span>
                             });
                     <span class="kw">if</span> <span class="ident">fields_are_unique</span> {
                         <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Forward</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>))

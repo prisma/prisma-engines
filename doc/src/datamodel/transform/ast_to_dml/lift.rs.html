@@ -638,6 +638,17 @@
 <span id="636">636</span>
 <span id="637">637</span>
 <span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">IndexField</span>, <span class="ident">PrimaryKeyField</span>},
@@ -991,15 +1002,15 @@
             <span class="ident">fields</span>: <span class="ident">pk</span>
                 .<span class="ident">scalar_field_attributes</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span>
-                    <span class="comment">//TODO (extended indexes) here it is ok to pass sort and length with out a preview flag</span>
-                    <span class="comment">// check since this is coming from the ast and the parsing would reject the args without</span>
-                    <span class="comment">// the flag set</span>
-                    <span class="comment">// When we start using the extra args here could be a place to fill in the defaults.</span>
-                    <span class="ident">PrimaryKeyField</span> {
-                    <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">as_scalar_field</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                    <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="ident">parser_database_sort_order_to_dml_sort_order</span>),
-                    <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>(),
-                })
+                     <span class="comment">//TODO (extended indexes) here it is ok to pass sort and length with out a preview flag</span>
+                     <span class="comment">// check since this is coming from the ast and the parsing would reject the args without</span>
+                     <span class="comment">// the flag set</span>
+                     <span class="comment">// When we start using the extra args here could be a place to fill in the defaults.</span>
+                     <span class="ident">PrimaryKeyField</span> {
+                         <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">as_scalar_field</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                         <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="ident">parser_database_sort_order_to_dml_sort_order</span>),
+                         <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>(),
+                     })
                 .<span class="ident">collect</span>(),
             <span class="ident">defined_on_field</span>: <span class="ident">pk</span>.<span class="ident">is_defined_on_field</span>(),
         });
@@ -1009,10 +1020,21 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">idx</span>
                     .<span class="ident">scalar_field_attributes</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">IndexField</span> {
-                        <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">as_scalar_field</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="ident">parser_database_sort_order_to_dml_sort_order</span>),
-                        <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>(),
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
+                        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">field</span>
+                            .<span class="ident">as_path_to_indexed_field</span>()
+                            .<span class="ident">into_iter</span>()
+                            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> (<span class="ident">a</span>.<span class="ident">to_owned</span>(), <span class="ident">b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_owned</span>())))
+                            .<span class="ident">collect</span>();
+
+                        <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="ident">parser_database_sort_order_to_dml_sort_order</span>);
+                        <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">length</span>();
+
+                        <span class="ident">IndexField</span> {
+                            <span class="ident">path</span>,
+                            <span class="ident">sort_order</span>,
+                            <span class="ident">length</span>,
+                        }
                     })
                     .<span class="ident">collect</span>();
 

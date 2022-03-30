@@ -180,6 +180,14 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="ident">Argument</span>, <span class="ident">Attribute</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::dml_to_ast::LowerDmlToAst</span>;
@@ -188,6 +196,7 @@
     <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">Ignorable</span>, <span class="ident">IndexDefinition</span>, <span class="ident">IndexType</span>, <span class="ident">Model</span>, <span class="ident">SortOrder</span>, <span class="ident">WithDatabaseName</span>},
 };
 <span class="kw">use</span> <span class="ident">::dml::model::IndexAlgorithm</span>;
+<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LowerDmlToAst</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Internal: Lowers a model&#39;s attributes.</span>
@@ -297,8 +306,15 @@
                 <span class="ident">ast::Span::empty</span>(),
             ))]
         } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">index_def</span>
+                .<span class="ident">fields</span>
+                .<span class="ident">clone</span>()
+                .<span class="ident">into_iter</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">path</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">field</span>).<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>))
+                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+
             <span class="macro">vec!</span>[<span class="ident">ast::Argument::new_unnamed</span>(<span class="ident">ast::Expression::Array</span>(
-                <span class="ident">LowerDmlToAst::field_array</span>(<span class="kw-2">&amp;</span><span class="ident">index_def</span>.<span class="ident">fields</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()),
+                <span class="ident">LowerDmlToAst::field_array</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>),
                 <span class="ident">ast::Span::empty</span>(),
             ))]
         }

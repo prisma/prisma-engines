@@ -428,6 +428,20 @@
 <span id="426">426</span>
 <span id="427">427</span>
 <span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">attributes</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::attributes::AttributesValidationState</span>;
@@ -755,6 +769,20 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">find_model_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interner</span>.<span class="ident">lookup</span>(<span class="ident">field_name</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">names</span>.<span class="ident">model_fields</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="ident">name</span>)).<span class="ident">cloned</span>()
+    }
+
+    <span class="doccomment">/// Find a specific field in a specific composite type.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">find_composite_type_field</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">composite_type_id</span>: <span class="ident">ast::CompositeTypeId</span>,
+        <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interner</span>.<span class="ident">lookup</span>(<span class="ident">field_name</span>)<span class="question-mark">?</span>;
+
+        <span class="self">self</span>.<span class="ident">names</span>
+            .<span class="ident">composite_type_fields</span>
+            .<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">composite_type_id</span>, <span class="ident">name</span>))
+            .<span class="ident">cloned</span>()
     }
 
     <span class="doccomment">/// Starts validating the arguments for an attribute, checking for duplicate arguments in the</span>

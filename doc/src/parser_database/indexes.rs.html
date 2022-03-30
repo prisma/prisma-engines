@@ -88,7 +88,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">context::Context</span>,
     <span class="ident">relations</span>::{<span class="ident">OneToOneRelationFields</span>, <span class="ident">RelationAttributes</span>},
-    <span class="ident">types</span>::{<span class="ident">FieldWithArgs</span>, <span class="ident">IndexAttribute</span>, <span class="ident">IndexType</span>},
+    <span class="ident">types</span>::{<span class="ident">FieldWithArgs</span>, <span class="ident">IndexAttribute</span>, <span class="ident">IndexFieldPath</span>, <span class="ident">IndexType</span>},
 };
 
 <span class="doccomment">/// Prisma forces a 1:1 relation to be unique from the defining side. If the</span>
@@ -152,7 +152,7 @@
                 <span class="ident">fields</span>: <span class="ident">referencing_fields</span>
                     .<span class="ident">iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">FieldWithArgs</span> {
-                        <span class="ident">field_id</span>: <span class="kw-2">*</span><span class="ident">f</span>,
+                        <span class="ident">path</span>: <span class="ident">IndexFieldPath::new</span>(<span class="kw-2">*</span><span class="ident">f</span>),
                         <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,
                         <span class="ident">length</span>: <span class="prelude-val">None</span>,
                     })

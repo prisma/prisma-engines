@@ -1498,7 +1498,7 @@
                 <span class="ident">indices</span>: <span class="macro">vec!</span>[<span class="ident">IndexDefinition</span> {
                     <span class="ident">name</span>: <span class="prelude-val">None</span>,
                     <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;unique_unique&quot;</span>.<span class="ident">to_string</span>()),
-                    <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">IndexField::new</span>(<span class="string">&quot;unique&quot;</span>)],
+                    <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">IndexField::new_in_model</span>(<span class="string">&quot;unique&quot;</span>)],
                     <span class="ident">tpe</span>: <span class="ident">dml::IndexType::Unique</span>,
                     <span class="ident">defined_on_field</span>: <span class="bool-val">true</span>,
                     <span class="ident">algorithm</span>: <span class="prelude-val">None</span>,
@@ -1868,7 +1868,7 @@
                 <span class="ident">indices</span>: <span class="macro">vec!</span>[<span class="ident">datamodel::dml::IndexDefinition</span> {
                     <span class="ident">name</span>: <span class="prelude-val">None</span>,
                     <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;name_last_name_unique&quot;</span>.<span class="ident">to_string</span>()),
-                    <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">IndexField::new</span>(<span class="string">&quot;name&quot;</span>), <span class="ident">IndexField::new</span>(<span class="string">&quot;lastname&quot;</span>)],
+                    <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">IndexField::new_in_model</span>(<span class="string">&quot;name&quot;</span>), <span class="ident">IndexField::new_in_model</span>(<span class="string">&quot;lastname&quot;</span>)],
                     <span class="ident">tpe</span>: <span class="ident">datamodel::dml::IndexType::Unique</span>,
                     <span class="ident">defined_on_field</span>: <span class="bool-val">false</span>,
                     <span class="ident">algorithm</span>: <span class="prelude-val">None</span>,
