@@ -18,24 +18,12 @@ mod aggregation_group_by_having {
     async fn basic_having_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
-            r#"{ id: 1, float: 10.1, int: 5, decimal: "1.1", bInt: "12", string: "group1" }"#,
+            r#"{ id: 1, float: 10.1, int: 5, bInt: "12", string: "group1" }"#,
         )
         .await?;
-        create_row(
-            &runner,
-            r#"{ id: 2, float: 5.5, int: 0, decimal: "6.7", bInt: "3", string: "group1" }"#,
-        )
-        .await?;
-        create_row(
-            &runner,
-            r#"{ id: 3, float: 10, int: 5, decimal: "11", bInt: "3", string: "group2" }"#,
-        )
-        .await?;
-        create_row(
-            &runner,
-            r#"{ id: 4, float: 10, int: 5, decimal: "11", bInt: "3", string: "group3" }"#,
-        )
-        .await?;
+        create_row(&runner, r#"{ id: 2, float: 5.5, int: 0, bInt: "3", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 3, float: 10, int: 5, bInt: "3", string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 4, float: 10, int: 5, bInt: "3", string: "group3" }"#).await?;
 
         // Group [string, int] produces:
         // group1, 5
@@ -140,10 +128,258 @@ mod aggregation_group_by_having {
     }
 
     #[connector_test]
+    async fn having_sum_scalar_filter(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, float: 6, int: 6, string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 3, float: 5, int: 5, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
+        create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
+
+        // Group 1 has 16, 2 has 6, 3 has 0
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"{ groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+                    float: { _sum: { equals: 16 }}
+                    int: { _sum: { equals: 16 }}
+                  }) {
+                    string
+                    _sum {
+                      float
+                      int
+                    }
+                  }
+                }"#
+            ),
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16}}]}}"###
+        );
+
+        match_connector_result!(
+            runner,
+            r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+              float: { _sum: { not: { equals: 16 }}}
+              int: { _sum: { not: { equals: 16 }}}
+            }) {
+              string
+              _sum {
+                float
+                int
+              }
+            }
+          }"#,
+          // On MongoDB, having sum returns 0 where there are inexistant element
+          // Contrary to SQL which returns NULL and therefore excludes group3
+          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5}},{"string":"group3","_sum":{"float":0.0,"int":0}}]}}"#],
+          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5}}]}}"#]
+        );
+
+        // Group 1 and 2 returned
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+                    float: { _sum: { in: [16, 5] }}
+                    int: { _sum: { in: [16, 5] }}
+                  }) {
+                    string
+                    _sum {
+                      float
+                      int
+                    }
+                  }
+                }"#
+            ),
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16}},{"string":"group2","_sum":{"float":5.0,"int":5}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn having_min_scalar_filter(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 3, float: 0, int: 0, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
+        create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
+
+        // Group 1 and 2 returned
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+                    float: { _min: { equals: 0 }}
+                    int: { _min: { equals: 0 }}
+                  }) {
+                    string
+                    _min {
+                      float
+                      int
+                    }
+                  }
+                }"#
+            ),
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0}},{"string":"group2","_min":{"float":0.0,"int":0}}]}}"###
+        );
+
+        match_connector_result!(
+          &runner,
+          r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+            float: { _min: { not: { equals: 0 }}}
+            int: { _min: { not: { equals: 0 }}}
+          }) {
+            string
+            _min {
+              float
+              int
+            }
+          }
+        }"#,
+          // MongoDB returns null for aggregations on undefined fields, so it's included
+          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group3","_min":{"float":null,"int":null}}]}}"#],
+          _ => vec![r#"{"data":{"groupByTestModel":[]}}"#]
+        );
+
+        // Group 1 and 2 returned
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+                    float: { _min: { in: [0] }}
+                    int: { _min: { in: [0] }}
+                  }) {
+                    string
+                    _min {
+                      float
+                      int
+                    }
+                  }
+                }"#
+            ),
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0}},{"string":"group2","_min":{"float":0.0,"int":0}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn having_max_scalar_filter(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 3, float: 10, int: 10, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
+        create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
+
+        // Group 1 returned
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+                    float: { _max: { equals: 10 }}
+                    int: { _max: { equals: 10 }}
+                  }) {
+                    string
+                    _max {
+                      float
+                      int
+                    }
+                  }
+                }"#
+            ),
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10}},{"string":"group2","_max":{"float":10.0,"int":10}}]}}"###
+        );
+
+        match_connector_result!(
+          &runner,
+          r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+            float: { _max: { not: { equals: 10 }}}
+            int: { _max: { not: { equals: 10 }}}
+          }) {
+            string
+            _max {
+              float
+              int
+            }
+          }
+        }"#,
+          // MongoDB returns null for aggregations on undefined fields, so it's included
+          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group3","_max":{"float":null,"int":null}}]}}"#],
+          _ => vec![r#"{"data":{"groupByTestModel":[]}}"#]
+        );
+
+        // Group 1 and 2 returned
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
+                    float: { _max: { in: [10] }}
+                    int: { _max: { in: [10] }}
+                  }) {
+                    string
+                    _max {
+                      float
+                      int
+                    }
+                  }
+                }"#
+            ),
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10}},{"string":"group2","_max":{"float":10.0,"int":10}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    /// Error cases
+
+    #[connector_test]
+    async fn having_filter_mismatch_selection(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            "query { groupByTestModel(by: [string], having: { int: { gt: 3 } }) {
+                _sum {
+                  int
+                }
+              }
+            }",
+            2019,
+            "Every field used in `having` filters must either be an aggregation filter or be included in the selection of the query. Missing fields: int"
+        );
+        Ok(())
+    }
+
+    async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
+        runner
+            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .await?
+            .assert_success();
+        Ok(())
+    }
+}
+
+#[test_suite(schema(schema), capabilities(DecimalType))]
+mod decimal_aggregation_group_by_having {
+    use query_engine_tests::{match_connector_result, run_query, Runner};
+
+    fn schema() -> String {
+        let schema = indoc! {
+            "model TestModel {
+              #id(id, Int, @id)
+              string  String?
+              decimal Decimal?
+          }"
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test]
     async fn having_avg_scalar_filter(runner: Runner) -> TestResult<()> {
-        create_row(&runner, r#"{ id: 1, int: 10, decimal: "10", string: "group1" }"#).await?;
-        create_row(&runner, r#"{ id: 2, int: 6, decimal: "6", string: "group1" }"#).await?;
-        create_row(&runner, r#"{ id: 3, int: 3, decimal: "5", string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 1, decimal: "10", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, decimal: "6", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 3, decimal: "5", string: "group2" }"#).await?;
         create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
         create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
         create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
@@ -169,67 +405,14 @@ mod aggregation_group_by_having {
             @r###"{"data":{"groupByTestModel":[{"string":"group1","_avg":{"decimal":"8"}}]}}"###
         );
 
-        // Group 2 and 3 returned (3 is null)
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    OR: [
-                      { decimal: { _avg: { not: { equals: "8.0" }}}},
-                      { decimal: { _avg: { equals: null }}}
-                    ]}
-                  ) {
-                      string
-                      _avg {
-                        decimal
-                      }
-                    }
-                }"#
-            ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group2","_avg":{"decimal":"5"}},{"string":"group3","_avg":{"decimal":null}}]}}"###
-        );
-
-        // Group 1 and 3 returned
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    decimal: {
-                      _avg: {
-                        in: ["8", "5"]
-                      }
-                    }
-                  }) {
-                    string
-                    _avg {
-                      decimal
-                    }
-                  }
-                }"#
-            ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_avg":{"decimal":"8"}},{"string":"group2","_avg":{"decimal":"5"}}]}}"###
-        );
-
         Ok(())
     }
 
     #[connector_test]
     async fn having_sum_scalar_filter(runner: Runner) -> TestResult<()> {
-        create_row(
-            &runner,
-            r#"{ id: 1, float: 10, int: 10, decimal: "10", string: "group1" }"#,
-        )
-        .await?;
-        create_row(
-            &runner,
-            r#"{ id: 2, float: 6, int: 6, decimal: "6", string: "group1" }"#,
-        )
-        .await?;
-        create_row(
-            &runner,
-            r#"{ id: 3, float: 5, int: 5, decimal: "5", string: "group2" }"#,
-        )
-        .await?;
+        create_row(&runner, r#"{ id: 1, decimal: "10", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, decimal: "6", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 3, decimal: "5", string: "group2" }"#).await?;
         create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
         create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
         create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
@@ -239,41 +422,33 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"{ groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { _sum: { equals: 16 }}
-                    int: { _sum: { equals: 16 }}
                     decimal: { _sum: { equals: "16" }}
                   }) {
                     string
                     _sum {
-                      float
-                      int
                       decimal
                     }
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16,"decimal":"16"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"decimal":"16"}}]}}"###
         );
 
         match_connector_result!(
             runner,
             r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-              float: { _sum: { not: { equals: 16 }}}
-              int: { _sum: { not: { equals: 16 }}}
               decimal: { _sum: { not: { equals: "16" }}}
             }) {
               string
               _sum {
-                float
-                int
                 decimal
               }
             }
           }"#,
           // On MongoDB, having sum returns 0 where there are inexistant element
           // Contrary to SQL which returns NULL and therefore excludes group3
-          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5,"decimal":"5"}},{"string":"group3","_sum":{"float":0.0,"int":0,"decimal":"0"}}]}}"#],
-          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5,"decimal":"5"}}]}}"#]
+          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"decimal":"5"}},{"string":"group3","_sum":{"decimal":"0"}}]}}"#],
+          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"decimal":"5"}}]}}"#]
         );
 
         // Group 1 and 2 returned
@@ -281,20 +456,16 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { _sum: { in: [16, 5] }}
-                    int: { _sum: { in: [16, 5] }}
                     decimal: { _sum: { in: ["16", "5"] }}
                   }) {
                     string
                     _sum {
-                      float
-                      int
                       decimal
                     }
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16,"decimal":"16"}},{"string":"group2","_sum":{"float":5.0,"int":5,"decimal":"5"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"decimal":"16"}},{"string":"group2","_sum":{"decimal":"5"}}]}}"###
         );
 
         Ok(())
@@ -302,21 +473,9 @@ mod aggregation_group_by_having {
 
     #[connector_test]
     async fn having_min_scalar_filter(runner: Runner) -> TestResult<()> {
-        create_row(
-            &runner,
-            r#"{ id: 1, float: 10, int: 10, decimal: "10", string: "group1" }"#,
-        )
-        .await?;
-        create_row(
-            &runner,
-            r#"{ id: 2, float: 0, int: 0, decimal: "0", string: "group1" }"#,
-        )
-        .await?;
-        create_row(
-            &runner,
-            r#"{ id: 3, float: 0, int: 0, decimal: "0", string: "group2" }"#,
-        )
-        .await?;
+        create_row(&runner, r#"{ id: 1, decimal: "10", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, decimal: "0", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 3, decimal: "0", string: "group2" }"#).await?;
         create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
         create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
         create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
@@ -326,39 +485,31 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { _min: { equals: 0 }}
-                    int: { _min: { equals: 0 }}
                     decimal: { _min: { equals: "0" }}
                   }) {
                     string
                     _min {
-                      float
-                      int
                       decimal
                     }
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0,"decimal":"0"}},{"string":"group2","_min":{"float":0.0,"int":0,"decimal":"0"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"decimal":"0"}},{"string":"group2","_min":{"decimal":"0"}}]}}"###
         );
 
         match_connector_result!(
           &runner,
           r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-            float: { _min: { not: { equals: 0 }}}
-            int: { _min: { not: { equals: 0 }}}
             decimal: { _min: { not: { equals: "0" }}}
           }) {
             string
             _min {
-              float
-              int
               decimal
             }
           }
         }"#,
           // MongoDB returns null for aggregations on undefined fields, so it's included
-          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group3","_min":{"float":null,"int":null,"decimal":null}}]}}"#],
+          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group3","_min":{"decimal":null}}]}}"#],
           _ => vec![r#"{"data":{"groupByTestModel":[]}}"#]
         );
 
@@ -367,20 +518,16 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { _min: { in: [0] }}
-                    int: { _min: { in: [0] }}
                     decimal: { _min: { in: ["0"] }}
                   }) {
                     string
                     _min {
-                      float
-                      int
                       decimal
                     }
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0,"decimal":"0"}},{"string":"group2","_min":{"float":0.0,"int":0,"decimal":"0"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"decimal":"0"}},{"string":"group2","_min":{"decimal":"0"}}]}}"###
         );
 
         Ok(())
@@ -388,21 +535,9 @@ mod aggregation_group_by_having {
 
     #[connector_test]
     async fn having_max_scalar_filter(runner: Runner) -> TestResult<()> {
-        create_row(
-            &runner,
-            r#"{ id: 1, float: 10, int: 10, decimal: "10", string: "group1" }"#,
-        )
-        .await?;
-        create_row(
-            &runner,
-            r#"{ id: 2, float: 0, int: 0, decimal: "0", string: "group1" }"#,
-        )
-        .await?;
-        create_row(
-            &runner,
-            r#"{ id: 3, float: 10, int: 10, decimal: "10", string: "group2" }"#,
-        )
-        .await?;
+        create_row(&runner, r#"{ id: 1, decimal: "10", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, decimal: "0", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 3, decimal: "10", string: "group2" }"#).await?;
         create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
         create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
         create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
@@ -412,39 +547,31 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { _max: { equals: 10 }}
-                    int: { _max: { equals: 10 }}
                     decimal: { _max: { equals: "10" }}
                   }) {
                     string
                     _max {
-                      float
-                      int
                       decimal
                     }
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10,"decimal":"10"}},{"string":"group2","_max":{"float":10.0,"int":10,"decimal":"10"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"decimal":"10"}},{"string":"group2","_max":{"decimal":"10"}}]}}"###
         );
 
         match_connector_result!(
           &runner,
           r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-            float: { _max: { not: { equals: 10 }}}
-            int: { _max: { not: { equals: 10 }}}
             decimal: { _max: { not: { equals: "10" }}}
           }) {
             string
             _max {
-              float
-              int
               decimal
             }
           }
         }"#,
           // MongoDB returns null for aggregations on undefined fields, so it's included
-          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group3","_max":{"float":null,"int":null,"decimal":null}}]}}"#],
+          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group3","_max":{"decimal":null}}]}}"#],
           _ => vec![r#"{"data":{"groupByTestModel":[]}}"#]
         );
 
@@ -453,40 +580,18 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { _max: { in: [10] }}
-                    int: { _max: { in: [10] }}
                     decimal: { _max: { in: ["10"] }}
                   }) {
                     string
                     _max {
-                      float
-                      int
                       decimal
                     }
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10,"decimal":"10"}},{"string":"group2","_max":{"float":10.0,"int":10,"decimal":"10"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"decimal":"10"}},{"string":"group2","_max":{"decimal":"10"}}]}}"###
         );
 
-        Ok(())
-    }
-
-    /// Error cases
-
-    #[connector_test]
-    async fn having_filter_mismatch_selection(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            runner,
-            "query { groupByTestModel(by: [string], having: { int: { gt: 3 } }) {
-                _sum {
-                  int
-                }
-              }
-            }",
-            2019,
-            "Every field used in `having` filters must either be an aggregation filter or be included in the selection of the query. Missing fields: int"
-        );
         Ok(())
     }
 

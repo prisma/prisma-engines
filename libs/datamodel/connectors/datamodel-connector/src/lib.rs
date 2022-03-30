@@ -219,6 +219,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::CompoundIds)
     }
 
+    fn supports_decimal(&self) -> bool {
+        self.has_capability(ConnectorCapability::DecimalType)
+    }
+
     fn allows_relation_fields_in_arbitrary_order(&self) -> bool {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }

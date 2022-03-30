@@ -262,14 +262,6 @@ mod is_set_to_one {
 
         Ok(())
     }
-
-    async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
-        runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
-            .await?
-            .assert_success();
-        Ok(())
-    }
 }
 
 #[test_suite(schema(to_one_composites), only(MongoDb))]

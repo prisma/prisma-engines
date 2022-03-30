@@ -1,13 +1,25 @@
-use super::common_test_data;
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::common_nullable_types))]
+#[test_suite(schema(schema), capabilities(DecimalType))]
 mod decimal_filter_spec {
     use query_engine_tests::run_query;
 
+    fn schema() -> String {
+        let schema = indoc! {
+            r#"
+              model TestModel {
+                #id(id, Int, @id)
+                decimal Decimal?
+              }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
     #[connector_test]
     async fn basic_where(runner: Runner) -> TestResult<()> {
-        common_test_data(&runner).await?;
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyTestModel(where: { decimal: { equals: "5.5" }}) { id }}"#),
@@ -29,7 +41,7 @@ mod decimal_filter_spec {
 
     #[connector_test]
     async fn where_shorthands(runner: Runner) -> TestResult<()> {
-        common_test_data(&runner).await?;
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyTestModel(where: { decimal: "5.5" }) { id }}"#),
@@ -49,7 +61,7 @@ mod decimal_filter_spec {
 
     #[connector_test]
     async fn inclusion_filter(runner: Runner) -> TestResult<()> {
-        common_test_data(&runner).await?;
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyTestModel(where: { decimal: { in: ["5.5", "1.0"] }}) { id }}"#),
@@ -71,7 +83,7 @@ mod decimal_filter_spec {
 
     #[connector_test]
     async fn numeric_comparison_filters(runner: Runner) -> TestResult<()> {
-        common_test_data(&runner).await?;
+        test_data(&runner).await?;
 
         // Gt
         insta::assert_snapshot!(
@@ -120,6 +132,33 @@ mod decimal_filter_spec {
           run_query!(&runner, r#"query { findManyTestModel(where: { decimal: { not: { lte: "1" }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
+
+        Ok(())
+    }
+
+    async fn test_data(runner: &Runner) -> TestResult<()> {
+        runner
+            .query(indoc! { r#"
+                mutation { createOneTestModel(data: {
+                    id: 1,
+                    decimal: "5.5",
+                }) { id }}"# })
+            .await?
+            .assert_success();
+
+        runner
+            .query(indoc! { r#"
+                mutation { createOneTestModel(data: {
+                    id: 2,
+                    decimal: "1",
+                }) { id }}"# })
+            .await?
+            .assert_success();
+
+        runner
+            .query(indoc! { r#"mutation { createOneTestModel(data: { id: 3 }) { id }}"# })
+            .await?
+            .assert_success();
 
         Ok(())
     }

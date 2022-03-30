@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
 // Ignored for MSSQL and SQLite because of low precision issues.
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), capabilities(DecimalType))]
 mod decimal {
     use indoc::indoc;
     use query_engine_tests::run_query;

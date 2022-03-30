@@ -5,6 +5,15 @@ use chrono::DateTime;
 #[test]
 fn should_set_default_for_all_scalar_types() {
     let dml = r#"
+    datasource test {
+        provider = "postgresql"
+        url = "postgresql://"
+    }
+
+    generator js {
+        provider = "prisma-client-js"
+    }
+
     model Model {
         id Int @id
         int Int @default(3)

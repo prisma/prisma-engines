@@ -48,10 +48,9 @@ pub fn numeric_text_optional_one2m() -> String {
             #id(id, Int, @id)
             float    Float
             int      Int
-            decimal      Decimal
             string   String
-            b_id Int?
-            b    B?   @relation(fields: [b_id], references: [id])
+            b_id     Int?
+            b        B?     @relation(fields: [b_id], references: [id])
         }
 
         model B {

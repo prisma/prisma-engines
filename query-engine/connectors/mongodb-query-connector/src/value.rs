@@ -126,9 +126,6 @@ impl IntoBson for (MongoDbType, PrismaValue) {
             (MongoDbType::Double, PrismaValue::Float(f)) => Bson::Double(f.to_f64().convert(expl::MONGO_DOUBLE)?),
             (MongoDbType::Double, PrismaValue::BigInt(b)) => Bson::Double(b.to_f64().convert(expl::MONGO_DOUBLE)?),
 
-            // Decimal
-            (MongoDbType::Decimal, _) => unimplemented!("Mongo decimals."),
-
             // Int
             (MongoDbType::Int, PrismaValue::Int(b)) => Bson::Int32(b as i32),
             (MongoDbType::Int, PrismaValue::BigInt(b)) => Bson::Int32(b as i32),
