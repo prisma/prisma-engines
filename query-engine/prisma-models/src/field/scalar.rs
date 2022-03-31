@@ -53,10 +53,6 @@ impl ScalarField {
         self.db_name.as_deref().unwrap_or(self.name.as_str())
     }
 
-    pub fn name(&self) -> &str {
-        self.name.as_str()
-    }
-
     pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
         (self.type_identifier.clone(), self.arity)
     }

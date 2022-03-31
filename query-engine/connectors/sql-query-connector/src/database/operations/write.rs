@@ -26,7 +26,7 @@ async fn generate_id(
     let (pk_select, need_select) = primary_key
         .selections()
         .filter_map(|field| match field {
-            SelectedField::Scalar(x) if x.default_value.is_some() && !args.has_arg_for(x.name()) => x
+            SelectedField::Scalar(x) if x.default_value.is_some() && !args.has_arg_for(x.db_name()) => x
                 .default_value
                 .clone()
                 .unwrap()
