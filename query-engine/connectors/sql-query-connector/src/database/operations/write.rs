@@ -20,12 +20,13 @@ async fn generate_id(
     conn: &dyn QueryExt,
     primary_key: &FieldSelection,
     trace_id: Option<String>,
+    args: &WriteArgs,
 ) -> crate::Result<Option<SelectionResult>> {
     // Go through all the values and generate a select statement with the correct MySQL function
     let (pk_select, need_select) = primary_key
         .selections()
         .filter_map(|field| match field {
-            SelectedField::Scalar(x) if x.default_value.is_some() => x
+            SelectedField::Scalar(x) if x.default_value.is_some() && !args.has_arg_for(x.db_name()) => x
                 .default_value
                 .clone()
                 .unwrap()
@@ -69,7 +70,7 @@ pub async fn create_record(
     let pk = model.primary_identifier();
 
     let returned_id = if *sql_family == SqlFamily::Mysql {
-        generate_id(conn, &pk, trace_id.clone()).await?
+        generate_id(conn, &pk, trace_id.clone(), &args).await?
     } else {
         args.as_record_projection(pk.clone().into())
     };

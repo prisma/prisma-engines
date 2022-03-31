@@ -112,4 +112,17 @@ mod special_id_values {
 
         Ok(())
     }
+
+    #[connector_test]
+    async fn uuid_is_provided(runner: Runner) -> TestResult<()> {
+        assert_query!(
+            runner,
+            r#"mutation {
+                createOneStrTest(data: {id: "e27861d6-c0cb-4e0b-aac5-158aa6eced65", name: "test"}) {id}
+            }"#,
+            r#"{"data":{"createOneStrTest":{"id":"e27861d6-c0cb-4e0b-aac5-158aa6eced65"}}}"#
+        );
+
+        Ok(())
+    }
 }
