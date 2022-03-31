@@ -1851,7 +1851,7 @@
     <span class="kw">fn</span> <span class="ident">reformat_function_expression</span>(<span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">LineWriteable</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">token</span>.<span class="ident">clone</span>().<span class="ident">into_inner</span>() {
             <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-                <span class="ident">Rule::non_empty_identifier</span> =&gt; {
+                <span class="ident">Rule::function_name</span> =&gt; {
                     <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">current</span>.<span class="ident">as_str</span>());
                 }
                 <span class="ident">Rule::arguments_list</span> =&gt; <span class="ident"><span class="self">Self</span>::reformat_arguments_list</span>(<span class="ident">target</span>, <span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="kw-2">&amp;</span>[]),
