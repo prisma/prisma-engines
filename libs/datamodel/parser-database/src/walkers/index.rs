@@ -115,10 +115,10 @@ impl<'db> IndexWalker<'db> {
         }
 
         self.scalar_field_attributes().zip(fields).all(|(a, b)| {
-            let same_name = a.as_index_field().field_id() == b.as_index_field().field_id();
             let same_attributes = a.sort_order() == b.sort_order() && a.length() == b.length();
+            let same_path = a.as_path_to_indexed_field() == b.as_path_to_indexed_field();
 
-            same_name && same_attributes
+            same_path && same_attributes
         })
     }
 

@@ -372,6 +372,8 @@ impl Model {
                     let fields: Vec<_> = id
                         .fields
                         .iter()
+                        // TODO: remove this when supporting composite indices on QE
+                        .filter(|f| f.path.len() == 1)
                         .map(|f| &f.path.first().unwrap().0)
                         .map(|name| self.find_scalar_field(name).unwrap())
                         .collect();
