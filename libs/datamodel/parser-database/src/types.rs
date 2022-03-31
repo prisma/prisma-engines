@@ -337,7 +337,7 @@ impl IndexFieldPath {
     }
 
     /// The starting point of the index path. If the indexed field is not in a
-    /// composite type, returns the same value as [`field_in_index`].
+    /// composite type, returns the same value as [`field_in_index`](Self::field_in_index()).
     ///
     /// ```ignore
     /// type A {
@@ -352,13 +352,11 @@ impl IndexFieldPath {
     ///   @@index([a.field])
     /// }
     /// ```
-    ///
-    /// [`field_in_index`]: struct IndexFieldPath#method.field_in_index
     pub fn root(&self) -> ast::FieldId {
         self.root
     }
 
-    /// The path after [`root`]. Empty if the field is not pointing to a
+    /// The path after [`root`](Self::root()). Empty if the field is not pointing to a
     /// composite type.
     ///
     /// ```ignore
@@ -374,18 +372,14 @@ impl IndexFieldPath {
     ///   @@index([a.field])
     /// }
     /// ```
-    ///
-    /// [`root`]: struct IndexFieldPath#method.root
     pub fn path(&self) -> &[(ast::CompositeTypeId, ast::FieldId)] {
         &self.path
     }
 
     /// The field that gets included in the index. Can either be in the model,
     /// or in a composite type embedded in the model. Returns the same value as
-    /// the [`root`] method if the field is in a model rather than in a
+    /// the [`root`](Self::root()) method if the field is in a model rather than in a
     /// composite type.
-    ///
-    /// [`root`]: struct IndexFieldPath#method.root
     pub fn field_in_index(&self) -> ast::FieldId {
         self.path.last().map(|(_, field_id)| *field_id).unwrap_or(self.root)
     }

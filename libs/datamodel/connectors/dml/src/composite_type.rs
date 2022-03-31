@@ -57,6 +57,11 @@ impl CompositeType {
             .iter()
             .filter(|f| matches!(f.r#type, CompositeTypeFieldType::Unsupported(_)))
     }
+
+    /// Finds a field by name.
+    pub fn find_field(&self, name: &str) -> Option<&CompositeTypeField> {
+        self.fields.iter().find(|f| f.name == name)
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]

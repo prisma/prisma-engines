@@ -1,3 +1,4 @@
+mod indices;
 mod name;
 
 pub(crate) use name::Name;
@@ -5,13 +6,12 @@ pub(crate) use name::Name;
 use super::{field_type::FieldType, CompositeTypeDepth};
 use convert_case::{Case, Casing};
 use datamodel::dml::{
-    self, CompositeType, CompositeTypeField, CompositeTypeFieldType, Datamodel, DefaultValue, Field, FieldArity,
-    IndexDefinition, IndexField, IndexType, Model, PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType,
-    SortOrder, ValueGenerator, WithDatabaseName,
+    self, CompositeType, CompositeTypeField, CompositeTypeFieldType, Datamodel, DefaultValue, Field, FieldArity, Model,
+    PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
 };
 use introspection_connector::Warning;
 use mongodb::bson::{Bson, Document};
-use mongodb_schema_describer::{IndexFieldProperty, IndexWalker};
+use mongodb_schema_describer::IndexWalker;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{
@@ -71,7 +71,7 @@ impl<'a> Statistics<'a> {
         let mut indices = self.indices;
         let (mut models, mut types) = populate_fields(&self.models, self.samples, warnings);
 
-        add_indices_to_models(&mut models, &mut types, &mut indices, warnings);
+        indices::add_to_models(&mut models, &mut types, &mut indices, warnings);
         add_missing_ids_to_models(&mut models);
 
         for (_, model) in models.into_iter() {
@@ -572,122 +572,6 @@ fn filter_out_empty_types(
         warnings.push(crate::warnings::fields_pointing_to_an_empty_type(
             &fields_with_an_empty_type,
         ));
-    }
-}
-
-fn add_indices_to_models(
-    models: &mut BTreeMap<String, Model>,
-    // TODO: here we go!
-    _types: &mut BTreeMap<String, CompositeType>,
-    indices: &mut BTreeMap<String, Vec<IndexWalker<'_>>>,
-    warnings: &mut Vec<Warning>,
-) {
-    let mut fields_with_unknown_type = Vec::new();
-
-    for (model_name, model) in models.iter_mut() {
-        for index in indices.remove(model_name).into_iter().flat_map(|i| i.into_iter()) {
-            let defined_on_field = index.fields().len() == 1;
-
-            let missing_fields: Vec<_> = index
-                .fields()
-                .filter(|indf| {
-                    !model
-                        .fields
-                        .iter()
-                        .any(|mf| mf.name() == indf.name() || mf.database_name() == Some(indf.name()))
-                })
-                .cloned()
-                .collect();
-
-            for field in missing_fields {
-                let docs = String::from("Field referred in an index, but found no data to define the type.");
-                fields_with_unknown_type.push((Name::Model(model_name.to_owned()), field.name.clone()));
-
-                let (name, database_name) = match sanitize_string(field.name()) {
-                    Some(name) => (name, Some(field.name)),
-                    None => (field.name, None),
-                };
-
-                let sf = ScalarField {
-                    name,
-                    field_type: FieldType::Json.into(),
-                    arity: FieldArity::Optional,
-                    database_name,
-                    default_value: None,
-                    documentation: Some(docs),
-                    is_generated: false,
-                    is_updated_at: false,
-                    is_commented_out: false,
-                    is_ignored: false,
-                };
-
-                model.fields.push(Field::ScalarField(sf));
-            }
-
-            let fields = index
-                .fields()
-                .map(|f| {
-                    let mut path = Vec::new();
-                    let mut splitted_name = f.name().split('.');
-                    let mut next_type = None;
-
-                    if let Some(field_name) = splitted_name.next() {
-                        next_type = model
-                            .fields()
-                            .find(|f| f.database_name() == Some(field_name) || f.name() == field_name)
-                            .and_then(|f| match f {
-                                Field::CompositeField(cf) => Some(cf.composite_type.as_str()),
-                                _ => None,
-                            });
-
-                        let name = sanitize_string(field_name).unwrap_or_else(|| field_name.to_owned());
-
-                        path.push((name, None));
-                    }
-
-                    for field_name in splitted_name {
-                        match next_type {
-                            Some(ct) => {
-                                let name = sanitize_string(field_name).unwrap_or_else(|| field_name.to_owned());
-                                path.push((name, Some(ct.to_owned())));
-                            }
-                            None => {
-                                todo!("We must create a new composite type and a field if it is not there yet");
-                            }
-                        }
-                    }
-
-                    IndexField {
-                        path,
-                        sort_order: match f.property {
-                            IndexFieldProperty::Text => None,
-                            IndexFieldProperty::Ascending => Some(SortOrder::Asc),
-                            IndexFieldProperty::Descending => Some(SortOrder::Desc),
-                        },
-                        length: None,
-                    }
-                })
-                .collect();
-
-            let tpe = match index.r#type() {
-                mongodb_schema_describer::IndexType::Normal => IndexType::Normal,
-                mongodb_schema_describer::IndexType::Unique => IndexType::Unique,
-                mongodb_schema_describer::IndexType::Fulltext => IndexType::Fulltext,
-            };
-
-            model.add_index(IndexDefinition {
-                fields,
-                tpe,
-                defined_on_field,
-                db_name: Some(index.name().to_string()),
-                name: None,
-                algorithm: None,
-            });
-        }
-    }
-
-    if !fields_with_unknown_type.is_empty() {
-        warnings.push(crate::warnings::fields_with_unknown_types(&fields_with_unknown_type));
     }
 }
 

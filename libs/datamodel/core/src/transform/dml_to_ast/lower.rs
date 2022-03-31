@@ -51,7 +51,7 @@ impl<'a> LowerDmlToAst<'a> {
         ast::Model {
             name: ast::Identifier::new(&model.name),
             fields,
-            attributes: self.lower_model_attributes(model),
+            attributes: self.lower_model_attributes(datamodel, model),
             documentation: model.documentation.clone().map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
             commented_out: model.is_commented_out,
