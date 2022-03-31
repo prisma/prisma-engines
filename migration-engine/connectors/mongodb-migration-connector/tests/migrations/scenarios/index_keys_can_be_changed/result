@@ -1,5 +1,5 @@
 [-] Index `UserExistingIndex`
-[+] Index `UserExistingIndex` on ({"lastName":1,"firstName":1,"age":1})
+[+] Index `UserExistingIndex` on ({"lastName":1,"firstName":1,"age":1,"address.number":1})
 
 ------
 
@@ -36,7 +36,8 @@
           "keys": {
             "lastName": 1,
             "firstName": 1,
-            "age": 1
+            "age": 1,
+            "address.number": 1
           }
         }
       ],
@@ -44,7 +45,10 @@
         {
           "_id": 1,
           "age": 52,
-          "firstName": "George"
+          "firstName": "George",
+          "address": {
+            "number": 42
+          }
         }
       ]
     }

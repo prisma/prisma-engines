@@ -1,16 +1,31 @@
- model User {
-     id Int @id
-     firstName String
-     lastName String
-     age Int
-
-    @@unique([firstName, lastName, age], map: "UserExistingIndex")
- }
-
- model Post {
-     id Int @id
-     title String
-
-     @@index([title])
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb://"
 }
 
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb", "extendedIndexes"]
+}
+
+type Ip {
+  address String
+}
+
+model User {
+  id        Int    @id @map("_id")
+  firstName String
+  lastName  String
+  age       Int
+  ip        Ip
+
+  @@unique([firstName, lastName, age, ip.address], map: "UserExistingIndex")
+}
+
+model Post {
+  id    Int    @id @map("_id")
+  title String
+  ip    Ip
+
+  @@index([title, ip.address])
+}

@@ -143,6 +143,40 @@ fn composite_index_with_map() {
 }
 
 #[test]
+fn composite_index_with_sort() {
+    let schema = indoc! {r#"
+        type A {
+          field String
+        }
+
+        model B {
+          id Int @id @map("_id")
+          a  A
+
+          @@index([a.field(sort: Desc)])
+        }
+    "#};
+
+    let datamodel = parse(&with_header(
+        schema,
+        crate::Provider::Mongo,
+        &["mongoDb", "extendedIndexes"],
+    ));
+
+    let mut field = IndexField::new_in_path(&[("a", None), ("field", Some("A"))]);
+    field.sort_order = Some(SortOrder::Desc);
+
+    datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("B_field_idx".to_string()),
+        fields: vec![field],
+        tpe: IndexType::Normal,
+        algorithm: None,
+        defined_on_field: false,
+    });
+}
+
+#[test]
 fn reformat() {
     let schema = indoc! {r#"
         type A {

@@ -27,7 +27,7 @@ fn parse_function(token: &Token<'_>) -> Expression {
 
     for current in token.relevant_children() {
         match current.as_rule() {
-            Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
+            Rule::function_name => name = Some(current.as_str().to_string()),
             Rule::arguments_list => parse_arguments_list(&current, &mut arguments),
             _ => parsing_catch_all(&current, "function"),
         }

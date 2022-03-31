@@ -1,6 +1,6 @@
 [-] Index `UserExistingIndex`
-[+] Unique index `UserExistingIndex` on ({"firstName":1,"lastName":1,"age":1})
-[+] Index `Post_title_idx` on ({"title":1})
+[+] Unique index `UserExistingIndex` on ({"firstName":1,"lastName":1,"age":1,"ip.address":1})
+[+] Index `Post_title_address_idx` on ({"title":1,"ip.address":1})
 
 ------
 
@@ -16,10 +16,11 @@
           }
         },
         {
-          "name": "Post_title_idx",
+          "name": "Post_title_address_idx",
           "is_unique": false,
           "keys": {
-            "title": 1
+            "title": 1,
+            "ip.address": 1
           }
         }
       ],
@@ -44,7 +45,8 @@
           "keys": {
             "firstName": 1,
             "lastName": 1,
-            "age": 1
+            "age": 1,
+            "ip.address": 1
           }
         }
       ],

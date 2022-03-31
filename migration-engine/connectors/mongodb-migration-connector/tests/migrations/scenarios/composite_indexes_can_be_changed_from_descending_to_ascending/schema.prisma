@@ -1,0 +1,21 @@
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb://"
+}
+
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb", "extendedIndexes"]
+}
+
+type Address {
+  street String
+  number Int
+}
+
+model User {
+  id      Int     @id @map("_id")
+  address Address
+
+  @@index([address.number])
+}

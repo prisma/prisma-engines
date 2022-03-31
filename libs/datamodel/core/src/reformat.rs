@@ -743,7 +743,7 @@ impl<'a> Reformatter<'a> {
     fn reformat_function_expression(target: &mut dyn LineWriteable, token: &Token<'_>) {
         for current in token.clone().into_inner() {
             match current.as_rule() {
-                Rule::non_empty_identifier => {
+                Rule::function_name => {
                     target.write(current.as_str());
                 }
                 Rule::arguments_list => Self::reformat_arguments_list(target, &current, &[]),
