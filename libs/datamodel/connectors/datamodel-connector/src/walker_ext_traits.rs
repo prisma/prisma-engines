@@ -17,7 +17,10 @@ impl<'db> IndexWalkerExt<'db> for IndexWalker<'db> {
         let model = self.model();
         let model_db_name = model.database_name();
 
-        let field_db_names = self.fields().map(|f| f.database_name()).collect::<Vec<_>>();
+        let field_db_names = self
+            .scalar_field_attributes()
+            .map(|f| f.as_mapped_path_to_indexed_field())
+            .collect::<Vec<_>>();
 
         if self.is_unique() {
             ConstraintNames::unique_index_name(model_db_name, &field_db_names, connector).into()

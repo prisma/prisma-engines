@@ -1,5 +1,5 @@
 [+] Collection `User`
-[+] Index `User_number_idx` on ({"address.number":1})
+[+] Index `User_address_number_idx` on ({"address.number":1})
 
 ------
 
@@ -15,7 +15,7 @@
           }
         },
         {
-          "name": "User_number_idx",
+          "name": "User_address_number_idx",
           "is_unique": false,
           "keys": {
             "address.number": 1

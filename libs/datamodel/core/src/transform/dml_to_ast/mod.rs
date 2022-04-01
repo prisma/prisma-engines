@@ -74,18 +74,26 @@ pub fn index_name_matches(
     model: &Model,
     connector: &dyn Connector,
 ) -> bool {
-    let column_names: Vec<&str> = idx
+    let column_names: Vec<Vec<(&str, Option<&str>)>> = idx
         .fields
         .iter()
-        .map(|field| match field.path.last() {
-            Some((field_name, Some(type_name))) => {
-                let ct = datamodel.find_composite_type(type_name).unwrap();
-                let field = ct.find_field(field_name).unwrap();
+        .map(|field| {
+            field
+                .path
+                .iter()
+                .map(|field_def| match field_def {
+                    (field_name, Some(type_name)) => {
+                        let ct = datamodel.find_composite_type(type_name).unwrap();
+                        let field = ct.find_field(field_name).unwrap();
 
-                field.database_name.as_ref().unwrap_or(field_name)
-            }
-            Some((field_name, None)) => model.find_scalar_field(field_name).unwrap().final_database_name(),
-            None => unreachable!(),
+                        (
+                            field.database_name.as_deref().unwrap_or(field_name.as_str()),
+                            Some(type_name.as_str()),
+                        )
+                    }
+                    (field_name, None) => (model.find_scalar_field(field_name).unwrap().final_database_name(), None),
+                })
+                .collect::<Vec<_>>()
         })
         .collect();
 

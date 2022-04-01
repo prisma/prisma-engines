@@ -870,7 +870,7 @@ fn single_column_normal_composite_index_default_name() {
 
         let options = IndexOptions::builder()
             .unique(Some(false))
-            .name(Some("A_age_idx".to_string()))
+            .name(Some("A_info_age_idx".to_string()))
             .build();
 
         let model = IndexModel::builder()
@@ -1087,7 +1087,7 @@ fn single_column_unique_composite_index_default_name() {
 
         let options = IndexOptions::builder()
             .unique(Some(true))
-            .name(Some("Cat_age_key".to_string()))
+            .name(Some("Cat_info_age_key".to_string()))
             .build();
 
         let model = IndexModel::builder()
