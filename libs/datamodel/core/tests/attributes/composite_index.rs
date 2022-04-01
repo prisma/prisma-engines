@@ -22,7 +22,7 @@ fn simple_composite_index() {
 
     datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("B_field_idx".to_string()),
+        db_name: Some("B_a_field_idx".to_string()),
         fields: vec![IndexField::new_in_path(&[("a", None), ("field", Some("A"))])],
         tpe: IndexType::Normal,
         algorithm: None,
@@ -49,12 +49,54 @@ fn simple_composite_unique() {
 
     datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("B_field_key".to_string()),
+        db_name: Some("B_a_field_key".to_string()),
         fields: vec![IndexField::new_in_path(&[("a", None), ("field", Some("A"))])],
         tpe: IndexType::Unique,
         algorithm: None,
         defined_on_field: false,
     });
+}
+
+#[test]
+fn composite_unique_with_normal_unique() {
+    let schema = indoc! {r#"
+        type Address {
+          street String
+          number Int
+        }
+
+        model User {
+          id      Int     @id @map("_id")
+          val     Int     @unique
+          address Address
+
+          @@unique([address.number])
+        }
+    "#};
+
+    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &["mongoDb"]));
+
+    datamodel
+        .assert_has_model("User")
+        .assert_has_index(IndexDefinition {
+            name: None,
+            db_name: Some("User_val_key".to_string()),
+            fields: vec![IndexField::new_in_model("val")],
+            tpe: IndexType::Unique,
+            algorithm: None,
+            defined_on_field: true,
+        })
+        .assert_has_index(IndexDefinition {
+            name: None,
+            db_name: Some("User_address_number_key".to_string()),
+            fields: vec![IndexField::new_in_path(&[
+                ("address", None),
+                ("number", Some("Address")),
+            ])],
+            tpe: IndexType::Unique,
+            algorithm: None,
+            defined_on_field: false,
+        });
 }
 
 #[test]
@@ -80,7 +122,7 @@ fn simple_composite_fulltext() {
 
     datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("B_field_idx".to_string()),
+        db_name: Some("B_a_field_idx".to_string()),
         fields: vec![IndexField::new_in_path(&[("a", None), ("field", Some("A"))])],
         tpe: IndexType::Fulltext,
         algorithm: None,
@@ -107,7 +149,7 @@ fn composite_index_with_default() {
 
     datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("B_field_idx".to_string()),
+        db_name: Some("B_a_field_idx".to_string()),
         fields: vec![IndexField::new_in_path(&[("a", None), ("field", Some("A"))])],
         tpe: IndexType::Normal,
         algorithm: None,
@@ -134,7 +176,7 @@ fn composite_index_with_map() {
 
     datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("B_meow_idx".to_string()),
+        db_name: Some("B_a_meow_idx".to_string()),
         fields: vec![IndexField::new_in_path(&[("a", None), ("field", Some("A"))])],
         tpe: IndexType::Normal,
         algorithm: None,
@@ -168,7 +210,7 @@ fn composite_index_with_sort() {
 
     datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
         name: None,
-        db_name: Some("B_field_idx".to_string()),
+        db_name: Some("B_a_field_idx".to_string()),
         fields: vec![field],
         tpe: IndexType::Normal,
         algorithm: None,

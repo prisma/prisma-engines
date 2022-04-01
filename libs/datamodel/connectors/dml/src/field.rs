@@ -62,6 +62,13 @@ impl FieldType {
         }
     }
 
+    pub fn as_composite_type(&self) -> Option<&str> {
+        match self {
+            FieldType::CompositeType(ct) => Some(ct),
+            _ => None,
+        }
+    }
+
     pub fn is_datetime(&self) -> bool {
         self.scalar_type().map(|st| st.is_datetime()).unwrap_or(false)
     }

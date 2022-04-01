@@ -5,12 +5,13 @@ use crate::{
     ast::{self, Span},
     dml::{self, Ignorable, IndexDefinition, IndexType, Model, SortOrder, WithDatabaseName},
 };
+use ::dml::datamodel::Datamodel;
 use ::dml::model::IndexAlgorithm;
 use itertools::Itertools;
 
 impl<'a> LowerDmlToAst<'a> {
     /// Internal: Lowers a model's attributes.
-    pub(crate) fn lower_model_attributes(&self, model: &dml::Model) -> Vec<ast::Attribute> {
+    pub(crate) fn lower_model_attributes(&self, datamodel: &Datamodel, model: &dml::Model) -> Vec<ast::Attribute> {
         let mut attributes = vec![];
 
         // @@id
@@ -62,7 +63,7 @@ impl<'a> LowerDmlToAst<'a> {
                     args.push(ast::Argument::new_string("name", name.to_string()));
                 }
 
-                self.push_index_map_argument(model, index_def, &mut args);
+                self.push_index_map_argument(datamodel, model, index_def, &mut args);
 
                 attributes.push(ast::Attribute::new("unique", args));
             });
@@ -74,7 +75,7 @@ impl<'a> LowerDmlToAst<'a> {
             .filter(|index| index.tpe == IndexType::Normal)
             .for_each(|index_def| {
                 let mut args = self.fields_argument(index_def, false);
-                self.push_index_map_argument(model, index_def, &mut args);
+                self.push_index_map_argument(datamodel, model, index_def, &mut args);
 
                 if let Some(IndexAlgorithm::Hash) = index_def.algorithm {
                     args.push(ast::Argument::new(
@@ -93,7 +94,7 @@ impl<'a> LowerDmlToAst<'a> {
             .filter(|index| index.is_fulltext())
             .for_each(|index_def| {
                 let mut args = self.fields_argument(index_def, true);
-                self.push_index_map_argument(model, index_def, &mut args);
+                self.push_index_map_argument(datamodel, model, index_def, &mut args);
 
                 attributes.push(ast::Attribute::new("fulltext", args));
             });
@@ -132,6 +133,7 @@ impl<'a> LowerDmlToAst<'a> {
 
     pub(crate) fn push_field_index_arguments(
         &self,
+        datamodel: &Datamodel,
         model: &Model,
         index_def: &IndexDefinition,
         args: &mut Vec<Argument>,
@@ -139,7 +141,7 @@ impl<'a> LowerDmlToAst<'a> {
         let field = index_def.fields.first().unwrap();
 
         if let Some(src) = self.datasource {
-            if !super::index_name_matches(index_def, model, &*src.active_connector) {
+            if !super::index_name_matches(index_def, datamodel, model, &*src.active_connector) {
                 args.push(ast::Argument::new(
                     "map",
                     ast::Expression::StringValue(String::from(index_def.db_name.as_ref().unwrap()), Span::empty()),
@@ -163,9 +165,15 @@ impl<'a> LowerDmlToAst<'a> {
         }
     }
 
-    pub(crate) fn push_index_map_argument(&self, model: &Model, index_def: &IndexDefinition, args: &mut Vec<Argument>) {
+    pub(crate) fn push_index_map_argument(
+        &self,
+        datamodel: &Datamodel,
+        model: &Model,
+        index_def: &IndexDefinition,
+        args: &mut Vec<Argument>,
+    ) {
         if let Some(src) = self.datasource {
-            if !super::index_name_matches(index_def, model, &*src.active_connector) {
+            if !super::index_name_matches(index_def, datamodel, model, &*src.active_connector) {
                 args.push(ast::Argument::new(
                     "map",
                     ast::Expression::StringValue(String::from(index_def.db_name.as_ref().unwrap()), Span::empty()),

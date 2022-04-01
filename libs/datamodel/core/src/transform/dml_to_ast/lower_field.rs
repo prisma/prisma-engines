@@ -132,7 +132,7 @@ impl<'a> LowerDmlToAst<'a> {
 
                     i.is_unique() && i.defined_on_field && i.fields.len() == 1 && names_match
                 }) {
-                    self.push_field_index_arguments(model, idx, &mut arguments)
+                    self.push_field_index_arguments(datamodel, model, idx, &mut arguments)
                 }
 
                 attributes.push(ast::Attribute::new("unique", arguments));

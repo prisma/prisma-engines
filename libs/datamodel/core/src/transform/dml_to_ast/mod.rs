@@ -7,6 +7,7 @@ mod lower_field;
 mod lower_model_attributes;
 
 pub use datasource_serializer::add_sources_to_ast;
+use dml::datamodel::Datamodel;
 pub use generator_serializer::GeneratorSerializer;
 pub use lower::LowerDmlToAst;
 
@@ -67,15 +68,32 @@ pub fn foreign_key_name_matches(
         == &ConstraintNames::foreign_key_constraint_name(model.final_database_name(), &column_names, connector)
 }
 
-pub fn index_name_matches(idx: &IndexDefinition, model: &Model, connector: &dyn Connector) -> bool {
-    let column_names: Vec<&str> = idx
+pub fn index_name_matches(
+    idx: &IndexDefinition,
+    datamodel: &Datamodel,
+    model: &Model,
+    connector: &dyn Connector,
+) -> bool {
+    let column_names: Vec<Vec<(&str, Option<&str>)>> = idx
         .fields
         .iter()
         .map(|field| {
-            model
-                .find_scalar_field(&field.path.first().unwrap().0)
-                .unwrap()
-                .final_database_name()
+            field
+                .path
+                .iter()
+                .map(|field_def| match field_def {
+                    (field_name, Some(type_name)) => {
+                        let ct = datamodel.find_composite_type(type_name).unwrap();
+                        let field = ct.find_field(field_name).unwrap();
+
+                        (
+                            field.database_name.as_deref().unwrap_or(field_name.as_str()),
+                            Some(type_name.as_str()),
+                        )
+                    }
+                    (field_name, None) => (model.find_scalar_field(field_name).unwrap().final_database_name(), None),
+                })
+                .collect::<Vec<_>>()
         })
         .collect();
 
