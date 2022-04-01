@@ -346,6 +346,8 @@ mod aggr_group_by_having {
           }"#),
           @r###"{"data":{"groupByTestModel":[{"string":"group1","_count":{"string":2}}]}}"###
         );
+
+        Ok(())
     }
 
     async fn having_without_aggr_sel(runner: Runner) -> TestResult<()> {
