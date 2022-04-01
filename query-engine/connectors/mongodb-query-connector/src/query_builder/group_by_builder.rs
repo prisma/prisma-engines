@@ -46,7 +46,7 @@ impl GroupByBuilder {
         let mut project_stage = doc! {};
 
         if self.count_all {
-            group_stage.insert("count_all", doc! { "$sum": Bson::Int32(1) });
+            group_stage.insert("count_all", doc! { "$sum": 1 });
             project_stage.extend(projection_doc("count_all"));
         }
 
@@ -98,7 +98,7 @@ impl GroupByBuilder {
         }
     }
 
-    /// Derives some `AggregationSelection` into some aggregated groupings.
+    /// Derives aggregated groupings from an `AggregationSelection`.
     pub fn with_selections(&mut self, selections: &[AggregationSelection]) {
         for selection in selections {
             match selection {
@@ -126,7 +126,9 @@ impl GroupByBuilder {
         }
     }
 
-    /// Derives a having `Filter` into some aggregated groupings so the filter can be matched against something.
+    /// Derives aggregated groupings from a having `Filter`.
+    /// Required because the filter needs to match against a grouping,
+    /// which is not present if no aggregation selection is made but an aggregation filter is used.
     pub fn with_having_filter(&mut self, having: &Filter) {
         let mut unfold_filters = |filters: &Vec<Filter>| {
             for filter in filters {
@@ -213,5 +215,5 @@ fn count_field_pair(field: &ScalarFieldRef) -> (String, Bson) {
 /// Produces a document that projects a field.
 /// Important: Only valid for non-count aggregations.
 fn projection_doc(key: &str) -> Document {
-    doc! { key: Bson::Int32(1) }
+    doc! { key: 1 }
 }
