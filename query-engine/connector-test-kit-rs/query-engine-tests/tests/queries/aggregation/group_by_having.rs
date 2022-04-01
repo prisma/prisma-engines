@@ -351,17 +351,17 @@ mod aggr_group_by_having {
     async fn having_without_aggr_sel(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
-            r#"{ id: 1, float: 10, int: 10, decimal: "10", string: "group1" }"#,
+            r#"{ id: 1, float: 10, int: 10, string: "group1" }"#,
         )
         .await?;
         create_row(
             &runner,
-            r#"{ id: 2, float: 0, int: 0, decimal: "0", string: "group1" }"#,
+            r#"{ id: 2, float: 0, int: 0, string: "group1" }"#,
         )
         .await?;
         create_row(
             &runner,
-            r#"{ id: 3, float: 10, int: 10, decimal: "10", string: "group2" }"#,
+            r#"{ id: 3, float: 10, int: 10, string: "group2" }"#,
         )
         .await?;
         create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
