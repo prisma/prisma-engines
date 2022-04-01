@@ -15,6 +15,7 @@ pub(crate) fn calculate(datamodel: &ValidatedSchema) -> MongoSchema {
 
         for index in model.indexes() {
             let name = index.constraint_name(&connector);
+
             let fields = index
                 .scalar_field_attributes()
                 .map(|field| {

@@ -47,4 +47,5 @@ scenarios! {
   composite_indexes_can_be_changed_from_descending_to_ascending
   composite_indexes_can_be_dropped
   composite_indexes_can_be_renamed
+  composite_indexes_work_on_arrays
 }

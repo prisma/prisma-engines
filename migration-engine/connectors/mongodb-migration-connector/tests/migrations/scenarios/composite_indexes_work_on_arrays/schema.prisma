@@ -1,0 +1,24 @@
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb://"
+}
+
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb", "fullTextIndex"]
+}
+
+type Address {
+  city   String
+  street String
+  number Int
+}
+
+model User {
+  id        Int       @id @map("_id")
+  addresses Address[]
+
+  @@unique([addresses.number])
+  @@index([addresses.street])
+  @@fulltext([addresses.city])
+}
