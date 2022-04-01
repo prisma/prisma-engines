@@ -4,7 +4,7 @@ use connector_interface::{
     ScalarCompare, ScalarCondition, ScalarFilter, ScalarListFilter, ScalarProjection,
 };
 use mongodb::bson::{doc, Bson, Document};
-use prisma_models::{CompositeFieldRef, PrismaValue, ScalarFieldRef};
+use prisma_models::{CompositeFieldRef, PrismaValue, ScalarFieldRef, TypeIdentifier};
 
 #[derive(Debug)]
 pub(crate) enum MongoFilter {
@@ -202,9 +202,11 @@ fn default_scalar_filter(
     let is_set_cond = matches!(&condition, ScalarCondition::IsSet(_));
 
     let filter_doc = match condition {
-        ScalarCondition::Equals(val) => doc! { "$eq": [&field_name, (field, val, is_count).into_bson()?] },
+        ScalarCondition::Equals(val) => {
+            doc! { "$eq": [&field_name, into_bson_coerce_count(field, val, is_count)?] }
+        }
         ScalarCondition::NotEquals(val) => {
-            doc! { "$ne": [&field_name, (field, val, is_count).into_bson()?] }
+            doc! { "$ne": [&field_name, into_bson_coerce_count(field, val, is_count)?] }
         }
         ScalarCondition::Contains(val) => regex_match(&field_name, field, ".*", val, ".*", false)?,
         ScalarCondition::NotContains(val) => {
@@ -219,16 +221,16 @@ fn default_scalar_filter(
             doc! { "$not": regex_match(&field_name, field, "", val, "$", false)? }
         }
         ScalarCondition::LessThan(val) => {
-            doc! { "$lt": [&field_name, (field, val, is_count).into_bson()?] }
+            doc! { "$lt": [&field_name, into_bson_coerce_count(field, val, is_count)?] }
         }
         ScalarCondition::LessThanOrEquals(val) => {
-            doc! { "$lte": [&field_name, (field, val, is_count).into_bson()?] }
+            doc! { "$lte": [&field_name, into_bson_coerce_count(field, val, is_count)?] }
         }
         ScalarCondition::GreaterThan(val) => {
-            doc! { "$gt": [&field_name, (field, val, is_count).into_bson()?] }
+            doc! { "$gt": [&field_name, into_bson_coerce_count(field, val, is_count)?] }
         }
         ScalarCondition::GreaterThanOrEquals(val) => {
-            doc! { "$gte": [&field_name, (field, val, is_count).into_bson()?] }
+            doc! { "$gte": [&field_name, into_bson_coerce_count(field, val, is_count)?] }
         }
         // Todo: The nested list unpack looks like a bug somewhere.
         //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
@@ -242,7 +244,7 @@ fn default_scalar_filter(
                         bson_values.extend(
                             inner
                                 .into_iter()
-                                .map(|val| (field, val, is_count).into_bson())
+                                .map(|val| into_bson_coerce_count(field, val, is_count))
                                 .collect::<crate::Result<Vec<_>>>()?,
                         )
                     }
@@ -250,12 +252,14 @@ fn default_scalar_filter(
 
                 doc! { "$in": [&field_name, bson_values] }
             }
-            _ => doc! { "$in": [&field_name, (field, PrismaValue::List(vals), is_count).into_bson()?] },
+            _ => {
+                doc! { "$in": [&field_name, into_bson_coerce_count(field, PrismaValue::List(vals), is_count)?] }
+            }
         },
         ScalarCondition::NotIn(vals) => {
             let bson_values = vals
                 .into_iter()
-                .map(|val| (field, val, is_count).into_bson())
+                .map(|val| into_bson_coerce_count(field, val, is_count))
                 .collect::<crate::Result<Vec<_>>>()?;
 
             doc! { "$not": { "$in": [&field_name, bson_values] } }
@@ -904,6 +908,18 @@ fn exclude_undefineds(field_name: &str, invert: bool, filter: Document) -> Docum
         doc! { "$or": [filter, is_set_filter] }
     } else {
         doc! { "$and": [filter, is_set_filter] }
+    }
+}
+
+/// Convert a PrismaValue into Bson, with a special case for `_count` aggregation filter.
+///
+/// When converting the value of a `_count` aggregation filter for a field that's _not_ numerical,
+/// we force the `TypeIdentifier` to be `Int` to prevent panics.
+fn into_bson_coerce_count(sf: &ScalarFieldRef, value: PrismaValue, is_count_aggregation: bool) -> crate::Result<Bson> {
+    if is_count_aggregation && !sf.is_numeric() {
+        (&TypeIdentifier::Int, value).into_bson()
+    } else {
+        (sf, value).into_bson()
     }
 }
 
