@@ -410,10 +410,10 @@
         }
 
         <span class="self">self</span>.<span class="ident">scalar_field_attributes</span>().<span class="ident">zip</span>(<span class="ident">fields</span>).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">same_name</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">as_index_field</span>().<span class="ident">field_id</span>() <span class="op">==</span> <span class="ident">b</span>.<span class="ident">as_index_field</span>().<span class="ident">field_id</span>();
             <span class="kw">let</span> <span class="ident">same_attributes</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">sort_order</span>() <span class="op">==</span> <span class="ident">b</span>.<span class="ident">sort_order</span>() <span class="op">&amp;&amp;</span> <span class="ident">a</span>.<span class="ident">length</span>() <span class="op">==</span> <span class="ident">b</span>.<span class="ident">length</span>();
+            <span class="kw">let</span> <span class="ident">same_path</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">as_path_to_indexed_field</span>() <span class="op">==</span> <span class="ident">b</span>.<span class="ident">as_path_to_indexed_field</span>();
 
-            <span class="ident">same_name</span> <span class="op">&amp;&amp;</span> <span class="ident">same_attributes</span>
+            <span class="ident">same_path</span> <span class="op">&amp;&amp;</span> <span class="ident">same_attributes</span>
         })
     }
 

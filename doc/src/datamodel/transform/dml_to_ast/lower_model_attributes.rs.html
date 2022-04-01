@@ -188,6 +188,14 @@
 <span id="186">186</span>
 <span id="187">187</span>
 <span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="ident">Argument</span>, <span class="ident">Attribute</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::dml_to_ast::LowerDmlToAst</span>;
@@ -195,12 +203,13 @@
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">Span</span>},
     <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">Ignorable</span>, <span class="ident">IndexDefinition</span>, <span class="ident">IndexType</span>, <span class="ident">Model</span>, <span class="ident">SortOrder</span>, <span class="ident">WithDatabaseName</span>},
 };
+<span class="kw">use</span> <span class="ident">::dml::datamodel::Datamodel</span>;
 <span class="kw">use</span> <span class="ident">::dml::model::IndexAlgorithm</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LowerDmlToAst</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Internal: Lowers a model&#39;s attributes.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">lower_model_attributes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Model</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">lower_model_attributes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Model</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
         <span class="comment">// @@id</span>
@@ -252,7 +261,7 @@
                     <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">ast::Argument::new_string</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">name</span>.<span class="ident">to_string</span>()));
                 }
 
-                <span class="self">self</span>.<span class="ident">push_index_map_argument</span>(<span class="ident">model</span>, <span class="ident">index_def</span>, <span class="kw-2">&amp;mut</span> <span class="ident">args</span>);
+                <span class="self">self</span>.<span class="ident">push_index_map_argument</span>(<span class="ident">datamodel</span>, <span class="ident">model</span>, <span class="ident">index_def</span>, <span class="kw-2">&amp;mut</span> <span class="ident">args</span>);
 
                 <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">ast::Attribute::new</span>(<span class="string">&quot;unique&quot;</span>, <span class="ident">args</span>));
             });
@@ -264,7 +273,7 @@
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">tpe</span> <span class="op">==</span> <span class="ident">IndexType::Normal</span>)
             .<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">index_def</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields_argument</span>(<span class="ident">index_def</span>, <span class="bool-val">false</span>);
-                <span class="self">self</span>.<span class="ident">push_index_map_argument</span>(<span class="ident">model</span>, <span class="ident">index_def</span>, <span class="kw-2">&amp;mut</span> <span class="ident">args</span>);
+                <span class="self">self</span>.<span class="ident">push_index_map_argument</span>(<span class="ident">datamodel</span>, <span class="ident">model</span>, <span class="ident">index_def</span>, <span class="kw-2">&amp;mut</span> <span class="ident">args</span>);
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Hash</span>) <span class="op">=</span> <span class="ident">index_def</span>.<span class="ident">algorithm</span> {
                     <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">ast::Argument::new</span>(
@@ -283,7 +292,7 @@
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">is_fulltext</span>())
             .<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">index_def</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields_argument</span>(<span class="ident">index_def</span>, <span class="bool-val">true</span>);
-                <span class="self">self</span>.<span class="ident">push_index_map_argument</span>(<span class="ident">model</span>, <span class="ident">index_def</span>, <span class="kw-2">&amp;mut</span> <span class="ident">args</span>);
+                <span class="self">self</span>.<span class="ident">push_index_map_argument</span>(<span class="ident">datamodel</span>, <span class="ident">model</span>, <span class="ident">index_def</span>, <span class="kw-2">&amp;mut</span> <span class="ident">args</span>);
 
                 <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">ast::Attribute::new</span>(<span class="string">&quot;fulltext&quot;</span>, <span class="ident">args</span>));
             });
@@ -322,6 +331,7 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">push_field_index_arguments</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>,
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">Model</span>,
         <span class="ident">index_def</span>: <span class="kw-2">&amp;</span><span class="ident">IndexDefinition</span>,
         <span class="ident">args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Argument</span><span class="op">&gt;</span>,
@@ -329,7 +339,7 @@
         <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">index_def</span>.<span class="ident">fields</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">src</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">datasource</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident"><span class="kw">super</span>::index_name_matches</span>(<span class="ident">index_def</span>, <span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">src</span>.<span class="ident">active_connector</span>) {
+            <span class="kw">if</span> <span class="op">!</span><span class="ident"><span class="kw">super</span>::index_name_matches</span>(<span class="ident">index_def</span>, <span class="ident">datamodel</span>, <span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">src</span>.<span class="ident">active_connector</span>) {
                 <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">ast::Argument::new</span>(
                     <span class="string">&quot;map&quot;</span>,
                     <span class="ident">ast::Expression::StringValue</span>(<span class="ident">String::from</span>(<span class="ident">index_def</span>.<span class="ident">db_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()), <span class="ident">Span::empty</span>()),
@@ -353,9 +363,15 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">push_index_map_argument</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">Model</span>, <span class="ident">index_def</span>: <span class="kw-2">&amp;</span><span class="ident">IndexDefinition</span>, <span class="ident">args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Argument</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">push_index_map_argument</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>,
+        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">Model</span>,
+        <span class="ident">index_def</span>: <span class="kw-2">&amp;</span><span class="ident">IndexDefinition</span>,
+        <span class="ident">args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Argument</span><span class="op">&gt;</span>,
+    ) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">src</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">datasource</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident"><span class="kw">super</span>::index_name_matches</span>(<span class="ident">index_def</span>, <span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">src</span>.<span class="ident">active_connector</span>) {
+            <span class="kw">if</span> <span class="op">!</span><span class="ident"><span class="kw">super</span>::index_name_matches</span>(<span class="ident">index_def</span>, <span class="ident">datamodel</span>, <span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">src</span>.<span class="ident">active_connector</span>) {
                 <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">ast::Argument::new</span>(
                     <span class="string">&quot;map&quot;</span>,
                     <span class="ident">ast::Expression::StringValue</span>(<span class="ident">String::from</span>(<span class="ident">index_def</span>.<span class="ident">db_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()), <span class="ident">Span::empty</span>()),

@@ -274,7 +274,7 @@
         <span class="ident">ast::Model</span> {
             <span class="ident">name</span>: <span class="ident">ast::Identifier::new</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>),
             <span class="ident">fields</span>,
-            <span class="ident">attributes</span>: <span class="self">self</span>.<span class="ident">lower_model_attributes</span>(<span class="ident">model</span>),
+            <span class="ident">attributes</span>: <span class="self">self</span>.<span class="ident">lower_model_attributes</span>(<span class="ident">datamodel</span>, <span class="ident">model</span>),
             <span class="ident">documentation</span>: <span class="ident">model</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">text</span><span class="op">|</span> <span class="ident">ast::Comment</span> { <span class="ident">text</span> }),
             <span class="ident">span</span>: <span class="ident">ast::Span::empty</span>(),
             <span class="ident">commented_out</span>: <span class="ident">model</span>.<span class="ident">is_commented_out</span>,

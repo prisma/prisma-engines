@@ -647,12 +647,6 @@
 <span id="645">645</span>
 <span id="646">646</span>
 <span id="647">647</span>
-<span id="648">648</span>
-<span id="649">649</span>
-<span id="650">650</span>
-<span id="651">651</span>
-<span id="652">652</span>
-<span id="653">653</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::Context</span>, <span class="ident">interner::StringId</span>, <span class="ident">DatamodelError</span>};
 <span class="kw">use</span> <span class="ident">schema_ast::ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>};
 <span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>};
@@ -992,7 +986,7 @@
     }
 
     <span class="doccomment">/// The starting point of the index path. If the indexed field is not in a</span>
-    <span class="doccomment">/// composite type, returns the same value as [`field_in_index`].</span>
+    <span class="doccomment">/// composite type, returns the same value as [`field_in_index`](Self::field_in_index()).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```ignore</span>
     <span class="doccomment">/// type A {</span>
@@ -1007,13 +1001,11 @@
     <span class="doccomment">///   @@index([a.field])</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`field_in_index`]: struct IndexFieldPath#method.field_in_index</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ast::FieldId</span> {
         <span class="self">self</span>.<span class="ident">root</span>
     }
 
-    <span class="doccomment">/// The path after [`root`]. Empty if the field is not pointing to a</span>
+    <span class="doccomment">/// The path after [`root`](Self::root()). Empty if the field is not pointing to a</span>
     <span class="doccomment">/// composite type.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```ignore</span>
@@ -1029,18 +1021,14 @@
     <span class="doccomment">///   @@index([a.field])</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`root`]: struct IndexFieldPath#method.root</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[(<span class="ident">ast::CompositeTypeId</span>, <span class="ident">ast::FieldId</span>)] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>
     }
 
     <span class="doccomment">/// The field that gets included in the index. Can either be in the model,</span>
     <span class="doccomment">/// or in a composite type embedded in the model. Returns the same value as</span>
-    <span class="doccomment">/// the [`root`] method if the field is in a model rather than in a</span>
+    <span class="doccomment">/// the [`root`](Self::root()) method if the field is in a model rather than in a</span>
     <span class="doccomment">/// composite type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`root`]: struct IndexFieldPath#method.root</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_in_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ast::FieldId</span> {
         <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">last</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">field_id</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">field_id</span>).<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">root</span>)
     }
