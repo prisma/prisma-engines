@@ -27,86 +27,45 @@
         {
           "name": "id",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
           "isId": true,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "createdAt",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "DateTime",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "DateTime"
         },
         {
           "name": "email",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
           "isUnique": true,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "String",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "String"
         },
         {
           "name": "name",
           "kind": "scalar",
-          "isList": false,
-          "isRequired": false,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "String",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "String"
         },
         {
           "name": "posts",
           "kind": "object",
           "isList": true,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "Post",
-          "hasDefaultValue": false,
           "relationName": "author",
           "relationFromFields": [],
-          "relationToFields": [],
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "relationToFields": []
         },
         {
           "name": "profile",
           "kind": "object",
-          "isList": false,
-          "isRequired": false,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "Profile",
-          "hasDefaultValue": false,
           "relationName": "ProfileToUser",
           "relationFromFields": [],
-          "relationToFields": [],
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "relationToFields": []
         }
       ],
       "isGenerated": false,
@@ -121,61 +80,32 @@
         {
           "name": "id",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
           "isId": true,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "userId",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
           "isUnique": true,
-          "isId": false,
           "isReadOnly": true,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "user",
           "kind": "object",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "User",
-          "hasDefaultValue": false,
           "relationName": "ProfileToUser",
-          "relationFromFields": [
-            "userId"
-          ],
-          "relationToFields": [
-            "id"
-          ],
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "relationFromFields": ["userId"],
+          "relationToFields": ["id"]
         },
         {
           "name": "bio",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "String",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "String"
         }
       ],
       "isGenerated": false,
@@ -190,141 +120,76 @@
         {
           "name": "id",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "createdAt",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "DateTime",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "DateTime"
         },
         {
           "name": "updatedAt",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "DateTime",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "DateTime"
         },
         {
           "name": "title",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "String",
           "hasDefaultValue": true,
-          "default": "Default-Title",
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "default": "Default-Title"
         },
         {
           "name": "wasLiked",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "Boolean",
           "hasDefaultValue": true,
-          "default": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "default": false
         },
         {
           "name": "published",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "Boolean",
           "hasDefaultValue": true,
-          "default": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "default": false
         },
         {
           "name": "authorId",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
           "isReadOnly": true,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "author",
           "kind": "object",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "User",
-          "hasDefaultValue": false,
           "relationName": "author",
-          "relationFromFields": [
-            "authorId"
-          ],
-          "relationToFields": [
-            "id"
-          ],
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "relationFromFields": ["authorId"],
+          "relationToFields": ["id"]
         },
         {
           "name": "categories",
           "kind": "object",
           "isList": true,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "PostToCategory",
-          "hasDefaultValue": false,
           "relationName": "PostToPostToCategory",
           "relationFromFields": [],
-          "relationToFields": [],
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "relationToFields": []
         }
       ],
       "isGenerated": false,
       "primaryKey": {
         "name": null,
-        "fields": [
-          "title",
-          "createdAt"
-        ]
+        "fields": ["title", "createdAt"]
       },
       "uniqueFields": [],
       "uniqueIndexes": []
@@ -336,57 +201,31 @@
         {
           "name": "id",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
           "isId": true,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "name",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "String",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "String"
         },
         {
           "name": "posts",
           "kind": "object",
           "isList": true,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "PostToCategory",
-          "hasDefaultValue": false,
           "relationName": "CategoryToPostToCategory",
           "relationFromFields": [],
-          "relationToFields": [],
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "relationToFields": []
         },
         {
           "name": "cat",
           "kind": "enum",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "CategoryEnum",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "CategoryEnum"
         }
       ],
       "isGenerated": false,
@@ -401,113 +240,57 @@
         {
           "name": "id",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
           "isId": true,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "postTitle",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
           "isReadOnly": true,
-          "type": "String",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "String"
         },
         {
           "name": "postCreatedAt",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
           "isReadOnly": true,
-          "type": "DateTime",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "DateTime"
         },
         {
           "name": "categoryId",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
           "isReadOnly": true,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "post",
           "kind": "object",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "Post",
-          "hasDefaultValue": false,
           "relationName": "PostToPostToCategory",
-          "relationFromFields": [
-            "postTitle",
-            "postCreatedAt"
-          ],
-          "relationToFields": [
-            "title",
-            "createdAt"
-          ],
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "relationFromFields": ["postTitle", "postCreatedAt"],
+          "relationToFields": ["title", "createdAt"]
         },
         {
           "name": "category",
           "kind": "object",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "Category",
-          "hasDefaultValue": false,
           "relationName": "CategoryToPostToCategory",
-          "relationFromFields": [
-            "categoryId"
-          ],
-          "relationToFields": [
-            "id"
-          ],
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "relationFromFields": ["categoryId"],
+          "relationToFields": ["id"]
         }
       ],
       "isGenerated": false,
       "primaryKey": null,
-      "uniqueFields": [
-        [
-          "postTitle",
-          "categoryId"
-        ]
-      ],
+      "uniqueFields": [["postTitle", "categoryId"]],
       "uniqueIndexes": [
         {
           "name": null,
-          "fields": [
-            "postTitle",
-            "categoryId"
-          ]
+          "fields": ["postTitle", "categoryId"]
         }
       ]
     },
@@ -518,48 +301,26 @@
         {
           "name": "id",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
           "isId": true,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "bId",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
           "isUnique": true,
-          "isId": false,
           "isReadOnly": true,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "b",
           "kind": "object",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "B",
-          "hasDefaultValue": false,
           "relationName": "AToB",
-          "relationFromFields": [
-            "bId"
-          ],
-          "relationToFields": [
-            "id"
-          ],
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "relationFromFields": ["bId"],
+          "relationToFields": ["id"]
         }
       ],
       "isGenerated": false,
@@ -574,31 +335,17 @@
         {
           "name": "id",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
           "isId": true,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "a",
           "kind": "object",
-          "isList": false,
-          "isRequired": false,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "A",
-          "hasDefaultValue": false,
           "relationName": "AToB",
           "relationFromFields": [],
-          "relationToFields": [],
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "relationToFields": []
         }
       ],
       "isGenerated": false,
@@ -613,77 +360,38 @@
         {
           "name": "a",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "b",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "c",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "d",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         }
       ],
       "isGenerated": false,
       "primaryKey": {
         "name": "MyPrimary",
-        "fields": [
-          "a",
-          "b"
-        ]
+        "fields": ["a", "b"]
       },
-      "uniqueFields": [
-        [
-          "c",
-          "d"
-        ]
-      ],
+      "uniqueFields": [["c", "d"]],
       "uniqueIndexes": [
         {
           "name": "MyUnique",
-          "fields": [
-            "c",
-            "d"
-          ]
+          "fields": ["c", "d"]
         }
       ]
     },
@@ -694,28 +402,16 @@
         {
           "name": "a",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
           "isId": true,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "b",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
           "isUnique": true,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         }
       ],
       "isGenerated": false,

@@ -8,31 +8,19 @@
         {
           "name": "id",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
           "isId": true,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "posts",
           "kind": "object",
           "isList": true,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "Post",
-          "hasDefaultValue": false,
           "relationName": "PostToUser",
           "relationFromFields": [],
-          "relationToFields": [],
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "relationToFields": []
         }
       ],
       "isGenerated": false,
@@ -47,48 +35,25 @@
         {
           "name": "id",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
           "isId": true,
-          "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "userId",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
           "isReadOnly": true,
-          "type": "Int",
-          "hasDefaultValue": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "type": "Int"
         },
         {
           "name": "user",
           "kind": "object",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
           "type": "User",
-          "hasDefaultValue": false,
           "relationName": "PostToUser",
-          "relationFromFields": [
-            "userId"
-          ],
-          "relationToFields": [
-            "id"
-          ],
-          "isGenerated": false,
-          "isUpdatedAt": false
+          "relationFromFields": ["userId"],
+          "relationToFields": ["id"]
         }
       ],
       "isGenerated": false,

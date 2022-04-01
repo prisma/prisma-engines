@@ -8,38 +8,26 @@
         {
           "name": "id",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
-          "isUnique": false,
           "isId": true,
-          "isReadOnly": false,
           "type": "Int",
           "hasDefaultValue": true,
           "default": {
             "name": "autoincrement",
             "args": []
-          },
-          "isGenerated": false,
-          "isUpdatedAt": false
+          }
         },
         {
           "name": "ip",
           "kind": "scalar",
-          "isList": false,
           "isRequired": true,
           "isUnique": true,
-          "isId": false,
-          "isReadOnly": false,
           "type": "Int",
           "hasDefaultValue": true,
           "default": {
             "name": "dbgenerated",
-            "args": [
-              "sqrt(4)"
-            ]
-          },
-          "isGenerated": false,
-          "isUpdatedAt": false
+            "args": ["sqrt(4)"]
+          }
         }
       ],
       "isGenerated": false,
