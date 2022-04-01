@@ -332,6 +332,24 @@ mod aggregation_group_by_having {
         Ok(())
     }
 
+    #[connector_test]
+    async fn having_count_non_numerical_field(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            groupByTestModel(
+              by: [string],
+              having: { string: { _count: { gt: 1 } } }
+            ) { string _count { string } }
+          }"#),
+          @r###"{"data":{"groupByTestModel":[{"string":"group1","_count":{"string":2}}]}}"###
+        );
+
+        Ok(())
+    }
+
     /// Error cases
 
     #[connector_test]
