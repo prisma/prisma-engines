@@ -7,7 +7,7 @@ use query_engine_tests::*;
 // - We don't need to check every single filter operation, as it's ultimately the same code path just with different
 //   operators applied. For a good confidence, we choose `equals`, `in`, `not equals`, `endsWith` (where applicable).
 #[test_suite(schema(schemas::common_text_and_numeric_types_optional))]
-mod aggregation_group_by_having {
+mod aggr_group_by_having {
     use query_engine_tests::{assert_error, match_connector_result, run_query, Runner};
 
     // This is just basic confirmation that scalar filters are applied correctly.
@@ -345,6 +345,47 @@ mod aggregation_group_by_having {
             ) { string _count { string } }
           }"#),
           @r###"{"data":{"groupByTestModel":[{"string":"group1","_count":{"string":2}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    async fn having_without_aggr_sel(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 3, float: 10, int: 10, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
+        create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
+
+        match_connector_result!(
+          &runner,
+          r#"{
+            groupByTestModel(
+              by: [string],
+              having: { int: { _max: { gt: 1 } } }
+            ) { string }
+          }"#,
+          _ => vec![
+            r#"{"data":{"groupByTestModel":[{"string":"group1"},{"string":"group2"}]}}"#,
+            r#"{"data":{"groupByTestModel":[{"string":"group2"},{"string":"group1"}]}}"#,
+          ]
+        );
+
+        match_connector_result!(
+          &runner,
+          r#"{
+            groupByTestModel(
+              by: [string]
+              having: {
+                AND: [{ int: { _max: { gt: 1 } } }, { decimal: { _sum: { gt: 1 } } }]
+              }
+            ) { string }
+          }"#,
+          _ => vec![
+            r#"{"data":{"groupByTestModel":[{"string":"group1"},{"string":"group2"}]}}"#,
+            r#"{"data":{"groupByTestModel":[{"string":"group2"},{"string":"group1"}]}}"#,
+          ]
         );
 
         Ok(())
