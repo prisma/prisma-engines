@@ -150,6 +150,10 @@ impl MongoSchema {
     /// this until the `extendedIndexes` is GA.
     pub fn normalize_index_attributes(&mut self) {
         for field in self.indexes.iter_mut().flat_map(|i| i.fields.iter_mut()) {
+            if matches!(field.property, IndexFieldProperty::Text) {
+                continue;
+            }
+
             field.property = IndexFieldProperty::Ascending;
         }
     }

@@ -81,6 +81,44 @@ fn single_column_composite_index() {
 }
 
 #[test]
+fn single_column_composite_array_index() {
+    let res = introspect(|db| async move {
+        db.create_collection("Cat", None).await?;
+        let collection = db.collection("Cat");
+        let docs = vec![doc! {"name": "Musti", "addresses": [ { "number": 27 }, { "number": 28 } ] }];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "addresses.number": 1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type CatAddresses {
+          number Int
+        }
+
+        model Cat {
+          id        String         @id @default(auto()) @map("_id") @db.ObjectId
+          addresses CatAddresses[]
+          name      String
+
+          @@index([addresses.number], map: "addresses.number_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
 fn single_column_deep_composite_index() {
     let res = introspect(|db| async move {
         db.create_collection("Cat", None).await?;
@@ -338,6 +376,45 @@ fn single_column_fulltext_composite_index() {
           name    String
 
           @@fulltext([address.street], map: "address.street_\"text\"")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn single_array_column_fulltext_composite_index() {
+    let res = introspect(|db| async move {
+        db.create_collection("Cat", None).await?;
+        let collection = db.collection("Cat");
+        let docs =
+            vec![doc! {"name": "Musti", "addresses": [ { "street": "Meowallee" }, { "street": "Purrstrasse" } ] }];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "addresses.street": "text" })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type CatAddresses {
+          street String
+        }
+
+        model Cat {
+          id        String         @id @default(auto()) @map("_id") @db.ObjectId
+          addresses CatAddresses[]
+          name      String
+
+          @@fulltext([addresses.street], map: "addresses.street_\"text\"")
         }
     "#]];
 
@@ -1035,6 +1112,44 @@ fn single_column_unique_composite_index() {
           name String
 
           @@unique([info.age], map: "info.age_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn single_array_column_unique_composite_index() {
+    let res = introspect(|db| async move {
+        db.create_collection("Cat", None).await?;
+        let collection = db.collection("Cat");
+        let docs = vec![doc! {"name": "Musti", "infos": [ { "age": 9 }, { "age": 10 } ] }];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(true)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "infos.age": 1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type CatInfos {
+          age Int
+        }
+
+        model Cat {
+          id    String     @id @default(auto()) @map("_id") @db.ObjectId
+          infos CatInfos[]
+          name  String
+
+          @@unique([infos.age], map: "infos.age_1")
         }
     "#]];
 

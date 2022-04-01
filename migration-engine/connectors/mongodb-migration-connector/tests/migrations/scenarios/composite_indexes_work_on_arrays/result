@@ -1,0 +1,45 @@
+[+] Collection `User`
+[+] Index `User_addresses_street_idx` on ({"addresses.street":1})
+[+] Unique index `User_addresses_number_key` on ({"addresses.number":1})
+[+] Fulltext index `User_addresses_city_idx` on ({"addresses.city":"text"})
+
+------
+
+{
+  "collections": {
+    "User": {
+      "indexes": [
+        {
+          "name": "_id_",
+          "is_unique": false,
+          "keys": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "User_addresses_street_idx",
+          "is_unique": false,
+          "keys": {
+            "addresses.street": 1
+          }
+        },
+        {
+          "name": "User_addresses_number_key",
+          "is_unique": true,
+          "keys": {
+            "addresses.number": 1
+          }
+        },
+        {
+          "name": "User_addresses_city_idx",
+          "is_unique": false,
+          "keys": {
+            "_fts": "text",
+            "_ftsx": 1
+          }
+        }
+      ],
+      "documents": []
+    }
+  }
+}
