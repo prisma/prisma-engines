@@ -149,7 +149,6 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table, ctx: &m
 }
 
 fn push_relation_tables(ctx: &mut Context<'_>) {
-    let max_identifier_length = ctx.datamodel.configuration.max_identifier_length();
     let datamodel = ctx.datamodel;
     let flavour = ctx.flavour;
     let m2m_relations = datamodel
@@ -165,11 +164,27 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
         let model_b_column = "B";
         let model_a_id = model_a.primary_key().unwrap().fields().next().unwrap();
         let model_b_id = model_b.primary_key().unwrap().fields().next().unwrap();
+        let max_identifier_length = ctx.flavour.datamodel_connector().max_identifier_length();
+        let fk_suffix = "_fkey";
+        let max_table_name_len = max_identifier_length - fk_suffix.len() - 2;
+        // We slightly diverge from the default naming conventions here, because we want to
+        // completely exclude the possibility of collisions, since these names are not
+        // configurable in implicit many-to-many relation tables.
+        let model_a_fk_name = if table_name.len() > max_table_name_len {
+            format!("{}_A{fk_suffix}", &table_name[0..max_table_name_len])
+        } else {
+            format!("{table_name}_A{fk_suffix}")
+        };
+        let model_b_fk_name = if table_name.len() >= max_table_name_len {
+            format!("{}_B{fk_suffix}", &table_name[0..max_table_name_len])
+        } else {
+            format!("{table_name}_B{fk_suffix}")
+        };
 
         let foreign_keys = if ctx.datamodel.referential_integrity().uses_foreign_keys() {
             vec![
                 sql::ForeignKey {
-                    constraint_name: None,
+                    constraint_name: Some(model_a_fk_name),
                     columns: vec![model_a_column.into()],
                     referenced_table: model_a.database_name().into(),
                     referenced_columns: vec![model_a_id.database_name().into()],
@@ -177,7 +192,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                     on_delete_action: flavour.m2m_foreign_key_action(model_a, model_b),
                 },
                 sql::ForeignKey {
-                    constraint_name: None,
+                    constraint_name: Some(model_b_fk_name),
                     columns: vec![model_b_column.into()],
                     referenced_table: model_b.database_name().into(),
                     referenced_columns: vec![model_b_id.database_name().into()],

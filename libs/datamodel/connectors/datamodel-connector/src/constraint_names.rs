@@ -106,6 +106,10 @@ impl ConstraintNames {
         format!("{}_df", trimmed)
     }
 
+    /// Params:
+    ///
+    /// - table_name: the name of the _constrained_/_referencing_ table, not the referenced one.
+    /// - column names: the _constrained_ column names
     pub fn foreign_key_constraint_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
         let fk_suffix = "_fkey";
         let limit = connector.max_identifier_length();

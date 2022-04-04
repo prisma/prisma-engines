@@ -1,4 +1,5 @@
 use indoc::indoc;
+use migration_core::json_rpc::types::*;
 use migration_engine_tests::test_api::*;
 use std::fmt::Write as _;
 
@@ -424,4 +425,73 @@ fn mysql_apply_migrations_errors_gives_the_failed_sql(api: TestApi) {
         .unwrap();
 
     expectation.assert_eq(first_segment)
+}
+
+// https://github.com/prisma/prisma/issues/12351
+#[test]
+fn dropping_m2m_relation_from_datamodel_works() {
+    let schema = r#"
+        datasource db {
+            provider = "mysql"
+            url = env("DBURL")
+        }
+
+        model Puppy {
+            name         String @id
+            motherId     String
+            mother       Dog @relation(fields: [motherId], references: [name])
+            dogFriends   Dog[] @relation("puppyFriendships")
+        }
+
+        model Dog {
+            name         String @id
+            puppies      Puppy[]
+            puppyFriends Puppy[] @relation("puppyFriendships")
+        }
+    "#;
+    let schema2 = r#"
+        datasource db {
+            provider = "mysql"
+            url = env("DBURL")
+        }
+
+        model Puppy {
+            name         String @id
+            motherId     String
+            mother       Dog @relation(fields: [motherId], references: [name])
+        }
+
+        model Dog {
+            name         String @id
+            puppies      Puppy[]
+        }
+    "#;
+
+    let tmpdir = tempfile::tempdir().unwrap();
+    let path = super::diff::write_file_to_tmp(schema, &tmpdir, "schema.prisma");
+    let path2 = super::diff::write_file_to_tmp(schema2, &tmpdir, "schema2.prisma");
+
+    let (_result, diff) = super::diff::diff_result(DiffParams {
+        exit_code: None,
+        from: DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: path.to_str().unwrap().to_owned(),
+        }),
+        to: DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: path2.to_str().unwrap().to_owned(),
+        }),
+        script: true,
+        shadow_database_url: None,
+    });
+
+    let expected = expect![[r#"
+        -- DropForeignKey
+        ALTER TABLE `_puppyFriendships` DROP FOREIGN KEY `_puppyFriendships_A_fkey`;
+
+        -- DropForeignKey
+        ALTER TABLE `_puppyFriendships` DROP FOREIGN KEY `_puppyFriendships_B_fkey`;
+
+        -- DropTable
+        DROP TABLE `_puppyFriendships`;
+    "#]];
+    expected.assert_eq(&diff);
 }
