@@ -37,7 +37,7 @@ fn mongodb_field_mapping_cannot_start_with_a_dollar_sign() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -61,7 +61,7 @@ fn mongodb_field_mapping_cannot_contain_periods() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"

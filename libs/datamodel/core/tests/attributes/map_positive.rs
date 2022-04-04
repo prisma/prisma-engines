@@ -38,12 +38,6 @@ fn map_on_composite_type_field() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
-
         type Address {
             fullName String @map("full_name")
         }

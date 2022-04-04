@@ -9,15 +9,12 @@ use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use indoc::formatdoc;
 use introspection_connector::{
-    ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
+    ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult,
 };
 use mongodb::{Client, Database};
 use mongodb_schema_describer::MongoSchema;
-use user_facing_errors::{
-    common::{InvalidConnectionString, UnsupportedFeatureError},
-    KnownError,
-};
+use user_facing_errors::{common::InvalidConnectionString, KnownError};
 
 #[derive(Debug)]
 pub struct MongoDbIntrospectionConnector {
@@ -136,20 +133,7 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
         _existing_data_model: &Datamodel,
         ctx: IntrospectionContext,
     ) -> ConnectorResult<IntrospectionResult> {
-        if !ctx.preview_features.contains(PreviewFeature::MongoDb) {
-            let mut error = ConnectorError::from_kind(ErrorKind::PreviewFeatureNotEnabled(
-                "MongoDB Introspection connector is a Preview feature and needs the `mongoDb` Preview feature flag. See https://www.prisma.io/docs/concepts/database-connectors/mongodb",
-            ));
-
-            error.user_facing_error = Some(KnownError::new(UnsupportedFeatureError {
-                message: error.to_string(),
-            }));
-
-            return Err(error);
-        }
-
         let schema = self.describe(ctx.preview_features).await?;
-
         Ok(sampler::sample(self.database(), ctx.composite_type_depth, schema).await?)
     }
 }

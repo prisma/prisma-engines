@@ -820,12 +820,6 @@ fn relation_field_in_composite_type_errors() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
-
         type Address {
             street String
             test Test
@@ -838,10 +832,10 @@ fn relation_field_in_composite_type_errors() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError validating composite type "Address": Test refers to a model, making this a relation field. Relation fields inside composite types are not supported.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m14 | [0m            street String
-        [1;94m15 | [0m            test [1;91mTest[0m
+        [1;94m 8 | [0m            street String
+        [1;94m 9 | [0m            test [1;91mTest[0m
         [1;94m   | [0m
     "#]];
 
@@ -856,12 +850,6 @@ fn relation_attribute_on_a_composite_field_errors() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
-
         type Address {
             street String
         }
@@ -874,16 +862,16 @@ fn relation_attribute_on_a_composite_field_errors() {
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Invalid field type, not a relation.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m18 | [0m            id Int @id
-        [1;94m19 | [0m            addres Address? @[1;91mrelation("TestAddress")[0m
+        [1;94m12 | [0m            id Int @id
+        [1;94m13 | [0m            addres Address? @[1;91mrelation("TestAddress")[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mNo such argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m18 | [0m            id Int @id
-        [1;94m19 | [0m            addres Address? @relation([1;91m"TestAddress"[0m)
+        [1;94m12 | [0m            id Int @id
+        [1;94m13 | [0m            addres Address? @relation([1;91m"TestAddress"[0m)
         [1;94m   | [0m
     "#]];
 

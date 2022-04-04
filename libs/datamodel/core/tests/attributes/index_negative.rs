@@ -414,7 +414,7 @@ fn mongodb_disallows_unique_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["extendedIndexes", "mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -440,7 +440,7 @@ fn mongodb_disallows_compound_unique_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["extendedIndexes", "mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -466,7 +466,7 @@ fn mongodb_disallows_index_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["extendedIndexes", "mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -859,7 +859,7 @@ fn hash_index_doesnt_work_on_mongo() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes", "mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1081,7 +1081,7 @@ fn duplicate_indices_on_the_same_fields_are_not_allowed_on_mongodb() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1115,7 +1115,7 @@ fn duplicate_uniques_on_the_same_fields_are_not_allowed_on_mongodb() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1148,7 +1148,7 @@ fn duplicate_indices_on_the_same_fields_different_sort_same_name_are_not_allowed
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb", "extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"

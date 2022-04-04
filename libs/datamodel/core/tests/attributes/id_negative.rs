@@ -514,10 +514,10 @@ fn id_does_not_allow_sort_or_index_unless_extended_indexes_are_on() {
          firstName  String
          middleName String
          lastName   String
-         
+
          @@id([firstName, middleName(length: 1), lastName])
      }
-     
+
      model Blog {
          title  String @id(length:5)
      }
@@ -532,7 +532,7 @@ fn id_does_not_allow_sort_or_index_unless_extended_indexes_are_on() {
         [1;91merror[0m: [1mError parsing attribute "@id": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
-        [1;94m16 | [0m         
+        [1;94m16 | [0m
         [1;94m17 | [0m         @@[1;91mid([firstName, middleName(length: 1), lastName])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@id": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
@@ -675,7 +675,7 @@ fn mongodb_does_not_allow_id_sort_argument() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes", "mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -698,7 +698,7 @@ fn mongodb_does_not_allow_id_sort_argument_without_preview_flag() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -868,7 +868,7 @@ fn mongodb_does_not_allow_id_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes", "mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -891,7 +891,7 @@ fn mongodb_does_not_allow_id_length_prefix_without_preview_flag() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1135,7 +1135,7 @@ fn mongodb_must_be_id_if_using_auto() {
         }
     "#};
 
-    let dml = with_header(schema, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -1162,7 +1162,7 @@ fn compound_ids_are_not_allowed_on_mongo() {
         }
     "#};
 
-    let dml = with_header(schema, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -1185,7 +1185,7 @@ fn mongodb_no_unique_index_for_id() {
         }
     "#};
 
-    let dml = with_header(schema, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -1210,7 +1210,7 @@ fn mongodb_no_unique_index_for_id_model_attribute() {
         }
     "#};
 
-    let dml = with_header(schema, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"

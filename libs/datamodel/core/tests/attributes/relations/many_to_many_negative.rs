@@ -94,7 +94,7 @@ fn embedded_many_to_many_relation_fields_with_referential_actions() {
         [1;94m   | [0m
     "#]];
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
 }
 
@@ -115,14 +115,14 @@ fn embedded_many_to_many_relation_fields_with_referential_actions_postgres() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids Int[]
         [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [id], onDelete: Restrict, onUpdate: Restrict)[0m
         [1;94m15 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids Int[]
@@ -160,7 +160,7 @@ fn embedded_many_to_many_must_define_references_on_both_sides() {
         [1;94m   | [0m
     "#]];
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
 
     let dml = indoc! {r#"
@@ -186,7 +186,7 @@ fn embedded_many_to_many_must_define_references_on_both_sides() {
         [1;94m   | [0m
     "#]];
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
 
     let dml = indoc! {r#"
@@ -218,7 +218,7 @@ fn embedded_many_to_many_must_define_references_on_both_sides() {
         [1;94m   | [0m
     "#]];
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
 }
 
@@ -239,14 +239,14 @@ fn embedded_many_to_many_must_define_references_on_both_sides_postgres() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids Int[]
         [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [id])[0m
         [1;94m15 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids Int[]
@@ -273,14 +273,14 @@ fn embedded_many_to_many_must_define_references_on_both_sides_postgres() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids Int[]
         [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids])[0m
         [1;94m15 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids Int[]
@@ -307,14 +307,14 @@ fn embedded_many_to_many_must_define_references_on_both_sides_postgres() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids Int[]
         [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids])[0m
         [1;94m15 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids Int[]
@@ -352,7 +352,7 @@ fn embedded_many_to_many_must_define_fields_on_both_sides() {
         [1;94m   | [0m
     "#]];
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
 
     let dml = indoc! {r#"
@@ -378,7 +378,7 @@ fn embedded_many_to_many_must_define_fields_on_both_sides() {
         [1;94m   | [0m
     "#]];
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
 }
 
@@ -399,14 +399,14 @@ fn embedded_many_to_many_must_define_fields_on_both_sides_postgres() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids Int[]
         [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [id])[0m
         [1;94m15 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids Int[]
@@ -433,14 +433,14 @@ fn embedded_many_to_many_must_define_fields_on_both_sides_postgres() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids Int[]
         [1;94m14 | [0m  [1;91mbs    B[]   @relation(references: [id])[0m
         [1;94m15 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids Int[]
@@ -470,14 +470,14 @@ fn embedded_many_to_many_relations_do_not_work_on_postgresql() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids Int[]
         [1;94m14 | [0m  [1;91mbs    B[]      @relation(fields: [b_ids], references: [id])[0m
         [1;94m15 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids Int[]
@@ -523,7 +523,7 @@ fn embedded_many_to_many_relations_do_not_work_on_postgresql_with_mongo_preview_
         [1;94m   | [0m
     "#]];
 
-    let dml = with_header(dml, Provider::Postgres, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Postgres, &[]);
     expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
 }
 
@@ -560,7 +560,7 @@ fn embedded_many_to_many_relations_must_refer_an_id_from_both_sides() {
         [1;94m   | [0m
     "#]];
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
 }
 
@@ -583,14 +583,14 @@ fn embedded_many_to_many_relations_must_refer_an_id_from_both_sides_postgres() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m  b_ids Int[]
         [1;94m15 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [u2])[0m
         [1;94m16 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:22[0m
         [1;94m   | [0m
         [1;94m21 | [0m  a_ids Int[]
@@ -634,7 +634,7 @@ fn implicit_many_to_many_relations_do_not_work_on_mongo() {
         [1;94m   | [0m
     "#]];
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
 }
 
@@ -663,7 +663,7 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_type() {
         [1;94m   | [0m
     "#]];
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
 }
 
@@ -684,14 +684,14 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_type_postgres() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids Int[]
         [1;94m14 | [0m  [1;91mbs    B[]   @relation(fields: [b_ids], references: [id])[0m
         [1;94m15 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids Int[]
@@ -729,7 +729,7 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_native_type() {
         [1;94m   | [0m
     "#]];
 
-    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
 }
 
@@ -750,14 +750,14 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_native_type_postgres
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids String[] @test.VarChar(255)
         [1;94m14 | [0m  [1;91mbs    B[]      @relation(fields: [b_ids], references: [id])[0m
         [1;94m15 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids String[] @test.VarChar(255)
@@ -787,14 +787,14 @@ fn embedded_many_to_many_fields_must_be_an_array_postgres() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids String
         [1;94m14 | [0m  [1;91mbs    B[]    @relation(fields: [b_ids], references: [id])[0m
         [1;94m15 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: An implicit many-to-many relation should not define `fields` argument.[0m
+        [1;91merror[0m: [1mError validating: Embedded many-to-many relations are not supported on Postgres. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids Int[]

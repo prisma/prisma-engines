@@ -13,7 +13,7 @@ fn valid_json_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let (_, datamodel) = datamodel::parse_schema(&schema).unwrap();
 
     let model = datamodel.assert_has_model("A");
@@ -33,7 +33,7 @@ fn valid_object_id_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let (_, datamodel) = datamodel::parse_schema(&schema).unwrap();
 
     let model = datamodel.assert_has_model("A");
@@ -57,7 +57,7 @@ fn valid_long_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let (_, datamodel) = datamodel::parse_schema(&schema).unwrap();
 
     let model = datamodel.assert_has_model("A");
@@ -84,7 +84,7 @@ fn invalid_string_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -140,7 +140,7 @@ fn invalid_string_usage_in_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -193,7 +193,7 @@ fn invalid_double_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -256,7 +256,7 @@ fn invalid_double_usage_in_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -314,7 +314,7 @@ fn invalid_long_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -370,7 +370,7 @@ fn invalid_long_usage_in_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -423,7 +423,7 @@ fn invalid_int_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -486,7 +486,7 @@ fn invalid_int_usage_in_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -545,7 +545,7 @@ fn invalid_bindata_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -608,7 +608,7 @@ fn invalid_bindata_usage_in_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -666,7 +666,7 @@ fn invalid_object_id_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -722,7 +722,7 @@ fn invalid_object_id_usage_in_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -775,7 +775,7 @@ fn invalid_bool_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -838,7 +838,7 @@ fn invalid_bool_usage_in_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -897,7 +897,7 @@ fn invalid_date_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -960,7 +960,7 @@ fn invalid_date_usage_in_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -1019,7 +1019,7 @@ fn invalid_timestamp_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -1082,7 +1082,7 @@ fn invalid_timestamp_usage_in_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -1141,7 +1141,7 @@ fn invalid_json_usage_in_model() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -1211,7 +1211,7 @@ fn invalid_json_usage_in_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"

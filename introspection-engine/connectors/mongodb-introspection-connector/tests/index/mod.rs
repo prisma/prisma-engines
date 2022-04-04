@@ -1,5 +1,4 @@
 use crate::test_api::*;
-use datamodel::common::preview_features::PreviewFeature;
 use introspection_connector::CompositeTypeDepth;
 use mongodb::{
     bson::{doc, Bson},
@@ -163,9 +162,8 @@ fn single_column_deep_composite_index() {
 #[test]
 fn single_column_descending_index_no_preview_enabled() {
     let depth = CompositeTypeDepth::Infinite;
-    let features = PreviewFeature::MongoDb;
 
-    let res = introspect_features(depth, features.into(), |db| async move {
+    let res = introspect_features(depth, Default::default(), |db| async move {
         db.create_collection("A", None).await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
@@ -200,9 +198,8 @@ fn single_column_descending_index_no_preview_enabled() {
 #[test]
 fn single_column_descending_composite_index_no_preview_enabled() {
     let depth = CompositeTypeDepth::Infinite;
-    let features = PreviewFeature::MongoDb;
 
-    let res = introspect_features(depth, features.into(), |db| async move {
+    let res = introspect_features(depth, Default::default(), |db| async move {
         db.create_collection("Cat", None).await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "address": { "number": 27 }}];
@@ -756,9 +753,8 @@ fn multi_column_fulltext_index_with_asc_in_beginning_desc_in_end() {
 #[test]
 fn fultext_index_without_preview_flag() {
     let depth = CompositeTypeDepth::Infinite;
-    let features = PreviewFeature::MongoDb;
 
-    let res = introspect_features(depth, features.into(), |db| async move {
+    let res = introspect_features(depth, Default::default(), |db| async move {
         db.create_collection("A", None).await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
@@ -791,9 +787,8 @@ fn fultext_index_without_preview_flag() {
 #[test]
 fn fultext_composite_index_without_preview_flag() {
     let depth = CompositeTypeDepth::Infinite;
-    let features = PreviewFeature::MongoDb;
 
-    let res = introspect_features(depth, features.into(), |db| async move {
+    let res = introspect_features(depth, Default::default(), |db| async move {
         db.create_collection("Cat", None).await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "address": { "street": "Meowallee" } }];
@@ -980,9 +975,8 @@ fn single_column_normal_composite_index_default_name() {
 #[test]
 fn multi_column_normal_index_no_preview() {
     let depth = CompositeTypeDepth::Infinite;
-    let features = PreviewFeature::MongoDb;
 
-    let res = introspect_features(depth, features.into(), |db| async move {
+    let res = introspect_features(depth, Default::default(), |db| async move {
         db.create_collection("A", None).await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
@@ -1235,9 +1229,8 @@ fn single_column_unique_composite_index_default_name() {
 #[test]
 fn multi_column_unique_index_no_preview() {
     let depth = CompositeTypeDepth::Infinite;
-    let features = PreviewFeature::MongoDb;
 
-    let res = introspect_features(depth, features.into(), |db| async move {
+    let res = introspect_features(depth, Default::default(), |db| async move {
         db.create_collection("A", None).await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
