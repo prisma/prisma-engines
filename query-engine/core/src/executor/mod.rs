@@ -17,6 +17,8 @@ use crate::{query_document::Operation, response_ir::ResponseData, schema::QueryS
 use async_trait::async_trait;
 use connector::Connector;
 
+use tracing::Dispatch;
+
 #[async_trait]
 pub trait QueryExecutor: TransactionManager {
     /// Executes a single operation and returns its result.
@@ -67,4 +69,21 @@ pub trait TransactionManager {
 
     /// Rolls back a transaction.
     async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<()>;
+}
+
+// With the node-api when a future is spawned in a new thread `tokio:spawn` it will not
+// use the current dispatcher and its logs will not be captured anymore. We can use this
+// method to get the current dispatcher and combine it with `with_subscriber`
+// let dispatcher = get_current_dispatcher();
+// tokio::spawn(async {
+//      my_async_ops.await
+// }.with_subscriber(dispatcher));
+//
+//
+// Finally, this can be replaced with with_current_collector
+// https://github.com/tokio-rs/tracing/blob/master/tracing-futures/src/lib.rs#L234
+// once this is in a release
+
+pub fn get_current_dispatcher() -> Dispatch {
+    tracing::dispatcher::get_default(|current| current.clone())
 }
