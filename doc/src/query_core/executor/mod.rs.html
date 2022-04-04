@@ -70,6 +70,25 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
 </pre><pre class="rust"><code><span class="doccomment">//! What the executor module DOES:</span>
 <span class="doccomment">//! - Defining an overarching executor trait, to be used on consumers of the core crate.</span>
 <span class="doccomment">//! - Defining executor implementations that combine the different core modules into a coherent</span>
@@ -88,6 +107,8 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">query_document::Operation</span>, <span class="ident">response_ir::ResponseData</span>, <span class="ident">schema::QuerySchemaRef</span>, <span class="ident">TxId</span>};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">connector::Connector</span>;
+
+<span class="kw">use</span> <span class="ident">tracing::Dispatch</span>;
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">QueryExecutor</span>: <span class="ident">TransactionManager</span> {
@@ -139,6 +160,23 @@
 
     <span class="doccomment">/// Rolls back a transaction.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+}
+
+<span class="comment">// With the node-api when a future is spawned in a new thread `tokio:spawn` it will not</span>
+<span class="comment">// use the current dispatcher and its logs will not be captured anymore. We can use this</span>
+<span class="comment">// method to get the current dispatcher and combine it with `with_subscriber`</span>
+<span class="comment">// let dispatcher = get_current_dispatcher();</span>
+<span class="comment">// tokio::spawn(async {</span>
+<span class="comment">//      my_async_ops.await</span>
+<span class="comment">// }.with_subscriber(dispatcher));</span>
+<span class="comment">//</span>
+<span class="comment">//</span>
+<span class="comment">// Finally, this can be replaced with with_current_collector</span>
+<span class="comment">// https://github.com/tokio-rs/tracing/blob/master/tracing-futures/src/lib.rs#L234</span>
+<span class="comment">// once this is in a release</span>
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_current_dispatcher</span>() -&gt; <span class="ident">Dispatch</span> {
+    <span class="ident">tracing::dispatcher::get_default</span>(<span class="op">|</span><span class="ident">current</span><span class="op">|</span> <span class="ident">current</span>.<span class="ident">clone</span>())
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
