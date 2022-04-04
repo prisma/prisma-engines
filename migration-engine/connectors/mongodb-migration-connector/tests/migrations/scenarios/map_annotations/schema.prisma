@@ -4,8 +4,8 @@ datasource db {
 }
 
 generator js {
-  provider = "prisma-client-js"
-  previewFeatures = [:"extendedIndexes"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["extendedIndexes"]
 }
 
 type Embed {
