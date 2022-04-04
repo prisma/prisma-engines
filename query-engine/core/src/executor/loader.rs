@@ -39,17 +39,7 @@ pub async fn load(
         COCKROACHDB_SOURCE_NAME => postgres(source, url).await,
 
         #[cfg(feature = "mongodb")]
-        MONGODB_SOURCE_NAME => {
-            if !features.contains(&PreviewFeature::MongoDb) {
-                let error = CoreError::UnsupportedFeatureError(
-                    "MongoDB Query connector is a Preview feature and needs the `mongoDb` Preview feature flag. See https://www.prisma.io/docs/concepts/database-connectors/mongodb".into(),
-                );
-
-                return Err(error);
-            }
-
-            mongodb(source, url).await
-        }
+        MONGODB_SOURCE_NAME => mongodb(source, url).await,
 
         x => Err(CoreError::ConfigurationError(format!(
             "Unsupported connector type: {}",
