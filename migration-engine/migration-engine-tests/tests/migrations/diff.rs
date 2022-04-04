@@ -366,11 +366,6 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
             url = "mongo+srv://test"
         }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongodb"]
-        }
-
         model TestModel {
             id String @id @default(auto()) @map("_id") @db.ObjectId
             names String
@@ -384,12 +379,6 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
             provider = "mongodb"
             url = "mongo+srv://test"
         }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongodb"]
-        }
-
 
         model TestModel {
             id String @id @default(auto()) @map("_id") @db.ObjectId
@@ -433,11 +422,6 @@ fn diffing_mongo_schemas_works() {
             url = "mongo+srv://test"
         }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongodb"]
-        }
-
         model TestModel {
             id String @id @default(auto()) @map("_id") @db.ObjectId
             names String
@@ -451,12 +435,6 @@ fn diffing_mongo_schemas_works() {
             provider = "mongodb"
             url = "mongo+srv://test"
         }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongodb"]
-        }
-
 
         model TestModel {
             id String @id @default(auto()) @map("_id") @db.ObjectId
