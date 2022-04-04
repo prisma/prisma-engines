@@ -89,11 +89,6 @@ fn fail_on_duplicate_composite_types() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         type Address {
             street String
         }
@@ -105,10 +100,10 @@ fn fail_on_duplicate_composite_types() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mThe composite type "Address" cannot be defined because a composite type with that name already exists.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0mtype [1;91mAddress[0m {
+        [1;94m 9 | [0m
+        [1;94m10 | [0mtype [1;91mAddress[0m {
         [1;94m   | [0m
     "#]];
 
@@ -123,11 +118,6 @@ fn fail_on_composite_type_model_conflict() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         type Address {
             street String
         }
@@ -139,10 +129,10 @@ fn fail_on_composite_type_model_conflict() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mThe model "Address" cannot be defined because a composite type with that name already exists.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0mmodel [1;91mAddress[0m {
+        [1;94m 9 | [0m
+        [1;94m10 | [0mmodel [1;91mAddress[0m {
         [1;94m   | [0m
     "#]];
 
@@ -157,11 +147,6 @@ fn fail_on_composite_type_enum_conflict() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         type Address {
             street String
         }
@@ -174,10 +159,10 @@ fn fail_on_composite_type_enum_conflict() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mThe enum "Address" cannot be defined because a composite type with that name already exists.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0menum [1;91mAddress[0m {
+        [1;94m 9 | [0m
+        [1;94m10 | [0menum [1;91mAddress[0m {
         [1;94m   | [0m
     "#]];
 
@@ -282,11 +267,6 @@ fn fail_on_duplicate_composite_type_field() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         type Address {
           name String
           street String
@@ -297,10 +277,10 @@ fn fail_on_duplicate_composite_type_field() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mField "street" is already defined on composite type "Address".[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m  street String
-        [1;94m14 | [0m  [1;91mstreet[0m String
+        [1;94m 8 | [0m  street String
+        [1;94m 9 | [0m  [1;91mstreet[0m String
         [1;94m   | [0m
     "#]];
 
@@ -351,11 +331,6 @@ fn fail_on_duplicate_composite_type_field_with_map() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         type User {
             firstName String
             otherName String @map("firstName")
@@ -364,11 +339,11 @@ fn fail_on_duplicate_composite_type_field_with_map() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mField "otherName" is already defined on composite type "User".[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    firstName String
-        [1;94m13 | [0m    [1;91motherName String @map("firstName")[0m
-        [1;94m14 | [0m}
+        [1;94m 7 | [0m    firstName String
+        [1;94m 8 | [0m    [1;91motherName String @map("firstName")[0m
+        [1;94m 9 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -384,7 +359,7 @@ fn mapped_names_should_not_cause_collisions_with_names() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let (_, datamodel) = datamodel::parse_schema(&dml).unwrap();
     let r#type = datamodel.assert_has_composite_type("TestData");
 
@@ -400,11 +375,6 @@ fn fail_on_duplicate_mapped_composite_type_field() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         type User {
             primaryName String @map("firstName")
             otherName String @map("firstName")
@@ -413,11 +383,11 @@ fn fail_on_duplicate_mapped_composite_type_field() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mField "firstName" is already defined on composite type "User".[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m    primaryName String @map("firstName")
-        [1;94m13 | [0m    [1;91motherName String @map("firstName")[0m
-        [1;94m14 | [0m}
+        [1;94m 7 | [0m    primaryName String @map("firstName")
+        [1;94m 8 | [0m    [1;91motherName String @map("firstName")[0m
+        [1;94m 9 | [0m}
         [1;94m   | [0m
     "#]];
 

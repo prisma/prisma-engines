@@ -48,7 +48,6 @@ features!(
     Distinct,
     UncheckedScalarInputs,
     MicrosoftSqlServer,
-    MongoDb,
     OrderByRelation,
     NApi,
     SelectRelationCount,
@@ -74,7 +73,6 @@ pub const GENERATOR: FeatureMap = FeatureMap::new()
     .with_active(&[
         FilterJson,
         ReferentialIntegrity,
-        MongoDb,
         InteractiveTransactions,
         FullTextSearch,
         FullTextIndex,

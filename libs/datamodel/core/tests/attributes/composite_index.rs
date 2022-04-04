@@ -18,7 +18,7 @@ fn simple_composite_index() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &["mongoDb"]));
+    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &[]));
 
     datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
         name: None,
@@ -45,7 +45,7 @@ fn simple_composite_unique() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &["mongoDb"]));
+    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &[]));
 
     datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
         name: None,
@@ -74,7 +74,7 @@ fn composite_unique_with_normal_unique() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &["mongoDb"]));
+    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &[]));
 
     datamodel
         .assert_has_model("User")
@@ -114,11 +114,7 @@ fn simple_composite_fulltext() {
         }
     "#};
 
-    let datamodel = parse(&with_header(
-        schema,
-        crate::Provider::Mongo,
-        &["mongoDb", "fullTextIndex"],
-    ));
+    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &["fullTextIndex"]));
 
     datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
         name: None,
@@ -145,7 +141,7 @@ fn composite_index_with_default() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &["mongoDb"]));
+    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &[]));
 
     datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
         name: None,
@@ -172,7 +168,7 @@ fn composite_index_with_map() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &["mongoDb"]));
+    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &[]));
 
     datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
         name: None,
@@ -199,11 +195,7 @@ fn composite_index_with_sort() {
         }
     "#};
 
-    let datamodel = parse(&with_header(
-        schema,
-        crate::Provider::Mongo,
-        &["mongoDb", "extendedIndexes"],
-    ));
+    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &["extendedIndexes"]));
 
     let mut field = IndexField::new_in_path(&[("a", None), ("field", Some("A"))]);
     field.sort_order = Some(SortOrder::Desc);
@@ -237,7 +229,7 @@ fn reformat() {
         }
     "#};
 
-    let datamodel = with_header(schema, crate::Provider::Mongo, &["mongoDb", "fullTextIndex"]);
+    let datamodel = with_header(schema, crate::Provider::Mongo, &["fullTextIndex"]);
     let result = datamodel::reformat(&datamodel, 2).unwrap_or_else(|_| datamodel.to_owned());
 
     let expected = expect![[r#"
@@ -248,7 +240,7 @@ fn reformat() {
 
         generator client {
           provider        = "prisma-client-js"
-          previewFeatures = ["mongoDb", "fullTextIndex"]
+          previewFeatures = ["fullTextIndex"]
         }
 
         type A {
@@ -341,7 +333,7 @@ fn a_bonkers_definition_1() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -372,7 +364,7 @@ fn a_bonkers_definition_2() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -403,7 +395,7 @@ fn a_bonkers_definition_3() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -434,7 +426,7 @@ fn a_bonkers_definition_4() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -465,7 +457,7 @@ fn a_bonkers_definition_5() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -496,7 +488,7 @@ fn a_bonkers_definition_6() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -526,7 +518,7 @@ fn id_cannot_use_composite_fields() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -560,7 +552,7 @@ fn relation_cannot_use_composite_fields() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -590,7 +582,7 @@ fn pointing_to_a_non_existing_type() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -622,7 +614,7 @@ fn index_to_a_missing_field_in_a_composite_type() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -666,7 +658,7 @@ fn index_to_a_missing_composite_field() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -711,7 +703,7 @@ fn non_composite_field_in_the_path() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
@@ -758,7 +750,7 @@ fn non_composite_field_in_the_middle_of_the_path() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, crate::Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"

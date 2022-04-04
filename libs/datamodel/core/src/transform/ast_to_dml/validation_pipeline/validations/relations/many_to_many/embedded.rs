@@ -1,7 +1,4 @@
-use crate::{
-    common::preview_features::PreviewFeature, diagnostics::DatamodelError,
-    transform::ast_to_dml::validation_pipeline::context::Context,
-};
+use crate::{diagnostics::DatamodelError, transform::ast_to_dml::validation_pipeline::context::Context};
 use datamodel_connector::ConnectorCapability;
 use parser_database::walkers::TwoWayEmbeddedManyToManyRelationWalker;
 
@@ -18,14 +15,11 @@ pub(crate) fn supports_embedded_relations(relation: TwoWayEmbeddedManyToManyRela
         .into_iter()
         .map(|r| r.ast_field().span);
 
-    let msg = if ctx.preview_features.contains(PreviewFeature::MongoDb) {
-        format!(
-            "Embedded many-to-many relations are not supported on {}. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many",
-            ctx.connector.name()
-        )
-    } else {
-        String::from("An implicit many-to-many relation should not define `fields` argument.")
-    };
+    let connector_name = ctx.connector.name();
+
+    let msg = format!(
+        "Embedded many-to-many relations are not supported on {connector_name}. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many",
+    );
 
     for span in spans {
         ctx.push_error(DatamodelError::new_validation_error(msg.clone(), span));

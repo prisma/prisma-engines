@@ -7,22 +7,13 @@ use crate::{with_header, Provider};
 #[test]
 fn mongodb_supports_composite_types() {
     let schema = r#"
-        datasource db {
-            provider = "mongodb"
-            url = "mongodb://"
-        }
-
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         type Address {
             street String
         }
     "#;
 
-    assert!(parse_schema(schema).is_ok());
+    let dml = with_header(schema, Provider::Mongo, &[]);
+    assert!(parse_schema(&dml).is_ok());
 }
 
 #[test]
@@ -33,7 +24,7 @@ fn mongodb_does_not_support_autoincrement() {
         }
     "#};
 
-    let dml = with_header(schema, Provider::Mongo, &["mongoDb"]);
+    let dml = with_header(schema, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"

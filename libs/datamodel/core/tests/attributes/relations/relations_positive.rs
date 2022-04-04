@@ -497,7 +497,7 @@ fn embedded_many_to_many_relations_work_on_mongodb() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Mongo, &["mongoDb"]));
+    let schema = parse(&with_header(dml, Provider::Mongo, &[]));
 
     schema
         .assert_has_model("A")

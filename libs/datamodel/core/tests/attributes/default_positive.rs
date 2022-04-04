@@ -208,11 +208,6 @@ fn mongodb_auto_id() {
           url = env("DATABASE_URL")
         }
 
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["mongoDb"]
-        }
-
         model a {
           id String @id @default(auto()) @db.ObjectId @map("_id")
         }

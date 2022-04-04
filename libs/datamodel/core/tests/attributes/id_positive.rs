@@ -463,6 +463,6 @@ fn mongodb_compound_unique_can_have_id_as_part_of_it() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }

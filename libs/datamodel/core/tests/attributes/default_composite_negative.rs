@@ -251,11 +251,6 @@ fn default_on_composite_type_field_errors() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         type Address {
             street String
         }
@@ -269,10 +264,10 @@ fn default_on_composite_type_field_errors() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `address` in composite type `Address`: Defaults on fields of type composite are not supported. Please remove the `@default` attribute.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m15 | [0mtype User {
-        [1;94m16 | [0m    address Address? @[1;91mdefault("{ \"street\": \"broadway\"}")[0m
+        [1;94m10 | [0mtype User {
+        [1;94m11 | [0m    address Address? @[1;91mdefault("{ \"street\": \"broadway\"}")[0m
         [1;94m   | [0m
     "#]];
 
@@ -308,7 +303,7 @@ fn json_defaults_must_be_valid_json() {
           provider = "mongodb"
           url = "mongodb://"
         }
-  
+
         type Test {
             name Json @default("not json")
         }

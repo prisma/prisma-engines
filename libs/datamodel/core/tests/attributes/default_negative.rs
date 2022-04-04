@@ -662,11 +662,6 @@ fn must_error_on_auto_default_on_non_native_type_on_mongodb() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         model User {
             id Int @id @map("_id")
             nickname String @default(auto())
@@ -677,18 +672,18 @@ fn must_error_on_auto_default_on_non_native_type_on_mongodb() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `nickname` in model `User`: MongoDB `@default(auto())` fields must have `ObjectId` native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m            id Int @id @map("_id")
-        [1;94m14 | [0m            [1;91mnickname String @default(auto())[0m
-        [1;94m15 | [0m        }
+        [1;94m 8 | [0m            id Int @id @map("_id")
+        [1;94m 9 | [0m            [1;91mnickname String @default(auto())[0m
+        [1;94m10 | [0m        }
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating field `nickname` in model `User`: MongoDB `@default(auto())` fields must have the `@id` attribute.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m            id Int @id @map("_id")
-        [1;94m14 | [0m            [1;91mnickname String @default(auto())[0m
-        [1;94m15 | [0m        }
+        [1;94m 8 | [0m            id Int @id @map("_id")
+        [1;94m 9 | [0m            [1;91mnickname String @default(auto())[0m
+        [1;94m10 | [0m        }
         [1;94m   | [0m
     "#]];
 
@@ -703,11 +698,6 @@ fn must_error_on_auto_default_on_non_object_id_on_mongodb() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         model User {
             id Int @id @map("_id") @default(auto()) @db.Int
             nickname String
@@ -718,11 +708,11 @@ fn must_error_on_auto_default_on_non_object_id_on_mongodb() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `id` in model `User`: MongoDB `@default(auto())` fields must have `ObjectId` native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m        model User {
-        [1;94m13 | [0m            [1;91mid Int @id @map("_id") @default(auto()) @db.Int[0m
-        [1;94m14 | [0m            nickname String
+        [1;94m 7 | [0m        model User {
+        [1;94m 8 | [0m            [1;91mid Int @id @map("_id") @default(auto()) @db.Int[0m
+        [1;94m 9 | [0m            nickname String
         [1;94m   | [0m
     "#]];
 
@@ -735,11 +725,6 @@ fn must_error_on_auto_default_on_mongodb_composite() {
         datasource db {
             provider = "mongodb"
             url = "mongodb://"
-        }
-
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
         }
 
         model User {
@@ -756,10 +741,10 @@ fn must_error_on_auto_default_on_mongodb_composite() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The function `auto()` is not supported on composite fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:18[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
-        [1;94m17 | [0m        type Meow {
-        [1;94m18 | [0m            id String @[1;91mdefault(auto())[0m @db.ObjectId
+        [1;94m12 | [0m        type Meow {
+        [1;94m13 | [0m            id String @[1;91mdefault(auto())[0m @db.ObjectId
         [1;94m   | [0m
     "#]];
 
@@ -774,11 +759,6 @@ fn must_error_on_dbgenerated_default_on_mongodb() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         model User {
             id String @id @map("_id") @default(dbgenerated()) @db.ObjectId
         }
@@ -788,11 +768,11 @@ fn must_error_on_dbgenerated_default_on_mongodb() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `id` in model `User`: The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m        model User {
-        [1;94m13 | [0m            [1;91mid String @id @map("_id") @default(dbgenerated()) @db.ObjectId[0m
-        [1;94m14 | [0m        }
+        [1;94m 7 | [0m        model User {
+        [1;94m 8 | [0m            [1;91mid String @id @map("_id") @default(dbgenerated()) @db.ObjectId[0m
+        [1;94m 9 | [0m        }
         [1;94m   | [0m
     "#]];
 
@@ -807,11 +787,6 @@ fn must_error_with_auto_params_on_mongodb() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         model User {
             id String @id @map("_id") @default(auto("meow")) @db.ObjectId
         }
@@ -821,10 +796,10 @@ fn must_error_with_auto_params_on_mongodb() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": `auto()` takes no arguments[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m        model User {
-        [1;94m13 | [0m            id String @id @map("_id") @[1;91mdefault(auto("meow"))[0m @db.ObjectId
+        [1;94m 7 | [0m        model User {
+        [1;94m 8 | [0m            id String @id @map("_id") @[1;91mdefault(auto("meow"))[0m @db.ObjectId
         [1;94m   | [0m
     "#]];
 
@@ -947,11 +922,6 @@ fn must_error_on_auto_default_on_non_id_on_mongodb() {
             url = "mongodb://"
         }
 
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["mongoDb"]
-        }
-
         model User {
             id Int @id @map("_id")
             nickname String @default(auto()) @db.ObjectId
@@ -962,11 +932,11 @@ fn must_error_on_auto_default_on_non_id_on_mongodb() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `nickname` in model `User`: MongoDB `@default(auto())` fields must have the `@id` attribute.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m            id Int @id @map("_id")
-        [1;94m14 | [0m            [1;91mnickname String @default(auto()) @db.ObjectId[0m
-        [1;94m15 | [0m        }
+        [1;94m 8 | [0m            id Int @id @map("_id")
+        [1;94m 9 | [0m            [1;91mnickname String @default(auto()) @db.ObjectId[0m
+        [1;94m10 | [0m        }
         [1;94m   | [0m
     "#]];
 

@@ -119,7 +119,7 @@ fn hidden_preview_features_setting_must_work() {
     let schema = indoc! {r#"
         generator go {
           provider = "go"
-          previewFeatures = ["mongoDb"]
+          previewFeatures = ["fullTextIndex"]
         }
     "#};
 
@@ -135,7 +135,7 @@ fn hidden_preview_features_setting_must_work() {
             "config": {},
             "binaryTargets": [],
             "previewFeatures": [
-              "mongoDb"
+              "fullTextIndex"
             ]
           }
         ]"#]];
@@ -258,7 +258,7 @@ fn nice_error_for_unknown_generator_preview_feature() {
         .unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mThe preview feature "foo" is not known. Expected one of: filterJson, referentialIntegrity, mongoDb, interactiveTransactions, fullTextSearch, fullTextIndex, dataProxy, extendedIndexes, cockroachdb, tracing[0m
+        [1;91merror[0m: [1mThe preview feature "foo" is not known. Expected one of: filterJson, referentialIntegrity, interactiveTransactions, fullTextSearch, fullTextIndex, dataProxy, extendedIndexes, cockroachdb, tracing[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "prisma-client-js"
