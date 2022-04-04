@@ -10,7 +10,6 @@ use tokio::{
     },
     time::{self, Duration},
 };
-use tracing::Dispatch;
 use tracing_futures::WithSubscriber;
 
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
@@ -254,19 +253,6 @@ impl ITXClient {
     }
 }
 
-// Warning!!! This is not pretty. When the actors are spawned with the node-api
-// They lose the current subscriber because it is not a global subscriber
-// and are no longer able to send logs. This fix gets the current dispatcher
-// and clones it out so that we can use `WithSubscriber` with it.
-fn get_current_dispatcher() -> Dispatch {
-    let mut dispatcher = tracing::Dispatch::default();
-    tracing::dispatcher::get_default(|current| {
-        dispatcher = current.clone();
-    });
-
-    dispatcher
-}
-
 pub fn spawn_itx_actor(
     query_schema: QuerySchemaRef,
     tx_id: TxId,
@@ -284,7 +270,7 @@ pub fn spawn_itx_actor(
     };
 
     let mut server = ITXServer::new(tx_id, CachedTx::Open(value), timeout, rx_from_client, query_schema);
-    let dispatcher = get_current_dispatcher();
+    let dispatcher = crate::get_current_dispatcher();
 
     tokio::task::spawn(
         async move {

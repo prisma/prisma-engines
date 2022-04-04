@@ -2,6 +2,7 @@ use super::pipeline::QueryPipeline;
 use crate::{IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, ResponseData};
 use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
+use tracing_futures::WithSubscriber;
 
 pub async fn execute_single_operation(
     query_schema: QuerySchemaRef,
@@ -63,18 +64,16 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
 ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
     let mut futures = Vec::with_capacity(operations.len());
 
+    let dispatcher = crate::get_current_dispatcher();
     for op in operations {
         match QueryGraphBuilder::new(query_schema.clone()).build(op.clone()) {
             Ok((graph, serializer)) => {
                 let conn = connector.get_connection().await?;
 
-                futures.push(tokio::spawn(execute_self_contained(
-                    conn,
-                    graph,
-                    serializer,
-                    force_transactions,
-                    trace_id.clone(),
-                )));
+                futures.push(tokio::spawn(
+                    execute_self_contained(conn, graph, serializer, force_transactions, trace_id.clone())
+                        .with_subscriber(dispatcher.clone()),
+                ));
             }
 
             // This looks unnecessary, but is the simplest way to preserve ordering of results for the batch.
