@@ -139,22 +139,6 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">mod</span> <span class="ident">sampler</span>;
 <span class="kw">mod</span> <span class="ident">warnings</span>;
@@ -166,15 +150,12 @@
 <span class="kw">use</span> <span class="ident">futures::TryStreamExt</span>;
 <span class="kw">use</span> <span class="ident">indoc::formatdoc</span>;
 <span class="kw">use</span> <span class="ident">introspection_connector</span>::{
-    <span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DatabaseMetadata</span>, <span class="ident">ErrorKind</span>, <span class="ident">IntrospectionConnector</span>, <span class="ident">IntrospectionContext</span>,
+    <span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DatabaseMetadata</span>, <span class="ident">IntrospectionConnector</span>, <span class="ident">IntrospectionContext</span>,
     <span class="ident">IntrospectionResult</span>,
 };
 <span class="kw">use</span> <span class="ident">mongodb</span>::{<span class="ident">Client</span>, <span class="ident">Database</span>};
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer::MongoSchema</span>;
-<span class="kw">use</span> <span class="ident">user_facing_errors</span>::{
-    <span class="ident">common</span>::{<span class="ident">InvalidConnectionString</span>, <span class="ident">UnsupportedFeatureError</span>},
-    <span class="ident">KnownError</span>,
-};
+<span class="kw">use</span> <span class="ident">user_facing_errors</span>::{<span class="ident">common::InvalidConnectionString</span>, <span class="ident">KnownError</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MongoDbIntrospectionConnector</span> {
@@ -293,20 +274,7 @@
         <span class="ident">_existing_data_model</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>,
         <span class="ident">ctx</span>: <span class="ident">IntrospectionContext</span>,
     ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::MongoDb</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::PreviewFeatureNotEnabled</span>(
-                <span class="string">&quot;MongoDB Introspection connector is a Preview feature and needs the `mongoDb` Preview feature flag. See https://www.prisma.io/docs/concepts/database-connectors/mongodb&quot;</span>,
-            ));
-
-            <span class="ident">error</span>.<span class="ident">user_facing_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">UnsupportedFeatureError</span> {
-                <span class="ident">message</span>: <span class="ident">error</span>.<span class="ident">to_string</span>(),
-            }));
-
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>);
-        }
-
         <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">describe</span>(<span class="ident">ctx</span>.<span class="ident">preview_features</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
         <span class="prelude-val">Ok</span>(<span class="ident">sampler::sample</span>(<span class="self">self</span>.<span class="ident">database</span>(), <span class="ident">ctx</span>.<span class="ident">composite_type_depth</span>, <span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 }

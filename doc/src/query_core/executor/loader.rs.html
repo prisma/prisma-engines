@@ -173,16 +173,6 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">interpreting_executor::InterpretingExecutor</span>, <span class="ident">QueryExecutor</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CoreError</span>;
 <span class="kw">use</span> <span class="ident">connection_string::JdbcString</span>;
@@ -224,17 +214,7 @@
         <span class="ident">COCKROACHDB_SOURCE_NAME</span> =&gt; <span class="ident">postgres</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
-        <span class="ident">MONGODB_SOURCE_NAME</span> =&gt; {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">features</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">PreviewFeature::MongoDb</span>) {
-                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">CoreError::UnsupportedFeatureError</span>(
-                    <span class="string">&quot;MongoDB Query connector is a Preview feature and needs the `mongoDb` Preview feature flag. See https://www.prisma.io/docs/concepts/database-connectors/mongodb&quot;</span>.<span class="ident">into</span>(),
-                );
-
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>);
-            }
-
-            <span class="ident">mongodb</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>
-        }
+        <span class="ident">MONGODB_SOURCE_NAME</span> =&gt; <span class="ident">mongodb</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
 
         <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">CoreError::ConfigurationError</span>(<span class="macro">format!</span>(
             <span class="string">&quot;Unsupported connector type: {}&quot;</span>,
