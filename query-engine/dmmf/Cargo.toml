@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 bigdecimal = "0.2.0"
-datamodel = { path = "../core" }
+datamodel = { path = "../../libs/datamodel/core" }
 serde = { version = "1.0.136", features = ["derive"] }
 serde_json = "1.0.78"
 
