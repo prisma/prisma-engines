@@ -434,6 +434,21 @@
 <span id="432">432</span>
 <span id="433">433</span>
 <span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">sql_schema_calculator_flavour</span>;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use</span> <span class="ident">sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour</span>;
@@ -585,7 +600,6 @@
 }
 
 <span class="kw">fn</span> <span class="ident">push_relation_tables</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">max_identifier_length</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">datamodel</span>.<span class="ident">configuration</span>.<span class="ident">max_identifier_length</span>();
     <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">datamodel</span>;
     <span class="kw">let</span> <span class="ident">flavour</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">flavour</span>;
     <span class="kw">let</span> <span class="ident">m2m_relations</span> <span class="op">=</span> <span class="ident">datamodel</span>
@@ -601,11 +615,27 @@
         <span class="kw">let</span> <span class="ident">model_b_column</span> <span class="op">=</span> <span class="string">&quot;B&quot;</span>;
         <span class="kw">let</span> <span class="ident">model_a_id</span> <span class="op">=</span> <span class="ident">model_a</span>.<span class="ident">primary_key</span>().<span class="ident">unwrap</span>().<span class="ident">fields</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">model_b_id</span> <span class="op">=</span> <span class="ident">model_b</span>.<span class="ident">primary_key</span>().<span class="ident">unwrap</span>().<span class="ident">fields</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">max_identifier_length</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">flavour</span>.<span class="ident">datamodel_connector</span>().<span class="ident">max_identifier_length</span>();
+        <span class="kw">let</span> <span class="ident">fk_suffix</span> <span class="op">=</span> <span class="string">&quot;_fkey&quot;</span>;
+        <span class="kw">let</span> <span class="ident">max_table_name_len</span> <span class="op">=</span> <span class="ident">max_identifier_length</span> <span class="op">-</span> <span class="ident">fk_suffix</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>;
+        <span class="comment">// We slightly diverge from the default naming conventions here, because we want to</span>
+        <span class="comment">// completely exclude the possibility of collisions, since these names are not</span>
+        <span class="comment">// configurable in implicit many-to-many relation tables.</span>
+        <span class="kw">let</span> <span class="ident">model_a_fk_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">table_name</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">max_table_name_len</span> {
+            <span class="macro">format!</span>(<span class="string">&quot;{}_A{fk_suffix}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">table_name</span>[<span class="number">0</span>..<span class="ident">max_table_name_len</span>])
+        } <span class="kw">else</span> {
+            <span class="macro">format!</span>(<span class="string">&quot;{table_name}_A{fk_suffix}&quot;</span>)
+        };
+        <span class="kw">let</span> <span class="ident">model_b_fk_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">table_name</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">max_table_name_len</span> {
+            <span class="macro">format!</span>(<span class="string">&quot;{}_B{fk_suffix}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">table_name</span>[<span class="number">0</span>..<span class="ident">max_table_name_len</span>])
+        } <span class="kw">else</span> {
+            <span class="macro">format!</span>(<span class="string">&quot;{table_name}_B{fk_suffix}&quot;</span>)
+        };
 
         <span class="kw">let</span> <span class="ident">foreign_keys</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">datamodel</span>.<span class="ident">referential_integrity</span>().<span class="ident">uses_foreign_keys</span>() {
             <span class="macro">vec!</span>[
                 <span class="ident">sql::ForeignKey</span> {
-                    <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">constraint_name</span>: <span class="prelude-val">Some</span>(<span class="ident">model_a_fk_name</span>),
                     <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">model_a_column</span>.<span class="ident">into</span>()],
                     <span class="ident">referenced_table</span>: <span class="ident">model_a</span>.<span class="ident">database_name</span>().<span class="ident">into</span>(),
                     <span class="ident">referenced_columns</span>: <span class="macro">vec!</span>[<span class="ident">model_a_id</span>.<span class="ident">database_name</span>().<span class="ident">into</span>()],
@@ -613,7 +643,7 @@
                     <span class="ident">on_delete_action</span>: <span class="ident">flavour</span>.<span class="ident">m2m_foreign_key_action</span>(<span class="ident">model_a</span>, <span class="ident">model_b</span>),
                 },
                 <span class="ident">sql::ForeignKey</span> {
-                    <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">constraint_name</span>: <span class="prelude-val">Some</span>(<span class="ident">model_b_fk_name</span>),
                     <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">model_b_column</span>.<span class="ident">into</span>()],
                     <span class="ident">referenced_table</span>: <span class="ident">model_b</span>.<span class="ident">database_name</span>().<span class="ident">into</span>(),
                     <span class="ident">referenced_columns</span>: <span class="macro">vec!</span>[<span class="ident">model_b_id</span>.<span class="ident">database_name</span>().<span class="ident">into</span>()],
