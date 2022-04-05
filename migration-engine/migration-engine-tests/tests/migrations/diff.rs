@@ -633,14 +633,14 @@ fn diff_with_exit_code_and_non_empty_diff_returns_two() {
 }
 
 // Call diff, and expect it to error. Return the error.
-fn diff_error(params: DiffParams) -> String {
+pub(crate) fn diff_error(params: DiffParams) -> String {
     let api = migration_core::migration_api(None, None).unwrap();
     let result = test_setup::runtime::run_with_tokio(api.diff(params));
     result.unwrap_err().to_string()
 }
 
 // Call diff, and expect it to succeed. Return the result and what would be printed to stdout.
-fn diff_result(params: DiffParams) -> (DiffResult, String) {
+pub(crate) fn diff_result(params: DiffParams) -> (DiffResult, String) {
     let host = Arc::new(TestConnectorHost::default());
     let api = migration_core::migration_api(None, Some(host.clone())).unwrap();
     let result = test_setup::runtime::run_with_tokio(api.diff(params)).unwrap();
@@ -654,7 +654,7 @@ fn diff_output(params: DiffParams) -> String {
     diff_result(params).1
 }
 
-fn write_file_to_tmp(contents: &str, tempdir: &tempfile::TempDir, name: &str) -> std::path::PathBuf {
+pub(crate) fn write_file_to_tmp(contents: &str, tempdir: &tempfile::TempDir, name: &str) -> std::path::PathBuf {
     let tempfile_path = tempdir.path().join(name);
     std::fs::write(&tempfile_path, contents.as_bytes()).unwrap();
     tempfile_path

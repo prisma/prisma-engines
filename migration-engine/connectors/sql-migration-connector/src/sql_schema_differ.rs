@@ -509,6 +509,16 @@ fn push_foreign_key_pair_changes(
         .map(|names| names.previous() != names.next())
         .unwrap_or(false)
     {
+        // Rename the foreign key.
+
+        // Since we are using the conventional foreign key names for the foreign keys of
+        // many-to-many relation tables, but we used not to (we did not provide a constraint
+        // names), and we do not want to cause new migrations on upgrade, we ignore the foreign
+        // keys of implicit many-to-many relation tables for renamings.
+        if fk.map(|fk| is_prisma_implicit_m2m_fk(fk)).as_tuple() == (&true, &true) {
+            return;
+        }
+
         if db.flavour.can_rename_foreign_key() {
             steps.push(SqlMigrationStep::RenameForeignKey {
                 table_id: fk.map(|fk| fk.table().table_id()),
@@ -533,4 +543,14 @@ fn next_column_has_virtual_default((table_id, column_id): (TableId, ColumnId), d
         .prisma_level_defaults
         .binary_search(&(table_id.0, column_id.0))
         .is_ok()
+}
+
+fn is_prisma_implicit_m2m_fk(fk: ForeignKeyWalker<'_>) -> bool {
+    let table = fk.table();
+
+    if table.columns().count() != 2 {
+        return false;
+    }
+
+    table.column("A").is_some() && table.column("B").is_some()
 }
