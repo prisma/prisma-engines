@@ -125,7 +125,7 @@ features = ["bundled"]
 optional = true
 
 [dependencies.tiberius]
-version = "0.7.0"
+version = "0.7.3"
 optional = true
 features = ["sql-browser-tokio", "chrono", "bigdecimal"]
 

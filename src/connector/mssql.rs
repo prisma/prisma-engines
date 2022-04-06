@@ -77,6 +77,7 @@ pub(crate) struct MssqlQueryParams {
     database: String,
     schema: String,
     trust_server_certificate: bool,
+    trust_server_certificate_ca: Option<String>,
     connection_limit: Option<usize>,
     socket_timeout: Option<Duration>,
     connect_timeout: Option<Duration>,
@@ -203,6 +204,11 @@ impl MssqlUrl {
         self.query_params.trust_server_certificate()
     }
 
+    /// Path to a custom server certificate file.
+    pub fn trust_server_certificate_ca(&self) -> Option<&str> {
+        self.query_params.trust_server_certificate_ca()
+    }
+
     /// Database port.
     pub fn port(&self) -> u16 {
         self.query_params.port()
@@ -247,6 +253,10 @@ impl MssqlQueryParams {
 
     fn trust_server_certificate(&self) -> bool {
         self.trust_server_certificate
+    }
+
+    fn trust_server_certificate_ca(&self) -> Option<&str> {
+        self.trust_server_certificate_ca.as_deref()
     }
 
     fn database(&self) -> &str {
@@ -534,6 +544,10 @@ impl MssqlUrl {
             .transpose()?
             .unwrap_or(false);
 
+        let trust_server_certificate_ca: Option<String> = props
+            .remove("trustservercertificateca")
+            .or_else(|| props.remove("trust_server_certificate_ca"));
+
         let mut max_connection_lifetime = props
             .remove("max_connection_lifetime")
             .map(|param| param.parse().map(Duration::from_secs))
@@ -564,6 +578,7 @@ impl MssqlUrl {
             database,
             schema,
             trust_server_certificate,
+            trust_server_certificate_ca,
             connection_limit,
             socket_timeout,
             connect_timeout,

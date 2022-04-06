@@ -101,6 +101,9 @@
 //! - `database` sets the database to connect to.
 //! - `trustServerCertificate` if set to `true`, accepts any kind of certificate
 //!   from the server.
+//! - `trustServerCertificateCA` sets the path to a custom certificate file.
+//!   Needs to be in pem, crt or der format. Cannot be used together with
+//!   `trustServerCertificate` parameter.
 //! - `socketTimeout` defined in seconds. If set, a query will return a
 //!   `Timeout` error if it fails to resolve before given time.
 //! - `connectTimeout` defined in seconds (default: 5). Connecting to a
