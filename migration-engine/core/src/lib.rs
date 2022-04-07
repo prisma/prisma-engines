@@ -34,6 +34,7 @@ use mongodb_migration_connector::MongoDbMigrationConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use std::env;
 use std::path::Path;
+use std::str::FromStr;
 use user_facing_errors::common::InvalidConnectionString;
 
 fn parse_schema(schema: &str) -> CoreResult<ValidatedSchema> {
@@ -142,7 +143,7 @@ fn schema_to_connector(
     let (source, url, preview_features, shadow_database_url) = parse_configuration(schema)?;
 
     let url = config_dir
-        .map(|config_dir| source.active_connector.set_config_dir(config_dir, &url).into_owned())
+        .map(|config_dir| source.active_connector.set_config_dir(&config_dir, &url).into_owned())
         .unwrap_or(url);
 
     let params = ConnectorParams {
