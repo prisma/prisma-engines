@@ -48,9 +48,9 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
-        (ErrorKind::DatabaseDoesNotExist { .. }, ConnectionInfo::Postgres(url)) => {
+        (ErrorKind::DatabaseDoesNotExist { db_name }, ConnectionInfo::Postgres(url)) => {
             Some(KnownError::new(common::DatabaseDoesNotExist::Postgres {
-                database_name: url.dbname().to_owned(),
+                database_name: db_name.to_string(),
                 database_schema_name: url.schema().to_owned(),
                 database_host: url.host().to_owned(),
                 database_port: url.port(),

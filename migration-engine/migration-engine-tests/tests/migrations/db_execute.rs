@@ -126,6 +126,27 @@ fn db_execute_error_path(api: TestApi) {
     assert!(result.is_err());
 }
 
+#[test_connector(tags(Postgres12))]
+fn db_execute_drop_database_that_doesnt_exist_error(api: TestApi) {
+    let script = r#"
+        DROP DATABASE "thisisadatabaseweassumedoesntexist";
+    "#;
+
+    let generic_api = migration_core::migration_api(None, None).unwrap();
+    let result = tok(generic_api.db_execute(DbExecuteParams {
+        datasource_type: DbExecuteDatasourceType::Url(UrlContainer {
+            url: api.connection_string().to_owned(),
+        }),
+        script: script.to_owned(),
+    }));
+
+    let error = result.unwrap_err().to_string();
+    let expectation = expect![[r#"
+        Database `thisisadatabaseweassumedoesntexist.prisma-tests` does not exist on the database server at `localhost:5434`.
+    "#]];
+    expectation.assert_eq(&error);
+}
+
 #[test]
 fn sqlite_db_execute_with_schema_datasource_resolves_relative_paths_correctly() {
     let tmpdir = tempfile::tempdir().unwrap();
