@@ -372,10 +372,14 @@ impl Queryable for Mssql {
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("mssql.query_raw", sql, params, move || async move {
             let mut client = self.client.lock().await;
-            let params = conversion::conv_params(params)?;
 
-            let query = client.query(sql, params.as_slice());
-            let mut results = self.perform_io(query).await?.into_results().await?;
+            let mut query = tiberius::Query::new(sql);
+
+            for param in params {
+                query.bind(param);
+            }
+
+            let mut results = self.perform_io(query.query(&mut client)).await?.into_results().await?;
 
             match results.pop() {
                 Some(rows) => {
@@ -409,11 +413,14 @@ impl Queryable for Mssql {
     #[tracing::instrument(skip(self, params))]
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("mssql.execute_raw", sql, params, move || async move {
-            let mut client = self.client.lock().await;
-            let params = conversion::conv_params(params)?;
+            let mut query = tiberius::Query::new(sql);
 
-            let query = client.execute(sql, params.as_slice());
-            let changes = self.perform_io(query).await?.total();
+            for param in params {
+                query.bind(param);
+            }
+
+            let mut client = self.client.lock().await;
+            let changes = self.perform_io(query.execute(&mut client)).await?.total();
 
             Ok(changes)
         })

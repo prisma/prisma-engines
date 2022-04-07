@@ -4,44 +4,35 @@ use crate::error::*;
 #[cfg(feature = "bigdecimal")]
 use bigdecimal::BigDecimal;
 use std::{borrow::Cow, convert::TryFrom};
-use tiberius::{ColumnData, FromSql, IntoSql, ToSql};
+#[cfg(feature = "bigdecimal")]
+use tiberius::ToSql;
+use tiberius::{ColumnData, FromSql, IntoSql};
 
-#[tracing::instrument(skip(params))]
-pub fn conv_params<'a>(params: &'a [Value<'a>]) -> crate::Result<Vec<&'a dyn ToSql>> {
-    let mut converted = Vec::with_capacity(params.len());
-
-    for param in params.iter() {
-        converted.push(param as &dyn ToSql)
-    }
-
-    Ok(converted)
-}
-
-impl<'a> ToSql for Value<'a> {
-    fn to_sql(&self) -> ColumnData<'_> {
+impl<'a> IntoSql<'a> for &'a Value<'a> {
+    fn into_sql(self) -> ColumnData<'a> {
         match self {
-            Value::Integer(val) => val.to_sql(),
-            Value::Float(val) => val.to_sql(),
-            Value::Double(val) => val.to_sql(),
-            Value::Text(val) => val.to_sql(),
-            Value::Bytes(val) => val.to_sql(),
-            Value::Enum(val) => val.to_sql(),
-            Value::Boolean(val) => val.to_sql(),
+            Value::Integer(val) => val.into_sql(),
+            Value::Float(val) => val.into_sql(),
+            Value::Double(val) => val.into_sql(),
+            Value::Text(val) => val.as_deref().into_sql(),
+            Value::Bytes(val) => val.as_deref().into_sql(),
+            Value::Enum(val) => val.as_deref().into_sql(),
+            Value::Boolean(val) => val.into_sql(),
             Value::Char(val) => val.as_ref().map(|val| format!("{}", val)).into_sql(),
-            Value::Xml(val) => val.to_sql(),
+            Value::Xml(val) => val.as_deref().into_sql(),
             Value::Array(_) => panic!("Arrays are not supported on SQL Server."),
             #[cfg(feature = "bigdecimal")]
             Value::Numeric(val) => (*val).to_sql(),
             #[cfg(feature = "json")]
             Value::Json(val) => val.as_ref().map(|val| serde_json::to_string(&val).unwrap()).into_sql(),
             #[cfg(feature = "uuid")]
-            Value::Uuid(val) => val.to_sql(),
+            Value::Uuid(val) => val.into_sql(),
             #[cfg(feature = "chrono")]
-            Value::DateTime(val) => val.to_sql(),
+            Value::DateTime(val) => val.into_sql(),
             #[cfg(feature = "chrono")]
-            Value::Date(val) => val.to_sql(),
+            Value::Date(val) => val.into_sql(),
             #[cfg(feature = "chrono")]
-            Value::Time(val) => val.to_sql(),
+            Value::Time(val) => val.into_sql(),
         }
     }
 }
