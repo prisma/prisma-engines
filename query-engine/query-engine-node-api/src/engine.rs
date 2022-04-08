@@ -352,7 +352,7 @@ impl QueryEngine {
     pub async fn rollback_transaction(&self, tx_id: String, trace: HashMap<String, String>) -> napi::Result<String> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
-        
+
         async move {
             let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
             let span = tracing::span!(Level::TRACE, "query");

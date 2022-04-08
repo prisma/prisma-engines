@@ -91,7 +91,7 @@ pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
     }
 
     let serialized = datamodel::mcf::config_to_mcf_json_value(&config);
-    
+
     js_env.to_js_value(&serialized)
 }
 
