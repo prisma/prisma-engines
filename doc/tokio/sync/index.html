@@ -1,11 +1,15 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Synchronization primitives for use in asynchronous contexts."><meta name="keywords" content="rust, rustlang, rust-lang, sync"><title>tokio::sync - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script>
-    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.png" alt="logo"></div>
-        </a><h2 class="location">Module sync</h2><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div><div id="sidebar-vars" data-name="sync" data-ty="mod" data-relpath="./"></div><script defer src="./sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio/index.html"><img class="rust-logo" src="../../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../index.html">tokio</a>::<wbr><a class="mod" href="#">sync</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/tokio/sync/mod.rs.html#1-499" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Synchronization primitives for use in asynchronous contexts.</p>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"><a href="#">Module sync</a></h2><div class="sidebar-elems"><section><div class="block"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div></section><div id="sidebar-vars" data-name="sync" data-ty="mod" data-relpath="./"></div><script defer src="./sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
+    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">tokio</a>::<wbr><a class="mod" href="#">sync</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/tokio/sync/mod.rs.html#1-499">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Synchronization primitives for use in asynchronous contexts.</p>
 <p>Tokio programs tend to be organized as a set of <a href="../task/index.html">tasks</a> where each task
 operates independently and may be executed on separate physical threads. The
 synchronization primitives provided in this module permit these independent
 tasks to communicate together.</p>
-<h2 id="message-passing" class="section-header"><a href="#message-passing">Message passing</a></h2>
+<h2 id="message-passing"><a href="#message-passing">Message passing</a></h2>
 <p>The most common form of synchronization in a Tokio program is message
 passing. Two tasks operate independently and send messages to each other to
 synchronize. Doing so has the advantage of avoiding shared state.</p>
@@ -18,7 +22,7 @@ supports multiple consumers, many different separate tasks may <strong>receive</
 messages.</p>
 <p>Tokio provides many different channel flavors as different message passing
 patterns are best handled with different implementations.</p>
-<h3 id="oneshot-channel" class="section-header"><a href="#oneshot-channel"><code>oneshot</code> channel</a></h3>
+<h3 id="oneshot-channel"><a href="#oneshot-channel"><code>oneshot</code> channel</a></h3>
 <p>The <a href="oneshot/index.html"><code>oneshot</code> channel</a> supports sending a <strong>single</strong> value from a
 single producer to a single consumer. This channel is usually used to send
 the result of a computation to a waiter.</p>
@@ -68,7 +72,7 @@ cause.</p>
     <span class="comment">// Wait for the computation result</span>
     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">join_handle</span>.<span class="kw">await</span>.<span class="ident">unwrap</span>();
 }</code></pre></div>
-<h3 id="mpsc-channel" class="section-header"><a href="#mpsc-channel"><code>mpsc</code> channel</a></h3>
+<h3 id="mpsc-channel"><a href="#mpsc-channel"><code>mpsc</code> channel</a></h3>
 <p>The <a href="mpsc/index.html"><code>mpsc</code> channel</a> supports sending <strong>many</strong> values from <strong>many</strong>
 producers to a single consumer. This channel is often used to send work to a
 task or to receive the result of many computations.</p>
@@ -198,7 +202,7 @@ sent over the provided <code>oneshot</code> channel.</p>
         <span class="ident">join_handle</span>.<span class="kw">await</span>.<span class="ident">unwrap</span>();
     }
 }</code></pre></div>
-<h3 id="broadcast-channel" class="section-header"><a href="#broadcast-channel"><code>broadcast</code> channel</a></h3>
+<h3 id="broadcast-channel"><a href="#broadcast-channel"><code>broadcast</code> channel</a></h3>
 <p>The <a href="broadcast/index.html"><code>broadcast</code> channel</a> supports sending <strong>many</strong> values from
 <strong>many</strong> producers to <strong>many</strong> consumers. Each consumer will receive
 <strong>each</strong> value. This channel can be used to implement “fan out” style
@@ -227,7 +231,7 @@ has its use cases.</p>
     <span class="ident">tx</span>.<span class="ident">send</span>(<span class="number">10</span>).<span class="ident">unwrap</span>();
     <span class="ident">tx</span>.<span class="ident">send</span>(<span class="number">20</span>).<span class="ident">unwrap</span>();
 }</code></pre></div>
-<h3 id="watch-channel" class="section-header"><a href="#watch-channel"><code>watch</code> channel</a></h3>
+<h3 id="watch-channel"><a href="#watch-channel"><code>watch</code> channel</a></h3>
 <p>The <a href="watch/index.html"><code>watch</code> channel</a> supports sending <strong>many</strong> values from a <strong>single</strong>
 producer to <strong>many</strong> consumers. However, only the <strong>most recent</strong> value is
 stored in the channel. Consumers are notified when a new value is sent, but
@@ -346,7 +350,7 @@ the file changes, the configuration changes are signalled to consumers.</p>
         <span class="ident">handle</span>.<span class="kw">await</span>.<span class="ident">unwrap</span>();
     }
 }</code></pre></div>
-<h2 id="state-synchronization" class="section-header"><a href="#state-synchronization">State synchronization</a></h2>
+<h2 id="state-synchronization"><a href="#state-synchronization">State synchronization</a></h2>
 <p>The remaining synchronization primitives focus on synchronizing state.
 These are asynchronous equivalents to versions provided by <code>std</code>. They
 operate in a similar way as their <code>std</code> counterparts but will wait
@@ -395,7 +399,7 @@ value.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.MappedMutexGuard.html" title="tokio::sync::MappedMutexGuard struct">MappedMutexGuard</a></div><div class="item-right docblock-short"><p>A handle to a held <code>Mutex</code> that has had a function applied to it via <a href="struct.MutexGuard.html#method.map"><code>MutexGuard::map</code></a>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Mutex.html" title="tokio::sync::Mutex struct">Mutex</a></div><div class="item-right docblock-short"><p>An asynchronous <code>Mutex</code>-like type.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.MutexGuard.html" title="tokio::sync::MutexGuard struct">MutexGuard</a></div><div class="item-right docblock-short"><p>A handle to a held <code>Mutex</code>. The guard can be held across any <code>.await</code> point
-as it is <a href="https://doc.rust-lang.org/1.59.0/core/marker/trait.Send.html" title="Send"><code>Send</code></a>.</p>
+as it is <a href="https://doc.rust-lang.org/1.60.0/core/marker/trait.Send.html" title="Send"><code>Send</code></a>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Notify.html" title="tokio::sync::Notify struct">Notify</a></div><div class="item-right docblock-short"><p>Notifies a single task to wake up.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OnceCell.html" title="tokio::sync::OnceCell struct">OnceCell</a></div><div class="item-right docblock-short"><p>A thread-safe cell that can be written to only once.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OwnedMutexGuard.html" title="tokio::sync::OwnedMutexGuard struct">OwnedMutexGuard</a></div><div class="item-right docblock-short"><p>An owned handle to a held <code>Mutex</code>.</p>
@@ -420,5 +424,5 @@ dropped.</p>
 </div></div></div><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.SetError.html" title="tokio::sync::SetError enum">SetError</a></div><div class="item-right docblock-short"><p>Errors that can be returned from <a href="struct.OnceCell.html#method.set"><code>OnceCell::set</code></a>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.TryAcquireError.html" title="tokio::sync::TryAcquireError enum">TryAcquireError</a></div><div class="item-right docblock-short"><p>Error returned from the <a href="struct.Semaphore.html#method.try_acquire"><code>Semaphore::try_acquire</code></a> function.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>
 </body></html>

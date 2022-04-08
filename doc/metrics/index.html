@@ -1,12 +1,16 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A lightweight metrics facade."><meta name="keywords" content="rust, rustlang, rust-lang, metrics"><title>metrics - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
-    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.png" alt="logo"></div>
-        </a><h2 class="location">Crate metrics</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.12.1</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all metrics's items</p></a><div class="block items"><ul><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><div id="sidebar-vars" data-name="metrics" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../metrics/index.html"><img class="rust-logo" src="../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">metrics</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/metrics/lib.rs.html#1-344" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A lightweight metrics facade.</p>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"><a href="#">Crate metrics</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.12.1</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div></section><div id="sidebar-vars" data-name="metrics" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../metrics/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">metrics</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/metrics/lib.rs.html#1-344">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A lightweight metrics facade.</p>
 <p>The <code>metrics</code> crate provides a single metrics API that abstracts over the actual metrics
 implementation.  Libraries can use the metrics API provided by this crate, and the consumer of
 those libraries can choose the metrics implementation that is most suitable for its use case.</p>
 <p>If no metrics implementation is selected, the facade falls back to a “noop” implementation that
 ignores all metrics.  The overhead in this case is very small - an atomic load and comparison.</p>
-<h2 id="use" class="section-header"><a href="#use">Use</a></h2>
+<h2 id="use"><a href="#use">Use</a></h2>
 <p>The basic use of the facade crate is through the four metrics macros: <a href="macro.counter.html" title="counter!"><code>counter!</code></a>, <a href="macro.gauge.html" title="gauge!"><code>gauge!</code></a>,
 <a href="macro.timing.html" title="timing!"><code>timing!</code></a>, and <a href="macro.value.html" title="value!"><code>value!</code></a>.  These macros correspond to updating a counter, updating a gauge,
 updating a histogram based on a start/end, and updating a histogram with a single value.</p>
@@ -16,10 +20,10 @@ contextual consistency: if you’re recording a measurement of the time passed d
 operation, the end result is a single value, but it’s more of a “timing” value than just a
 “value”.  The <a href="macro.timing.html" title="timing!"><code>timing!</code></a> macro also has a branch to accept the start and end values which
 allows for a potentially clearer invocation.</p>
-<h3 id="in-libraries" class="section-header"><a href="#in-libraries">In libraries</a></h3>
+<h3 id="in-libraries"><a href="#in-libraries">In libraries</a></h3>
 <p>Libraries should link only to the <code>metrics</code> crate, and use the provided macros to record
 whatever metrics will be useful to downstream consumers.</p>
-<h4 id="examples" class="section-header"><a href="#examples">Examples</a></h4>
+<h4 id="examples"><a href="#examples">Examples</a></h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">timing</span>, <span class="ident">counter</span>};
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process</span>(<span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">u64</span> {
@@ -32,22 +36,22 @@ whatever metrics will be useful to downstream consumers.</p>
 
     <span class="ident">row_count</span>
 }</code></pre></div>
-<h3 id="in-executables" class="section-header"><a href="#in-executables">In executables</a></h3>
+<h3 id="in-executables"><a href="#in-executables">In executables</a></h3>
 <p>Executables should choose a metrics implementation and initialize it early in the runtime of
 the program.  Metrics implementations will typically include a function to do this.  Any
 metrics recordered before the implementation is initialized will be ignored.</p>
 <p>The executable itself may use the <code>metrics</code> crate to record metrics well.</p>
-<h4 id="warning" class="section-header"><a href="#warning">Warning</a></h4>
+<h4 id="warning"><a href="#warning">Warning</a></h4>
 <p>The metrics system may only be initialized once.</p>
-<h2 id="available-metrics-implementations" class="section-header"><a href="#available-metrics-implementations">Available metrics implementations</a></h2>
+<h2 id="available-metrics-implementations"><a href="#available-metrics-implementations">Available metrics implementations</a></h2>
 <ul>
-<li><h2 id="native-recorder" class="section-header"><a href="#native-recorder">Native recorder:</a></h2>
+<li><h2 id="native-recorder"><a href="#native-recorder">Native recorder:</a></h2>
 <ul>
 <li><a href="https://docs.rs/metrics-runtime">metrics-runtime</a></li>
 </ul>
 </li>
 </ul>
-<h2 id="implementing-a-recorder" class="section-header"><a href="#implementing-a-recorder">Implementing a Recorder</a></h2>
+<h2 id="implementing-a-recorder"><a href="#implementing-a-recorder">Implementing a Recorder</a></h2>
 <p>Recorders implement the <a href="trait.Recorder.html" title="Recorder"><code>Recorder</code></a> trait.  Here’s a basic example which writes the
 metrics in text form via the <code>log</code> crate.</p>
 
@@ -80,7 +84,7 @@ function that wraps the creation and installation of the recorder:</p>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SetRecorderError</span><span class="op">&gt;</span> {
     <span class="ident">metrics::set_recorder</span>(<span class="kw-2">&amp;</span><span class="ident">RECORDER</span>)
 }</code></pre></div>
-<h2 id="use-with-std" class="section-header"><a href="#use-with-std">Use with <code>std</code></a></h2>
+<h2 id="use-with-std"><a href="#use-with-std">Use with <code>std</code></a></h2>
 <p><code>set_recorder</code> requires you to provide a <code>&amp;'static Recorder</code>, which can be hard to
 obtain if your recorder depends on some runtime configuration.  The <code>set_boxed_recorder</code>
 function is available with the <code>std</code> Cargo feature.  It is identical to <code>set_recorder</code> except
@@ -108,5 +112,5 @@ that it takes a <code>Box&lt;Recorder&gt;</code> rather than a <code>&amp;'stati
 </div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.set_recorder.html" title="metrics::set_recorder fn">set_recorder</a></div><div class="item-right docblock-short"><p>Sets the global recorder to a <code>&amp;'static Recorder</code>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.set_recorder_racy.html" title="metrics::set_recorder_racy fn">set_recorder_racy</a><a title="unsafe function" href="#"><sup>⚠</sup></a></div><div class="item-right docblock-short"><p>A thread-unsafe version of <a href="fn.set_recorder.html" title="set_recorder"><code>set_recorder</code></a>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.try_recorder.html" title="metrics::try_recorder fn">try_recorder</a></div><div class="item-right docblock-short"><p>Returns a reference to the recorder.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>
 </body></html>

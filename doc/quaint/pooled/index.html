@@ -1,6 +1,10 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A connection pool to a SQL database."><meta name="keywords" content="rust, rustlang, rust-lang, pooled"><title>quaint::pooled - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script>
-    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.png" alt="logo"></div>
-        </a><h2 class="location">Module pooled</h2><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li></ul></div><div id="sidebar-vars" data-name="pooled" data-ty="mod" data-relpath="./"></div><script defer src="./sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../quaint/index.html"><img class="rust-logo" src="../../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../index.html">quaint</a>::<wbr><a class="mod" href="#">pooled</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/quaint/pooled.rs.html#1-490" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="a-connection-pool-to-a-sql-database" class="section-header"><a href="#a-connection-pool-to-a-sql-database">A connection pool to a SQL database.</a></h2>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"><a href="#">Module pooled</a></h2><div class="sidebar-elems"><section><div class="block"><ul><li><a href="#structs">Structs</a></li></ul></div></section><div id="sidebar-vars" data-name="pooled" data-ty="mod" data-relpath="./"></div><script defer src="./sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../quaint/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
+    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">quaint</a>::<wbr><a class="mod" href="#">pooled</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/quaint/pooled.rs.html#1-490">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="a-connection-pool-to-a-sql-database"><a href="#a-connection-pool-to-a-sql-database">A connection pool to a SQL database.</a></h2>
 <p>A pool is created through the <a href="struct.Quaint.html#method.builder"><code>builder</code></a> method, starting from a connection
 string that allows some of the parameters be delivered by the user.</p>
 <p>A connection string has the following structure:</p>
@@ -16,12 +20,12 @@ string that allows some of the parameters be delivered by the user.</p>
 <p>As a special case, Microsoft SQL Server connections use the JDBC URI
 format:</p>
 <p><code>jdbc:sqlserver://host\instance:port;key1=val1;key2=val2;</code></p>
-<h3 id="common-parameters" class="section-header"><a href="#common-parameters">Common parameters</a></h3>
+<h3 id="common-parameters"><a href="#common-parameters">Common parameters</a></h3>
 <ul>
 <li><code>connection_limit</code> defines the maximum number of connections opened to the
 database.</li>
 </ul>
-<h3 id="sqlite" class="section-header"><a href="#sqlite">SQLite</a></h3>
+<h3 id="sqlite"><a href="#sqlite">SQLite</a></h3>
 <ul>
 <li><code>user</code>/<code>password</code> do not do anything and can be emitted.</li>
 <li><code>host</code> should point to the database file.</li>
@@ -31,7 +35,7 @@ query namespacing.</li>
 SQLite. When set, queries that are waiting for a lock to be released
 will return the <code>Timeout</code> error after the defined value.</li>
 </ul>
-<h3 id="postgresql" class="section-header"><a href="#postgresql">PostgreSQL</a></h3>
+<h3 id="postgresql"><a href="#postgresql">PostgreSQL</a></h3>
 <ul>
 <li><code>sslmode</code> either <code>disable</code>, <code>prefer</code> or <code>require</code>. <a href="https://docs.rs/tokio-postgres/0.5.0-alpha.1/tokio_postgres/config/enum.SslMode.html">Read more</a></li>
 <li><code>sslcert</code> should point to a PEM certificate file.</li>
@@ -64,7 +68,7 @@ sessions.</li>
 Defaults to 500. If <code>pgbouncer</code> mode is enabled, caching is always off.</li>
 <li><code>options</code> Specifies command-line options to send to the server at connection start. <a href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNECT-OPTIONS">Read more</a></li>
 </ul>
-<h3 id="mysql" class="section-header"><a href="#mysql">MySQL</a></h3>
+<h3 id="mysql"><a href="#mysql">MySQL</a></h3>
 <ul>
 <li><code>sslcert</code> should point to a PEM certificate file.</li>
 <li><code>sslidentity</code> should point to a PKCS12 certificate database.</li>
@@ -86,7 +90,7 @@ If set to zero, no timeout.</li>
 <li><code>statement_cache_size</code>, number of prepared statements kept cached.
 Defaults to 1000. Set to 0 to disable caching.</li>
 </ul>
-<h3 id="microsoft-sql-server" class="section-header"><a href="#microsoft-sql-server">Microsoft SQL Server</a></h3>
+<h3 id="microsoft-sql-server"><a href="#microsoft-sql-server">Microsoft SQL Server</a></h3>
 <ul>
 <li><code>encrypt</code> if set to <code>true</code> encrypts all traffic over TLS. If <code>false</code>, only
 the login details are encrypted. A special value <code>DANGER_PLAINTEXT</code> will
@@ -141,5 +145,5 @@ must be used in every query to be effective.</li>
 <a href="connector/trait.Queryable.html">Queryable</a>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Quaint.html" title="quaint::pooled::Quaint struct">Quaint</a></div><div class="item-right docblock-short"><p>The main entry point and an abstraction over database connections and
 connection handling.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>
 </body></html>
