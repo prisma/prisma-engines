@@ -267,7 +267,6 @@
 <span id="262">262</span>
 <span id="263">263</span>
 <span id="264">264</span>
-<span id="265">265</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">common</span>, <span class="ident">query_engine</span>, <span class="ident">KnownError</span>};
 <span class="kw">use</span> <span class="ident">common::ModelKind</span>;
 <span class="kw">use</span> <span class="ident">indoc::formatdoc</span>;
@@ -318,10 +317,9 @@
             }))
         }
 
-        (<span class="ident">ErrorKind::DatabaseDoesNotExist</span> { .. }, <span class="ident">ConnectionInfo::Postgres</span>(<span class="ident">url</span>)) =&gt; {
+        (<span class="ident">ErrorKind::DatabaseDoesNotExist</span> { <span class="ident">db_name</span> }, <span class="ident">ConnectionInfo::Postgres</span>(<span class="ident">url</span>)) =&gt; {
             <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">common::DatabaseDoesNotExist::Postgres</span> {
-                <span class="ident">database_name</span>: <span class="ident">url</span>.<span class="ident">dbname</span>().<span class="ident">to_owned</span>(),
-                <span class="ident">database_schema_name</span>: <span class="ident">url</span>.<span class="ident">schema</span>().<span class="ident">to_owned</span>(),
+                <span class="ident">database_name</span>: <span class="ident">db_name</span>.<span class="ident">to_string</span>(),
                 <span class="ident">database_host</span>: <span class="ident">url</span>.<span class="ident">host</span>().<span class="ident">to_owned</span>(),
                 <span class="ident">database_port</span>: <span class="ident">url</span>.<span class="ident">port</span>(),
             }))

@@ -281,9 +281,6 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::UserFacingError</span>;
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
@@ -355,7 +352,6 @@ Context: {context}
     },
     <span class="ident">Postgres</span> {
         <span class="ident">database_name</span>: <span class="ident">String</span>,
-        <span class="ident">database_schema_name</span>: <span class="ident">String</span>,
         <span class="ident">database_host</span>: <span class="ident">String</span>,
         <span class="ident">database_port</span>: <span class="ident">u16</span>,
     },
@@ -387,13 +383,11 @@ Context: {context}
             ),
             <span class="ident">DatabaseDoesNotExist::Postgres</span> {
                 <span class="ident">database_name</span>,
-                <span class="ident">database_schema_name</span>,
                 <span class="ident">database_host</span>,
                 <span class="ident">database_port</span>,
             } =&gt; <span class="macro">format!</span>(
-                <span class="string">&quot;Database `{database_name}.{database_schema_name}` does not exist on the database server at `{database_host}:{database_port}`.&quot;</span>,
+                <span class="string">&quot;Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.&quot;</span>,
                 <span class="ident">database_name</span> <span class="op">=</span> <span class="ident">database_name</span>,
-                <span class="ident">database_schema_name</span> <span class="op">=</span> <span class="ident">database_schema_name</span>,
                 <span class="ident">database_host</span> <span class="op">=</span> <span class="ident">database_host</span>,
                 <span class="ident">database_port</span> <span class="op">=</span> <span class="ident">database_port</span>,
             ),
