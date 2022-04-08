@@ -3,6 +3,7 @@
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 #![allow(clippy::trivial_regex)] // these will grow
 #![allow(clippy::redundant_closure)] // too eager, sometimes wrong
+#![allow(clippy::ptr_arg)] // remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
 mod apply_migration;
 mod connection_wrapper;

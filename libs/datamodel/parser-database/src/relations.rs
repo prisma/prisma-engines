@@ -95,6 +95,7 @@ impl Relations {
 
     /// Iterator over relations where the provided model is model A, or the forward side of the
     /// relation.
+    #[allow(clippy::wrong_self_convention)] // this is the name we want
     pub(crate) fn from_model(&self, model_a_id: ast::ModelId) -> impl Iterator<Item = RelationId> + '_ {
         self.forward
             .range((model_a_id, ast::ModelId::ZERO, RelationId::MIN)..(model_a_id, ast::ModelId::MAX, RelationId::MAX))

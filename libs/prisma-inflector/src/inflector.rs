@@ -125,12 +125,7 @@ impl Inflector {
         // Rules are all 1-byte characters, so we can use slices.
         if first_singular == first_plural {
             vec![Rule::regex(
-                Regex::new(&format!(
-                    "(?i)({}){}$",
-                    first_singular.to_owned(),
-                    singular[1..].to_owned()
-                ))
-                .unwrap(),
+                Regex::new(&format!("(?i)({}){}$", first_singular, singular[1..].to_owned())).unwrap(),
                 format!("${{1}}{}", plural[1..].to_owned()),
             )]
         } else {
