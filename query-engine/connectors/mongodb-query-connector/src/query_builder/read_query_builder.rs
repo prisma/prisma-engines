@@ -54,7 +54,7 @@ impl PipelineQuery {
             .aggregate_with_session(self.stages, opts, with_session)
             .await?;
 
-        Ok(vacuum_cursor(cursor, with_session).await?)
+        vacuum_cursor(cursor, with_session).await
     }
 }
 
@@ -73,7 +73,7 @@ impl FindQuery {
             .find_with_session(self.filter, self.options, with_session)
             .await?;
 
-        Ok(vacuum_cursor(cursor, with_session).await?)
+        vacuum_cursor(cursor, with_session).await
     }
 }
 

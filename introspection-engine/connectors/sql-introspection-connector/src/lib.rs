@@ -1,4 +1,5 @@
 #![allow(clippy::vec_init_then_push)]
+#![allow(clippy::ptr_arg)] // remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
 pub mod calculate_datamodel; // only exported to be able to unit test it
 

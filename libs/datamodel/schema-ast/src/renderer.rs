@@ -467,7 +467,6 @@ impl<'a> Renderer<'a> {
 impl<'a> LineWriteable for Renderer<'a> {
     fn write(&mut self, param: &str) {
         self.is_new = false;
-        // TODO: Proper result handling.
         if self.new_line > 0 || self.maybe_new_line > 0 {
             for _i in 0..std::cmp::max(self.new_line, self.maybe_new_line) {
                 self.stream.write_char('\n').expect("Writer error.");
