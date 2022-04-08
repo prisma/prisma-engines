@@ -84,7 +84,7 @@ impl TableFormat {
                 if row[index].is_empty() {
                     row[index] = String::from(text);
                 } else {
-                    row[index] = format!("{}{}", &row[index], text);
+                    row[index].push_str(text);
                 }
             }
             Row::Interleaved(_) => panic!("Cannot append to col in interleaved mode"),

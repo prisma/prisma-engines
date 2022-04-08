@@ -408,16 +408,16 @@ impl<'a> Reformatter<'a> {
         let attributes = Self::extract_and_sort_attributes(token, true);
 
         // iterate through tokens and reorder attributes
-        let mut count = 0;
+        let mut attributes_count = 0;
         let inner_pairs_with_sorted_attributes = token.clone().into_inner().map(|p| match p.as_rule() {
             Rule::attribute => {
-                count += 1;
-                attributes[count - 1].clone()
+                attributes_count += 1;
+                attributes[attributes_count - 1].clone()
             }
             _ => p,
         });
 
-        // write to target
+        // Write existing attributes first.
         for current in inner_pairs_with_sorted_attributes {
             match current.as_rule() {
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
@@ -449,12 +449,22 @@ impl<'a> Reformatter<'a> {
             }
         }
 
-        for missing_field_attribute in &self.missing_field_attributes {
-            if missing_field_attribute.field == field_name && missing_field_attribute.model.as_str() == model_name {
-                Renderer::render_field_attribute(
-                    &mut target.column_locked_writer_for(2),
-                    &missing_field_attribute.attribute,
-                )
+        // Write missing attributes.
+        let mut column_writer = target.column_locked_writer_for(2); // third column
+        let mut missing_field_attributes = self
+            .missing_field_attributes
+            .iter()
+            .filter(|missing_field_attribute| {
+                missing_field_attribute.field == field_name && missing_field_attribute.model.as_str() == model_name
+            })
+            .peekable();
+        if attributes_count > 0 && missing_field_attributes.peek().is_some() {
+            column_writer.write(" "); // space between attributes
+        }
+        while let Some(missing_field_attribute) = missing_field_attributes.next() {
+            Renderer::render_field_attribute(&mut column_writer, &missing_field_attribute.attribute);
+            if missing_field_attributes.peek().is_some() {
+                column_writer.write(" "); // space between attributes
             }
         }
 
