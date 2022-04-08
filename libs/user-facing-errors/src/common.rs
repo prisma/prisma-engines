@@ -69,7 +69,6 @@ pub enum DatabaseDoesNotExist {
     },
     Postgres {
         database_name: String,
-        database_schema_name: String,
         database_host: String,
         database_port: u16,
     },
@@ -101,13 +100,11 @@ impl UserFacingError for DatabaseDoesNotExist {
             ),
             DatabaseDoesNotExist::Postgres {
                 database_name,
-                database_schema_name,
                 database_host,
                 database_port,
             } => format!(
-                "Database `{database_name}.{database_schema_name}` does not exist on the database server at `{database_host}:{database_port}`.",
+                "Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.",
                 database_name = database_name,
-                database_schema_name = database_schema_name,
                 database_host = database_host,
                 database_port = database_port,
             ),
