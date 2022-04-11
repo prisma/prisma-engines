@@ -89,6 +89,8 @@ jobs:
             url: "postgresql://postgres:prisma@localhost:5437"
           - name: cockroach_22_1_0_alpha_1
             url: "postgresql://prisma@localhost:26257"
+          - name: cockroach_21_2_0_patched
+            url: "postgresql://prisma@localhost:26258"
           - name: sqlite
             url: sqlite
           - name: vitess_5_7
