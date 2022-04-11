@@ -6,8 +6,8 @@ use quaint::Value;
 
 pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
     let val = match quaint_value {
-        Value::Integer(i) => i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
-
+        Value::Int32(i) => i.map(|i| PrismaValue::Int(i as i64)).unwrap_or(PrismaValue::Null),
+        Value::Int64(i) => i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
         Value::Float(Some(f)) => match f {
             f if f.is_nan() => {
                 return Err(ConversionFailure {
