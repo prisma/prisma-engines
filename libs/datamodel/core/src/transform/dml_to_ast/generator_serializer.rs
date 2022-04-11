@@ -24,7 +24,7 @@ impl GeneratorSerializer {
             properties.push(super::lower_string_from_env_var("output", output));
         }
 
-        if let Some(ref features) = dbg!(&generator.preview_features) {
+        if let Some(ref features) = &generator.preview_features {
             let features: Vec<ast::Expression> = features
                 .iter()
                 .map(|f| ast::Expression::StringValue(f.to_string(), ast::Span::empty()))

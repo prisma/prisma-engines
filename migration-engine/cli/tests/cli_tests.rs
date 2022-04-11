@@ -131,7 +131,6 @@ fn test_create_database(api: TestApi) {
     assert!(output.status.success(), "{:#?}", output);
 
     let output = api.run(&["--datasource", &connection_string, "create-database"]);
-    dbg!(&output);
     assert!(output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("Database 'test_create_database\' was successfully created."));

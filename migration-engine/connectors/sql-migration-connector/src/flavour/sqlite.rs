@@ -143,7 +143,26 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        with_connection(&mut self.state, |_, _| future::ready(Ok(())))
+        let params = self.state.get_unwrapped_params();
+        let path = std::path::Path::new(&params.file_path);
+        // we use metadata() here instead of Path::exists() because we want accurate diagnostics:
+        // if the file is not reachable because of missing permissions, we don't want to return
+        // that the file doesn't exist.
+        let result = match std::fs::metadata(path) {
+            Ok(_) => Ok(()),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Err(ConnectorError::user_facing(
+                user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
+                    database_file_name: path
+                        .file_name()
+                        .map(|osstr| osstr.to_string_lossy().into_owned())
+                        .unwrap_or_else(|| params.file_path.clone()),
+                    database_file_path: params.file_path.clone(),
+                },
+            )),
+            Err(err) => Err(ConnectorError::from_source(err, "Failed to open SQLite database.")),
+        };
+
+        Box::pin(future::ready(result))
     }
 
     fn query<'a>(

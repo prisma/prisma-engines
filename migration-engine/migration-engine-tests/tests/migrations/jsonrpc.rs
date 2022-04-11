@@ -28,10 +28,9 @@ impl TestApi {
 #[test_connector(tags(Sqlite))]
 fn test_can_connect_to_database(mut api: TestApi) {
     let tempdir = tempfile::tempdir().unwrap();
-    let url = format!(
-        "file:{}",
-        tempdir.path().join("test.sqlite").to_string_lossy().into_owned()
-    );
+    let sqlite_schema_path = tempdir.path().join("test.sqlite");
+    std::fs::File::create(&sqlite_schema_path).unwrap();
+    let url = format!("file:{}", sqlite_schema_path.to_string_lossy().into_owned());
     let request = r#"
         {"jsonrpc":"2.0","id":1,"method":"ensureConnectionValidity","params":{"datasource":{"tag":"ConnectionString", "url": "theurl"}}}
     "#.replace("theurl", &url);
