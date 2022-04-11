@@ -1,11 +1,10 @@
 use crate::error::ApiError;
 use crate::logger;
 use datamodel::{dml::Datamodel, ValidatedConfiguration};
-use napi::threadsafe_function::ThreadsafeFunction;
 use opentelemetry::global;
 use prisma_models::InternalDataModelBuilder;
 use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer, TxId};
-use request_handlers::{GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse, TxInput};
+use request_handlers::{GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
@@ -18,16 +17,18 @@ use tracing::{instrument::WithSubscriber, warn, Dispatch, Level};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 use tracing_subscriber::filter::LevelFilter;
 
-/// The main engine, that can be cloned between threads when using JavaScript
-/// promises.
-#[derive(Clone)]
+use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsUnknown};
+use napi_derive::napi;
+
+/// The main query engine used by JS
+#[napi]
 pub struct QueryEngine {
-    inner: Arc<RwLock<Inner>>,
+    inner: RwLock<Inner>,
     logger: Dispatch,
 }
 
 /// The state of the engine.
-pub enum Inner {
+enum Inner {
     /// Not connected, holding all data to form a connection.
     Builder(EngineBuilder),
     /// A connected engine, holding all data to disconnect and form a new
@@ -43,7 +44,7 @@ struct EngineDatamodel {
 }
 
 /// Everything needed to connect to the database and have the core running.
-pub struct EngineBuilder {
+struct EngineBuilder {
     datamodel: EngineDatamodel,
     config: ValidatedConfiguration,
     config_dir: PathBuf,
@@ -51,7 +52,7 @@ pub struct EngineBuilder {
 }
 
 /// Internal structure for querying and reconnecting with the engine.
-pub struct ConnectedEngine {
+struct ConnectedEngine {
     datamodel: EngineDatamodel,
     query_schema: Arc<QuerySchema>,
     executor: crate::Executor,
@@ -62,7 +63,7 @@ pub struct ConnectedEngine {
 /// Returned from the `serverInfo` method in javascript.
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ServerInfo {
+struct ServerInfo {
     commit: String,
     version: String,
     primary_connector: Option<String>,
@@ -83,7 +84,7 @@ impl ConnectedEngine {
 /// Parameters defining the construction of an engine.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ConstructorOptions {
+struct ConstructorOptions {
     datamodel: String,
     log_level: String,
     #[serde(default)]
@@ -101,16 +102,47 @@ pub struct ConstructorOptions {
 
 #[derive(Debug, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
-#[allow(dead_code)]
-pub struct TelemetryOptions {
+struct TelemetryOptions {
     enabled: bool,
+    #[allow(unused)]
     endpoint: Option<String>,
 }
 
+impl Inner {
+    /// Returns a builder if the engine is not connected
+    fn as_builder(&self) -> crate::Result<&EngineBuilder> {
+        match self {
+            Inner::Builder(ref builder) => Ok(builder),
+            Inner::Connected(_) => Err(ApiError::AlreadyConnected),
+        }
+    }
+
+    /// Returns the engine if connected
+    fn as_engine(&self) -> crate::Result<&ConnectedEngine> {
+        match self {
+            Inner::Builder(_) => Err(ApiError::NotConnected),
+            Inner::Connected(ref engine) => Ok(engine),
+        }
+    }
+}
+
+#[napi]
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
-    pub fn new(opts: ConstructorOptions, log_callback: ThreadsafeFunction<String>) -> crate::Result<Self> {
+    #[napi(constructor)]
+    pub fn new(env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
+        // We want panics to be rendered as JSON
         set_panic_hook();
+
+        let mut log_callback = callback.create_threadsafe_function(0, |mut ctx: ThreadSafeCallContext<String>| {
+            ctx.env.adjust_external_memory(ctx.value.len() as i64)?;
+
+            ctx.env
+                .create_string_from_std(ctx.value)
+                .map(|js_string| vec![js_string])
+        })?;
+
+        log_callback.unref(&env)?;
 
         let ConstructorOptions {
             datamodel,
@@ -121,7 +153,7 @@ impl QueryEngine {
             telemetry,
             config_dir,
             ignore_env_var_errors,
-        } = opts;
+        } = env.from_js_value(options)?;
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
@@ -165,194 +197,184 @@ impl QueryEngine {
         let log_level = log_level.parse::<LevelFilter>().unwrap();
 
         Ok(Self {
-            inner: Arc::new(RwLock::new(Inner::Builder(builder))),
+            inner: RwLock::new(Inner::Builder(builder)),
             logger: logger::create_log_dispatch(log_queries, log_level, log_callback),
         })
     }
 
     /// Connect to the database, allow queries to be run.
-    pub async fn connect(&self) -> crate::Result<()> {
+    #[napi]
+    pub async fn connect(&self) -> napi::Result<()> {
         let mut inner = self.inner.write().await;
+        let builder = inner.as_builder()?;
 
-        match *inner {
-            Inner::Builder(ref builder) => {
-                let engine = async move {
-                    // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
-                    let data_source = builder
-                        .config
-                        .subject
-                        .datasources
-                        .first()
-                        .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
+        let engine = async move {
+            // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
+            let data_source = builder
+                .config
+                .subject
+                .datasources
+                .first()
+                .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                    let preview_features: Vec<_> = builder.config.subject.preview_features().iter().collect();
-                    let url = data_source
-                        .load_url_with_config_dir(&builder.config_dir, |key| {
-                            builder.env.get(key).map(ToString::to_string)
-                        })
-                        .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
+            let preview_features: Vec<_> = builder.config.subject.preview_features().iter().collect();
+            let url = data_source
+                .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
+                .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
 
-                    let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
-                    let connector = executor.primary_connector();
-                    connector.get_connection().await?;
+            let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
+            let connector = executor.primary_connector();
+            connector.get_connection().await?;
 
-                    // Build internal data model
-                    let internal_data_model = InternalDataModelBuilder::from(&builder.datamodel.ast).build(db_name);
+            // Build internal data model
+            let internal_data_model = InternalDataModelBuilder::from(&builder.datamodel.ast).build(db_name);
 
-                    let query_schema = schema_builder::build(
-                        internal_data_model,
-                        BuildMode::Modern,
-                        true, // enable raw queries
-                        data_source.capabilities(),
-                        preview_features,
-                        data_source.referential_integrity(),
-                    );
+            let query_schema = schema_builder::build(
+                internal_data_model,
+                BuildMode::Modern,
+                true, // enable raw queries
+                data_source.capabilities(),
+                preview_features,
+                data_source.referential_integrity(),
+            );
 
-                    Ok(ConnectedEngine {
-                        datamodel: builder.datamodel.clone(),
-                        query_schema: Arc::new(query_schema),
-                        executor,
-                        config_dir: builder.config_dir.clone(),
-                        env: builder.env.clone(),
-                    }) as crate::Result<ConnectedEngine>
-                }
-                .with_subscriber(self.logger.clone())
-                .await?;
-
-                *inner = Inner::Connected(engine);
-
-                Ok(())
-            }
-            Inner::Connected(_) => Err(ApiError::AlreadyConnected),
+            Ok(ConnectedEngine {
+                datamodel: builder.datamodel.clone(),
+                query_schema: Arc::new(query_schema),
+                executor,
+                config_dir: builder.config_dir.clone(),
+                env: builder.env.clone(),
+            }) as crate::Result<ConnectedEngine>
         }
+        .with_subscriber(self.logger.clone())
+        .await?;
+
+        *inner = Inner::Connected(engine);
+
+        Ok(())
     }
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
-    pub async fn disconnect(&self) -> crate::Result<()> {
+    #[napi]
+    pub async fn disconnect(&self) -> napi::Result<()> {
         let mut inner = self.inner.write().await;
+        let engine = inner.as_engine()?;
 
-        match *inner {
-            Inner::Connected(ref engine) => {
-                let config = datamodel::parse_configuration(&engine.datamodel.raw)
-                    .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
+        let config = datamodel::parse_configuration(&engine.datamodel.raw)
+            .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
 
-                let builder = EngineBuilder {
-                    datamodel: engine.datamodel.clone(),
-                    config,
-                    config_dir: engine.config_dir.clone(),
-                    env: engine.env.clone(),
-                };
+        let builder = EngineBuilder {
+            datamodel: engine.datamodel.clone(),
+            config,
+            config_dir: engine.config_dir.clone(),
+            env: engine.env.clone(),
+        };
 
-                *inner = Inner::Builder(builder);
+        *inner = Inner::Builder(builder);
 
-                Ok(())
-            }
-            Inner::Builder(_) => Err(ApiError::NotConnected),
-        }
+        Ok(())
     }
 
     /// If connected, sends a query to the core and returns the response.
-    pub async fn query(
-        &self,
-        query: GraphQlBody,
-        trace: HashMap<String, String>,
-        tx_id: Option<String>,
-    ) -> crate::Result<PrismaResponse> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => {
-                async move {
-                    let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-                    let span = tracing::span!(Level::TRACE, "query");
+    #[napi]
+    pub async fn query(&self, body: String, trace: String, tx_id: Option<String>) -> napi::Result<String> {
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-                    span.set_parent(cx);
-                    let trace_id = trace.get("traceparent").map(String::from);
+        let query = serde_json::from_str(&body)?;
+        let trace: HashMap<String, String> = serde_json::from_str(&trace)?;
 
-                    let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
-                    Ok(handler.handle(query, tx_id.map(TxId::from), trace_id).await)
-                }
-                .with_subscriber(self.logger.clone())
-                .await
-            }
-            Inner::Builder(_) => Err(ApiError::NotConnected),
+        async move {
+            let ctx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+            let current_span = tracing::span!(Level::TRACE, "query");
+            current_span.set_parent(ctx);
+
+            let trace_id = trace.get("traceparent").map(String::from);
+            let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
+
+            let response = handler.handle(query, tx_id.map(TxId::from), trace_id).await;
+
+            Ok(serde_json::to_string(&response)?)
         }
+        .with_subscriber(self.logger.clone())
+        .await
     }
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
-    pub async fn start_tx(&self, input: TxInput, trace: HashMap<String, String>) -> crate::Result<String> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => {
-                async move {
-                    let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-                    let span = tracing::span!(Level::TRACE, "query");
+    #[napi]
+    pub async fn start_transaction(&self, input: String, trace: HashMap<String, String>) -> napi::Result<String> {
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-                    span.set_parent(cx);
+        async move {
+            let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+            let span = tracing::span!(Level::TRACE, "query");
+            let input: TxInput = serde_json::from_str(&input)?;
 
-                    match engine
-                        .executor()
-                        .start_tx(engine.query_schema().clone(), input.max_wait, input.timeout)
-                        .await
-                    {
-                        Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
-                        Err(err) => Ok(map_known_error(err)?),
-                    }
-                }
-                .with_subscriber(self.logger.clone())
+            span.set_parent(cx);
+
+            match engine
+                .executor()
+                .start_tx(engine.query_schema().clone(), input.max_wait, input.timeout)
                 .await
+            {
+                Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
+                Err(err) => Ok(map_known_error(err)?),
             }
-            Inner::Builder(_) => Err(ApiError::NotConnected),
         }
+        .with_subscriber(self.logger.clone())
+        .await
     }
 
-    /// If connected, attempts to commit a transaction with id `tx_id` in the core.
-    pub async fn commit_tx(&self, tx_id: String, trace: HashMap<String, String>) -> crate::Result<String> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => {
-                async move {
-                    let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-                    let span = tracing::span!(Level::TRACE, "query");
+    // /// If connected, attempts to commit a transaction with id `tx_id` in the core.
+    #[napi]
+    pub async fn commit_transaction(&self, tx_id: String, trace: HashMap<String, String>) -> napi::Result<String> {
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-                    span.set_parent(cx);
+        async move {
+            let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+            let span = tracing::span!(Level::TRACE, "query");
 
-                    match engine.executor().commit_tx(TxId::from(tx_id)).await {
-                        Ok(_) => Ok("{}".to_string()),
-                        Err(err) => Ok(map_known_error(err)?),
-                    }
-                }
-                .with_subscriber(self.logger.clone())
-                .await
+            span.set_parent(cx);
+
+            match engine.executor().commit_tx(TxId::from(tx_id)).await {
+                Ok(_) => Ok("{}".to_string()),
+                Err(err) => Ok(map_known_error(err)?),
             }
-            Inner::Builder(_) => Err(ApiError::NotConnected),
         }
+        .with_subscriber(self.logger.clone())
+        .await
     }
 
-    /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
-    pub async fn rollback_tx(&self, tx_id: String, trace: HashMap<String, String>) -> crate::Result<String> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => {
-                async move {
-                    let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-                    let span = tracing::span!(Level::TRACE, "query");
+    // /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
+    #[napi]
+    pub async fn rollback_transaction(&self, tx_id: String, trace: HashMap<String, String>) -> napi::Result<String> {
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-                    span.set_parent(cx);
+        async move {
+            let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+            let span = tracing::span!(Level::TRACE, "query");
 
-                    match engine.executor().rollback_tx(TxId::from(tx_id)).await {
-                        Ok(_) => Ok("{}".to_string()),
-                        Err(err) => Ok(map_known_error(err)?),
-                    }
-                }
-                .with_subscriber(self.logger.clone())
-                .await
+            span.set_parent(cx);
+
+            match engine.executor().rollback_tx(TxId::from(tx_id)).await {
+                Ok(_) => Ok("{}".to_string()),
+                Err(err) => Ok(map_known_error(err)?),
             }
-            Inner::Builder(_) => Err(ApiError::NotConnected),
         }
+        .with_subscriber(self.logger.clone())
+        .await
     }
 
     /// Loads the query schema. Only available when connected.
-    pub async fn sdl_schema(&self) -> crate::Result<String> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => Ok(GraphQLSchemaRenderer::render(engine.query_schema().clone())),
-            Inner::Builder(_) => Err(ApiError::NotConnected),
-        }
+    #[napi]
+    pub async fn sdl_schema(&self) -> napi::Result<String> {
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
+
+        Ok(GraphQLSchemaRenderer::render(engine.query_schema().clone()))
     }
 }
 
@@ -394,7 +416,7 @@ fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<Stri
     Err(ApiError::JsonDecode(msg.to_string()))
 }
 
-pub fn set_panic_hook() {
+fn set_panic_hook() {
     let original_hook = std::panic::take_hook();
 
     std::panic::set_hook(Box::new(move |info| {
