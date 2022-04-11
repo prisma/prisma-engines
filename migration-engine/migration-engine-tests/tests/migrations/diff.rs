@@ -632,6 +632,63 @@ fn diff_with_exit_code_and_non_empty_diff_returns_two() {
     expected_diff.assert_eq(&diff);
 }
 
+#[test]
+fn diff_with_non_existing_sqlite_database_from_url() {
+    let expected = expect![[r#"
+        Database db.sqlite does not exist at <the-tmpdir-path>/db.sqlite
+    "#]];
+    let tmpdir = tempfile::tempdir().unwrap();
+
+    let error = diff_error(DiffParams {
+        exit_code: Some(true),
+        from: DiffTarget::Empty,
+        script: false,
+        shadow_database_url: None,
+        to: DiffTarget::Url(UrlContainer {
+            url: format!("file:{}", tmpdir.path().join("db.sqlite").to_string_lossy()),
+        }),
+    });
+
+    let error = error
+        .replace(tmpdir.path().to_str().unwrap(), "<the-tmpdir-path>")
+        .replace(std::path::MAIN_SEPARATOR, "/"); // normalize windows paths
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn diff_with_non_existing_sqlite_database_from_datasource() {
+    let expected = expect![[r#"
+        Database assume.sqlite does not exist at /this/file/doesnt/exist/we/assume.sqlite
+    "#]];
+
+    let schema = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:/this/file/doesnt/exist/we/assume.sqlite"
+        }
+    "#;
+    let tmpdir = tempfile::tempdir().unwrap();
+
+    let schema_path = write_file_to_tmp(schema, &tmpdir, "schema.prisma");
+
+    let error = diff_error(DiffParams {
+        exit_code: Some(true),
+        from: DiffTarget::Empty,
+        script: false,
+        shadow_database_url: None,
+        to: DiffTarget::SchemaDatasource(SchemaContainer {
+            schema: schema_path.to_string_lossy().into_owned(),
+        }),
+    });
+
+    if cfg!(target_os = "windows") {
+        return; // path in error looks different
+    }
+
+    expected.assert_eq(&error);
+}
+
 // Call diff, and expect it to error. Return the error.
 pub(crate) fn diff_error(params: DiffParams) -> String {
     let api = migration_core::migration_api(None, None).unwrap();

@@ -81,6 +81,7 @@ async fn json_rpc_diff_target_to_connector(
             let schema_contents = read_prisma_schema_from_path(schema)?;
             let schema_dir = std::path::Path::new(schema).parent();
             let mut connector = crate::schema_to_connector(&schema_contents, schema_dir)?;
+            connector.ensure_connection_validity().await?;
             let schema = connector
                 .database_schema_from_diff_target(McDiff::Database, None)
                 .await?;
@@ -96,6 +97,7 @@ async fn json_rpc_diff_target_to_connector(
         }
         DiffTarget::Url(UrlContainer { url }) => {
             let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::empty())?;
+            connector.ensure_connection_validity().await?;
             let schema = connector
                 .database_schema_from_diff_target(McDiff::Database, None)
                 .await?;
