@@ -238,7 +238,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let size: i64 = rows
             .into_single()
-            .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))
+            .map(|row| row.get("size").and_then(|x| x.as_integer()).unwrap_or(0))
             .unwrap_or(0);
 
         Ok(size

@@ -66,6 +66,10 @@ impl QueryResult {
             PrismaResponse::Multi(ref m) => m.errors().collect(),
         }
     }
+
+    pub fn to_string_pretty(&self) -> String {
+        serde_json::to_string_pretty(&self.response).unwrap()
+    }
 }
 
 impl ToString for QueryResult {

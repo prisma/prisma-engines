@@ -30,14 +30,14 @@ pub trait DatamodelRenderer {
 }
 
 /// Render the complete datamodel with all bells and whistles.
-pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template: String) -> String {
+pub fn render_test_datamodel(
+    config: &TestConfig,
+    test_database: &str,
+    template: String,
+    excluded_features: &[&str],
+) -> String {
     let tag = config.test_connector_tag().unwrap();
-    let all_features = GENERATOR
-        .active_features()
-        .iter()
-        .chain(GENERATOR.hidden_features())
-        .map(|f| format!(r#""{}""#, f))
-        .join(", ");
+    let preview_features = render_preview_features(excluded_features);
 
     let datasource_with_generator = format!(
         indoc! {r#"
@@ -55,7 +55,7 @@ pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template:
         tag.datamodel_provider(),
         tag.connection_string(test_database, config.is_ci()),
         tag.referential_integrity(),
-        all_features
+        preview_features
     );
 
     let renderer = tag.datamodel_renderer();
@@ -77,4 +77,16 @@ fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> S
     fragment_defs.into_iter().fold(preprocessed.to_string(), |aggr, next| {
         aggr.replacen("#{}", &renderer.render(next), 1)
     })
+}
+
+fn render_preview_features(excluded_features: &[&str]) -> String {
+    let excluded_features: Vec<_> = excluded_features.iter().map(|f| format!(r#""{}""#, f)).collect();
+
+    GENERATOR
+        .active_features()
+        .iter()
+        .chain(GENERATOR.hidden_features())
+        .map(|f| format!(r#""{}""#, f))
+        .filter(|f| !excluded_features.contains(f))
+        .join(", ")
 }
