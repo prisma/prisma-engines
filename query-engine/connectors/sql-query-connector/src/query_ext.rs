@@ -81,7 +81,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
         let params = params.into_iter().map(convert_lossy).collect_vec();
-        let result_set = AssertUnwindSafe(self.query_raw(&query, &params))
+        let result_set = AssertUnwindSafe(self.query_raw_typed(&query, &params))
             .catch_unwind()
             .await??;
 
@@ -118,7 +118,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
         let params = params.into_iter().map(convert_lossy).collect_vec();
-        let changes = AssertUnwindSafe(self.execute_raw(&query, &params))
+        let changes = AssertUnwindSafe(self.execute_raw_typed(&query, &params))
             .catch_unwind()
             .await??;
 
