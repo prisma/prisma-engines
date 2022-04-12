@@ -3167,7 +3167,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#466e900209dbd49385842e2387809ba757af3677"
+source = "git+https://github.com/prisma/quaint#c7dc33f9aecf8b359757af396b14f1567cf1598e"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -4206,6 +4206,7 @@ dependencies = [
  "rand 0.7.3",
  "serde",
  "serde_json",
+ "sql-datamodel-connector",
  "thiserror",
  "tokio",
  "tracing",

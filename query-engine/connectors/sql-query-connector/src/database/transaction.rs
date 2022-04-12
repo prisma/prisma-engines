@@ -6,6 +6,7 @@ use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, QueryArguments, ReadOperations,
     RecordFilter, Transaction, WriteArgs, WriteOperations,
 };
+use datamodel::common::preview_features::PreviewFeature;
 use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
@@ -16,14 +17,21 @@ use super::catch;
 pub struct SqlConnectorTransaction<'tx> {
     inner: quaint::connector::Transaction<'tx>,
     connection_info: ConnectionInfo,
+    features: Vec<PreviewFeature>,
 }
 
 impl<'tx> SqlConnectorTransaction<'tx> {
-    pub fn new(tx: quaint::connector::Transaction<'tx>, connection_info: &ConnectionInfo) -> Self {
+    pub fn new(
+        tx: quaint::connector::Transaction<'tx>,
+        connection_info: &ConnectionInfo,
+        features: Vec<PreviewFeature>,
+    ) -> Self {
         let connection_info = connection_info.clone();
+
         Self {
             inner: tx,
             connection_info,
+            features,
         }
     }
 }
@@ -242,7 +250,13 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         _query_type: Option<String>,
     ) -> connector::Result<serde_json::Value> {
         catch(self.connection_info.clone(), async move {
-            write::query_raw(&self.inner, inputs).await
+            write::query_raw(
+                &self.inner,
+                SqlInfo::from(&self.connection_info),
+                &self.features,
+                inputs,
+            )
+            .await
         })
         .await
     }

@@ -135,7 +135,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let result = self.conn.query_raw(sql, &[]).await?;
         let size: i64 = result
             .first()
-            .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))
+            .map(|row| row.get("size").and_then(|x| x.as_integer()).unwrap_or(0))
             .unwrap();
 
         Ok(size.try_into().unwrap())
@@ -245,7 +245,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                     Some(_) => None,
                 };
 
-                let pk_col = row.get("pk").and_then(|x| x.as_i64()).expect("primary key");
+                let pk_col = row.get("pk").and_then(|x| x.as_integer()).expect("primary key");
 
                 let col = Column {
                     name: row.get("name").and_then(|x| x.to_string()).expect("name"),
@@ -329,8 +329,8 @@ impl<'a> SqlSchemaDescriber<'a> {
         let mut intermediate_fks: BTreeMap<i64, IntermediateForeignKey> = BTreeMap::new();
         for row in result_set.into_iter() {
             trace!("got FK description row {:?}", row);
-            let id = row.get("id").and_then(|x| x.as_i64()).expect("id");
-            let seq = row.get("seq").and_then(|x| x.as_i64()).expect("seq");
+            let id = row.get("id").and_then(|x| x.as_integer()).expect("id");
+            let seq = row.get("seq").and_then(|x| x.as_integer()).expect("seq");
             let column = row.get("from").and_then(|x| x.to_string()).expect("from");
             // this can be null if the primary key and shortened fk syntax was used
             let referenced_column = row.get("to").and_then(|x| x.to_string());
@@ -467,7 +467,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
                 match row.get("name").and_then(|x| x.to_string()) {
                     Some(name) => {
-                        let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
+                        let pos = row.get("seqno").and_then(|x| x.as_integer()).expect("get seqno") as usize;
                         if index.columns.len() <= pos {
                             index.columns.resize(pos + 1, IndexColumn::default());
                         }
@@ -484,9 +484,9 @@ impl<'a> SqlSchemaDescriber<'a> {
             for row in result_set.into_iter() {
                 //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
                 if row.get("name").and_then(|x| x.to_string()).is_some() {
-                    let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
+                    let pos = row.get("seqno").and_then(|x| x.as_integer()).expect("get seqno") as usize;
 
-                    let sort_order = row.get("desc").and_then(|r| r.as_i64()).map(|v| match v {
+                    let sort_order = row.get("desc").and_then(|r| r.as_integer()).map(|v| match v {
                         0 => SQLSortOrder::Asc,
                         _ => SQLSortOrder::Desc,
                     });

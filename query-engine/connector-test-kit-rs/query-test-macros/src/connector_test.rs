@@ -19,6 +19,9 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
         return err.write_errors().into();
     };
 
+    let excluded_features = args.exclude_features.features();
+    let excluded_features = quote! { &[#(#excluded_features),*] };
+
     let connectors = args.connectors_to_test();
     let handler = args.schema.unwrap().handler_path;
 
@@ -85,7 +88,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
 
             if ConnectorTag::should_run(&config, &enabled_connectors, &capabilities, #test_name) {
                 let template = #handler();
-                let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template);
+                let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template, #excluded_features);
                 let connector = config.test_connector_tag().unwrap();
 
                 query_tests_setup::run_with_tokio(async move {

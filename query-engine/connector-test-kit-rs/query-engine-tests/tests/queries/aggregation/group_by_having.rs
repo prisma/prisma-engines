@@ -379,7 +379,7 @@ mod aggr_group_by_having {
             groupByTestModel(
               by: [string]
               having: {
-                AND: [{ int: { _max: { gt: 1 } } }, { float: { _sum: { gt: 1 } } }]
+                AND: [{ int: { _max: { gt: 1 } } }, { int: { _sum: { gt: 1 } } }]
               }
             ) { string }
           }"#,

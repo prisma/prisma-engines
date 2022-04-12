@@ -55,7 +55,7 @@ fn extract_table_rows_count(table_name: &str, result_set: quaint::prelude::Resul
             ))
         })?
         .at(0)
-        .and_then(|value| value.as_i64())
+        .and_then(|value| value.as_integer())
         .ok_or_else(|| {
             ConnectorError::from_msg(format!(
                 "No count was returned when checking for existing rows in the `{}` table.",
@@ -69,6 +69,6 @@ fn extract_column_values_count(result_set: quaint::prelude::ResultSet) -> Connec
         .first()
         .as_ref()
         .and_then(|row| row.at(0))
-        .and_then(|count| count.as_i64())
+        .and_then(|count| count.as_integer())
         .ok_or_else(|| ConnectorError::from_msg("Unexpected result set shape when checking dropped columns.".into()))
 }
