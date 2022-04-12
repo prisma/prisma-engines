@@ -1,0 +1,12 @@
+[package]
+name = "schema"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+prisma-models = { path = "../prisma-models" } # Doesn't compile for WASM
+once_cell = "1.3"
+datamodel = { path = "../../libs/datamodel/core" } # Compiles for WASM
+datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" } # Compiles for WASM
