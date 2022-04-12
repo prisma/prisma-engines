@@ -74,3 +74,4 @@ pub enum ErrorKind {
     #[error("Preview feature not enabled: {}", _0)]
     PreviewFeatureNotEnabled(&'static str),
 }
+
