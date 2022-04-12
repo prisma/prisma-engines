@@ -1,6 +1,6 @@
 use crate::{
-    column_metadata, error::*, model_extensions::*, sql_trace::SqlTraceComment, AliasedCondition, ColumnMetadata,
-    SqlRow, ToSqlRow,
+    column_metadata, error::*, model_extensions::*, sql_trace::SqlTraceComment, value_ext::IntoTypedJsonExtension,
+    AliasedCondition, ColumnMetadata, SqlRow, ToSqlRow,
 };
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
@@ -92,7 +92,7 @@ pub trait QueryExt: Queryable + Send + Sync {
             for (idx, p_value) in row.into_iter().enumerate() {
                 let column_name = columns.get(idx).unwrap_or(&format!("f{}", idx)).clone();
 
-                object.insert(column_name, Value::from(p_value));
+                object.insert(column_name, p_value.as_typed_json());
             }
 
             result.push(Value::Object(object));
