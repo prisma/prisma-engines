@@ -3026,7 +3026,6 @@ dependencies = [
  "bigdecimal 0.2.2",
  "chrono",
  "once_cell",
- "quaint",
  "regex",
  "serde",
  "serde_derive",
@@ -3709,6 +3708,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "schema"
+version = "0.1.0"
+dependencies = [
+ "datamodel",
+ "datamodel-connector",
+ "once_cell",
+ "prisma-models",
+]
+
+[[package]]
 name = "schema-ast"
 version = "0.1.0"
 dependencies = [
@@ -3716,6 +3725,10 @@ dependencies = [
  "pest",
  "pest_derive",
 ]
+
+[[package]]
+name = "schema-builder"
+version = "0.1.0"
 
 [[package]]
 name = "scopeguard"

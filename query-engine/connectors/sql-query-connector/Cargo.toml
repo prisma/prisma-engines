@@ -46,7 +46,6 @@ features = ["sql-ext"]
 path = "../../prisma-models"
 
 [dependencies.prisma-value]
-features = ["sql-ext"]
 path = "../../../libs/prisma-value"
 
 [dependencies.chrono]
