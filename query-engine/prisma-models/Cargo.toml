@@ -1,17 +1,10 @@
 [package]
-authors = [
-  "Dominic Petrick <petrick@prisma.io>",
-  "Julius de Bruijn <bruijn@prisma.io>",
-  "Marcus Böhm <boehm@prisma.io>",
-  "Katharina Fey <kookie@spacekookie.de>",
-]
 edition = "2021"
 name = "prisma-models"
 version = "0.0.0"
 
 [features]
 default = []
-sql-ext = ["quaint"]
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
@@ -28,7 +21,3 @@ serde_json = { version = "1.0", features = ["float_roundtrip"] }
 thiserror = "1.0"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 
-[dependencies.quaint]
-git = "https://github.com/prisma/quaint"
-optional = true
-features = ["uuid"]

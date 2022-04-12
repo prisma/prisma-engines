@@ -3009,7 +3009,6 @@ dependencies = [
  "itertools",
  "once_cell",
  "prisma-value",
- "quaint",
  "rand 0.7.3",
  "serde",
  "serde_derive",
