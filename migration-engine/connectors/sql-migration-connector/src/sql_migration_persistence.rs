@@ -163,11 +163,13 @@ impl MigrationPersistence for SqlMigrationConnector {
                     started_at: row.get("started_at").and_then(|v| v.as_datetime()).ok_or_else(|| {
                         ConnectorError::from_msg("Failed to extract `started_at` from `_prisma_migrations` row.".into())
                     })?,
-                    applied_steps_count: row.get("applied_steps_count").and_then(|v| v.as_i64()).ok_or_else(|| {
-                        ConnectorError::from_msg(
-                            "Failed to extract `applied_steps_count` from `_prisma_migrations` row.".into(),
-                        )
-                    })? as u32,
+                    applied_steps_count: row.get("applied_steps_count").and_then(|v| v.as_integer()).ok_or_else(
+                        || {
+                            ConnectorError::from_msg(
+                                "Failed to extract `applied_steps_count` from `_prisma_migrations` row.".into(),
+                            )
+                        },
+                    )? as u32,
                 })
             })
             .collect::<Result<Vec<_>, _>>()?;

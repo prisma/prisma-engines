@@ -1,6 +1,7 @@
 use crate::sql_trace::SqlTraceComment;
 use crate::{error::SqlError, model_extensions::*, query_builder::write, sql_info::SqlInfo, QueryExt};
 use connector_interface::*;
+use datamodel::common::preview_features::PreviewFeature;
 use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
@@ -392,9 +393,14 @@ pub async fn execute_raw(conn: &dyn QueryExt, inputs: HashMap<String, PrismaValu
 
 /// Execute a plain SQL query with the given parameters, returning the answer as
 /// a JSON `Value`.
-#[tracing::instrument(skip(conn, inputs))]
-pub async fn query_raw(conn: &dyn QueryExt, inputs: HashMap<String, PrismaValue>) -> crate::Result<serde_json::Value> {
-    let value = conn.raw_json(inputs).await?;
+#[tracing::instrument(skip(conn, sql_info, features, inputs))]
+pub async fn query_raw(
+    conn: &dyn QueryExt,
+    sql_info: SqlInfo,
+    features: &[PreviewFeature],
+    inputs: HashMap<String, PrismaValue>,
+) -> crate::Result<serde_json::Value> {
+    let value = conn.raw_json(sql_info, features, inputs).await?;
 
     Ok(value)
 }

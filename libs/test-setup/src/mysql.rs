@@ -31,7 +31,10 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
             .first()
             .ok_or_else(|| "Got an empty result set when fetching metadata".to_owned())?;
 
-        if let Some(1) = first_row.get("lower_cases_table_names").and_then(|lctn| lctn.as_i64()) {
+        if let Some(1) = first_row
+            .get("lower_cases_table_names")
+            .and_then(|lctn| lctn.as_integer())
+        {
             tags |= Tags::LowerCasesTableNames;
         }
 
