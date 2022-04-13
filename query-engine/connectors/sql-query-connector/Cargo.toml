@@ -53,6 +53,7 @@ version = "0.4"
 
 [dependencies.datamodel]
 path = "../../../libs/datamodel/core"
+features = ["full"]
 
 [dependencies.serde]
 features = ["derive"]

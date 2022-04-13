@@ -636,6 +636,17 @@ dependencies = [
 [[package]]
 name = "cuid"
 version = "0.1.0"
+source = "git+https://github.com/prisma/cuid-rust?branch=wasm_stub#e61b55588451c6a89423db67b824a1891c0bbd3e"
+dependencies = [
+ "hostname 0.1.5",
+ "lazy_static",
+ "parking_lot 0.10.2",
+ "rand 0.7.3",
+]
+
+[[package]]
+name = "cuid"
+version = "0.1.0"
 source = "git+https://github.com/prisma/cuid-rust#4ffb2e47c772af62fed3ddc92bb7fc444d19e159"
 dependencies = [
  "hostname 0.1.5",
@@ -822,7 +833,7 @@ name = "dml"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "cuid",
+ "cuid 0.1.0 (git+https://github.com/prisma/cuid-rust?branch=wasm_stub)",
  "enumflags2",
  "indoc",
  "native-types",
@@ -1265,8 +1276,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d39cd93900197114fa1fcb7ae84ca742095eed9442088988ae74fa744e930e77"
 dependencies = [
  "cfg-if 1.0.0",
+ "js-sys",
  "libc",
  "wasi 0.10.2+wasi-snapshot-preview1",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -2267,7 +2280,7 @@ dependencies = [
  "async-trait",
  "bigdecimal 0.2.2",
  "chrono",
- "cuid",
+ "cuid 0.1.0 (git+https://github.com/prisma/cuid-rust)",
  "datamodel",
  "futures",
  "indexmap",
@@ -3004,17 +3017,14 @@ version = "0.0.0"
 dependencies = [
  "bigdecimal 0.2.2",
  "chrono",
- "cuid",
  "datamodel",
  "itertools",
  "once_cell",
  "prisma-value",
- "rand 0.7.3",
  "serde",
  "serde_derive",
  "serde_json",
  "thiserror",
- "uuid",
 ]
 
 [[package]]
@@ -3221,7 +3231,7 @@ dependencies = [
  "chrono",
  "connection-string",
  "crossbeam-queue 0.2.3",
- "cuid",
+ "cuid 0.1.0 (git+https://github.com/prisma/cuid-rust)",
  "datamodel",
  "datamodel-connector",
  "futures",
@@ -3710,7 +3720,6 @@ dependencies = [
 name = "schema"
 version = "0.1.0"
 dependencies = [
- "datamodel",
  "datamodel-connector",
  "once_cell",
  "prisma-models",
@@ -4118,7 +4127,7 @@ dependencies = [
  "async-trait",
  "bigdecimal 0.2.2",
  "chrono",
- "cuid",
+ "cuid 0.1.0 (git+https://github.com/prisma/cuid-rust)",
  "datamodel",
  "futures",
  "itertools",

@@ -1,8 +1,7 @@
 use super::*;
-use datamodel::common::preview_features::PreviewFeature;
 use datamodel_connector::{ConnectorCapability, ReferentialIntegrity};
 use fmt::Debug;
-use prisma_models::{InternalDataModelRef, ModelRef};
+use prisma_models::{datamodel::common::preview_features::PreviewFeature, InternalDataModelRef, ModelRef};
 use std::{borrow::Borrow, fmt};
 
 /// The query schema.
