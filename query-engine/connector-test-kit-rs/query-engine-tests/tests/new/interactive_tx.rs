@@ -136,7 +136,7 @@ mod interactive_tx {
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
-          run_query!(&runner, fmt_execute_raw("INSERT INTO \"TestModel\"(id, field) VALUES ($1, $2)", vec![PrismaValue::Int(1), PrismaValue::String("Test".to_owned())])),
+          run_query!(&runner, fmt_execute_raw("INSERT INTO \"TestModel\"(id, field) VALUES ($1, $2)", vec![RawValue::scalar(1_i32), RawValue::scalar("Test")])),
           @r###"{"data":{"executeRaw":1}}"###
         );
 
