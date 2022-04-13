@@ -3,7 +3,6 @@ use super::*;
 use constants::args;
 use datamodel_connector::ConnectorCapability;
 
-#[tracing::instrument(skip(ctx, model, parent_field))]
 pub(crate) fn update_one_input_types(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -21,7 +20,6 @@ pub(crate) fn update_one_input_types(
 }
 
 /// Builds "<x>UpdateInput" input object type.
-#[tracing::instrument(skip(ctx, model, parent_field))]
 fn checked_update_one_input_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -47,7 +45,6 @@ fn checked_update_one_input_type(
 }
 
 /// Builds "<x>UncheckedUpdateInput" input object type.
-#[tracing::instrument(skip(ctx, model, parent_field))]
 fn unchecked_update_one_input_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -185,71 +182,8 @@ pub(super) fn filter_unchecked_update_fields(
         .collect()
 }
 
-/// For unchecked update input types only. Compute input fields for checked relational fields.
-#[tracing::instrument(skip(ctx, model, parent_field))]
-fn relation_input_fields_for_unchecked_update_one(
-    ctx: &mut BuilderContext,
-    model: &ModelRef,
-    parent_field: Option<&RelationFieldRef>,
-) -> Vec<InputField> {
-    model
-        .fields()
-        .relation()
-        .into_iter()
-        .filter_map(|rf| {
-            let related_model = rf.related_model();
-            let related_field = rf.related_field();
-
-            // Compute input object name
-            let arity_part = match (rf.is_list(), rf.is_required()) {
-                (true, _) => "Many",
-                (false, true) => "OneRequired",
-                (false, false) => "One",
-            };
-
-            let without_part = format!("Without{}", capitalize(&related_field.name));
-            let ident = Identifier::new(
-                format!(
-                    "{}UncheckedUpdate{}{}Input",
-                    related_model.name, arity_part, without_part
-                ),
-                PRISMA_NAMESPACE,
-            );
-
-            let field_is_opposite_relation_field =
-                parent_field.filter(|pf| pf.related_field().name == rf.name).is_some();
-
-            // Filter out all inlined relations on `related_model`.
-            // -> Only relations that point to other models are allowed in the unchecked input.
-            if field_is_opposite_relation_field || !related_field.is_inlined_on_enclosing_model() {
-                None
-            } else {
-                let input_object = match ctx.get_input_type(&ident) {
-                    Some(t) => t,
-                    None => {
-                        let input_object = Arc::new(init_input_object_type(ident.clone()));
-                        ctx.cache_input_type(ident, input_object.clone());
-
-                        // Enqueue the nested update input for its fields to be
-                        // created at a later point, to avoid recursing too deep
-                        // (that has caused stack overflows on large schemas in
-                        // the past).
-                        ctx.nested_update_inputs_queue
-                            .push((Arc::clone(&input_object), Arc::clone(&rf)));
-
-                        Arc::downgrade(&input_object)
-                    }
-                };
-
-                Some(input_field(rf.name.clone(), InputType::object(input_object), None).optional())
-            }
-        })
-        .collect()
-}
-
 /// Builds "<x>UpdateWithWhereUniqueNestedInput" / "<x>UpdateWithWhereUniqueWithout<y>Input" input object types.
 /// Simple combination object of "where" and "data".
-#[tracing::instrument(skip(ctx, update_types, parent_field))]
 pub(crate) fn update_one_where_combination_object(
     ctx: &mut BuilderContext,
     update_types: Vec<InputType>,

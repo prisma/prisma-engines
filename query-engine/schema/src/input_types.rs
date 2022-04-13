@@ -267,3 +267,9 @@ impl InputType {
         }
     }
 }
+
+impl Into<Vec<InputType>> for InputType {
+    fn into(self) -> Vec<InputType> {
+        vec![self]
+    }
+}
