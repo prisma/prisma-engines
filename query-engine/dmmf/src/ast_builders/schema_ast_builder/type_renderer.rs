@@ -1,7 +1,6 @@
 use super::{DmmfTypeReference, RenderContext, TypeLocation};
-use query_core::schema::{InputType, IntoArc, OutputType, ScalarType};
+use schema::{InputType, IntoArc, OutputType, ScalarType};
 
-// WIP dedup code
 pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderContext) -> DmmfTypeReference {
     match output_type {
         OutputType::Object(ref obj) => {

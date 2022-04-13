@@ -1,18 +1,10 @@
-use crate::{Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex};
+use crate::serialization_ast::datamodel_ast::{
+    Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
+};
 use bigdecimal::ToPrimitive;
 use datamodel::dml::{self, CompositeTypeFieldType, FieldType, Ignorable, PrismaValue, ScalarType};
 
-pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
-    let dmmf = schema_to_dmmf(schema);
-    serde_json::to_string_pretty(&dmmf).expect("Failed to render JSON")
-}
-
-pub fn render_to_dmmf_value(schema: &dml::Datamodel) -> serde_json::Value {
-    let dmmf = schema_to_dmmf(schema);
-    serde_json::to_value(&dmmf).expect("Failed to render JSON")
-}
-
-fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
+pub fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
     let mut datamodel = Datamodel {
         models: vec![],
         enums: vec![],
@@ -280,5 +272,75 @@ fn get_relation_delete_strategy(field: &dml::Field) -> Option<String> {
     match &field {
         dml::Field::RelationField(rf) => rf.relation_info.on_delete.map(|ri| ri.to_string()),
         _ => None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::schema_to_dmmf;
+    use datamodel::dml::Datamodel;
+    use pretty_assertions::assert_eq;
+    use std::fs;
+
+    pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
+        match datamodel::parse_datamodel(datamodel_string) {
+            Ok(s) => s.subject,
+            Err(errs) => {
+                panic!(
+                    "Datamodel parsing failed\n\n{}",
+                    errs.to_pretty_string("", datamodel_string)
+                )
+            }
+        }
+    }
+
+    fn render_to_dmmf(schema: &datamodel::dml::Datamodel) -> String {
+        let dmmf = schema_to_dmmf(schema);
+        serde_json::to_string_pretty(&dmmf).expect("Failed to render JSON")
+    }
+
+    // fn render_to_dmmf_value(schema: &datamodel::dml::Datamodel) -> serde_json::Value {
+    //     let dmmf = schema_to_dmmf(schema);
+    //     serde_json::to_value(&dmmf).expect("Failed to render JSON")
+    // }
+
+    #[test]
+    fn test_dmmf_rendering() {
+        let test_cases = vec![
+            "general",
+            "functions",
+            "source",
+            "source_with_comments",
+            "source_with_generator",
+            "without_relation_name",
+            "ignore",
+        ];
+
+        for test_case in test_cases {
+            println!("TESTING: {}", test_case);
+
+            let datamodel_string = load_from_file(format!("{}.prisma", test_case).as_str());
+            let dml = parse(&datamodel_string);
+            let dmmf_string = render_to_dmmf(&dml);
+
+            assert_eq_json(
+                &dmmf_string,
+                &load_from_file(format!("{}.json", test_case).as_str()),
+                test_case,
+            );
+        }
+    }
+
+    #[track_caller]
+    fn assert_eq_json(a: &str, b: &str, msg: &str) {
+        let json_a: serde_json::Value = serde_json::from_str(a).expect("The String a was not valid JSON.");
+        let json_b: serde_json::Value = serde_json::from_str(b).expect("The String b was not valid JSON.");
+
+        assert_eq!(json_a, json_b, "{}", msg);
+    }
+
+    fn load_from_file(file: &str) -> String {
+        let samples_folder_path = concat!(env!("CARGO_MANIFEST_DIR"), "/test_files");
+        fs::read_to_string(format!("{}/{}", samples_folder_path, file)).unwrap()
     }
 }

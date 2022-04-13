@@ -1,25 +1,21 @@
-mod ast;
 mod enum_renderer;
-
 mod field_renderer;
 mod object_renderer;
 mod schema_renderer;
 mod type_renderer;
 
-use super::{DmmfModelOperations, DmmfOperationMappings};
+use crate::serialization_ast::{mappings_ast::*, schema_ast::*};
 use enum_renderer::*;
 use field_renderer::*;
 use indexmap::map::Entry;
 use object_renderer::*;
-use query_core::schema::*;
+use schema::*;
 use schema_renderer::*;
 use std::{
     collections::HashSet,
     sync::{Arc, Weak},
 };
 use type_renderer::*;
-
-pub use ast::*;
 
 pub struct DmmfQuerySchemaRenderer;
 

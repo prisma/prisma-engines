@@ -1,5 +1,4 @@
 use super::*;
-use schema_builder::constants::args;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -7,6 +6,7 @@ use crate::{
 };
 use connector::Filter;
 use prisma_models::{ModelRef, RelationFieldRef};
+use schema_builder::constants::args;
 use std::{convert::TryInto, sync::Arc};
 
 /// Handles nested update (single record) cases.

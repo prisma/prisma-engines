@@ -839,8 +839,12 @@ dependencies = [
  "bigdecimal 0.2.2",
  "datamodel",
  "expect-test",
+ "indexmap",
  "indoc",
  "pretty_assertions",
+ "prisma-models",
+ "schema",
+ "schema-builder",
  "serde",
  "serde_json",
 ]

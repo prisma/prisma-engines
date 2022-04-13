@@ -2,7 +2,7 @@ use super::{
     type_renderer::{render_input_types, render_output_type},
     DmmfInputField, DmmfOutputField, RenderContext,
 };
-use query_core::schema::{InputFieldRef, InputType, OutputFieldRef, ScalarType};
+use schema::{InputFieldRef, InputType, OutputFieldRef, ScalarType};
 
 pub(super) fn render_input_field(input_field: &InputFieldRef, ctx: &mut RenderContext) -> DmmfInputField {
     let type_references = render_input_types(&input_field.field_types, ctx);
