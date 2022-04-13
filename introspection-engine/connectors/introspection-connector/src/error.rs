@@ -4,7 +4,7 @@ use user_facing_errors::KnownError;
 #[derive(Debug, Error)]
 #[error("{}", kind)]
 pub struct ConnectorError {
-    /// An optional error already rendered for users in case the introspection core does not handle it.
+    /// An optional error already rendered for users in case the introspection core does not handle it
     pub user_facing_error: Option<KnownError>,
     /// The error information for internal use.
     pub kind: ErrorKind,
