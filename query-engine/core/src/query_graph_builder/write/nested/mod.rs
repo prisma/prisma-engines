@@ -8,10 +8,10 @@ mod update_nested;
 mod upsert_nested;
 
 use super::*;
+use schema::ConnectorContext;
+use schema_builder::constants::operations;
 use crate::{
-    constants::operations,
-    query_graph::{NodeRef, QueryGraph},
-    ConnectorContext, ParsedInputMap,
+    query_graph::{NodeRef, QueryGraph}, ParsedInputMap,
 };
 use connect_nested::*;
 use connect_or_create_nested::*;

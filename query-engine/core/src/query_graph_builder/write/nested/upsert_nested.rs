@@ -1,5 +1,5 @@
 use super::*;
-use crate::{constants::args, query_graph_builder::write::utils::coerce_vec};
+use crate::query_graph_builder::write::utils::coerce_vec;
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -7,6 +7,7 @@ use crate::{
 };
 use connector::{Filter, IntoFilter};
 use prisma_models::RelationFieldRef;
+use schema_builder::constants::args;
 use std::{convert::TryInto, sync::Arc};
 
 /// Handles a nested upsert.

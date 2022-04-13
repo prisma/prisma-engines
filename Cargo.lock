@@ -3235,6 +3235,8 @@ dependencies = [
  "prisma-models",
  "prisma-value",
  "query-connector",
+ "schema",
+ "schema-builder",
  "serde",
  "serde_json",
  "sql-query-connector",

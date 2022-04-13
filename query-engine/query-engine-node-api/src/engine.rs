@@ -2,7 +2,7 @@ use crate::{error::ApiError, logger::Logger};
 use datamodel::{dml::Datamodel, ValidatedConfiguration};
 use opentelemetry::global;
 use prisma_models::InternalDataModelBuilder;
-use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer, TxId};
+use query_core::{executor, schema_builder, QueryExecutor, schema::{QuerySchema, QuerySchemaRenderer}, TxId};
 use request_handlers::{GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -238,7 +238,6 @@ impl QueryEngine {
 
             let query_schema = schema_builder::build(
                 internal_data_model,
-                BuildMode::Modern,
                 true, // enable raw queries
                 data_source.capabilities(),
                 preview_features,

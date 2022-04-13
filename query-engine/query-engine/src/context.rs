@@ -1,7 +1,7 @@
 use crate::{PrismaError, PrismaResult};
 use datamodel::{dml::Datamodel, Configuration};
 use prisma_models::InternalDataModelBuilder;
-use query_core::{executor, schema::QuerySchemaRef, schema_builder, BuildMode, QueryExecutor};
+use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 use std::{env, fmt, sync::Arc};
 
 /// Prisma request context containing all immutable state of the process.
@@ -40,13 +40,13 @@ impl ContextBuilder {
     }
 
     pub async fn build(self) -> PrismaResult<PrismaContext> {
-        PrismaContext::new(self.config, self.datamodel, self.legacy, self.enable_raw_queries).await
+        PrismaContext::new(self.config, self.datamodel, self.enable_raw_queries).await
     }
 }
 
 impl PrismaContext {
     /// Initializes a new Prisma context.
-    async fn new(config: Configuration, dm: Datamodel, legacy: bool, enable_raw_queries: bool) -> PrismaResult<Self> {
+    async fn new(config: Configuration, dm: Datamodel, enable_raw_queries: bool) -> PrismaResult<Self> {
         // We only support one data source at the moment, so take the first one (default not exposed yet).
         let data_source = config
             .datasources
@@ -63,10 +63,8 @@ impl PrismaContext {
         let internal_data_model = InternalDataModelBuilder::from(&dm).build(db_name);
 
         // Construct query schema
-        let build_mode = if legacy { BuildMode::Legacy } else { BuildMode::Modern };
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
-            build_mode,
             enable_raw_queries,
             data_source.capabilities(),
             preview_features,

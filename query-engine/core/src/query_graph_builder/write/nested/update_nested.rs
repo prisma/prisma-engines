@@ -1,6 +1,6 @@
 use super::*;
+use schema_builder::constants::args;
 use crate::{
-    constants::args,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,

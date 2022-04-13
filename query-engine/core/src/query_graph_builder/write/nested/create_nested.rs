@@ -1,6 +1,5 @@
 use super::*;
 use crate::{
-    constants::args,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     write::write_args_parser::WriteArgsParser,
@@ -8,6 +7,7 @@ use crate::{
 };
 use connector::{Filter, IntoFilter};
 use prisma_models::{ModelRef, RelationFieldRef};
+use schema_builder::constants::args;
 use std::{convert::TryInto, sync::Arc};
 
 /// Handles nested create one cases.

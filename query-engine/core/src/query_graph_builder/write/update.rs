@@ -1,5 +1,5 @@
 use super::*;
-use crate::{constants::args, query_graph_builder::write::write_args_parser::*, ConnectorContext};
+use crate::query_graph_builder::write::write_args_parser::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -7,6 +7,8 @@ use crate::{
 };
 use connector::{Filter, IntoFilter};
 use prisma_models::ModelRef;
+use schema::ConnectorContext;
+use schema_builder::constants::args;
 use std::{convert::TryInto, sync::Arc};
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.

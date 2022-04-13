@@ -1,5 +1,5 @@
 use indexmap::IndexMap;
-use query_core::Deprecation;
+use query_core::schema::Deprecation;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
