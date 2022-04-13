@@ -3,9 +3,6 @@ edition = "2021"
 name = "prisma-models"
 version = "0.0.0"
 
-# [features]
-# js = ["datamodel/js"] # , "uuid/wasm-bindgen"
-
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
 datamodel = { path = "../../libs/datamodel/core" }

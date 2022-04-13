@@ -29,5 +29,5 @@ native-types = { path = "../../native-types" }
 pretty_assertions = "0.6.1"
 
 [features]
-full = ["dml/full"]
-# js = ["dml/js"]
+default_generators = ["dml/default_generators"]
+
