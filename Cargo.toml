@@ -29,6 +29,7 @@ members = [
   "query-engine/request-handlers",
   "query-engine/schema",
   "query-engine/schema-builder",
+  "query-engine/getdmmf_proto",
   "prisma-fmt",
   "libs/datamodel/core",
   "libs/datamodel/diagnostics",

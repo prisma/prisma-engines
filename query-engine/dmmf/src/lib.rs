@@ -8,6 +8,11 @@ use prisma_models::InternalDataModelBuilder;
 use schema::{QuerySchemaRef, QuerySchemaRenderer};
 use std::sync::Arc;
 
+pub fn dmmf_json_from_schema(schema: &str) -> String {
+    let dmmf = dmmf_from_schema(schema);
+    serde_json::to_string(&dmmf).unwrap()
+}
+
 // enable raw param?
 pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
     let (config, dml) = datamodel::parse_schema(schema).unwrap();
