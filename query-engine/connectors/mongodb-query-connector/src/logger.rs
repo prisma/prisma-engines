@@ -1,5 +1,4 @@
 use crate::query_builder::MongoReadQuery;
-use itertools::Itertools;
 use mongodb::{
     bson::{Bson, Document},
     options::FindOptions,
