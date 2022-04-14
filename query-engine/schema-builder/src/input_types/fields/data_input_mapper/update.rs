@@ -132,7 +132,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                 // (that has caused stack overflows on large schemas in
                 // the past).
                 ctx.nested_update_inputs_queue
-                    .push((Arc::clone(&input_object), Arc::clone(&rf)));
+                    .push((Arc::clone(&input_object), Arc::clone(rf)));
 
                 Arc::downgrade(&input_object)
             }

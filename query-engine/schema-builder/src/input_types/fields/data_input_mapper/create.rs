@@ -18,7 +18,7 @@ impl CreateDataInputFieldMapper {
 
 impl DataInputFieldMapper for CreateDataInputFieldMapper {
     fn map_scalar(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
-        let typ = map_scalar_input_type_for_field(ctx, &sf);
+        let typ = map_scalar_input_type_for_field(ctx, sf);
         let supports_advanced_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
 
         match &sf.type_identifier {
@@ -40,7 +40,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
     }
 
     fn map_scalar_list(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
-        let typ = map_scalar_input_type_for_field(ctx, &sf);
+        let typ = map_scalar_input_type_for_field(ctx, sf);
         let ident = Identifier::new(
             format!("{}Create{}Input", sf.container.name(), sf.name),
             PRISMA_NAMESPACE,
@@ -93,7 +93,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
                 // (that has caused stack overflows on large schemas in
                 // the past).
                 ctx.nested_create_inputs_queue
-                    .push((Arc::clone(&input_object), Arc::clone(&rf)));
+                    .push((Arc::clone(&input_object), Arc::clone(rf)));
 
                 Arc::downgrade(&input_object)
             }

@@ -4,7 +4,7 @@ use prisma_models::PrismaValue;
 use prisma_value::ConversionFailure;
 use quaint::Value;
 
-pub fn to_prisma_value<'a>(quaint_value: Value<'a>) -> crate::Result<PrismaValue> {
+pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
     let val = match quaint_value {
         Value::Integer(i) => i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
 

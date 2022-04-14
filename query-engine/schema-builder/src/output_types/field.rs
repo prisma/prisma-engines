@@ -5,8 +5,8 @@ use prisma_models::{CompositeFieldRef, ScalarFieldRef};
 pub(crate) fn map_output_field(ctx: &mut BuilderContext, model_field: &ModelField) -> OutputField {
     field(
         model_field.name(),
-        arguments::many_records_output_field_arguments(ctx, &model_field),
-        map_field_output_type(ctx, &model_field),
+        arguments::many_records_output_field_arguments(ctx, model_field),
+        map_field_output_type(ctx, model_field),
         None,
     )
     .nullable_if(!model_field.is_required())
@@ -30,7 +30,7 @@ pub(crate) fn map_scalar_output_type(ctx: &mut BuilderContext, typ: &TypeIdentif
         TypeIdentifier::Float => OutputType::float(),
         TypeIdentifier::Decimal => OutputType::decimal(),
         TypeIdentifier::Boolean => OutputType::boolean(),
-        TypeIdentifier::Enum(e) => map_enum_type(ctx, &e).into(),
+        TypeIdentifier::Enum(e) => map_enum_type(ctx, e).into(),
         TypeIdentifier::Json => OutputType::json(),
         TypeIdentifier::DateTime => OutputType::date_time(),
         TypeIdentifier::UUID => OutputType::uuid(),

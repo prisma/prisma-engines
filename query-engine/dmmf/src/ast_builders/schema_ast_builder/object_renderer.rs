@@ -30,7 +30,7 @@ impl DmmfObjectRenderer {
         let mut rendered_fields = Vec::with_capacity(fields.len());
 
         for field in fields {
-            rendered_fields.push(render_input_field(&field, ctx));
+            rendered_fields.push(render_input_field(field, ctx));
         }
 
         let input_type = DmmfInputType {
@@ -59,7 +59,7 @@ impl DmmfObjectRenderer {
         let mut rendered_fields: Vec<DmmfOutputField> = Vec::with_capacity(fields.len());
 
         for field in fields {
-            rendered_fields.push(render_output_field(&field, ctx))
+            rendered_fields.push(render_output_field(field, ctx))
         }
 
         let output_type = DmmfOutputType {

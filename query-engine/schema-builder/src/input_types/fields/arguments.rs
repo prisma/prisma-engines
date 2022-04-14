@@ -14,7 +14,7 @@ pub(crate) fn where_argument(ctx: &mut BuilderContext, model: &ModelRef) -> Inpu
 
 /// Builds "where" argument which input type is the where unique type of the input builder.
 pub(crate) fn where_unique_argument(ctx: &mut BuilderContext, model: &ModelRef) -> Option<InputField> {
-    let input_object_type = filter_objects::where_unique_object_type(ctx, &model);
+    let input_object_type = filter_objects::where_unique_object_type(ctx, model);
 
     if input_object_type.into_arc().is_empty() {
         None
@@ -131,7 +131,7 @@ pub(crate) fn relation_selection_arguments(
     };
 
     let mut args = vec![
-        where_argument(ctx, &model),
+        where_argument(ctx, model),
         order_by_argument(ctx, &model.into(), &order_by_options),
         input_field(args::CURSOR, unique_input_type, None).optional(),
         input_field(args::TAKE, InputType::int(), None).optional(),
@@ -179,7 +179,7 @@ pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> 
     let field_enum_type = InputType::Enum(model_field_enum(model));
 
     vec![
-        where_argument(ctx, &model),
+        where_argument(ctx, model),
         order_by_argument(ctx, &model.into(), &OrderByOptions::new().with_aggregates()),
         input_field(
             args::BY,

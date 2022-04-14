@@ -95,47 +95,31 @@ fn compute_scalar_aggregation_fields(ctx: &mut BuilderContext, container: &Paren
         .flat_map(ModelField::into_scalar)
         .collect::<Vec<ScalarFieldRef>>();
 
-    let mut fields = vec![];
-
-    fields.push(order_by_field_aggregate(
-        aggregations::UNDERSCORE_COUNT,
-        "Count",
-        ctx,
-        container,
-        scalar_fields,
-    ));
-
-    fields.push(order_by_field_aggregate(
-        aggregations::UNDERSCORE_AVG,
-        "Avg",
-        ctx,
-        container,
-        numeric_fields.clone(),
-    ));
-
-    fields.push(order_by_field_aggregate(
-        aggregations::UNDERSCORE_MAX,
-        "Max",
-        ctx,
-        container,
-        non_list_nor_json_fields.clone(),
-    ));
-
-    fields.push(order_by_field_aggregate(
-        aggregations::UNDERSCORE_MIN,
-        "Min",
-        ctx,
-        container,
-        non_list_nor_json_fields,
-    ));
-
-    fields.push(order_by_field_aggregate(
-        aggregations::UNDERSCORE_SUM,
-        "Sum",
-        ctx,
-        container,
-        numeric_fields,
-    ));
+    let fields = vec![
+        order_by_field_aggregate(aggregations::UNDERSCORE_COUNT, "Count", ctx, container, scalar_fields),
+        order_by_field_aggregate(
+            aggregations::UNDERSCORE_AVG,
+            "Avg",
+            ctx,
+            container,
+            numeric_fields.clone(),
+        ),
+        order_by_field_aggregate(
+            aggregations::UNDERSCORE_MAX,
+            "Max",
+            ctx,
+            container,
+            non_list_nor_json_fields.clone(),
+        ),
+        order_by_field_aggregate(
+            aggregations::UNDERSCORE_MIN,
+            "Min",
+            ctx,
+            container,
+            non_list_nor_json_fields,
+        ),
+        order_by_field_aggregate(aggregations::UNDERSCORE_SUM, "Sum", ctx, container, numeric_fields),
+    ];
 
     fields.into_iter().flatten().collect()
 }

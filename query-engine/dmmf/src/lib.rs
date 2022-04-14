@@ -36,7 +36,7 @@ pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
 
 pub fn from_precomputed_parts(dml: &datamodel::dml::Datamodel, query_schema: QuerySchemaRef) -> DataModelMetaFormat {
     let (schema, mappings) = DmmfQuerySchemaRenderer::render(query_schema);
-    let data_model = schema_to_dmmf(&dml);
+    let data_model = schema_to_dmmf(dml);
 
     DataModelMetaFormat {
         data_model,

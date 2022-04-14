@@ -49,6 +49,7 @@ impl<T: Debug> TypeRefCache<T> {
 }
 
 /// Consumes the cache and returns all contents as vector of the cached values.
+#[allow(clippy::from_over_into)]
 impl<T> Into<Vec<Arc<T>>> for TypeRefCache<T> {
     fn into(self) -> Vec<Arc<T>> {
         let mut vec: Vec<Arc<T>> = vec![];

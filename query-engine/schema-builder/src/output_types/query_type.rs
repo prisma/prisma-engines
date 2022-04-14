@@ -41,9 +41,9 @@ fn find_unique_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
         field(
             field_name,
             vec![arg],
-            OutputType::object(objects::model::map_type(ctx, &model)),
+            OutputType::object(objects::model::map_type(ctx, model)),
             Some(QueryInfo {
-                model: Some(Arc::clone(&model)),
+                model: Some(Arc::clone(model)),
                 tag: QueryTag::FindUnique,
             }),
         )
@@ -53,15 +53,15 @@ fn find_unique_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
 
 /// Builds a find first item field for given model.
 fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::relation_selection_arguments(ctx, &model, true);
+    let args = arguments::relation_selection_arguments(ctx, model, true);
     let field_name = format!("findFirst{}", model.name);
 
     field(
         field_name,
         args,
-        OutputType::object(objects::model::map_type(ctx, &model)),
+        OutputType::object(objects::model::map_type(ctx, model)),
         Some(QueryInfo {
-            model: Some(Arc::clone(&model)),
+            model: Some(Arc::clone(model)),
             tag: QueryTag::FindFirst,
         }),
     )
@@ -70,16 +70,16 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 
 /// Builds a "multiple" query arity items field (e.g. "users", "posts", ...) for given model.
 fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::relation_selection_arguments(ctx, &model, true);
+    let args = arguments::relation_selection_arguments(ctx, model, true);
     let field_name = format!("findMany{}", model.name);
-    let object_type = objects::model::map_type(ctx, &model);
+    let object_type = objects::model::map_type(ctx, model);
 
     field(
         field_name,
         args,
         OutputType::list(OutputType::object(object_type)),
         Some(QueryInfo {
-            model: Some(Arc::clone(&model)),
+            model: Some(Arc::clone(model)),
             tag: QueryTag::FindMany,
         }),
     )
@@ -89,10 +89,10 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     field(
         format!("aggregate{}", model.name),
-        arguments::relation_selection_arguments(ctx, &model, false),
-        OutputType::object(aggregation::plain::aggregation_object_type(ctx, &model)),
+        arguments::relation_selection_arguments(ctx, model, false),
+        OutputType::object(aggregation::plain::aggregation_object_type(ctx, model)),
         Some(QueryInfo {
-            model: Some(Arc::clone(&model)),
+            model: Some(Arc::clone(model)),
             tag: QueryTag::Aggregate,
         }),
     )
@@ -102,12 +102,12 @@ fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Output
 fn group_by_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     field(
         format!("groupBy{}", model.name),
-        arguments::group_by_arguments(ctx, &model),
+        arguments::group_by_arguments(ctx, model),
         OutputType::list(OutputType::object(aggregation::group_by::group_by_output_object_type(
-            ctx, &model,
+            ctx, model,
         ))),
         Some(QueryInfo {
-            model: Some(Arc::clone(&model)),
+            model: Some(Arc::clone(model)),
             tag: QueryTag::GroupBy,
         }),
     )

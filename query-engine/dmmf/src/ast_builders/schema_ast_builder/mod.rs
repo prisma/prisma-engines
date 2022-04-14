@@ -125,7 +125,7 @@ impl RenderContext {
                     .find(|mapping| mapping.model_name == model_name);
 
                 match model_op {
-                    Some(ref existing) => existing.add_operation(tag_str, name),
+                    Some(existing) => existing.add_operation(tag_str, name),
                     None => {
                         let new_mapping = DmmfModelOperations::new(model_name);
 

@@ -97,10 +97,9 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
 
     // TODO (dom): This can probably be collapsed into just uniques and pks
     // Single unique or ID fields.
-    let unique_fields: Vec<ScalarFieldRef> = model.fields().scalar().into_iter().filter(|f| f.unique()).collect();
+    let unique_fields = model.fields().scalar().into_iter().filter(|f| f.unique());
 
     let mut fields: Vec<InputField> = unique_fields
-        .into_iter()
         .map(|sf| {
             let name = sf.name.clone();
             let typ = map_scalar_input_type_for_field(ctx, &sf);
@@ -185,7 +184,7 @@ pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &Composite
     let mut fields = vec![];
 
     let input_fields = cf.typ.fields().iter().map(|f| match f {
-        ModelField::Scalar(sf) => input_field(sf.name.clone(), map_scalar_input_type_for_field(ctx, &sf), None)
+        ModelField::Scalar(sf) => input_field(sf.name.clone(), map_scalar_input_type_for_field(ctx, sf), None)
             .optional_if(!sf.is_required())
             .nullable_if(!sf.is_required() && !sf.is_list()),
 
