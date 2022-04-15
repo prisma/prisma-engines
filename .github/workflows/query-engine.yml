@@ -10,7 +10,7 @@ on:
       - 'LICENSE'
       - 'CODEOWNERS'
       - 'renovate.json'
-  
+
 env:
   LOG_LEVEL: "info"
   LOG_QUERIES: "y"
@@ -62,7 +62,7 @@ jobs:
         database:
           - "cockroach"
 
-    runs-on: [self-hosted, buildjet-4vcpu-ubuntu-2004]
+    runs-on: buildjet-4vcpu-ubuntu-2004 # ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
@@ -80,3 +80,4 @@ jobs:
           SIMPLE_TEST_MODE: 1
           QUERY_BATCH_SIZE: 10
           CLOSED_TX_CLEANUP: 2
+
