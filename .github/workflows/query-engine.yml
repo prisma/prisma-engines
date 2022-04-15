@@ -62,7 +62,7 @@ jobs:
         database:
           - "cockroach"
 
-    runs-on: ubuntu-latest # [self-hosted, buildjet-4vcpu-ubuntu-2004]
+    runs-on: buildjet-4vcpu-ubuntu-2004 # ubuntu-latest # [self-hosted, buildjet-4vcpu-ubuntu-2004]
     steps:
       - uses: actions/checkout@v2
 
