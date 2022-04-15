@@ -6,13 +6,14 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use datamodel::Datasource;
+use datamodel::{common::preview_features::PreviewFeature, Datasource};
 use quaint::{connector::SqliteParams, error::ErrorKind as QuaintKind, pooled::Quaint, prelude::ConnectionInfo};
 use std::{convert::TryFrom, time::Duration};
 
 pub struct Sqlite {
     pool: Quaint,
     file_path: String,
+    features: Option<Vec<PreviewFeature>>,
 }
 
 impl Sqlite {
@@ -22,6 +23,16 @@ impl Sqlite {
 
     fn connection_info(&self) -> &ConnectionInfo {
         self.pool.connection_info()
+    }
+
+    /// Set the sqlite's features.
+    pub fn set_features(&mut self, features: &[PreviewFeature]) {
+        self.features = Some(features.to_vec());
+    }
+
+    /// Get SQLite's features.
+    pub fn features(&self) -> &[PreviewFeature] {
+        self.features.as_ref().expect("SQLite preview features aren't set")
     }
 }
 
@@ -53,7 +64,11 @@ impl FromSource for Sqlite {
 
         let pool = builder.build();
 
-        Ok(Sqlite { pool, file_path })
+        Ok(Sqlite {
+            pool,
+            file_path,
+            features: None,
+        })
     }
 }
 
@@ -71,7 +86,7 @@ impl Connector for Sqlite {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info().clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::new(conn, self.connection_info());
+            let conn = SqlConnection::new(conn, self.connection_info(), self.features());
 
             Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })

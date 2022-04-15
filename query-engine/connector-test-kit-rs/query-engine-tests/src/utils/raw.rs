@@ -1,6 +1,6 @@
-use anyhow::Result;
 use chrono::{DateTime, FixedOffset};
 use prisma_value::encode_bytes;
+use query_tests_setup::{TestError, TestResult};
 
 pub fn fmt_query_raw(query: &str, params: Vec<RawValue>) -> String {
     let params = params_to_json(params);
@@ -13,7 +13,7 @@ pub fn fmt_query_raw(query: &str, params: Vec<RawValue>) -> String {
     )
 }
 
-pub fn fmt_execute_raw<T>(query: &str, params: Vec<RawValue>) -> String {
+pub fn fmt_execute_raw(query: &str, params: Vec<RawValue>) -> String {
     let params = params_to_json(params);
     let params = serde_json::to_string(&params).unwrap();
 
@@ -29,12 +29,15 @@ pub enum RawValue {
     Bytes(Vec<u8>),
     BigInt(i64),
     Decimal(String),
+    Array(Vec<RawValue>),
     Scalar(serde_json::Value),
 }
 
 impl RawValue {
-    pub fn try_datetime(s: &str) -> Result<Self> {
-        Ok(Self::DateTime(DateTime::parse_from_rfc3339(s)?))
+    pub fn try_datetime(s: &str) -> TestResult<Self> {
+        let datetime = DateTime::parse_from_rfc3339(s).map_err(|err| TestError::ParseError(err.to_string()))?;
+
+        Ok(Self::DateTime(datetime))
     }
 
     pub fn bytes(bytes: &[u8]) -> Self {
@@ -47,6 +50,12 @@ impl RawValue {
 
     pub fn decimal(dec: &str) -> Self {
         Self::Decimal(dec.to_owned())
+    }
+
+    pub fn array(arr: Vec<impl Into<RawValue>>) -> Self {
+        let arr: Vec<_> = arr.into_iter().map(Into::into).collect();
+
+        Self::Array(arr)
     }
 
     pub fn scalar(val: impl Into<serde_json::Value>) -> Self {
@@ -78,10 +87,15 @@ raw_value_from!(String, &str, i32, i64, bool, f32, f64);
 impl From<RawValue> for serde_json::Value {
     fn from(val: RawValue) -> Self {
         match val {
-            RawValue::DateTime(dt) => scalar_type("datetime", dt.to_rfc3339()),
+            RawValue::DateTime(dt) => scalar_type("date", dt.to_rfc3339()),
             RawValue::Bytes(bytes) => scalar_type("bytes", encode_bytes(&bytes)),
             RawValue::BigInt(b_int) => scalar_type("bigint", b_int.to_string()),
             RawValue::Decimal(dec) => scalar_type("decimal", dec.as_str()),
+            RawValue::Array(values) => {
+                let json_values: Vec<_> = values.into_iter().map(|v| serde_json::Value::from(v)).collect();
+
+                serde_json::Value::Array(json_values)
+            }
             RawValue::Scalar(v) => v,
         }
     }

@@ -30,13 +30,20 @@ pub trait DatamodelRenderer {
 }
 
 /// Render the complete datamodel with all bells and whistles.
-pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template: String) -> String {
+pub fn render_test_datamodel(
+    config: &TestConfig,
+    test_database: &str,
+    template: String,
+    excluded_features: &[&str],
+) -> String {
     let tag = config.test_connector_tag().unwrap();
+    let excluded_features: Vec<_> = excluded_features.into_iter().map(|f| format!(r#""{}""#, f)).collect();
     let all_features = GENERATOR
         .active_features()
         .iter()
         .chain(GENERATOR.hidden_features())
         .map(|f| format!(r#""{}""#, f))
+        .filter(|f| !excluded_features.contains(f))
         .join(", ");
 
     let datasource_with_generator = format!(

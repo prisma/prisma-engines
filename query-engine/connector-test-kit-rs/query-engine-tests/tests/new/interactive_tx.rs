@@ -142,7 +142,7 @@ mod interactive_tx {
 
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw("SELECT * FROM \"TestModel\"", vec![])),
-          @r###"{"data":{"queryRaw":[{"id":1,"field":"Test"}]}}"###
+          @r###"{"data":{"queryRaw":[{"id":{"prisma__type":"integer","prisma__value":1},"field":{"prisma__type":"string","prisma__value":"Test"}}]}}"###
         );
 
         let res = runner.commit_tx(tx_id.clone()).await?;
@@ -152,7 +152,7 @@ mod interactive_tx {
         // Data still there after commit.
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw("SELECT * FROM \"TestModel\"", vec![])),
-          @r###"{"data":{"queryRaw":[{"id":1,"field":"Test"}]}}"###
+          @r###"{"data":{"queryRaw":[{"id":{"prisma__type":"integer","prisma__value":1},"field":{"prisma__type":"string","prisma__value":"Test"}}]}}"###
         );
 
         Ok(())

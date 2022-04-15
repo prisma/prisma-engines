@@ -5,13 +5,26 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use datamodel::Datasource;
+use datamodel::{common::preview_features::PreviewFeature, Datasource};
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
 pub struct PostgreSql {
     pool: Quaint,
     connection_info: ConnectionInfo,
+    features: Option<Vec<PreviewFeature>>,
+}
+
+impl PostgreSql {
+    /// Set the PostgreSQL's preview features.
+    pub fn set_features(&mut self, features: &[PreviewFeature]) {
+        self.features = Some(features.to_vec());
+    }
+
+    /// Get PostgreSQL's preview features.
+    pub fn features(&self) -> &[PreviewFeature] {
+        self.features.as_ref().expect("Postgres preview features aren't set")
+    }
 }
 
 #[async_trait]
@@ -35,7 +48,11 @@ impl FromSource for PostgreSql {
 
         let pool = builder.build();
         let connection_info = pool.connection_info().to_owned();
-        Ok(PostgreSql { pool, connection_info })
+        Ok(PostgreSql {
+            pool,
+            connection_info,
+            features: None,
+        })
     }
 }
 
@@ -45,7 +62,7 @@ impl Connector for PostgreSql {
     async fn get_connection<'a>(&'a self) -> connector_interface::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::new(conn, &self.connection_info);
+            let conn = SqlConnection::new(conn, &self.connection_info, self.features());
             Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })
         .await

@@ -64,6 +64,7 @@ features!(
     ExtendedIndexes,
     Cockroachdb,
     Tracing,
+    NewQueryRaw
 );
 
 // Mapping of which active, deprecated and hidden
@@ -81,6 +82,7 @@ pub const GENERATOR: FeatureMap = FeatureMap::new()
         ExtendedIndexes,
         Cockroachdb,
         Tracing,
+        NewQueryRaw,
     ])
     .with_deprecated(&[
         AtomicNumberOperations,
