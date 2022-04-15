@@ -88,11 +88,11 @@ start-postgres14:
 dev-postgres14: start-postgres14
 	cp $(CONFIG_PATH)/postgres14 $(CONFIG_FILE)
 
-start-cockroach_22_1_0:
-	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach_22_1_0
+start-cockroach_22_1_0_alpha_1:
+	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach_22_1_0_alpha_1
 
-dev-cockroach: start-cockroach_22_1_0
-	cp $(CONFIG_PATH)/cockroach_22_1_0 $(CONFIG_FILE)
+dev-cockroach: start-cockroach_22_1_0_alpha_1
+	cp $(CONFIG_PATH)/cockroach_22_1_0_alpha_1 $(CONFIG_FILE)
 
 start-cockroach_21_2_0_patched:
 	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach_21_2_0_patched
