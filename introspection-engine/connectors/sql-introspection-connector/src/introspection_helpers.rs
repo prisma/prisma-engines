@@ -179,6 +179,7 @@ pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> Inde
         tpe,
         defined_on_field: index.columns.len() == 1,
         algorithm: using,
+        clustered: false,
     }
 }
 

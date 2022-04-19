@@ -235,6 +235,7 @@ pub(crate) struct IndexAttribute {
     pub(crate) name: Option<StringId>,
     pub(crate) mapped_name: Option<StringId>,
     pub(crate) algorithm: Option<IndexAlgorithm>,
+    pub(crate) clustered: Option<bool>,
 }
 
 impl IndexAttribute {
@@ -263,6 +264,7 @@ pub(crate) struct IdAttribute {
     pub(super) source_attribute: ast::AttributeId,
     pub(super) name: Option<StringId>,
     pub(super) mapped_name: Option<StringId>,
+    pub(super) clustered: Option<bool>,
 }
 
 impl IdAttribute {

@@ -142,6 +142,12 @@ impl<'db> IndexWalker<'db> {
         self.index.is_none()
     }
 
+    /// If true, the index defines the storage and ordering of the row. Mostly
+    /// matters on SQL Server where one can change the clustering.
+    pub fn clustered(self) -> Option<bool> {
+        self.index_attribute.clustered
+    }
+
     /// The model the index is defined on.
     pub fn model(self) -> ModelWalker<'db> {
         ModelWalker {

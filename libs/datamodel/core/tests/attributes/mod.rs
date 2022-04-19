@@ -12,6 +12,7 @@ mod id_negative;
 mod id_positive;
 mod ignore_negative;
 mod ignore_positive;
+mod index_clustering;
 mod index_negative;
 mod index_positive;
 mod map_negative;

@@ -6,6 +6,7 @@ use super::{
 };
 use crate::{
     ast,
+    common::preview_features::PreviewFeature,
     diagnostics::DatamodelError,
     transform::ast_to_dml::{
         db::{
@@ -16,7 +17,10 @@ use crate::{
     },
 };
 use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
-use parser_database::walkers::TypedFieldWalker;
+use parser_database::{
+    ast::{WithName, WithSpan},
+    walkers::{PrimaryKeyWalker, TypedFieldWalker},
+};
 
 pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ctx: &mut Context<'_>) {
     let model = field.model();
@@ -332,5 +336,69 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
 
             ctx.push_error(DatamodelError::new_validation_error(msg, field.ast_field().span));
         }
+    }
+}
+
+pub(crate) fn id_supports_clustering_setting(pk: PrimaryKeyWalker<'_>, ctx: &mut Context<'_>) {
+    if ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
+        return;
+    }
+
+    if pk.clustered().is_none() {
+        return;
+    }
+
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        "Defining clustering is not supported in the current connector.",
+        pk.ast_attribute().name(),
+        *pk.ast_attribute().span(),
+    ));
+}
+
+pub(crate) fn clustering_setting_preview_enabled(pk: PrimaryKeyWalker<'_>, ctx: &mut Context<'_>) {
+    if !ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
+        return;
+    }
+
+    if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        return;
+    }
+
+    if pk.clustered().is_none() {
+        return;
+    }
+
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        "To specify clustering, please enable `extendedIndexes` preview feature.",
+        pk.ast_attribute().name(),
+        *pk.ast_attribute().span(),
+    ))
+}
+
+pub(crate) fn clustering_can_be_defined_only_once(pk: PrimaryKeyWalker<'_>, ctx: &mut Context<'_>) {
+    if !ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
+        return;
+    }
+
+    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        return;
+    }
+
+    if pk.clustered() == Some(false) {
+        return;
+    }
+
+    for index in pk.model().indexes() {
+        if index.clustered() != Some(true) {
+            continue;
+        }
+
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "A model can only hold one clustered index or id.",
+            pk.ast_attribute().name(),
+            *pk.ast_attribute().span(),
+        ));
+
+        return;
     }
 }
