@@ -97,6 +97,7 @@ pub fn introspect(
                     })
                     .collect(),
                 defined_on_field: pk.columns.len() == 1,
+                clustered: true,
             });
         }
 

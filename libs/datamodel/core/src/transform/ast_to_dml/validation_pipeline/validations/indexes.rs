@@ -376,3 +376,102 @@ pub(super) fn has_fields(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
         *attr.span(),
     ))
 }
+
+pub(crate) fn supports_clustering_setting(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+    if ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
+        return;
+    }
+
+    if index.clustered().is_none() {
+        return;
+    }
+
+    let attr = if let Some(attribute) = index.ast_attribute() {
+        attribute
+    } else {
+        return;
+    };
+
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        "Defining clustering is not supported in the current connector.",
+        attr.name(),
+        *attr.span(),
+    ))
+}
+
+pub(crate) fn clustering_setting_preview_enabled(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+    if !ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
+        return;
+    }
+
+    if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        return;
+    }
+
+    if index.clustered().is_none() {
+        return;
+    }
+
+    let attr = if let Some(attribute) = index.ast_attribute() {
+        attribute
+    } else {
+        return;
+    };
+
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        "To specify index clustering, please enable `extendedIndexes` preview feature.",
+        attr.name(),
+        *attr.span(),
+    ))
+}
+
+pub(crate) fn clustering_can_be_defined_only_once(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+    if !ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
+        return;
+    }
+
+    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        return;
+    }
+
+    if index.clustered() != Some(true) {
+        return;
+    }
+
+    let attr = if let Some(attribute) = index.ast_attribute() {
+        attribute
+    } else {
+        return;
+    };
+
+    if matches!(
+        index.model().primary_key().and_then(|pk| pk.clustered()),
+        Some(true) | None
+    ) {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "A model can only hold one clustered index or key.",
+            attr.name(),
+            *attr.span(),
+        ));
+
+        return;
+    }
+
+    for other in index.model().indexes() {
+        if other.attribute_id() == index.attribute_id() {
+            continue;
+        }
+
+        if other.clustered() != Some(true) {
+            continue;
+        }
+
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "A model can only hold one clustered index.",
+            attr.name(),
+            *attr.span(),
+        ));
+
+        return;
+    }
+}

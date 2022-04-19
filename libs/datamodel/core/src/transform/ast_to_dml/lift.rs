@@ -362,6 +362,8 @@ impl<'a> LiftAstToDml<'a> {
                      })
                 .collect(),
             defined_on_field: pk.is_defined_on_field(),
+            // By default a primary key is always clustered in any database.
+            clustered: pk.clustered().unwrap_or(true),
         });
 
         model.indices = walker
@@ -405,6 +407,8 @@ impl<'a> LiftAstToDml<'a> {
                     tpe,
                     algorithm,
                     defined_on_field: idx.is_defined_on_field(),
+                    // By default an index that is not a primary key is always non-clustered in any database.
+                    clustered: idx.clustered().unwrap_or(false),
                 }
             })
             .collect();

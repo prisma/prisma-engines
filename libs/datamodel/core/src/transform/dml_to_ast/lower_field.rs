@@ -110,6 +110,13 @@ impl<'a> LowerDmlToAst<'a> {
                             ast::Expression::NumericValue("Desc".to_string(), Span::empty()),
                         ));
                     }
+
+                    if !pk.clustered {
+                        args.push(ast::Argument::new(
+                            "clustered",
+                            ast::Expression::ConstantValue("false".to_string(), Span::empty()),
+                        ));
+                    }
                 };
 
                 attributes.push(ast::Attribute::new("id", args));
@@ -132,7 +139,14 @@ impl<'a> LowerDmlToAst<'a> {
 
                     i.is_unique() && i.defined_on_field && i.fields.len() == 1 && names_match
                 }) {
-                    self.push_field_index_arguments(datamodel, model, idx, &mut arguments)
+                    if self.preview_features.contains(PreviewFeature::ExtendedIndexes) && idx.clustered {
+                        arguments.push(ast::Argument::new(
+                            "clustered",
+                            ast::Expression::ConstantValue("true".to_string(), Span::empty()),
+                        ));
+                    }
+
+                    self.push_field_index_arguments(datamodel, model, idx, &mut arguments);
                 }
 
                 attributes.push(ast::Attribute::new("unique", arguments));

@@ -428,6 +428,7 @@ fn composite_types_are_parsed_without_error() {
                                 },
                             ],
                             defined_on_field: true,
+                            clustered: true,
                         },
                     ),
                     is_generated: false,

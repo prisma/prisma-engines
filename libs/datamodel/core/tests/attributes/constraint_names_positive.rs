@@ -35,6 +35,7 @@ fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mysql() 
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: false,
     });
 
     post_model.assert_has_index(IndexDefinition {
@@ -44,6 +45,7 @@ fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mysql() 
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: false,
     });
 }
 
@@ -80,6 +82,7 @@ fn foreign_keys_and_indexes_with_same_name_on_same_table_are_not_supported_on_my
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: false,
     });
 }
 
@@ -118,6 +121,7 @@ fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mssql() 
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: false,
     });
 
     post_model.assert_has_index(IndexDefinition {
@@ -127,6 +131,7 @@ fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mssql() 
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: false,
     });
 }
 
@@ -167,6 +172,7 @@ fn multiple_constraints_with_same_name_in_different_namespaces_are_supported_by_
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: false,
     });
 
     post_model.assert_has_index(IndexDefinition {
@@ -176,5 +182,6 @@ fn multiple_constraints_with_same_name_in_different_namespaces_are_supported_by_
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: false,
     });
 }
