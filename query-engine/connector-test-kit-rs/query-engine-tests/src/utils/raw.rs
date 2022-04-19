@@ -2,7 +2,7 @@ use chrono::{DateTime, FixedOffset};
 use prisma_value::encode_bytes;
 use query_tests_setup::{TestError, TestResult};
 
-pub fn fmt_query_raw(query: &str, params: Vec<RawValue>) -> String {
+pub fn fmt_query_raw(query: &str, params: Vec<RawParam>) -> String {
     let params = params_to_json(params);
     let params = serde_json::to_string(&params).unwrap();
 
@@ -13,7 +13,7 @@ pub fn fmt_query_raw(query: &str, params: Vec<RawValue>) -> String {
     )
 }
 
-pub fn fmt_execute_raw(query: &str, params: Vec<RawValue>) -> String {
+pub fn fmt_execute_raw(query: &str, params: Vec<RawParam>) -> String {
     let params = params_to_json(params);
     let params = serde_json::to_string(&params).unwrap();
 
@@ -24,16 +24,18 @@ pub fn fmt_execute_raw(query: &str, params: Vec<RawValue>) -> String {
     )
 }
 
-pub enum RawValue {
+/// Small abstraction over query raw parameters.
+/// Useful to differentiate floats from decimals as they're encoded differently in clients.
+pub enum RawParam {
     DateTime(DateTime<FixedOffset>),
     Bytes(Vec<u8>),
     BigInt(i64),
     Decimal(String),
-    Array(Vec<RawValue>),
+    Array(Vec<RawParam>),
     Scalar(serde_json::Value),
 }
 
-impl RawValue {
+impl RawParam {
     pub fn try_datetime(s: &str) -> TestResult<Self> {
         let datetime = DateTime::parse_from_rfc3339(s).map_err(|err| TestError::ParseError(err.to_string()))?;
 
@@ -52,7 +54,7 @@ impl RawValue {
         Self::Decimal(dec.to_owned())
     }
 
-    pub fn array(arr: Vec<impl Into<RawValue>>) -> Self {
+    pub fn array(arr: Vec<impl Into<RawParam>>) -> Self {
         let arr: Vec<_> = arr.into_iter().map(Into::into).collect();
 
         Self::Array(arr)
@@ -63,14 +65,14 @@ impl RawValue {
     }
 }
 
-fn params_to_json(params: Vec<RawValue>) -> Vec<serde_json::Value> {
+fn params_to_json(params: Vec<RawParam>) -> Vec<serde_json::Value> {
     params.into_iter().map(serde_json::Value::from).collect::<Vec<_>>()
 }
 
 macro_rules! raw_value_from {
   ($($typ:ty),+) => {
       $(
-          impl From<$typ> for RawValue {
+          impl From<$typ> for RawParam {
               fn from(ty: $typ) -> Self {
                   Self::scalar(ty)
               }
@@ -81,19 +83,19 @@ macro_rules! raw_value_from {
 
 raw_value_from!(String, &str, i32, i64, bool, f32, f64);
 
-impl From<RawValue> for serde_json::Value {
-    fn from(val: RawValue) -> Self {
+impl From<RawParam> for serde_json::Value {
+    fn from(val: RawParam) -> Self {
         match val {
-            RawValue::DateTime(dt) => scalar_type("date", dt.to_rfc3339()),
-            RawValue::Bytes(bytes) => scalar_type("bytes", encode_bytes(&bytes)),
-            RawValue::BigInt(b_int) => scalar_type("bigint", b_int.to_string()),
-            RawValue::Decimal(dec) => scalar_type("decimal", dec.as_str()),
-            RawValue::Array(values) => {
+            RawParam::DateTime(dt) => scalar_type("date", dt.to_rfc3339()),
+            RawParam::Bytes(bytes) => scalar_type("bytes", encode_bytes(&bytes)),
+            RawParam::BigInt(b_int) => scalar_type("bigint", b_int.to_string()),
+            RawParam::Decimal(dec) => scalar_type("decimal", dec.as_str()),
+            RawParam::Array(values) => {
                 let json_values: Vec<_> = values.into_iter().map(serde_json::Value::from).collect();
 
                 serde_json::Value::Array(json_values)
             }
-            RawValue::Scalar(v) => v,
+            RawParam::Scalar(v) => v,
         }
     }
 }

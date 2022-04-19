@@ -95,7 +95,6 @@ pub trait QueryExt: Queryable + Send + Sync {
             for (idx, p_value) in row.into_iter().enumerate() {
                 let column_name = columns.get(idx).unwrap_or(&format!("f{}", idx)).clone();
                 // TODO: Remove backward_compatible checks for Prisma4
-                // BigInt and Decimal
                 let backward_compatible = !features.contains(&PreviewFeature::NewQueryRaw)
                     || sql_info.has_capability(ConnectorCapability::BackwardCompatibleQueryRaw);
 

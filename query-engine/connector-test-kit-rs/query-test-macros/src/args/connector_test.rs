@@ -98,8 +98,6 @@ pub struct ExcludeFeatures {
 }
 
 impl ExcludeFeatures {
-    /// Get a reference to the exclude features's features.
-    #[must_use]
     pub fn features(&self) -> &[String] {
         self.features.as_ref()
     }

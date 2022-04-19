@@ -38,7 +38,7 @@ mod typed_output {
             "queryRaw": [
               {
                 "id": {
-                  "prisma__type": "integer",
+                  "prisma__type": "int",
                   "prisma__value": 1
                 },
                 "string": {
@@ -46,7 +46,7 @@ mod typed_output {
                   "prisma__value": "str"
                 },
                 "int": {
-                  "prisma__type": "integer",
+                  "prisma__type": "int",
                   "prisma__value": 42
                 },
                 "bInt": {
@@ -66,7 +66,7 @@ mod typed_output {
                   "prisma__value": true
                 },
                 "dt": {
-                  "prisma__type": "date",
+                  "prisma__type": "datetime",
                   "prisma__value": "1900-10-10T01:10:10.001+00:00"
                 },
                 "dec": {
@@ -116,7 +116,7 @@ mod typed_output {
               },
               {
                 "id": {
-                  "prisma__type": "integer",
+                  "prisma__type": "int",
                   "prisma__value": 2
                 },
                 "string": {
@@ -172,7 +172,7 @@ mod typed_output {
 
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw(r#"SELECT 1 + 1;"#, vec![])),
-          @r###"{"data":{"queryRaw":[{"?column?":{"prisma__type":"integer","prisma__value":2}}]}}"###
+          @r###"{"data":{"queryRaw":[{"?column?":{"prisma__type":"int","prisma__value":2}}]}}"###
         );
 
         Ok(())
@@ -191,7 +191,7 @@ mod typed_output {
             "queryRaw": [
               {
                 "id": {
-                  "prisma__type": "integer",
+                  "prisma__type": "int",
                   "prisma__value": 1
                 },
                 "string": {
@@ -199,11 +199,11 @@ mod typed_output {
                   "prisma__value": "str"
                 },
                 "int": {
-                  "prisma__type": "integer",
+                  "prisma__type": "int",
                   "prisma__value": 42
                 },
                 "bInt": {
-                  "prisma__type": "integer",
+                  "prisma__type": "int",
                   "prisma__value": 9223372036854775807
                 },
                 "float": {
@@ -257,11 +257,11 @@ mod typed_output {
                   "prisma__type": "array",
                   "prisma__value": [
                     {
-                      "prisma__type": "integer",
+                      "prisma__type": "int",
                       "prisma__value": -9223372036854775808
                     },
                     {
-                      "prisma__type": "integer",
+                      "prisma__type": "int",
                       "prisma__value": 9223372036854775807
                     }
                   ]
@@ -269,7 +269,7 @@ mod typed_output {
               },
               {
                 "id": {
-                  "prisma__type": "integer",
+                  "prisma__type": "int",
                   "prisma__value": 2
                 },
                 "string": {
@@ -325,7 +325,7 @@ mod typed_output {
 
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw(r#"SELECT 1 + 1;"#, vec![])),
-          @r###"{"data":{"queryRaw":[{"?column?":{"prisma__type":"integer","prisma__value":2}}]}}"###
+          @r###"{"data":{"queryRaw":[{"?column?":{"prisma__type":"int","prisma__value":2}}]}}"###
         );
 
         Ok(())

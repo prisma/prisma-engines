@@ -4,7 +4,7 @@ use query_engine_tests::*;
 mod input_coercion {
     use query_engine_tests::fmt_execute_raw;
 
-    // Checks that query raw inputs are correctly coerced to the correct types
+    // Checks that query raw inputs are coerced to the correct types
     #[connector_test]
     async fn scalar_input_correctly_coerced(runner: Runner) -> TestResult<()> {
         run_query!(
@@ -12,14 +12,14 @@ mod input_coercion {
             fmt_execute_raw(
                 r#"INSERT INTO "TestModel" ("id", "string", "int", "bInt", "float", "bytes", "bool", "dt") VALUES ($1, $2, $3, $4, $5, $6, $7, $8);"#,
                 vec![
-                    RawValue::scalar(1_i32),
-                    RawValue::scalar("str"),
-                    RawValue::scalar(42_i32),
-                    RawValue::bigint(9223372036854775807),
-                    RawValue::scalar(1.5432_f64),
-                    RawValue::bytes(&[1, 2, 3]),
-                    RawValue::scalar(true),
-                    RawValue::try_datetime("1900-10-10T01:10:10.001Z")?
+                    RawParam::scalar(1_i32),
+                    RawParam::scalar("str"),
+                    RawParam::scalar(42_i32),
+                    RawParam::bigint(9223372036854775807),
+                    RawParam::scalar(1.5432_f64),
+                    RawParam::bytes(&[1, 2, 3]),
+                    RawParam::scalar(true),
+                    RawParam::try_datetime("1900-10-10T01:10:10.001Z")?
                 ],
             )
         );
@@ -43,14 +43,14 @@ mod input_coercion {
         schema.to_owned()
     }
 
-    // Checks that query raw inputs are correctly coerced to the correct types
+    // Checks that query raw inputs are coerced to the correct types
     #[connector_test(schema(decimal))]
     async fn decimal_input_correctly_coerced(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
             fmt_execute_raw(
                 r#"INSERT INTO "TestModel" ("id", "decimal") VALUES ($1, $2);"#,
-                vec![RawValue::scalar(1_i32), RawValue::decimal("123.456789")],
+                vec![RawParam::scalar(1_i32), RawParam::decimal("123.456789")],
             )
         );
 
