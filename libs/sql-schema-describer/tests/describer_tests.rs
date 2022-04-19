@@ -258,7 +258,8 @@ fn composite_primary_keys_must_work(api: TestApi) {
                     SqlFamily::Postgres => Some("User_pkey".into()),
                     SqlFamily::Mssql => Some("PK_User".into()),
                     _ => None,
-                }
+                },
+                clustered: None,
             }),
             foreign_keys: vec![],
         }

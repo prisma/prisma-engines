@@ -87,7 +87,7 @@ pub(super) fn add_to_models(
                 db_name: Some(index.name().to_string()),
                 name: None,
                 algorithm: None,
-                clustered: false,
+                clustered: None,
             });
         }
     }

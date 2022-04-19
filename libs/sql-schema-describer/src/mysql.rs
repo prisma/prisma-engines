@@ -531,6 +531,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     columns: vec![column],
                                     sequence: None,
                                     constraint_name: None,
+                                    clustered: None,
                                 });
                             }
                         };
@@ -560,6 +561,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 columns: vec![column],
                                 tpe,
                                 algorithm: None,
+                                clustered: None,
                             },
                         );
                     }

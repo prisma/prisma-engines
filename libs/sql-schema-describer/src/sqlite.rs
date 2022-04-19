@@ -311,6 +311,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 columns,
                 sequence: None,
                 constraint_name: None,
+                clustered: None,
             })
         };
 
@@ -465,6 +466,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 },
                 columns: vec![],
                 algorithm: None,
+                clustered: None,
             };
 
             let sql = format!(r#"PRAGMA index_info("{}");"#, name);

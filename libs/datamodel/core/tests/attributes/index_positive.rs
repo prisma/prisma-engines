@@ -25,7 +25,7 @@ fn basic_index_must_work() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -54,7 +54,7 @@ fn indexes_on_enum_fields_must_work() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -83,7 +83,7 @@ fn the_name_argument_must_work() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -116,7 +116,7 @@ fn the_map_argument_must_work() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -146,7 +146,7 @@ fn multiple_index_must_work() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
-        clustered: false,
+        clustered: None,
     });
 
     user_model.assert_has_index(IndexDefinition {
@@ -159,7 +159,7 @@ fn multiple_index_must_work() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -213,7 +213,7 @@ fn index_accepts_three_different_notations() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
-        clustered: false,
+        clustered: None,
     });
 
     user_model.assert_has_index(IndexDefinition {
@@ -226,7 +226,7 @@ fn index_accepts_three_different_notations() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
-        clustered: false,
+        clustered: None,
     });
 
     user_model.assert_has_index(IndexDefinition {
@@ -239,7 +239,7 @@ fn index_accepts_three_different_notations() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -265,7 +265,7 @@ fn mysql_allows_unique_length_prefix() {
         tpe: IndexType::Unique,
         defined_on_field: true,
         algorithm: None,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -468,7 +468,7 @@ fn hash_index_works_on_postgres() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: Some(IndexAlgorithm::Hash),
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -493,7 +493,7 @@ fn mysql_fulltext_index() {
         tpe: IndexType::Fulltext,
         algorithm: None,
         defined_on_field: false,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -518,7 +518,7 @@ fn mysql_fulltext_index_map() {
         tpe: IndexType::Fulltext,
         algorithm: None,
         defined_on_field: false,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -543,7 +543,7 @@ fn fulltext_index_mongodb() {
         tpe: IndexType::Fulltext,
         algorithm: None,
         defined_on_field: false,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -572,7 +572,7 @@ fn duplicate_index_different_sort_order_mongodb() {
         tpe: IndexType::Normal,
         algorithm: None,
         defined_on_field: false,
-        clustered: false,
+        clustered: None,
     });
 
     parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
@@ -586,7 +586,7 @@ fn duplicate_index_different_sort_order_mongodb() {
         tpe: IndexType::Normal,
         algorithm: None,
         defined_on_field: false,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -618,7 +618,7 @@ fn fulltext_index_sort_mongodb() {
         tpe: IndexType::Fulltext,
         algorithm: None,
         defined_on_field: false,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -648,7 +648,7 @@ fn multiple_fulltext_indexes_allowed_per_model_in_mysql() {
             tpe: IndexType::Fulltext,
             algorithm: None,
             defined_on_field: false,
-            clustered: false,
+            clustered: None,
         })
         .assert_has_index(IndexDefinition {
             name: None,
@@ -662,6 +662,6 @@ fn multiple_fulltext_indexes_allowed_per_model_in_mysql() {
             tpe: IndexType::Fulltext,
             algorithm: None,
             defined_on_field: false,
-            clustered: false,
+            clustered: None,
         });
 }

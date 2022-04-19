@@ -21,7 +21,7 @@ fn clustered_index_works_on_sql_server() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
-        clustered: true,
+        clustered: Some(true),
     });
 }
 
@@ -43,7 +43,7 @@ fn clustered_unique_index_works_on_sql_server() {
         db_name: Some("A_a_key".to_string()),
         fields: vec![IndexField::new_in_model("a")],
         tpe: IndexType::Unique,
-        clustered: true,
+        clustered: Some(true),
         defined_on_field: true,
         algorithm: None,
     });
@@ -70,7 +70,7 @@ fn clustered_compound_unique_index_works_on_sql_server() {
         db_name: Some("A_a_b_key".to_string()),
         fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
         tpe: IndexType::Unique,
-        clustered: true,
+        clustered: Some(true),
         defined_on_field: false,
         algorithm: None,
     });
@@ -93,7 +93,7 @@ fn non_clustered_id_works_on_sql_server() {
         db_name: Some("A_pkey".to_string()),
         fields: vec![PrimaryKeyField::new("id")],
         defined_on_field: true,
-        clustered: false,
+        clustered: Some(false),
     });
 }
 
@@ -117,7 +117,7 @@ fn non_clustered_compound_id_works_on_sql_server() {
         db_name: Some("A_pkey".to_string()),
         fields: vec![PrimaryKeyField::new("left"), PrimaryKeyField::new("right")],
         defined_on_field: false,
-        clustered: false,
+        clustered: Some(false),
     });
 }
 

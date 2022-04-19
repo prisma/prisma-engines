@@ -652,6 +652,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                             columns: vec![PrimaryKeyColumn::new(column_name)],
                             sequence,
                             constraint_name: Some(name.clone()),
+                            clustered: None,
                         });
                     }
                 }
@@ -672,6 +673,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                             false => IndexType::Normal,
                         },
                         algorithm,
+                        clustered: None,
                     })
                 }
             }

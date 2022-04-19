@@ -331,6 +331,8 @@ pub struct Index {
     pub tpe: IndexType,
     /// BTree or Hash
     pub algorithm: Option<SQLIndexAlgorithm>,
+    /// If true, the field defines how the row is ordered to the disk.
+    pub clustered: Option<bool>,
 }
 
 impl Index {
@@ -398,6 +400,8 @@ pub struct PrimaryKey {
     pub sequence: Option<Sequence>,
     /// The name of the primary key constraint, when available.
     pub constraint_name: Option<String>,
+    /// If true, the field defines how the row is ordered to the disk.
+    pub clustered: Option<bool>,
 }
 
 impl PrimaryKey {

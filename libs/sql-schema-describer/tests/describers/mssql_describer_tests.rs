@@ -679,6 +679,7 @@ fn mssql_foreign_key_on_delete_must_be_handled(api: TestApi) {
                 }],
                 sequence: None,
                 constraint_name: Some("PK__User".into()),
+                clustered: None,
             }),
             foreign_keys: vec![
                 ForeignKey {

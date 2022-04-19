@@ -111,7 +111,7 @@ impl<'a> LowerDmlToAst<'a> {
                         ));
                     }
 
-                    if !pk.clustered {
+                    if matches!(pk.clustered, Some(false)) {
                         args.push(ast::Argument::new(
                             "clustered",
                             ast::Expression::ConstantValue("false".to_string(), Span::empty()),
@@ -139,7 +139,9 @@ impl<'a> LowerDmlToAst<'a> {
 
                     i.is_unique() && i.defined_on_field && i.fields.len() == 1 && names_match
                 }) {
-                    if self.preview_features.contains(PreviewFeature::ExtendedIndexes) && idx.clustered {
+                    if self.preview_features.contains(PreviewFeature::ExtendedIndexes)
+                        && matches!(idx.clustered, Some(true))
+                    {
                         arguments.push(ast::Argument::new(
                             "clustered",
                             ast::Expression::ConstantValue("true".to_string(), Span::empty()),

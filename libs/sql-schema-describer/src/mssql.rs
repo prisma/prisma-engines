@@ -381,6 +381,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 ind.name AS index_name,
                 ind.is_unique AS is_unique,
                 ind.is_primary_key AS is_primary_key,
+                ind.type_desc as clustering,
                 col.name AS column_name,
                 ic.key_ordinal AS seq_in_index,
                 ic.is_descending_key AS is_descending,
@@ -418,6 +419,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 true => SQLSortOrder::Desc,
                 false => SQLSortOrder::Asc,
             };
+
+            let clustered = row.get_expect_string("clustering").starts_with("CLUSTERED");
 
             match row.get("column_name").and_then(|x| x.to_string()) {
                 Some(column_name) => {
@@ -460,6 +463,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     columns: vec![column],
                                     sequence: None,
                                     constraint_name: Some(index_name),
+                                    clustered: Some(clustered),
                                 });
                             }
                         };
@@ -484,6 +488,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     false => IndexType::Normal,
                                 },
                                 algorithm: None,
+                                clustered: Some(clustered),
                             },
                         );
                     }
