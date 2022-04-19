@@ -123,7 +123,7 @@ impl ExcludeConnectorTags {
 impl darling::FromMeta for ExcludeFeatures {
     fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
         let features = items
-            .into_iter()
+            .iter()
             .map(|i| match i {
                 syn::NestedMeta::Meta(m) => Err(darling::Error::unexpected_type(
                     "Preview features can only be string literals.",

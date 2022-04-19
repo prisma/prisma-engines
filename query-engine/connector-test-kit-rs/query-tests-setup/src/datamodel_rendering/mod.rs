@@ -37,7 +37,7 @@ pub fn render_test_datamodel(
     excluded_features: &[&str],
 ) -> String {
     let tag = config.test_connector_tag().unwrap();
-    let excluded_features: Vec<_> = excluded_features.into_iter().map(|f| format!(r#""{}""#, f)).collect();
+    let excluded_features: Vec<_> = excluded_features.iter().map(|f| format!(r#""{}""#, f)).collect();
     let all_features = GENERATOR
         .active_features()
         .iter()

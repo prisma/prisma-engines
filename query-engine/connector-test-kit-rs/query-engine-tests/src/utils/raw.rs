@@ -64,10 +64,7 @@ impl RawValue {
 }
 
 fn params_to_json(params: Vec<RawValue>) -> Vec<serde_json::Value> {
-    params
-        .into_iter()
-        .map(|value| serde_json::Value::from(value))
-        .collect::<Vec<_>>()
+    params.into_iter().map(serde_json::Value::from).collect::<Vec<_>>()
 }
 
 macro_rules! raw_value_from {
@@ -92,7 +89,7 @@ impl From<RawValue> for serde_json::Value {
             RawValue::BigInt(b_int) => scalar_type("bigint", b_int.to_string()),
             RawValue::Decimal(dec) => scalar_type("decimal", dec.as_str()),
             RawValue::Array(values) => {
-                let json_values: Vec<_> = values.into_iter().map(|v| serde_json::Value::from(v)).collect();
+                let json_values: Vec<_> = values.into_iter().map(serde_json::Value::from).collect();
 
                 serde_json::Value::Array(json_values)
             }
