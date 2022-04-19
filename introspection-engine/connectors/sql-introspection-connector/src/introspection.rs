@@ -72,6 +72,12 @@ pub fn introspect(
         }
 
         if let Some(pk) = &table.primary_key {
+            let clustered = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                pk.clustered
+            } else {
+                None
+            };
+
             model.primary_key = Some(PrimaryKeyDefinition {
                 name: None,
                 db_name: pk.constraint_name.clone(),
@@ -97,7 +103,7 @@ pub fn introspect(
                     })
                     .collect(),
                 defined_on_field: pk.columns.len() == 1,
-                clustered: true,
+                clustered,
             });
         }
 

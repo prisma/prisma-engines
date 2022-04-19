@@ -153,6 +153,12 @@ pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> Inde
         None
     };
 
+    let clustered = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        index.clustered
+    } else {
+        None
+    };
+
     IndexDefinition {
         name: None,
         db_name: Some(index.name.clone()),
@@ -179,7 +185,7 @@ pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> Inde
         tpe,
         defined_on_field: index.columns.len() == 1,
         algorithm: using,
-        clustered: false,
+        clustered,
     }
 }
 

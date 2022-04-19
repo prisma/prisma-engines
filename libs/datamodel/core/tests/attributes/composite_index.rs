@@ -27,7 +27,7 @@ fn simple_composite_index() {
         tpe: IndexType::Normal,
         algorithm: None,
         defined_on_field: false,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -55,7 +55,7 @@ fn simple_composite_unique() {
         tpe: IndexType::Unique,
         algorithm: None,
         defined_on_field: false,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -87,7 +87,7 @@ fn composite_unique_with_normal_unique() {
             tpe: IndexType::Unique,
             algorithm: None,
             defined_on_field: true,
-            clustered: false,
+            clustered: None,
         })
         .assert_has_index(IndexDefinition {
             name: None,
@@ -99,7 +99,7 @@ fn composite_unique_with_normal_unique() {
             tpe: IndexType::Unique,
             algorithm: None,
             defined_on_field: false,
-            clustered: false,
+            clustered: None,
         });
 }
 
@@ -127,7 +127,7 @@ fn simple_composite_fulltext() {
         tpe: IndexType::Fulltext,
         algorithm: None,
         defined_on_field: false,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -155,7 +155,7 @@ fn composite_index_with_default() {
         tpe: IndexType::Normal,
         algorithm: None,
         defined_on_field: false,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -183,7 +183,7 @@ fn composite_index_with_map() {
         tpe: IndexType::Normal,
         algorithm: None,
         defined_on_field: false,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -214,7 +214,7 @@ fn composite_index_with_sort() {
         tpe: IndexType::Normal,
         algorithm: None,
         defined_on_field: false,
-        clustered: false,
+        clustered: None,
     });
 }
 

@@ -321,7 +321,7 @@ fn new_model(model_name: &str) -> Model {
             length: None,
         }],
         defined_on_field: true,
-        clustered: true,
+        clustered: None,
     };
 
     let (name, database_name, documentation) = match sanitize_string(model_name) {

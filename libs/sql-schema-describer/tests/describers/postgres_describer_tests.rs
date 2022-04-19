@@ -579,6 +579,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     name: "User_primary_col_seq".into(),
                 },),
                 constraint_name: Some("User_pkey".into()),
+                clustered: None,
             }),
             foreign_keys: vec![],
         }

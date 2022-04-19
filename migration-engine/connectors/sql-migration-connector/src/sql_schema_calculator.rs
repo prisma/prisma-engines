@@ -57,6 +57,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
             constraint_name: pk
                 .constraint_name(ctx.flavour.datamodel_connector())
                 .map(|c| c.into_owned()),
+            clustered: pk.clustered(),
         });
 
         let indices = model
@@ -91,6 +92,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
                     columns,
                     tpe: index_type,
                     algorithm,
+                    clustered: index.clustered(),
                 }
             })
             .collect();
@@ -216,6 +218,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 ],
                 tpe: sql::IndexType::Unique,
                 algorithm: None,
+                clustered: None,
             },
             sql::Index {
                 name: format!(
@@ -225,6 +228,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 columns: vec![sql::IndexColumn::new(model_b_column)],
                 tpe: sql::IndexType::Normal,
                 algorithm: None,
+                clustered: None,
             },
         ];
 

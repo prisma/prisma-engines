@@ -48,7 +48,7 @@ pub struct IndexDefinition {
     pub db_name: Option<String>,
     pub fields: Vec<IndexField>,
     pub tpe: IndexType,
-    pub clustered: bool,
+    pub clustered: Option<bool>,
     pub algorithm: Option<IndexAlgorithm>,
     pub defined_on_field: bool,
 }
@@ -100,7 +100,7 @@ pub struct PrimaryKeyDefinition {
     pub db_name: Option<String>,
     pub fields: Vec<PrimaryKeyField>,
     pub defined_on_field: bool,
-    pub clustered: bool,
+    pub clustered: Option<bool>,
 }
 
 ///A field in a Primary Key that optionally defines a sort order and length limit.

@@ -382,7 +382,7 @@ fn implicit_unique_constraint_on_one_to_one() {
         tpe: IndexType::Unique,
         defined_on_field: true,
         algorithm: None,
-        clustered: false,
+        clustered: None,
     });
 }
 
@@ -428,7 +428,7 @@ fn implicit_unique_constraint_on_compound_one_to_one() {
         tpe: IndexType::Unique,
         defined_on_field: false,
         algorithm: None,
-        clustered: false,
+        clustered: None,
     });
 }
 
