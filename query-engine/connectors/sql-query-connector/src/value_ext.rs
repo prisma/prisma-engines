@@ -11,37 +11,38 @@ impl<'a> IntoTypedJsonExtension for quaint::Value<'a> {
             return "null".to_owned();
         }
 
-        let type_name = match self {
-            quaint::Value::Int32(_) => "integer",
-            quaint::Value::Int64(_) => match backward_compatible {
-                // TODO: Remove backward_compatible checks for Prisma4
-                true => "integer",
-                false => "bigint",
-            },
-            quaint::Value::Float(_) => "float",
-            quaint::Value::Double(_) => "double",
-            quaint::Value::Text(_) => "string",
-            quaint::Value::Enum(_) => "enum",
-            quaint::Value::Bytes(_) => match backward_compatible {
-                // TODO: Remove backward_compatible checks for Prisma4
-                true => "string",
-                false => "bytes",
-            },
-            quaint::Value::Boolean(_) => "bool",
-            quaint::Value::Char(_) => "char",
-            quaint::Value::Numeric(_) => match backward_compatible {
-                true => "float",
-                false => "decimal",
-            },
-            quaint::Value::Json(_) => "json",
-            quaint::Value::Xml(_) => "xml",
-            quaint::Value::Uuid(_) => "uuid",
-            quaint::Value::DateTime(_) | quaint::Value::Date(_) | quaint::Value::Time(_) => match backward_compatible {
-                // TODO: Remove backward_compatible checks for Prisma4
-                true => "string",
-                false => "date",
-            },
-            quaint::Value::Array(_) => "array",
+        let type_name = if backward_compatible {
+            match self {
+                quaint::Value::Boolean(_) => "bool",
+                quaint::Value::Int32(_) => "int",
+                quaint::Value::Int64(_) => "int",
+                quaint::Value::Float(_) => "float",
+                quaint::Value::Double(_) => "double",
+                quaint::Value::Json(_) => "json",
+                quaint::Value::Numeric(_) => "float",
+                quaint::Value::Array(_) => "array",
+                _ => "string",
+            }
+        } else {
+            match self {
+                quaint::Value::Int32(_) => "int",
+                quaint::Value::Int64(_) => "bigint",
+                quaint::Value::Float(_) => "float",
+                quaint::Value::Double(_) => "double",
+                quaint::Value::Text(_) => "string",
+                quaint::Value::Enum(_) => "enum",
+                quaint::Value::Bytes(_) => "bytes",
+                quaint::Value::Boolean(_) => "bool",
+                quaint::Value::Char(_) => "char",
+                quaint::Value::Numeric(_) => "decimal",
+                quaint::Value::Json(_) => "json",
+                quaint::Value::Xml(_) => "xml",
+                quaint::Value::Uuid(_) => "uuid",
+                quaint::Value::DateTime(_) => "datetime",
+                quaint::Value::Date(_) => "date",
+                quaint::Value::Time(_) => "time",
+                quaint::Value::Array(_) => "array",
+            }
         };
 
         type_name.to_owned()
