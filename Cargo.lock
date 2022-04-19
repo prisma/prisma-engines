@@ -3135,7 +3135,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#479e08a41b13902028906bc05f778688c06a3f18"
+source = "git+https://github.com/Weakky/quaint.git?branch=feat/separate-i32-i64-fork#8fba0ae616003e5dcd0637fdd508bd1a250fbd50"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -4095,6 +4095,7 @@ dependencies = [
  "rand 0.7.3",
  "serde",
  "serde_json",
+ "sql-datamodel-connector",
  "thiserror",
  "tokio",
  "tracing",
@@ -4329,9 +4330,9 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.7.1"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "00035fdbcee3e791e756d1831a1b9a89e414c320d3eccdae65aba4f388216c30"
+checksum = "ca082fe560e504c0f1c1fe0b6bd395728a4d2b2baa97c1be454b6849341e5aee"
 dependencies = [
  "async-native-tls",
  "async-trait",
