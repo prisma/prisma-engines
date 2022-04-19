@@ -95,7 +95,7 @@ dev-cockroach: start-cockroach_22_1_0_alpha_1
 	cp $(CONFIG_PATH)/cockroach_22_1_0_alpha_1 $(CONFIG_FILE)
 
 start-cockroach_21_2_0_patched:
-	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach_21_2_0_patched && docker exec -it prisma-engines-cockroach_21_2_0_patched_1 ./cockroach sql --insecure -e "SHOW PUBLIC CLUSTER SETTINGS;"
+	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach_21_2_0_patched && docker exec -it prisma-engines_cockroach_21_2_0_patched_1 ./cockroach sql --insecure -e "SHOW PUBLIC CLUSTER SETTINGS;"
 
 dev-cockroach: start-cockroach_21_2_0_patched
 	cp $(CONFIG_PATH)/cockroach_21_2_0_patched $(CONFIG_FILE)
