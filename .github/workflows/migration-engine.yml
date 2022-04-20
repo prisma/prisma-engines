@@ -166,7 +166,7 @@ jobs:
 
       - name: cargo test -p migration-engine-cli | !matrix.database.single_threaded
         run: cargo test -p migration-engine-cli
-        if: ${{ !matrix.database.single_threaded }}
+        if: ${{ !matrix.database.single_threaded && (matrix.database.allow_failure && always()) }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
