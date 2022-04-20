@@ -444,17 +444,14 @@ pub(crate) fn clustering_can_be_defined_only_once(index: IndexWalker<'_>, ctx: &
         return;
     };
 
-    if matches!(
-        index.model().primary_key().and_then(|pk| pk.clustered()),
-        Some(true) | None
-    ) {
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
-            "A model can only hold one clustered index or key.",
-            attr.name(),
-            *attr.span(),
-        ));
-
-        return;
+    if let Some(pk) = index.model().primary_key() {
+        if matches!(pk.clustered(), Some(true) | None) {
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                "A model can only hold one clustered index or key.",
+                attr.name(),
+                *attr.span(),
+            ));
+        }
     }
 
     for other in index.model().indexes() {

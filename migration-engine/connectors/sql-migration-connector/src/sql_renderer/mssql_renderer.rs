@@ -147,13 +147,15 @@ impl SqlRenderer for MssqlFlavour {
             rendered
         });
 
-        format!(
-            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
-            index_type = index_type,
-            index_name = index_name,
-            table_reference = table_reference,
-            columns = columns.join(", "),
-        )
+        let clustering = match index.clustered() {
+            Some(true) => "CLUSTERED ",
+            Some(false) => "NONCLUSTERED ",
+            None => "",
+        };
+
+        let columns = columns.join(", ");
+
+        format!("CREATE {index_type}{clustering}INDEX {index_name} ON {table_reference}({columns})",)
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
@@ -178,11 +180,15 @@ impl SqlRenderer for MssqlFlavour {
                 })
                 .join(",");
 
-            format!(
-                ",\n    CONSTRAINT {} PRIMARY KEY ({})",
-                self.quote(pk.constraint_name.as_ref().unwrap()),
-                column_names
-            )
+            let clustering = match pk.clustered {
+                Some(true) => " CLUSTERED",
+                Some(false) => " NONCLUSTERED",
+                None => "",
+            };
+
+            let constraint_name = self.quote(pk.constraint_name.as_ref().unwrap());
+
+            format!(",\n    CONSTRAINT {constraint_name} PRIMARY KEY{clustering} ({column_names})",)
         } else {
             String::new()
         };
@@ -207,7 +213,16 @@ impl SqlRenderer for MssqlFlavour {
                         rendered
                     });
 
-                    format!("CONSTRAINT {} UNIQUE ({})", self.quote(index.name()), columns.join(","))
+                    let constraint_name = self.quote(index.name());
+                    let column_names = columns.join(",");
+
+                    let clustering = match index.clustered() {
+                        Some(true) => " CLUSTERED",
+                        Some(false) => " NONCLUSTERED",
+                        None => "",
+                    };
+
+                    format!("CONSTRAINT {constraint_name} UNIQUE{clustering} ({column_names})")
                 })
                 .join(",\n    ");
 

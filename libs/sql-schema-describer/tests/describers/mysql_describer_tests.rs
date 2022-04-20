@@ -1207,6 +1207,7 @@ fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
             columns,
             tpe: IndexType::Unique,
             algorithm: None,
+            clustered: None,
         }]
     );
 }
@@ -1246,6 +1247,7 @@ fn old_mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
             columns,
             tpe: IndexType::Unique,
             algorithm: None,
+            clustered: None,
         }]
     );
 }

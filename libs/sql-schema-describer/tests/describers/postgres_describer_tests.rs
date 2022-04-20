@@ -572,6 +572,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 }],
                 tpe: IndexType::Unique,
                 algorithm: Some(SQLIndexAlgorithm::BTree),
+                clustered: None,
             },],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("primary_col")],

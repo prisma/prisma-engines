@@ -187,9 +187,16 @@ impl<'a> AlterTableConstructor<'a> {
             quoted_columns.push(rendered);
         }
 
+        let clustering = match self.tables.next().primary_key().expect("Primary key missing").clustered {
+            Some(true) => " CLUSTERED",
+            Some(false) => " NONCLUSTERED",
+            None => "",
+        };
+
         self.add_constraints.insert(format!(
-            "CONSTRAINT {} PRIMARY KEY ({})",
+            "CONSTRAINT {} PRIMARY KEY{} ({})",
             constraint_name,
+            clustering,
             quoted_columns.join(","),
         ));
     }

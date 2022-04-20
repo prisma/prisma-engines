@@ -688,6 +688,20 @@ impl<'a> PrimaryKeyAssertion<'a> {
         self
     }
 
+    #[track_caller]
+    pub fn assert_non_clustered(self) -> Self {
+        assert_eq!(self.pk.clustered, Some(false));
+
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_clustered(self) -> Self {
+        assert!(self.pk.clustered.unwrap_or(true));
+
+        self
+    }
+
     pub fn debug_print(self) -> Self {
         println!("{:?}", &self.pk);
         self
@@ -775,6 +789,20 @@ impl<'a> IndexAssertion<'a> {
 
     pub fn assert_is_unique(self) -> Self {
         assert_eq!(self.0.tpe, IndexType::Unique);
+
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_clustered(self) -> Self {
+        assert_eq!(self.0.clustered, Some(true));
+
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_non_clustered(self) -> Self {
+        assert!(!self.0.clustered.unwrap_or(false));
 
         self
     }

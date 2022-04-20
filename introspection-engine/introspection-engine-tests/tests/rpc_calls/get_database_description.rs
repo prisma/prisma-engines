@@ -59,7 +59,8 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
                   }
                 ],
                 "sequence": null,
-                "constraint_name": null
+                "constraint_name": null,
+                "clustered": null
               },
               "foreign_keys": []
             }
@@ -119,7 +120,8 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
                   }
                 ],
                 "sequence": null,
-                "constraint_name": null
+                "constraint_name": null,
+                "clustered": null
               },
               "foreign_keys": []
             }
@@ -186,7 +188,8 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
                 "sequence": {
                   "name": "Blog_id_seq"
                 },
-                "constraint_name": "Blog_pkey"
+                "constraint_name": "Blog_pkey",
+                "clustered": null
               },
               "foreign_keys": []
             }
@@ -250,7 +253,8 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
                   }
                 ],
                 "sequence": null,
-                "constraint_name": null
+                "constraint_name": null,
+                "clustered": null
               },
               "foreign_keys": []
             }
