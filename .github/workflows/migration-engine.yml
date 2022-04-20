@@ -227,7 +227,7 @@ jobs:
           RUST_LOG: debug
 
       - name: cargo test -p migration-engine-cli -- --test-threads=1 | matrix.database.is_vitess
-        run: cargo test -p migration-engine-cli
+        run: cargo test -p migration-engine-cli -- --test-threads=1
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
