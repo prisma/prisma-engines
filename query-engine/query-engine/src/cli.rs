@@ -24,11 +24,17 @@ pub struct DmmfRequest {
     build_mode: BuildMode,
     enable_raw_queries: bool,
     config: Configuration,
+
+    /// Artificially panic (for testing the CLI)
+    trigger_panic: bool,
 }
 
 pub struct GetConfigRequest {
     config: ValidatedConfiguration,
     ignore_env_var_errors: bool,
+
+    /// Artificially panic (for testing the CLI)
+    trigger_panic: bool,
 }
 
 pub enum CliCommand {
@@ -48,7 +54,7 @@ impl CliCommand {
 
         match subcommand {
             Subcommand::Cli(ref cliopts) => match cliopts {
-                CliOpt::Dmmf => {
+                CliOpt::Dmmf(input) => {
                     let build_mode = if opts.legacy {
                         BuildMode::Legacy
                     } else {
@@ -60,11 +66,13 @@ impl CliCommand {
                         build_mode,
                         enable_raw_queries: opts.enable_raw_queries,
                         config: opts.configuration(true)?.subject,
+                        trigger_panic: input.trigger_panic,
                     })))
                 }
                 CliOpt::GetConfig(input) => Ok(Some(CliCommand::GetConfig(GetConfigRequest {
                     config: opts.configuration(input.ignore_env_var_errors)?,
                     ignore_env_var_errors: input.ignore_env_var_errors,
+                    trigger_panic: input.trigger_panic,
                 }))),
                 CliOpt::ExecuteRequest(input) => Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
                     query: input.query.clone(),
@@ -86,6 +94,10 @@ impl CliCommand {
     }
 
     async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
+        if request.trigger_panic {
+            panic!("Triggered dmmf artificial panic");
+        }
+
         let datasource = request.config.datasources.first();
         let capabilities = datasource
             .map(|ds| ds.capabilities())
@@ -112,6 +124,10 @@ impl CliCommand {
     }
 
     fn get_config(mut req: GetConfigRequest) -> PrismaResult<()> {
+        if req.trigger_panic {
+            panic!("Triggered get_config artificial panic");
+        }
+
         let config = &mut req.config;
 
         if !req.ignore_env_var_errors {
