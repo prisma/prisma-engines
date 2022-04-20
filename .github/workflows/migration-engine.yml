@@ -91,6 +91,7 @@ jobs:
             url: "postgresql://prisma@localhost:26257"
           - name: cockroach_21_2_0_patched
             url: "postgresql://prisma@localhost:26258"
+            allow_failure: true
           - name: sqlite
             url: sqlite
           - name: vitess_5_7
@@ -105,6 +106,7 @@ jobs:
             single_threaded: true
 
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.database.allow_failure }}
     steps:
       - uses: actions/checkout@v2
 
@@ -192,12 +194,12 @@ jobs:
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           TEST_SHADOW_DATABASE_URL: ${{ matrix.database.shadow_database_url }}
 
-      - name: cargo test -p sql-schema-describer -- --test-threads=1 | matrix.database.is_vitess
-        run: cargo test -p sql-schema-describer -- --test-threads=1
-        if: ${{ matrix.database.is_vitess }}
-        env:
-          CLICOLOR_FORCE: 1
-          TEST_DATABASE_URL: ${{ matrix.database.url }}
+      #- name: cargo test -p sql-schema-describer -- --test-threads=1 | matrix.database.is_vitess
+      #  run: cargo test -p sql-schema-describer -- --test-threads=1
+      #  if: ${{ matrix.database.is_vitess }}
+      #  env:
+      #    CLICOLOR_FORCE: 1
+      #    TEST_DATABASE_URL: ${{ matrix.database.url }}
           
       - name: cargo test -p migration-engine-tests -- --test-threads=1 | matrix.database.is_vitess
         run: cargo test -p migration-engine-tests -- --test-threads=1
