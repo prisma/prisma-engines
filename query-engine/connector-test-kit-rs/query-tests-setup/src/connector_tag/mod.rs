@@ -77,7 +77,7 @@ pub enum ConnectorVersion {
     MySql(Option<MySqlVersion>),
     MongoDb(Option<MongoDbVersion>),
     Sqlite,
-    CockroachDb,
+    CockroachDb(Option<CockroachDbVersion>),
     Vitess(Option<VitessVersion>),
 }
 
@@ -89,7 +89,7 @@ impl From<&ConnectorTag> for ConnectorVersion {
             ConnectorTag::MySql(c) => ConnectorVersion::MySql(c.version()),
             ConnectorTag::MongoDb(c) => ConnectorVersion::MongoDb(c.version()),
             ConnectorTag::Sqlite(_) => ConnectorVersion::Sqlite,
-            ConnectorTag::Cockroach(_) => ConnectorVersion::CockroachDb,
+            ConnectorTag::Cockroach(_) => ConnectorVersion::CockroachDb(c.version()),
             ConnectorTag::Vitess(c) => ConnectorVersion::Vitess(c.version()),
         }
     }
@@ -135,7 +135,10 @@ impl fmt::Display for ConnectorVersion {
                 Some(v) => format!("Vitess ({})", v),
                 None => "Vitess (unknown)".to_string(),
             },
-            Self::CockroachDb => "CockroachDB".to_string(),
+            Self::CockroachDb(v) => match v {
+                Some(v) => format!("CockroachDb ({})", v),
+                None => "CockroachDb (unknown)".to_string(),
+            },
         };
 
         write!(f, "{}", printable)
