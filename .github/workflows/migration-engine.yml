@@ -124,46 +124,53 @@ jobs:
       #       target
       #     key: me-ie-${{ runner.os }}-${{ matrix.database.name }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: cargo test -p introspection-engine-tests # !matrix.database.single_threaded
+      - name: cargo test -p introspection-engine-tests !matrix.database.single_threaded
+        run: cargo test -p introspection-engine-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p sql-schema-describer # !matrix.database.single_threaded
+      - name: cargo test -p sql-schema-describer # !matrix.database.single_threaded
+        run: cargo test -p sql-schema-describer
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p migration-engine-tests # !matrix.database.single_threaded
+      - name: cargo test -p migration-engine-tests # !matrix.database.single_threaded
+        run: cargo test -p migration-engine-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           RUST_LOG: debug
 
-      - run: cargo test -p migration-engine-cli # !matrix.database.single_threaded
+      - name: cargo test -p migration-engine-cli # !matrix.database.single_threaded
+        run: cargo test -p migration-engine-cli
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
 
-      - run: cargo test -p introspection-engine-tests -- --test-threads=1 # matrix.database.is_vitess
+      - name: cargo test -p introspection-engine-tests -- --test-threads=1 # matrix.database.is_vitess
+        run: cargo test -p introspection-engine-tests -- --test-threads=1
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           TEST_SHADOW_DATABASE_URL: ${{ matrix.database.shadow_database_url }}
 
-      - run: cargo test -p sql-schema-describer # matrix.database.is_vitess
+      - name: cargo test -p sql-schema-describer # matrix.database.is_vitess
+        run: cargo test -p sql-schema-describer
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           
-      - run: cargo test -p migration-engine-tests -- --test-threads=1 # matrix.database.is_vitess
+      - name: cargo test -p migration-engine-tests -- --test-threads=1 # matrix.database.is_vitess
+        run: cargo test -p migration-engine-tests -- --test-threads=1
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
@@ -171,7 +178,8 @@ jobs:
           TEST_SHADOW_DATABASE_URL: ${{ matrix.database.shadow_database_url }}
           RUST_LOG: debug
 
-      - run: cargo test -p migration-engine-cli -- --test-threads=1 # matrix.database.is_vitess
+      - name: cargo test -p migration-engine-cli -- --test-threads=1 # matrix.database.is_vitess
+        run: cargo test -p migration-engine-cli
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
@@ -181,26 +189,30 @@ jobs:
 
 
 
-      - run: cargo test -p introspection-engine-tests -- --test-threads=1 # !matrix.database.is_vitess && matrix.database.single_threaded
+      - name: cargo test -p introspection-engine-tests -- --test-threads=1 # !matrix.database.is_vitess && matrix.database.single_threaded
+        run: cargo test -p introspection-engine-tests -- --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p sql-schema-describer -- --test-threads=1 # !matrix.database.is_vitess && matrix.database.single_threaded
+      - name: cargo test -p sql-schema-describer -- --test-threads=1 # !matrix.database.is_vitess && matrix.database.single_threaded
+        run: cargo test -p sql-schema-describer -- --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p migration-engine-tests -- --test-threads=1 # !matrix.database.is_vitess && matrix.database.single_threaded
+      - name: cargo test -p migration-engine-tests -- --test-threads=1 # !matrix.database.is_vitess && matrix.database.single_threaded
+        run: cargo test -p migration-engine-tests -- --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           RUST_LOG: debug
 
-      - run: cargo test -p migration-engine-cli -- --test-threads=1 # !matrix.database.is_vitess && matrix.database.single_threaded
+      - name: cargo test -p migration-engine-cli -- --test-threads=1 # !matrix.database.is_vitess && matrix.database.single_threaded
+        run: cargo test -p migration-engine-cli -- --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
