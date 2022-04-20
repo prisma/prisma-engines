@@ -13,7 +13,7 @@ on:
 
 jobs:
   test-mongodb-introspection-and-migration-connector:
-    name: "Test ${{ matrix.database.name }} on Linux"
+    name: "Test ${{ matrix.database.name }} on Linux (MongoDB)"
     strategy:
       fail-fast: false
       matrix:
@@ -64,46 +64,62 @@ jobs:
           - name: mssql_2017
             url: "sqlserver://localhost:1434;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
             single_threaded: true
+            allow_failure: false
           - name: mssql_2019
             url: "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
             single_threaded: true
+            allow_failure: false
           - name: mysql_5_6
             url: "mysql://root:prisma@localhost:3309"
+            allow_failure: false
           - name: mysql_5_7
             url: "mysql://root:prisma@localhost:3306"
+            allow_failure: false
           - name: mysql_8
             url: "mysql://root:prisma@localhost:3307"
+            allow_failure: false
           - name: mysql_mariadb
             url: "mysql://root:prisma@localhost:3308"
+            allow_failure: false
           - name: postgres9
             url: "postgresql://postgres:prisma@localhost:5431"
+            allow_failure: false
           - name: postgres10
             url: "postgresql://postgres:prisma@localhost:5432"
+            allow_failure: false
           - name: postgres11
             url: "postgresql://postgres:prisma@localhost:5433"
+            allow_failure: false
           - name: postgres12
             url: "postgresql://postgres:prisma@localhost:5434"
+            allow_failure: false
           - name: postgres13
             url: "postgresql://postgres:prisma@localhost:5435"
+            allow_failure: false
           - name: postgres14
             url: "postgresql://postgres:prisma@localhost:5437"
+            allow_failure: false
           - name: cockroach_22_1_0_alpha_1
             url: "postgresql://prisma@localhost:26257"
+            allow_failure: false
           - name: cockroach_21_2_0_patched
             url: "postgresql://prisma@localhost:26258"
             allow_failure: true
           - name: sqlite
             url: sqlite
+            allow_failure: false
           - name: vitess_5_7
             url: "mysql://root:prisma@localhost:33577/test"
             shadow_database_url: "mysql://root:prisma@localhost:33578/shadow"
             is_vitess: true
             single_threaded: true
+            allow_failure: false
           - name: vitess_8_0
             url: "mysql://root:prisma@localhost:33807/test"
             shadow_database_url: "mysql://root:prisma@localhost:33808/shadow"
             is_vitess: true
             single_threaded: true
+            allow_failure: false
 
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.database.allow_failure }}
