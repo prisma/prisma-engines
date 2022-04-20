@@ -1,7 +1,7 @@
 use super::*;
-use crate::datamodel_rendering::SqlDatamodelRenderer;
+use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone)]
 pub struct CockroachDbConnectorTag {
     version: Option<CockroachDbVersion>,
     capabilities: Vec<ConnectorCapability>,
@@ -21,25 +21,17 @@ impl ConnectorTagInterface for CockroachDbConnectorTag {
         // can't handle 1 schema per test in a database well at this point in time.
 
         match self.version {
-            Some(CockroachDbVersion::V22_1) if is_ci => format!(
-                "postgresql://prisma@test-db-cockroachdb:26257/{0}?schema={0}",
-                database
-            ),
-            Some(CockroachDbVersion::V22_1) => {
-                format!(
-                    "postgresql://prisma@127.0.0.1:26257/{0}?schema={0}",
-                    database
-                )
+            Some(CockroachDbVersion::V22_1) if is_ci => {
+                format!("postgresql://prisma@test-db-cockroachdb:26257/{0}?schema={0}", database)
             }
-            Some(CockroachDbVersion::V21_2) if is_ci => format!(
-                "postgresql://prisma@test-db-cockroachdb:26258/{0}?schema={0}",
-                database
-            ),
+            Some(CockroachDbVersion::V22_1) => {
+                format!("postgresql://prisma@127.0.0.1:26257/{0}?schema={0}", database)
+            }
+            Some(CockroachDbVersion::V21_2) if is_ci => {
+                format!("postgresql://prisma@test-db-cockroachdb:26258/{0}?schema={0}", database)
+            }
             Some(CockroachDbVersion::V21_2) => {
-                format!(
-                    "postgresql://prisma@127.0.0.1:26258/{0}?schema={0}",
-                    database
-                )
+                format!("postgresql://prisma@127.0.0.1:26258/{0}?schema={0}", database)
             }
             None => unreachable!("A versioned connector must have a concrete version to run."),
         }
