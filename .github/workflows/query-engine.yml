@@ -60,7 +60,8 @@ jobs:
       fail-fast: false
       matrix:
         database:
-          - "cockroach"
+          - "cockroach_22_1_0_alpha_1"
+          - "cockroach_21_2_0_patched"
 
     runs-on: buildjet-4vcpu-ubuntu-2004 # ubuntu-latest
     steps:

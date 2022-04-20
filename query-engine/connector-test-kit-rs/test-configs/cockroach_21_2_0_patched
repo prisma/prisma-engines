@@ -1,0 +1,5 @@
+{
+    "connector": "cockroachdb",
+    "version": "21.2.0-patched",
+    "runner": "direct"
+}

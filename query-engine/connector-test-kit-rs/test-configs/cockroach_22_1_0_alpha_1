@@ -1,4 +1,5 @@
 {
     "connector": "cockroachdb",
+    "version": "22.1.0-alpha.1",
     "runner": "direct"
 }
