@@ -102,6 +102,11 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
     pub(crate) fn created_primary_key(&self) -> Option<&'schema PrimaryKey> {
         match self.tables.as_ref().map(|t| t.primary_key()).as_tuple() {
             (None, Some(pk)) => Some(pk),
+            (Some(previous_pk), Some(next_pk))
+                if previous_pk.clustered.unwrap_or(true) != next_pk.clustered.unwrap_or(true) =>
+            {
+                Some(next_pk)
+            }
             (Some(previous_pk), Some(next_pk)) if previous_pk.columns != next_pk.columns => Some(next_pk),
             (Some(previous_pk), Some(next_pk)) => self.primary_key_column_changed(previous_pk).then(|| *next_pk),
             _ => None,
@@ -112,6 +117,11 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
     pub(crate) fn dropped_primary_key(&self) -> Option<&'schema PrimaryKey> {
         match self.tables.as_ref().map(|t| t.primary_key()).as_tuple() {
             (Some(pk), None) => Some(pk),
+            (Some(previous_pk), Some(next_pk))
+                if previous_pk.clustered.unwrap_or(true) != next_pk.clustered.unwrap_or(true) =>
+            {
+                Some(previous_pk)
+            }
             (Some(previous_pk), Some(next_pk)) if previous_pk.columns != next_pk.columns => Some(previous_pk),
             (Some(previous_pk), Some(_next_pk)) => self.primary_key_column_changed(previous_pk).then(|| *previous_pk),
             _ => None,
@@ -174,4 +184,5 @@ fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>) -> bool {
         })
         && first.index_type() == second.index_type()
         && first.algorithm().unwrap_or_default() == second.algorithm().unwrap_or_default()
+        && first.clustered().unwrap_or(false) == second.clustered().unwrap_or(false)
 }

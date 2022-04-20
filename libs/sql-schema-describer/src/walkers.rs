@@ -681,6 +681,11 @@ impl<'a> IndexWalker<'a> {
     pub fn algorithm(&self) -> Option<SQLIndexAlgorithm> {
         self.get().algorithm
     }
+
+    /// The clustering of the index.
+    pub fn clustered(&self) -> Option<bool> {
+        self.get().clustered
+    }
 }
 
 /// Traverse an enum.
