@@ -245,8 +245,6 @@ fn composite_primary_keys_must_work(api: TestApi) {
         vec![PrimaryKeyColumn::new("id"), PrimaryKeyColumn::new("name")]
     };
 
-    let clustered = if api.is_mssql() { Some(true) } else { None };
-
     assert_eq!(
         table,
         &Table {
@@ -261,7 +259,6 @@ fn composite_primary_keys_must_work(api: TestApi) {
                     SqlFamily::Mssql => Some("PK_User".into()),
                     _ => None,
                 },
-                clustered,
             }),
             foreign_keys: vec![],
         }
@@ -325,8 +322,6 @@ fn indices_must_work(api: TestApi) {
         None
     };
 
-    let clustered = if api.is_mssql() { Some(false) } else { None };
-
     assert_eq!(
         vec![Index {
             name: "count".to_string(),
@@ -337,7 +332,6 @@ fn indices_must_work(api: TestApi) {
             }],
             tpe: IndexType::Normal,
             algorithm,
-            clustered,
         }],
         user_table.indices
     );

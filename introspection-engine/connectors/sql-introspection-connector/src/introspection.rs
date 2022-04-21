@@ -1,7 +1,7 @@
 use crate::introspection_helpers::{
     calculate_backrelation_field, calculate_index, calculate_many_to_many_field, calculate_relation_field,
     calculate_scalar_field, is_new_migration_table, is_old_migration_table, is_prisma_1_point_0_join_table,
-    is_prisma_1_point_1_or_2_join_table, is_relay_table,
+    is_prisma_1_point_1_or_2_join_table, is_relay_table, primary_key_is_clustered,
 };
 use crate::version_checker::VersionChecker;
 
@@ -37,6 +37,7 @@ pub fn introspect(
         .filter(|table| !is_prisma_1_point_0_join_table(table))
         .filter(|table| !is_relay_table(table))
     {
+        let walker = schema.table_walkers().find(|t| t.name() == table.name).unwrap();
         debug!("Calculating model: {}", table.name);
         let mut model = Model::new(table.name.clone(), None);
 
@@ -60,10 +61,10 @@ pub fn introspect(
             model.add_field(Field::RelationField(relation_field));
         }
 
-        for index in &table.indices {
+        for index in walker.indexes() {
             // TODO: enable with preview flag, when dml index extensions are done.
             if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes)
-                && index.columns.iter().any(|c| c.length.is_some())
+                && index.columns().any(|c| c.length().is_some())
             {
                 continue;
             }
@@ -73,7 +74,7 @@ pub fn introspect(
 
         if let Some(pk) = &table.primary_key {
             let clustered = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                pk.clustered
+                primary_key_is_clustered(walker.table_id(), schema, ctx)
             } else {
                 None
             };

@@ -125,7 +125,6 @@ async fn sqlite_column_types_must_work() {
                 columns: vec![PrimaryKeyColumn::new("primary_col")],
                 sequence: None,
                 constraint_name: None,
-                clustered: None,
             }),
             foreign_keys: vec![],
         }
@@ -225,7 +224,6 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 columns: vec![PrimaryKeyColumn::new("id")],
                 sequence: None,
                 constraint_name: None,
-                clustered: None,
             }),
             foreign_keys: vec![
                 ForeignKey {
@@ -299,7 +297,6 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
             columns: vec![PrimaryKeyColumn::new("primary_col")],
             sequence: None,
             constraint_name: None,
-            clustered: None,
         }
     );
 }

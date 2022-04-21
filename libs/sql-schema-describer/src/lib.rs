@@ -9,20 +9,27 @@ pub mod sqlite;
 pub mod walkers;
 
 pub(crate) mod common;
+
+mod connector_data;
 mod error;
 mod getters;
 mod ids;
 mod parsers;
 
+pub use self::{
+    error::{DescriberError, DescriberErrorKind, DescriberResult},
+    ids::*,
+};
+
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::fmt::{self, Debug};
+use std::{
+    any::Any,
+    fmt::{self, Debug},
+};
 use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
-
-pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
-pub use ids::{ColumnId, TableId};
 
 /// A database description connector.
 #[async_trait::async_trait]
@@ -60,9 +67,25 @@ pub struct SqlSchema {
     procedures: Vec<Procedure>,
     /// The user-defined types procedures.
     user_defined_types: Vec<UserDefinedType>,
+    /// Connector-specific data
+    connector_data: connector_data::ConnectorData,
 }
 
 impl SqlSchema {
+    /// Extract connector-specific constructs. The type parameter must be the right one.
+    pub fn downcast_connector_data<T: 'static>(&self) -> &T {
+        self.connector_data.data.downcast_ref().unwrap()
+    }
+
+    /// Extract connector-specific constructs. The type parameter must be the right one.
+    pub fn downcast_connector_data_mut<T: 'static>(&mut self) -> &mut T {
+        self.connector_data.data.downcast_mut().unwrap()
+    }
+
+    pub fn set_connector_data(&mut self, data: Box<dyn Any + Send + Sync>) {
+        self.connector_data.data = data;
+    }
+
     /// Get a table.
     pub fn get_table(&self, name: &str) -> Option<&Table> {
         self.tables.iter().find(|x| x.name == name)
@@ -158,7 +181,7 @@ impl SqlSchema {
 }
 
 /// A table found in a schema.
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Table {
     /// The table's name.
     pub name: String,
@@ -331,8 +354,6 @@ pub struct Index {
     pub tpe: IndexType,
     /// BTree or Hash
     pub algorithm: Option<SQLIndexAlgorithm>,
-    /// If true, the field defines how the row is ordered to the disk.
-    pub clustered: Option<bool>,
 }
 
 impl Index {
@@ -410,8 +431,6 @@ pub struct PrimaryKey {
     pub sequence: Option<Sequence>,
     /// The name of the primary key constraint, when available.
     pub constraint_name: Option<String>,
-    /// If true, the field defines how the row is ordered to the disk.
-    pub clustered: Option<bool>,
 }
 
 impl PrimaryKey {

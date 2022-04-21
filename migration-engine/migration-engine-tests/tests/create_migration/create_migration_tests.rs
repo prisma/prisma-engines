@@ -24,8 +24,7 @@ fn basic_create_migration_works(api: TestApi) {
         .assert_migration_directories_count(1)
         .assert_migration("create-cats", move |migration| {
             let expected_script = if is_cockroach {
-                indoc! {
-                    r#"
+                expect![[r#"
                         -- CreateTable
                         CREATE TABLE "Cat" (
                             "id" INT4 NOT NULL,
@@ -33,11 +32,9 @@ fn basic_create_migration_works(api: TestApi) {
 
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
-                    "#
-                }
+                    "#]]
             } else if is_postgres {
-                indoc! {
-                    r#"
+                expect![[r#"
                         -- CreateTable
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL,
@@ -45,11 +42,9 @@ fn basic_create_migration_works(api: TestApi) {
 
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
-                    "#
-                }
+                    "#]]
             } else if is_mysql {
-                indoc! {
-                    r#"
+                expect![[r#"
                         -- CreateTable
                         CREATE TABLE `Cat` (
                             `id` INTEGER NOT NULL,
@@ -57,51 +52,46 @@ fn basic_create_migration_works(api: TestApi) {
 
                             PRIMARY KEY (`id`)
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-                        "#
-                }
+                        "#]]
             } else if is_sqlite {
-                indoc! {
-                    r#"
+                expect![[r#"
                         -- CreateTable
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                             "name" TEXT NOT NULL
                         );
-                        "#
-                }
+                        "#]]
             } else if is_mssql {
-                indoc! {
-                    r#"
-                        BEGIN TRY
+                expect![[r#"
+                    BEGIN TRY
 
-                        BEGIN TRAN;
+                    BEGIN TRAN;
 
-                        -- CreateTable
-                        CREATE TABLE [basic_create_migration_works].[Cat] (
-                            [id] INT NOT NULL,
-                            [name] NVARCHAR(1000) NOT NULL,
-                            CONSTRAINT [Cat_pkey] PRIMARY KEY ([id])
-                        );
+                    -- CreateTable
+                    CREATE TABLE [basic_create_migration_works].[Cat] (
+                        [id] INT NOT NULL,
+                        [name] NVARCHAR(1000) NOT NULL,
+                        CONSTRAINT [Cat_pkey] PRIMARY KEY CLUSTERED ([id])
+                    );
 
-                        COMMIT TRAN;
+                    COMMIT TRAN;
 
-                        END TRY
-                        BEGIN CATCH
+                    END TRY
+                    BEGIN CATCH
 
-                        IF @@TRANCOUNT > 0
-                        BEGIN
-                            ROLLBACK TRAN;
-                        END;
-                        THROW
+                    IF @@TRANCOUNT > 0
+                    BEGIN
+                        ROLLBACK TRAN;
+                    END;
+                    THROW
 
-                        END CATCH
-                        "#
-                }
+                    END CATCH
+                "#]]
             } else {
                 unreachable!()
             };
 
-            migration.assert_contents(expected_script)
+            migration.expect_contents(expected_script)
         });
 }
 
@@ -146,7 +136,7 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
         .assert_migration_directories_count(2)
         .assert_migration("create-dogs", |migration| {
             let expected_script = if is_cockroach {
-                    indoc! {
+                expect![[
                         r#"
                         -- CreateTable
                         CREATE TABLE "Dog" (
@@ -156,11 +146,11 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                             CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
                         );
                         "#
-                    }
+                ]]
                 }
                 else if is_postgres
                 {
-                    indoc! {
+                    expect![[
                         r#"
                         -- CreateTable
                         CREATE TABLE "Dog" (
@@ -170,9 +160,9 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                             CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
                         );
                         "#
-                    }
+                    ]]
                 } else if is_mysql {
-                    indoc! {
+                    expect![[
                         r#"
                         -- CreateTable
                         CREATE TABLE `Dog` (
@@ -182,10 +172,10 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                             PRIMARY KEY (`id`)
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                         "#
-                    }
+                    ]]
                 }
                 else if is_sqlite {
-                    indoc! {
+                    expect![[
                         r#"
                         -- CreateTable
                         CREATE TABLE "Dog" (
@@ -193,10 +183,9 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                             "name" TEXT NOT NULL
                         );
                         "#
-                    }
-                }
-                else if is_mssql {
-                    indoc! {
+                            ]]
+                } else if is_mssql {
+                    expect![[
                         r#"
                         BEGIN TRY
 
@@ -206,7 +195,7 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                         CREATE TABLE [creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline].[Dog] (
                             [id] INT NOT NULL,
                             [name] NVARCHAR(1000) NOT NULL,
-                            CONSTRAINT [Dog_pkey] PRIMARY KEY ([id])
+                            CONSTRAINT [Dog_pkey] PRIMARY KEY CLUSTERED ([id])
                         );
 
                         COMMIT TRAN;
@@ -221,13 +210,13 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                         THROW
 
                         END CATCH
-                        "#
-                    }
+                    "#
+                        ]]
                 } else {
                     unreachable!()
                 };
 
-            migration.assert_contents(expected_script)
+            migration.expect_contents(expected_script)
         });
 }
 
@@ -594,56 +583,56 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
         .assert_migration_directories_count(1)
         .assert_migration("setup", |migration| {
             let expected_script = if is_mssql {
-                indoc! {
+                expect![[
                      r#"
-                     BEGIN TRY
-                     
-                     BEGIN TRAN;
-                     
-                     -- CreateTable
-                     CREATE TABLE [create_constraint_name_tests_w_implicit_names].[A] (
-                         [id] INT NOT NULL,
-                         [name] NVARCHAR(1000) NOT NULL,
-                         [a] NVARCHAR(1000) NOT NULL,
-                         [b] NVARCHAR(1000) NOT NULL,
-                         CONSTRAINT [A_pkey] PRIMARY KEY ([id]),
-                         CONSTRAINT [A_name_key] UNIQUE ([name]),
-                         CONSTRAINT [A_a_b_key] UNIQUE ([a],[b])
-                     );
-                     
-                     -- CreateTable
-                     CREATE TABLE [create_constraint_name_tests_w_implicit_names].[B] (
-                         [a] NVARCHAR(1000) NOT NULL,
-                         [b] NVARCHAR(1000) NOT NULL,
-                         [aId] INT NOT NULL,
-                         CONSTRAINT [B_pkey] PRIMARY KEY ([a],[b])
-                     );
-                     
-                     -- CreateIndex
-                     CREATE INDEX [A_a_idx] ON [create_constraint_name_tests_w_implicit_names].[A]([a]);
-                     
-                     -- CreateIndex
-                     CREATE INDEX [B_a_b_idx] ON [create_constraint_name_tests_w_implicit_names].[B]([a], [b]);
-                     
-                     -- AddForeignKey
-                     ALTER TABLE [create_constraint_name_tests_w_implicit_names].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_implicit_names].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
-                     
-                     COMMIT TRAN;
-                     
-                     END TRY
-                     BEGIN CATCH
-                     
-                     IF @@TRANCOUNT > 0
-                     BEGIN
-                         ROLLBACK TRAN;
-                     END;
-                     THROW
-                     
-                     END CATCH
-                 "#
-                 }
+                    BEGIN TRY
+
+                    BEGIN TRAN;
+
+                    -- CreateTable
+                    CREATE TABLE [create_constraint_name_tests_w_implicit_names].[A] (
+                        [id] INT NOT NULL,
+                        [name] NVARCHAR(1000) NOT NULL,
+                        [a] NVARCHAR(1000) NOT NULL,
+                        [b] NVARCHAR(1000) NOT NULL,
+                        CONSTRAINT [A_pkey] PRIMARY KEY CLUSTERED ([id]),
+                        CONSTRAINT [A_name_key] UNIQUE NONCLUSTERED ([name]),
+                        CONSTRAINT [A_a_b_key] UNIQUE NONCLUSTERED ([a],[b])
+                    );
+
+                    -- CreateTable
+                    CREATE TABLE [create_constraint_name_tests_w_implicit_names].[B] (
+                        [a] NVARCHAR(1000) NOT NULL,
+                        [b] NVARCHAR(1000) NOT NULL,
+                        [aId] INT NOT NULL,
+                        CONSTRAINT [B_pkey] PRIMARY KEY CLUSTERED ([a],[b])
+                    );
+
+                    -- CreateIndex
+                    CREATE NONCLUSTERED INDEX [A_a_idx] ON [create_constraint_name_tests_w_implicit_names].[A]([a]);
+
+                    -- CreateIndex
+                    CREATE NONCLUSTERED INDEX [B_a_b_idx] ON [create_constraint_name_tests_w_implicit_names].[B]([a], [b]);
+
+                    -- AddForeignKey
+                    ALTER TABLE [create_constraint_name_tests_w_implicit_names].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_implicit_names].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+                    COMMIT TRAN;
+
+                    END TRY
+                    BEGIN CATCH
+
+                    IF @@TRANCOUNT > 0
+                    BEGIN
+                        ROLLBACK TRAN;
+                    END;
+                    THROW
+
+                    END CATCH
+                "#
+                 ]]
             } else if is_cockroach {
-                indoc! {
+                expect![[
                      r#"
                      -- CreateTable
                      CREATE TABLE "A" (
@@ -679,9 +668,9 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      -- AddForeignKey
                      ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
-                 }
+                     ]]
             } else if is_postgres {
-                indoc! {
+                expect![[
                      r#"
                      -- CreateTable
                      CREATE TABLE "A" (
@@ -717,9 +706,9 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      -- AddForeignKey
                      ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
-                 }
+                     ]]
             } else if is_mysql {
-                indoc! {
+                expect![[
                      r#"
                  -- CreateTable
                  CREATE TABLE `A` (
@@ -747,9 +736,9 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                  -- AddForeignKey
                  ALTER TABLE `B` ADD CONSTRAINT `B_aId_fkey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
-                 }
+                     ]]
             }else if is_sqlite {
-                indoc!{r#"
+                expect![[r#"
                  -- CreateTable
                  CREATE TABLE "A" (
                      "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -780,11 +769,12 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                  -- CreateIndex
                  CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
                  "#
-             }} else {
-                ""
+                     ]]
+             } else {
+                 unreachable!();
             };
 
-            migration.assert_contents(expected_script)
+            migration.expect_contents(expected_script)
         });
 }
 
@@ -827,57 +817,57 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
         .assert_migration_directories_count(1)
         .assert_migration("setup", move |migration| {
             let expected_script = if is_mssql {
-                indoc! {
+                expect![[
                      r#"
-                     BEGIN TRY
-                     
-                     BEGIN TRAN;
-                     
-                     -- CreateTable
-                     CREATE TABLE [create_constraint_name_tests_w_explicit_names].[A] (
-                         [id] INT NOT NULL,
-                         [name] NVARCHAR(1000) NOT NULL,
-                         [a] NVARCHAR(1000) NOT NULL,
-                         [b] NVARCHAR(1000) NOT NULL,
-                         CONSTRAINT [A_pkey] PRIMARY KEY ([id]),
-                         CONSTRAINT [SingleUnique] UNIQUE ([name]),
-                         CONSTRAINT [NamedCompoundUnique] UNIQUE ([a],[b]),
-                         CONSTRAINT [UnNamedCompoundUnique] UNIQUE ([a],[b])
-                     );
-                     
-                     -- CreateTable
-                     CREATE TABLE [create_constraint_name_tests_w_explicit_names].[B] (
-                         [a] NVARCHAR(1000) NOT NULL,
-                         [b] NVARCHAR(1000) NOT NULL,
-                         [aId] INT NOT NULL,
-                         CONSTRAINT [B_pkey] PRIMARY KEY ([a],[b])
-                     );
-                     
-                     -- CreateIndex
-                     CREATE INDEX [SingleIndex] ON [create_constraint_name_tests_w_explicit_names].[A]([a]);
-                     
-                     -- CreateIndex
-                     CREATE INDEX [CompoundIndex] ON [create_constraint_name_tests_w_explicit_names].[B]([a], [b]);
-                     
-                     -- AddForeignKey
-                     ALTER TABLE [create_constraint_name_tests_w_explicit_names].[B] ADD CONSTRAINT [ForeignKey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_explicit_names].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
-                     
-                     COMMIT TRAN;
-                     
-                     END TRY
-                     BEGIN CATCH
-                     
-                     IF @@TRANCOUNT > 0
-                     BEGIN
-                         ROLLBACK TRAN;
-                     END;
-                     THROW
-                     
-                     END CATCH
-                 "#
-                 }
+                    BEGIN TRY
+
+                    BEGIN TRAN;
+
+                    -- CreateTable
+                    CREATE TABLE [create_constraint_name_tests_w_explicit_names].[A] (
+                        [id] INT NOT NULL,
+                        [name] NVARCHAR(1000) NOT NULL,
+                        [a] NVARCHAR(1000) NOT NULL,
+                        [b] NVARCHAR(1000) NOT NULL,
+                        CONSTRAINT [A_pkey] PRIMARY KEY CLUSTERED ([id]),
+                        CONSTRAINT [SingleUnique] UNIQUE NONCLUSTERED ([name]),
+                        CONSTRAINT [NamedCompoundUnique] UNIQUE NONCLUSTERED ([a],[b]),
+                        CONSTRAINT [UnNamedCompoundUnique] UNIQUE NONCLUSTERED ([a],[b])
+                    );
+
+                    -- CreateTable
+                    CREATE TABLE [create_constraint_name_tests_w_explicit_names].[B] (
+                        [a] NVARCHAR(1000) NOT NULL,
+                        [b] NVARCHAR(1000) NOT NULL,
+                        [aId] INT NOT NULL,
+                        CONSTRAINT [B_pkey] PRIMARY KEY CLUSTERED ([a],[b])
+                    );
+
+                    -- CreateIndex
+                    CREATE NONCLUSTERED INDEX [SingleIndex] ON [create_constraint_name_tests_w_explicit_names].[A]([a]);
+
+                    -- CreateIndex
+                    CREATE NONCLUSTERED INDEX [CompoundIndex] ON [create_constraint_name_tests_w_explicit_names].[B]([a], [b]);
+
+                    -- AddForeignKey
+                    ALTER TABLE [create_constraint_name_tests_w_explicit_names].[B] ADD CONSTRAINT [ForeignKey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_explicit_names].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+                    COMMIT TRAN;
+
+                    END TRY
+                    BEGIN CATCH
+
+                    IF @@TRANCOUNT > 0
+                    BEGIN
+                        ROLLBACK TRAN;
+                    END;
+                    THROW
+
+                    END CATCH
+                "#
+                 ]]
             } else if is_cockroach {
-                indoc! {
+                expect![[
                      r#"
                      -- CreateTable
                      CREATE TABLE "A" (
@@ -916,9 +906,9 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      -- AddForeignKey
                      ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
-                 }
+                     ]]
             }else if is_postgres {
-                indoc! {
+                expect![[
                      r#"
                      -- CreateTable
                      CREATE TABLE "A" (
@@ -957,9 +947,9 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      -- AddForeignKey
                      ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
-                 }
-            } else if is_mysql{
-                indoc! {
+                     ]]
+            } else if is_mysql {
+                expect![[
                      r#"
                  -- CreateTable
                  CREATE TABLE `A` (
@@ -988,9 +978,9 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                  -- AddForeignKey
                  ALTER TABLE `B` ADD CONSTRAINT `ForeignKey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
-                 }
+                     ]]
             }else if is_sqlite {
-                indoc!{r#"
+                expect![[r#"
                  -- CreateTable
                  CREATE TABLE "A" (
                      "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -1024,11 +1014,12 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                  -- CreateIndex
                  CREATE INDEX "CompoundIndex" ON "B"("a", "b");
                  "#
-             }} else {
-                ""
+                     ]]
+             } else {
+                 unreachable!();
             };
 
-            migration.assert_contents(expected_script)
+            migration.expect_contents(expected_script)
         });
 }
 

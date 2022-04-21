@@ -234,7 +234,6 @@ fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<P
                     col.length = None;
                     col.sort_order = None;
                 }
-                pk.clustered = None;
             }
 
             let mut kept_indexes = Vec::new();
@@ -251,7 +250,6 @@ fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<P
                 }
 
                 index.algorithm = None;
-                index.clustered = None;
 
                 if !remove_index {
                     kept_indexes.push(index);
