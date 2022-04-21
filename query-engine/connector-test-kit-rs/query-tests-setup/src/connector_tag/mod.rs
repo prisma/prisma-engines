@@ -6,7 +6,7 @@ mod sql_server;
 mod sqlite;
 mod vitess;
 
-use cockroachdb::*;
+pub use cockroachdb::*;
 use datamodel_connector::ConnectorCapability;
 use enum_dispatch::enum_dispatch;
 pub use mongodb::*;
@@ -67,7 +67,7 @@ pub enum ConnectorTag {
     MongoDb(MongoDbConnectorTag),
     Sqlite(SqliteConnectorTag),
     Vitess(VitessConnectorTag),
-    Cockroach(CockroachDbConnectorTag),
+    CockroachDb(CockroachDbConnectorTag),
 }
 
 #[derive(Debug, Clone)]
@@ -89,7 +89,7 @@ impl From<&ConnectorTag> for ConnectorVersion {
             ConnectorTag::MySql(c) => ConnectorVersion::MySql(c.version()),
             ConnectorTag::MongoDb(c) => ConnectorVersion::MongoDb(c.version()),
             ConnectorTag::Sqlite(_) => ConnectorVersion::Sqlite,
-            ConnectorTag::Cockroach(_) => ConnectorVersion::CockroachDb(c.version()),
+            ConnectorTag::CockroachDb(_) => ConnectorVersion::CockroachDb(c.version()),
             ConnectorTag::Vitess(c) => ConnectorVersion::Vitess(c.version()),
         }
     }
@@ -104,7 +104,7 @@ impl fmt::Display for ConnectorTag {
             Self::MongoDb(_) => "MongoDB",
             Self::Sqlite(_) => "SQLite",
             Self::Vitess(_) => "Vitess",
-            Self::Cockroach(_) => "CockroachDB",
+            Self::CockroachDb(_) => "CockroachDB",
         };
 
         write!(f, "{}", printable)
@@ -155,7 +155,7 @@ impl ConnectorTag {
             .chain(MySqlConnectorTag::all().into_iter().map(Self::MySql))
             .chain(MongoDbConnectorTag::all().into_iter().map(Self::MongoDb))
             .chain(SqliteConnectorTag::all().into_iter().map(Self::Sqlite))
-            .chain(CockroachDbConnectorTag::all().into_iter().map(Self::Cockroach))
+            .chain(CockroachDbConnectorTag::all().into_iter().map(Self::CockroachDb))
             .collect()
     }
 
@@ -205,7 +205,7 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
         let tag = match connector.to_lowercase().as_str() {
             "sqlite" => Self::Sqlite(SqliteConnectorTag::new()),
             "sqlserver" => Self::SqlServer(SqlServerConnectorTag::new(version)?),
-            "cockroachdb" => Self::Cockroach(CockroachDbConnectorTag::new(version)?),
+            "cockroachdb" => Self::CockroachDb(CockroachDbConnectorTag::new(version)?),
             "postgres" => Self::Postgres(PostgresConnectorTag::new(version)?),
             "mysql" => Self::MySql(MySqlConnectorTag::new(version)?),
             "mongodb" => Self::MongoDb(MongoDbConnectorTag::new(version)?),
