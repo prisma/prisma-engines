@@ -516,6 +516,8 @@
 <span id="511">511</span>
 <span id="512">512</span>
 <span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">indoc::formatdoc</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::default_value::DefaultKind</span>;
@@ -566,6 +568,7 @@
     <span class="kw">pub</span> <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexField</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">tpe</span>: <span class="ident">IndexType</span>,
+    <span class="kw">pub</span> <span class="ident">clustered</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">algorithm</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">defined_on_field</span>: <span class="ident">bool</span>,
 }
@@ -617,6 +620,7 @@
     <span class="kw">pub</span> <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrimaryKeyField</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">defined_on_field</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">clustered</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">///A field in a Primary Key that optionally defines a sort order and length limit.</span>

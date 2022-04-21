@@ -810,6 +810,34 @@
 <span id="805">805</span>
 <span id="806">806</span>
 <span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">migration_assertions</span>;
 <span class="kw">mod</span> <span class="ident">quaint_result_set_ext</span>;
 
@@ -1500,6 +1528,20 @@
         <span class="self">self</span>
     }
 
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_non_clustered</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">clustered</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>));
+
+        <span class="self">self</span>
+    }
+
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_clustered</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">clustered</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>));
+
+        <span class="self">self</span>
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug_print</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pk</span>);
         <span class="self">self</span>
@@ -1587,6 +1629,20 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_is_unique</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">tpe</span>, <span class="ident">IndexType::Unique</span>);
+
+        <span class="self">self</span>
+    }
+
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_clustered</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clustered</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>));
+
+        <span class="self">self</span>
+    }
+
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_non_clustered</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">clustered</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>));
 
         <span class="self">self</span>
     }

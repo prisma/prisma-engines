@@ -1079,6 +1079,21 @@
 <span id="1074">1074</span>
 <span id="1075">1075</span>
 <span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">default</span>;
 <span class="kw">mod</span> <span class="ident">id</span>;
 <span class="kw">mod</span> <span class="ident">map</span>;
@@ -1382,6 +1397,8 @@
         <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
 
+    <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident">validate_clustering_setting</span>(<span class="ident">ctx</span>);
+
     <span class="ident">model_attributes</span>.<span class="ident">ast_indexes</span>.<span class="ident">push</span>((
         <span class="ident">ctx</span>.<span class="ident">current_attribute_id</span>(),
         <span class="ident">IndexAttribute</span> {
@@ -1393,6 +1410,7 @@
             }],
             <span class="ident">source_field</span>: <span class="prelude-val">Some</span>(<span class="ident">field_id</span>),
             <span class="ident">mapped_name</span>,
+            <span class="ident">clustered</span>,
             ..<span class="ident">Default::default</span>()
         },
     ))
@@ -1583,14 +1601,11 @@
         (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="ident">index_attribute</span>.<span class="ident">algorithm</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_arg</span>(<span class="string">&quot;type&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="ident">sort</span>.<span class="ident">as_constant_literal</span>()) {
+    <span class="kw">let</span> <span class="ident">algo</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_arg</span>(<span class="string">&quot;type&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="ident">sort</span>.<span class="ident">as_constant_literal</span>()) {
         <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="string">&quot;BTree&quot;</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::BTree</span>),
         <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="string">&quot;Hash&quot;</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Hash</span>),
         <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">other</span>)) =&gt; {
-            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                <span class="string">&quot;The `type` argument can only be `BTree` or `Hash` you provided: {}.&quot;</span>,
-                <span class="ident">other</span>
-            ));
+            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Unknown index type: {}.&quot;</span>, <span class="ident">other</span>));
             <span class="prelude-val">None</span>
         }
         <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
@@ -1599,6 +1614,9 @@
         }
         <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     };
+
+    <span class="ident">index_attribute</span>.<span class="ident">algorithm</span> <span class="op">=</span> <span class="ident">algo</span>;
+    <span class="ident">index_attribute</span>.<span class="ident">clustered</span> <span class="op">=</span> <span class="ident">validate_clustering_setting</span>(<span class="ident">ctx</span>);
 
     <span class="ident">data</span>.<span class="ident">ast_indexes</span>.<span class="ident">push</span>((<span class="ident">ctx</span>.<span class="ident">current_attribute_id</span>(), <span class="ident">index_attribute</span>));
 }
@@ -1655,6 +1673,7 @@
 
     <span class="ident">index_attribute</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>;
     <span class="ident">index_attribute</span>.<span class="ident">mapped_name</span> <span class="op">=</span> <span class="ident">mapped_name</span>;
+    <span class="ident">index_attribute</span>.<span class="ident">clustered</span> <span class="op">=</span> <span class="ident">validate_clustering_setting</span>(<span class="ident">ctx</span>);
 
     <span class="ident">data</span>.<span class="ident">ast_indexes</span>.<span class="ident">push</span>((<span class="ident">current_attribute_id</span>, <span class="ident">index_attribute</span>));
 }
@@ -2154,6 +2173,17 @@
         <span class="ident">object_name</span>,
         <span class="ident">span</span>,
     ))
+}
+
+<span class="kw">fn</span> <span class="ident">validate_clustering_setting</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_arg</span>(<span class="string">&quot;clustered&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="ident">sort</span>.<span class="ident">as_bool</span>()) {
+        <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">val</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">val</span>),
+        <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
+            <span class="prelude-val">None</span>
+        }
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>

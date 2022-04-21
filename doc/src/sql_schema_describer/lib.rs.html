@@ -758,6 +758,20 @@
 <span id="753">753</span>
 <span id="754">754</span>
 <span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::trivial_regex</span>)]</span> <span class="comment">// this is allowed, because we want to do CoW replaces and these regexes will grow.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::match_bool</span>)]</span> <span class="comment">// we respectfully disagree that it makes the code less readable.</span>
@@ -1091,6 +1105,8 @@
     <span class="kw">pub</span> <span class="ident">tpe</span>: <span class="ident">IndexType</span>,
     <span class="doccomment">/// BTree or Hash</span>
     <span class="kw">pub</span> <span class="ident">algorithm</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SQLIndexAlgorithm</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If true, the field defines how the row is ordered to the disk.</span>
+    <span class="kw">pub</span> <span class="ident">clustered</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Index</span> {
@@ -1125,11 +1141,17 @@
     <span class="kw">pub</span> <span class="ident">definition</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrimaryKeyColumn</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">sort_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SQLSortOrder</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">PrimaryKeyColumn</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">length</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">length</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">sort_order</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">sort_order</span>()
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">PrimaryKeyColumn</span> {
@@ -1147,6 +1169,10 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_sort_order</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sort_order</span>: <span class="ident">SQLSortOrder</span>) {
         <span class="self">self</span>.<span class="ident">sort_order</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">sort_order</span>);
     }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort_order</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SQLSortOrder</span> {
+        <span class="self">self</span>.<span class="ident">sort_order</span>.<span class="ident">unwrap_or</span>(<span class="ident">SQLSortOrder::Asc</span>)
+    }
 }
 
 <span class="doccomment">/// The primary key of a table.</span>
@@ -1158,6 +1184,8 @@
     <span class="kw">pub</span> <span class="ident">sequence</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Sequence</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The name of the primary key constraint, when available.</span>
     <span class="kw">pub</span> <span class="ident">constraint_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If true, the field defines how the row is ordered to the disk.</span>
+    <span class="kw">pub</span> <span class="ident">clustered</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">PrimaryKey</span> {

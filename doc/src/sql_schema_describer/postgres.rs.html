@@ -1090,6 +1090,8 @@
 <span id="1085">1085</span>
 <span id="1086">1086</span>
 <span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -1744,6 +1746,7 @@
                             <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyColumn::new</span>(<span class="ident">column_name</span>)],
                             <span class="ident">sequence</span>,
                             <span class="ident">constraint_name</span>: <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">clone</span>()),
+                            <span class="ident">clustered</span>: <span class="prelude-val">None</span>,
                         });
                     }
                 }
@@ -1764,6 +1767,7 @@
                             <span class="bool-val">false</span> =&gt; <span class="ident">IndexType::Normal</span>,
                         },
                         <span class="ident">algorithm</span>,
+                        <span class="ident">clustered</span>: <span class="prelude-val">None</span>,
                     })
                 }
             }

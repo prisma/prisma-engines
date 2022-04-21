@@ -452,6 +452,10 @@
 <span id="447">447</span>
 <span id="448">448</span>
 <span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">sql_schema_calculator_flavour</span>;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use</span> <span class="ident">sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour</span>;
@@ -511,6 +515,7 @@
             <span class="ident">constraint_name</span>: <span class="ident">pk</span>
                 .<span class="ident">constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">flavour</span>.<span class="ident">datamodel_connector</span>())
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into_owned</span>()),
+            <span class="ident">clustered</span>: <span class="ident">pk</span>.<span class="ident">clustered</span>(),
         });
 
         <span class="kw">let</span> <span class="ident">indices</span> <span class="op">=</span> <span class="ident">model</span>
@@ -545,6 +550,7 @@
                     <span class="ident">columns</span>,
                     <span class="ident">tpe</span>: <span class="ident">index_type</span>,
                     <span class="ident">algorithm</span>,
+                    <span class="ident">clustered</span>: <span class="ident">index</span>.<span class="ident">clustered</span>(),
                 }
             })
             .<span class="ident">collect</span>();
@@ -670,6 +676,7 @@
                 ],
                 <span class="ident">tpe</span>: <span class="ident">sql::IndexType::Unique</span>,
                 <span class="ident">algorithm</span>: <span class="prelude-val">None</span>,
+                <span class="ident">clustered</span>: <span class="prelude-val">None</span>,
             },
             <span class="ident">sql::Index</span> {
                 <span class="ident">name</span>: <span class="macro">format!</span>(
@@ -679,6 +686,7 @@
                 <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">sql::IndexColumn::new</span>(<span class="ident">model_b_column</span>)],
                 <span class="ident">tpe</span>: <span class="ident">sql::IndexType::Normal</span>,
                 <span class="ident">algorithm</span>: <span class="prelude-val">None</span>,
+                <span class="ident">clustered</span>: <span class="prelude-val">None</span>,
             },
         ];
 

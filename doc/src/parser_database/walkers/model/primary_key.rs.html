@@ -96,6 +96,12 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types::IdAttribute</span>,
@@ -130,6 +136,12 @@
     <span class="doccomment">/// Is this an `@id` on a specific field, rather than on the model?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_defined_on_field</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">source_field</span>.<span class="ident">is_some</span>()
+    }
+
+    <span class="doccomment">/// If true, the index defines the storage and ordering of the row. Mostly</span>
+    <span class="doccomment">/// matters on SQL Server where one can change the clustering.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clustered</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">clustered</span>
     }
 
     <span class="doccomment">/// The model the id is deined on.</span>

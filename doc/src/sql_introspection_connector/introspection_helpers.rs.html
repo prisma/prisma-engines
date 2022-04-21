@@ -523,6 +523,13 @@
 <span id="518">518</span>
 <span id="519">519</span>
 <span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Dedup</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlError</span>;
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
@@ -678,6 +685,12 @@
         <span class="prelude-val">None</span>
     };
 
+    <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
+        <span class="ident">index</span>.<span class="ident">clustered</span>
+    } <span class="kw">else</span> {
+        <span class="prelude-val">None</span>
+    };
+
     <span class="ident">IndexDefinition</span> {
         <span class="ident">name</span>: <span class="prelude-val">None</span>,
         <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">index</span>.<span class="ident">name</span>.<span class="ident">clone</span>()),
@@ -704,6 +717,7 @@
         <span class="ident">tpe</span>,
         <span class="ident">defined_on_field</span>: <span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span>,
         <span class="ident">algorithm</span>: <span class="ident">using</span>,
+        <span class="ident">clustered</span>,
     }
 }
 

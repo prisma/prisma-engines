@@ -244,6 +244,12 @@
 <span id="239">239</span>
 <span id="240">240</span>
 <span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FieldResolutionError</span>, <span class="ident">FieldResolvingSetup</span>};
@@ -374,12 +380,15 @@
         (<span class="ident">name</span>, <span class="ident">mapped_name</span>)
     };
 
+    <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::validate_clustering_setting</span>(<span class="ident">ctx</span>);
+
     <span class="ident">model_data</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">IdAttribute</span> {
         <span class="ident">name</span>,
         <span class="ident">source_attribute</span>: <span class="ident">ctx</span>.<span class="ident">current_attribute_id</span>(),
         <span class="ident">mapped_name</span>,
         <span class="ident">fields</span>: <span class="ident">resolved_fields</span>,
         <span class="ident">source_field</span>: <span class="prelude-val">None</span>,
+        <span class="ident">clustered</span>,
     });
 }
 
@@ -424,6 +433,8 @@
                 <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
             };
 
+            <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::validate_clustering_setting</span>(<span class="ident">ctx</span>);
+
             <span class="ident">model_attributes</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">IdAttribute</span> {
                 <span class="ident">name</span>: <span class="prelude-val">None</span>,
                 <span class="ident">mapped_name</span>,
@@ -434,6 +445,7 @@
                     <span class="ident">length</span>,
                 }],
                 <span class="ident">source_field</span>: <span class="prelude-val">Some</span>(<span class="ident">field_id</span>),
+                <span class="ident">clustered</span>,
             })
         }
     }

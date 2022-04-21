@@ -203,6 +203,15 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
 </pre><pre class="rust"><code><span class="doccomment">//! See [ValueValidator](./struct.ValueValidator.html).</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -295,6 +304,15 @@
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span> {
             <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">value</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">value</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">construct_type_mismatch_error</span>(<span class="string">&quot;constant literal&quot;</span>)),
+        }
+    }
+
+    <span class="doccomment">/// Unwraps the wrapped value as a boolean.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_bool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_constant_literal</span>() {
+            <span class="prelude-val">Ok</span>(<span class="string">&quot;true&quot;</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+            <span class="prelude-val">Ok</span>(<span class="string">&quot;false&quot;</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">construct_type_mismatch_error</span>(<span class="string">&quot;boolean&quot;</span>)),
         }
     }
 

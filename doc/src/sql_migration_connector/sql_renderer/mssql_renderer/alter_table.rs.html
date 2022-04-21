@@ -298,6 +298,13 @@
 <span id="293">293</span>
 <span id="294">294</span>
 <span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::render_default</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_renderer::common::Quoted</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -487,9 +494,16 @@
             <span class="ident">quoted_columns</span>.<span class="ident">push</span>(<span class="ident">rendered</span>);
         }
 
+        <span class="kw">let</span> <span class="ident">clustering</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">primary_key</span>().<span class="ident">expect</span>(<span class="string">&quot;Primary key missing&quot;</span>).<span class="ident">clustered</span> {
+            <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) =&gt; <span class="string">&quot; CLUSTERED&quot;</span>,
+            <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) =&gt; <span class="string">&quot; NONCLUSTERED&quot;</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="string">&quot;&quot;</span>,
+        };
+
         <span class="self">self</span>.<span class="ident">add_constraints</span>.<span class="ident">insert</span>(<span class="macro">format!</span>(
-            <span class="string">&quot;CONSTRAINT {} PRIMARY KEY ({})&quot;</span>,
+            <span class="string">&quot;CONSTRAINT {} PRIMARY KEY{} ({})&quot;</span>,
             <span class="ident">constraint_name</span>,
+            <span class="ident">clustering</span>,
             <span class="ident">quoted_columns</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>),
         ));
     }

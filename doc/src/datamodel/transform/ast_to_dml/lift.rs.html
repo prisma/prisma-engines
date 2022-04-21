@@ -652,6 +652,10 @@
 <span id="647">647</span>
 <span id="648">648</span>
 <span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">IndexField</span>, <span class="ident">PrimaryKeyField</span>},
@@ -1016,6 +1020,8 @@
                      })
                 .<span class="ident">collect</span>(),
             <span class="ident">defined_on_field</span>: <span class="ident">pk</span>.<span class="ident">is_defined_on_field</span>(),
+            <span class="comment">// By default a primary key is always clustered in any database.</span>
+            <span class="ident">clustered</span>: <span class="ident">pk</span>.<span class="ident">clustered</span>(),
         });
 
         <span class="ident">model</span>.<span class="ident">indices</span> <span class="op">=</span> <span class="ident">walker</span>
@@ -1059,6 +1065,8 @@
                     <span class="ident">tpe</span>,
                     <span class="ident">algorithm</span>,
                     <span class="ident">defined_on_field</span>: <span class="ident">idx</span>.<span class="ident">is_defined_on_field</span>(),
+                    <span class="comment">// By default an index that is not a primary key is always non-clustered in any database.</span>
+                    <span class="ident">clustered</span>: <span class="ident">idx</span>.<span class="ident">clustered</span>(),
                 }
             })
             .<span class="ident">collect</span>();

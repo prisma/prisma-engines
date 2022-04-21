@@ -296,6 +296,12 @@
 <span id="291">291</span>
 <span id="292">292</span>
 <span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="ident">IndexAlgorithm</span>, <span class="ident">IndexAttribute</span>},
@@ -438,6 +444,12 @@
     <span class="doccomment">/// True if it&#39;s our implicit unique index.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_implicit</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">is_none</span>()
+    }
+
+    <span class="doccomment">/// If true, the index defines the storage and ordering of the row. Mostly</span>
+    <span class="doccomment">/// matters on SQL Server where one can change the clustering.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clustered</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">clustered</span>
     }
 
     <span class="doccomment">/// The model the index is defined on.</span>
