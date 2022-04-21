@@ -89,7 +89,7 @@ impl From<&ConnectorTag> for ConnectorVersion {
             ConnectorTag::MySql(c) => ConnectorVersion::MySql(c.version()),
             ConnectorTag::MongoDb(c) => ConnectorVersion::MongoDb(c.version()),
             ConnectorTag::Sqlite(_) => ConnectorVersion::Sqlite,
-            ConnectorTag::CockroachDb(_) => ConnectorVersion::CockroachDb(c.version()),
+            ConnectorTag::CockroachDb(c) => ConnectorVersion::CockroachDb(c.version()),
             ConnectorTag::Vitess(c) => ConnectorVersion::Vitess(c.version()),
         }
     }
