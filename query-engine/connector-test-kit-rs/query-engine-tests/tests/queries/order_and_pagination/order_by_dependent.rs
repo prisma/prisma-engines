@@ -244,7 +244,7 @@ mod order_by_dependent {
             }
           }"#,
           MongoDb(_) | Sqlite => vec![r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#],
-          MySql(_) | CockroachDb => vec![
+          MySql(_) | CockroachDb(_) => vec![
             r#"{"data":{"findManyModelA":[{"id":4,"b":null},{"id":3,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
             r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
           ],
@@ -276,7 +276,7 @@ mod order_by_dependent {
               }
             }"#,
             MongoDb(_) | Sqlite => vec![r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#],
-            MySql(_) | CockroachDb => vec![
+            MySql(_) | CockroachDb(_) => vec![
               r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":4,"b":null},{"id":3,"b":null}]}}"#,
               r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
             ],
