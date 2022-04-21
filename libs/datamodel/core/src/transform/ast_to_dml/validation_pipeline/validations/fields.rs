@@ -375,6 +375,9 @@ pub(crate) fn clustering_setting_preview_enabled(pk: PrimaryKeyWalker<'_>, ctx: 
     ))
 }
 
+/// Only one index or key can be clustered per table.
+///
+/// Here we check the primary key. Another check in index validations.
 pub(crate) fn clustering_can_be_defined_only_once(pk: PrimaryKeyWalker<'_>, ctx: &mut Context<'_>) {
     if !ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
         return;
