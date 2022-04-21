@@ -3135,7 +3135,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/Weakky/quaint.git?branch=feat/separate-i32-i64-fork#8fba0ae616003e5dcd0637fdd508bd1a250fbd50"
+source = "git+https://github.com/Weakky/quaint.git?branch=feat/pg-type-hints-fork#5ef4a6dbe30ac2336beab31d3082125d62dbae16"
 dependencies = [
  "async-trait",
  "base64 0.12.3",

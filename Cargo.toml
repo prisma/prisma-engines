@@ -56,4 +56,4 @@ opt-level = 'z' # Optimize for size.
 #strip="symbols"
 
 [patch."https://github.com/prisma/quaint"]
-quaint = { git = "https://github.com/Weakky/quaint.git", branch = "feat/separate-i32-i64-fork" }
+quaint = { git = "https://github.com/Weakky/quaint.git", branch = "feat/pg-type-hints-fork" }
