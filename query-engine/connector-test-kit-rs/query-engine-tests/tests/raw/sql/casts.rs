@@ -1,7 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(schema(common_nullable_types))]
+#[test_suite(schema(common_nullable_types), only(Postgres))]
 mod casts {
     use query_engine_tests::{fmt_query_raw, run_query, RawParam};
 
