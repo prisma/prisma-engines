@@ -136,7 +136,7 @@ impl fmt::Display for ConnectorVersion {
                 None => "Vitess (unknown)".to_string(),
             },
             Self::CockroachDb(v) => match v {
-                Some(v) => format!("CockroachDb ({})", v),
+                Some(v) => format!("CockroachDb ({})", v.to_string()),
                 None => "CockroachDb (unknown)".to_string(),
             },
         };
