@@ -1080,16 +1080,8 @@ fn validate_client_name(span: Span, object_name: &str, name: StringId, attribute
 }
 
 fn validate_clustering_setting(ctx: &mut Context<'_>) -> Option<bool> {
-    match ctx
-        .visit_optional_arg("clustered")
-        .map(|sort| sort.as_constant_literal())
-    {
-        Some(Ok("true")) => Some(true),
-        Some(Ok("false")) => Some(false),
-        Some(Ok(other)) => {
-            ctx.push_attribute_validation_error(&format!("Unknown boolean value: {}.", other));
-            None
-        }
+    match ctx.visit_optional_arg("clustered").map(|sort| sort.as_bool()) {
+        Some(Ok(val)) => Some(val),
         Some(Err(err)) => {
             ctx.push_error(err);
             None
