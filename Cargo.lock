@@ -3300,6 +3300,7 @@ dependencies = [
 name = "query-engine-node-api"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "connection-string",
  "datamodel",
  "datamodel-connector",

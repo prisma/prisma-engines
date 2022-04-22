@@ -13,6 +13,7 @@ name = "query_engine"
 vendored-openssl = ["sql-connector/vendored-openssl"]
 
 [dependencies]
+anyhow = "1"
 query-core = { path = "../core" }
 request-handlers = { path = "../request-handlers" }
 query-connector = { path = "../connectors/query-connector" }
