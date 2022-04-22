@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["SqlSchemaDescriber",""]]});
+initSidebarItems({"struct":[["MssqlSchemaExt",""],["SqlSchemaDescriber",""]]});

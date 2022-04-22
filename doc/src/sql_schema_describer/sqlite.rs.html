@@ -585,14 +585,6 @@
 <span id="580">580</span>
 <span id="581">581</span>
 <span id="582">582</span>
-<span id="583">583</span>
-<span id="584">584</span>
-<span id="585">585</span>
-<span id="586">586</span>
-<span id="587">587</span>
-<span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQLite description.</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::purge_dangling_foreign_keys</span>, <span class="ident">getters::Getter</span>, <span class="ident">parsers::Parser</span>, <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>,
@@ -664,15 +656,9 @@
         <span class="kw">let</span> <span class="ident">views</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_views</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">SqlSchema</span> {
-            <span class="comment">// There&#39;s no enum type in SQLite.</span>
-            <span class="ident">enums</span>: <span class="macro">vec!</span>[],
-            <span class="comment">// There are no sequences in SQLite.</span>
-            <span class="ident">sequences</span>: <span class="macro">vec!</span>[],
-            <span class="comment">// There are no procedures in SQLite (phew).</span>
-            <span class="ident">procedures</span>: <span class="macro">vec!</span>[],
             <span class="ident">tables</span>,
             <span class="ident">views</span>,
-            <span class="ident">user_defined_types</span>: <span class="macro">vec!</span>[],
+            ..<span class="ident">Default::default</span>()
         })
     }
 
@@ -906,7 +892,6 @@
                 <span class="ident">columns</span>,
                 <span class="ident">sequence</span>: <span class="prelude-val">None</span>,
                 <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
-                <span class="ident">clustered</span>: <span class="prelude-val">None</span>,
             })
         };
 
@@ -1061,7 +1046,6 @@
                 },
                 <span class="ident">columns</span>: <span class="macro">vec!</span>[],
                 <span class="ident">algorithm</span>: <span class="prelude-val">None</span>,
-                <span class="ident">clustered</span>: <span class="prelude-val">None</span>,
             };
 
             <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">r#&quot;PRAGMA index_info(&quot;{}&quot;);&quot;#</span>, <span class="ident">name</span>);

@@ -49,6 +49,8 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mssql</span>;
 <span class="kw">mod</span> <span class="ident">mysql</span>;
 <span class="kw">mod</span> <span class="ident">postgres</span>;
@@ -94,6 +96,8 @@
     <span class="kw">fn</span> <span class="ident">m2m_foreign_key_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_model_a</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">_model_b</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">sql::ForeignKeyAction</span> {
         <span class="ident">sql::ForeignKeyAction::Cascade</span>
     }
+
+    <span class="kw">fn</span> <span class="ident">push_connector_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_context</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>

@@ -63,6 +63,7 @@
 <span id="58">58</span>
 <span id="59">59</span>
 <span id="60">60</span>
+<span id="61">61</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::SqliteFlavour</span>, <span class="ident">pair::Pair</span>, <span class="ident">sql_schema_differ::column::ColumnTypeChange</span>,
@@ -101,6 +102,7 @@
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">differ</span><span class="op">|</span> {
                 <span class="ident">differ</span>.<span class="ident">created_primary_key</span>().<span class="ident">is_some</span>()
                     <span class="op">|</span><span class="op">|</span> <span class="ident">differ</span>.<span class="ident">dropped_primary_key</span>().<span class="ident">is_some</span>()
+                    <span class="op">|</span><span class="op">|</span> <span class="ident">differ</span>.<span class="ident">primary_key_changed</span>()
                     <span class="op">|</span><span class="op">|</span> <span class="ident">differ</span>.<span class="ident">dropped_columns</span>().<span class="ident">next</span>().<span class="ident">is_some</span>()
                     <span class="op">|</span><span class="op">|</span> <span class="ident">differ</span>.<span class="ident">added_columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>())
                     <span class="op">|</span><span class="op">|</span> <span class="ident">differ</span>.<span class="ident">any_column_changed</span>()

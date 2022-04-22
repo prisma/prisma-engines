@@ -780,14 +780,24 @@
 <span id="775">775</span>
 <span id="776">776</span>
 <span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions and types for conveniently traversing and querying a SqlSchema.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnId</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultValue</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>,
-    <span class="ident">Index</span>, <span class="ident">IndexColumn</span>, <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>, <span class="ident">PrimaryKeyColumn</span>, <span class="ident">SQLIndexAlgorithm</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
-    <span class="ident">TableId</span>, <span class="ident">UserDefinedType</span>, <span class="ident">View</span>,
+    <span class="ident">ids::IndexId</span>, <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnId</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultValue</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKey</span>,
+    <span class="ident">ForeignKeyAction</span>, <span class="ident">Index</span>, <span class="ident">IndexColumn</span>, <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>, <span class="ident">PrimaryKeyColumn</span>, <span class="ident">SQLIndexAlgorithm</span>, <span class="ident">SQLSortOrder</span>,
+    <span class="ident">SqlSchema</span>, <span class="ident">Table</span>, <span class="ident">TableId</span>, <span class="ident">UserDefinedType</span>, <span class="ident">View</span>,
 };
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1164,6 +1174,11 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()).<span class="ident">collect</span>())
     }
 
+    <span class="doccomment">/// The SQLSchema the table belongs to.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlSchema</span> {
+        <span class="self">self</span>.<span class="ident">schema</span>
+    }
+
     <span class="doccomment">/// Reference to the underlying `Table` struct.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Table</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>[<span class="self">self</span>.<span class="ident">table_id</span>]
@@ -1441,6 +1456,11 @@
         <span class="self">self</span>.<span class="ident">index_index</span>
     }
 
+    <span class="doccomment">/// The identifier of the index.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IndexId</span> {
+        <span class="ident">IndexId</span>(<span class="self">self</span>.<span class="ident">table_id</span>, <span class="self">self</span>.<span class="ident">index_index</span> <span class="kw">as</span> <span class="ident">u32</span>)
+    }
+
     <span class="doccomment">/// The IndexType</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IndexType</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">tpe</span>
@@ -1449,6 +1469,11 @@
     <span class="doccomment">/// The name of the index.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get</span>().<span class="ident">name</span>
+    }
+
+    <span class="doccomment">/// The SqlSchema the index belongs to</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlSchema</span> {
+        <span class="self">self</span>.<span class="ident">schema</span>
     }
 
     <span class="doccomment">/// Traverse to the table of the index.</span>
@@ -1462,11 +1487,6 @@
     <span class="doccomment">/// The hash algorithm used in the index.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SQLIndexAlgorithm</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">algorithm</span>
-    }
-
-    <span class="doccomment">/// The clustering of the index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clustered</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">clustered</span>
     }
 }
 

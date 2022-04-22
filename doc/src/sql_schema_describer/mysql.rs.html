@@ -873,9 +873,6 @@
 <span id="868">868</span>
 <span id="869">869</span>
 <span id="870">870</span>
-<span id="871">871</span>
-<span id="872">872</span>
-<span id="873">873</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">getters::Getter</span>, <span class="ident">parsers::Parser</span>};
 <span class="kw">use</span> <span class="ident">bigdecimal::ToPrimitive</span>;
@@ -976,8 +973,7 @@
             <span class="ident">enums</span>,
             <span class="ident">views</span>,
             <span class="ident">procedures</span>,
-            <span class="ident">sequences</span>: <span class="macro">vec!</span>[],
-            <span class="ident">user_defined_types</span>: <span class="macro">vec!</span>[],
+            ..<span class="ident">Default::default</span>()
         })
     }
 
@@ -1409,7 +1405,6 @@
                                     <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">column</span>],
                                     <span class="ident">sequence</span>: <span class="prelude-val">None</span>,
                                     <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
-                                    <span class="ident">clustered</span>: <span class="prelude-val">None</span>,
                                 });
                             }
                         };
@@ -1439,7 +1434,6 @@
                                 <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">column</span>],
                                 <span class="ident">tpe</span>,
                                 <span class="ident">algorithm</span>: <span class="prelude-val">None</span>,
-                                <span class="ident">clustered</span>: <span class="prelude-val">None</span>,
                             },
                         );
                     }
