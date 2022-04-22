@@ -91,13 +91,13 @@ dev-postgres14: start-postgres14
 start-cockroach_22_1_0_alpha_1:
 	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach_22_1_0_alpha_1
 
-dev-cockroach: start-cockroach_22_1_0_alpha_1
+dev-cockroach_22_1_0_alpha_1: start-cockroach_22_1_0_alpha_1
 	cp $(CONFIG_PATH)/cockroach_22_1_0_alpha_1 $(CONFIG_FILE)
 
 start-cockroach_21_2_0_patched:
 	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach_21_2_0_patched
 
-dev-cockroach: start-cockroach_21_2_0_patched
+dev-cockroach_21_2_0_patched: start-cockroach_21_2_0_patched
 	cp $(CONFIG_PATH)/cockroach_21_2_0_patched $(CONFIG_FILE)
 
 dev-pgbouncer:
