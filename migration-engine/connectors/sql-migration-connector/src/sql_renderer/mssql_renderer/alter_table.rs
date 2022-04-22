@@ -1,14 +1,17 @@
 use super::render_default;
-use crate::sql_renderer::common::Quoted;
 use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
     sql_migration::AlterColumn,
     sql_migration::TableChange,
-    sql_renderer::{common::IteratorJoin, SqlRenderer},
+    sql_renderer::{
+        common::{IteratorJoin, Quoted},
+        SqlRenderer,
+    },
     sql_schema_differ::ColumnChanges,
 };
 use sql_schema_describer::{
+    mssql::MssqlSchemaExt,
     walkers::{ColumnWalker, TableWalker},
     ColumnId, DefaultValue,
 };
@@ -166,6 +169,7 @@ impl<'a> AlterTableConstructor<'a> {
     }
 
     fn add_primary_key(&mut self) {
+        let mssql_schema_ext: &MssqlSchemaExt = self.tables.next().schema().downcast_connector_data();
         let constraint_name = self
             .tables
             .next()
@@ -187,10 +191,10 @@ impl<'a> AlterTableConstructor<'a> {
             quoted_columns.push(rendered);
         }
 
-        let clustering = match self.tables.next().primary_key().expect("Primary key missing").clustered {
-            Some(true) => " CLUSTERED",
-            Some(false) => " NONCLUSTERED",
-            None => "",
+        let clustering = if mssql_schema_ext.pk_is_clustered(self.tables.next().table_id()) {
+            " CLUSTERED"
+        } else {
+            " NONCLUSTERED"
         };
 
         self.add_constraints.insert(format!(

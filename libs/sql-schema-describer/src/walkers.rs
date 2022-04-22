@@ -3,9 +3,9 @@
 #![deny(missing_docs)]
 
 use crate::{
-    Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
-    Index, IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SQLIndexAlgorithm, SQLSortOrder, SqlSchema, Table,
-    TableId, UserDefinedType, View,
+    ids::IndexId, Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey,
+    ForeignKeyAction, Index, IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SQLIndexAlgorithm, SQLSortOrder,
+    SqlSchema, Table, TableId, UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
 use std::fmt;
@@ -382,6 +382,11 @@ impl<'a> TableWalker<'a> {
             .map(|pk| pk.columns.iter().map(|c| c.name().to_string()).collect())
     }
 
+    /// The SQLSchema the table belongs to.
+    pub fn schema(self) -> &'a SqlSchema {
+        self.schema
+    }
+
     /// Reference to the underlying `Table` struct.
     pub fn table(&self) -> &'a Table {
         &self.schema[self.table_id]
@@ -659,6 +664,11 @@ impl<'a> IndexWalker<'a> {
         self.index_index
     }
 
+    /// The identifier of the index.
+    pub fn index_id(&self) -> IndexId {
+        IndexId(self.table_id, self.index_index as u32)
+    }
+
     /// The IndexType
     pub fn index_type(&self) -> IndexType {
         self.get().tpe
@@ -667,6 +677,11 @@ impl<'a> IndexWalker<'a> {
     /// The name of the index.
     pub fn name(&self) -> &'a str {
         &self.get().name
+    }
+
+    /// The SqlSchema the index belongs to
+    pub fn schema(self) -> &'a SqlSchema {
+        self.schema
     }
 
     /// Traverse to the table of the index.
@@ -680,11 +695,6 @@ impl<'a> IndexWalker<'a> {
     /// The hash algorithm used in the index.
     pub fn algorithm(&self) -> Option<SQLIndexAlgorithm> {
         self.get().algorithm
-    }
-
-    /// The clustering of the index.
-    pub fn clustered(&self) -> Option<bool> {
-        self.get().clustered
     }
 }
 

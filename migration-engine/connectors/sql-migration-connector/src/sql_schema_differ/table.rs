@@ -1,5 +1,5 @@
 use super::{differ_database::DifferDatabase, foreign_keys_match};
-use crate::pair::Pair;
+use crate::{flavour::SqlFlavour, pair::Pair};
 use sql_schema_describer::{
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     PrimaryKey, TableId,
@@ -54,7 +54,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         self.next_indexes().filter(move |next_index| {
             !self
                 .previous_indexes()
-                .any(move |previous_index| indexes_match(&previous_index, next_index))
+                .any(move |previous_index| indexes_match(&previous_index, next_index, self.db.flavour))
         })
     }
 
@@ -62,7 +62,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         self.previous_indexes().filter(move |previous_index| {
             !self
                 .next_indexes()
-                .any(|next_index| indexes_match(previous_index, &next_index))
+                .any(|next_index| indexes_match(previous_index, &next_index, self.db.flavour))
         })
     }
 
@@ -93,22 +93,32 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 
         singular_indexes.filter_map(move |previous_index| {
             self.next_indexes()
-                .find(|next_index| indexes_match(&previous_index, next_index))
+                .find(|next_index| indexes_match(&previous_index, next_index, self.db.flavour))
                 .map(|renamed_index| Pair::new(previous_index, renamed_index))
         })
+    }
+
+    pub(crate) fn primary_key_changed(&self) -> bool {
+        match self.tables.as_ref().map(|t| t.primary_key()).as_tuple() {
+            (Some(previous_pk), Some(next_pk)) => {
+                if previous_pk.columns != next_pk.columns {
+                    return true;
+                }
+
+                if self.primary_key_column_changed(previous_pk) {
+                    return true;
+                }
+
+                self.db.flavour.primary_key_changed(self.tables)
+            }
+            _ => false,
+        }
     }
 
     /// The primary key present in `next` but not `previous`, if applicable.
     pub(crate) fn created_primary_key(&self) -> Option<&'schema PrimaryKey> {
         match self.tables.as_ref().map(|t| t.primary_key()).as_tuple() {
             (None, Some(pk)) => Some(pk),
-            (Some(previous_pk), Some(next_pk))
-                if previous_pk.clustered.unwrap_or(true) != next_pk.clustered.unwrap_or(true) =>
-            {
-                Some(next_pk)
-            }
-            (Some(previous_pk), Some(next_pk)) if previous_pk.columns != next_pk.columns => Some(next_pk),
-            (Some(previous_pk), Some(next_pk)) => self.primary_key_column_changed(previous_pk).then(|| *next_pk),
             _ => None,
         }
     }
@@ -117,13 +127,6 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
     pub(crate) fn dropped_primary_key(&self) -> Option<&'schema PrimaryKey> {
         match self.tables.as_ref().map(|t| t.primary_key()).as_tuple() {
             (Some(pk), None) => Some(pk),
-            (Some(previous_pk), Some(next_pk))
-                if previous_pk.clustered.unwrap_or(true) != next_pk.clustered.unwrap_or(true) =>
-            {
-                Some(previous_pk)
-            }
-            (Some(previous_pk), Some(next_pk)) if previous_pk.columns != next_pk.columns => Some(previous_pk),
-            (Some(previous_pk), Some(_next_pk)) => self.primary_key_column_changed(previous_pk).then(|| *previous_pk),
             _ => None,
         }
     }
@@ -170,7 +173,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 }
 
 /// Compare two SQL indexes and return whether they only differ by name.
-fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>) -> bool {
+fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>, flavour: &dyn SqlFlavour) -> bool {
     let left_cols = first.columns();
     let right_cols = second.columns();
 
@@ -184,5 +187,5 @@ fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>) -> bool {
         })
         && first.index_type() == second.index_type()
         && first.algorithm().unwrap_or_default() == second.algorithm().unwrap_or_default()
-        && first.clustered().unwrap_or(false) == second.clustered().unwrap_or(false)
+        && flavour.indexes_match(*first, *second)
 }

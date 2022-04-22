@@ -29,6 +29,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     push_model_tables(&mut context);
     push_relation_tables(&mut context);
+    flavour.push_connector_data(&mut context);
 
     schema
 }
@@ -57,7 +58,6 @@ fn push_model_tables(ctx: &mut Context<'_>) {
             constraint_name: pk
                 .constraint_name(ctx.flavour.datamodel_connector())
                 .map(|c| c.into_owned()),
-            clustered: pk.clustered(),
         });
 
         let indices = model
@@ -92,7 +92,6 @@ fn push_model_tables(ctx: &mut Context<'_>) {
                     columns,
                     tpe: index_type,
                     algorithm,
-                    clustered: index.clustered(),
                 }
             })
             .collect();
@@ -218,7 +217,6 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 ],
                 tpe: sql::IndexType::Unique,
                 algorithm: None,
-                clustered: None,
             },
             sql::Index {
                 name: format!(
@@ -228,7 +226,6 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 columns: vec![sql::IndexColumn::new(model_b_column)],
                 tpe: sql::IndexType::Normal,
                 algorithm: None,
-                clustered: None,
             },
         ];
 
@@ -426,7 +423,7 @@ fn column_arity(arity: FieldArity) -> sql::ColumnArity {
     }
 }
 
-struct Context<'a> {
+pub(crate) struct Context<'a> {
     datamodel: &'a ValidatedSchema,
     schema: &'a mut SqlDatabaseSchema,
     flavour: &'a dyn SqlFlavour,

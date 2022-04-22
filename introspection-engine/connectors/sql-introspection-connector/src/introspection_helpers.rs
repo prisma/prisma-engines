@@ -1,5 +1,4 @@
-use crate::Dedup;
-use crate::SqlError;
+use crate::{Dedup, SqlError, SqlFamilyTrait};
 use datamodel::{
     common::{preview_features::PreviewFeature, RelationNames},
     dml::{
@@ -9,9 +8,9 @@ use datamodel::{
     },
 };
 use introspection_connector::IntrospectionContext;
-use sql_schema_describer::SQLIndexAlgorithm;
+use sql::mssql::MssqlSchemaExt;
 use sql_schema_describer::{
-    Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SQLSortOrder, SqlSchema, Table,
+    self as sql, ColumnArity, ColumnTypeFamily, ForeignKey, IndexType, SQLSortOrder, SqlSchema, Table,
 };
 use sql_schema_describer::{DefaultKind, ForeignKeyAction};
 use tracing::debug;
@@ -128,9 +127,8 @@ pub fn calculate_many_to_many_field(
     RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
 }
 
-pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> IndexDefinition {
-    debug!("Handling index  {:?}", index);
-    let tpe = match index.tpe {
+pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &IntrospectionContext) -> IndexDefinition {
+    let tpe = match index.index_type() {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
         IndexType::Normal => datamodel::dml::IndexType::Normal,
         IndexType::Fulltext if ctx.preview_features.contains(PreviewFeature::FullTextIndex) => {
@@ -145,51 +143,50 @@ pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> Inde
     //but due to re-introspection previous datamodels and clients should keep working as before.
 
     let using = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        index.algorithm.map(|algo| match algo {
-            SQLIndexAlgorithm::BTree => IndexAlgorithm::BTree,
-            SQLIndexAlgorithm::Hash => IndexAlgorithm::Hash,
+        index.algorithm().map(|algo| match algo {
+            sql::SQLIndexAlgorithm::BTree => IndexAlgorithm::BTree,
+            sql::SQLIndexAlgorithm::Hash => IndexAlgorithm::Hash,
         })
     } else {
         None
     };
 
     let clustered = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        index.clustered
+        index_is_clustered(index.index_id(), index.schema(), ctx)
     } else {
         None
     };
 
     IndexDefinition {
         name: None,
-        db_name: Some(index.name.clone()),
+        db_name: Some(index.name().to_owned()),
         fields: index
-            .columns
-            .iter()
+            .columns()
             .map(|c| {
                 let (sort_order, length) = if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
                     (None, None)
                 } else {
-                    let sort_order = c.sort_order.map(|sort| match sort {
+                    let sort_order = c.sort_order().map(|sort| match sort {
                         SQLSortOrder::Asc => SortOrder::Asc,
                         SQLSortOrder::Desc => SortOrder::Desc,
                     });
-                    (sort_order, c.length)
+                    (sort_order, c.length())
                 };
                 IndexField {
-                    path: vec![(c.name().to_string(), None)],
+                    path: vec![(c.as_column().name().to_owned(), None)],
                     sort_order,
                     length,
                 }
             })
             .collect(),
         tpe,
-        defined_on_field: index.columns.len() == 1,
+        defined_on_field: index.columns().len() == 1,
         algorithm: using,
         clustered,
     }
 }
 
-pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &IntrospectionContext) -> ScalarField {
+pub(crate) fn calculate_scalar_field(table: &Table, column: &sql::Column, ctx: &IntrospectionContext) -> ScalarField {
     debug!("Handling column {:?}", column);
 
     let field_type = calculate_scalar_field_type_with_native_types(column, ctx);
@@ -244,7 +241,7 @@ pub(crate) fn calculate_relation_field(
         on_update: Some(map_action(foreign_key.on_update_action)),
     };
 
-    let columns: Vec<&Column> = foreign_key
+    let columns: Vec<&sql::Column> = foreign_key
         .columns
         .iter()
         .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
@@ -322,7 +319,7 @@ pub(crate) fn calculate_backrelation_field(
     }
 }
 
-pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DMLDef> {
+pub(crate) fn calculate_default(table: &sql::Table, column: &sql::Column, arity: &FieldArity) -> Option<DMLDef> {
     match (column.default.as_ref().map(|d| d.kind()), &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
         (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::new_expression(VG::new_autoincrement())),
@@ -346,7 +343,7 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
     }
 }
 
-fn set_default(mut default: DMLDef, column: &Column) -> DMLDef {
+fn set_default(mut default: DMLDef, column: &sql::Column) -> DMLDef {
     let db_name = column.default.as_ref().and_then(|df| df.constraint_name());
 
     if let Some(name) = db_name {
@@ -356,7 +353,7 @@ fn set_default(mut default: DMLDef, column: &Column) -> DMLDef {
     default
 }
 
-pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
+pub(crate) fn is_id(column: &sql::Column, table: &sql::Table) -> bool {
     table
         .primary_key
         .as_ref()
@@ -364,7 +361,7 @@ pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
         .unwrap_or(false)
 }
 
-pub(crate) fn is_sequence(column: &Column, table: &Table) -> bool {
+pub(crate) fn is_sequence(column: &sql::Column, table: &sql::Table) -> bool {
     table
         .primary_key
         .as_ref()
@@ -419,7 +416,7 @@ pub(crate) fn calculate_relation_name(
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> FieldType {
+pub(crate) fn calculate_scalar_field_type_for_native_type(column: &sql::Column) -> FieldType {
     debug!("Calculating field type for '{}'", column.name);
     let fdt = column.tpe.full_data_type.to_owned();
 
@@ -439,7 +436,10 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, ctx: &IntrospectionContext) -> FieldType {
+pub(crate) fn calculate_scalar_field_type_with_native_types(
+    column: &sql::Column,
+    ctx: &IntrospectionContext,
+) -> FieldType {
     debug!("Calculating native field type for '{}'", column.name);
     let scalar_type = calculate_scalar_field_type_for_native_type(column);
 
@@ -524,4 +524,28 @@ pub fn replace_index_field_names(target: &mut Vec<IndexField>, old_name: &str, n
             }
         })
         .for_each(drop);
+}
+
+fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &IntrospectionContext) -> Option<bool> {
+    if !ctx.sql_family().is_mssql() {
+        return None;
+    }
+
+    let ext: &MssqlSchemaExt = schema.downcast_connector_data();
+
+    Some(ext.index_is_clustered(index_id))
+}
+
+pub(crate) fn primary_key_is_clustered(
+    table_id: sql::TableId,
+    schema: &SqlSchema,
+    ctx: &IntrospectionContext,
+) -> Option<bool> {
+    if !ctx.sql_family().is_mssql() {
+        return None;
+    }
+
+    let ext: &MssqlSchemaExt = schema.downcast_connector_data();
+
+    Some(ext.pk_is_clustered(table_id))
 }
