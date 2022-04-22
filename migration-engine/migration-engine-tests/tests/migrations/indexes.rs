@@ -1,3 +1,5 @@
+mod mssql;
+
 use indoc::{formatdoc, indoc};
 use migration_engine_tests::test_api::*;
 use sql_schema_describer::{SQLIndexAlgorithm, SQLSortOrder};

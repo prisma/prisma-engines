@@ -93,6 +93,15 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
+    /// Unwraps the wrapped value as a boolean.
+    pub(crate) fn as_bool(&self) -> Result<bool, DatamodelError> {
+        match self.as_constant_literal() {
+            Ok("true") => Ok(true),
+            Ok("false") => Ok(false),
+            _ => Err(self.construct_type_mismatch_error("boolean")),
+        }
+    }
+
     #[allow(clippy::type_complexity)]
     /// Unwraps the value as an array of constants.
     pub(crate) fn as_field_array_with_args(

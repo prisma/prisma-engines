@@ -331,6 +331,8 @@ pub struct Index {
     pub tpe: IndexType,
     /// BTree or Hash
     pub algorithm: Option<SQLIndexAlgorithm>,
+    /// If true, the field defines how the row is ordered to the disk.
+    pub clustered: Option<bool>,
 }
 
 impl Index {
@@ -365,11 +367,17 @@ pub struct UserDefinedType {
     pub definition: Option<String>,
 }
 
-#[derive(Default, Serialize, Deserialize, Debug, PartialEq, Clone)]
+#[derive(Default, Serialize, Deserialize, Debug, Clone)]
 pub struct PrimaryKeyColumn {
     pub name: String,
     pub length: Option<u32>,
     pub sort_order: Option<SQLSortOrder>,
+}
+
+impl PartialEq for PrimaryKeyColumn {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name && self.length == other.length && self.sort_order() == other.sort_order()
+    }
 }
 
 impl PrimaryKeyColumn {
@@ -387,6 +395,10 @@ impl PrimaryKeyColumn {
     pub fn set_sort_order(&mut self, sort_order: SQLSortOrder) {
         self.sort_order = Some(sort_order);
     }
+
+    pub fn sort_order(&self) -> SQLSortOrder {
+        self.sort_order.unwrap_or(SQLSortOrder::Asc)
+    }
 }
 
 /// The primary key of a table.
@@ -398,6 +410,8 @@ pub struct PrimaryKey {
     pub sequence: Option<Sequence>,
     /// The name of the primary key constraint, when available.
     pub constraint_name: Option<String>,
+    /// If true, the field defines how the row is ordered to the disk.
+    pub clustered: Option<bool>,
 }
 
 impl PrimaryKey {

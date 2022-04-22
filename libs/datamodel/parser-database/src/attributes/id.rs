@@ -128,12 +128,15 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
         (name, mapped_name)
     };
 
+    let clustered = super::validate_clustering_setting(ctx);
+
     model_data.primary_key = Some(IdAttribute {
         name,
         source_attribute: ctx.current_attribute_id(),
         mapped_name,
         fields: resolved_fields,
         source_field: None,
+        clustered,
     });
 }
 
@@ -178,6 +181,8 @@ pub(super) fn field<'db>(
                 None => None,
             };
 
+            let clustered = super::validate_clustering_setting(ctx);
+
             model_attributes.primary_key = Some(IdAttribute {
                 name: None,
                 mapped_name,
@@ -188,6 +193,7 @@ pub(super) fn field<'db>(
                     length,
                 }],
                 source_field: Some(field_id),
+                clustered,
             })
         }
     }
