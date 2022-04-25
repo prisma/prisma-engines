@@ -10,6 +10,7 @@ use datamodel::dml::PrismaValue;
 use indoc::{formatdoc, indoc};
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use sql_schema_describer::{
+    mssql::MssqlSchemaExt,
     walkers::{
         ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
@@ -127,6 +128,7 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+        let mssql_schema_ext: &MssqlSchemaExt = index.schema().downcast_connector_data();
         let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
@@ -147,10 +149,10 @@ impl SqlRenderer for MssqlFlavour {
             rendered
         });
 
-        let clustering = match index.clustered() {
-            Some(true) => "CLUSTERED ",
-            Some(false) => "NONCLUSTERED ",
-            None => "",
+        let clustering = if mssql_schema_ext.index_is_clustered(index.index_id()) {
+            "CLUSTERED "
+        } else {
+            "NONCLUSTERED "
         };
 
         let columns = columns.join(", ");
@@ -163,6 +165,7 @@ impl SqlRenderer for MssqlFlavour {
             .columns()
             .map(|column| self.render_column(&column))
             .join(",\n    ");
+        let mssql_schema_ext: &MssqlSchemaExt = table.schema().downcast_connector_data();
 
         let primary_key = if let Some(pk) = table.primary_key() {
             let column_names = pk
@@ -180,10 +183,10 @@ impl SqlRenderer for MssqlFlavour {
                 })
                 .join(",");
 
-            let clustering = match pk.clustered {
-                Some(true) => " CLUSTERED",
-                Some(false) => " NONCLUSTERED",
-                None => "",
+            let clustering = if mssql_schema_ext.pk_is_clustered(table.table_id()) {
+                " CLUSTERED"
+            } else {
+                " NONCLUSTERED"
             };
 
             let constraint_name = self.quote(pk.constraint_name.as_ref().unwrap());
@@ -216,10 +219,10 @@ impl SqlRenderer for MssqlFlavour {
                     let constraint_name = self.quote(index.name());
                     let column_names = columns.join(",");
 
-                    let clustering = match index.clustered() {
-                        Some(true) => " CLUSTERED",
-                        Some(false) => " NONCLUSTERED",
-                        None => "",
+                    let clustering = if mssql_schema_ext.index_is_clustered(index.index_id()) {
+                        " CLUSTERED"
+                    } else {
+                        " NONCLUSTERED"
                     };
 
                     format!("CONSTRAINT {constraint_name} UNIQUE{clustering} ({column_names})")

@@ -246,7 +246,8 @@ fn added_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
     let from_psl_change = differ
         .created_primary_key()
         .filter(|pk| !pk.columns.is_empty())
-        .map(|_| TableChange::AddPrimaryKey);
+        .map(|_| TableChange::AddPrimaryKey)
+        .or_else(|| Some(TableChange::AddPrimaryKey).filter(|_| differ.primary_key_changed()));
 
     if differ.db.flavour.should_recreate_the_primary_key_on_column_recreate() {
         from_psl_change.or_else(|| {
@@ -270,7 +271,10 @@ fn added_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
 }
 
 fn dropped_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
-    let from_psl_change = differ.dropped_primary_key().map(|_pk| TableChange::DropPrimaryKey);
+    let from_psl_change = differ
+        .dropped_primary_key()
+        .map(|_pk| TableChange::DropPrimaryKey)
+        .or_else(|| Some(TableChange::DropPrimaryKey).filter(|_| differ.primary_key_changed()));
 
     // ALTER PRIMARY KEY instead where possible (e.g. cockroachdb)
     if differ.tables.previous.primary_key().is_some()

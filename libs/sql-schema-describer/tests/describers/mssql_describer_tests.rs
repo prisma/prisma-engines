@@ -679,7 +679,7 @@ fn mssql_foreign_key_on_delete_must_be_handled(api: TestApi) {
                 }],
                 sequence: None,
                 constraint_name: Some("PK__User".into()),
-                clustered: Some(true),
+                // clustered: Some(true),
             }),
             foreign_keys: vec![
                 ForeignKey {
@@ -738,7 +738,7 @@ fn mssql_multi_field_indexes_must_be_inferred(api: TestApi) {
             columns,
             tpe: IndexType::Unique,
             algorithm: None,
-            clustered: Some(false),
+            // clustered: Some(false),
         }]
     );
 }
@@ -789,7 +789,7 @@ fn mssql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
             columns,
             tpe: IndexType::Unique,
             algorithm: None,
-            clustered: Some(false),
+            // clustered: Some(false),
         }]
     );
 }

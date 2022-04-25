@@ -1,7 +1,7 @@
 use crate::{
-    getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, DescriberError,
-    DescriberErrorKind, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType, PrimaryKey,
-    PrimaryKeyColumn, Procedure, SQLSortOrder, SqlMetadata, SqlSchema, Table, UserDefinedType, View,
+    getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
+    DescriberError, DescriberErrorKind, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType,
+    PrimaryKey, PrimaryKeyColumn, Procedure, SQLSortOrder, SqlMetadata, SqlSchema, Table, UserDefinedType, View,
 };
 use indoc::indoc;
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
@@ -12,7 +12,7 @@ use regex::Regex;
 use std::{
     any::type_name,
     borrow::Cow,
-    collections::{BTreeMap, HashSet},
+    collections::{BTreeMap, HashMap},
     convert::TryInto,
 };
 use tracing::{debug, trace};
@@ -65,6 +65,22 @@ pub struct SqlSchemaDescriber<'a> {
     conn: &'a dyn Queryable,
 }
 
+#[derive(Default)]
+pub struct MssqlSchemaExt {
+    pub clustered_indexes: Vec<IndexId>,
+    pub nonclustered_primary_keys: Vec<TableId>,
+}
+
+impl MssqlSchemaExt {
+    pub fn pk_is_clustered(&self, table_id: TableId) -> bool {
+        self.nonclustered_primary_keys.binary_search(&table_id).is_err()
+    }
+
+    pub fn index_is_clustered(&self, index_id: IndexId) -> bool {
+        self.clustered_indexes.binary_search(&index_id).is_ok()
+    }
+}
+
 impl std::fmt::Debug for SqlSchemaDescriber<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct(type_name::<SqlSchemaDescriber>()).finish()
@@ -89,16 +105,23 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
 
     #[tracing::instrument]
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+        let mut tables = self.get_table_names(schema).await?;
+        let table_ids = tables
+            .iter()
+            .enumerate()
+            .map(|(idx, t)| (t.name.clone(), TableId(idx as u32)))
+            .collect();
+        let mut mssql_ext = MssqlSchemaExt::default();
         let mut columns = self.get_all_columns(schema).await?;
-        let mut indexes = self.get_all_indices(schema).await?;
+        self.get_all_indices(schema, &mut mssql_ext, &mut tables, &table_ids)
+            .await?;
         let mut foreign_keys = self.get_foreign_keys(schema).await?;
 
-        let table_names = self.get_table_names(schema).await?;
-        let mut tables = Vec::with_capacity(table_names.len());
+        mssql_ext.clustered_indexes.sort();
+        mssql_ext.nonclustered_primary_keys.sort();
 
-        for table_name in table_names {
-            let table = self.get_table(&table_name, &mut columns, &mut indexes, &mut foreign_keys);
-            tables.push(table);
+        for table in &mut tables {
+            self.get_table(table, &mut columns, &mut foreign_keys);
         }
 
         let views = self.get_views(schema).await?;
@@ -109,9 +132,11 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
             tables,
             views,
             procedures,
-            enums: vec![],
-            sequences: vec![],
             user_defined_types,
+            connector_data: crate::connector_data::ConnectorData {
+                data: Box::new(mssql_ext),
+            },
+            ..Default::default()
         })
     }
 
@@ -164,7 +189,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     #[tracing::instrument]
-    async fn get_table_names(&self, schema: &str) -> DescriberResult<Vec<String>> {
+    async fn get_table_names(&self, schema: &str) -> DescriberResult<Vec<Table>> {
         let select = r#"
             SELECT t.name AS table_name
             FROM sys.tables t
@@ -179,6 +204,10 @@ impl<'a> SqlSchemaDescriber<'a> {
         let names = rows
             .into_iter()
             .map(|row| row.get_expect_string("table_name"))
+            .map(|name| Table {
+                name,
+                ..Default::default()
+            })
             .collect();
 
         trace!("Found table names: {:?}", names);
@@ -219,23 +248,12 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     fn get_table(
         &self,
-        name: &str,
+        table: &mut Table,
         columns: &mut BTreeMap<String, Vec<Column>>,
-        indexes: &mut BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
         foreign_keys: &mut BTreeMap<String, Vec<ForeignKey>>,
-    ) -> Table {
-        let columns = columns.remove(name).unwrap_or_default();
-        let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
-
-        let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
-
-        Table {
-            name: name.to_string(),
-            columns,
-            foreign_keys,
-            indices: indices.into_iter().map(|(_k, v)| v).collect(),
-            primary_key,
-        }
+    ) {
+        table.foreign_keys = foreign_keys.remove(&table.name).unwrap_or_default();
+        table.columns = columns.remove(&table.name).unwrap_or_default();
     }
 
     async fn get_all_columns(&self, schema: &str) -> DescriberResult<BTreeMap<String, Vec<Column>>> {
@@ -372,10 +390,10 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_all_indices(
         &self,
         schema: &str,
-    ) -> DescriberResult<BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
-        let mut map = BTreeMap::new();
-        let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
-
+        mssql_ext: &mut MssqlSchemaExt,
+        tables: &mut [Table],
+        table_ids: &HashMap<String, TableId>,
+    ) -> DescriberResult<()> {
         let sql = indoc! {r#"
             SELECT DISTINCT
                 ind.name AS index_name,
@@ -413,6 +431,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             trace!("Got index row: {:#?}", row);
 
             let table_name = row.get_expect_string("table_name");
+            let table_id = table_ids[table_name.as_str()];
+            let table = &mut tables[table_id.0 as usize];
             let index_name = row.get_expect_string("index_name");
 
             let sort_order = match row.get_expect_bool("is_descending") {
@@ -422,92 +442,78 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             let clustered = row.get_expect_string("clustering").starts_with("CLUSTERED");
 
-            match row.get("column_name").and_then(|x| x.to_string()) {
-                Some(column_name) => {
-                    let seq_in_index = row.get_expect_i64("seq_in_index");
-                    let pos = seq_in_index - 1;
-                    let is_unique = row.get_expect_bool("is_unique");
+            let column_name = row.get("column_name").and_then(|x| x.to_string()).unwrap();
+            // Multi-column indices will return more than one row (with different column_name values).
+            // We cannot assume that one row corresponds to one index.
+            let seq_in_index = row.get_expect_i64("seq_in_index");
+            let pos = seq_in_index - 1;
+            let is_unique = row.get_expect_bool("is_unique");
 
-                    // Multi-column indices will return more than one row (with different column_name values).
-                    // We cannot assume that one row corresponds to one index.
-                    let (ref mut indexes_map, ref mut primary_key): &mut (_, Option<PrimaryKey>) = map
-                        .entry(table_name)
-                        .or_insert((BTreeMap::<String, Index>::new(), None));
+            let is_pk = row.get_expect_bool("is_primary_key");
 
-                    let is_pk = row.get_expect_bool("is_primary_key");
+            if is_pk {
+                debug!("Column '{}' is part of the primary key", column_name);
 
-                    if is_pk {
-                        debug!("Column '{}' is part of the primary key", column_name);
-
-                        match primary_key {
-                            Some(pk) => {
-                                if pk.columns.len() < (pos + 1) as usize {
-                                    pk.columns.resize((pos + 1) as usize, PrimaryKeyColumn::default());
-                                }
-
-                                pk.columns[pos as usize] = PrimaryKeyColumn::new(column_name);
-                                pk.columns[pos as usize].set_sort_order(sort_order);
-
-                                debug!(
-                                    "The primary key has already been created, added column to it: {:?}",
-                                    pk.columns
-                                );
-                            }
-                            None => {
-                                debug!("Instantiating primary key");
-
-                                let mut column = PrimaryKeyColumn::new(column_name);
-                                column.set_sort_order(sort_order);
-
-                                primary_key.replace(PrimaryKey {
-                                    columns: vec![column],
-                                    sequence: None,
-                                    constraint_name: Some(index_name),
-                                    clustered: Some(clustered),
-                                });
-                            }
-                        };
-                    } else if indexes_map.contains_key(&index_name) {
-                        if let Some(index) = indexes_map.get_mut(&index_name) {
-                            let mut column = IndexColumn::new(column_name);
-                            column.set_sort_order(sort_order);
-
-                            index.columns.push(column);
+                match &mut table.primary_key {
+                    Some(pk) => {
+                        if pk.columns.len() < (pos + 1) as usize {
+                            pk.columns.resize((pos + 1) as usize, PrimaryKeyColumn::default());
                         }
-                    } else {
-                        let mut column = IndexColumn::new(column_name);
-                        column.set_sort_order(sort_order);
 
-                        indexes_map.insert(
-                            index_name.clone(),
-                            Index {
-                                name: index_name,
-                                columns: vec![column],
-                                tpe: match is_unique {
-                                    true => IndexType::Unique,
-                                    false => IndexType::Normal,
-                                },
-                                algorithm: None,
-                                clustered: Some(clustered),
-                            },
+                        pk.columns[pos as usize] = PrimaryKeyColumn::new(column_name);
+                        pk.columns[pos as usize].set_sort_order(sort_order);
+
+                        debug!(
+                            "The primary key has already been created, added column to it: {:?}",
+                            pk.columns
                         );
                     }
+                    None => {
+                        debug!("Instantiating primary key");
+
+                        let mut column = PrimaryKeyColumn::new(column_name);
+                        column.set_sort_order(sort_order);
+
+                        if !clustered {
+                            mssql_ext.nonclustered_primary_keys.push(table_id);
+                        }
+
+                        table.primary_key.replace(PrimaryKey {
+                            columns: vec![column],
+                            sequence: None,
+                            constraint_name: Some(index_name),
+                        });
+                    }
+                };
+            } else if table.indices.iter().any(|index| index.name == index_name) {
+                let index = table.indices.iter_mut().find(|idx| idx.name == index_name).unwrap();
+                let mut column = IndexColumn::new(column_name);
+                column.set_sort_order(sort_order);
+
+                index.columns.push(column);
+            } else {
+                let mut column = IndexColumn::new(column_name);
+                column.set_sort_order(sort_order);
+
+                if clustered {
+                    mssql_ext
+                        .clustered_indexes
+                        .push(IndexId(table_id, table.indices.len() as u32));
                 }
-                None => {
-                    indexes_with_expressions.insert((table_name, index_name));
-                }
+
+                table.indices.push(Index {
+                    name: index_name,
+                    columns: vec![column],
+                    tpe: match is_unique {
+                        true => IndexType::Unique,
+                        false => IndexType::Normal,
+                    },
+                    algorithm: None,
+                });
             }
         }
 
-        for (table, (index_map, _)) in &mut map {
-            for (tble, index_name) in &indexes_with_expressions {
-                if tble == table {
-                    index_map.remove(index_name);
-                }
-            }
-        }
-
-        Ok(map)
+        Ok(())
     }
 
     #[tracing::instrument]

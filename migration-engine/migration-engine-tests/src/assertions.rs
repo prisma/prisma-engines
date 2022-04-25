@@ -8,8 +8,8 @@ use datamodel::datamodel_connector::Connector;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
-    Column, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
-    PrimaryKey, SQLIndexAlgorithm, SQLSortOrder, SqlSchema, Table,
+    self as sql, Column, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index,
+    IndexType, PrimaryKey, SQLIndexAlgorithm, SQLSortOrder, SqlSchema, Table,
 };
 use test_setup::{BitFlags, Tags};
 
@@ -42,15 +42,15 @@ impl SchemaAssertion {
     }
 
     #[track_caller]
-    fn find_table(&self, table_name: &str) -> &sql_schema_describer::Table {
-        match self.schema.tables.iter().find(|t| {
+    fn find_table(&self, table_name: &str) -> (&sql::Table, sql::TableId) {
+        match self.schema.tables.iter().enumerate().find(|(_id, t)| {
             if self.tags.contains(Tags::LowerCasesTableNames) {
                 t.name.eq_ignore_ascii_case(table_name)
             } else {
                 t.name == table_name
             }
         }) {
-            Some(table) => table,
+            Some((table_idx, table)) => (table, sql::TableId(table_idx as u32)),
             None => panic!(
                 "assert_has_table failed. Table {} not found. Tables in database: {:?}",
                 table_name,
@@ -70,8 +70,13 @@ impl SchemaAssertion {
     where
         F: for<'a> FnOnce(TableAssertion<'a>) -> TableAssertion<'a>,
     {
-        let table = self.find_table(table_name);
-        table_assertions(TableAssertion::new(table, self.tags));
+        let (table, table_id) = self.find_table(table_name);
+        table_assertions(TableAssertion {
+            table,
+            tags: self.tags,
+            table_id,
+            schema: &self.schema,
+        });
         self
     }
 
@@ -159,14 +164,12 @@ impl<'a> EnumAssertion<'a> {
 #[derive(Clone, Copy)]
 pub struct TableAssertion<'a> {
     table: &'a Table,
+    table_id: sql::TableId,
+    schema: &'a SqlSchema,
     tags: BitFlags<Tags>,
 }
 
 impl<'a> TableAssertion<'a> {
-    pub fn new(table: &'a Table, tags: BitFlags<Tags>) -> Self {
-        Self { table, tags }
-    }
-
     pub fn assert_column_count(self, n: usize) -> Self {
         let columns_count = self.table.columns.len();
 
@@ -279,7 +282,13 @@ impl<'a> TableAssertion<'a> {
     {
         match self.table.primary_key.as_ref() {
             Some(pk) => {
-                pk_assertions(PrimaryKeyAssertion { pk, table: self.table });
+                pk_assertions(PrimaryKeyAssertion {
+                    pk,
+                    table: self.table,
+                    table_id: self.table_id,
+                    schema: self.schema,
+                    tags: self.tags,
+                });
                 self
             }
             None => panic!("Primary key not found on {}.", self.table.name),
@@ -297,13 +306,19 @@ impl<'a> TableAssertion<'a> {
     where
         F: FnOnce(IndexAssertion<'a>) -> IndexAssertion<'a>,
     {
-        if let Some(idx) = self
+        if let Some((id, idx)) = self
             .table
             .indices
             .iter()
-            .find(|idx| idx.column_names().collect::<Vec<_>>() == columns)
+            .enumerate()
+            .find(|(_, idx)| idx.column_names().collect::<Vec<_>>() == columns)
         {
-            index_assertions(IndexAssertion(idx));
+            index_assertions(IndexAssertion {
+                index: idx,
+                index_id: sql::IndexId(self.table_id, id as u32),
+                schema: self.schema,
+                tags: self.tags,
+            });
         } else {
             panic!("Could not find index on {}.{:?}", self.table.name, columns);
         }
@@ -628,7 +643,10 @@ impl IndexColumnAssertion {
 
 pub struct PrimaryKeyAssertion<'a> {
     pk: &'a PrimaryKey,
-    table: &'a Table,
+    table: &'a sql::Table,
+    table_id: sql::TableId,
+    tags: BitFlags<Tags>,
+    schema: &'a SqlSchema,
 }
 
 impl<'a> PrimaryKeyAssertion<'a> {
@@ -690,14 +708,20 @@ impl<'a> PrimaryKeyAssertion<'a> {
 
     #[track_caller]
     pub fn assert_non_clustered(self) -> Self {
-        assert_eq!(self.pk.clustered, Some(false));
+        if self.tags.contains(Tags::Mssql) {
+            let ext: &sql::mssql::MssqlSchemaExt = self.schema.downcast_connector_data();
+            assert!(!ext.pk_is_clustered(self.table_id))
+        }
 
         self
     }
 
     #[track_caller]
     pub fn assert_clustered(self) -> Self {
-        assert!(self.pk.clustered.unwrap_or(true));
+        if self.tags.contains(Tags::Mssql) {
+            let ext: &sql::mssql::MssqlSchemaExt = self.schema.downcast_connector_data();
+            assert!(ext.pk_is_clustered(self.table_id))
+        }
 
         self
     }
@@ -765,56 +789,67 @@ impl<'a> ForeignKeyAssertion<'a> {
     }
 }
 
-pub struct IndexAssertion<'a>(&'a Index);
+pub struct IndexAssertion<'a> {
+    index: &'a Index,
+    index_id: sql::IndexId,
+    schema: &'a SqlSchema,
+    tags: BitFlags<Tags>,
+}
 
 impl<'a> IndexAssertion<'a> {
     #[track_caller]
     pub fn assert_name(self, name: &str) -> Self {
-        assert_eq!(self.0.name, name);
+        assert_eq!(self.index.name, name);
 
         self
     }
 
     pub fn assert_is_fulltext(self) -> Self {
-        assert_eq!(self.0.tpe, IndexType::Fulltext);
+        assert_eq!(self.index.tpe, IndexType::Fulltext);
 
         self
     }
 
     pub fn assert_is_normal(self) -> Self {
-        assert_eq!(self.0.tpe, IndexType::Normal);
+        assert_eq!(self.index.tpe, IndexType::Normal);
 
         self
     }
 
     pub fn assert_is_unique(self) -> Self {
-        assert_eq!(self.0.tpe, IndexType::Unique);
+        assert_eq!(self.index.tpe, IndexType::Unique);
 
         self
     }
 
     #[track_caller]
     pub fn assert_clustered(self) -> Self {
-        assert_eq!(self.0.clustered, Some(true));
+        if self.tags.contains(Tags::Mssql) {
+            let ext: &sql::mssql::MssqlSchemaExt = self.schema.downcast_connector_data();
+            assert!(ext.index_is_clustered(self.index_id))
+        }
 
         self
     }
 
     #[track_caller]
     pub fn assert_non_clustered(self) -> Self {
-        assert!(!self.0.clustered.unwrap_or(false));
+        if self.tags.contains(Tags::Mssql) {
+            let ext: &sql::mssql::MssqlSchemaExt = self.schema.downcast_connector_data();
+            assert!(!ext.index_is_clustered(self.index_id))
+        }
 
         self
     }
 
     pub fn assert_is_not_unique(self) -> Self {
-        assert_eq!(self.0.tpe, IndexType::Normal);
+        assert_eq!(self.index.tpe, IndexType::Normal);
 
         self
     }
 
     pub fn assert_algorithm(self, algo: SQLIndexAlgorithm) -> Self {
-        assert_eq!(self.0.algorithm, Some(algo));
+        assert_eq!(self.index.algorithm, Some(algo));
 
         self
     }
@@ -823,7 +858,7 @@ impl<'a> IndexAssertion<'a> {
     where
         F: FnOnce(IndexColumnAssertion) -> IndexColumnAssertion,
     {
-        let col = self.0.columns.iter().find(|i| i.name == column_name).unwrap();
+        let col = self.index.columns.iter().find(|i| i.name == column_name).unwrap();
 
         f(IndexColumnAssertion {
             sort_order: col.sort_order,

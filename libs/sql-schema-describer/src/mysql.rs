@@ -98,8 +98,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
             enums,
             views,
             procedures,
-            sequences: vec![],
-            user_defined_types: vec![],
+            ..Default::default()
         })
     }
 
@@ -531,7 +530,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     columns: vec![column],
                                     sequence: None,
                                     constraint_name: None,
-                                    clustered: None,
                                 });
                             }
                         };
@@ -561,7 +559,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 columns: vec![column],
                                 tpe,
                                 algorithm: None,
-                                clustered: None,
                             },
                         );
                     }
