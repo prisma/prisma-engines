@@ -1,11 +1,20 @@
 version: "3"
 services:
-  cockroach:
+  cockroach_22_1_0_alpha_1:
     image: prismagraphql/cockroachdb-custom:22.1.0-alpha.1
     restart: always
     command: start-single-node --insecure
     ports:
       - "26257:26257"
+    networks:
+      - databases
+
+  cockroach_21_2_0_patched:
+    image: prismagraphql/cockroachdb-custom:21.2.0-patched
+    restart: always
+    command: start-single-node --insecure
+    ports:
+      - "26258:26257"
     networks:
       - databases
 
