@@ -127,7 +127,11 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
-        sql_datamodel_connector::POSTGRES
+        if self.is_cockroachdb() {
+            sql_datamodel_connector::COCKROACH
+        } else {
+            sql_datamodel_connector::POSTGRES
+        }
     }
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {

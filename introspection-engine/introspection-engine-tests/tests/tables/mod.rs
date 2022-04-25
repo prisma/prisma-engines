@@ -436,10 +436,12 @@ async fn default_values(api: &TestApi) -> TestResult {
     } else {
         ""
     };
-    let varchar_native = if !api.sql_family().is_sqlite() {
-        "@db.VarChar(5)"
-    } else {
+    let varchar_native = if api.sql_family().is_sqlite() {
         ""
+    } else if api.is_cockroach() {
+        "@db.String(5)"
+    } else {
+        "@db.VarChar(5)"
     };
 
     let float_native = if api.sql_family().is_mssql() {

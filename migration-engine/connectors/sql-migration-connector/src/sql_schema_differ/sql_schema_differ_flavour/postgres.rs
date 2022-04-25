@@ -127,9 +127,8 @@ fn cockroach_column_type_change(columns: Pair<ColumnWalker<'_>>) -> Option<Colum
     let from_scalar_to_list = !columns.previous.arity().is_list() && columns.next.arity().is_list();
 
     match (previous_type, next_type) {
-        (_, Some(CockroachType::Text)) if from_list_to_scalar => Some(SafeCast),
-        (_, Some(CockroachType::VarChar(None))) if from_list_to_scalar => Some(SafeCast),
-        (_, Some(CockroachType::VarChar(_))) if from_list_to_scalar => Some(RiskyCast),
+        (_, Some(CockroachType::String(None))) if from_list_to_scalar => Some(SafeCast),
+        (_, Some(CockroachType::String(_))) if from_list_to_scalar => Some(RiskyCast),
         (_, Some(CockroachType::Char(_))) if from_list_to_scalar => Some(RiskyCast),
         (_, _) if from_scalar_to_list || from_list_to_scalar => Some(NotCastable),
         (Some(previous), Some(next)) => cockroach_native_type_change_riskyness(previous, next, columns),
@@ -157,8 +156,8 @@ fn cockroach_native_type_change_riskyness(
         == (&true, &true);
 
     match (previous, next) {
-        (CockroachType::Integer, CockroachType::Text) if !covered_by_index => Some(ColumnTypeChange::SafeCast),
-        (CockroachType::BigInt, CockroachType::Integer) if !covered_by_index => Some(ColumnTypeChange::RiskyCast),
+        (CockroachType::Int4, CockroachType::String(None)) if !covered_by_index => Some(ColumnTypeChange::SafeCast),
+        (CockroachType::Int8, CockroachType::Int4) if !covered_by_index => Some(ColumnTypeChange::RiskyCast),
         (previous, next) if previous == next => None,
         // Timestamp default precisions
         (CockroachType::Time(None), CockroachType::Time(Some(6)))

@@ -488,35 +488,29 @@ fn render_column_type_cockroachdb(col: &ColumnWalker<'_>) -> Cow<'static, str> {
         .expect("Missing native type in postgres_renderer::render_column_type()");
 
     let tpe: Cow<'_, str> = match native_type {
-        CockroachType::Citext => "CITEXT".into(),
-        CockroachType::Oid => "OID".into(),
         CockroachType::Inet => "INET".into(),
-        CockroachType::SmallInt if is_autoincrement => "SMALLSERIAL".into(),
-        CockroachType::SmallInt => "SMALLINT".into(),
-        CockroachType::Integer if is_autoincrement => "SERIAL4".into(),
-        CockroachType::Integer => "INT4".into(),
-        CockroachType::BigInt if is_autoincrement => "BIGSERIAL".into(),
-        CockroachType::BigInt => "BIGINT".into(),
+        CockroachType::Int2 if is_autoincrement => "SMALLSERIAL".into(),
+        CockroachType::Int2 => "INT2".into(),
+        CockroachType::Int4 if is_autoincrement => "SERIAL4".into(),
+        CockroachType::Int4 => "INT4".into(),
+        CockroachType::Int8 if is_autoincrement => "BIGSERIAL".into(),
+        CockroachType::Int8 => "BIGINT".into(),
         CockroachType::Decimal(precision) => format!("DECIMAL{}", render_decimal_args(precision)).into(),
-        CockroachType::Real => "REAL".into(),
-        CockroachType::DoublePrecision => "DOUBLE PRECISION".into(),
-        CockroachType::VarChar(length) => format!("VARCHAR{}", render_optional_args(length)).into(),
-        CockroachType::Char(length) => {
-            // https://www.cockroachlabs.com/docs/stable/string.html
-            if length.is_none() {
-                r#""char""#.into()
-            } else {
-                format!("CHAR{}", render_optional_args(length)).into()
-            }
-        }
-        CockroachType::Text => "TEXT".into(),
-        CockroachType::ByteA => "BYTEA".into(),
+        CockroachType::Float4 => "REAL".into(),
+        CockroachType::Float8 => "DOUBLE PRECISION".into(),
+        CockroachType::String(length) => format!("STRING{}", render_optional_args(length)).into(),
+
+        // https://www.cockroachlabs.com/docs/stable/string.html
+        CockroachType::Char(length) => format!("CHAR{}", render_optional_args(length)).into(),
+        CockroachType::SingleChar => r#""char""#.into(),
+
+        CockroachType::Bytes => "BYTES".into(),
         CockroachType::Date => "DATE".into(),
         CockroachType::Timestamp(precision) => format!("TIMESTAMP{}", render_optional_args(precision)).into(),
         CockroachType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render_optional_args(precision)).into(),
         CockroachType::Time(precision) => format!("TIME{}", render_optional_args(precision)).into(),
         CockroachType::Timetz(precision) => format!("TIMETZ{}", render_optional_args(precision)).into(),
-        CockroachType::Boolean => "BOOLEAN".into(),
+        CockroachType::Bool => "BOOLEAN".into(),
         CockroachType::Bit(length) => format!("BIT{}", render_optional_args(length)).into(),
         CockroachType::VarBit(length) => format!("VARBIT{}", render_optional_args(length)).into(),
         CockroachType::Uuid => "UUID".into(),

@@ -952,21 +952,20 @@ fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         name if data_type == "ARRAY" && name.starts_with('_') && enum_exists(name.trim_start_matches('_')) => {
             (Enum(name.trim_start_matches('_').to_owned()), None)
         }
-        "int2" | "_int2" => (Int, Some(CockroachType::SmallInt)),
-        "int4" | "_int4" => (Int, Some(CockroachType::Integer)),
-        "int8" | "_int8" => (BigInt, Some(CockroachType::BigInt)),
-        "oid" | "_oid" => (Int, Some(CockroachType::Oid)),
-        "float4" | "_float4" => (Float, Some(CockroachType::Real)),
-        "float8" | "_float8" => (Float, Some(CockroachType::DoublePrecision)),
-        "bool" | "_bool" => (Boolean, Some(CockroachType::Boolean)),
-        "text" | "_text" => (String, Some(CockroachType::Text)),
-        "citext" | "_citext" => (String, Some(CockroachType::Citext)),
-        "varchar" | "_varchar" => (String, Some(CockroachType::VarChar(precision.character_maximum_length))),
+        "int2" | "_int2" => (Int, Some(CockroachType::Int2)),
+        "int4" | "_int4" => (Int, Some(CockroachType::Int4)),
+        "int8" | "_int8" => (BigInt, Some(CockroachType::Int8)),
+        "float4" | "_float4" => (Float, Some(CockroachType::Float4)),
+        "float8" | "_float8" => (Float, Some(CockroachType::Float8)),
+        "bool" | "_bool" => (Boolean, Some(CockroachType::Bool)),
+        "text" | "_text" => (String, Some(CockroachType::String(precision.character_maximum_length))),
+        "varchar" | "_varchar" => (String, Some(CockroachType::String(precision.character_maximum_length))),
         "bpchar" | "_bpchar" => (String, Some(CockroachType::Char(precision.character_maximum_length))),
         // https://www.cockroachlabs.com/docs/stable/string.html
-        "char" | "_char" => (String, Some(CockroachType::Char(None))),
+        "char" | "_char" if data_type == "\"char\"" => (String, Some(CockroachType::SingleChar)),
+        "char" | "_char" => (String, Some(CockroachType::Char(precision.character_maximum_length))),
         "date" | "_date" => (DateTime, Some(CockroachType::Date)),
-        "bytea" | "_bytea" => (Binary, Some(CockroachType::ByteA)),
+        "bytea" | "_bytea" => (Binary, Some(CockroachType::Bytes)),
         "jsonb" | "_jsonb" => (Json, Some(CockroachType::JsonB)),
         "uuid" | "_uuid" => (Uuid, Some(CockroachType::Uuid)),
         // bit and varbit should be binary, but are currently mapped to strings.

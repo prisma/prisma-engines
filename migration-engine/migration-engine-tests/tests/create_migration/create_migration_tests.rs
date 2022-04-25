@@ -25,14 +25,14 @@ fn basic_create_migration_works(api: TestApi) {
         .assert_migration("create-cats", move |migration| {
             let expected_script = if is_cockroach {
                 expect![[r#"
-                        -- CreateTable
-                        CREATE TABLE "Cat" (
-                            "id" INT4 NOT NULL,
-                            "name" TEXT NOT NULL,
+                    -- CreateTable
+                    CREATE TABLE "Cat" (
+                        "id" INT4 NOT NULL,
+                        "name" STRING NOT NULL,
 
-                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
-                        );
-                    "#]]
+                        CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                    );
+                "#]]
             } else if is_postgres {
                 expect![[r#"
                         -- CreateTable
@@ -138,14 +138,14 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
             let expected_script = if is_cockroach {
                 expect![[
                         r#"
-                        -- CreateTable
-                        CREATE TABLE "Dog" (
-                            "id" INT4 NOT NULL,
-                            "name" TEXT NOT NULL,
+                    -- CreateTable
+                    CREATE TABLE "Dog" (
+                        "id" INT4 NOT NULL,
+                        "name" STRING NOT NULL,
 
-                            CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
-                        );
-                        "#
+                        CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
+                    );
+                "#
                 ]]
                 }
                 else if is_postgres
@@ -455,7 +455,7 @@ fn create_enum_renders_correctly(api: TestApi) {
         });
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn unsupported_type_renders_correctly(api: TestApi) {
     let dm = r#"
         datasource test {
@@ -634,40 +634,40 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
             } else if is_cockroach {
                 expect![[
                      r#"
-                     -- CreateTable
-                     CREATE TABLE "A" (
-                         "id" INT4 NOT NULL,
-                         "name" TEXT NOT NULL,
-                         "a" TEXT NOT NULL,
-                         "b" TEXT NOT NULL,
-                     
-                         CONSTRAINT "A_pkey" PRIMARY KEY ("id")
-                     );
-                     
-                     -- CreateTable
-                     CREATE TABLE "B" (
-                         "a" TEXT NOT NULL,
-                         "b" TEXT NOT NULL,
-                         "aId" INT4 NOT NULL,
-                 
-                         CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
-                     );
-                     
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
-                     
-                     -- CreateIndex
-                     CREATE INDEX "A_a_idx" ON "A"("a");
-                     
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "A_a_b_key" ON "A"("a", "b");
-                     
-                     -- CreateIndex
-                     CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
-                     
-                     -- AddForeignKey
-                     ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-                 "#
+                    -- CreateTable
+                    CREATE TABLE "A" (
+                        "id" INT4 NOT NULL,
+                        "name" STRING NOT NULL,
+                        "a" STRING NOT NULL,
+                        "b" STRING NOT NULL,
+
+                        CONSTRAINT "A_pkey" PRIMARY KEY ("id")
+                    );
+
+                    -- CreateTable
+                    CREATE TABLE "B" (
+                        "a" STRING NOT NULL,
+                        "b" STRING NOT NULL,
+                        "aId" INT4 NOT NULL,
+
+                        CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
+                    );
+
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
+
+                    -- CreateIndex
+                    CREATE INDEX "A_a_idx" ON "A"("a");
+
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "A_a_b_key" ON "A"("a", "b");
+
+                    -- CreateIndex
+                    CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
+
+                    -- AddForeignKey
+                    ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+                "#
                      ]]
             } else if is_postgres {
                 expect![[
@@ -869,43 +869,43 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
             } else if is_cockroach {
                 expect![[
                      r#"
-                     -- CreateTable
-                     CREATE TABLE "A" (
-                         "id" INT4 NOT NULL,
-                         "name" TEXT NOT NULL,
-                         "a" TEXT NOT NULL,
-                         "b" TEXT NOT NULL,
-                     
-                         CONSTRAINT "A_pkey" PRIMARY KEY ("id")
-                     );
-                     
-                     -- CreateTable
-                     CREATE TABLE "B" (
-                         "a" TEXT NOT NULL,
-                         "b" TEXT NOT NULL,
-                         "aId" INT4 NOT NULL,
-                     
-                         CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
-                     );
-                     
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "SingleUnique" ON "A"("name");
-                     
-                     -- CreateIndex
-                     CREATE INDEX "SingleIndex" ON "A"("a");
-                     
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "NamedCompoundUnique" ON "A"("a", "b");
-                     
-                     -- CreateIndex
-                     CREATE UNIQUE INDEX "UnNamedCompoundUnique" ON "A"("a", "b");
-                     
-                     -- CreateIndex
-                     CREATE INDEX "CompoundIndex" ON "B"("a", "b");
-                     
-                     -- AddForeignKey
-                     ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-                 "#
+                    -- CreateTable
+                    CREATE TABLE "A" (
+                        "id" INT4 NOT NULL,
+                        "name" STRING NOT NULL,
+                        "a" STRING NOT NULL,
+                        "b" STRING NOT NULL,
+
+                        CONSTRAINT "A_pkey" PRIMARY KEY ("id")
+                    );
+
+                    -- CreateTable
+                    CREATE TABLE "B" (
+                        "a" STRING NOT NULL,
+                        "b" STRING NOT NULL,
+                        "aId" INT4 NOT NULL,
+
+                        CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
+                    );
+
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "SingleUnique" ON "A"("name");
+
+                    -- CreateIndex
+                    CREATE INDEX "SingleIndex" ON "A"("a");
+
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "NamedCompoundUnique" ON "A"("a", "b");
+
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "UnNamedCompoundUnique" ON "A"("a", "b");
+
+                    -- CreateIndex
+                    CREATE INDEX "CompoundIndex" ON "B"("a", "b");
+
+                    -- AddForeignKey
+                    ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+                "#
                      ]]
             }else if is_postgres {
                 expect![[

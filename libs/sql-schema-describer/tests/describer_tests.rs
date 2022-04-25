@@ -3,7 +3,7 @@ mod test_api;
 
 use crate::test_api::*;
 use barrel::types;
-use native_types::{MsSqlType, MsSqlTypeParameter, MySqlType, NativeType, PostgresType};
+use native_types::{CockroachType, MsSqlType, MsSqlTypeParameter, MySqlType, NativeType, PostgresType};
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
@@ -22,6 +22,7 @@ fn int_full_data_type(api: &TestApi) -> &'static str {
 
 fn int_native_type(api: &TestApi) -> Option<Value> {
     match api.sql_family() {
+        SqlFamily::Postgres if api.is_cockroach() => Some(CockroachType::Int4.to_json()),
         SqlFamily::Postgres => Some(PostgresType::Integer.to_json()),
         SqlFamily::Sqlite => None,
         SqlFamily::Mysql if api.connector_tags().contains(Tags::Mysql8) => Some(MySqlType::Int.to_json()),
@@ -42,6 +43,7 @@ fn varchar_full_data_type(api: &TestApi, length: u64) -> String {
 
 fn varchar_native_type(api: &TestApi, length: u32) -> Option<Value> {
     match api.sql_family() {
+        SqlFamily::Postgres if api.is_cockroach() => Some(CockroachType::String(Some(length)).to_json()),
         SqlFamily::Postgres => Some(PostgresType::VarChar(Some(length)).to_json()),
         SqlFamily::Sqlite => None,
         SqlFamily::Mysql if api.connector_tags().contains(Tags::Mysql8) => Some(MySqlType::VarChar(length).to_json()),

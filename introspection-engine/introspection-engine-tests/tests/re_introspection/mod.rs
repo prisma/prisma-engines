@@ -1091,7 +1091,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn virtual_cuid_default(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -1135,6 +1135,60 @@ async fn virtual_cuid_default(api: &TestApi) {
 
         model User2 {
             id        String    @id @default(uuid()) @db.VarChar(36)
+        }
+
+        model Unrelated {
+            id               Int @id @default(autoincrement())
+        }
+    "#};
+
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(&input_dm).await.unwrap());
+}
+
+#[test_connector(tags(CockroachDb))]
+async fn virtual_cuid_default_cockroach(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("non_id", types::varchar(30));
+            });
+
+            migration.create_table("User2", |t| {
+                t.add_column("id", types::varchar(36).primary(true));
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await
+        .unwrap();
+
+    let input_dm = format!(
+        r#"
+        {datasource}
+
+        model User {{
+            id        String    @id @default(cuid()) @db.String(30)
+            non_id    String    @default(cuid()) @db.String(30)
+        }}
+
+        model User2 {{
+            id        String    @id @default(uuid()) @db.String(36)
+        }}
+        "#,
+        datasource = api.datasource_block()
+    );
+
+    let final_dm = indoc! {r#"
+        model User {
+            id        String    @id @default(cuid()) @db.String(30)
+            non_id    String    @default(cuid()) @db.String(30)
+        }
+
+        model User2 {
+            id        String    @id @default(uuid()) @db.String(36)
         }
 
         model Unrelated {
