@@ -5,7 +5,7 @@ use crate::{
     sql_migration::{AlterEnum, SqlMigrationStep},
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase},
 };
-use native_types::PostgresType;
+use native_types::{CockroachType, PostgresType};
 use once_cell::sync::Lazy;
 use regex::RegexSet;
 use sql_schema_describer::walkers::{ColumnWalker, IndexWalker};
@@ -78,11 +78,6 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 
     fn column_type_change(&self, columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
-        use ColumnTypeChange::*;
-
-        let from_list_to_scalar = columns.previous.arity().is_list() && !columns.next.arity().is_list();
-        let from_scalar_to_list = !columns.previous.arity().is_list() && columns.next.arity().is_list();
-
         // Handle the enum cases first.
         match columns.map(|col| col.column_type_family().as_enum()).as_tuple() {
             (Some(previous_enum), Some(next_enum)) if previous_enum == next_enum => return None,
@@ -91,28 +86,10 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             (None, None) => (),
         };
 
-        let previous_type: Option<PostgresType> = columns.previous.column_native_type();
-        let next_type: Option<PostgresType> = columns.next.column_native_type();
-
-        match (previous_type, next_type) {
-            (_, Some(PostgresType::Text)) if from_list_to_scalar => Some(SafeCast),
-            (_, Some(PostgresType::VarChar(None))) if from_list_to_scalar => Some(SafeCast),
-            (_, Some(PostgresType::VarChar(_))) if from_list_to_scalar => Some(RiskyCast),
-            (_, Some(PostgresType::Char(_))) if from_list_to_scalar => Some(RiskyCast),
-            (_, _) if from_scalar_to_list || from_list_to_scalar => Some(NotCastable),
-            (Some(previous), Some(next)) if self.is_cockroachdb() => {
-                cockroach_native_type_change_riskyness(previous, next, columns)
-            }
-            (Some(previous), Some(next)) => postgres_native_type_change_riskyness(previous, next),
-            // Unsupported types will have None as Native type
-            (None, Some(_)) => Some(RiskyCast),
-            (Some(_), None) => Some(RiskyCast),
-            (None, None)
-                if columns.previous.column_type().full_data_type == columns.previous.column_type().full_data_type =>
-            {
-                None
-            }
-            (None, None) => Some(RiskyCast),
+        if self.is_cockroachdb() {
+            cockroach_column_type_change(columns)
+        } else {
+            postgres_column_type_change(columns)
         }
     }
 
@@ -141,10 +118,36 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 }
 
+fn cockroach_column_type_change(columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+    use ColumnTypeChange::*;
+
+    let previous_type: Option<CockroachType> = columns.previous.column_native_type();
+    let next_type: Option<CockroachType> = columns.next.column_native_type();
+    let from_list_to_scalar = columns.previous.arity().is_list() && !columns.next.arity().is_list();
+    let from_scalar_to_list = !columns.previous.arity().is_list() && columns.next.arity().is_list();
+
+    match (previous_type, next_type) {
+        (_, Some(CockroachType::String(None))) if from_list_to_scalar => Some(SafeCast),
+        (_, Some(CockroachType::String(_))) if from_list_to_scalar => Some(RiskyCast),
+        (_, Some(CockroachType::Char(_))) if from_list_to_scalar => Some(RiskyCast),
+        (_, _) if from_scalar_to_list || from_list_to_scalar => Some(NotCastable),
+        (Some(previous), Some(next)) => cockroach_native_type_change_riskyness(previous, next, columns),
+        // Unsupported types will have None as Native type
+        (None, Some(_)) => Some(RiskyCast),
+        (Some(_), None) => Some(RiskyCast),
+        (None, None)
+            if columns.previous.column_type().full_data_type == columns.previous.column_type().full_data_type =>
+        {
+            None
+        }
+        (None, None) => Some(RiskyCast),
+    }
+}
+
 // https://go.crdb.dev/issue-v/49329/v22.1
 fn cockroach_native_type_change_riskyness(
-    previous: PostgresType,
-    next: PostgresType,
+    previous: CockroachType,
+    next: CockroachType,
     columns: Pair<ColumnWalker<'_>>,
 ) -> Option<ColumnTypeChange> {
     let covered_by_index = columns
@@ -153,19 +156,45 @@ fn cockroach_native_type_change_riskyness(
         == (&true, &true);
 
     match (previous, next) {
-        (PostgresType::Integer, PostgresType::Text) if !covered_by_index => Some(ColumnTypeChange::SafeCast),
-        (PostgresType::BigInt, PostgresType::Integer) if !covered_by_index => Some(ColumnTypeChange::RiskyCast),
+        (CockroachType::Int4, CockroachType::String(None)) if !covered_by_index => Some(ColumnTypeChange::SafeCast),
+        (CockroachType::Int8, CockroachType::Int4) if !covered_by_index => Some(ColumnTypeChange::RiskyCast),
         (previous, next) if previous == next => None,
         // Timestamp default precisions
-        (PostgresType::Time(None), PostgresType::Time(Some(6)))
-        | (PostgresType::Time(Some(6)), PostgresType::Time(None))
-        | (PostgresType::Timetz(None), PostgresType::Timetz(Some(6)))
-        | (PostgresType::Timetz(Some(6)), PostgresType::Timetz(None))
-        | (PostgresType::Timestamptz(None), PostgresType::Timestamptz(Some(6)))
-        | (PostgresType::Timestamptz(Some(6)), PostgresType::Timestamptz(None))
-        | (PostgresType::Timestamp(None), PostgresType::Timestamp(Some(6)))
-        | (PostgresType::Timestamp(Some(6)), PostgresType::Timestamp(None)) => None,
+        (CockroachType::Time(None), CockroachType::Time(Some(6)))
+        | (CockroachType::Time(Some(6)), CockroachType::Time(None))
+        | (CockroachType::Timetz(None), CockroachType::Timetz(Some(6)))
+        | (CockroachType::Timetz(Some(6)), CockroachType::Timetz(None))
+        | (CockroachType::Timestamptz(None), CockroachType::Timestamptz(Some(6)))
+        | (CockroachType::Timestamptz(Some(6)), CockroachType::Timestamptz(None))
+        | (CockroachType::Timestamp(None), CockroachType::Timestamp(Some(6)))
+        | (CockroachType::Timestamp(Some(6)), CockroachType::Timestamp(None)) => None,
         _ => Some(ColumnTypeChange::NotCastable),
+    }
+}
+
+fn postgres_column_type_change(columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+    use ColumnTypeChange::*;
+    let previous_type: Option<PostgresType> = columns.previous.column_native_type();
+    let next_type: Option<PostgresType> = columns.next.column_native_type();
+    let from_list_to_scalar = columns.previous.arity().is_list() && !columns.next.arity().is_list();
+    let from_scalar_to_list = !columns.previous.arity().is_list() && columns.next.arity().is_list();
+
+    match (previous_type, next_type) {
+        (_, Some(PostgresType::Text)) if from_list_to_scalar => Some(SafeCast),
+        (_, Some(PostgresType::VarChar(None))) if from_list_to_scalar => Some(SafeCast),
+        (_, Some(PostgresType::VarChar(_))) if from_list_to_scalar => Some(RiskyCast),
+        (_, Some(PostgresType::Char(_))) if from_list_to_scalar => Some(RiskyCast),
+        (_, _) if from_scalar_to_list || from_list_to_scalar => Some(NotCastable),
+        (Some(previous), Some(next)) => postgres_native_type_change_riskyness(previous, next),
+        // Unsupported types will have None as Native type
+        (None, Some(_)) => Some(RiskyCast),
+        (Some(_), None) => Some(RiskyCast),
+        (None, None)
+            if columns.previous.column_type().full_data_type == columns.previous.column_type().full_data_type =>
+        {
+            None
+        }
+        (None, None) => Some(RiskyCast),
     }
 }
 

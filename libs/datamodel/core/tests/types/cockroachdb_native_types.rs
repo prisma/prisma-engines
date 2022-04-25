@@ -74,3 +74,46 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
     "#]];
     expect_error(dml, &expectation);
 }
+
+#[test]
+fn cockroach_specific_native_types_are_valid() {
+    let schema = r#"
+    datasource db {
+        provider = "cockroachdb"
+        url = env("TEST_DATABASE_URL")
+    }
+
+    generator js {
+        provider = "prisma-client-js"
+        previewFeatures = ["cockroachdb"]
+    }
+
+    model NativeTypesTest {
+        id          Int      @db.Int4 @id @default(autoincrement())
+        bitcol      String   @db.Bit
+        boolcol     Boolean  @db.Bool
+        bytescol    Bytes    @db.Bytes
+        charcol     String   @db.Char(5)
+        datecol     DateTime @db.Date
+        decimalcol  Decimal  @db.Decimal(5, 2)
+        float4col   Float    @db.Float4
+        float8col   Float    @db.Float8
+        inetcol     String   @db.Inet
+        int2col     Int      @db.Int2
+        int4col     Int      @db.Int4
+        int8col     BigInt   @db.Int8
+        jsonbcol    Json     @db.JsonB
+        scharcol    String   @db.SingleChar
+        stringcol1  String   @db.String
+        stringcol2  String   @db.String(40)
+        timecol     DateTime @db.Time
+        timetzcol   DateTime @db.Timetz
+        timestcol   DateTime @db.Timestamp
+        timesttzcol DateTime @db.Timestamptz
+        uuidcol     String   @db.Uuid
+        varbitcol   String   @db.VarBit(200)
+    }
+    "#;
+
+    parse(schema);
+}

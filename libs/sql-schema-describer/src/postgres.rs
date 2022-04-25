@@ -4,7 +4,7 @@ use super::*;
 use crate::{getters::Getter, parsers::Parser};
 use enumflags2::BitFlags;
 use indoc::indoc;
-use native_types::{NativeType, PostgresType};
+use native_types::{CockroachType, NativeType, PostgresType};
 use quaint::{connector::ResultRow, prelude::Queryable};
 use regex::Regex;
 use serde_json::from_str;
@@ -321,7 +321,11 @@ impl<'a> SqlSchemaDescriber<'a> {
             };
 
             let data_type = col.get_expect_string("data_type");
-            let tpe = get_column_type(&col, enums);
+            let tpe = if self.is_cockroach() {
+                get_column_type_cockroachdb(&col, enums)
+            } else {
+                get_column_type_postgresql(&col, enums)
+            };
             let default = Self::get_default_value(&col, &data_type, &tpe, sequences, schema);
 
             let auto_increment = is_identity
@@ -836,7 +840,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 }
 
-fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
+fn get_column_type_postgresql(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     use ColumnTypeFamily::*;
     let data_type = row.get_expect_string("data_type");
     let full_data_type = row.get_expect_string("full_data_type");
@@ -903,6 +907,89 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "tsvector" | "_tsvector" => unsupported_type(),
         "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
         "inet" | "_inet" => (String, Some(PostgresType::Inet)),
+        //geometric
+        "box" | "_box" => unsupported_type(),
+        "circle" | "_circle" => unsupported_type(),
+        "line" | "_line" => unsupported_type(),
+        "lseg" | "_lseg" => unsupported_type(),
+        "path" | "_path" => unsupported_type(),
+        "polygon" | "_polygon" => unsupported_type(),
+        name if enum_exists(name) => (Enum(name.to_owned()), None),
+        _ => unsupported_type(),
+    };
+
+    ColumnType {
+        full_data_type,
+        family,
+        arity,
+        native_type: native_type.map(|x| x.to_json()),
+    }
+}
+
+// Separate from get_column_type_postgresql because of native types.
+fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
+    use ColumnTypeFamily::*;
+    let data_type = row.get_expect_string("data_type");
+    let full_data_type = row.get_expect_string("full_data_type");
+    let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
+        "no" => true,
+        "yes" => false,
+        x => panic!("unrecognized is_nullable variant '{}'", x),
+    };
+
+    let arity = match matches!(data_type.as_str(), "ARRAY") {
+        true => ColumnArity::List,
+        false if is_required => ColumnArity::Required,
+        false => ColumnArity::Nullable,
+    };
+
+    let precision = SqlSchemaDescriber::get_precision(row);
+    let unsupported_type = || (Unsupported(full_data_type.clone()), None);
+    let enum_exists = |name| enums.iter().any(|e| e.name == name);
+
+    let (family, native_type) = match full_data_type.as_str() {
+        name if data_type == "USER-DEFINED" && enum_exists(name) => (Enum(name.to_owned()), None),
+        name if data_type == "ARRAY" && name.starts_with('_') && enum_exists(name.trim_start_matches('_')) => {
+            (Enum(name.trim_start_matches('_').to_owned()), None)
+        }
+        "int2" | "_int2" => (Int, Some(CockroachType::Int2)),
+        "int4" | "_int4" => (Int, Some(CockroachType::Int4)),
+        "int8" | "_int8" => (BigInt, Some(CockroachType::Int8)),
+        "float4" | "_float4" => (Float, Some(CockroachType::Float4)),
+        "float8" | "_float8" => (Float, Some(CockroachType::Float8)),
+        "bool" | "_bool" => (Boolean, Some(CockroachType::Bool)),
+        "text" | "_text" => (String, Some(CockroachType::String(precision.character_maximum_length))),
+        "varchar" | "_varchar" => (String, Some(CockroachType::String(precision.character_maximum_length))),
+        "bpchar" | "_bpchar" => (String, Some(CockroachType::Char(precision.character_maximum_length))),
+        // https://www.cockroachlabs.com/docs/stable/string.html
+        "char" | "_char" if data_type == "\"char\"" => (String, Some(CockroachType::SingleChar)),
+        "char" | "_char" => (String, Some(CockroachType::Char(precision.character_maximum_length))),
+        "date" | "_date" => (DateTime, Some(CockroachType::Date)),
+        "bytea" | "_bytea" => (Binary, Some(CockroachType::Bytes)),
+        "jsonb" | "_jsonb" => (Json, Some(CockroachType::JsonB)),
+        "uuid" | "_uuid" => (Uuid, Some(CockroachType::Uuid)),
+        // bit and varbit should be binary, but are currently mapped to strings.
+        "bit" | "_bit" => (String, Some(CockroachType::Bit(precision.character_maximum_length))),
+        "varbit" | "_varbit" => (String, Some(CockroachType::VarBit(precision.character_maximum_length))),
+        "numeric" | "_numeric" => (
+            Decimal,
+            Some(CockroachType::Decimal(
+                match (precision.numeric_precision, precision.numeric_scale) {
+                    (None, None) => None,
+                    (Some(prec), Some(scale)) => Some((prec, scale)),
+                    _ => None,
+                },
+            )),
+        ),
+        "pg_lsn" | "_pg_lsn" => unsupported_type(),
+        "time" | "_time" => (DateTime, Some(CockroachType::Time(precision.time_precision))),
+        "timetz" | "_timetz" => (DateTime, Some(CockroachType::Timetz(precision.time_precision))),
+        "timestamp" | "_timestamp" => (DateTime, Some(CockroachType::Timestamp(precision.time_precision))),
+        "timestamptz" | "_timestamptz" => (DateTime, Some(CockroachType::Timestamptz(precision.time_precision))),
+        "tsquery" | "_tsquery" => unsupported_type(),
+        "tsvector" | "_tsvector" => unsupported_type(),
+        "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
+        "inet" | "_inet" => (String, Some(CockroachType::Inet)),
         //geometric
         "box" | "_box" => unsupported_type(),
         "circle" | "_circle" => unsupported_type(),
