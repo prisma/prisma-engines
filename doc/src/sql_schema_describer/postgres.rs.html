@@ -1090,13 +1090,100 @@
 <span id="1085">1085</span>
 <span id="1086">1086</span>
 <span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+<span id="1106">1106</span>
+<span id="1107">1107</span>
+<span id="1108">1108</span>
+<span id="1109">1109</span>
+<span id="1110">1110</span>
+<span id="1111">1111</span>
+<span id="1112">1112</span>
+<span id="1113">1113</span>
+<span id="1114">1114</span>
+<span id="1115">1115</span>
+<span id="1116">1116</span>
+<span id="1117">1117</span>
+<span id="1118">1118</span>
+<span id="1119">1119</span>
+<span id="1120">1120</span>
+<span id="1121">1121</span>
+<span id="1122">1122</span>
+<span id="1123">1123</span>
+<span id="1124">1124</span>
+<span id="1125">1125</span>
+<span id="1126">1126</span>
+<span id="1127">1127</span>
+<span id="1128">1128</span>
+<span id="1129">1129</span>
+<span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
+<span id="1152">1152</span>
+<span id="1153">1153</span>
+<span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
+<span id="1159">1159</span>
+<span id="1160">1160</span>
+<span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
+<span id="1172">1172</span>
+<span id="1173">1173</span>
+<span id="1174">1174</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">getters::Getter</span>, <span class="ident">parsers::Parser</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
-<span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">NativeType</span>, <span class="ident">PostgresType</span>};
+<span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">CockroachType</span>, <span class="ident">NativeType</span>, <span class="ident">PostgresType</span>};
 <span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">connector::ResultRow</span>, <span class="ident">prelude::Queryable</span>};
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">serde_json::from_str</span>;
@@ -1413,7 +1500,11 @@
             };
 
             <span class="kw">let</span> <span class="ident">data_type</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;data_type&quot;</span>);
-            <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="ident">get_column_type</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="ident">enums</span>);
+            <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroach</span>() {
+                <span class="ident">get_column_type_cockroachdb</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="ident">enums</span>)
+            } <span class="kw">else</span> {
+                <span class="ident">get_column_type_postgresql</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="ident">enums</span>)
+            };
             <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::get_default_value</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="kw-2">&amp;</span><span class="ident">data_type</span>, <span class="kw-2">&amp;</span><span class="ident">tpe</span>, <span class="ident">sequences</span>, <span class="ident">schema</span>);
 
             <span class="kw">let</span> <span class="ident">auto_increment</span> <span class="op">=</span> <span class="ident">is_identity</span>
@@ -1928,7 +2019,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_column_type</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">ResultRow</span>, <span class="ident">enums</span>: <span class="kw-2">&amp;</span>[<span class="ident">Enum</span>]) -&gt; <span class="ident">ColumnType</span> {
+<span class="kw">fn</span> <span class="ident">get_column_type_postgresql</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">ResultRow</span>, <span class="ident">enums</span>: <span class="kw-2">&amp;</span>[<span class="ident">Enum</span>]) -&gt; <span class="ident">ColumnType</span> {
     <span class="kw">use</span> <span class="ident">ColumnTypeFamily</span>::<span class="kw-2">*</span>;
     <span class="kw">let</span> <span class="ident">data_type</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;data_type&quot;</span>);
     <span class="kw">let</span> <span class="ident">full_data_type</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;full_data_type&quot;</span>);
@@ -1995,6 +2086,89 @@
         <span class="string">&quot;tsvector&quot;</span> <span class="op">|</span> <span class="string">&quot;_tsvector&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
         <span class="string">&quot;txid_snapshot&quot;</span> <span class="op">|</span> <span class="string">&quot;_txid_snapshot&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
         <span class="string">&quot;inet&quot;</span> <span class="op">|</span> <span class="string">&quot;_inet&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Inet</span>)),
+        <span class="comment">//geometric</span>
+        <span class="string">&quot;box&quot;</span> <span class="op">|</span> <span class="string">&quot;_box&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="string">&quot;circle&quot;</span> <span class="op">|</span> <span class="string">&quot;_circle&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="string">&quot;line&quot;</span> <span class="op">|</span> <span class="string">&quot;_line&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="string">&quot;lseg&quot;</span> <span class="op">|</span> <span class="string">&quot;_lseg&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="string">&quot;path&quot;</span> <span class="op">|</span> <span class="string">&quot;_path&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="string">&quot;polygon&quot;</span> <span class="op">|</span> <span class="string">&quot;_polygon&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="ident">name</span> <span class="kw">if</span> <span class="ident">enum_exists</span>(<span class="ident">name</span>) =&gt; (<span class="ident">Enum</span>(<span class="ident">name</span>.<span class="ident">to_owned</span>()), <span class="prelude-val">None</span>),
+        <span class="kw">_</span> =&gt; <span class="ident">unsupported_type</span>(),
+    };
+
+    <span class="ident">ColumnType</span> {
+        <span class="ident">full_data_type</span>,
+        <span class="ident">family</span>,
+        <span class="ident">arity</span>,
+        <span class="ident">native_type</span>: <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_json</span>()),
+    }
+}
+
+<span class="comment">// Separate from get_column_type_postgresql because of native types.</span>
+<span class="kw">fn</span> <span class="ident">get_column_type_cockroachdb</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">ResultRow</span>, <span class="ident">enums</span>: <span class="kw-2">&amp;</span>[<span class="ident">Enum</span>]) -&gt; <span class="ident">ColumnType</span> {
+    <span class="kw">use</span> <span class="ident">ColumnTypeFamily</span>::<span class="kw-2">*</span>;
+    <span class="kw">let</span> <span class="ident">data_type</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;data_type&quot;</span>);
+    <span class="kw">let</span> <span class="ident">full_data_type</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;full_data_type&quot;</span>);
+    <span class="kw">let</span> <span class="ident">is_required</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;is_nullable&quot;</span>).<span class="ident">to_lowercase</span>().<span class="ident">as_ref</span>() {
+        <span class="string">&quot;no&quot;</span> =&gt; <span class="bool-val">true</span>,
+        <span class="string">&quot;yes&quot;</span> =&gt; <span class="bool-val">false</span>,
+        <span class="ident">x</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unrecognized is_nullable variant &#39;{}&#39;&quot;</span>, <span class="ident">x</span>),
+    };
+
+    <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">matches!</span>(<span class="ident">data_type</span>.<span class="ident">as_str</span>(), <span class="string">&quot;ARRAY&quot;</span>) {
+        <span class="bool-val">true</span> =&gt; <span class="ident">ColumnArity::List</span>,
+        <span class="bool-val">false</span> <span class="kw">if</span> <span class="ident">is_required</span> =&gt; <span class="ident">ColumnArity::Required</span>,
+        <span class="bool-val">false</span> =&gt; <span class="ident">ColumnArity::Nullable</span>,
+    };
+
+    <span class="kw">let</span> <span class="ident">precision</span> <span class="op">=</span> <span class="ident">SqlSchemaDescriber::get_precision</span>(<span class="ident">row</span>);
+    <span class="kw">let</span> <span class="ident">unsupported_type</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">Unsupported</span>(<span class="ident">full_data_type</span>.<span class="ident">clone</span>()), <span class="prelude-val">None</span>);
+    <span class="kw">let</span> <span class="ident">enum_exists</span> <span class="op">=</span> <span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">enums</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>);
+
+    <span class="kw">let</span> (<span class="ident">family</span>, <span class="ident">native_type</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">full_data_type</span>.<span class="ident">as_str</span>() {
+        <span class="ident">name</span> <span class="kw">if</span> <span class="ident">data_type</span> <span class="op">==</span> <span class="string">&quot;USER-DEFINED&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">enum_exists</span>(<span class="ident">name</span>) =&gt; (<span class="ident">Enum</span>(<span class="ident">name</span>.<span class="ident">to_owned</span>()), <span class="prelude-val">None</span>),
+        <span class="ident">name</span> <span class="kw">if</span> <span class="ident">data_type</span> <span class="op">==</span> <span class="string">&quot;ARRAY&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&#39;_&#39;</span>) <span class="op">&amp;&amp;</span> <span class="ident">enum_exists</span>(<span class="ident">name</span>.<span class="ident">trim_start_matches</span>(<span class="string">&#39;_&#39;</span>)) =&gt; {
+            (<span class="ident">Enum</span>(<span class="ident">name</span>.<span class="ident">trim_start_matches</span>(<span class="string">&#39;_&#39;</span>).<span class="ident">to_owned</span>()), <span class="prelude-val">None</span>)
+        }
+        <span class="string">&quot;int2&quot;</span> <span class="op">|</span> <span class="string">&quot;_int2&quot;</span> =&gt; (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Int2</span>)),
+        <span class="string">&quot;int4&quot;</span> <span class="op">|</span> <span class="string">&quot;_int4&quot;</span> =&gt; (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Int4</span>)),
+        <span class="string">&quot;int8&quot;</span> <span class="op">|</span> <span class="string">&quot;_int8&quot;</span> =&gt; (<span class="ident">BigInt</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Int8</span>)),
+        <span class="string">&quot;float4&quot;</span> <span class="op">|</span> <span class="string">&quot;_float4&quot;</span> =&gt; (<span class="ident">Float</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Float4</span>)),
+        <span class="string">&quot;float8&quot;</span> <span class="op">|</span> <span class="string">&quot;_float8&quot;</span> =&gt; (<span class="ident">Float</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Float8</span>)),
+        <span class="string">&quot;bool&quot;</span> <span class="op">|</span> <span class="string">&quot;_bool&quot;</span> =&gt; (<span class="ident">Boolean</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Bool</span>)),
+        <span class="string">&quot;text&quot;</span> <span class="op">|</span> <span class="string">&quot;_text&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::String</span>(<span class="ident">precision</span>.<span class="ident">character_maximum_length</span>))),
+        <span class="string">&quot;varchar&quot;</span> <span class="op">|</span> <span class="string">&quot;_varchar&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::String</span>(<span class="ident">precision</span>.<span class="ident">character_maximum_length</span>))),
+        <span class="string">&quot;bpchar&quot;</span> <span class="op">|</span> <span class="string">&quot;_bpchar&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Char</span>(<span class="ident">precision</span>.<span class="ident">character_maximum_length</span>))),
+        <span class="comment">// https://www.cockroachlabs.com/docs/stable/string.html</span>
+        <span class="string">&quot;char&quot;</span> <span class="op">|</span> <span class="string">&quot;_char&quot;</span> <span class="kw">if</span> <span class="ident">data_type</span> <span class="op">==</span> <span class="string">&quot;\&quot;char\&quot;&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::SingleChar</span>)),
+        <span class="string">&quot;char&quot;</span> <span class="op">|</span> <span class="string">&quot;_char&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Char</span>(<span class="ident">precision</span>.<span class="ident">character_maximum_length</span>))),
+        <span class="string">&quot;date&quot;</span> <span class="op">|</span> <span class="string">&quot;_date&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Date</span>)),
+        <span class="string">&quot;bytea&quot;</span> <span class="op">|</span> <span class="string">&quot;_bytea&quot;</span> =&gt; (<span class="ident">Binary</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Bytes</span>)),
+        <span class="string">&quot;jsonb&quot;</span> <span class="op">|</span> <span class="string">&quot;_jsonb&quot;</span> =&gt; (<span class="ident">Json</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::JsonB</span>)),
+        <span class="string">&quot;uuid&quot;</span> <span class="op">|</span> <span class="string">&quot;_uuid&quot;</span> =&gt; (<span class="ident">Uuid</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Uuid</span>)),
+        <span class="comment">// bit and varbit should be binary, but are currently mapped to strings.</span>
+        <span class="string">&quot;bit&quot;</span> <span class="op">|</span> <span class="string">&quot;_bit&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Bit</span>(<span class="ident">precision</span>.<span class="ident">character_maximum_length</span>))),
+        <span class="string">&quot;varbit&quot;</span> <span class="op">|</span> <span class="string">&quot;_varbit&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::VarBit</span>(<span class="ident">precision</span>.<span class="ident">character_maximum_length</span>))),
+        <span class="string">&quot;numeric&quot;</span> <span class="op">|</span> <span class="string">&quot;_numeric&quot;</span> =&gt; (
+            <span class="ident">Decimal</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Decimal</span>(
+                <span class="kw">match</span> (<span class="ident">precision</span>.<span class="ident">numeric_precision</span>, <span class="ident">precision</span>.<span class="ident">numeric_scale</span>) {
+                    (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
+                    (<span class="prelude-val">Some</span>(<span class="ident">prec</span>), <span class="prelude-val">Some</span>(<span class="ident">scale</span>)) =&gt; <span class="prelude-val">Some</span>((<span class="ident">prec</span>, <span class="ident">scale</span>)),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                },
+            )),
+        ),
+        <span class="string">&quot;pg_lsn&quot;</span> <span class="op">|</span> <span class="string">&quot;_pg_lsn&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="string">&quot;time&quot;</span> <span class="op">|</span> <span class="string">&quot;_time&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Time</span>(<span class="ident">precision</span>.<span class="ident">time_precision</span>))),
+        <span class="string">&quot;timetz&quot;</span> <span class="op">|</span> <span class="string">&quot;_timetz&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Timetz</span>(<span class="ident">precision</span>.<span class="ident">time_precision</span>))),
+        <span class="string">&quot;timestamp&quot;</span> <span class="op">|</span> <span class="string">&quot;_timestamp&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Timestamp</span>(<span class="ident">precision</span>.<span class="ident">time_precision</span>))),
+        <span class="string">&quot;timestamptz&quot;</span> <span class="op">|</span> <span class="string">&quot;_timestamptz&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Timestamptz</span>(<span class="ident">precision</span>.<span class="ident">time_precision</span>))),
+        <span class="string">&quot;tsquery&quot;</span> <span class="op">|</span> <span class="string">&quot;_tsquery&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="string">&quot;tsvector&quot;</span> <span class="op">|</span> <span class="string">&quot;_tsvector&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="string">&quot;txid_snapshot&quot;</span> <span class="op">|</span> <span class="string">&quot;_txid_snapshot&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="string">&quot;inet&quot;</span> <span class="op">|</span> <span class="string">&quot;_inet&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Inet</span>)),
         <span class="comment">//geometric</span>
         <span class="string">&quot;box&quot;</span> <span class="op">|</span> <span class="string">&quot;_box&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
         <span class="string">&quot;circle&quot;</span> <span class="op">|</span> <span class="string">&quot;_circle&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),

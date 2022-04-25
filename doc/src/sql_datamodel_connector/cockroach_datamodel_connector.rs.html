@@ -304,69 +304,60 @@
 <span id="299">299</span>
 <span id="300">300</span>
 <span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
     <span class="ident">parser_database</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>,
     <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>, <span class="ident">Span</span>,
 };
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">native_types</span>::{
-    <span class="ident">CockroachType</span>::{<span class="self">self</span>, <span class="kw-2">*</span>},
-    <span class="ident">NativeType</span>,
-};
+<span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">CockroachType</span>, <span class="ident">NativeType</span>};
 
-<span class="kw">const</span> <span class="ident">SMALL_INT_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;SmallInt&quot;</span>;
-<span class="kw">const</span> <span class="ident">INTEGER_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Integer&quot;</span>;
-<span class="kw">const</span> <span class="ident">BIG_INT_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;BigInt&quot;</span>;
-<span class="kw">const</span> <span class="ident">DECIMAL_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Decimal&quot;</span>;
-<span class="kw">const</span> <span class="ident">INET_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Inet&quot;</span>;
-<span class="kw">const</span> <span class="ident">CITEXT_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Citext&quot;</span>;
-<span class="kw">const</span> <span class="ident">OID_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Oid&quot;</span>;
-<span class="kw">const</span> <span class="ident">REAL_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Real&quot;</span>;
-<span class="kw">const</span> <span class="ident">DOUBLE_PRECISION_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;DoublePrecision&quot;</span>;
-<span class="kw">const</span> <span class="ident">VARCHAR_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;VarChar&quot;</span>;
+<span class="kw">const</span> <span class="ident">BIT_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Bit&quot;</span>;
+<span class="kw">const</span> <span class="ident">BOOL_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Bool&quot;</span>;
+<span class="kw">const</span> <span class="ident">BYTES_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Bytes&quot;</span>;
 <span class="kw">const</span> <span class="ident">CHAR_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Char&quot;</span>;
-<span class="kw">const</span> <span class="ident">TEXT_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Text&quot;</span>;
-<span class="kw">const</span> <span class="ident">BYTE_A_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;ByteA&quot;</span>;
+<span class="kw">const</span> <span class="ident">DATE_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Date&quot;</span>;
+<span class="kw">const</span> <span class="ident">DECIMAL_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Decimal&quot;</span>;
+<span class="kw">const</span> <span class="ident">FLOAT4_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Float4&quot;</span>;
+<span class="kw">const</span> <span class="ident">FLOAT8_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Float8&quot;</span>;
+<span class="kw">const</span> <span class="ident">INET_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Inet&quot;</span>;
+<span class="kw">const</span> <span class="ident">INT2_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Int2&quot;</span>;
+<span class="kw">const</span> <span class="ident">INT4_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Int4&quot;</span>;
+<span class="kw">const</span> <span class="ident">INT8_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Int8&quot;</span>;
+<span class="kw">const</span> <span class="ident">JSON_B_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;JsonB&quot;</span>;
+<span class="kw">const</span> <span class="ident">SINGLE_CHAR_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;SingleChar&quot;</span>;
+<span class="kw">const</span> <span class="ident">STRING_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;String&quot;</span>;
 <span class="kw">const</span> <span class="ident">TIMESTAMP_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Timestamp&quot;</span>;
 <span class="kw">const</span> <span class="ident">TIMESTAMP_TZ_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Timestamptz&quot;</span>;
-<span class="kw">const</span> <span class="ident">DATE_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Date&quot;</span>;
 <span class="kw">const</span> <span class="ident">TIME_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Time&quot;</span>;
 <span class="kw">const</span> <span class="ident">TIME_TZ_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Timetz&quot;</span>;
-<span class="kw">const</span> <span class="ident">BOOLEAN_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Boolean&quot;</span>;
-<span class="kw">const</span> <span class="ident">BIT_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Bit&quot;</span>;
-<span class="kw">const</span> <span class="ident">VAR_BIT_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;VarBit&quot;</span>;
 <span class="kw">const</span> <span class="ident">UUID_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Uuid&quot;</span>;
-<span class="kw">const</span> <span class="ident">JSON_B_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;JsonB&quot;</span>;
+<span class="kw">const</span> <span class="ident">VAR_BIT_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;VarBit&quot;</span>;
+<span class="kw">const</span> <span class="ident">VARCHAR_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;VarChar&quot;</span>;
 
 <span class="kw">const</span> <span class="ident">NATIVE_TYPE_CONSTRUCTORS</span>: <span class="kw-2">&amp;</span>[<span class="ident">NativeTypeConstructor</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">SMALL_INT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">INTEGER_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BIG_INT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::BigInt</span>]),
-    <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">DECIMAL_TYPE_NAME</span>, <span class="number">2</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Decimal</span>]),
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">INET_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">CITEXT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">OID_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">REAL_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Float</span>]),
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DOUBLE_PRECISION_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Float</span>]),
-    <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">VARCHAR_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
+    <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">BIT_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
     <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">CHAR_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">TEXT_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BYTE_A_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Bytes</span>]),
+    <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">DECIMAL_TYPE_NAME</span>, <span class="number">2</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Decimal</span>]),
+    <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">STRING_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
     <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">TIMESTAMP_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
     <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">TIMESTAMP_TZ_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DATE_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
     <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">TIME_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
     <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">TIME_TZ_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BOOLEAN_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Boolean</span>]),
-    <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">BIT_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
     <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">VAR_BIT_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
-    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">UUID_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
+    <span class="ident">NativeTypeConstructor::with_optional_args</span>(<span class="ident">VARCHAR_TYPE_NAME</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BOOL_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Boolean</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">BYTES_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Bytes</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">DATE_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::DateTime</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">FLOAT4_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Float</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">FLOAT8_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Float</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">INET_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">INT2_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">INT4_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Int</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">INT8_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::BigInt</span>]),
     <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">JSON_B_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::Json</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">SINGLE_CHAR_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
+    <span class="ident">NativeTypeConstructor::without_args</span>(<span class="ident">UUID_TYPE_NAME</span>, <span class="kw-2">&amp;</span>[<span class="ident">ScalarType::String</span>]),
 ];
 
 <span class="kw">const</span> <span class="ident">CONSTRAINT_SCOPES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey</span>];
@@ -398,14 +389,14 @@
 ];
 
 <span class="kw">const</span> <span class="ident">SCALAR_TYPE_DEFAULTS</span>: <span class="kw-2">&amp;</span>[(<span class="ident">ScalarType</span>, <span class="ident">CockroachType</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    (<span class="ident">ScalarType::Int</span>, <span class="ident">CockroachType::Integer</span>),
-    (<span class="ident">ScalarType::BigInt</span>, <span class="ident">CockroachType::BigInt</span>),
-    (<span class="ident">ScalarType::Float</span>, <span class="ident">CockroachType::DoublePrecision</span>),
+    (<span class="ident">ScalarType::Int</span>, <span class="ident">CockroachType::Int4</span>),
+    (<span class="ident">ScalarType::BigInt</span>, <span class="ident">CockroachType::Int8</span>),
+    (<span class="ident">ScalarType::Float</span>, <span class="ident">CockroachType::Float8</span>),
     (<span class="ident">ScalarType::Decimal</span>, <span class="ident">CockroachType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="number">65</span>, <span class="number">30</span>)))),
-    (<span class="ident">ScalarType::Boolean</span>, <span class="ident">CockroachType::Boolean</span>),
-    (<span class="ident">ScalarType::String</span>, <span class="ident">CockroachType::Text</span>),
+    (<span class="ident">ScalarType::Boolean</span>, <span class="ident">CockroachType::Bool</span>),
+    (<span class="ident">ScalarType::String</span>, <span class="ident">CockroachType::String</span>(<span class="prelude-val">None</span>)),
     (<span class="ident">ScalarType::DateTime</span>, <span class="ident">CockroachType::Timestamp</span>(<span class="prelude-val">Some</span>(<span class="number">3</span>))),
-    (<span class="ident">ScalarType::Bytes</span>, <span class="ident">CockroachType::ByteA</span>),
+    (<span class="ident">ScalarType::Bytes</span>, <span class="ident">CockroachType::Bytes</span>),
     (<span class="ident">ScalarType::Json</span>, <span class="ident">CockroachType::JsonB</span>),
 ];
 
@@ -437,38 +428,36 @@
         <span class="kw">let</span> <span class="ident">native_type</span>: <span class="ident">CockroachType</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">native_type</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">match</span> <span class="ident">native_type</span> {
-            <span class="comment">//String</span>
-            <span class="ident">Text</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">Char</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">VarBit</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">Uuid</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">Inet</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">Citext</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="comment">//Boolean</span>
-            <span class="ident">Boolean</span> =&gt; <span class="ident">ScalarType::Boolean</span>,
-            <span class="comment">//Int</span>
-            <span class="ident">SmallInt</span> =&gt; <span class="ident">ScalarType::Int</span>,
-            <span class="ident">Integer</span> =&gt; <span class="ident">ScalarType::Int</span>,
-            <span class="ident">Oid</span> =&gt; <span class="ident">ScalarType::Int</span>,
-            <span class="comment">//BigInt</span>
-            <span class="ident">BigInt</span> =&gt; <span class="ident">ScalarType::BigInt</span>,
-            <span class="comment">//Float</span>
-            <span class="ident">Real</span> =&gt; <span class="ident">ScalarType::Float</span>,
-            <span class="ident">DoublePrecision</span> =&gt; <span class="ident">ScalarType::Float</span>,
-            <span class="comment">//Decimal</span>
-            <span class="ident">Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::Decimal</span>,
-            <span class="comment">//DateTime</span>
-            <span class="ident">Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">Timestamptz</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">Date</span> =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">Time</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">Timetz</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="comment">//Json</span>
-            <span class="ident">JsonB</span> =&gt; <span class="ident">ScalarType::Json</span>,
-            <span class="comment">//Bytes</span>
-            <span class="ident">ByteA</span> =&gt; <span class="ident">ScalarType::Bytes</span>,
+            <span class="comment">// String</span>
+            <span class="ident">CockroachType::Char</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">CockroachType::SingleChar</span> =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">CockroachType::String</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">CockroachType::Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">CockroachType::VarBit</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">CockroachType::Uuid</span> =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">CockroachType::Inet</span> =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="comment">// Boolean</span>
+            <span class="ident">CockroachType::Bool</span> =&gt; <span class="ident">ScalarType::Boolean</span>,
+            <span class="comment">// Int</span>
+            <span class="ident">CockroachType::Int2</span> =&gt; <span class="ident">ScalarType::Int</span>,
+            <span class="ident">CockroachType::Int4</span> =&gt; <span class="ident">ScalarType::Int</span>,
+            <span class="comment">// BigInt</span>
+            <span class="ident">CockroachType::Int8</span> =&gt; <span class="ident">ScalarType::BigInt</span>,
+            <span class="comment">// Float</span>
+            <span class="ident">CockroachType::Float4</span> =&gt; <span class="ident">ScalarType::Float</span>,
+            <span class="ident">CockroachType::Float8</span> =&gt; <span class="ident">ScalarType::Float</span>,
+            <span class="comment">// Decimal</span>
+            <span class="ident">CockroachType::Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::Decimal</span>,
+            <span class="comment">// DateTime</span>
+            <span class="ident">CockroachType::Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
+            <span class="ident">CockroachType::Timestamptz</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
+            <span class="ident">CockroachType::Date</span> =&gt; <span class="ident">ScalarType::DateTime</span>,
+            <span class="ident">CockroachType::Time</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
+            <span class="ident">CockroachType::Timetz</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
+            <span class="comment">// Json</span>
+            <span class="ident">CockroachType::JsonB</span> =&gt; <span class="ident">ScalarType::Json</span>,
+            <span class="comment">// Bytes</span>
+            <span class="ident">CockroachType::Bytes</span> =&gt; <span class="ident">ScalarType::Bytes</span>,
         }
     }
 
@@ -503,19 +492,24 @@
         <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">native_instance_error</span>(<span class="ident">native_type_instance</span>);
 
         <span class="kw">match</span> <span class="ident">native_type</span> {
-            <span class="ident">Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">precision</span>, <span class="ident">scale</span>))) <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&gt;</span> <span class="ident">precision</span> =&gt; {
+            <span class="ident">CockroachType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">precision</span>, <span class="ident">scale</span>))) <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&gt;</span> <span class="ident">precision</span> =&gt; {
                 <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_scale_larger_than_precision_error</span>(<span class="ident">span</span>))
             }
-            <span class="ident">Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">prec</span>, <span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">prec</span> <span class="op">&gt;</span> <span class="number">1000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">prec</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
+            <span class="ident">CockroachType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">prec</span>, <span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">prec</span> <span class="op">&gt;</span> <span class="number">1000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">prec</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
                 <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(
                     <span class="string">&quot;Precision must be positive with a maximum value of 1000.&quot;</span>,
                     <span class="ident">span</span>,
                 ))
             }
-            <span class="ident">Bit</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)) <span class="op">|</span> <span class="ident">VarBit</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; {
+            <span class="ident">CockroachType::Bit</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)) <span class="op">|</span> <span class="ident">CockroachType::VarBit</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; {
                 <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M must be a positive integer.&quot;</span>, <span class="ident">span</span>))
             }
-            <span class="ident">Timestamp</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="op">|</span> <span class="ident">Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="op">|</span> <span class="ident">Time</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="op">|</span> <span class="ident">Timetz</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="kw">if</span> <span class="ident">p</span> <span class="op">&gt;</span> <span class="number">6</span> =&gt; {
+            <span class="ident">CockroachType::Timestamp</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>))
+            <span class="op">|</span> <span class="ident">CockroachType::Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>))
+            <span class="op">|</span> <span class="ident">CockroachType::Time</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>))
+            <span class="op">|</span> <span class="ident">CockroachType::Timetz</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>))
+                <span class="kw">if</span> <span class="ident">p</span> <span class="op">&gt;</span> <span class="number">6</span> =&gt;
+            {
                 <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M can range from 0 to 6.&quot;</span>, <span class="ident">span</span>))
             }
             <span class="kw">_</span> =&gt; (),
@@ -541,29 +535,29 @@
         <span class="kw">let</span> <span class="ident">cloned_args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">clone</span>();
 
         <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="ident">SMALL_INT_TYPE_NAME</span> =&gt; <span class="ident">SmallInt</span>,
-            <span class="ident">INTEGER_TYPE_NAME</span> =&gt; <span class="ident">Integer</span>,
-            <span class="ident">BIG_INT_TYPE_NAME</span> =&gt; <span class="ident">BigInt</span>,
-            <span class="ident">DECIMAL_TYPE_NAME</span> =&gt; <span class="ident">Decimal</span>(<span class="ident">parse_two_opt_u32</span>(<span class="ident">args</span>, <span class="ident">DECIMAL_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
-            <span class="ident">INET_TYPE_NAME</span> =&gt; <span class="ident">Inet</span>,
-            <span class="ident">CITEXT_TYPE_NAME</span> =&gt; <span class="ident">Citext</span>,
-            <span class="ident">OID_TYPE_NAME</span> =&gt; <span class="ident">Oid</span>,
-            <span class="ident">REAL_TYPE_NAME</span> =&gt; <span class="ident">Real</span>,
-            <span class="ident">DOUBLE_PRECISION_TYPE_NAME</span> =&gt; <span class="ident">DoublePrecision</span>,
-            <span class="ident">VARCHAR_TYPE_NAME</span> =&gt; <span class="ident">VarChar</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">VARCHAR_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
-            <span class="ident">CHAR_TYPE_NAME</span> =&gt; <span class="ident">Char</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">CHAR_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
-            <span class="ident">TEXT_TYPE_NAME</span> =&gt; <span class="ident">Text</span>,
-            <span class="ident">BYTE_A_TYPE_NAME</span> =&gt; <span class="ident">ByteA</span>,
-            <span class="ident">TIMESTAMP_TYPE_NAME</span> =&gt; <span class="ident">Timestamp</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIMESTAMP_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
-            <span class="ident">TIMESTAMP_TZ_TYPE_NAME</span> =&gt; <span class="ident">Timestamptz</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIMESTAMP_TZ_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
-            <span class="ident">DATE_TYPE_NAME</span> =&gt; <span class="ident">Date</span>,
-            <span class="ident">TIME_TYPE_NAME</span> =&gt; <span class="ident">Time</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIME_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
-            <span class="ident">TIME_TZ_TYPE_NAME</span> =&gt; <span class="ident">Timetz</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIME_TZ_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
-            <span class="ident">BOOLEAN_TYPE_NAME</span> =&gt; <span class="ident">Boolean</span>,
-            <span class="ident">BIT_TYPE_NAME</span> =&gt; <span class="ident">Bit</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">BIT_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
-            <span class="ident">VAR_BIT_TYPE_NAME</span> =&gt; <span class="ident">VarBit</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">VAR_BIT_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
-            <span class="ident">UUID_TYPE_NAME</span> =&gt; <span class="ident">Uuid</span>,
-            <span class="ident">JSON_B_TYPE_NAME</span> =&gt; <span class="ident">JsonB</span>,
+            <span class="ident">BYTES_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Bytes</span>,
+            <span class="ident">CHAR_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Char</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">CHAR_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">DECIMAL_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Decimal</span>(<span class="ident">parse_two_opt_u32</span>(<span class="ident">args</span>, <span class="ident">DECIMAL_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">FLOAT4_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Float4</span>,
+            <span class="ident">FLOAT8_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Float8</span>,
+            <span class="ident">INET_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Inet</span>,
+            <span class="ident">INT2_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Int2</span>,
+            <span class="ident">INT4_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Int4</span>,
+            <span class="ident">INT8_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Int8</span>,
+            <span class="ident">SINGLE_CHAR_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::SingleChar</span>,
+            <span class="ident">STRING_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::String</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">STRING_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">TIMESTAMP_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Timestamp</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIMESTAMP_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">TIMESTAMP_TZ_TYPE_NAME</span> =&gt; {
+                <span class="ident">CockroachType::Timestamptz</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIMESTAMP_TZ_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>)
+            }
+            <span class="ident">BIT_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Bit</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">BIT_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">BOOL_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Bool</span>,
+            <span class="ident">DATE_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Date</span>,
+            <span class="ident">JSON_B_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::JsonB</span>,
+            <span class="ident">TIME_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Time</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIME_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">TIME_TZ_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Timetz</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIME_TZ_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">UUID_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::Uuid</span>,
+            <span class="ident">VAR_BIT_TYPE_NAME</span> =&gt; <span class="ident">CockroachType::VarBit</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">VAR_BIT_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
             <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_native_type_parser_error</span>(<span class="ident">name</span>, <span class="ident">span</span>)),
         };
 
@@ -573,29 +567,27 @@
     <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="ident">NativeTypeInstance</span> {
         <span class="kw">let</span> <span class="ident">native_type</span>: <span class="ident">CockroachType</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">native_type</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> (<span class="ident">constructor_name</span>, <span class="ident">args</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">native_type</span> {
-            <span class="ident">SmallInt</span> =&gt; (<span class="ident">SMALL_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Integer</span> =&gt; (<span class="ident">INTEGER_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">BigInt</span> =&gt; (<span class="ident">BIG_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Decimal</span>(<span class="ident">x</span>) =&gt; (<span class="ident">DECIMAL_TYPE_NAME</span>, <span class="ident">args_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Real</span> =&gt; (<span class="ident">REAL_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">DoublePrecision</span> =&gt; (<span class="ident">DOUBLE_PRECISION_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">VarChar</span>(<span class="ident">x</span>) =&gt; (<span class="ident">VARCHAR_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Char</span>(<span class="ident">x</span>) =&gt; (<span class="ident">CHAR_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Text</span> =&gt; (<span class="ident">TEXT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">ByteA</span> =&gt; (<span class="ident">BYTE_A_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Timestamp</span>(<span class="ident">x</span>) =&gt; (<span class="ident">TIMESTAMP_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Timestamptz</span>(<span class="ident">x</span>) =&gt; (<span class="ident">TIMESTAMP_TZ_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Date</span> =&gt; (<span class="ident">DATE_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Time</span>(<span class="ident">x</span>) =&gt; (<span class="ident">TIME_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Timetz</span>(<span class="ident">x</span>) =&gt; (<span class="ident">TIME_TZ_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Boolean</span> =&gt; (<span class="ident">BOOLEAN_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Bit</span>(<span class="ident">x</span>) =&gt; (<span class="ident">BIT_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">VarBit</span>(<span class="ident">x</span>) =&gt; (<span class="ident">VAR_BIT_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Uuid</span> =&gt; (<span class="ident">UUID_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">JsonB</span> =&gt; (<span class="ident">JSON_B_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Inet</span> =&gt; (<span class="ident">INET_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Citext</span> =&gt; (<span class="ident">CITEXT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Oid</span> =&gt; (<span class="ident">OID_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">CockroachType::Int2</span> =&gt; (<span class="ident">INT2_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">CockroachType::Int4</span> =&gt; (<span class="ident">INT4_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">CockroachType::Int8</span> =&gt; (<span class="ident">INT8_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">CockroachType::Decimal</span>(<span class="ident">x</span>) =&gt; (<span class="ident">DECIMAL_TYPE_NAME</span>, <span class="ident">args_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">CockroachType::Float4</span> =&gt; (<span class="ident">FLOAT4_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">CockroachType::Float8</span> =&gt; (<span class="ident">FLOAT8_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">CockroachType::String</span>(<span class="ident">x</span>) =&gt; (<span class="ident">STRING_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">CockroachType::Char</span>(<span class="ident">x</span>) =&gt; (<span class="ident">CHAR_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">CockroachType::SingleChar</span> =&gt; (<span class="ident">SINGLE_CHAR_TYPE_NAME</span>, <span class="ident">Vec::new</span>()),
+            <span class="ident">CockroachType::Bytes</span> =&gt; (<span class="ident">BYTES_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">CockroachType::Timestamp</span>(<span class="ident">x</span>) =&gt; (<span class="ident">TIMESTAMP_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">CockroachType::Timestamptz</span>(<span class="ident">x</span>) =&gt; (<span class="ident">TIMESTAMP_TZ_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">CockroachType::Date</span> =&gt; (<span class="ident">DATE_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">CockroachType::Time</span>(<span class="ident">x</span>) =&gt; (<span class="ident">TIME_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">CockroachType::Timetz</span>(<span class="ident">x</span>) =&gt; (<span class="ident">TIME_TZ_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">CockroachType::Bool</span> =&gt; (<span class="ident">BOOL_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">CockroachType::Bit</span>(<span class="ident">x</span>) =&gt; (<span class="ident">BIT_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">CockroachType::VarBit</span>(<span class="ident">x</span>) =&gt; (<span class="ident">VAR_BIT_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">CockroachType::Uuid</span> =&gt; (<span class="ident">UUID_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">CockroachType::JsonB</span> =&gt; (<span class="ident">JSON_B_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">CockroachType::Inet</span> =&gt; (<span class="ident">INET_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">constructor</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_native_type_constructor</span>(<span class="ident">constructor_name</span>) {

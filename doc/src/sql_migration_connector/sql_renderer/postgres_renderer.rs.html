@@ -867,6 +867,45 @@
 <span id="862">862</span>
 <span id="863">863</span>
 <span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">common</span>::<span class="kw-2">*</span>, <span class="ident">SqlRenderer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::PostgresFlavour</span>,
@@ -875,7 +914,7 @@
     <span class="ident">sql_schema_differ</span>::{<span class="ident">ColumnChange</span>, <span class="ident">ColumnChanges</span>},
 };
 <span class="kw">use</span> <span class="ident">datamodel::dml::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">native_types::PostgresType</span>;
+<span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">CockroachType</span>, <span class="ident">PostgresType</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">sql_ddl</span>::{<span class="ident">postgres</span> <span class="kw">as</span> <span class="ident">ddl</span>, <span class="ident">IndexColumn</span>, <span class="ident">SortOrder</span>};
@@ -1287,8 +1326,6 @@
 
 <span class="kw">fn</span> <span class="ident">render_column_type</span>(<span class="ident">col</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresFlavour</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">column_type</span>();
-    <span class="kw">let</span> <span class="ident">is_autoincrement</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">is_autoincrement</span>();
-
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">family</span> {
         <span class="kw">return</span> <span class="macro">format!</span>(<span class="string">&quot;\&quot;{}\&quot;{}&quot;</span>, <span class="ident">name</span>, <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">arity</span>.<span class="ident">is_list</span>() { <span class="string">&quot;[]&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> }).<span class="ident">into</span>();
     }
@@ -1297,23 +1334,20 @@
         <span class="kw">return</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">description</span>, <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">arity</span>.<span class="ident">is_list</span>() { <span class="string">&quot;[]&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> }).<span class="ident">into</span>();
     }
 
+    <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">is_cockroachdb</span>() {
+        <span class="ident">render_column_type_cockroachdb</span>(<span class="ident">col</span>)
+    } <span class="kw">else</span> {
+        <span class="ident">render_column_type_postgres</span>(<span class="ident">col</span>)
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">render_column_type_postgres</span>(<span class="ident">col</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">column_type</span>();
+    <span class="kw">let</span> <span class="ident">is_autoincrement</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">is_autoincrement</span>();
+
     <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">col</span>
         .<span class="ident">column_native_type</span>()
         .<span class="ident">expect</span>(<span class="string">&quot;Missing native type in postgres_renderer::render_column_type()&quot;</span>);
-
-    <span class="kw">fn</span> <span class="ident">render</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="ident">input</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">arg</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, <span class="ident">arg</span>),
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">render_decimal</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="ident">input</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="prelude-val">Some</span>((<span class="ident">precision</span>, <span class="ident">scale</span>)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;({},{})&quot;</span>, <span class="ident">precision</span>, <span class="ident">scale</span>),
-        }
-    }
 
     <span class="kw">let</span> <span class="ident">tpe</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">native_type</span> {
         <span class="ident">PostgresType::Citext</span> =&gt; <span class="string">&quot;CITEXT&quot;</span>.<span class="ident">into</span>(),
@@ -1322,39 +1356,25 @@
         <span class="ident">PostgresType::Money</span> =&gt; <span class="string">&quot;MONEY&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::SmallInt</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;SMALLSERIAL&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::SmallInt</span> =&gt; <span class="string">&quot;SMALLINT&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">PostgresType::Integer</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> <span class="op">&amp;&amp;</span> <span class="ident">flavour</span>.<span class="ident">is_cockroachdb</span>() =&gt; <span class="string">&quot;SERIAL4&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::Integer</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;SERIAL&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">PostgresType::Integer</span> =&gt; {
-            <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">is_cockroachdb</span>() {
-                <span class="string">&quot;INT4&quot;</span>.<span class="ident">into</span>()
-            } <span class="kw">else</span> {
-                <span class="string">&quot;INTEGER&quot;</span>.<span class="ident">into</span>()
-            }
-        }
+        <span class="ident">PostgresType::Integer</span> =&gt; <span class="string">&quot;INTEGER&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::BigInt</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;BIGSERIAL&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::BigInt</span> =&gt; <span class="string">&quot;BIGINT&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">PostgresType::Decimal</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DECIMAL{}&quot;</span>, <span class="ident">render_decimal</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">PostgresType::Decimal</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DECIMAL{}&quot;</span>, <span class="ident">render_decimal_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
         <span class="ident">PostgresType::Real</span> =&gt; <span class="string">&quot;REAL&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::DoublePrecision</span> =&gt; <span class="string">&quot;DOUBLE PRECISION&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">PostgresType::VarChar</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARCHAR{}&quot;</span>, <span class="ident">render</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
-        <span class="ident">PostgresType::Char</span>(<span class="ident">length</span>) =&gt; {
-            <span class="comment">// https://www.cockroachlabs.com/docs/stable/string.html</span>
-            <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">is_cockroachdb</span>() <span class="op">&amp;&amp;</span> <span class="ident">length</span>.<span class="ident">is_none</span>() {
-                <span class="string">r#&quot;&quot;char&quot;&quot;#</span>.<span class="ident">into</span>()
-            } <span class="kw">else</span> {
-                <span class="macro">format!</span>(<span class="string">&quot;CHAR{}&quot;</span>, <span class="ident">render</span>(<span class="ident">length</span>)).<span class="ident">into</span>()
-            }
-        }
+        <span class="ident">PostgresType::VarChar</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARCHAR{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
+        <span class="ident">PostgresType::Char</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;CHAR{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
         <span class="ident">PostgresType::Text</span> =&gt; <span class="string">&quot;TEXT&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::ByteA</span> =&gt; <span class="string">&quot;BYTEA&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::Date</span> =&gt; <span class="string">&quot;DATE&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">PostgresType::Timestamp</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMESTAMP{}&quot;</span>, <span class="ident">render</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
-        <span class="ident">PostgresType::Timestamptz</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMESTAMPTZ{}&quot;</span>, <span class="ident">render</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
-        <span class="ident">PostgresType::Time</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIME{}&quot;</span>, <span class="ident">render</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
-        <span class="ident">PostgresType::Timetz</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMETZ{}&quot;</span>, <span class="ident">render</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">PostgresType::Timestamp</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMESTAMP{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">PostgresType::Timestamptz</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMESTAMPTZ{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">PostgresType::Time</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIME{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">PostgresType::Timetz</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMETZ{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
         <span class="ident">PostgresType::Boolean</span> =&gt; <span class="string">&quot;BOOLEAN&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">PostgresType::Bit</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;BIT{}&quot;</span>, <span class="ident">render</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
-        <span class="ident">PostgresType::VarBit</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARBIT{}&quot;</span>, <span class="ident">render</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
+        <span class="ident">PostgresType::Bit</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;BIT{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
+        <span class="ident">PostgresType::VarBit</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARBIT{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
         <span class="ident">PostgresType::Uuid</span> =&gt; <span class="string">&quot;UUID&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::Xml</span> =&gt; <span class="string">&quot;XML&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::Json</span> =&gt; <span class="string">&quot;JSON&quot;</span>.<span class="ident">into</span>(),
@@ -1365,6 +1385,64 @@
         <span class="macro">format!</span>(<span class="string">&quot;{}[]&quot;</span>, <span class="ident">tpe</span>.<span class="ident">to_owned</span>()).<span class="ident">into</span>()
     } <span class="kw">else</span> {
         <span class="ident">tpe</span>
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">render_column_type_cockroachdb</span>(<span class="ident">col</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">column_type</span>();
+    <span class="kw">let</span> <span class="ident">is_autoincrement</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">is_autoincrement</span>();
+    <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">col</span>
+        .<span class="ident">column_native_type</span>()
+        .<span class="ident">expect</span>(<span class="string">&quot;Missing native type in postgres_renderer::render_column_type()&quot;</span>);
+
+    <span class="kw">let</span> <span class="ident">tpe</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">native_type</span> {
+        <span class="ident">CockroachType::Inet</span> =&gt; <span class="string">&quot;INET&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Int2</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;SMALLSERIAL&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Int2</span> =&gt; <span class="string">&quot;INT2&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Int4</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;SERIAL4&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Int4</span> =&gt; <span class="string">&quot;INT4&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Int8</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;BIGSERIAL&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Int8</span> =&gt; <span class="string">&quot;BIGINT&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Decimal</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DECIMAL{}&quot;</span>, <span class="ident">render_decimal_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Float4</span> =&gt; <span class="string">&quot;REAL&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Float8</span> =&gt; <span class="string">&quot;DOUBLE PRECISION&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::String</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;STRING{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
+
+        <span class="comment">// https://www.cockroachlabs.com/docs/stable/string.html</span>
+        <span class="ident">CockroachType::Char</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;CHAR{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
+        <span class="ident">CockroachType::SingleChar</span> =&gt; <span class="string">r#&quot;&quot;char&quot;&quot;#</span>.<span class="ident">into</span>(),
+
+        <span class="ident">CockroachType::Bytes</span> =&gt; <span class="string">&quot;BYTES&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Date</span> =&gt; <span class="string">&quot;DATE&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Timestamp</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMESTAMP{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Timestamptz</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMESTAMPTZ{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Time</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIME{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Timetz</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMETZ{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Bool</span> =&gt; <span class="string">&quot;BOOLEAN&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Bit</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;BIT{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
+        <span class="ident">CockroachType::VarBit</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARBIT{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Uuid</span> =&gt; <span class="string">&quot;UUID&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::JsonB</span> =&gt; <span class="string">&quot;JSONB&quot;</span>.<span class="ident">into</span>(),
+    };
+
+    <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">arity</span>.<span class="ident">is_list</span>() {
+        <span class="macro">format!</span>(<span class="string">&quot;{}[]&quot;</span>, <span class="ident">tpe</span>.<span class="ident">to_owned</span>()).<span class="ident">into</span>()
+    } <span class="kw">else</span> {
+        <span class="ident">tpe</span>
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">render_optional_args</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">match</span> <span class="ident">input</span> {
+        <span class="prelude-val">None</span> =&gt; <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
+        <span class="prelude-val">Some</span>(<span class="ident">arg</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, <span class="ident">arg</span>),
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">render_decimal_args</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">match</span> <span class="ident">input</span> {
+        <span class="prelude-val">None</span> =&gt; <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
+        <span class="prelude-val">Some</span>((<span class="ident">precision</span>, <span class="ident">scale</span>)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;({},{})&quot;</span>, <span class="ident">precision</span>, <span class="ident">scale</span>),
     }
 }
 

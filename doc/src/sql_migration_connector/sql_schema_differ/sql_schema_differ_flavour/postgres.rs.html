@@ -514,6 +514,35 @@
 <span id="509">509</span>
 <span id="510">510</span>
 <span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::PostgresFlavour</span>,
@@ -521,7 +550,7 @@
     <span class="ident">sql_migration</span>::{<span class="ident">AlterEnum</span>, <span class="ident">SqlMigrationStep</span>},
     <span class="ident">sql_schema_differ</span>::{<span class="ident">column::ColumnTypeChange</span>, <span class="ident">differ_database::DifferDatabase</span>},
 };
-<span class="kw">use</span> <span class="ident">native_types::PostgresType</span>;
+<span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">CockroachType</span>, <span class="ident">PostgresType</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">regex::RegexSet</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer::walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">IndexWalker</span>};
@@ -594,11 +623,6 @@
     }
 
     <span class="kw">fn</span> <span class="ident">column_type_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">ColumnTypeChange</span>::<span class="kw-2">*</span>;
-
-        <span class="kw">let</span> <span class="ident">from_list_to_scalar</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>();
-        <span class="kw">let</span> <span class="ident">from_scalar_to_list</span> <span class="op">=</span> <span class="op">!</span><span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>();
-
         <span class="comment">// Handle the enum cases first.</span>
         <span class="kw">match</span> <span class="ident">columns</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">column_type_family</span>().<span class="ident">as_enum</span>()).<span class="ident">as_tuple</span>() {
             (<span class="prelude-val">Some</span>(<span class="ident">previous_enum</span>), <span class="prelude-val">Some</span>(<span class="ident">next_enum</span>)) <span class="kw">if</span> <span class="ident">previous_enum</span> <span class="op">==</span> <span class="ident">next_enum</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
@@ -607,28 +631,10 @@
             (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; (),
         };
 
-        <span class="kw">let</span> <span class="ident">previous_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_native_type</span>();
-        <span class="kw">let</span> <span class="ident">next_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">column_native_type</span>();
-
-        <span class="kw">match</span> (<span class="ident">previous_type</span>, <span class="ident">next_type</span>) {
-            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Text</span>)) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SafeCast</span>),
-            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarChar</span>(<span class="prelude-val">None</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SafeCast</span>),
-            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
-            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Char</span>(<span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
-            (<span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">from_scalar_to_list</span> <span class="op">|</span><span class="op">|</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">NotCastable</span>),
-            (<span class="prelude-val">Some</span>(<span class="ident">previous</span>), <span class="prelude-val">Some</span>(<span class="ident">next</span>)) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroachdb</span>() =&gt; {
-                <span class="ident">cockroach_native_type_change_riskyness</span>(<span class="ident">previous</span>, <span class="ident">next</span>, <span class="ident">columns</span>)
-            }
-            (<span class="prelude-val">Some</span>(<span class="ident">previous</span>), <span class="prelude-val">Some</span>(<span class="ident">next</span>)) =&gt; <span class="ident">postgres_native_type_change_riskyness</span>(<span class="ident">previous</span>, <span class="ident">next</span>),
-            <span class="comment">// Unsupported types will have None as Native type</span>
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
-            (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
-                <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span> <span class="op">==</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span> =&gt;
-            {
-                <span class="prelude-val">None</span>
-            }
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroachdb</span>() {
+            <span class="ident">cockroach_column_type_change</span>(<span class="ident">columns</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">postgres_column_type_change</span>(<span class="ident">columns</span>)
         }
     }
 
@@ -657,10 +663,36 @@
     }
 }
 
+<span class="kw">fn</span> <span class="ident">cockroach_column_type_change</span>(<span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
+    <span class="kw">use</span> <span class="ident">ColumnTypeChange</span>::<span class="kw-2">*</span>;
+
+    <span class="kw">let</span> <span class="ident">previous_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CockroachType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_native_type</span>();
+    <span class="kw">let</span> <span class="ident">next_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CockroachType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">column_native_type</span>();
+    <span class="kw">let</span> <span class="ident">from_list_to_scalar</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>();
+    <span class="kw">let</span> <span class="ident">from_scalar_to_list</span> <span class="op">=</span> <span class="op">!</span><span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>();
+
+    <span class="kw">match</span> (<span class="ident">previous_type</span>, <span class="ident">next_type</span>) {
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::String</span>(<span class="prelude-val">None</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SafeCast</span>),
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::String</span>(<span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Char</span>(<span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+        (<span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">from_scalar_to_list</span> <span class="op">|</span><span class="op">|</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">NotCastable</span>),
+        (<span class="prelude-val">Some</span>(<span class="ident">previous</span>), <span class="prelude-val">Some</span>(<span class="ident">next</span>)) =&gt; <span class="ident">cockroach_native_type_change_riskyness</span>(<span class="ident">previous</span>, <span class="ident">next</span>, <span class="ident">columns</span>),
+        <span class="comment">// Unsupported types will have None as Native type</span>
+        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+        (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+            <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span> <span class="op">==</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span> =&gt;
+        {
+            <span class="prelude-val">None</span>
+        }
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+    }
+}
+
 <span class="comment">// https://go.crdb.dev/issue-v/49329/v22.1</span>
 <span class="kw">fn</span> <span class="ident">cockroach_native_type_change_riskyness</span>(
-    <span class="ident">previous</span>: <span class="ident">PostgresType</span>,
-    <span class="ident">next</span>: <span class="ident">PostgresType</span>,
+    <span class="ident">previous</span>: <span class="ident">CockroachType</span>,
+    <span class="ident">next</span>: <span class="ident">CockroachType</span>,
     <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">covered_by_index</span> <span class="op">=</span> <span class="ident">columns</span>
@@ -669,19 +701,45 @@
         <span class="op">==</span> (<span class="kw-2">&amp;</span><span class="bool-val">true</span>, <span class="kw-2">&amp;</span><span class="bool-val">true</span>);
 
     <span class="kw">match</span> (<span class="ident">previous</span>, <span class="ident">next</span>) {
-        (<span class="ident">PostgresType::Integer</span>, <span class="ident">PostgresType::Text</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">covered_by_index</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::SafeCast</span>),
-        (<span class="ident">PostgresType::BigInt</span>, <span class="ident">PostgresType::Integer</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">covered_by_index</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::RiskyCast</span>),
+        (<span class="ident">CockroachType::Int4</span>, <span class="ident">CockroachType::String</span>(<span class="prelude-val">None</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">covered_by_index</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::SafeCast</span>),
+        (<span class="ident">CockroachType::Int8</span>, <span class="ident">CockroachType::Int4</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">covered_by_index</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::RiskyCast</span>),
         (<span class="ident">previous</span>, <span class="ident">next</span>) <span class="kw">if</span> <span class="ident">previous</span> <span class="op">==</span> <span class="ident">next</span> =&gt; <span class="prelude-val">None</span>,
         <span class="comment">// Timestamp default precisions</span>
-        (<span class="ident">PostgresType::Time</span>(<span class="prelude-val">None</span>), <span class="ident">PostgresType::Time</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
-        <span class="op">|</span> (<span class="ident">PostgresType::Time</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)), <span class="ident">PostgresType::Time</span>(<span class="prelude-val">None</span>))
-        <span class="op">|</span> (<span class="ident">PostgresType::Timetz</span>(<span class="prelude-val">None</span>), <span class="ident">PostgresType::Timetz</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
-        <span class="op">|</span> (<span class="ident">PostgresType::Timetz</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)), <span class="ident">PostgresType::Timetz</span>(<span class="prelude-val">None</span>))
-        <span class="op">|</span> (<span class="ident">PostgresType::Timestamptz</span>(<span class="prelude-val">None</span>), <span class="ident">PostgresType::Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
-        <span class="op">|</span> (<span class="ident">PostgresType::Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)), <span class="ident">PostgresType::Timestamptz</span>(<span class="prelude-val">None</span>))
-        <span class="op">|</span> (<span class="ident">PostgresType::Timestamp</span>(<span class="prelude-val">None</span>), <span class="ident">PostgresType::Timestamp</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
-        <span class="op">|</span> (<span class="ident">PostgresType::Timestamp</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)), <span class="ident">PostgresType::Timestamp</span>(<span class="prelude-val">None</span>)) =&gt; <span class="prelude-val">None</span>,
+        (<span class="ident">CockroachType::Time</span>(<span class="prelude-val">None</span>), <span class="ident">CockroachType::Time</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
+        <span class="op">|</span> (<span class="ident">CockroachType::Time</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)), <span class="ident">CockroachType::Time</span>(<span class="prelude-val">None</span>))
+        <span class="op">|</span> (<span class="ident">CockroachType::Timetz</span>(<span class="prelude-val">None</span>), <span class="ident">CockroachType::Timetz</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
+        <span class="op">|</span> (<span class="ident">CockroachType::Timetz</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)), <span class="ident">CockroachType::Timetz</span>(<span class="prelude-val">None</span>))
+        <span class="op">|</span> (<span class="ident">CockroachType::Timestamptz</span>(<span class="prelude-val">None</span>), <span class="ident">CockroachType::Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
+        <span class="op">|</span> (<span class="ident">CockroachType::Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)), <span class="ident">CockroachType::Timestamptz</span>(<span class="prelude-val">None</span>))
+        <span class="op">|</span> (<span class="ident">CockroachType::Timestamp</span>(<span class="prelude-val">None</span>), <span class="ident">CockroachType::Timestamp</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
+        <span class="op">|</span> (<span class="ident">CockroachType::Timestamp</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)), <span class="ident">CockroachType::Timestamp</span>(<span class="prelude-val">None</span>)) =&gt; <span class="prelude-val">None</span>,
         <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::NotCastable</span>),
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">postgres_column_type_change</span>(<span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
+    <span class="kw">use</span> <span class="ident">ColumnTypeChange</span>::<span class="kw-2">*</span>;
+    <span class="kw">let</span> <span class="ident">previous_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_native_type</span>();
+    <span class="kw">let</span> <span class="ident">next_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">column_native_type</span>();
+    <span class="kw">let</span> <span class="ident">from_list_to_scalar</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>();
+    <span class="kw">let</span> <span class="ident">from_scalar_to_list</span> <span class="op">=</span> <span class="op">!</span><span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>();
+
+    <span class="kw">match</span> (<span class="ident">previous_type</span>, <span class="ident">next_type</span>) {
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Text</span>)) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SafeCast</span>),
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarChar</span>(<span class="prelude-val">None</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SafeCast</span>),
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Char</span>(<span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+        (<span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">from_scalar_to_list</span> <span class="op">|</span><span class="op">|</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">NotCastable</span>),
+        (<span class="prelude-val">Some</span>(<span class="ident">previous</span>), <span class="prelude-val">Some</span>(<span class="ident">next</span>)) =&gt; <span class="ident">postgres_native_type_change_riskyness</span>(<span class="ident">previous</span>, <span class="ident">next</span>),
+        <span class="comment">// Unsupported types will have None as Native type</span>
+        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+        (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+            <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span> <span class="op">==</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span> =&gt;
+        {
+            <span class="prelude-val">None</span>
+        }
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
     }
 }
 
