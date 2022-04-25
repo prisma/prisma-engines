@@ -48,6 +48,15 @@ impl<'a> LowerDmlToAst<'a> {
                     }
                 }
 
+                if self.preview_features.contains(PreviewFeature::ExtendedIndexes)
+                    && matches!(pk.clustered, Some(false))
+                {
+                    args.push(ast::Argument::new(
+                        "clustered",
+                        ast::Expression::ConstantValue("false".to_string(), Span::empty()),
+                    ));
+                }
+
                 attributes.push(ast::Attribute::new("id", args));
             }
         }
@@ -64,6 +73,15 @@ impl<'a> LowerDmlToAst<'a> {
                 }
 
                 self.push_index_map_argument(datamodel, model, index_def, &mut args);
+
+                if self.preview_features.contains(PreviewFeature::ExtendedIndexes)
+                    && matches!(index_def.clustered, Some(true))
+                {
+                    args.push(ast::Argument::new(
+                        "clustered",
+                        ast::Expression::NumericValue("true".to_string(), Span::empty()),
+                    ));
+                }
 
                 attributes.push(ast::Attribute::new("unique", args));
             });
@@ -83,6 +101,15 @@ impl<'a> LowerDmlToAst<'a> {
                         ast::Expression::ConstantValue("Hash".to_string(), Span::empty()),
                     ));
                 };
+
+                if self.preview_features.contains(PreviewFeature::ExtendedIndexes)
+                    && matches!(index_def.clustered, Some(true))
+                {
+                    args.push(ast::Argument::new(
+                        "clustered",
+                        ast::Expression::ConstantValue("true".to_string(), Span::empty()),
+                    ));
+                }
 
                 attributes.push(ast::Attribute::new("index", args));
             });

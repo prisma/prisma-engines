@@ -68,7 +68,8 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
           "sequences": [],
           "views": [],
           "procedures": [],
-          "user_defined_types": []
+          "user_defined_types": [],
+          "connector_data": null
         }"#]];
 
     expected.assert_eq(&api.get_database_description().await?);
@@ -128,7 +129,8 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
           "sequences": [],
           "views": [],
           "procedures": [],
-          "user_defined_types": []
+          "user_defined_types": [],
+          "connector_data": null
         }"#]];
 
     expected.assert_eq(&api.get_database_description().await?);
@@ -199,7 +201,8 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
           ],
           "views": [],
           "procedures": [],
-          "user_defined_types": []
+          "user_defined_types": [],
+          "connector_data": null
         }"#]];
 
     expected.assert_eq(&api.get_database_description().await?);
@@ -259,7 +262,8 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
           "sequences": [],
           "views": [],
           "procedures": [],
-          "user_defined_types": []
+          "user_defined_types": [],
+          "connector_data": null
         }"#]];
 
     expected.assert_eq(&api.get_database_description().await?);

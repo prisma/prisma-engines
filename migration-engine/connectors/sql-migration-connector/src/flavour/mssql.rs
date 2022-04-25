@@ -6,12 +6,13 @@ use crate::{
     SqlFlavour,
 };
 use connection_string::JdbcString;
+use datamodel::common::preview_features::PreviewFeature;
 use indoc::formatdoc;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
 };
 use quaint::{connector::MssqlUrl, prelude::Table};
-use sql_schema_describer::SqlSchema;
+use sql_schema_describer::{mssql::MssqlSchemaExt, SqlSchema};
 use std::{future, str::FromStr};
 use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, KnownError};
 
@@ -106,6 +107,18 @@ impl SqlFlavour for MssqlFlavour {
                 })?;
 
             normalize_sql_schema(&mut schema, params.connector_params.preview_features);
+            let mssql_ext: &mut MssqlSchemaExt = schema.downcast_connector_data_mut();
+
+            // Remove this when the feature is GA
+            if !params
+                .connector_params
+                .preview_features
+                .contains(PreviewFeature::ExtendedIndexes)
+            {
+                mssql_ext.clustered_indexes.clear();
+                mssql_ext.nonclustered_primary_keys.clear();
+            }
+
             Ok(schema)
         })
     }

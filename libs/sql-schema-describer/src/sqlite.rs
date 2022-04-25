@@ -69,15 +69,9 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         let views = self.get_views().await?;
 
         Ok(SqlSchema {
-            // There's no enum type in SQLite.
-            enums: vec![],
-            // There are no sequences in SQLite.
-            sequences: vec![],
-            // There are no procedures in SQLite (phew).
-            procedures: vec![],
             tables,
             views,
-            user_defined_types: vec![],
+            ..Default::default()
         })
     }
 

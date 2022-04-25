@@ -29,6 +29,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     push_model_tables(&mut context);
     push_relation_tables(&mut context);
+    flavour.push_connector_data(&mut context);
 
     schema
 }
@@ -422,7 +423,7 @@ fn column_arity(arity: FieldArity) -> sql::ColumnArity {
     }
 }
 
-struct Context<'a> {
+pub(crate) struct Context<'a> {
     datamodel: &'a ValidatedSchema,
     schema: &'a mut SqlDatabaseSchema,
     flavour: &'a dyn SqlFlavour,

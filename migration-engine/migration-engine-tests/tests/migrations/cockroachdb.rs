@@ -71,17 +71,18 @@ fn cockroach_apply_migrations_errors(api: TestApi) {
 #[test_connector(tags(CockroachDb))]
 fn native_type_columns_can_be_created(api: TestApi) {
     let types = &[
-        ("smallint", "Int", "SmallInt", "int2"),
-        ("int", "Int", "Integer", "int4"),
-        ("bigint", "BigInt", "BigInt", "int8"),
+        ("smallint", "Int", "Int2", "int2"),
+        ("int", "Int", "Int4", "int4"),
+        ("bigint", "BigInt", "Int8", "int8"),
         ("decimal", "Decimal", "Decimal(4, 2)", "numeric"),
         ("decimaldefault", "Decimal", "Decimal", "numeric"),
-        ("real", "Float", "Real", "float4"),
-        ("doublePrecision", "Float", "DoublePrecision", "float8"),
-        ("varChar", "String", "VarChar(200)", "varchar"),
+        ("float4col", "Float", "Float4", "float4"),
+        ("float8col", "Float", "Float8", "float8"),
+        ("stringargs", "String", "String(200)", "text"),
         ("char", "String", "Char(200)", "bpchar"),
-        ("text", "String", "Text", "text"),
-        ("bytea", "Bytes", "ByteA", "bytea"),
+        ("singlechar", "String", "SingleChar", "char"),
+        ("stringnoarg", "String", "String", "text"),
+        ("bytea", "Bytes", "Bytes", "bytea"),
         ("ts", "DateTime", "Timestamp(0)", "timestamp"),
         ("tsdefault", "DateTime", "Timestamp", "timestamp"),
         ("tstz", "DateTime", "Timestamptz", "timestamptz"),
@@ -90,7 +91,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
         ("timedefault", "DateTime", "Time", "time"),
         ("timetz", "DateTime", "Timetz(2)", "timetz"),
         ("timetzdefault", "DateTime", "Timetz", "timetz"),
-        ("bool", "Boolean", "Boolean", "bool"),
+        ("bool", "Boolean", "Bool", "bool"),
         ("bit", "String", "Bit(1)", "bit"),
         ("varbit", "String", "VarBit(1)", "varbit"),
         ("uuid", "String", "Uuid", "uuid"),
@@ -239,4 +240,146 @@ fn primary_key_column_type_migrations_are_unexecutable(api: TestApi) {
     api.assert_schema().assert_table("Dog", |table| {
         table.assert_pk(|pk| pk.assert_columns(&["name", "passportNumber"]))
     });
+}
+
+#[test_connector(tags(CockroachDb))]
+fn bigint_primary_keys_are_idempotent(api: TestApi) {
+    let dm1 = r#"
+            model Cat {
+                id BigInt @id @default(autoincrement()) @db.Int8
+            }
+        "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+    api.schema_push_w_datasource(dm1)
+        .send()
+        .assert_green()
+        .assert_no_steps();
+
+    let dm2 = r#"
+        model Cat {
+            id BigInt @id @default(autoincrement())
+        }
+        "#;
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+    api.schema_push_w_datasource(dm2)
+        .send()
+        .assert_green()
+        .assert_no_steps();
+}
+
+#[test_connector(tags(CockroachDb))]
+fn typescript_starter_schema_with_different_native_types_is_idempotent(api: TestApi) {
+    let dm = r#"
+        model Post {
+            id        Int     @id @default(autoincrement())
+            title     String
+            content   String?
+            published Boolean @default(false)
+            author    User?   @relation(fields: [authorId], references: [id])
+            authorId  Int?
+        }
+
+        model User {
+            id    Int     @id @default(autoincrement())
+            email String  @unique
+            name  String?
+            posts Post[]
+        }
+    "#;
+
+    let dm2 = r#"
+        model Post {
+            id        Int     @id @default(autoincrement()) @db.Int4
+            title     String  @db.String(100)
+            content   String? @db.String(100)
+            published Boolean @default(false) @db.Bool
+            author    User?   @relation(fields: [authorId], references: [id])
+            authorId  Int?    @db.Int4
+        }
+
+        model User {
+            id    Int     @id @default(autoincrement()) @db.Int4
+            email String  @unique @db.String(100)
+            name  String? @db.String(100)
+            posts Post[]
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm)
+        .migration_id(Some("first"))
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push_w_datasource(dm)
+        .migration_id(Some("second"))
+        .send()
+        .assert_green()
+        .assert_no_steps();
+    api.schema_push_w_datasource(dm2)
+        .migration_id(Some("third"))
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push_w_datasource(dm2)
+        .migration_id(Some("fourth"))
+        .send()
+        .assert_green()
+        .assert_no_steps();
+}
+
+#[test_connector(tags(CockroachDb))]
+fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
+    let dm = r#"
+        model Post {
+            id        Int     @id @default(autoincrement())
+            title     String
+            content   String?
+            published Boolean @default(false)
+            author    User?   @relation(fields: [authorId], references: [id])
+            authorId  Int?
+        }
+
+        model User {
+            id    Int     @id @default(autoincrement())
+            email String  @unique
+            name  String?
+            posts Post[]
+        }
+    "#;
+
+    let dm2 = r#"
+        model Post {
+            id        Int     @id @default(autoincrement()) @db.Int4
+            title     String  @db.String
+            content   String? @db.String
+            published Boolean @default(false) @db.Bool
+            author    User?   @relation(fields: [authorId], references: [id])
+            authorId  Int?    @db.Int4
+        }
+
+        model User {
+            id    Int     @id @default(autoincrement()) @db.Int4
+            email String  @unique @db.String
+            name  String? @db.String
+            posts Post[]
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm)
+        .migration_id(Some("first"))
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push_w_datasource(dm)
+        .migration_id(Some("second"))
+        .send()
+        .assert_green()
+        .assert_no_steps();
+    api.schema_push_w_datasource(dm2)
+        .migration_id(Some("third"))
+        .send()
+        .assert_green()
+        .assert_no_steps();
 }

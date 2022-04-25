@@ -98,8 +98,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
             enums,
             views,
             procedures,
-            sequences: vec![],
-            user_defined_types: vec![],
+            ..Default::default()
         })
     }
 
