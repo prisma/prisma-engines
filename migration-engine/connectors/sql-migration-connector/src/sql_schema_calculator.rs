@@ -54,7 +54,6 @@ fn push_model_tables(ctx: &mut Context<'_>) {
                     }),
                 })
                 .collect(),
-            sequence: None,
             constraint_name: pk
                 .constraint_name(ctx.flavour.datamodel_connector())
                 .map(|c| c.into_owned()),
@@ -82,12 +81,12 @@ fn push_model_tables(ctx: &mut Context<'_>) {
                 };
 
                 let algorithm = index.algorithm().map(|algo| match algo {
-                    IndexAlgorithm::BTree => sql::SQLIndexAlgorithm::BTree,
-                    IndexAlgorithm::Hash => sql::SQLIndexAlgorithm::Hash,
-                    IndexAlgorithm::Gist => sql::SQLIndexAlgorithm::Gist,
-                    IndexAlgorithm::Gin => sql::SQLIndexAlgorithm::Gin,
-                    IndexAlgorithm::SpGist => sql::SQLIndexAlgorithm::SpGist,
-                    IndexAlgorithm::Brin => sql::SQLIndexAlgorithm::Brin,
+                    IndexAlgorithm::BTree => sql::SqlIndexAlgorithm::BTree,
+                    IndexAlgorithm::Hash => sql::SqlIndexAlgorithm::Hash,
+                    IndexAlgorithm::Gist => sql::SqlIndexAlgorithm::Gist,
+                    IndexAlgorithm::Gin => sql::SqlIndexAlgorithm::Gin,
+                    IndexAlgorithm::SpGist => sql::SqlIndexAlgorithm::SpGist,
+                    IndexAlgorithm::Brin => sql::SqlIndexAlgorithm::Brin,
                 });
 
                 sql::Index {

@@ -509,7 +509,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
     let pk_columns = pk.columns.iter().map(|c| c.name()).collect::<Vec<_>>();
     assert_eq!(vec!["primary_col"], pk_columns);
 
-    assert_eq!(None, pk.sequence);
     assert!(pk
         .constraint_name
         .as_ref()
@@ -677,9 +676,7 @@ fn mssql_foreign_key_on_delete_must_be_handled(api: TestApi) {
                     sort_order: Some(SQLSortOrder::Asc),
                     length: None
                 }],
-                sequence: None,
                 constraint_name: Some("PK__User".into()),
-                // clustered: Some(true),
             }),
             foreign_keys: vec![
                 ForeignKey {
@@ -738,7 +735,6 @@ fn mssql_multi_field_indexes_must_be_inferred(api: TestApi) {
             columns,
             tpe: IndexType::Unique,
             algorithm: None,
-            // clustered: Some(false),
         }]
     );
 }

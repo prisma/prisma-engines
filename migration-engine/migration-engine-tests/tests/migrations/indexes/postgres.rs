@@ -4,7 +4,7 @@ mod gist;
 mod spgist;
 
 use migration_engine_tests::test_api::*;
-use sql_schema_describer::SQLIndexAlgorithm;
+use sql_schema_describer::SqlIndexAlgorithm;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
 fn hash_index(api: TestApi) {
@@ -21,7 +21,7 @@ fn hash_index(api: TestApi) {
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["a"], |index| {
-            index.assert_is_not_unique().assert_algorithm(SQLIndexAlgorithm::Hash)
+            index.assert_is_not_unique().assert_algorithm(SqlIndexAlgorithm::Hash)
         })
     });
 

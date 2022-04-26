@@ -4140,6 +4140,7 @@ dependencies = [
  "barrel",
  "bigdecimal 0.2.2",
  "enumflags2",
+ "expect-test",
  "indoc",
  "native-types",
  "once_cell",

@@ -19,7 +19,6 @@ mod parsers;
 pub use self::{
     error::{DescriberError, DescriberErrorKind, DescriberResult},
     ids::*,
-    postgres::{SQLOperatorClass, SQLOperatorClassKind},
 };
 
 use once_cell::sync::Lazy;
@@ -60,8 +59,6 @@ pub struct SqlSchema {
     pub tables: Vec<Table>,
     /// The schema's enums.
     pub enums: Vec<Enum>,
-    /// The schema's sequences, unique to Postgres.
-    sequences: Vec<Sequence>,
     /// The schema's views,
     views: Vec<View>,
     /// The stored procedures.
@@ -118,12 +115,11 @@ impl SqlSchema {
             SqlSchema {
                 tables,
                 enums,
-                sequences,
                 views,
                 procedures,
                 user_defined_types,
                 ..
-            } if tables.is_empty() && enums.is_empty() && sequences.is_empty() && views.is_empty() && procedures.is_empty() && user_defined_types.is_empty()
+            } if tables.is_empty() && enums.is_empty() && views.is_empty() && procedures.is_empty() && user_defined_types.is_empty()
         )
     }
 
@@ -150,15 +146,6 @@ impl SqlSchema {
 
     pub fn table_bang(&self, name: &str) -> &Table {
         self.table(name).unwrap()
-    }
-
-    /// Get a sequence.
-    pub fn get_sequence(&self, name: &str) -> Option<&Sequence> {
-        self.sequences.iter().find(|x| x.name == name)
-    }
-
-    pub fn empty() -> SqlSchema {
-        SqlSchema::default()
     }
 
     pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
@@ -266,7 +253,7 @@ impl IndexType {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
-pub enum SQLIndexAlgorithm {
+pub enum SqlIndexAlgorithm {
     BTree,
     Hash,
     Gist,
@@ -275,13 +262,13 @@ pub enum SQLIndexAlgorithm {
     Brin,
 }
 
-impl Default for SQLIndexAlgorithm {
+impl Default for SqlIndexAlgorithm {
     fn default() -> Self {
         Self::BTree
     }
 }
 
-impl AsRef<str> for SQLIndexAlgorithm {
+impl AsRef<str> for SqlIndexAlgorithm {
     fn as_ref(&self) -> &str {
         match self {
             Self::BTree => "BTREE",
@@ -294,7 +281,7 @@ impl AsRef<str> for SQLIndexAlgorithm {
     }
 }
 
-impl fmt::Display for SQLIndexAlgorithm {
+impl fmt::Display for SqlIndexAlgorithm {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(self.as_ref())
     }
@@ -362,7 +349,7 @@ pub struct Index {
     /// Type of index.
     pub tpe: IndexType,
     /// BTree or Hash
-    pub algorithm: Option<SQLIndexAlgorithm>,
+    pub algorithm: Option<SqlIndexAlgorithm>,
 }
 
 impl Index {
@@ -436,8 +423,6 @@ impl PrimaryKeyColumn {
 pub struct PrimaryKey {
     /// Columns.
     pub columns: Vec<PrimaryKeyColumn>,
-    /// The sequence optionally seeding this primary key.
-    pub sequence: Option<Sequence>,
     /// The name of the primary key constraint, when available.
     pub constraint_name: Option<String>,
 }
@@ -658,13 +643,6 @@ pub struct Enum {
     pub name: String,
     /// Possible enum values.
     pub values: Vec<String>,
-}
-
-/// A SQL sequence.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
-pub struct Sequence {
-    /// Sequence name.
-    pub name: String,
 }
 
 /// An SQL view.

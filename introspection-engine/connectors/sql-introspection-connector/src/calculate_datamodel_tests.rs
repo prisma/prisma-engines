@@ -17,7 +17,7 @@ mod tests {
     use pretty_assertions::assert_eq;
     use sql_schema_describer::{
         Column, ColumnArity, ColumnType, ColumnTypeFamily, Enum, ForeignKey, ForeignKeyAction, Index, IndexColumn,
-        IndexType, PrimaryKey, PrimaryKeyColumn, Sequence, SqlSchema, Table,
+        IndexType, PrimaryKey, PrimaryKeyColumn, SqlSchema, Table,
     };
 
     fn postgres_context() -> IntrospectionContext {
@@ -159,7 +159,6 @@ mod tests {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("required")],
-                sequence: None,
                 constraint_name: None,
             }),
             foreign_keys: vec![],
@@ -308,7 +307,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("primary")],
-                    sequence: None,
                     constraint_name: None,
                 }),
                 foreign_keys: vec![],
@@ -329,7 +327,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("primary")],
-                    sequence: None,
                     constraint_name: None,
                 }),
                 foreign_keys: vec![],
@@ -350,9 +347,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("primary")],
-                    sequence: Some(Sequence {
-                        name: "sequence".to_string(),
-                    }),
                     constraint_name: None,
                 }),
                 foreign_keys: vec![],
@@ -643,7 +637,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("id")],
-                    sequence: None,
                     constraint_name: None,
                 }),
                 foreign_keys: vec![],
@@ -688,7 +681,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("id")],
-                    sequence: None,
                     constraint_name: None,
                 }),
                 foreign_keys: vec![ForeignKey {
@@ -833,7 +825,6 @@ mod tests {
             }],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("id")],
-                sequence: None,
                 constraint_name: None,
             }),
             foreign_keys: vec![],
@@ -1020,7 +1011,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("id")],
-                    sequence: None,
                     constraint_name: None,
                 }),
                 foreign_keys: vec![],
@@ -1054,7 +1044,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("id")],
-                    sequence: None,
                     constraint_name: None,
                 }),
                 foreign_keys: vec![ForeignKey {

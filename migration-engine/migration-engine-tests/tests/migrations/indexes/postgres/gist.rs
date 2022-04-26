@@ -1,5 +1,5 @@
 use migration_engine_tests::test_api::*;
-use sql_schema_describer::{SQLIndexAlgorithm, SQLOperatorClassKind};
+use sql_schema_describer::{postgres::SQLOperatorClassKind, SqlIndexAlgorithm};
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn gist_preview_disabled(api: TestApi) {
@@ -38,7 +38,7 @@ fn gist_change_from_btree(api: TestApi) {
     api.assert_schema().assert_table("A", |table| {
         table
             .assert_has_column("data")
-            .assert_index_on_columns(&["data"], |idx| idx.assert_algorithm(SQLIndexAlgorithm::BTree))
+            .assert_index_on_columns(&["data"], |idx| idx.assert_algorithm(SqlIndexAlgorithm::BTree))
     });
 
     let dm = r#"
@@ -55,7 +55,7 @@ fn gist_change_from_btree(api: TestApi) {
     api.assert_schema().assert_table("A", |table| {
         table
             .assert_has_column("data")
-            .assert_index_on_columns(&["data"], |idx| idx.assert_algorithm(SQLIndexAlgorithm::Gist))
+            .assert_index_on_columns(&["data"], |idx| idx.assert_algorithm(SqlIndexAlgorithm::Gist))
     });
 }
 
@@ -76,7 +76,7 @@ fn gist_inet_ops(api: TestApi) {
         table
             .assert_has_column("data")
             .assert_index_on_columns(&["data"], |idx| {
-                idx.assert_algorithm(SQLIndexAlgorithm::Gist)
+                idx.assert_algorithm(SqlIndexAlgorithm::Gist)
                     .assert_column("data", |attrs| attrs.assert_ops(SQLOperatorClassKind::InetOps))
             })
     });
@@ -101,7 +101,7 @@ fn gist_raw_ops(api: TestApi) {
         table
             .assert_has_column("data")
             .assert_index_on_columns(&["data"], |idx| {
-                idx.assert_algorithm(SQLIndexAlgorithm::Gist)
+                idx.assert_algorithm(SqlIndexAlgorithm::Gist)
                     .assert_column("data", |attrs| {
                         attrs.assert_ops(SQLOperatorClassKind::raw("tsvector_ops"))
                     })
@@ -128,7 +128,7 @@ fn gist_unsupported_no_ops(api: TestApi) {
         table
             .assert_has_column("data")
             .assert_index_on_columns(&["data"], |idx| {
-                idx.assert_algorithm(SQLIndexAlgorithm::Gist)
+                idx.assert_algorithm(SqlIndexAlgorithm::Gist)
                     .assert_column("data", |attrs| {
                         attrs.assert_ops(SQLOperatorClassKind::raw("tsvector_ops"))
                     })

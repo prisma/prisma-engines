@@ -58,14 +58,12 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
                     "sort_order": null
                   }
                 ],
-                "sequence": null,
                 "constraint_name": null
               },
               "foreign_keys": []
             }
           ],
           "enums": [],
-          "sequences": [],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
@@ -119,14 +117,12 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
                     "sort_order": null
                   }
                 ],
-                "sequence": null,
                 "constraint_name": null
               },
               "foreign_keys": []
             }
           ],
           "enums": [],
-          "sequences": [],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
@@ -185,20 +181,12 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
                     "sort_order": null
                   }
                 ],
-                "sequence": {
-                  "name": "Blog_id_seq"
-                },
                 "constraint_name": "Blog_pkey"
               },
               "foreign_keys": []
             }
           ],
           "enums": [],
-          "sequences": [
-            {
-              "name": "Blog_id_seq"
-            }
-          ],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
@@ -252,14 +240,12 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
                     "sort_order": null
                   }
                 ],
-                "sequence": null,
                 "constraint_name": null
               },
               "foreign_keys": []
             }
           ],
           "enums": [],
-          "sequences": [],
           "views": [],
           "procedures": [],
           "user_defined_types": [],

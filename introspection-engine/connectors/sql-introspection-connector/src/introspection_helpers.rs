@@ -144,12 +144,12 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Intros
 
     let using = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
         index.algorithm().map(|algo| match algo {
-            sql::SQLIndexAlgorithm::BTree => IndexAlgorithm::BTree,
-            sql::SQLIndexAlgorithm::Hash => IndexAlgorithm::Hash,
-            sql::SQLIndexAlgorithm::Gist => IndexAlgorithm::Gist,
-            sql::SQLIndexAlgorithm::Gin => IndexAlgorithm::Gin,
-            sql::SQLIndexAlgorithm::SpGist => IndexAlgorithm::SpGist,
-            sql::SQLIndexAlgorithm::Brin => IndexAlgorithm::Brin,
+            sql::SqlIndexAlgorithm::BTree => IndexAlgorithm::BTree,
+            sql::SqlIndexAlgorithm::Hash => IndexAlgorithm::Hash,
+            sql::SqlIndexAlgorithm::Gist => IndexAlgorithm::Gist,
+            sql::SqlIndexAlgorithm::Gin => IndexAlgorithm::Gin,
+            sql::SqlIndexAlgorithm::SpGist => IndexAlgorithm::SpGist,
+            sql::SqlIndexAlgorithm::Brin => IndexAlgorithm::Brin,
         })
     } else {
         None
@@ -376,7 +376,7 @@ pub(crate) fn is_sequence(column: &sql::Column, table: &sql::Table) -> bool {
     table
         .primary_key
         .as_ref()
-        .map(|pk| pk.is_single_primary_key(&column.name) && pk.sequence.is_some())
+        .map(|pk| pk.is_single_primary_key(&column.name) && matches!(&column.default, Some(d) if d.is_sequence()))
         .unwrap_or(false)
 }
 
@@ -386,7 +386,7 @@ pub(crate) fn calculate_relation_name(
     table: &Table,
     m2m_table_names: &[String],
 ) -> Result<String, SqlError> {
-    //this is not called for prisma many to many relations. for them the name is just the name of the join table.
+    // This is not called for prisma many to many relations. For them the name is just the name of the join table.
     let referenced_model = &fk.referenced_table;
     let model_with_fk = &table.name;
     let fk_column_name = fk.columns.join("_");
@@ -579,62 +579,64 @@ fn get_opclass(
 
     match &opclass.kind {
         _ if opclass.is_default => None,
-        sql::SQLOperatorClassKind::InetOps => Some(OperatorClass::InetOps),
-        sql::SQLOperatorClassKind::JsonbOps => Some(OperatorClass::JsonbOps),
-        sql::SQLOperatorClassKind::JsonbPathOps => Some(OperatorClass::JsonbPathOps),
-        sql::SQLOperatorClassKind::ArrayOps => Some(OperatorClass::ArrayOps),
-        sql::SQLOperatorClassKind::TextOps => Some(OperatorClass::TextOps),
-        sql::SQLOperatorClassKind::BitMinMaxOps => Some(OperatorClass::BitMinMaxOps),
-        sql::SQLOperatorClassKind::VarBitMinMaxOps => Some(OperatorClass::VarBitMinMaxOps),
-        sql::SQLOperatorClassKind::BpcharBloomOps => Some(OperatorClass::BpcharBloomOps),
-        sql::SQLOperatorClassKind::BpcharMinMaxOps => Some(OperatorClass::BpcharMinMaxOps),
-        sql::SQLOperatorClassKind::ByteaBloomOps => Some(OperatorClass::ByteaBloomOps),
-        sql::SQLOperatorClassKind::ByteaMinMaxOps => Some(OperatorClass::ByteaMinMaxOps),
-        sql::SQLOperatorClassKind::DateBloomOps => Some(OperatorClass::DateBloomOps),
-        sql::SQLOperatorClassKind::DateMinMaxOps => Some(OperatorClass::DateMinMaxOps),
-        sql::SQLOperatorClassKind::DateMinMaxMultiOps => Some(OperatorClass::DateMinMaxMultiOps),
-        sql::SQLOperatorClassKind::Float4BloomOps => Some(OperatorClass::Float4BloomOps),
-        sql::SQLOperatorClassKind::Float4MinMaxOps => Some(OperatorClass::Float4MinMaxOps),
-        sql::SQLOperatorClassKind::Float4MinMaxMultiOps => Some(OperatorClass::Float4MinMaxMultiOps),
-        sql::SQLOperatorClassKind::Float8BloomOps => Some(OperatorClass::Float8BloomOps),
-        sql::SQLOperatorClassKind::Float8MinMaxOps => Some(OperatorClass::Float8MinMaxOps),
-        sql::SQLOperatorClassKind::Float8MinMaxMultiOps => Some(OperatorClass::Float8MinMaxMultiOps),
-        sql::SQLOperatorClassKind::InetInclusionOps => Some(OperatorClass::InetInclusionOps),
-        sql::SQLOperatorClassKind::InetBloomOps => Some(OperatorClass::InetBloomOps),
-        sql::SQLOperatorClassKind::InetMinMaxOps => Some(OperatorClass::InetMinMaxOps),
-        sql::SQLOperatorClassKind::InetMinMaxMultiOps => Some(OperatorClass::InetMinMaxMultiOps),
-        sql::SQLOperatorClassKind::Int2BloomOps => Some(OperatorClass::Int2BloomOps),
-        sql::SQLOperatorClassKind::Int2MinMaxOps => Some(OperatorClass::Int2MinMaxOps),
-        sql::SQLOperatorClassKind::Int2MinMaxMultiOps => Some(OperatorClass::Int2MinMaxMultiOps),
-        sql::SQLOperatorClassKind::Int4BloomOps => Some(OperatorClass::Int4BloomOps),
-        sql::SQLOperatorClassKind::Int4MinMaxOps => Some(OperatorClass::Int4MinMaxOps),
-        sql::SQLOperatorClassKind::Int4MinMaxMultiOps => Some(OperatorClass::Int4MinMaxMultiOps),
-        sql::SQLOperatorClassKind::Int8BloomOps => Some(OperatorClass::Int8BloomOps),
-        sql::SQLOperatorClassKind::Int8MinMaxOps => Some(OperatorClass::Int8MinMaxOps),
-        sql::SQLOperatorClassKind::Int8MinMaxMultiOps => Some(OperatorClass::Int8MinMaxMultiOps),
-        sql::SQLOperatorClassKind::NumericBloomOps => Some(OperatorClass::NumericBloomOps),
-        sql::SQLOperatorClassKind::NumericMinMaxOps => Some(OperatorClass::NumericMinMaxOps),
-        sql::SQLOperatorClassKind::NumericMinMaxMultiOps => Some(OperatorClass::NumericMinMaxMultiOps),
-        sql::SQLOperatorClassKind::OidBloomOps => Some(OperatorClass::OidBloomOps),
-        sql::SQLOperatorClassKind::OidMinMaxOps => Some(OperatorClass::OidMinMaxOps),
-        sql::SQLOperatorClassKind::OidMinMaxMultiOps => Some(OperatorClass::OidMinMaxMultiOps),
-        sql::SQLOperatorClassKind::TextBloomOps => Some(OperatorClass::TextBloomOps),
-        sql::SQLOperatorClassKind::TextMinMaxOps => Some(OperatorClass::TextMinMaxOps),
-        sql::SQLOperatorClassKind::TimestampBloomOps => Some(OperatorClass::TimestampBloomOps),
-        sql::SQLOperatorClassKind::TimestampMinMaxOps => Some(OperatorClass::TimestampMinMaxOps),
-        sql::SQLOperatorClassKind::TimestampMinMaxMultiOps => Some(OperatorClass::TimestampMinMaxMultiOps),
-        sql::SQLOperatorClassKind::TimestampTzBloomOps => Some(OperatorClass::TimestampTzBloomOps),
-        sql::SQLOperatorClassKind::TimestampTzMinMaxOps => Some(OperatorClass::TimestampTzMinMaxOps),
-        sql::SQLOperatorClassKind::TimestampTzMinMaxMultiOps => Some(OperatorClass::TimestampTzMinMaxMultiOps),
-        sql::SQLOperatorClassKind::TimeBloomOps => Some(OperatorClass::TimeBloomOps),
-        sql::SQLOperatorClassKind::TimeMinMaxOps => Some(OperatorClass::TimeMinMaxOps),
-        sql::SQLOperatorClassKind::TimeMinMaxMultiOps => Some(OperatorClass::TimeMinMaxMultiOps),
-        sql::SQLOperatorClassKind::TimeTzBloomOps => Some(OperatorClass::TimeTzBloomOps),
-        sql::SQLOperatorClassKind::TimeTzMinMaxOps => Some(OperatorClass::TimeTzMinMaxOps),
-        sql::SQLOperatorClassKind::TimeTzMinMaxMultiOps => Some(OperatorClass::TimeTzMinMaxMultiOps),
-        sql::SQLOperatorClassKind::UuidBloomOps => Some(OperatorClass::UuidBloomOps),
-        sql::SQLOperatorClassKind::UuidMinMaxOps => Some(OperatorClass::UuidMinMaxOps),
-        sql::SQLOperatorClassKind::UuidMinMaxMultiOps => Some(OperatorClass::UuidMinMaxMultiOps),
-        sql::SQLOperatorClassKind::Raw(c) => Some(OperatorClass::Raw(c.to_string().into())),
+        sql::postgres::SQLOperatorClassKind::InetOps => Some(OperatorClass::InetOps),
+        sql::postgres::SQLOperatorClassKind::JsonbOps => Some(OperatorClass::JsonbOps),
+        sql::postgres::SQLOperatorClassKind::JsonbPathOps => Some(OperatorClass::JsonbPathOps),
+        sql::postgres::SQLOperatorClassKind::ArrayOps => Some(OperatorClass::ArrayOps),
+        sql::postgres::SQLOperatorClassKind::TextOps => Some(OperatorClass::TextOps),
+        sql::postgres::SQLOperatorClassKind::BitMinMaxOps => Some(OperatorClass::BitMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::VarBitMinMaxOps => Some(OperatorClass::VarBitMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::BpcharBloomOps => Some(OperatorClass::BpcharBloomOps),
+        sql::postgres::SQLOperatorClassKind::BpcharMinMaxOps => Some(OperatorClass::BpcharMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::ByteaBloomOps => Some(OperatorClass::ByteaBloomOps),
+        sql::postgres::SQLOperatorClassKind::ByteaMinMaxOps => Some(OperatorClass::ByteaMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::DateBloomOps => Some(OperatorClass::DateBloomOps),
+        sql::postgres::SQLOperatorClassKind::DateMinMaxOps => Some(OperatorClass::DateMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::DateMinMaxMultiOps => Some(OperatorClass::DateMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Float4BloomOps => Some(OperatorClass::Float4BloomOps),
+        sql::postgres::SQLOperatorClassKind::Float4MinMaxOps => Some(OperatorClass::Float4MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Float4MinMaxMultiOps => Some(OperatorClass::Float4MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Float8BloomOps => Some(OperatorClass::Float8BloomOps),
+        sql::postgres::SQLOperatorClassKind::Float8MinMaxOps => Some(OperatorClass::Float8MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Float8MinMaxMultiOps => Some(OperatorClass::Float8MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::InetInclusionOps => Some(OperatorClass::InetInclusionOps),
+        sql::postgres::SQLOperatorClassKind::InetBloomOps => Some(OperatorClass::InetBloomOps),
+        sql::postgres::SQLOperatorClassKind::InetMinMaxOps => Some(OperatorClass::InetMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::InetMinMaxMultiOps => Some(OperatorClass::InetMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Int2BloomOps => Some(OperatorClass::Int2BloomOps),
+        sql::postgres::SQLOperatorClassKind::Int2MinMaxOps => Some(OperatorClass::Int2MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Int2MinMaxMultiOps => Some(OperatorClass::Int2MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Int4BloomOps => Some(OperatorClass::Int4BloomOps),
+        sql::postgres::SQLOperatorClassKind::Int4MinMaxOps => Some(OperatorClass::Int4MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Int4MinMaxMultiOps => Some(OperatorClass::Int4MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Int8BloomOps => Some(OperatorClass::Int8BloomOps),
+        sql::postgres::SQLOperatorClassKind::Int8MinMaxOps => Some(OperatorClass::Int8MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Int8MinMaxMultiOps => Some(OperatorClass::Int8MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::NumericBloomOps => Some(OperatorClass::NumericBloomOps),
+        sql::postgres::SQLOperatorClassKind::NumericMinMaxOps => Some(OperatorClass::NumericMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::NumericMinMaxMultiOps => Some(OperatorClass::NumericMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::OidBloomOps => Some(OperatorClass::OidBloomOps),
+        sql::postgres::SQLOperatorClassKind::OidMinMaxOps => Some(OperatorClass::OidMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::OidMinMaxMultiOps => Some(OperatorClass::OidMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::TextBloomOps => Some(OperatorClass::TextBloomOps),
+        sql::postgres::SQLOperatorClassKind::TextMinMaxOps => Some(OperatorClass::TextMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimestampBloomOps => Some(OperatorClass::TimestampBloomOps),
+        sql::postgres::SQLOperatorClassKind::TimestampMinMaxOps => Some(OperatorClass::TimestampMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimestampMinMaxMultiOps => Some(OperatorClass::TimestampMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::TimestampTzBloomOps => Some(OperatorClass::TimestampTzBloomOps),
+        sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxOps => Some(OperatorClass::TimestampTzMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxMultiOps => {
+            Some(OperatorClass::TimestampTzMinMaxMultiOps)
+        }
+        sql::postgres::SQLOperatorClassKind::TimeBloomOps => Some(OperatorClass::TimeBloomOps),
+        sql::postgres::SQLOperatorClassKind::TimeMinMaxOps => Some(OperatorClass::TimeMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimeMinMaxMultiOps => Some(OperatorClass::TimeMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::TimeTzBloomOps => Some(OperatorClass::TimeTzBloomOps),
+        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxOps => Some(OperatorClass::TimeTzMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxMultiOps => Some(OperatorClass::TimeTzMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::UuidBloomOps => Some(OperatorClass::UuidBloomOps),
+        sql::postgres::SQLOperatorClassKind::UuidMinMaxOps => Some(OperatorClass::UuidMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps => Some(OperatorClass::UuidMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Raw(c) => Some(OperatorClass::Raw(c.to_string().into())),
     }
 }

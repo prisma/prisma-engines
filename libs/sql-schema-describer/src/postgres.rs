@@ -11,11 +11,17 @@ use serde_json::from_str;
 use std::{
     any::type_name,
     borrow::Cow,
-    collections::HashSet,
-    collections::{BTreeMap, HashMap},
+    collections::{BTreeMap, HashMap, HashSet},
     convert::TryInto,
 };
 use tracing::trace;
+
+/// A SQL sequence.
+#[derive(Debug)]
+pub struct Sequence {
+    /// Sequence name.
+    pub name: String,
+}
 
 #[enumflags2::bitflags]
 #[derive(Clone, Copy, Debug)]
@@ -38,14 +44,20 @@ impl Debug for SqlSchemaDescriber<'_> {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct PostgresSchemaExt {
-    pub opclasses: HashMap<IndexFieldId, SQLOperatorClass>,
+    pub opclasses: Vec<(IndexFieldId, SQLOperatorClass)>,
+    /// The schema's sequences.
+    pub sequences: Vec<Sequence>,
 }
 
 impl PostgresSchemaExt {
     pub fn get_opclass(&self, index_field_id: IndexFieldId) -> Option<&SQLOperatorClass> {
-        self.opclasses.get(&index_field_id)
+        let idx = self
+            .opclasses
+            .binary_search_by_key(&index_field_id, |(id, _)| *id)
+            .ok()?;
+        Some(&self.opclasses[idx].1)
     }
 }
 
@@ -327,9 +339,9 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
         let mut pg_ext = PostgresSchemaExt::default();
 
-        let sequences = self.get_sequences(schema).await?;
+        self.get_sequences(schema, &mut pg_ext).await?;
         let enums = self.get_enums(schema).await?;
-        let mut columns = self.get_columns(schema, &enums, &sequences).await?;
+        let mut columns = self.get_columns(schema, &enums, &pg_ext.sequences).await?;
         let mut foreign_keys = self.get_foreign_keys(schema).await?;
 
         let table_names = self.get_table_names(schema).await?;
@@ -340,7 +352,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
             .map(|(idx, name)| (name.clone(), TableId(idx as u32)))
             .collect();
 
-        let mut indexes = self.get_indices(schema, &sequences, &mut pg_ext, &table_ids).await?;
+        let mut indexes = self.get_indices(schema, &mut pg_ext, &table_ids).await?;
         let mut tables = Vec::with_capacity(table_names.len());
 
         if self.is_cockroach() {
@@ -383,7 +395,6 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
         Ok(SqlSchema {
             enums,
-            sequences,
             tables,
             views,
             procedures,
@@ -833,7 +844,6 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_indices(
         &self,
         schema: &str,
-        sequences: &[Sequence],
         pg_ext: &mut PostgresSchemaExt,
         table_ids: &HashMap<String, TableId>,
     ) -> DescriberResult<BTreeMap<String, (Vec<Index>, Option<PrimaryKey>)>> {
@@ -852,9 +862,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                CASE rawIndex.sort_order & 1
                    WHEN 1 THEN 'DESC'
                    ELSE 'ASC'
-                   END                                     AS column_order,
-               pg_get_serial_sequence('"' || $1 || '"."' || tableInfos.relname || '"',
-                                      columnInfos.attname) AS sequence_name
+                   END                                     AS column_order
         FROM
             -- pg_class stores infos about tables, indices etc: https://www.postgresql.org/docs/current/catalog-pg-class.html
             pg_class tableInfos,
@@ -918,7 +926,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             let is_primary_key = row.get_expect_bool("is_primary_key");
             let table_name = row.get_expect_string("table_name");
             let table_id = table_ids[table_name.as_str()];
-            let sequence_name = row.get_string("sequence_name");
 
             let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
                 "ASC" => SQLSortOrder::Asc,
@@ -930,43 +937,34 @@ impl<'a> SqlSchemaDescriber<'a> {
             });
 
             let algorithm = match row.get_string("index_algo").as_deref() {
-                Some("btree") => Some(SQLIndexAlgorithm::BTree),
-                Some("hash") => Some(SQLIndexAlgorithm::Hash),
-                Some("gist") => Some(SQLIndexAlgorithm::Gist),
-                Some("gin") => Some(SQLIndexAlgorithm::Gin),
-                Some("spgist") => Some(SQLIndexAlgorithm::SpGist),
-                Some("brin") => Some(SQLIndexAlgorithm::Brin),
+                Some("btree") => Some(SqlIndexAlgorithm::BTree),
+                Some("hash") => Some(SqlIndexAlgorithm::Hash),
+                Some("gist") => Some(SqlIndexAlgorithm::Gist),
+                Some("gin") => Some(SqlIndexAlgorithm::Gin),
+                Some("spgist") => Some(SqlIndexAlgorithm::SpGist),
+                Some("brin") => Some(SqlIndexAlgorithm::Brin),
                 _ => None,
             };
 
             if is_primary_key {
-                let entry: &mut (Vec<_>, Option<PrimaryKey>) =
-                    indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
+                let entry: &mut (Vec<_>, Option<PrimaryKey>) = indexes_map
+                    .entry(table_name.clone())
+                    .or_insert_with(|| (Vec::new(), None));
 
                 match entry.1.as_mut() {
                     Some(pk) => {
                         pk.columns.push(PrimaryKeyColumn::new(column_name));
                     }
                     None => {
-                        let sequence = sequence_name.and_then(|sequence_name| {
-                            let captures = RE_SEQ.captures(&sequence_name).expect("get captures");
-                            let sequence_name = captures.get(1).expect("get capture").as_str();
-                            sequences.iter().find(|s| s.name == sequence_name).map(|sequence| {
-                                trace!("Got sequence corresponding to primary key: {:#?}", sequence);
-                                sequence.clone()
-                            })
-                        });
-
                         entry.1 = Some(PrimaryKey {
                             columns: vec![PrimaryKeyColumn::new(column_name)],
-                            sequence,
                             constraint_name: Some(name.clone()),
                         });
                     }
                 }
             } else {
                 let operator_class = algorithm
-                    .filter(|alg| !matches!(alg, SQLIndexAlgorithm::BTree | SQLIndexAlgorithm::Hash))
+                    .filter(|alg| !matches!(alg, SqlIndexAlgorithm::BTree | SqlIndexAlgorithm::Hash))
                     .and_then(|_| {
                         row.get_string("opclass")
                             .map(|c| (c, row.get_bool("opcdefault").unwrap_or_default()))
@@ -988,7 +986,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                         let index_id = IndexId(table_id, index_id as u32);
                         let index_field_id = IndexFieldId(index_id, existing_index.columns.len() as u32);
 
-                        pg_ext.opclasses.insert(index_field_id, opclass);
+                        pg_ext.opclasses.push((index_field_id, opclass));
                     }
 
                     existing_index.columns.push(column);
@@ -997,7 +995,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                         let index_id = IndexId(table_id, entry.0.len() as u32);
                         let index_field_id = IndexFieldId(index_id, 0);
 
-                        pg_ext.opclasses.insert(index_field_id, opclass);
+                        pg_ext.opclasses.push((index_field_id, opclass));
                     }
 
                     entry.0.push(Index {
@@ -1016,24 +1014,16 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(indexes_map)
     }
 
-    #[tracing::instrument]
-    async fn get_sequences(&self, schema: &str) -> DescriberResult<Vec<Sequence>> {
+    async fn get_sequences(&self, schema: &str, postgres_ext: &mut PostgresSchemaExt) -> DescriberResult<()> {
         let sql = "SELECT sequence_name
                   FROM information_schema.sequences
                   WHERE sequence_schema = $1";
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
-        let sequences = rows
-            .into_iter()
-            .map(|seq| {
-                trace!("Got sequence: {:?}", seq);
-                Sequence {
-                    name: seq.get_expect_string("sequence_name"),
-                }
-            })
-            .collect();
-
-        trace!("Found sequences: {:?}", sequences);
-        Ok(sequences)
+        let sequences = rows.into_iter().map(|seq| Sequence {
+            name: seq.get_expect_string("sequence_name"),
+        });
+        postgres_ext.sequences.extend(sequences);
+        Ok(())
     }
 
     #[tracing::instrument]
@@ -1342,8 +1332,6 @@ fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     }
 }
 
-static RE_SEQ: Lazy<Regex> = Lazy::new(|| Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex"));
-
 static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r#"nextval\((\(?)'((.+)\.)?(("(?P<sequence>.+)")|(?P<sequence2>.+))'(::text\))?::(regclass|REGCLASS)\)"#)
         .expect("compile autoincrement regex")
@@ -1367,15 +1355,10 @@ fn fetch_dbgenerated(value: &str) -> Option<String> {
     static POSTGRES_DB_GENERATED_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"(^\((.*)\)):{2,3}(\\")?(.*)(\\")?$"#).unwrap());
 
-    if !POSTGRES_DB_GENERATED_RE.is_match(value) {
-        None
-    } else {
-        let captures = POSTGRES_DB_GENERATED_RE.captures(value)?;
-        let fun = captures.get(1).unwrap().as_str();
-        let suffix = captures.get(4).unwrap().as_str();
-
-        Some(format!("{}::{}", fun, suffix))
-    }
+    let captures = POSTGRES_DB_GENERATED_RE.captures(value)?;
+    let fun = captures.get(1).unwrap().as_str();
+    let suffix = captures.get(4).unwrap().as_str();
+    Some(format!("{}::{}", fun, suffix))
 }
 
 fn unsuffix_default_literal<'a, T: AsRef<str>>(literal: &'a str, expected_suffixes: &[T]) -> Option<Cow<'a, str>> {

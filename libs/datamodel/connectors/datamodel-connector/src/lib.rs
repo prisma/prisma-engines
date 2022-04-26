@@ -23,11 +23,11 @@ pub use self::{
 pub use diagnostics::{ConnectorErrorFactory, DatamodelError, Diagnostics, Span};
 pub use empty_connector::EmptyDatamodelConnector;
 pub use native_type_constructor::NativeTypeConstructor;
-use parser_database::IndexAlgorithm;
 pub use parser_database::{self, ReferentialAction, ScalarType};
 pub use referential_integrity::ReferentialIntegrity;
 
 use enumflags2::BitFlags;
+use parser_database::IndexAlgorithm;
 use std::{borrow::Cow, collections::BTreeMap};
 
 /// The datamodel connector API.
@@ -224,11 +224,11 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::DecimalType)
     }
 
-    fn supported_index_types(&self) -> &'static [IndexAlgorithm] {
-        &[IndexAlgorithm::BTree]
+    fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
+        IndexAlgorithm::BTree.into()
     }
 
-    fn supports_index_type(&self, algo: &IndexAlgorithm) -> bool {
+    fn supports_index_type(&self, algo: IndexAlgorithm) -> bool {
         self.supported_index_types().contains(algo)
     }
 
