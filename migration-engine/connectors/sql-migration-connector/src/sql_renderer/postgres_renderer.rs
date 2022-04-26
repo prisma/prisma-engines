@@ -258,6 +258,7 @@ impl SqlRenderer for PostgresFlavour {
                 //todo we should think about not rendering this if it is the db default anyways
                 SQLIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
                 SQLIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,
+                _ => todo!(),
             }),
             columns: index
                 .columns()

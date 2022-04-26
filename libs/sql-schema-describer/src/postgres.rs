@@ -8,7 +8,13 @@ use native_types::{CockroachType, NativeType, PostgresType};
 use quaint::{connector::ResultRow, prelude::Queryable};
 use regex::Regex;
 use serde_json::from_str;
-use std::{any::type_name, borrow::Cow, collections::BTreeMap, collections::HashSet, convert::TryInto};
+use std::{
+    any::type_name,
+    borrow::Cow,
+    collections::HashSet,
+    collections::{BTreeMap, HashMap},
+    convert::TryInto,
+};
 use tracing::trace;
 
 #[enumflags2::bitflags]
@@ -32,6 +38,17 @@ impl Debug for SqlSchemaDescriber<'_> {
     }
 }
 
+#[derive(Default)]
+pub struct PostgresSchemaExt {
+    pub opclasses: HashMap<IndexFieldId, SQLOperatorClass>,
+}
+
+impl PostgresSchemaExt {
+    pub fn get_opclass(&self, index_field_id: IndexFieldId) -> Option<&SQLOperatorClass> {
+        self.opclasses.get(&index_field_id)
+    }
+}
+
 #[async_trait::async_trait]
 impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
@@ -49,13 +66,22 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     }
 
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+        let mut pg_ext = PostgresSchemaExt::default();
+
         let sequences = self.get_sequences(schema).await?;
         let enums = self.get_enums(schema).await?;
         let mut columns = self.get_columns(schema, &enums, &sequences).await?;
         let mut foreign_keys = self.get_foreign_keys(schema).await?;
-        let mut indexes = self.get_indices(schema, &sequences).await?;
 
         let table_names = self.get_table_names(schema).await?;
+
+        let table_ids = table_names
+            .iter()
+            .enumerate()
+            .map(|(idx, name)| (name.clone(), TableId(idx as u32)))
+            .collect();
+
+        let mut indexes = self.get_indices(schema, &sequences, &mut pg_ext, &table_ids).await?;
         let mut tables = Vec::with_capacity(table_names.len());
 
         if self.is_cockroach() {
@@ -102,6 +128,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
             tables,
             views,
             procedures,
+            connector_data: crate::connector_data::ConnectorData { data: Box::new(pg_ext) },
             ..Default::default()
         })
     }
@@ -548,6 +575,8 @@ impl<'a> SqlSchemaDescriber<'a> {
         &self,
         schema: &str,
         sequences: &[Sequence],
+        pg_ext: &mut PostgresSchemaExt,
+        table_ids: &HashMap<String, TableId>,
     ) -> DescriberResult<BTreeMap<String, (Vec<Index>, Option<PrimaryKey>)>> {
         let mut indexes_map = BTreeMap::new();
 
@@ -559,6 +588,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                tableInfos.relname                          AS table_name,
                indexAccess.amname                          AS index_algo,
                rawIndex.indkeyidx,
+               rawIndex.opclass                            AS opclass,
+               rawIndex.opcdefault                         AS opcdefault,
                CASE rawIndex.sort_order & 1
                    WHEN 1 THEN 'DESC'
                    ELSE 'ASC'
@@ -576,22 +607,25 @@ impl<'a> SqlSchemaDescriber<'a> {
                        i.indisunique,
                        i.indisprimary,
                        i.indkey,
+                       opc.opcname opclass,
+                       opc.opcdefault opcdefault,
                        o.OPTION AS sort_order,
                        c.colnum AS sort_order_colnum,
                        generate_subscripts(i.indkey, 1) AS indkeyidx
                 FROM pg_index i
-                         CROSS JOIN LATERAL UNNEST(indkey) WITH ordinality AS c (colnum, ordinality)
+                         CROSS JOIN LATERAL UNNEST(indkey, indclass) WITH ordinality AS c (colnum, opcoid, ordinality)
                          LEFT JOIN LATERAL UNNEST(indoption) WITH ordinality AS o (OPTION, ordinality)
                                    ON c.ordinality = o.ordinality
+                         JOIN pg_opclass opc ON opc.oid = c.opcoid
                 WHERE i.indpred IS NULL
-                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, i.indoption, sort_order, sort_order_colnum
+                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, i.indoption, opc.opcname, sort_order, sort_order_colnum, opc.opcdefault
                 ORDER BY i.indrelid, i.indexrelid
             ) rawIndex,
             -- pg_attribute stores infos about columns: https://www.postgresql.org/docs/current/catalog-pg-attribute.html
             pg_attribute columnInfos,
             -- pg_namespace stores info about the schema
             pg_namespace schemaInfo,
-            -- index access methods: https://www.postgresql.org/docs/9.3/catalog-pg-am.html     
+            -- index access methods: https://www.postgresql.org/docs/9.3/catalog-pg-am.html
             pg_am indexAccess
         WHERE
           -- find table info for index
@@ -609,7 +643,7 @@ impl<'a> SqlSchemaDescriber<'a> {
           AND rawIndex.sort_order_colnum = columnInfos.attnum
           AND indexAccess.oid = indexInfos.relam
         GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname,
-                 rawIndex.indkeyidx, column_order, index_algo
+                 rawIndex.indkeyidx, column_order, index_algo, opclass, opcdefault
         ORDER BY rawIndex.indkeyidx;
         "#;
 
@@ -622,6 +656,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let is_unique = row.get_expect_bool("is_unique");
             let is_primary_key = row.get_expect_bool("is_primary_key");
             let table_name = row.get_expect_string("table_name");
+            let table_id = table_ids[table_name.as_str()];
             let sequence_name = row.get_string("sequence_name");
 
             let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
@@ -636,6 +671,10 @@ impl<'a> SqlSchemaDescriber<'a> {
             let algorithm = match row.get_string("index_algo").as_deref() {
                 Some("btree") => Some(SQLIndexAlgorithm::BTree),
                 Some("hash") => Some(SQLIndexAlgorithm::Hash),
+                Some("gist") => Some(SQLIndexAlgorithm::Gist),
+                Some("gin") => Some(SQLIndexAlgorithm::Gin),
+                Some("spgist") => Some(SQLIndexAlgorithm::SpGist),
+                Some("brin") => Some(SQLIndexAlgorithm::Brin),
                 _ => None,
             };
 
@@ -665,14 +704,41 @@ impl<'a> SqlSchemaDescriber<'a> {
                     }
                 }
             } else {
+                let operator_class = algorithm
+                    .filter(|alg| !matches!(alg, SQLIndexAlgorithm::BTree | SQLIndexAlgorithm::Hash))
+                    .and_then(|_| {
+                        row.get_string("opclass")
+                            .map(|c| (c, row.get_expect_bool("opcdefault")))
+                    })
+                    .map(|(c, is_default)| SQLOperatorClass {
+                        kind: SQLOperatorClassKind::from(c.as_str()),
+                        is_default,
+                    });
+
                 let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
                 let mut column = IndexColumn::new(column_name);
                 column.sort_order = sort_order;
 
-                if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == name) {
+                if let Some(index_id) = entry.0.iter_mut().position(|idx| idx.name == name) {
+                    let existing_index = &mut entry.0[index_id];
+
+                    if let Some(opclass) = operator_class {
+                        let index_id = IndexId(table_id, index_id as u32);
+                        let index_field_id = IndexFieldId(index_id, existing_index.columns.len() as u32);
+
+                        pg_ext.opclasses.insert(index_field_id, opclass);
+                    }
+
                     existing_index.columns.push(column);
                 } else {
+                    if let Some(opclass) = operator_class {
+                        let index_id = IndexId(table_id, entry.0.len() as u32);
+                        let index_field_id = IndexFieldId(index_id, 0);
+
+                        pg_ext.opclasses.insert(index_field_id, opclass);
+                    }
+
                     entry.0.push(Index {
                         name,
                         columns: vec![column],

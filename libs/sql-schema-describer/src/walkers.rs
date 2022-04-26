@@ -3,9 +3,9 @@
 #![deny(missing_docs)]
 
 use crate::{
-    ids::IndexId, Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey,
-    ForeignKeyAction, Index, IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SQLIndexAlgorithm, SQLSortOrder,
-    SqlSchema, Table, TableId, UserDefinedType, View,
+    Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
+    Index, IndexColumn, IndexFieldId, IndexId, IndexType, PrimaryKey, PrimaryKeyColumn, SQLIndexAlgorithm,
+    SQLSortOrder, SqlSchema, Table, TableId, UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
 use std::fmt;
@@ -608,6 +608,11 @@ impl<'a> IndexColumnWalker<'a> {
             column_id: ColumnId(column_id as u32),
             table_id: self.table_id,
         }
+    }
+
+    /// The identifier of the index column.
+    pub fn index_field_id(&self) -> IndexFieldId {
+        IndexFieldId(self.index().index_id(), self.index_column_id as u32)
     }
 }
 

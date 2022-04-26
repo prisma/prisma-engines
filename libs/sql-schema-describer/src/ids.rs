@@ -49,3 +49,15 @@ impl Index<IndexId> for SqlSchema {
         &self[index.0].indices[index.1 as usize]
     }
 }
+
+/// The identifier for an Index in a SqlSchema.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct IndexFieldId(pub IndexId, pub u32);
+
+impl Index<IndexFieldId> for SqlSchema {
+    type Output = crate::IndexColumn;
+
+    fn index(&self, index: IndexFieldId) -> &Self::Output {
+        &self[index.0].columns[index.1 as usize]
+    }
+}
