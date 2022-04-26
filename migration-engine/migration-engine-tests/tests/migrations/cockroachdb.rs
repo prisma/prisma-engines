@@ -5,6 +5,42 @@ use migration_engine_tests::test_api::*;
 use std::fmt::Write as _;
 
 #[test_connector(tags(CockroachDb))]
+fn db_push_on_cockroach_db_with_postgres_provider_works(api: TestApi) {
+    let schema = format!(
+        r#"
+        datasource mypg {{
+            provider = "postgresql"
+            url = "{}"
+        }}
+
+        model Test {{
+            id      Int @id
+            name    String
+        }}
+    "#,
+        api.connection_string()
+    );
+
+    let connector = migration_core::migration_api(Some(schema.clone()), None).unwrap();
+    let output = tok(connector.schema_push(migration_core::json_rpc::types::SchemaPushInput {
+        force: false,
+        schema: schema.clone(),
+    }))
+    .unwrap();
+
+    assert!(output.warnings.is_empty());
+    assert!(output.unexecutable.is_empty());
+    assert!(output.executed_steps > 0);
+
+    let output =
+        tok(connector.schema_push(migration_core::json_rpc::types::SchemaPushInput { force: false, schema })).unwrap();
+
+    assert!(output.warnings.is_empty());
+    assert!(output.unexecutable.is_empty());
+    assert_eq!(output.executed_steps, 0);
+}
+
+#[test_connector(tags(CockroachDb))]
 fn soft_resets_work_on_cockroachdb(mut api: TestApi) {
     let initial = r#"
         CREATE TABLE "Cat" ( id TEXT PRIMARY KEY, name TEXT, meowmeow BOOLEAN );

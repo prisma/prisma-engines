@@ -16,6 +16,7 @@ use tracing::trace;
 #[repr(u8)]
 pub enum Circumstances {
     Cockroach,
+    CockroachWithPostgresNativeTypes, // TODO: this is a temporary workaround
 }
 
 pub struct SqlSchemaDescriber<'a> {
@@ -321,7 +322,11 @@ impl<'a> SqlSchemaDescriber<'a> {
             };
 
             let data_type = col.get_expect_string("data_type");
-            let tpe = if self.is_cockroach() {
+            let tpe = if self.is_cockroach()
+                && !self
+                    .circumstances
+                    .contains(Circumstances::CockroachWithPostgresNativeTypes)
+            {
                 get_column_type_cockroachdb(&col, enums)
             } else {
                 get_column_type_postgresql(&col, enums)
