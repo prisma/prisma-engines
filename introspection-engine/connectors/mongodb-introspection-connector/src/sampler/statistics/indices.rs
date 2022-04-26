@@ -70,6 +70,7 @@ pub(super) fn add_to_models(
                             IndexFieldProperty::Descending => Some(dml::SortOrder::Desc),
                         },
                         length: None,
+                        operator_class: None,
                     }
                 })
                 .collect();

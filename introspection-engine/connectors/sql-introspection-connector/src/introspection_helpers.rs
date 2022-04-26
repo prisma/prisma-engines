@@ -176,6 +176,7 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Intros
                     path: vec![(c.as_column().name().to_owned(), None)],
                     sort_order,
                     length,
+                    operator_class: None,
                 }
             })
             .collect(),

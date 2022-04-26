@@ -1,10 +1,11 @@
 use crate::{
     ast,
-    types::{DefaultAttribute, FieldWithArgs, ScalarField, ScalarType, SortOrder},
+    types::{DefaultAttribute, FieldWithArgs, OperatorClassStore, ScalarField, ScalarType, SortOrder},
     walkers::{EnumWalker, ModelWalker, Walker},
-    ParserDatabase, ScalarFieldType,
+    OperatorClass, ParserDatabase, ScalarFieldType,
 };
 use diagnostics::Span;
+use either::Either;
 
 use super::IndexFieldWalker;
 
@@ -252,6 +253,30 @@ impl<'db> DefaultValueWalker<'db> {
     }
 }
 
+/// An operator class defines the operators allowed in an index. Mostly
+/// a PostgreSQL thing.
+#[derive(Copy, Clone)]
+pub struct OperatorClassWalker<'db> {
+    pub(crate) class: &'db OperatorClassStore,
+    pub(crate) db: &'db ParserDatabase,
+}
+
+impl<'db> OperatorClassWalker<'db> {
+    /// Gets the operator class of the indexed field.
+    ///
+    /// ```ignore
+    /// @@index(name(ops: InetOps))
+    /// //                ^ Either::Left(InetOps)
+    /// @@index(name(ops: raw("tsvector_ops")))
+    /// //                ^ Either::Right("tsvector_ops")
+    pub fn get(self) -> Either<OperatorClass, &'db str> {
+        match self.class.inner {
+            Either::Left(class) => Either::Left(class),
+            Either::Right(id) => Either::Right(&self.db[id]),
+        }
+    }
+}
+
 /// A scalar field as referenced in a key specification (id, index or unique).
 #[derive(Copy, Clone)]
 pub struct ScalarFieldAttributeWalker<'db> {
@@ -274,6 +299,19 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
     /// ```
     pub fn length(self) -> Option<u32> {
         self.args().length
+    }
+
+    /// A custom operator class to control the operators catched by the index.
+    ///
+    /// ```ignore
+    /// @@index([name(ops: InetOps)], type: Gist)
+    ///                    ^^^^^^^
+    /// ```
+    pub fn operator_class(self) -> Option<OperatorClassWalker<'db>> {
+        self.args()
+            .operator_class
+            .as_ref()
+            .map(|class| OperatorClassWalker { class, db: self.db })
     }
 
     /// The underlying field.

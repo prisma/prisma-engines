@@ -23,6 +23,7 @@ pub use self::{
 pub use diagnostics::{ConnectorErrorFactory, DatamodelError, Diagnostics, Span};
 pub use empty_connector::EmptyDatamodelConnector;
 pub use native_type_constructor::NativeTypeConstructor;
+use parser_database::IndexAlgorithm;
 pub use parser_database::{self, ReferentialAction, ScalarType};
 pub use referential_integrity::ReferentialIntegrity;
 
@@ -221,6 +222,14 @@ pub trait Connector: Send + Sync {
 
     fn supports_decimal(&self) -> bool {
         self.has_capability(ConnectorCapability::DecimalType)
+    }
+
+    fn supported_index_types(&self) -> &'static [IndexAlgorithm] {
+        &[IndexAlgorithm::BTree]
+    }
+
+    fn supports_index_type(&self, algo: &IndexAlgorithm) -> bool {
+        self.supported_index_types().contains(algo)
     }
 
     fn allows_relation_fields_in_arbitrary_order(&self) -> bool {

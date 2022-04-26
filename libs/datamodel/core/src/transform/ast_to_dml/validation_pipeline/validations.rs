@@ -102,6 +102,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             indexes::supports_clustering_setting(index, ctx);
             indexes::clustering_setting_preview_enabled(index, ctx);
             indexes::clustering_can_be_defined_only_once(index, ctx);
+            indexes::cannot_set_index_field_ops_on_unique(index, ctx);
 
             for field_attribute in index.scalar_field_attributes() {
                 let span = index

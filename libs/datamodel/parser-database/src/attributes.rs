@@ -10,7 +10,7 @@ use crate::{
     context::Context,
     types::{
         EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexFieldPath, IndexType, ModelAttributes,
-        RelationField, ScalarField, ScalarFieldType, SortOrder,
+        OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder,
     },
     DatamodelError, StringId, ValueValidator,
 };
@@ -311,6 +311,7 @@ fn visit_field_unique(field_id: ast::FieldId, model_attributes: &mut ModelAttrib
                 path: IndexFieldPath::new(field_id),
                 sort_order,
                 length,
+                operator_class: None,
             }],
             source_field: Some(field_id),
             mapped_name,
@@ -508,6 +509,10 @@ fn model_index(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Con
     let algo = match ctx.visit_optional_arg("type").map(|sort| sort.as_constant_literal()) {
         Some(Ok("BTree")) => Some(IndexAlgorithm::BTree),
         Some(Ok("Hash")) => Some(IndexAlgorithm::Hash),
+        Some(Ok("Gist")) => Some(IndexAlgorithm::Gist),
+        Some(Ok("Gin")) => Some(IndexAlgorithm::Gin),
+        Some(Ok("SpGist")) => Some(IndexAlgorithm::SpGist),
+        Some(Ok("Brin")) => Some(IndexAlgorithm::Brin),
         Some(Ok(other)) => {
             ctx.push_attribute_validation_error(&format!("Unknown index type: {}.", other));
             None
@@ -919,15 +924,15 @@ fn resolve_field_array_with_args<'db>(
 
     let ast_model = &ctx.ast[model_id];
 
-    'fields: for (field_name, _, _) in &constant_array {
-        let path = if field_name.contains('.') {
+    'fields: for attrs in &constant_array {
+        let path = if attrs.field_name.contains('.') {
             if !resolving.follow_composites() {
-                unknown_fields.push((ast::TopId::Model(model_id), *field_name));
+                unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
                 continue 'fields;
             }
 
-            let field_count = field_name.split('.').count();
-            let mut path_in_schema = field_name.split('.').enumerate();
+            let field_count = attrs.field_name.split('.').count();
+            let mut path_in_schema = attrs.field_name.split('.').enumerate();
 
             let (mut path, mut next_type) = match path_in_schema.next() {
                 Some((_, field_shard)) => {
@@ -947,7 +952,7 @@ fn resolve_field_array_with_args<'db>(
                     match &ctx.types.scalar_fields[&(model_id, field_id)].r#type {
                         ScalarFieldType::CompositeType(ctid) => (IndexFieldPath::new(field_id), *ctid),
                         _ => {
-                            unknown_fields.push((ast::TopId::Model(model_id), field_name));
+                            unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
                             continue 'fields;
                         }
                     }
@@ -975,7 +980,7 @@ fn resolve_field_array_with_args<'db>(
                         next_type = *ctid;
                     }
                     _ if i < field_count - 1 => {
-                        unknown_fields.push((ast::TopId::Model(model_id), field_name));
+                        unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
                         continue 'fields;
                     }
                     _ => (),
@@ -983,7 +988,7 @@ fn resolve_field_array_with_args<'db>(
             }
 
             path
-        } else if let Some(field_id) = ctx.find_model_field(model_id, field_name) {
+        } else if let Some(field_id) = ctx.find_model_field(model_id, attrs.field_name) {
             // Is the field a scalar field?
             if !ctx.types.scalar_fields.contains_key(&(model_id, field_id)) {
                 relation_fields.push((&ctx.ast[model_id][field_id], field_id));
@@ -992,14 +997,14 @@ fn resolve_field_array_with_args<'db>(
                 IndexFieldPath::new(field_id)
             }
         } else {
-            unknown_fields.push((ast::TopId::Model(model_id), field_name));
+            unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
             continue;
         };
 
         // Is the field used twice?
         if field_ids.contains(&path) {
             let path_str = match path.type_holding_the_indexed_field() {
-                None => Cow::from(*field_name),
+                None => Cow::from(attrs.field_name),
                 Some(ctid) => {
                     let field_id = path.field_in_index();
                     let field_name = &ctx.ast[ctid][field_id].name.name;
@@ -1030,14 +1035,22 @@ fn resolve_field_array_with_args<'db>(
         let fields_with_args = constant_array
             .into_iter()
             .zip(field_ids)
-            .map(|((_, sort_order, length), field_location)| FieldWithArgs {
+            .map(|(attrs, field_location)| FieldWithArgs {
                 path: field_location,
-                sort_order,
-                length,
+                sort_order: attrs.sort_order,
+                length: attrs.length,
+                operator_class: attrs.operator_class.map(|c| convert_op_class(c, ctx)),
             })
             .collect();
 
         Ok(fields_with_args)
+    }
+}
+
+fn convert_op_class(raw: crate::value_validator::OperatorClass<'_>, ctx: &mut Context<'_>) -> OperatorClassStore {
+    match raw {
+        crate::value_validator::OperatorClass::Constant(class) => OperatorClassStore::from(class),
+        crate::value_validator::OperatorClass::Raw(s) => OperatorClassStore::raw(ctx.interner.intern(s)),
     }
 }
 

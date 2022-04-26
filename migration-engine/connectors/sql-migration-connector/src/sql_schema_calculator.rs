@@ -84,6 +84,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
                 let algorithm = index.algorithm().map(|algo| match algo {
                     IndexAlgorithm::BTree => sql::SQLIndexAlgorithm::BTree,
                     IndexAlgorithm::Hash => sql::SQLIndexAlgorithm::Hash,
+                    _ => todo!(),
                 });
 
                 sql::Index {

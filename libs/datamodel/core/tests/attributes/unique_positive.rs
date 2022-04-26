@@ -145,6 +145,7 @@ fn multiple_unique_must_work() {
                         ],
                         sort_order: None,
                         length: None,
+                        operator_class: None,
                     },
                     IndexField {
                         path: [
@@ -155,6 +156,7 @@ fn multiple_unique_must_work() {
                         ],
                         sort_order: None,
                         length: None,
+                        operator_class: None,
                     },
                 ],
                 tpe: Unique,
@@ -179,6 +181,7 @@ fn multiple_unique_must_work() {
                         ],
                         sort_order: None,
                         length: None,
+                        operator_class: None,
                     },
                     IndexField {
                         path: [
@@ -189,6 +192,7 @@ fn multiple_unique_must_work() {
                         ],
                         sort_order: None,
                         length: None,
+                        operator_class: None,
                     },
                 ],
                 tpe: Unique,

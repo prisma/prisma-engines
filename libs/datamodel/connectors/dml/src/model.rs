@@ -4,6 +4,7 @@ use crate::default_value::DefaultKind;
 use crate::field::{Field, FieldType, RelationField, ScalarField};
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
+use std::borrow::Cow;
 use std::fmt;
 
 /// Represents a model in a prisma schema.
@@ -33,11 +34,28 @@ pub struct Model {
 pub enum IndexAlgorithm {
     BTree,
     Hash,
+    Gist,
+    Gin,
+    SpGist,
+    Brin,
 }
 
 impl Default for IndexAlgorithm {
     fn default() -> Self {
         Self::BTree
+    }
+}
+
+impl fmt::Display for IndexAlgorithm {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            IndexAlgorithm::BTree => f.write_str("BTree"),
+            IndexAlgorithm::Hash => f.write_str("Hash"),
+            IndexAlgorithm::Gist => f.write_str("Gist"),
+            IndexAlgorithm::Gin => f.write_str("Gin"),
+            IndexAlgorithm::SpGist => f.write_str("SpGist"),
+            IndexAlgorithm::Brin => f.write_str("Brin"),
+        }
     }
 }
 
@@ -63,12 +81,156 @@ impl IndexDefinition {
     }
 }
 
+#[derive(Debug, PartialEq, Clone)]
+pub enum OperatorClass {
+    // GiST
+    InetOps,
+
+    // GIN
+    JsonbOps,
+    JsonbPathOps,
+    ArrayOps,
+
+    // SP-GiST
+    TextOps,
+
+    // BRIN
+    BitMinMaxOps,
+    VarBitMinMaxOps,
+    BpcharBloomOps,
+    BpcharMinMaxOps,
+    ByteaBloomOps,
+    ByteaMinMaxOps,
+    DateBloomOps,
+    DateMinMaxOps,
+    DateMinMaxMultiOps,
+    Float4BloomOps,
+    Float4MinMaxOps,
+    Float4MinMaxMultiOps,
+    Float8BloomOps,
+    Float8MinMaxOps,
+    Float8MinMaxMultiOps,
+    InetInclusionOps,
+    InetBloomOps,
+    InetMinMaxOps,
+    InetMinMaxMultiOps,
+    Int2BloomOps,
+    Int2MinMaxOps,
+    Int2MinMaxMultiOps,
+    Int4BloomOps,
+    Int4MinMaxOps,
+    Int4MinMaxMultiOps,
+    Int8BloomOps,
+    Int8MinMaxOps,
+    Int8MinMaxMultiOps,
+    NumericBloomOps,
+    NumericMinMaxOps,
+    NumericMinMaxMultiOps,
+    OidBloomOps,
+    OidMinMaxOps,
+    OidMinMaxMultiOps,
+    TextBloomOps,
+    TextMinMaxOps,
+    TimestampBloomOps,
+    TimestampMinMaxOps,
+    TimestampMinMaxMultiOps,
+    TimestampTzBloomOps,
+    TimestampTzMinMaxOps,
+    TimestampTzMinMaxMultiOps,
+    TimeBloomOps,
+    TimeMinMaxOps,
+    TimeMinMaxMultiOps,
+    TimeTzBloomOps,
+    TimeTzMinMaxOps,
+    TimeTzMinMaxMultiOps,
+    UuidBloomOps,
+    UuidMinMaxOps,
+    UuidMinMaxMultiOps,
+
+    Raw(Cow<'static, str>),
+}
+
+impl fmt::Display for OperatorClass {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InetOps => f.write_str("InetOps"),
+            Self::JsonbOps => f.write_str("JsonbOps"),
+            Self::JsonbPathOps => f.write_str("JsonbPathOps"),
+            Self::ArrayOps => f.write_str("ArrayOps"),
+            Self::TextOps => f.write_str("TextOps"),
+            Self::BitMinMaxOps => f.write_str("BitMinMaxOps"),
+            Self::VarBitMinMaxOps => f.write_str("VarBitMinMaxOps"),
+            Self::BpcharBloomOps => f.write_str("BpcharBloomOps"),
+            Self::BpcharMinMaxOps => f.write_str("BpcharMinMaxOps"),
+            Self::ByteaBloomOps => f.write_str("ByteaBloomOps"),
+            Self::ByteaMinMaxOps => f.write_str("ByteaMinMaxOps"),
+            Self::DateBloomOps => f.write_str("DateBloomOps"),
+            Self::DateMinMaxOps => f.write_str("DateMinMaxOps"),
+            Self::DateMinMaxMultiOps => f.write_str("DateMinMaxMultiOps"),
+            Self::Float4BloomOps => f.write_str("Float4BloomOps"),
+            Self::Float4MinMaxOps => f.write_str("Float4MinMaxOps"),
+            Self::Float4MinMaxMultiOps => f.write_str("Float4MinMaxMultiOps"),
+            Self::Float8BloomOps => f.write_str("Float8BloomOps"),
+            Self::Float8MinMaxOps => f.write_str("Float8MinMaxOps"),
+            Self::Float8MinMaxMultiOps => f.write_str("Float8MinMaxMultiOps"),
+            Self::InetInclusionOps => f.write_str("InetInclusionOps"),
+            Self::InetBloomOps => f.write_str("InetBloomOps"),
+            Self::InetMinMaxOps => f.write_str("InetMinMaxOps"),
+            Self::InetMinMaxMultiOps => f.write_str("InetMinMaxMultiOps"),
+            Self::Int2BloomOps => f.write_str("Int2BloomOps"),
+            Self::Int2MinMaxOps => f.write_str("Int2MinMaxOps"),
+            Self::Int2MinMaxMultiOps => f.write_str("Int2MinMaxMultiOps"),
+            Self::Int4BloomOps => f.write_str("Int4BloomOps"),
+            Self::Int4MinMaxOps => f.write_str("Int4MinMaxOps"),
+            Self::Int4MinMaxMultiOps => f.write_str("Int4MinMaxMultiOps"),
+            Self::Int8BloomOps => f.write_str("Int8BloomOps"),
+            Self::Int8MinMaxOps => f.write_str("Int8MinMaxOps"),
+            Self::Int8MinMaxMultiOps => f.write_str("Int8MinMaxMultiOps"),
+            Self::NumericBloomOps => f.write_str("NumericBloomOps"),
+            Self::NumericMinMaxOps => f.write_str("NumericMinMaxOps"),
+            Self::NumericMinMaxMultiOps => f.write_str("NumericMinMaxMultiOps"),
+            Self::OidBloomOps => f.write_str("OidBloomOps"),
+            Self::OidMinMaxOps => f.write_str("OidMinMaxOps"),
+            Self::OidMinMaxMultiOps => f.write_str("OidMinMaxMultiOps"),
+            Self::TextBloomOps => f.write_str("TextBloomOps"),
+            Self::TextMinMaxOps => f.write_str("TextMinMaxOps"),
+            Self::TimestampBloomOps => f.write_str("TimestampBloomOps"),
+            Self::TimestampMinMaxOps => f.write_str("TimestampMinMaxOps"),
+            Self::TimestampMinMaxMultiOps => f.write_str("TimestampMinMaxMultiOps"),
+            Self::TimestampTzBloomOps => f.write_str("TimestampTzBloomOps"),
+            Self::TimestampTzMinMaxOps => f.write_str("TimestampTzMinMaxOps"),
+            Self::TimestampTzMinMaxMultiOps => f.write_str("TimestampTzMinMaxMultiOps"),
+            Self::TimeBloomOps => f.write_str("TimeBloomOps"),
+            Self::TimeMinMaxOps => f.write_str("TimeMinMaxOps"),
+            Self::TimeMinMaxMultiOps => f.write_str("TimeMinMaxMultiOps"),
+            Self::TimeTzBloomOps => f.write_str("TimeTzBloomOps"),
+            Self::TimeTzMinMaxOps => f.write_str("TimeTzMinMaxOps"),
+            Self::TimeTzMinMaxMultiOps => f.write_str("TimeTzMinMaxMultiOps"),
+            Self::UuidBloomOps => f.write_str("UuidBloomOps"),
+            Self::UuidMinMaxOps => f.write_str("UuidMinMaxOps"),
+            Self::UuidMinMaxMultiOps => f.write_str("UuidMinMaxOps"),
+            Self::Raw(s) => f.write_str(s),
+        }
+    }
+}
+
+impl OperatorClass {
+    pub fn raw(op: impl Into<Cow<'static, str>>) -> Self {
+        Self::Raw(op.into())
+    }
+
+    pub fn is_raw(&self) -> bool {
+        matches!(self, Self::Raw(_))
+    }
+}
+
 ///A field in an index that optionally defines a sort order and length limit.
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexField {
     pub path: Vec<(String, Option<String>)>,
     pub sort_order: Option<SortOrder>,
     pub length: Option<u32>,
+    pub operator_class: Option<OperatorClass>,
 }
 
 impl IndexField {
@@ -78,6 +240,7 @@ impl IndexField {
             path: vec![(name.into(), None)],
             sort_order: None,
             length: None,
+            operator_class: None,
         }
     }
 
@@ -89,6 +252,7 @@ impl IndexField {
                 .collect(),
             sort_order: None,
             length: None,
+            operator_class: None,
         }
     }
 }

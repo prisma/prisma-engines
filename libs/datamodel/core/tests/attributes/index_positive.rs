@@ -261,6 +261,7 @@ fn mysql_allows_unique_length_prefix() {
             path: vec![("id".to_string(), None)],
             sort_order: None,
             length: Some(30),
+            operator_class: None,
         }],
         tpe: IndexType::Unique,
         defined_on_field: true,
@@ -311,18 +312,6 @@ fn mysql_allows_unique_sort_order() {
 }
 
 #[test]
-fn postgres_allows_unique_sort_order() {
-    let dml = indoc! {r#"
-        model A {
-          id String @unique(sort: Desc)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
-}
-
-#[test]
 fn sqlite_allows_unique_sort_order() {
     let dml = indoc! {r#"
         model A {
@@ -357,20 +346,6 @@ fn mysql_allows_compound_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
-}
-
-#[test]
-fn postgres_allows_compound_unique_sort_order() {
-    let dml = indoc! {r#"
-        model A {
-          a String
-          b String
-          @@unique([a(sort: Desc), b(sort: Asc)])
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -418,21 +393,6 @@ fn mysql_allows_index_sort_order() {
 }
 
 #[test]
-fn postrgres_allows_index_sort_order() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a String
-
-          @@index([a(sort: Desc)])
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
-}
-
-#[test]
 fn sqlserver_allows_index_sort_order() {
     let dml = indoc! {r#"
         model A {
@@ -445,31 +405,6 @@ fn sqlserver_allows_index_sort_order() {
 
     let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
     assert!(datamodel::parse_schema(&schema).is_ok());
-}
-
-#[test]
-fn hash_index_works_on_postgres() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a  Int
-
-          @@index([a], type: Hash)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
-    let schema = parse(&schema);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![IndexField::new_in_model("a")],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Hash),
-        clustered: None,
-    });
 }
 
 #[test]
@@ -568,6 +503,7 @@ fn duplicate_index_different_sort_order_mongodb() {
             path: vec![("a".to_string(), None)],
             sort_order: Some(SortOrder::Asc),
             length: None,
+            operator_class: None,
         }],
         tpe: IndexType::Normal,
         algorithm: None,
@@ -582,6 +518,7 @@ fn duplicate_index_different_sort_order_mongodb() {
             path: vec![("a".to_string(), None)],
             sort_order: Some(SortOrder::Desc),
             length: None,
+            operator_class: None,
         }],
         tpe: IndexType::Normal,
         algorithm: None,
@@ -613,6 +550,7 @@ fn fulltext_index_sort_mongodb() {
                 path: vec![("b".to_string(), None)],
                 sort_order: Some(SortOrder::Desc),
                 length: None,
+                operator_class: None,
             },
         ],
         tpe: IndexType::Fulltext,
