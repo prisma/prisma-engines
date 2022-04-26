@@ -32,7 +32,7 @@ pub struct GetConfigRequest {
 }
 
 pub struct DebugPanicRequest {
-    message: Option<String>
+    message: Option<String>,
 }
 
 pub enum CliCommand {
@@ -79,7 +79,7 @@ impl CliCommand {
                     config: opts.configuration(false)?.subject,
                 }))),
                 CliOpt::DebugPanic(input) => Ok(Some(CliCommand::DebugPanic(DebugPanicRequest {
-                    message: input.message.clone()
+                    message: input.message.clone(),
                 }))),
             },
         }
@@ -96,7 +96,7 @@ impl CliCommand {
                 } else {
                     panic!("query-engine debug panic");
                 }
-            },
+            }
         }
     }
 
