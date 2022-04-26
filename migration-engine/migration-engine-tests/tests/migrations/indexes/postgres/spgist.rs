@@ -1,7 +1,7 @@
 use migration_engine_tests::test_api::*;
 use sql_schema_describer::{SQLIndexAlgorithm, SQLOperatorClassKind};
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9))]
 fn spgist_preview_disabled(api: TestApi) {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data inet)",);
@@ -59,7 +59,7 @@ fn spgist_change_from_btree(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9), preview_features("extendedIndexes"))]
 fn spgist_inet_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -84,7 +84,7 @@ fn spgist_inet_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9), preview_features("extendedIndexes"))]
 fn spgist_inet_ops_default(api: TestApi) {
     let dm = r#"
         model A {

@@ -103,7 +103,7 @@ async fn bpchar_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn bpchar_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bpchar)",);
@@ -153,7 +153,7 @@ async fn bytea_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn bytea_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bytea)",);
@@ -203,7 +203,7 @@ async fn date_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn date_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data date)",);
@@ -228,7 +228,7 @@ async fn date_bloom_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn date_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data date)",);
@@ -278,7 +278,7 @@ async fn float_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn float_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data real)",);
@@ -303,7 +303,7 @@ async fn float_bloom_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn float_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data real)",);
@@ -353,7 +353,7 @@ async fn double_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn double_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data double precision)",);
@@ -378,7 +378,7 @@ async fn double_bloom_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn double_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data double precision)",);
@@ -428,7 +428,7 @@ async fn inet_inclusion_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn inet_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data inet)",);
@@ -478,7 +478,7 @@ async fn inet_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn inet_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data inet)",);
@@ -503,7 +503,7 @@ async fn inet_minmax_multi_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn int2_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data smallint)",);
@@ -553,7 +553,7 @@ async fn int2_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn int2_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data smallint)",);
@@ -578,7 +578,7 @@ async fn int2_minmax_multi_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn int4_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data int)",);
@@ -628,7 +628,7 @@ async fn int4_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn int4_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data int)",);
@@ -653,7 +653,7 @@ async fn int4_minmax_multi_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn int8_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bigint)",);
@@ -703,7 +703,7 @@ async fn int8_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn int8_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bigint)",);
@@ -728,7 +728,7 @@ async fn int8_minmax_multi_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn numeric_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data decimal)",);
@@ -778,7 +778,7 @@ async fn numeric_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn numeric_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data decimal)",);
@@ -803,7 +803,7 @@ async fn numeric_minmax_multi_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn oid_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data oid)",);
@@ -828,7 +828,7 @@ async fn oid_bloom_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn oid_minmax_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data oid)",);
@@ -853,7 +853,7 @@ async fn oid_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn oid_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data oid)",);
@@ -878,7 +878,7 @@ async fn oid_minmax_multi_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn text_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data text)",);
@@ -903,7 +903,7 @@ async fn text_bloom_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn text_minmax_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data text)",);
@@ -928,7 +928,7 @@ async fn text_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn timestamp_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timestamp)",);
@@ -978,7 +978,7 @@ async fn timestamp_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn timestamp_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timestamp)",);
@@ -1004,7 +1004,7 @@ async fn timestamp_minmax_multi_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn timestamptz_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timestamptz)",);
@@ -1054,7 +1054,7 @@ async fn timestamptz_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn timestamptz_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timestamptz)",);
@@ -1080,7 +1080,7 @@ async fn timestamptz_minmax_multi_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn time_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data time)",);
@@ -1105,7 +1105,7 @@ async fn time_bloom_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn time_minmax_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data time)",);
@@ -1130,7 +1130,7 @@ async fn time_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn time_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data time)",);
@@ -1155,7 +1155,7 @@ async fn time_minmax_multi_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn timetz_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timetz)",);
@@ -1205,7 +1205,7 @@ async fn timetz_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn timetz_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timetz)",);
@@ -1230,7 +1230,7 @@ async fn timetz_minmax_multi_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn uuid_bloom_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data uuid)",);
@@ -1280,7 +1280,7 @@ async fn uuid_minmax_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn uuid_minmax_multi_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data uuid)",);

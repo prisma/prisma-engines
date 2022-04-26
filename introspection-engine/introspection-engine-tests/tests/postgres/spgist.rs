@@ -3,7 +3,7 @@ use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9))]
 async fn spgist_preview_disabled(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
 
@@ -52,7 +52,7 @@ async fn spgist_raw_ops(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9), preview_features("extendedIndexes"))]
 async fn spgist_inet_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data inet)",);

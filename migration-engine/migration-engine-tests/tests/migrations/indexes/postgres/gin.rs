@@ -22,7 +22,7 @@ fn gin_preview_disabled(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9), preview_features("extendedIndexes"))]
 fn gin_change_from_btree(api: TestApi) {
     let dm = r#"
         model A {
@@ -59,7 +59,7 @@ fn gin_change_from_btree(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9), preview_features("extendedIndexes"))]
 fn gin_array_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -84,7 +84,7 @@ fn gin_array_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9), preview_features("extendedIndexes"))]
 fn gin_array_ops_default(api: TestApi) {
     let dm = r#"
         model A {
