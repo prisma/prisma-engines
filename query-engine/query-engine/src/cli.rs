@@ -31,10 +31,15 @@ pub struct GetConfigRequest {
     ignore_env_var_errors: bool,
 }
 
+pub struct DebugPanicRequest {
+    message: Option<String>,
+}
+
 pub enum CliCommand {
     Dmmf(DmmfRequest),
     GetConfig(GetConfigRequest),
     ExecuteRequest(ExecuteRequest),
+    DebugPanic(DebugPanicRequest),
 }
 
 impl CliCommand {
@@ -73,6 +78,9 @@ impl CliCommand {
                     datamodel: opts.datamodel()?,
                     config: opts.configuration(false)?.subject,
                 }))),
+                CliOpt::DebugPanic(input) => Ok(Some(CliCommand::DebugPanic(DebugPanicRequest {
+                    message: input.message.clone(),
+                }))),
             },
         }
     }
@@ -82,6 +90,13 @@ impl CliCommand {
             CliCommand::Dmmf(request) => Self::dmmf(request).await,
             CliCommand::GetConfig(input) => Self::get_config(input),
             CliCommand::ExecuteRequest(request) => Self::execute_request(request).await,
+            CliCommand::DebugPanic(request) => {
+                if let Some(message) = request.message {
+                    panic!("{}", message);
+                } else {
+                    panic!("query-engine debug panic");
+                }
+            }
         }
     }
 
