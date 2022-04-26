@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["CliOpt",""],["Subcommand",""]],"struct":[["ExecuteRequestInput",""],["GetConfigInput",""],["PrismaOpt",""]]});
+initSidebarItems({"enum":[["CliOpt",""],["Subcommand",""]],"struct":[["DebugPanicInput",""],["ExecuteRequestInput",""],["GetConfigInput",""],["PrismaOpt",""]]});

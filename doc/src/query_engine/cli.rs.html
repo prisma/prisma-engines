@@ -159,6 +159,21 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">context::PrismaContext</span>,
     <span class="ident">opt</span>::{<span class="ident">CliOpt</span>, <span class="ident">PrismaOpt</span>, <span class="ident">Subcommand</span>},
@@ -192,10 +207,15 @@
     <span class="ident">ignore_env_var_errors</span>: <span class="ident">bool</span>,
 }
 
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DebugPanicRequest</span> {
+    <span class="ident">message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+}
+
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CliCommand</span> {
     <span class="ident">Dmmf</span>(<span class="ident">DmmfRequest</span>),
     <span class="ident">GetConfig</span>(<span class="ident">GetConfigRequest</span>),
     <span class="ident">ExecuteRequest</span>(<span class="ident">ExecuteRequest</span>),
+    <span class="ident">DebugPanic</span>(<span class="ident">DebugPanicRequest</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">CliCommand</span> {
@@ -234,6 +254,9 @@
                     <span class="ident">datamodel</span>: <span class="ident">opts</span>.<span class="ident">datamodel</span>()<span class="question-mark">?</span>,
                     <span class="ident">config</span>: <span class="ident">opts</span>.<span class="ident">configuration</span>(<span class="bool-val">false</span>)<span class="question-mark">?</span>.<span class="ident">subject</span>,
                 }))),
+                <span class="ident">CliOpt::DebugPanic</span>(<span class="ident">input</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CliCommand::DebugPanic</span>(<span class="ident">DebugPanicRequest</span> {
+                    <span class="ident">message</span>: <span class="ident">input</span>.<span class="ident">message</span>.<span class="ident">clone</span>(),
+                }))),
             },
         }
     }
@@ -243,6 +266,13 @@
             <span class="ident">CliCommand::Dmmf</span>(<span class="ident">request</span>) =&gt; <span class="ident"><span class="self">Self</span>::dmmf</span>(<span class="ident">request</span>).<span class="kw">await</span>,
             <span class="ident">CliCommand::GetConfig</span>(<span class="ident">input</span>) =&gt; <span class="ident"><span class="self">Self</span>::get_config</span>(<span class="ident">input</span>),
             <span class="ident">CliCommand::ExecuteRequest</span>(<span class="ident">request</span>) =&gt; <span class="ident"><span class="self">Self</span>::execute_request</span>(<span class="ident">request</span>).<span class="kw">await</span>,
+            <span class="ident">CliCommand::DebugPanic</span>(<span class="ident">request</span>) =&gt; {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">request</span>.<span class="ident">message</span> {
+                    <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">message</span>);
+                } <span class="kw">else</span> {
+                    <span class="macro">panic!</span>(<span class="string">&quot;query-engine debug panic&quot;</span>);
+                }
+            }
         }
     }
 

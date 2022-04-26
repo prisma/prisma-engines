@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["CliCommand",""]],"struct":[["DmmfRequest",""],["ExecuteRequest",""],["GetConfigRequest",""]]});
+initSidebarItems({"enum":[["CliCommand",""]],"struct":[["DebugPanicRequest",""],["DmmfRequest",""],["ExecuteRequest",""],["GetConfigRequest",""]]});
