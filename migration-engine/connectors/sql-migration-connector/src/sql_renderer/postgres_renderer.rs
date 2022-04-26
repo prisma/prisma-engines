@@ -489,15 +489,16 @@ fn render_column_type_cockroachdb(col: &ColumnWalker<'_>) -> Cow<'static, str> {
 
     let tpe: Cow<'_, str> = match native_type {
         CockroachType::Inet => "INET".into(),
-        CockroachType::Int2 if is_autoincrement => "SMALLSERIAL".into(),
+        CockroachType::Int2 if is_autoincrement => "SERIAL2".into(),
         CockroachType::Int2 => "INT2".into(),
         CockroachType::Int4 if is_autoincrement => "SERIAL4".into(),
         CockroachType::Int4 => "INT4".into(),
-        CockroachType::Int8 if is_autoincrement => "BIGSERIAL".into(),
-        CockroachType::Int8 => "BIGINT".into(),
+        CockroachType::Int8 if is_autoincrement => "SERIAL8".into(),
+        CockroachType::Int8 => "INT8".into(),
+        CockroachType::Oid => "OID".into(),
         CockroachType::Decimal(precision) => format!("DECIMAL{}", render_decimal_args(precision)).into(),
-        CockroachType::Float4 => "REAL".into(),
-        CockroachType::Float8 => "DOUBLE PRECISION".into(),
+        CockroachType::Float4 => "FLOAT4".into(),
+        CockroachType::Float8 => "FLOAT8".into(),
         CockroachType::String(length) => format!("STRING{}", render_optional_args(length)).into(),
 
         // https://www.cockroachlabs.com/docs/stable/string.html
@@ -510,7 +511,7 @@ fn render_column_type_cockroachdb(col: &ColumnWalker<'_>) -> Cow<'static, str> {
         CockroachType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render_optional_args(precision)).into(),
         CockroachType::Time(precision) => format!("TIME{}", render_optional_args(precision)).into(),
         CockroachType::Timetz(precision) => format!("TIMETZ{}", render_optional_args(precision)).into(),
-        CockroachType::Bool => "BOOLEAN".into(),
+        CockroachType::Bool => "BOOL".into(),
         CockroachType::Bit(length) => format!("BIT{}", render_optional_args(length)).into(),
         CockroachType::VarBit(length) => format!("VARBIT{}", render_optional_args(length)).into(),
         CockroachType::Uuid => "UUID".into(),

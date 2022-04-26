@@ -103,6 +103,7 @@ fn cockroach_specific_native_types_are_valid() {
         int4col     Int      @db.Int4
         int8col     BigInt   @db.Int8
         jsonbcol    Json     @db.JsonB
+        oidcol      Int      @db.Oid
         scharcol    String   @db.SingleChar
         stringcol1  String   @db.String
         stringcol2  String   @db.String(40)
