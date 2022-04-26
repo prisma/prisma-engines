@@ -371,7 +371,7 @@
 <span class="kw">use</span> <span class="ident">tracing::Instrument</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestApi</span> {
-    <span class="ident">api</span>: <span class="ident">SqlIntrospectionConnector</span>,
+    <span class="kw">pub</span> <span class="ident">api</span>: <span class="ident">SqlIntrospectionConnector</span>,
     <span class="ident">database</span>: <span class="ident">Quaint</span>,
     <span class="ident">args</span>: <span class="ident">TestApiArgs</span>,
     <span class="ident">connection_string</span>: <span class="ident">String</span>,

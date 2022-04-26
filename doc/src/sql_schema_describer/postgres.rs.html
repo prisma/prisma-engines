@@ -1177,6 +1177,11 @@
 <span id="1172">1172</span>
 <span id="1173">1173</span>
 <span id="1174">1174</span>
+<span id="1175">1175</span>
+<span id="1176">1176</span>
+<span id="1177">1177</span>
+<span id="1178">1178</span>
+<span id="1179">1179</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -1195,6 +1200,7 @@
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Circumstances</span> {
     <span class="ident">Cockroach</span>,
+    <span class="ident">CockroachWithPostgresNativeTypes</span>, <span class="comment">// TODO: this is a temporary workaround</span>
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqlSchemaDescriber</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -1500,7 +1506,11 @@
             };
 
             <span class="kw">let</span> <span class="ident">data_type</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;data_type&quot;</span>);
-            <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroach</span>() {
+            <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroach</span>()
+                <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>
+                    .<span class="ident">circumstances</span>
+                    .<span class="ident">contains</span>(<span class="ident">Circumstances::CockroachWithPostgresNativeTypes</span>)
+            {
                 <span class="ident">get_column_type_cockroachdb</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="ident">enums</span>)
             } <span class="kw">else</span> {
                 <span class="ident">get_column_type_postgresql</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="ident">enums</span>)
