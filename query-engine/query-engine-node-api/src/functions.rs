@@ -97,8 +97,9 @@ pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
 
 #[napi]
 pub fn debug_panic(panic_message: Option<String>) -> napi::Result<()> {
-    let user_facing =
-        user_facing_errors::Error::from_panic_payload(Box::new(panic_message.unwrap_or_else(|| "query-engine-node-api debug panic".to_string())));
+    let user_facing = user_facing_errors::Error::from_panic_payload(Box::new(
+        panic_message.unwrap_or_else(|| "query-engine-node-api debug panic".to_string()),
+    ));
     let message = serde_json::to_string(&user_facing).unwrap();
 
     Err(napi::Error::from_reason(message))
