@@ -425,12 +425,6 @@
 <span id="420">420</span>
 <span id="421">421</span>
 <span id="422">422</span>
-<span id="423">423</span>
-<span id="424">424</span>
-<span id="425">425</span>
-<span id="426">426</span>
-<span id="427">427</span>
-<span id="428">428</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::DecorateErrorWithFieldInformationExtension</span>,
@@ -468,7 +462,7 @@
     <span class="comment">//       query capability (e.g. query for field: null may need to check for exist as well?)</span>
     <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model</span>
         .<span class="ident">fields</span>()
-        .<span class="ident">all</span>
+        .<span class="ident">non_relational</span>()
         .<span class="ident">iter</span>()
         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">args</span>.<span class="ident">has_arg_for</span>(<span class="ident">field</span>.<span class="ident">db_name</span>()))
         .<span class="ident">map</span>(<span class="ident">Clone::clone</span>)
@@ -506,13 +500,7 @@
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
     <span class="kw">let</span> <span class="ident">num_records</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">len</span>();
-    <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model</span>
-        .<span class="ident">fields</span>()
-        .<span class="ident">all</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">field</span>, <span class="ident">Field::Scalar</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Field::Composite</span>(<span class="kw">_</span>)))
-        .<span class="ident">map</span>(<span class="ident">Clone::clone</span>)
-        .<span class="ident">collect</span>();
+    <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">non_relational</span>();
 
     <span class="kw">let</span> <span class="ident">docs</span> <span class="op">=</span> <span class="ident">args</span>
         .<span class="ident">into_iter</span>()
