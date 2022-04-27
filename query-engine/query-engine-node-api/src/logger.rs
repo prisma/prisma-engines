@@ -9,7 +9,7 @@ use opentelemetry::{
 };
 use opentelemetry_otlp::WithExportConfig;
 use serde_json::Value;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 use tokio::sync::RwLock;
 use tracing::{
     field::{Field, Visit},
