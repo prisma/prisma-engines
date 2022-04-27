@@ -1,5 +1,4 @@
-use crate::error::ApiError;
-use crate::logger;
+use crate::{error::ApiError, logger::Logger};
 use datamodel::{dml::Datamodel, ValidatedConfiguration};
 use opentelemetry::global;
 use prisma_models::InternalDataModelBuilder;
@@ -13,7 +12,7 @@ use std::{
     sync::Arc,
 };
 use tokio::sync::RwLock;
-use tracing::{instrument::WithSubscriber, warn, Dispatch, Level};
+use tracing::{instrument::WithSubscriber, warn, Level};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 use tracing_subscriber::filter::LevelFilter;
 
@@ -24,7 +23,7 @@ use napi_derive::napi;
 #[napi]
 pub struct QueryEngine {
     inner: RwLock<Inner>,
-    logger: Dispatch,
+    logger: Logger,
 }
 
 /// The state of the engine.
@@ -198,8 +197,14 @@ impl QueryEngine {
 
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
-            logger: logger::create_log_dispatch(log_queries, log_level, log_callback),
+            logger: Logger::new(log_queries, log_level, log_callback),
         })
+    }
+
+    /// Starts capturing telemetry tracing data
+    #[napi]
+    pub async fn enable_tracing(&self, endpoint: Option<String>, name: Option<String>) -> napi::Result<()> {
+        self.logger.enable_telemetry(endpoint, name).await
     }
 
     /// Connect to the database, allow queries to be run.
@@ -207,6 +212,8 @@ impl QueryEngine {
     pub async fn connect(&self) -> napi::Result<()> {
         let mut inner = self.inner.write().await;
         let builder = inner.as_builder()?;
+
+        let dispatcher = self.logger.dispatcher().await;
 
         let engine = async move {
             // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
@@ -246,7 +253,7 @@ impl QueryEngine {
                 env: builder.env.clone(),
             }) as crate::Result<ConnectedEngine>
         }
-        .with_subscriber(self.logger.clone())
+        .with_subscriber(dispatcher)
         .await?;
 
         *inner = Inner::Connected(engine);
@@ -284,6 +291,8 @@ impl QueryEngine {
         let query = serde_json::from_str(&body)?;
         let trace: HashMap<String, String> = serde_json::from_str(&trace)?;
 
+        let dispatcher = self.logger.dispatcher().await;
+
         async move {
             let ctx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
             let current_span = tracing::span!(Level::TRACE, "query");
@@ -296,7 +305,7 @@ impl QueryEngine {
 
             Ok(serde_json::to_string(&response)?)
         }
-        .with_subscriber(self.logger.clone())
+        .with_subscriber(dispatcher)
         .await
     }
 
@@ -305,6 +314,8 @@ impl QueryEngine {
     pub async fn start_transaction(&self, input: String, trace: HashMap<String, String>) -> napi::Result<String> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
+
+        let dispatcher = self.logger.dispatcher().await;
 
         async move {
             let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
@@ -322,7 +333,7 @@ impl QueryEngine {
                 Err(err) => Ok(map_known_error(err)?),
             }
         }
-        .with_subscriber(self.logger.clone())
+        .with_subscriber(dispatcher)
         .await
     }
 
@@ -331,6 +342,8 @@ impl QueryEngine {
     pub async fn commit_transaction(&self, tx_id: String, trace: HashMap<String, String>) -> napi::Result<String> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
+
+        let dispatcher = self.logger.dispatcher().await;
 
         async move {
             let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
@@ -343,7 +356,7 @@ impl QueryEngine {
                 Err(err) => Ok(map_known_error(err)?),
             }
         }
-        .with_subscriber(self.logger.clone())
+        .with_subscriber(dispatcher)
         .await
     }
 
@@ -352,6 +365,8 @@ impl QueryEngine {
     pub async fn rollback_transaction(&self, tx_id: String, trace: HashMap<String, String>) -> napi::Result<String> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
+
+        let dispatcher = self.logger.dispatcher().await;
 
         async move {
             let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
@@ -364,7 +379,7 @@ impl QueryEngine {
                 Err(err) => Ok(map_known_error(err)?),
             }
         }
-        .with_subscriber(self.logger.clone())
+        .with_subscriber(dispatcher)
         .await
     }
 
