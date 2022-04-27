@@ -9,7 +9,7 @@ use opentelemetry::{
 };
 use opentelemetry_otlp::WithExportConfig;
 use serde_json::Value;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use tokio::sync::RwLock;
 use tracing::{
     field::{Field, Visit},
@@ -60,13 +60,16 @@ impl Logger {
     }
 
     /// Sets the Logger to use telemetry
-    pub async fn start_telemetry_capture(&self, endpoint: Option<String>) -> Result<()> {
+    pub async fn enable_telemetry(&self, endpoint: Option<String>, name: Option<String>) -> Result<()> {
         global::set_text_map_propagator(TraceContextPropagator::new());
 
-        let resource = Resource::new(vec![KeyValue::new("service.name", "Pazuzu")]);
+        let name = name.unwrap_or(String::from("prisma-query-engine"));
+
+        let resource = Resource::new(vec![KeyValue::new("service.name", name)]);
         let config = Config::default().with_resource(resource);
 
         let builder = opentelemetry_otlp::new_pipeline().tracing().with_trace_config(config);
+
         let mut exporter = opentelemetry_otlp::new_exporter().tonic();
 
         if let Some(endpoint) = endpoint {

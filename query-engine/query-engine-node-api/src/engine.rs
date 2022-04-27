@@ -203,8 +203,8 @@ impl QueryEngine {
 
     /// Starts capturing telemetry tracing data
     #[napi]
-    pub async fn start_tracing(&self, endpoint: Option<String>) -> napi::Result<()> {
-        self.logger.start_telemetry_capture(endpoint).await
+    pub async fn enable_tracing(&self, endpoint: Option<String>, name: Option<String>) -> napi::Result<()> {
+        self.logger.enable_telemetry(endpoint, name).await
     }
 
     /// Connect to the database, allow queries to be run.
