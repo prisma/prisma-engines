@@ -258,6 +258,47 @@ mod one2one_opt {
 
         Ok(())
     }
+
+    fn diff_id_name() -> String {
+        let schema = indoc! {
+            r#"model User {
+              #id(id, Int, @id)
+              name          String?
+              profile       Profile?
+            }
+            
+            model Profile {
+              #id(profileId, Int, @id)
+              user      User     @relation(fields: [profileId], references: [id], onUpdate: Cascade)
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(diff_id_name))]
+    async fn update_parent_diff_id_name(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneUser(data: { id: 1, name: "Bob", profile: { create: {} } }) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneUser(
+              where: { id: 1 }
+              data: { name: { set: "updated" } }
+            ) {
+              id
+              name
+            }
+          }
+          "#),
+          @r###"{"data":{"updateOneUser":{"id":1,"name":"updated"}}}"###
+        );
+
+        Ok(())
+    }
 }
 
 #[test_suite(suite = "cascade_onU_1toM_req", schema(required))]

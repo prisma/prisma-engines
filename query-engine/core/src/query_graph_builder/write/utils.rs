@@ -960,7 +960,7 @@ pub fn emulate_on_update_cascade(
 ) -> QueryGraphBuilderResult<()> {
     let dependent_model = relation_field.model();
     let parent_relation_field = relation_field.related_field();
-    let child_model_identifier = relation_field.related_model().primary_identifier();
+    let child_linking_fields = parent_relation_field.related_field().linking_fields();
     let (parent_pks, child_fks) = if relation_field.is_inlined_on_enclosing_model() {
         (relation_field.referenced_fields(), relation_field.scalar_fields())
     } else {
@@ -1006,7 +1006,7 @@ pub fn emulate_on_update_cascade(
         &dependent_records_node,
         &update_dependents_node,
         QueryGraphDependency::ProjectedDataDependency(
-            child_model_identifier.clone(),
+            child_linking_fields,
             Box::new(move |mut update_dependents_node, dependent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut dmr))) = update_dependents_node {
                     dmr.record_filter = dependent_ids.into();
