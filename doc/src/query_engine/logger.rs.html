@@ -127,7 +127,6 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
-<span id="125">125</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">opentelemetry</span>::{
     <span class="ident">global</span>,
     <span class="ident">sdk</span>::{<span class="ident">propagation::TraceContextPropagator</span>, <span class="ident">trace::Config</span>, <span class="ident">Resource</span>},
@@ -238,8 +237,7 @@
 
             <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">with_exporter</span>(<span class="ident">exporter</span>);
 
-            <span class="comment">// TODO: Use async batch exporter</span>
-            <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">install_batch</span>(<span class="ident">opentelemetry::runtime::Tokio</span>).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">install_simple</span>().<span class="ident">unwrap</span>();
 
             <span class="kw">let</span> <span class="ident">telemetry</span> <span class="op">=</span> <span class="ident">tracing_opentelemetry::layer</span>().<span class="ident">with_tracer</span>(<span class="ident">tracer</span>);
 
