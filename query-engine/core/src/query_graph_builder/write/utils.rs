@@ -448,7 +448,7 @@ pub fn emulate_on_delete_cascade(
 ) -> QueryGraphBuilderResult<()> {
     let dependent_model = relation_field.model();
     let parent_relation_field = relation_field.related_field();
-    let child_model_identifier = relation_field.related_model().primary_identifier();
+    let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
     // Records that need to be deleted for the cascade.
     let dependent_records_node =
@@ -473,7 +473,7 @@ pub fn emulate_on_delete_cascade(
         &dependent_records_node,
         &delete_dependents_node,
         QueryGraphDependency::ProjectedDataDependency(
-            child_model_identifier.clone(),
+            child_linking_fields,
             Box::new(move |mut delete_dependents_node, dependent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_dependents_node {
                     dmr.record_filter = dependent_ids.into();
