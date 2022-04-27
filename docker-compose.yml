@@ -39,12 +39,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs9"
     ports:
       - "5431:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs9:size=4g
 
   postgres10:
     image: postgres:10
@@ -52,12 +50,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs10"
     ports:
       - "5432:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs10:size=4g
 
   postgres11:
     image: postgres:11
@@ -65,12 +61,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs11"
     ports:
       - "5433:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs11:size=4g
 
   postgres12:
     image: postgres:12
@@ -78,12 +72,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs12"
     ports:
       - "5434:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs12:size=4g
 
   postgres13:
     image: postgres:13
@@ -91,12 +83,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs13"
     ports:
       - "5435:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs13:size=4g
 
   postgres14:
     image: postgres:14
