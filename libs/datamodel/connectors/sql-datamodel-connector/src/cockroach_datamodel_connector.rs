@@ -4,59 +4,54 @@ use datamodel_connector::{
     NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
 };
 use enumflags2::BitFlags;
-use native_types::{
-    CockroachType::{self, *},
-    NativeType,
-};
+use native_types::{CockroachType, NativeType};
 
-const SMALL_INT_TYPE_NAME: &str = "SmallInt";
-const INTEGER_TYPE_NAME: &str = "Integer";
-const BIG_INT_TYPE_NAME: &str = "BigInt";
-const DECIMAL_TYPE_NAME: &str = "Decimal";
-const INET_TYPE_NAME: &str = "Inet";
-const CITEXT_TYPE_NAME: &str = "Citext";
-const OID_TYPE_NAME: &str = "Oid";
-const REAL_TYPE_NAME: &str = "Real";
-const DOUBLE_PRECISION_TYPE_NAME: &str = "DoublePrecision";
-const VARCHAR_TYPE_NAME: &str = "VarChar";
+const BIT_TYPE_NAME: &str = "Bit";
+const BOOL_TYPE_NAME: &str = "Bool";
+const BYTES_TYPE_NAME: &str = "Bytes";
 const CHAR_TYPE_NAME: &str = "Char";
-const TEXT_TYPE_NAME: &str = "Text";
-const BYTE_A_TYPE_NAME: &str = "ByteA";
+const DATE_TYPE_NAME: &str = "Date";
+const DECIMAL_TYPE_NAME: &str = "Decimal";
+const FLOAT4_TYPE_NAME: &str = "Float4";
+const FLOAT8_TYPE_NAME: &str = "Float8";
+const INET_TYPE_NAME: &str = "Inet";
+const INT2_TYPE_NAME: &str = "Int2";
+const INT4_TYPE_NAME: &str = "Int4";
+const INT8_TYPE_NAME: &str = "Int8";
+const JSON_B_TYPE_NAME: &str = "JsonB";
+const SINGLE_CHAR_TYPE_NAME: &str = "SingleChar";
+const STRING_TYPE_NAME: &str = "String";
 const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
 const TIMESTAMP_TZ_TYPE_NAME: &str = "Timestamptz";
-const DATE_TYPE_NAME: &str = "Date";
 const TIME_TYPE_NAME: &str = "Time";
 const TIME_TZ_TYPE_NAME: &str = "Timetz";
-const BOOLEAN_TYPE_NAME: &str = "Boolean";
-const BIT_TYPE_NAME: &str = "Bit";
-const VAR_BIT_TYPE_NAME: &str = "VarBit";
 const UUID_TYPE_NAME: &str = "Uuid";
-const JSON_B_TYPE_NAME: &str = "JsonB";
+const VAR_BIT_TYPE_NAME: &str = "VarBit";
+const VARCHAR_TYPE_NAME: &str = "VarChar";
 
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
-    NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, &[ScalarType::Int]),
-    NativeTypeConstructor::without_args(INTEGER_TYPE_NAME, &[ScalarType::Int]),
-    NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, &[ScalarType::BigInt]),
-    NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, &[ScalarType::Decimal]),
-    NativeTypeConstructor::without_args(INET_TYPE_NAME, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(CITEXT_TYPE_NAME, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(OID_TYPE_NAME, &[ScalarType::Int]),
-    NativeTypeConstructor::without_args(REAL_TYPE_NAME, &[ScalarType::Float]),
-    NativeTypeConstructor::without_args(DOUBLE_PRECISION_TYPE_NAME, &[ScalarType::Float]),
-    NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, &[ScalarType::String]),
+    NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, &[ScalarType::String]),
     NativeTypeConstructor::with_optional_args(CHAR_TYPE_NAME, 1, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(TEXT_TYPE_NAME, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(BYTE_A_TYPE_NAME, &[ScalarType::Bytes]),
+    NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, &[ScalarType::Decimal]),
+    NativeTypeConstructor::with_optional_args(STRING_TYPE_NAME, 1, &[ScalarType::String]),
     NativeTypeConstructor::with_optional_args(TIMESTAMP_TYPE_NAME, 1, &[ScalarType::DateTime]),
     NativeTypeConstructor::with_optional_args(TIMESTAMP_TZ_TYPE_NAME, 1, &[ScalarType::DateTime]),
-    NativeTypeConstructor::without_args(DATE_TYPE_NAME, &[ScalarType::DateTime]),
     NativeTypeConstructor::with_optional_args(TIME_TYPE_NAME, 1, &[ScalarType::DateTime]),
     NativeTypeConstructor::with_optional_args(TIME_TZ_TYPE_NAME, 1, &[ScalarType::DateTime]),
-    NativeTypeConstructor::without_args(BOOLEAN_TYPE_NAME, &[ScalarType::Boolean]),
-    NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, &[ScalarType::String]),
     NativeTypeConstructor::with_optional_args(VAR_BIT_TYPE_NAME, 1, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(UUID_TYPE_NAME, &[ScalarType::String]),
+    NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, &[ScalarType::String]),
+    NativeTypeConstructor::without_args(BOOL_TYPE_NAME, &[ScalarType::Boolean]),
+    NativeTypeConstructor::without_args(BYTES_TYPE_NAME, &[ScalarType::Bytes]),
+    NativeTypeConstructor::without_args(DATE_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(FLOAT4_TYPE_NAME, &[ScalarType::Float]),
+    NativeTypeConstructor::without_args(FLOAT8_TYPE_NAME, &[ScalarType::Float]),
+    NativeTypeConstructor::without_args(INET_TYPE_NAME, &[ScalarType::String]),
+    NativeTypeConstructor::without_args(INT2_TYPE_NAME, &[ScalarType::Int]),
+    NativeTypeConstructor::without_args(INT4_TYPE_NAME, &[ScalarType::Int]),
+    NativeTypeConstructor::without_args(INT8_TYPE_NAME, &[ScalarType::BigInt]),
     NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, &[ScalarType::Json]),
+    NativeTypeConstructor::without_args(SINGLE_CHAR_TYPE_NAME, &[ScalarType::String]),
+    NativeTypeConstructor::without_args(UUID_TYPE_NAME, &[ScalarType::String]),
 ];
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey];
@@ -88,14 +83,14 @@ const CAPABILITIES: &[ConnectorCapability] = &[
 ];
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
-    (ScalarType::Int, CockroachType::Integer),
-    (ScalarType::BigInt, CockroachType::BigInt),
-    (ScalarType::Float, CockroachType::DoublePrecision),
+    (ScalarType::Int, CockroachType::Int4),
+    (ScalarType::BigInt, CockroachType::Int8),
+    (ScalarType::Float, CockroachType::Float8),
     (ScalarType::Decimal, CockroachType::Decimal(Some((65, 30)))),
-    (ScalarType::Boolean, CockroachType::Boolean),
-    (ScalarType::String, CockroachType::Text),
+    (ScalarType::Boolean, CockroachType::Bool),
+    (ScalarType::String, CockroachType::String(None)),
     (ScalarType::DateTime, CockroachType::Timestamp(Some(3))),
-    (ScalarType::Bytes, CockroachType::ByteA),
+    (ScalarType::Bytes, CockroachType::Bytes),
     (ScalarType::Json, CockroachType::JsonB),
 ];
 
@@ -127,38 +122,36 @@ impl Connector for CockroachDatamodelConnector {
         let native_type: CockroachType = serde_json::from_value(native_type).unwrap();
 
         match native_type {
-            //String
-            Text => ScalarType::String,
-            Char(_) => ScalarType::String,
-            VarChar(_) => ScalarType::String,
-            Bit(_) => ScalarType::String,
-            VarBit(_) => ScalarType::String,
-            Uuid => ScalarType::String,
-            Inet => ScalarType::String,
-            Citext => ScalarType::String,
-            //Boolean
-            Boolean => ScalarType::Boolean,
-            //Int
-            SmallInt => ScalarType::Int,
-            Integer => ScalarType::Int,
-            Oid => ScalarType::Int,
-            //BigInt
-            BigInt => ScalarType::BigInt,
-            //Float
-            Real => ScalarType::Float,
-            DoublePrecision => ScalarType::Float,
-            //Decimal
-            Decimal(_) => ScalarType::Decimal,
-            //DateTime
-            Timestamp(_) => ScalarType::DateTime,
-            Timestamptz(_) => ScalarType::DateTime,
-            Date => ScalarType::DateTime,
-            Time(_) => ScalarType::DateTime,
-            Timetz(_) => ScalarType::DateTime,
-            //Json
-            JsonB => ScalarType::Json,
-            //Bytes
-            ByteA => ScalarType::Bytes,
+            // String
+            CockroachType::Char(_) => ScalarType::String,
+            CockroachType::SingleChar => ScalarType::String,
+            CockroachType::String(_) => ScalarType::String,
+            CockroachType::Bit(_) => ScalarType::String,
+            CockroachType::VarBit(_) => ScalarType::String,
+            CockroachType::Uuid => ScalarType::String,
+            CockroachType::Inet => ScalarType::String,
+            // Boolean
+            CockroachType::Bool => ScalarType::Boolean,
+            // Int
+            CockroachType::Int2 => ScalarType::Int,
+            CockroachType::Int4 => ScalarType::Int,
+            // BigInt
+            CockroachType::Int8 => ScalarType::BigInt,
+            // Float
+            CockroachType::Float4 => ScalarType::Float,
+            CockroachType::Float8 => ScalarType::Float,
+            // Decimal
+            CockroachType::Decimal(_) => ScalarType::Decimal,
+            // DateTime
+            CockroachType::Timestamp(_) => ScalarType::DateTime,
+            CockroachType::Timestamptz(_) => ScalarType::DateTime,
+            CockroachType::Date => ScalarType::DateTime,
+            CockroachType::Time(_) => ScalarType::DateTime,
+            CockroachType::Timetz(_) => ScalarType::DateTime,
+            // Json
+            CockroachType::JsonB => ScalarType::Json,
+            // Bytes
+            CockroachType::Bytes => ScalarType::Bytes,
         }
     }
 
@@ -193,19 +186,24 @@ impl Connector for CockroachDatamodelConnector {
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
-            Decimal(Some((precision, scale))) if scale > precision => {
+            CockroachType::Decimal(Some((precision, scale))) if scale > precision => {
                 errors.push_error(error.new_scale_larger_than_precision_error(span))
             }
-            Decimal(Some((prec, _))) if prec > 1000 || prec == 0 => {
+            CockroachType::Decimal(Some((prec, _))) if prec > 1000 || prec == 0 => {
                 errors.push_error(error.new_argument_m_out_of_range_error(
                     "Precision must be positive with a maximum value of 1000.",
                     span,
                 ))
             }
-            Bit(Some(0)) | VarBit(Some(0)) => {
+            CockroachType::Bit(Some(0)) | CockroachType::VarBit(Some(0)) => {
                 errors.push_error(error.new_argument_m_out_of_range_error("M must be a positive integer.", span))
             }
-            Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if p > 6 => {
+            CockroachType::Timestamp(Some(p))
+            | CockroachType::Timestamptz(Some(p))
+            | CockroachType::Time(Some(p))
+            | CockroachType::Timetz(Some(p))
+                if p > 6 =>
+            {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
             }
             _ => (),
@@ -231,29 +229,29 @@ impl Connector for CockroachDatamodelConnector {
         let cloned_args = args.clone();
 
         let native_type = match name {
-            SMALL_INT_TYPE_NAME => SmallInt,
-            INTEGER_TYPE_NAME => Integer,
-            BIG_INT_TYPE_NAME => BigInt,
-            DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME, span)?),
-            INET_TYPE_NAME => Inet,
-            CITEXT_TYPE_NAME => Citext,
-            OID_TYPE_NAME => Oid,
-            REAL_TYPE_NAME => Real,
-            DOUBLE_PRECISION_TYPE_NAME => DoublePrecision,
-            VARCHAR_TYPE_NAME => VarChar(parse_one_opt_u32(args, VARCHAR_TYPE_NAME, span)?),
-            CHAR_TYPE_NAME => Char(parse_one_opt_u32(args, CHAR_TYPE_NAME, span)?),
-            TEXT_TYPE_NAME => Text,
-            BYTE_A_TYPE_NAME => ByteA,
-            TIMESTAMP_TYPE_NAME => Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME, span)?),
-            TIMESTAMP_TZ_TYPE_NAME => Timestamptz(parse_one_opt_u32(args, TIMESTAMP_TZ_TYPE_NAME, span)?),
-            DATE_TYPE_NAME => Date,
-            TIME_TYPE_NAME => Time(parse_one_opt_u32(args, TIME_TYPE_NAME, span)?),
-            TIME_TZ_TYPE_NAME => Timetz(parse_one_opt_u32(args, TIME_TZ_TYPE_NAME, span)?),
-            BOOLEAN_TYPE_NAME => Boolean,
-            BIT_TYPE_NAME => Bit(parse_one_opt_u32(args, BIT_TYPE_NAME, span)?),
-            VAR_BIT_TYPE_NAME => VarBit(parse_one_opt_u32(args, VAR_BIT_TYPE_NAME, span)?),
-            UUID_TYPE_NAME => Uuid,
-            JSON_B_TYPE_NAME => JsonB,
+            BYTES_TYPE_NAME => CockroachType::Bytes,
+            CHAR_TYPE_NAME => CockroachType::Char(parse_one_opt_u32(args, CHAR_TYPE_NAME, span)?),
+            DECIMAL_TYPE_NAME => CockroachType::Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME, span)?),
+            FLOAT4_TYPE_NAME => CockroachType::Float4,
+            FLOAT8_TYPE_NAME => CockroachType::Float8,
+            INET_TYPE_NAME => CockroachType::Inet,
+            INT2_TYPE_NAME => CockroachType::Int2,
+            INT4_TYPE_NAME => CockroachType::Int4,
+            INT8_TYPE_NAME => CockroachType::Int8,
+            SINGLE_CHAR_TYPE_NAME => CockroachType::SingleChar,
+            STRING_TYPE_NAME => CockroachType::String(parse_one_opt_u32(args, STRING_TYPE_NAME, span)?),
+            TIMESTAMP_TYPE_NAME => CockroachType::Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME, span)?),
+            TIMESTAMP_TZ_TYPE_NAME => {
+                CockroachType::Timestamptz(parse_one_opt_u32(args, TIMESTAMP_TZ_TYPE_NAME, span)?)
+            }
+            BIT_TYPE_NAME => CockroachType::Bit(parse_one_opt_u32(args, BIT_TYPE_NAME, span)?),
+            BOOL_TYPE_NAME => CockroachType::Bool,
+            DATE_TYPE_NAME => CockroachType::Date,
+            JSON_B_TYPE_NAME => CockroachType::JsonB,
+            TIME_TYPE_NAME => CockroachType::Time(parse_one_opt_u32(args, TIME_TYPE_NAME, span)?),
+            TIME_TZ_TYPE_NAME => CockroachType::Timetz(parse_one_opt_u32(args, TIME_TZ_TYPE_NAME, span)?),
+            UUID_TYPE_NAME => CockroachType::Uuid,
+            VAR_BIT_TYPE_NAME => CockroachType::VarBit(parse_one_opt_u32(args, VAR_BIT_TYPE_NAME, span)?),
             _ => return Err(DatamodelError::new_native_type_parser_error(name, span)),
         };
 
@@ -263,29 +261,27 @@ impl Connector for CockroachDatamodelConnector {
     fn introspect_native_type(&self, native_type: serde_json::Value) -> NativeTypeInstance {
         let native_type: CockroachType = serde_json::from_value(native_type).unwrap();
         let (constructor_name, args) = match native_type {
-            SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
-            Integer => (INTEGER_TYPE_NAME, vec![]),
-            BigInt => (BIG_INT_TYPE_NAME, vec![]),
-            Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
-            Real => (REAL_TYPE_NAME, vec![]),
-            DoublePrecision => (DOUBLE_PRECISION_TYPE_NAME, vec![]),
-            VarChar(x) => (VARCHAR_TYPE_NAME, arg_vec_from_opt(x)),
-            Char(x) => (CHAR_TYPE_NAME, arg_vec_from_opt(x)),
-            Text => (TEXT_TYPE_NAME, vec![]),
-            ByteA => (BYTE_A_TYPE_NAME, vec![]),
-            Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
-            Timestamptz(x) => (TIMESTAMP_TZ_TYPE_NAME, arg_vec_from_opt(x)),
-            Date => (DATE_TYPE_NAME, vec![]),
-            Time(x) => (TIME_TYPE_NAME, arg_vec_from_opt(x)),
-            Timetz(x) => (TIME_TZ_TYPE_NAME, arg_vec_from_opt(x)),
-            Boolean => (BOOLEAN_TYPE_NAME, vec![]),
-            Bit(x) => (BIT_TYPE_NAME, arg_vec_from_opt(x)),
-            VarBit(x) => (VAR_BIT_TYPE_NAME, arg_vec_from_opt(x)),
-            Uuid => (UUID_TYPE_NAME, vec![]),
-            JsonB => (JSON_B_TYPE_NAME, vec![]),
-            Inet => (INET_TYPE_NAME, vec![]),
-            Citext => (CITEXT_TYPE_NAME, vec![]),
-            Oid => (OID_TYPE_NAME, vec![]),
+            CockroachType::Int2 => (INT2_TYPE_NAME, vec![]),
+            CockroachType::Int4 => (INT4_TYPE_NAME, vec![]),
+            CockroachType::Int8 => (INT8_TYPE_NAME, vec![]),
+            CockroachType::Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
+            CockroachType::Float4 => (FLOAT4_TYPE_NAME, vec![]),
+            CockroachType::Float8 => (FLOAT8_TYPE_NAME, vec![]),
+            CockroachType::String(x) => (STRING_TYPE_NAME, arg_vec_from_opt(x)),
+            CockroachType::Char(x) => (CHAR_TYPE_NAME, arg_vec_from_opt(x)),
+            CockroachType::SingleChar => (SINGLE_CHAR_TYPE_NAME, Vec::new()),
+            CockroachType::Bytes => (BYTES_TYPE_NAME, vec![]),
+            CockroachType::Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
+            CockroachType::Timestamptz(x) => (TIMESTAMP_TZ_TYPE_NAME, arg_vec_from_opt(x)),
+            CockroachType::Date => (DATE_TYPE_NAME, vec![]),
+            CockroachType::Time(x) => (TIME_TYPE_NAME, arg_vec_from_opt(x)),
+            CockroachType::Timetz(x) => (TIME_TZ_TYPE_NAME, arg_vec_from_opt(x)),
+            CockroachType::Bool => (BOOL_TYPE_NAME, vec![]),
+            CockroachType::Bit(x) => (BIT_TYPE_NAME, arg_vec_from_opt(x)),
+            CockroachType::VarBit(x) => (VAR_BIT_TYPE_NAME, arg_vec_from_opt(x)),
+            CockroachType::Uuid => (UUID_TYPE_NAME, vec![]),
+            CockroachType::JsonB => (JSON_B_TYPE_NAME, vec![]),
+            CockroachType::Inet => (INET_TYPE_NAME, vec![]),
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {

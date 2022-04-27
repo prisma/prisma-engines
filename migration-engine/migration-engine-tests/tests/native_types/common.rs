@@ -59,7 +59,7 @@ fn typescript_starter_schema_starting_without_native_types_is_idempotent(api: Te
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres, Mysql, Mssql))]
+#[test_connector(tags(Postgres, Mysql, Mssql), exclude(CockroachDb))]
 fn bigint_primary_keys_are_idempotent(api: TestApi) {
     let dm1 = r#"
             model Cat {

@@ -87,7 +87,7 @@ async fn dbgenerated_type_casts_should_work_cockroach(api: &TestApi) -> TestResu
 
     let dm = indoc! {r#"
         model A {
-          id String @id @default(dbgenerated("now():::TIMESTAMPTZ::STRING")) @db.VarChar(30)
+          id String @id @default(dbgenerated("now():::TIMESTAMPTZ::STRING")) @db.String(30)
         }
     "#};
 
