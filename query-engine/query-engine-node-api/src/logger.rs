@@ -63,7 +63,7 @@ impl Logger {
     pub async fn enable_telemetry(&self, endpoint: Option<String>, name: Option<String>) -> Result<()> {
         global::set_text_map_propagator(TraceContextPropagator::new());
 
-        let name = name.unwrap_or(String::from("prisma-query-engine"));
+        let name = name.unwrap_or_else(|| String::from("prisma-query-engine"));
 
         let resource = Resource::new(vec![KeyValue::new("service.name", name)]);
         let config = Config::default().with_resource(resource);
