@@ -1150,10 +1150,10 @@ fn alter_constraint_name(mut api: TestApi) {
                     ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
 
                     -- RenameIndex
-                    ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
+                    ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
 
                     -- RenameIndex
-                    ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
+                    ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
 
                     -- RenameIndex
                     ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";

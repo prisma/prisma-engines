@@ -613,10 +613,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                        c.colnum AS sort_order_colnum,
                        generate_subscripts(i.indkey, 1) AS indkeyidx
                 FROM pg_index i
-                         CROSS JOIN LATERAL UNNEST(indkey, indclass) WITH ordinality AS c (colnum, opcoid, ordinality)
+                         CROSS JOIN LATERAL UNNEST(indkey) WITH ordinality AS c (colnum, ordinality)
+                         LEFT JOIN LATERAL UNNEST(indclass) WITH ordinality AS p (opcoid, ordinality)
+                                   ON c.ordinality = p.ordinality
                          LEFT JOIN LATERAL UNNEST(indoption) WITH ordinality AS o (OPTION, ordinality)
                                    ON c.ordinality = o.ordinality
-                         JOIN pg_opclass opc ON opc.oid = c.opcoid
+                         LEFT JOIN pg_opclass opc ON opc.oid = p.opcoid
                 WHERE i.indpred IS NULL
                 GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, i.indoption, opc.opcname, sort_order, sort_order_colnum, opc.opcdefault
                 ORDER BY i.indrelid, i.indexrelid
@@ -708,7 +710,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                     .filter(|alg| !matches!(alg, SQLIndexAlgorithm::BTree | SQLIndexAlgorithm::Hash))
                     .and_then(|_| {
                         row.get_string("opclass")
-                            .map(|c| (c, row.get_expect_bool("opcdefault")))
+                            .map(|c| (c, row.get_bool("opcdefault").unwrap_or_default()))
                     })
                     .map(|(c, is_default)| SQLOperatorClass {
                         kind: SQLOperatorClassKind::from(c.as_str()),
