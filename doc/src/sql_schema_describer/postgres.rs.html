@@ -1182,6 +1182,7 @@
 <span id="1177">1177</span>
 <span id="1178">1178</span>
 <span id="1179">1179</span>
+<span id="1180">1180</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -2171,6 +2172,7 @@
             )),
         ),
         <span class="string">&quot;pg_lsn&quot;</span> <span class="op">|</span> <span class="string">&quot;_pg_lsn&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="string">&quot;oid&quot;</span> <span class="op">|</span> <span class="string">&quot;_oid&quot;</span> =&gt; (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Oid</span>)),
         <span class="string">&quot;time&quot;</span> <span class="op">|</span> <span class="string">&quot;_time&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Time</span>(<span class="ident">precision</span>.<span class="ident">time_precision</span>))),
         <span class="string">&quot;timetz&quot;</span> <span class="op">|</span> <span class="string">&quot;_timetz&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Timetz</span>(<span class="ident">precision</span>.<span class="ident">time_precision</span>))),
         <span class="string">&quot;timestamp&quot;</span> <span class="op">|</span> <span class="string">&quot;_timestamp&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Timestamp</span>(<span class="ident">precision</span>.<span class="ident">time_precision</span>))),

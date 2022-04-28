@@ -906,6 +906,7 @@
 <span id="901">901</span>
 <span id="902">902</span>
 <span id="903">903</span>
+<span id="904">904</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">common</span>::<span class="kw-2">*</span>, <span class="ident">SqlRenderer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::PostgresFlavour</span>,
@@ -1397,15 +1398,16 @@
 
     <span class="kw">let</span> <span class="ident">tpe</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">native_type</span> {
         <span class="ident">CockroachType::Inet</span> =&gt; <span class="string">&quot;INET&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">CockroachType::Int2</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;SMALLSERIAL&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Int2</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;SERIAL2&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">CockroachType::Int2</span> =&gt; <span class="string">&quot;INT2&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">CockroachType::Int4</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;SERIAL4&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">CockroachType::Int4</span> =&gt; <span class="string">&quot;INT4&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">CockroachType::Int8</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;BIGSERIAL&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">CockroachType::Int8</span> =&gt; <span class="string">&quot;BIGINT&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Int8</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;SERIAL8&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Int8</span> =&gt; <span class="string">&quot;INT8&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Oid</span> =&gt; <span class="string">&quot;OID&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">CockroachType::Decimal</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DECIMAL{}&quot;</span>, <span class="ident">render_decimal_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
-        <span class="ident">CockroachType::Float4</span> =&gt; <span class="string">&quot;REAL&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">CockroachType::Float8</span> =&gt; <span class="string">&quot;DOUBLE PRECISION&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Float4</span> =&gt; <span class="string">&quot;FLOAT4&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Float8</span> =&gt; <span class="string">&quot;FLOAT8&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">CockroachType::String</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;STRING{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
 
         <span class="comment">// https://www.cockroachlabs.com/docs/stable/string.html</span>
@@ -1418,7 +1420,7 @@
         <span class="ident">CockroachType::Timestamptz</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMESTAMPTZ{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
         <span class="ident">CockroachType::Time</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIME{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
         <span class="ident">CockroachType::Timetz</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMETZ{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
-        <span class="ident">CockroachType::Bool</span> =&gt; <span class="string">&quot;BOOLEAN&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">CockroachType::Bool</span> =&gt; <span class="string">&quot;BOOL&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">CockroachType::Bit</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;BIT{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
         <span class="ident">CockroachType::VarBit</span>(<span class="ident">length</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARBIT{}&quot;</span>, <span class="ident">render_optional_args</span>(<span class="ident">length</span>)).<span class="ident">into</span>(),
         <span class="ident">CockroachType::Uuid</span> =&gt; <span class="string">&quot;UUID&quot;</span>.<span class="ident">into</span>(),
