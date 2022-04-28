@@ -715,12 +715,12 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
             IndexColumn {
                 name: "name".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
             IndexColumn {
                 name: "age".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
         ]
     );
@@ -735,12 +735,12 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
             IndexColumn {
                 name: "age".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
             IndexColumn {
                 name: "name".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
         ]
     );

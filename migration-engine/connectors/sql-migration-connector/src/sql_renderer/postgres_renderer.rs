@@ -11,8 +11,8 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
-    walkers::*, ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLIndexAlgorithm,
-    SQLSortOrder, SqlSchema,
+    postgres::PostgresSchemaExt, walkers::*, ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue,
+    ForeignKeyAction, SQLIndexAlgorithm, SQLSortOrder, SqlSchema,
 };
 use std::borrow::Cow;
 
@@ -250,6 +250,8 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+        let pg_ext: &PostgresSchemaExt = index.schema().downcast_connector_data();
+
         ddl::CreateIndex {
             index_name: index.name().into(),
             is_unique: index.index_type().is_unique(),
@@ -258,6 +260,10 @@ impl SqlRenderer for PostgresFlavour {
                 //todo we should think about not rendering this if it is the db default anyways
                 SQLIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
                 SQLIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,
+                SQLIndexAlgorithm::Gist => ddl::IndexAlgorithm::Gist,
+                SQLIndexAlgorithm::Gin => ddl::IndexAlgorithm::Gin,
+                SQLIndexAlgorithm::SpGist => ddl::IndexAlgorithm::SpGist,
+                SQLIndexAlgorithm::Brin => ddl::IndexAlgorithm::Brin,
             }),
             columns: index
                 .columns()
@@ -268,6 +274,7 @@ impl SqlRenderer for PostgresFlavour {
                         SQLSortOrder::Asc => SortOrder::Asc,
                         SQLSortOrder::Desc => SortOrder::Desc,
                     }),
+                    operator_class: pg_ext.get_opclass(c.index_field_id()).map(|c| c.kind.as_ref().into()),
                 })
                 .collect(),
         }

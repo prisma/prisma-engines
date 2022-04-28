@@ -729,6 +729,7 @@ dependencies = [
  "datamodel-connector",
  "diagnostics",
  "dml",
+ "either",
  "enumflags2",
  "expect-test",
  "indoc",
@@ -2751,6 +2752,7 @@ name = "parser-database"
 version = "0.1.0"
 dependencies = [
  "diagnostics",
+ "either",
  "enumflags2",
  "indexmap",
  "schema-ast",
@@ -4029,6 +4031,7 @@ name = "sql-datamodel-connector"
 version = "0.1.0"
 dependencies = [
  "datamodel-connector",
+ "either",
  "enumflags2",
  "native-types",
  "once_cell",
@@ -4079,6 +4082,7 @@ dependencies = [
  "chrono",
  "connection-string",
  "datamodel",
+ "either",
  "enumflags2",
  "indoc",
  "migration-connector",

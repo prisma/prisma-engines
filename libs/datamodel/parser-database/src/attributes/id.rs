@@ -191,6 +191,7 @@ pub(super) fn field<'db>(
                     path: IndexFieldPath::new(field_id),
                     sort_order,
                     length,
+                    operator_class: None,
                 }],
                 source_field: Some(field_id),
                 clustered,

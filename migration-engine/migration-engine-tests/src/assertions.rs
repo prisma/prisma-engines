@@ -7,9 +7,10 @@ pub use quaint_result_set_ext::*;
 use datamodel::datamodel_connector::Connector;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
+use sql::{postgres::PostgresSchemaExt, IndexFieldId};
 use sql_schema_describer::{
     self as sql, Column, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index,
-    IndexType, PrimaryKey, SQLIndexAlgorithm, SQLSortOrder, SqlSchema, Table,
+    IndexType, PrimaryKey, SQLIndexAlgorithm, SQLOperatorClassKind, SQLSortOrder, SqlSchema, Table,
 };
 use test_setup::{BitFlags, Tags};
 
@@ -620,23 +621,33 @@ impl<'a> ColumnAssertion<'a> {
 pub struct IndexColumnAssertion {
     sort_order: Option<SQLSortOrder>,
     length: Option<u32>,
+    operator_class: Option<SQLOperatorClassKind>,
 }
 
 impl IndexColumnAssertion {
+    #[track_caller]
     pub fn assert_sort_order(self, sort_order: SQLSortOrder) -> Self {
         assert_eq!(self.sort_order, Some(sort_order));
 
         self
     }
 
+    #[track_caller]
     pub fn assert_length_prefix(self, length: u32) -> Self {
         assert_eq!(self.length, Some(length));
 
         self
     }
 
+    #[track_caller]
     pub fn assert_no_length_prefix(self) -> Self {
         assert_eq!(self.length, None);
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_ops(self, ops: SQLOperatorClassKind) -> Self {
+        assert_eq!(self.operator_class, Some(ops));
         self
     }
 }
@@ -670,6 +681,7 @@ impl<'a> PrimaryKeyAssertion<'a> {
         f(IndexColumnAssertion {
             length: col.length,
             sort_order: col.sort_order,
+            operator_class: None,
         });
 
         self
@@ -858,11 +870,27 @@ impl<'a> IndexAssertion<'a> {
     where
         F: FnOnce(IndexColumnAssertion) -> IndexColumnAssertion,
     {
-        let col = self.index.columns.iter().find(|i| i.name == column_name).unwrap();
+        let (col_idx, col) = self
+            .index
+            .columns
+            .iter()
+            .enumerate()
+            .find(|(_, c)| c.name == column_name)
+            .unwrap();
+
+        let operator_class = if self.tags.contains(Tags::Postgres) {
+            let ext: &PostgresSchemaExt = self.schema.downcast_connector_data();
+
+            ext.get_opclass(IndexFieldId(self.index_id, col_idx as u32))
+                .map(|c| c.kind.clone())
+        } else {
+            None
+        };
 
         f(IndexColumnAssertion {
             sort_order: col.sort_order,
             length: col.length,
+            operator_class,
         });
 
         self

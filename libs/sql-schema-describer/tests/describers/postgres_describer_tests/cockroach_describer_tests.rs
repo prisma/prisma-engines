@@ -241,12 +241,12 @@ fn cockroach_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestAp
             IndexColumn {
                 name: "name".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
             IndexColumn {
                 name: "age".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
         ]
     );
@@ -261,12 +261,12 @@ fn cockroach_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestAp
             IndexColumn {
                 name: "age".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
             IndexColumn {
                 name: "name".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
         ]
     );

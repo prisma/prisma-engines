@@ -95,12 +95,15 @@ impl<'a> LowerDmlToAst<'a> {
                 let mut args = self.fields_argument(index_def, false);
                 self.push_index_map_argument(datamodel, model, index_def, &mut args);
 
-                if let Some(IndexAlgorithm::Hash) = index_def.algorithm {
-                    args.push(ast::Argument::new(
-                        "type",
-                        ast::Expression::ConstantValue("Hash".to_string(), Span::empty()),
-                    ));
-                };
+                match index_def.algorithm {
+                    Some(IndexAlgorithm::BTree) | None => (),
+                    Some(algo) => {
+                        args.push(ast::Argument::new(
+                            "type",
+                            ast::Expression::ConstantValue(algo.to_string(), Span::empty()),
+                        ));
+                    }
+                }
 
                 if self.preview_features.contains(PreviewFeature::ExtendedIndexes)
                     && matches!(index_def.clustered, Some(true))

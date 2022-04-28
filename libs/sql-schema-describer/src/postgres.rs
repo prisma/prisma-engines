@@ -8,7 +8,13 @@ use native_types::{CockroachType, NativeType, PostgresType};
 use quaint::{connector::ResultRow, prelude::Queryable};
 use regex::Regex;
 use serde_json::from_str;
-use std::{any::type_name, borrow::Cow, collections::BTreeMap, collections::HashSet, convert::TryInto};
+use std::{
+    any::type_name,
+    borrow::Cow,
+    collections::HashSet,
+    collections::{BTreeMap, HashMap},
+    convert::TryInto,
+};
 use tracing::trace;
 
 #[enumflags2::bitflags]
@@ -32,6 +38,276 @@ impl Debug for SqlSchemaDescriber<'_> {
     }
 }
 
+#[derive(Default)]
+pub struct PostgresSchemaExt {
+    pub opclasses: HashMap<IndexFieldId, SQLOperatorClass>,
+}
+
+impl PostgresSchemaExt {
+    pub fn get_opclass(&self, index_field_id: IndexFieldId) -> Option<&SQLOperatorClass> {
+        self.opclasses.get(&index_field_id)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct SQLOperatorClass {
+    pub kind: SQLOperatorClassKind,
+    pub is_default: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub enum SQLOperatorClassKind {
+    /// GiST + inet type
+    InetOps,
+    /// GIN + jsonb type
+    JsonbOps,
+    /// GIN + jsonb type
+    JsonbPathOps,
+    /// GIN + array type
+    ArrayOps,
+    /// SP-GiST + text type
+    TextOps,
+    /// BRIN + bit
+    BitMinMaxOps,
+    /// BRIN + varbit
+    VarBitMinMaxOps,
+    /// BRIN + char
+    BpcharBloomOps,
+    /// BRIN + char
+    BpcharMinMaxOps,
+    /// BRIN + bytea
+    ByteaBloomOps,
+    /// BRIN + bytea
+    ByteaMinMaxOps,
+    /// BRIN + date
+    DateBloomOps,
+    /// BRIN + date
+    DateMinMaxOps,
+    /// BRIN + date
+    DateMinMaxMultiOps,
+    /// BRIN + float
+    Float4BloomOps,
+    /// BRIN + float
+    Float4MinMaxOps,
+    /// BRIN + float
+    Float4MinMaxMultiOps,
+    /// BRIN + double
+    Float8BloomOps,
+    /// BRIN + double
+    Float8MinMaxOps,
+    /// BRIN + double
+    Float8MinMaxMultiOps,
+    /// BRIN + inet
+    InetInclusionOps,
+    /// BRIN + inet
+    InetBloomOps,
+    /// BRIN + inet
+    InetMinMaxOps,
+    /// BRIN + inet
+    InetMinMaxMultiOps,
+    /// BRIN + int2
+    Int2BloomOps,
+    /// BRIN + int2
+    Int2MinMaxOps,
+    /// BRIN + int2
+    Int2MinMaxMultiOps,
+    /// BRIN + int4
+    Int4BloomOps,
+    /// BRIN + int4
+    Int4MinMaxOps,
+    /// BRIN + int4
+    Int4MinMaxMultiOps,
+    /// BRIN + int8
+    Int8BloomOps,
+    /// BRIN + int8
+    Int8MinMaxOps,
+    /// BRIN + int8
+    Int8MinMaxMultiOps,
+    /// BRIN + numeric
+    NumericBloomOps,
+    /// BRIN + numeric
+    NumericMinMaxOps,
+    /// BRIN + numeric
+    NumericMinMaxMultiOps,
+    /// BRIN + oid
+    OidBloomOps,
+    /// BRIN + oid
+    OidMinMaxOps,
+    /// BRIN + oid
+    OidMinMaxMultiOps,
+    /// BRIN + text
+    TextBloomOps,
+    /// BRIN + text
+    TextMinMaxOps,
+    /// BRIN + timestamp
+    TimestampBloomOps,
+    /// BRIN + timestamp
+    TimestampMinMaxOps,
+    /// BRIN + timestamp
+    TimestampMinMaxMultiOps,
+    /// BRIN + timestamptz
+    TimestampTzBloomOps,
+    /// BRIN + timestamptz
+    TimestampTzMinMaxOps,
+    /// BRIN + timestamptz
+    TimestampTzMinMaxMultiOps,
+    /// BRIN + time
+    TimeBloomOps,
+    /// BRIN + time
+    TimeMinMaxOps,
+    /// BRIN + time
+    TimeMinMaxMultiOps,
+    /// BRIN + timetz
+    TimeTzBloomOps,
+    /// BRIN + timetz
+    TimeTzMinMaxOps,
+    /// BRIN + timetz
+    TimeTzMinMaxMultiOps,
+    /// BRIN + uuid
+    UuidBloomOps,
+    /// BRIN + uuid
+    UuidMinMaxOps,
+    /// BRIN + uuid
+    UuidMinMaxMultiOps,
+
+    /// Escape hatch
+    Raw(String),
+}
+
+impl SQLOperatorClassKind {
+    pub fn raw(s: &str) -> Self {
+        Self::Raw(s.to_string())
+    }
+}
+
+impl From<&str> for SQLOperatorClassKind {
+    fn from(s: &str) -> Self {
+        match s {
+            "array_ops" => SQLOperatorClassKind::ArrayOps,
+            "jsonb_ops" => SQLOperatorClassKind::JsonbOps,
+            "text_ops" => SQLOperatorClassKind::TextOps,
+            "bit_minmax_ops" => SQLOperatorClassKind::BitMinMaxOps,
+            "varbit_minmax_ops" => SQLOperatorClassKind::VarBitMinMaxOps,
+            "bpchar_minmax_ops" => SQLOperatorClassKind::BpcharMinMaxOps,
+            "bytea_minmax_ops" => SQLOperatorClassKind::ByteaMinMaxOps,
+            "float4_minmax_ops" => SQLOperatorClassKind::Float4MinMaxOps,
+            "date_minmax_ops" => SQLOperatorClassKind::DateMinMaxOps,
+            "float8_minmax_ops" => SQLOperatorClassKind::Float8MinMaxOps,
+            "inet_inclusion_ops" => SQLOperatorClassKind::InetInclusionOps,
+            "int2_minmax_ops" => SQLOperatorClassKind::Int2MinMaxOps,
+            "int4_minmax_ops" => SQLOperatorClassKind::Int4MinMaxOps,
+            "int8_minmax_ops" => SQLOperatorClassKind::Int8MinMaxOps,
+            "numeric_minmax_ops" => SQLOperatorClassKind::NumericMinMaxOps,
+            "oid_minmax_ops" => SQLOperatorClassKind::OidMinMaxOps,
+            "text_minmax_ops" => SQLOperatorClassKind::TextMinMaxOps,
+            "timestamp_minmax_ops" => SQLOperatorClassKind::TimestampMinMaxOps,
+            "timestamptz_minmax_ops" => SQLOperatorClassKind::TimestampTzMinMaxOps,
+            "time_minmax_ops" => SQLOperatorClassKind::TimeMinMaxOps,
+            "timetz_minmax_ops" => SQLOperatorClassKind::TimeTzMinMaxOps,
+            "uuid_minmax_ops" => SQLOperatorClassKind::UuidMinMaxOps,
+            "inet_ops" => SQLOperatorClassKind::InetOps,
+            "jsonb_path_ops" => SQLOperatorClassKind::JsonbPathOps,
+            "bpchar_bloom_ops" => SQLOperatorClassKind::BpcharBloomOps,
+            "bytea_bloom_ops" => SQLOperatorClassKind::ByteaBloomOps,
+            "date_bloom_ops" => SQLOperatorClassKind::DateBloomOps,
+            "date_minmax_multi_ops" => SQLOperatorClassKind::DateMinMaxMultiOps,
+            "float4_bloom_ops" => SQLOperatorClassKind::Float4BloomOps,
+            "float4_minmax_multi_ops" => SQLOperatorClassKind::Float4MinMaxMultiOps,
+            "float8_bloom_ops" => SQLOperatorClassKind::Float8BloomOps,
+            "float8_minmax_multi_ops" => SQLOperatorClassKind::Float8MinMaxMultiOps,
+            "inet_bloom_ops" => SQLOperatorClassKind::InetBloomOps,
+            "inet_minmax_ops" => SQLOperatorClassKind::InetMinMaxOps,
+            "inet_minmax_multi_ops" => SQLOperatorClassKind::InetMinMaxMultiOps,
+            "int2_bloom_ops" => SQLOperatorClassKind::Int2BloomOps,
+            "int2_minmax_multi_ops" => SQLOperatorClassKind::Int2MinMaxMultiOps,
+            "int4_bloom_ops" => SQLOperatorClassKind::Int4BloomOps,
+            "int4_minmax_multi_ops" => SQLOperatorClassKind::Int4MinMaxMultiOps,
+            "int8_bloom_ops" => SQLOperatorClassKind::Int8BloomOps,
+            "int8_minmax_multi_ops" => SQLOperatorClassKind::Int8MinMaxMultiOps,
+            "numeric_bloom_ops" => SQLOperatorClassKind::NumericBloomOps,
+            "numeric_minmax_multi_ops" => SQLOperatorClassKind::NumericMinMaxMultiOps,
+            "oid_bloom_ops" => SQLOperatorClassKind::OidBloomOps,
+            "oid_minmax_multi_ops" => SQLOperatorClassKind::OidMinMaxMultiOps,
+            "text_bloom_ops" => SQLOperatorClassKind::TextBloomOps,
+            "timestamp_bloom_ops" => SQLOperatorClassKind::TimestampBloomOps,
+            "timestamp_minmax_multi_ops" => SQLOperatorClassKind::TimestampMinMaxMultiOps,
+            "timestamptz_bloom_ops" => SQLOperatorClassKind::TimestampTzBloomOps,
+            "timestamptz_minmax_multi_ops" => SQLOperatorClassKind::TimestampTzMinMaxMultiOps,
+            "time_bloom_ops" => SQLOperatorClassKind::TimeBloomOps,
+            "time_minmax_multi_ops" => SQLOperatorClassKind::TimeMinMaxMultiOps,
+            "timetz_bloom_ops" => SQLOperatorClassKind::TimeTzBloomOps,
+            "timetz_minmax_multi_ops" => SQLOperatorClassKind::TimeTzMinMaxMultiOps,
+            "uuid_bloom_ops" => SQLOperatorClassKind::UuidBloomOps,
+            "uuid_minmax_multi_ops" => SQLOperatorClassKind::UuidMinMaxMultiOps,
+            _ => SQLOperatorClassKind::Raw(s.to_string()),
+        }
+    }
+}
+
+impl AsRef<str> for SQLOperatorClassKind {
+    fn as_ref(&self) -> &str {
+        match self {
+            SQLOperatorClassKind::InetOps => "inet_ops",
+            SQLOperatorClassKind::JsonbOps => "jsonb_ops",
+            SQLOperatorClassKind::JsonbPathOps => "jsonb_path_ops",
+            SQLOperatorClassKind::ArrayOps => "array_ops",
+            SQLOperatorClassKind::TextOps => "text_ops",
+            SQLOperatorClassKind::BitMinMaxOps => "bit_minmax_ops",
+            SQLOperatorClassKind::VarBitMinMaxOps => "varbit_minmax_ops",
+            SQLOperatorClassKind::BpcharBloomOps => "bpchar_bloom_ops",
+            SQLOperatorClassKind::BpcharMinMaxOps => "bpchar_minmax_ops",
+            SQLOperatorClassKind::ByteaBloomOps => "bytea_bloom_ops",
+            SQLOperatorClassKind::ByteaMinMaxOps => "bytea_minmax_ops",
+            SQLOperatorClassKind::DateBloomOps => "date_bloom_ops",
+            SQLOperatorClassKind::DateMinMaxOps => "date_minmax_ops",
+            SQLOperatorClassKind::DateMinMaxMultiOps => "date_minmax_multi_ops",
+            SQLOperatorClassKind::Float4BloomOps => "float4_bloom_ops",
+            SQLOperatorClassKind::Float4MinMaxOps => "float4_minmax_ops",
+            SQLOperatorClassKind::Float4MinMaxMultiOps => "float4_minmax_multi_ops",
+            SQLOperatorClassKind::Float8BloomOps => "float8_bloom_ops",
+            SQLOperatorClassKind::Float8MinMaxOps => "float8_minmax_ops",
+            SQLOperatorClassKind::Float8MinMaxMultiOps => "float8_minmax_multi_ops",
+            SQLOperatorClassKind::InetInclusionOps => "inet_inclusion_ops",
+            SQLOperatorClassKind::InetBloomOps => "inet_bloom_ops",
+            SQLOperatorClassKind::InetMinMaxOps => "inet_minmax_ops",
+            SQLOperatorClassKind::InetMinMaxMultiOps => "inet_minmax_multi_ops",
+            SQLOperatorClassKind::Int2BloomOps => "int2_bloom_ops",
+            SQLOperatorClassKind::Int2MinMaxOps => "int2_minmax_ops",
+            SQLOperatorClassKind::Int2MinMaxMultiOps => "int2_minmax_multi_ops",
+            SQLOperatorClassKind::Int4BloomOps => "int4_bloom_ops",
+            SQLOperatorClassKind::Int4MinMaxOps => "int4_minmax_ops",
+            SQLOperatorClassKind::Int4MinMaxMultiOps => "int4_minmax_multi_ops",
+            SQLOperatorClassKind::Int8BloomOps => "int8_bloom_ops",
+            SQLOperatorClassKind::Int8MinMaxOps => "int8_minmax_ops",
+            SQLOperatorClassKind::Int8MinMaxMultiOps => "int8_minmax_multi_ops",
+            SQLOperatorClassKind::NumericBloomOps => "numeric_bloom_ops",
+            SQLOperatorClassKind::NumericMinMaxOps => "numeric_minmax_ops",
+            SQLOperatorClassKind::NumericMinMaxMultiOps => "numeric_minmax_multi_ops",
+            SQLOperatorClassKind::OidBloomOps => "oid_bloom_ops",
+            SQLOperatorClassKind::OidMinMaxOps => "oid_minmax_ops",
+            SQLOperatorClassKind::OidMinMaxMultiOps => "oid_minmax_multi_ops",
+            SQLOperatorClassKind::TextBloomOps => "text_bloom_ops",
+            SQLOperatorClassKind::TextMinMaxOps => "text_minmax_ops",
+            SQLOperatorClassKind::TimestampBloomOps => "timestamp_bloom_ops",
+            SQLOperatorClassKind::TimestampMinMaxOps => "timestamp_minmax_ops",
+            SQLOperatorClassKind::TimestampMinMaxMultiOps => "timestamp_minmax_multi_ops",
+            SQLOperatorClassKind::TimestampTzBloomOps => "timestamptz_bloom_ops",
+            SQLOperatorClassKind::TimestampTzMinMaxOps => "timestamptz_minmax_ops",
+            SQLOperatorClassKind::TimestampTzMinMaxMultiOps => "timestamptz_minmax_multi_ops",
+            SQLOperatorClassKind::TimeBloomOps => "time_bloom_ops",
+            SQLOperatorClassKind::TimeMinMaxOps => "time_minmax_ops",
+            SQLOperatorClassKind::TimeMinMaxMultiOps => "time_minmax_multi_ops",
+            SQLOperatorClassKind::TimeTzBloomOps => "timetz_bloom_ops",
+            SQLOperatorClassKind::TimeTzMinMaxOps => "timetz_minmax_ops",
+            SQLOperatorClassKind::TimeTzMinMaxMultiOps => "timetz_minmax_multi_ops",
+            SQLOperatorClassKind::UuidBloomOps => "uuid_bloom_ops",
+            SQLOperatorClassKind::UuidMinMaxOps => "uuid_minmax_ops",
+            SQLOperatorClassKind::UuidMinMaxMultiOps => "uuid_minmax_multi_ops",
+            SQLOperatorClassKind::Raw(ref c) => c,
+        }
+    }
+}
+
 #[async_trait::async_trait]
 impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
@@ -49,13 +325,22 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     }
 
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+        let mut pg_ext = PostgresSchemaExt::default();
+
         let sequences = self.get_sequences(schema).await?;
         let enums = self.get_enums(schema).await?;
         let mut columns = self.get_columns(schema, &enums, &sequences).await?;
         let mut foreign_keys = self.get_foreign_keys(schema).await?;
-        let mut indexes = self.get_indices(schema, &sequences).await?;
 
         let table_names = self.get_table_names(schema).await?;
+
+        let table_ids = table_names
+            .iter()
+            .enumerate()
+            .map(|(idx, name)| (name.clone(), TableId(idx as u32)))
+            .collect();
+
+        let mut indexes = self.get_indices(schema, &sequences, &mut pg_ext, &table_ids).await?;
         let mut tables = Vec::with_capacity(table_names.len());
 
         if self.is_cockroach() {
@@ -102,6 +387,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
             tables,
             views,
             procedures,
+            connector_data: crate::connector_data::ConnectorData { data: Box::new(pg_ext) },
             ..Default::default()
         })
     }
@@ -548,6 +834,8 @@ impl<'a> SqlSchemaDescriber<'a> {
         &self,
         schema: &str,
         sequences: &[Sequence],
+        pg_ext: &mut PostgresSchemaExt,
+        table_ids: &HashMap<String, TableId>,
     ) -> DescriberResult<BTreeMap<String, (Vec<Index>, Option<PrimaryKey>)>> {
         let mut indexes_map = BTreeMap::new();
 
@@ -559,6 +847,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                tableInfos.relname                          AS table_name,
                indexAccess.amname                          AS index_algo,
                rawIndex.indkeyidx,
+               rawIndex.opclass                            AS opclass,
+               rawIndex.opcdefault                         AS opcdefault,
                CASE rawIndex.sort_order & 1
                    WHEN 1 THEN 'DESC'
                    ELSE 'ASC'
@@ -576,22 +866,27 @@ impl<'a> SqlSchemaDescriber<'a> {
                        i.indisunique,
                        i.indisprimary,
                        i.indkey,
+                       opc.opcname opclass,
+                       opc.opcdefault opcdefault,
                        o.OPTION AS sort_order,
                        c.colnum AS sort_order_colnum,
                        generate_subscripts(i.indkey, 1) AS indkeyidx
                 FROM pg_index i
                          CROSS JOIN LATERAL UNNEST(indkey) WITH ordinality AS c (colnum, ordinality)
+                         LEFT JOIN LATERAL UNNEST(indclass) WITH ordinality AS p (opcoid, ordinality)
+                                   ON c.ordinality = p.ordinality
                          LEFT JOIN LATERAL UNNEST(indoption) WITH ordinality AS o (OPTION, ordinality)
                                    ON c.ordinality = o.ordinality
+                         LEFT JOIN pg_opclass opc ON opc.oid = p.opcoid
                 WHERE i.indpred IS NULL
-                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, i.indoption, sort_order, sort_order_colnum
+                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, i.indoption, opc.opcname, sort_order, sort_order_colnum, opc.opcdefault
                 ORDER BY i.indrelid, i.indexrelid
             ) rawIndex,
             -- pg_attribute stores infos about columns: https://www.postgresql.org/docs/current/catalog-pg-attribute.html
             pg_attribute columnInfos,
             -- pg_namespace stores info about the schema
             pg_namespace schemaInfo,
-            -- index access methods: https://www.postgresql.org/docs/9.3/catalog-pg-am.html     
+            -- index access methods: https://www.postgresql.org/docs/9.3/catalog-pg-am.html
             pg_am indexAccess
         WHERE
           -- find table info for index
@@ -609,7 +904,7 @@ impl<'a> SqlSchemaDescriber<'a> {
           AND rawIndex.sort_order_colnum = columnInfos.attnum
           AND indexAccess.oid = indexInfos.relam
         GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname,
-                 rawIndex.indkeyidx, column_order, index_algo
+                 rawIndex.indkeyidx, column_order, index_algo, opclass, opcdefault
         ORDER BY rawIndex.indkeyidx;
         "#;
 
@@ -622,6 +917,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let is_unique = row.get_expect_bool("is_unique");
             let is_primary_key = row.get_expect_bool("is_primary_key");
             let table_name = row.get_expect_string("table_name");
+            let table_id = table_ids[table_name.as_str()];
             let sequence_name = row.get_string("sequence_name");
 
             let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
@@ -636,6 +932,10 @@ impl<'a> SqlSchemaDescriber<'a> {
             let algorithm = match row.get_string("index_algo").as_deref() {
                 Some("btree") => Some(SQLIndexAlgorithm::BTree),
                 Some("hash") => Some(SQLIndexAlgorithm::Hash),
+                Some("gist") => Some(SQLIndexAlgorithm::Gist),
+                Some("gin") => Some(SQLIndexAlgorithm::Gin),
+                Some("spgist") => Some(SQLIndexAlgorithm::SpGist),
+                Some("brin") => Some(SQLIndexAlgorithm::Brin),
                 _ => None,
             };
 
@@ -665,14 +965,41 @@ impl<'a> SqlSchemaDescriber<'a> {
                     }
                 }
             } else {
+                let operator_class = algorithm
+                    .filter(|alg| !matches!(alg, SQLIndexAlgorithm::BTree | SQLIndexAlgorithm::Hash))
+                    .and_then(|_| {
+                        row.get_string("opclass")
+                            .map(|c| (c, row.get_bool("opcdefault").unwrap_or_default()))
+                    })
+                    .map(|(c, is_default)| SQLOperatorClass {
+                        kind: SQLOperatorClassKind::from(c.as_str()),
+                        is_default,
+                    });
+
                 let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
                 let mut column = IndexColumn::new(column_name);
                 column.sort_order = sort_order;
 
-                if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == name) {
+                if let Some(index_id) = entry.0.iter_mut().position(|idx| idx.name == name) {
+                    let existing_index = &mut entry.0[index_id];
+
+                    if let Some(opclass) = operator_class {
+                        let index_id = IndexId(table_id, index_id as u32);
+                        let index_field_id = IndexFieldId(index_id, existing_index.columns.len() as u32);
+
+                        pg_ext.opclasses.insert(index_field_id, opclass);
+                    }
+
                     existing_index.columns.push(column);
                 } else {
+                    if let Some(opclass) = operator_class {
+                        let index_id = IndexId(table_id, entry.0.len() as u32);
+                        let index_field_id = IndexFieldId(index_id, 0);
+
+                        pg_ext.opclasses.insert(index_field_id, opclass);
+                    }
+
                     entry.0.push(Index {
                         name,
                         columns: vec![column],

@@ -3,16 +3,16 @@ use datamodel::{
     common::{preview_features::PreviewFeature, RelationNames},
     dml::{
         Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, Model,
-        PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder,
-        ValueGenerator as VG,
+        OperatorClass, PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType,
+        SortOrder, ValueGenerator as VG,
     },
 };
 use introspection_connector::IntrospectionContext;
-use sql::mssql::MssqlSchemaExt;
+use sql::{mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, IndexFieldId};
 use sql_schema_describer::{
-    self as sql, ColumnArity, ColumnTypeFamily, ForeignKey, IndexType, SQLSortOrder, SqlSchema, Table,
+    self as sql, ColumnArity, ColumnTypeFamily, DefaultKind, ForeignKey, ForeignKeyAction, IndexType, SQLSortOrder,
+    SqlSchema, Table,
 };
-use sql_schema_describer::{DefaultKind, ForeignKeyAction};
 use tracing::debug;
 
 //checks
@@ -146,6 +146,10 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Intros
         index.algorithm().map(|algo| match algo {
             sql::SQLIndexAlgorithm::BTree => IndexAlgorithm::BTree,
             sql::SQLIndexAlgorithm::Hash => IndexAlgorithm::Hash,
+            sql::SQLIndexAlgorithm::Gist => IndexAlgorithm::Gist,
+            sql::SQLIndexAlgorithm::Gin => IndexAlgorithm::Gin,
+            sql::SQLIndexAlgorithm::SpGist => IndexAlgorithm::SpGist,
+            sql::SQLIndexAlgorithm::Brin => IndexAlgorithm::Brin,
         })
     } else {
         None
@@ -162,20 +166,27 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Intros
         db_name: Some(index.name().to_owned()),
         fields: index
             .columns()
-            .map(|c| {
-                let (sort_order, length) = if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                    (None, None)
-                } else {
-                    let sort_order = c.sort_order().map(|sort| match sort {
-                        SQLSortOrder::Asc => SortOrder::Asc,
-                        SQLSortOrder::Desc => SortOrder::Desc,
-                    });
-                    (sort_order, c.length())
-                };
+            .enumerate()
+            .map(|(i, c)| {
+                let (sort_order, length, operator_class) =
+                    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                        (None, None, None)
+                    } else {
+                        let sort_order = c.sort_order().map(|sort| match sort {
+                            SQLSortOrder::Asc => SortOrder::Asc,
+                            SQLSortOrder::Desc => SortOrder::Desc,
+                        });
+
+                        let index_field_id = IndexFieldId(index.index_id(), i as u32);
+
+                        (sort_order, c.length(), get_opclass(index_field_id, index.schema(), ctx))
+                    };
+
                 IndexField {
                     path: vec![(c.as_column().name().to_owned(), None)],
                     sort_order,
                     length,
+                    operator_class,
                 }
             })
             .collect(),
@@ -548,4 +559,82 @@ pub(crate) fn primary_key_is_clustered(
     let ext: &MssqlSchemaExt = schema.downcast_connector_data();
 
     Some(ext.pk_is_clustered(table_id))
+}
+
+fn get_opclass(
+    index_field_id: sql::IndexFieldId,
+    schema: &SqlSchema,
+    ctx: &IntrospectionContext,
+) -> Option<OperatorClass> {
+    if !ctx.sql_family().is_postgres() {
+        return None;
+    }
+
+    let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+
+    let opclass = match ext.get_opclass(index_field_id) {
+        Some(opclass) => opclass,
+        None => return None,
+    };
+
+    match &opclass.kind {
+        _ if opclass.is_default => None,
+        sql::SQLOperatorClassKind::InetOps => Some(OperatorClass::InetOps),
+        sql::SQLOperatorClassKind::JsonbOps => Some(OperatorClass::JsonbOps),
+        sql::SQLOperatorClassKind::JsonbPathOps => Some(OperatorClass::JsonbPathOps),
+        sql::SQLOperatorClassKind::ArrayOps => Some(OperatorClass::ArrayOps),
+        sql::SQLOperatorClassKind::TextOps => Some(OperatorClass::TextOps),
+        sql::SQLOperatorClassKind::BitMinMaxOps => Some(OperatorClass::BitMinMaxOps),
+        sql::SQLOperatorClassKind::VarBitMinMaxOps => Some(OperatorClass::VarBitMinMaxOps),
+        sql::SQLOperatorClassKind::BpcharBloomOps => Some(OperatorClass::BpcharBloomOps),
+        sql::SQLOperatorClassKind::BpcharMinMaxOps => Some(OperatorClass::BpcharMinMaxOps),
+        sql::SQLOperatorClassKind::ByteaBloomOps => Some(OperatorClass::ByteaBloomOps),
+        sql::SQLOperatorClassKind::ByteaMinMaxOps => Some(OperatorClass::ByteaMinMaxOps),
+        sql::SQLOperatorClassKind::DateBloomOps => Some(OperatorClass::DateBloomOps),
+        sql::SQLOperatorClassKind::DateMinMaxOps => Some(OperatorClass::DateMinMaxOps),
+        sql::SQLOperatorClassKind::DateMinMaxMultiOps => Some(OperatorClass::DateMinMaxMultiOps),
+        sql::SQLOperatorClassKind::Float4BloomOps => Some(OperatorClass::Float4BloomOps),
+        sql::SQLOperatorClassKind::Float4MinMaxOps => Some(OperatorClass::Float4MinMaxOps),
+        sql::SQLOperatorClassKind::Float4MinMaxMultiOps => Some(OperatorClass::Float4MinMaxMultiOps),
+        sql::SQLOperatorClassKind::Float8BloomOps => Some(OperatorClass::Float8BloomOps),
+        sql::SQLOperatorClassKind::Float8MinMaxOps => Some(OperatorClass::Float8MinMaxOps),
+        sql::SQLOperatorClassKind::Float8MinMaxMultiOps => Some(OperatorClass::Float8MinMaxMultiOps),
+        sql::SQLOperatorClassKind::InetInclusionOps => Some(OperatorClass::InetInclusionOps),
+        sql::SQLOperatorClassKind::InetBloomOps => Some(OperatorClass::InetBloomOps),
+        sql::SQLOperatorClassKind::InetMinMaxOps => Some(OperatorClass::InetMinMaxOps),
+        sql::SQLOperatorClassKind::InetMinMaxMultiOps => Some(OperatorClass::InetMinMaxMultiOps),
+        sql::SQLOperatorClassKind::Int2BloomOps => Some(OperatorClass::Int2BloomOps),
+        sql::SQLOperatorClassKind::Int2MinMaxOps => Some(OperatorClass::Int2MinMaxOps),
+        sql::SQLOperatorClassKind::Int2MinMaxMultiOps => Some(OperatorClass::Int2MinMaxMultiOps),
+        sql::SQLOperatorClassKind::Int4BloomOps => Some(OperatorClass::Int4BloomOps),
+        sql::SQLOperatorClassKind::Int4MinMaxOps => Some(OperatorClass::Int4MinMaxOps),
+        sql::SQLOperatorClassKind::Int4MinMaxMultiOps => Some(OperatorClass::Int4MinMaxMultiOps),
+        sql::SQLOperatorClassKind::Int8BloomOps => Some(OperatorClass::Int8BloomOps),
+        sql::SQLOperatorClassKind::Int8MinMaxOps => Some(OperatorClass::Int8MinMaxOps),
+        sql::SQLOperatorClassKind::Int8MinMaxMultiOps => Some(OperatorClass::Int8MinMaxMultiOps),
+        sql::SQLOperatorClassKind::NumericBloomOps => Some(OperatorClass::NumericBloomOps),
+        sql::SQLOperatorClassKind::NumericMinMaxOps => Some(OperatorClass::NumericMinMaxOps),
+        sql::SQLOperatorClassKind::NumericMinMaxMultiOps => Some(OperatorClass::NumericMinMaxMultiOps),
+        sql::SQLOperatorClassKind::OidBloomOps => Some(OperatorClass::OidBloomOps),
+        sql::SQLOperatorClassKind::OidMinMaxOps => Some(OperatorClass::OidMinMaxOps),
+        sql::SQLOperatorClassKind::OidMinMaxMultiOps => Some(OperatorClass::OidMinMaxMultiOps),
+        sql::SQLOperatorClassKind::TextBloomOps => Some(OperatorClass::TextBloomOps),
+        sql::SQLOperatorClassKind::TextMinMaxOps => Some(OperatorClass::TextMinMaxOps),
+        sql::SQLOperatorClassKind::TimestampBloomOps => Some(OperatorClass::TimestampBloomOps),
+        sql::SQLOperatorClassKind::TimestampMinMaxOps => Some(OperatorClass::TimestampMinMaxOps),
+        sql::SQLOperatorClassKind::TimestampMinMaxMultiOps => Some(OperatorClass::TimestampMinMaxMultiOps),
+        sql::SQLOperatorClassKind::TimestampTzBloomOps => Some(OperatorClass::TimestampTzBloomOps),
+        sql::SQLOperatorClassKind::TimestampTzMinMaxOps => Some(OperatorClass::TimestampTzMinMaxOps),
+        sql::SQLOperatorClassKind::TimestampTzMinMaxMultiOps => Some(OperatorClass::TimestampTzMinMaxMultiOps),
+        sql::SQLOperatorClassKind::TimeBloomOps => Some(OperatorClass::TimeBloomOps),
+        sql::SQLOperatorClassKind::TimeMinMaxOps => Some(OperatorClass::TimeMinMaxOps),
+        sql::SQLOperatorClassKind::TimeMinMaxMultiOps => Some(OperatorClass::TimeMinMaxMultiOps),
+        sql::SQLOperatorClassKind::TimeTzBloomOps => Some(OperatorClass::TimeTzBloomOps),
+        sql::SQLOperatorClassKind::TimeTzMinMaxOps => Some(OperatorClass::TimeTzMinMaxOps),
+        sql::SQLOperatorClassKind::TimeTzMinMaxMultiOps => Some(OperatorClass::TimeTzMinMaxMultiOps),
+        sql::SQLOperatorClassKind::UuidBloomOps => Some(OperatorClass::UuidBloomOps),
+        sql::SQLOperatorClassKind::UuidMinMaxOps => Some(OperatorClass::UuidMinMaxOps),
+        sql::SQLOperatorClassKind::UuidMinMaxMultiOps => Some(OperatorClass::UuidMinMaxMultiOps),
+        sql::SQLOperatorClassKind::Raw(c) => Some(OperatorClass::Raw(c.to_string().into())),
+    }
 }

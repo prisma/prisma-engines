@@ -8,7 +8,10 @@ use crate::{
 use native_types::{CockroachType, PostgresType};
 use once_cell::sync::Lazy;
 use regex::RegexSet;
-use sql_schema_describer::walkers::{ColumnWalker, IndexWalker};
+use sql_schema_describer::{
+    postgres::PostgresSchemaExt,
+    walkers::{ColumnWalker, IndexWalker},
+};
 
 /// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.
 static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
@@ -64,6 +67,28 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 
     fn indexes_should_be_recreated_after_column_drop(&self) -> bool {
         true
+    }
+
+    fn indexes_match(&self, a: IndexWalker<'_>, b: IndexWalker<'_>) -> bool {
+        let columns_previous = a.columns();
+        let columns_next = b.columns();
+
+        let pg_ext_previous: &PostgresSchemaExt = a.schema().downcast_connector_data();
+        let pg_ext_next: &PostgresSchemaExt = b.schema().downcast_connector_data();
+
+        columns_previous.len() == columns_next.len()
+            && columns_previous.zip(columns_next).all(|(col_a, col_b)| {
+                let a_class = pg_ext_previous.get_opclass(col_a.index_field_id());
+                let b_class = pg_ext_next.get_opclass(col_b.index_field_id());
+                let a_kind = a_class.map(|c| &c.kind);
+                let b_kind = b_class.map(|c| &c.kind);
+                let a_is_default = a_class.map(|c| c.is_default).unwrap_or(false);
+                let b_is_default = b_class.map(|c| c.is_default).unwrap_or(false);
+
+                // the dml doesn't always have opclass defined if it's the
+                // default.
+                a_kind == b_kind || (a_class.is_none() && b_is_default) || (b_class.is_none() && a_is_default)
+            })
     }
 
     fn index_should_be_renamed(&self, pair: &Pair<IndexWalker<'_>>) -> bool {

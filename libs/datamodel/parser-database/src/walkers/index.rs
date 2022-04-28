@@ -132,9 +132,14 @@ impl<'db> IndexWalker<'db> {
         self.index_attribute.is_unique()
     }
 
-    /// Is this an `@@fulltext`?
+    /// Is this a `@@fulltext`?
     pub fn is_fulltext(self) -> bool {
         self.index_attribute.is_fulltext()
+    }
+
+    /// Is this an `@@index`?
+    pub fn is_normal(self) -> bool {
+        self.index_attribute.is_normal()
     }
 
     /// True if it's our implicit unique index.

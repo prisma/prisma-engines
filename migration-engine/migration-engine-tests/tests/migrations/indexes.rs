@@ -1,8 +1,9 @@
 mod mssql;
+mod postgres;
 
 use indoc::{formatdoc, indoc};
 use migration_engine_tests::test_api::*;
-use sql_schema_describer::{SQLIndexAlgorithm, SQLSortOrder};
+use sql_schema_describer::SQLSortOrder;
 
 #[test_connector(preview_features("referentialIntegrity"))]
 fn index_on_compound_relation_fields_must_work(api: TestApi) {
@@ -535,33 +536,6 @@ fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestA
     api.assert_schema().assert_table("Cat", |cat| {
         cat.assert_indexes_count(1)
             .assert_index_on_columns(&["name", "age"], |idx| idx.assert_is_not_unique())
-    });
-}
-
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
-fn hash_index(api: TestApi) {
-    let dm = formatdoc! {r#"
-        {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
-
-        model A {{
-          id Int @id
-          a  Int
-
-          @@index([a], type: Hash)
-        }}
-    "#, api.datasource_block()};
-
-    api.schema_push(&dm).send().assert_green();
-
-    api.assert_schema().assert_table("A", |table| {
-        table.assert_index_on_columns(&["a"], |index| {
-            index.assert_is_not_unique().assert_algorithm(SQLIndexAlgorithm::Hash)
-        })
     });
 }
 

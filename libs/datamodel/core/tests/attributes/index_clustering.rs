@@ -277,7 +277,7 @@ fn clustered_index_allowed_only_with_preview_flag() {
           id Int @id @map("_id")
           a  Int
 
-          @@index([a], clustered: true)
+          @@index([a], clustered: false)
         }
     "#};
 
@@ -289,7 +289,7 @@ fn clustered_index_allowed_only_with_preview_flag() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a], clustered: true)[0m
+        [1;94m15 | [0m  @@[1;91mindex([a], clustered: false)[0m
         [1;94m   | [0m
     "#]];
 
@@ -301,7 +301,7 @@ fn clustered_unique_allowed_only_with_preview_flag() {
     let dml = indoc! {r#"
         model A {
           id Int @id @map("_id")
-          a  Int @unique(clustered: true)
+          a  Int @unique(clustered: false)
         }
     "#};
 
@@ -313,7 +313,7 @@ fn clustered_unique_allowed_only_with_preview_flag() {
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m  id Int @id @map("_id")
-        [1;94m13 | [0m  a  Int @[1;91munique(clustered: true)[0m
+        [1;94m13 | [0m  a  Int @[1;91munique(clustered: false)[0m
         [1;94m   | [0m
     "#]];
 
@@ -328,7 +328,7 @@ fn clustered_compound_unique_allowed_only_with_preview_flag() {
           a  Int
           b  Int
 
-          @@unique([a, b], clustered: true)
+          @@unique([a, b], clustered: false)
         }
     "#};
 
@@ -340,7 +340,7 @@ fn clustered_compound_unique_allowed_only_with_preview_flag() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91munique([a, b], clustered: true)[0m
+        [1;94m16 | [0m  @@[1;91munique([a, b], clustered: false)[0m
         [1;94m   | [0m
     "#]];
 

@@ -5,6 +5,7 @@ use crate::{
 };
 use ::dml::composite_type::{CompositeType, CompositeTypeField, CompositeTypeFieldType};
 use datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity, ScalarType};
+use either::Either;
 use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.
@@ -380,11 +381,13 @@ impl<'a> LiftAstToDml<'a> {
 
                         let sort_order = field.sort_order().map(parser_database_sort_order_to_dml_sort_order);
                         let length = field.length();
+                        let operator_class = field.operator_class().map(convert_op_class);
 
                         IndexField {
                             path,
                             sort_order,
                             length,
+                            operator_class,
                         }
                     })
                     .collect();
@@ -398,6 +401,10 @@ impl<'a> LiftAstToDml<'a> {
                 let algorithm = idx.algorithm().map(|using| match using {
                     IndexAlgorithm::BTree => dml::IndexAlgorithm::BTree,
                     IndexAlgorithm::Hash => dml::IndexAlgorithm::Hash,
+                    IndexAlgorithm::Gist => dml::IndexAlgorithm::Gist,
+                    IndexAlgorithm::Gin => dml::IndexAlgorithm::Gin,
+                    IndexAlgorithm::SpGist => dml::IndexAlgorithm::SpGist,
+                    IndexAlgorithm::Brin => dml::IndexAlgorithm::Brin,
                 });
 
                 dml::IndexDefinition {
@@ -649,5 +656,75 @@ fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarT
             other => unreachable!("{:?}", other),
         },
         other => unreachable!("{:?}", other),
+    }
+}
+
+fn convert_op_class(from_db: OperatorClassWalker<'_>) -> dml::OperatorClass {
+    match from_db.get() {
+        // gist
+        Either::Left(db::OperatorClass::InetOps) => dml::OperatorClass::InetOps,
+
+        // gin
+        Either::Left(db::OperatorClass::JsonbOps) => dml::OperatorClass::JsonbOps,
+        Either::Left(db::OperatorClass::JsonbPathOps) => dml::OperatorClass::JsonbPathOps,
+        Either::Left(db::OperatorClass::ArrayOps) => dml::OperatorClass::ArrayOps,
+
+        // sp-gist
+        Either::Left(db::OperatorClass::TextOps) => dml::OperatorClass::TextOps,
+
+        // brin
+        Either::Left(db::OperatorClass::BitMinMaxOps) => dml::OperatorClass::BitMinMaxOps,
+        Either::Left(db::OperatorClass::VarBitMinMaxOps) => dml::OperatorClass::VarBitMinMaxOps,
+        Either::Left(db::OperatorClass::BpcharBloomOps) => dml::OperatorClass::BpcharBloomOps,
+        Either::Left(db::OperatorClass::BpcharMinMaxOps) => dml::OperatorClass::BpcharMinMaxOps,
+        Either::Left(db::OperatorClass::ByteaBloomOps) => dml::OperatorClass::ByteaBloomOps,
+        Either::Left(db::OperatorClass::ByteaMinMaxOps) => dml::OperatorClass::ByteaMinMaxOps,
+        Either::Left(db::OperatorClass::DateBloomOps) => dml::OperatorClass::DateBloomOps,
+        Either::Left(db::OperatorClass::DateMinMaxOps) => dml::OperatorClass::DateMinMaxOps,
+        Either::Left(db::OperatorClass::DateMinMaxMultiOps) => dml::OperatorClass::DateMinMaxMultiOps,
+        Either::Left(db::OperatorClass::Float4BloomOps) => dml::OperatorClass::Float4BloomOps,
+        Either::Left(db::OperatorClass::Float4MinMaxOps) => dml::OperatorClass::Float4MinMaxOps,
+        Either::Left(db::OperatorClass::Float4MinMaxMultiOps) => dml::OperatorClass::Float4MinMaxMultiOps,
+        Either::Left(db::OperatorClass::Float8BloomOps) => dml::OperatorClass::Float8BloomOps,
+        Either::Left(db::OperatorClass::Float8MinMaxOps) => dml::OperatorClass::Float8MinMaxOps,
+        Either::Left(db::OperatorClass::Float8MinMaxMultiOps) => dml::OperatorClass::Float8MinMaxMultiOps,
+        Either::Left(db::OperatorClass::InetInclusionOps) => dml::OperatorClass::InetInclusionOps,
+        Either::Left(db::OperatorClass::InetBloomOps) => dml::OperatorClass::InetBloomOps,
+        Either::Left(db::OperatorClass::InetMinMaxOps) => dml::OperatorClass::InetMinMaxOps,
+        Either::Left(db::OperatorClass::InetMinMaxMultiOps) => dml::OperatorClass::InetMinMaxMultiOps,
+        Either::Left(db::OperatorClass::Int2BloomOps) => dml::OperatorClass::Int2BloomOps,
+        Either::Left(db::OperatorClass::Int2MinMaxOps) => dml::OperatorClass::Int2MinMaxOps,
+        Either::Left(db::OperatorClass::Int2MinMaxMultiOps) => dml::OperatorClass::Int2MinMaxMultiOps,
+        Either::Left(db::OperatorClass::Int4BloomOps) => dml::OperatorClass::Int4BloomOps,
+        Either::Left(db::OperatorClass::Int4MinMaxOps) => dml::OperatorClass::Int4MinMaxOps,
+        Either::Left(db::OperatorClass::Int4MinMaxMultiOps) => dml::OperatorClass::Int4MinMaxMultiOps,
+        Either::Left(db::OperatorClass::Int8BloomOps) => dml::OperatorClass::Int8BloomOps,
+        Either::Left(db::OperatorClass::Int8MinMaxOps) => dml::OperatorClass::Int8MinMaxOps,
+        Either::Left(db::OperatorClass::Int8MinMaxMultiOps) => dml::OperatorClass::Int8MinMaxMultiOps,
+        Either::Left(db::OperatorClass::NumericBloomOps) => dml::OperatorClass::NumericBloomOps,
+        Either::Left(db::OperatorClass::NumericMinMaxOps) => dml::OperatorClass::NumericMinMaxOps,
+        Either::Left(db::OperatorClass::NumericMinMaxMultiOps) => dml::OperatorClass::NumericMinMaxMultiOps,
+        Either::Left(db::OperatorClass::OidBloomOps) => dml::OperatorClass::OidBloomOps,
+        Either::Left(db::OperatorClass::OidMinMaxOps) => dml::OperatorClass::OidMinMaxOps,
+        Either::Left(db::OperatorClass::OidMinMaxMultiOps) => dml::OperatorClass::OidMinMaxMultiOps,
+        Either::Left(db::OperatorClass::TextBloomOps) => dml::OperatorClass::TextBloomOps,
+        Either::Left(db::OperatorClass::TextMinMaxOps) => dml::OperatorClass::TextMinMaxOps,
+        Either::Left(db::OperatorClass::TimestampBloomOps) => dml::OperatorClass::TimestampBloomOps,
+        Either::Left(db::OperatorClass::TimestampMinMaxOps) => dml::OperatorClass::TimestampMinMaxOps,
+        Either::Left(db::OperatorClass::TimestampMinMaxMultiOps) => dml::OperatorClass::TimestampMinMaxMultiOps,
+        Either::Left(db::OperatorClass::TimestampTzBloomOps) => dml::OperatorClass::TimestampTzBloomOps,
+        Either::Left(db::OperatorClass::TimestampTzMinMaxOps) => dml::OperatorClass::TimestampTzMinMaxOps,
+        Either::Left(db::OperatorClass::TimestampTzMinMaxMultiOps) => dml::OperatorClass::TimestampTzMinMaxMultiOps,
+        Either::Left(db::OperatorClass::TimeBloomOps) => dml::OperatorClass::TimeBloomOps,
+        Either::Left(db::OperatorClass::TimeMinMaxOps) => dml::OperatorClass::TimeMinMaxOps,
+        Either::Left(db::OperatorClass::TimeMinMaxMultiOps) => dml::OperatorClass::TimeMinMaxMultiOps,
+        Either::Left(db::OperatorClass::TimeTzBloomOps) => dml::OperatorClass::TimeTzBloomOps,
+        Either::Left(db::OperatorClass::TimeTzMinMaxOps) => dml::OperatorClass::TimeTzMinMaxOps,
+        Either::Left(db::OperatorClass::TimeTzMinMaxMultiOps) => dml::OperatorClass::TimeTzMinMaxMultiOps,
+        Either::Left(db::OperatorClass::UuidBloomOps) => dml::OperatorClass::UuidBloomOps,
+        Either::Left(db::OperatorClass::UuidMinMaxOps) => dml::OperatorClass::UuidMinMaxOps,
+        Either::Left(db::OperatorClass::UuidMinMaxMultiOps) => dml::OperatorClass::UuidMinMaxMultiOps,
+
+        Either::Right(raw) => dml::OperatorClass::Raw(raw.to_string().into()),
     }
 }

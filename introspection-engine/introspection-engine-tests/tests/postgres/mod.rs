@@ -1,3 +1,8 @@
+mod brin;
+mod gin;
+mod gist;
+mod spgist;
+
 use indoc::{formatdoc, indoc};
 use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;

@@ -19,6 +19,7 @@ mod parsers;
 pub use self::{
     error::{DescriberError, DescriberErrorKind, DescriberResult},
     ids::*,
+    postgres::{SQLOperatorClass, SQLOperatorClassKind},
 };
 
 use once_cell::sync::Lazy;
@@ -268,6 +269,10 @@ impl IndexType {
 pub enum SQLIndexAlgorithm {
     BTree,
     Hash,
+    Gist,
+    Gin,
+    SpGist,
+    Brin,
 }
 
 impl Default for SQLIndexAlgorithm {
@@ -281,6 +286,10 @@ impl AsRef<str> for SQLIndexAlgorithm {
         match self {
             Self::BTree => "BTREE",
             Self::Hash => "HASH",
+            Self::Gist => "GIST",
+            Self::Gin => "GIN",
+            Self::SpGist => "SPGIST",
+            Self::Brin => "BRIN",
         }
     }
 }

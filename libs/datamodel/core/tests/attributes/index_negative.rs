@@ -184,80 +184,6 @@ fn index_does_not_accept_missing_length_with_extended_indexes() {
 }
 
 #[test]
-fn postgres_disallows_unique_length_prefix() {
-    let dml = indoc! {r#"
-        model A {
-          id String @unique(length: 30) @test.VarChar(255)
-        }
-    "#};
-
-    let dml = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not supported in an index definition with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
-        [1;94m   | [0m
-        [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id String @[1;91munique(length: 30)[0m @test.VarChar(255)
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
-fn postgres_disallows_compound_unique_length_prefix() {
-    let dml = indoc! {r#"
-        model A {
-          a String
-          b String
-          @@unique([a(length: 10), b(length: 30)])
-        }
-    "#};
-
-    let dml = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not supported in an index definition with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
-        [1;94m   | [0m
-        [1;94m13 | [0m  b String
-        [1;94m14 | [0m  @@[1;91munique([a(length: 10), b(length: 30)])[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
-fn postgres_disallows_index_length_prefix() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a String
-
-          @@index([a(length: 10)])
-        }
-    "#};
-
-    let dml = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is not supported in an index definition with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn sqlserver_disallows_unique_length_prefix() {
     let dml = indoc! {r#"
         model A {
@@ -704,7 +630,7 @@ fn hash_index_doesnt_work_on_sqlserver() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given type argument is not supported with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@index": The given index type is not supported with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -757,7 +683,7 @@ fn hash_index_doesnt_work_on_mysql() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given type argument is not supported with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@index": The given index type is not supported with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -810,7 +736,7 @@ fn hash_index_doesnt_work_on_sqlite() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given type argument is not supported with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@index": The given index type is not supported with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -863,7 +789,7 @@ fn hash_index_doesnt_work_on_mongo() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given type argument is not supported with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@index": The given index type is not supported with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
