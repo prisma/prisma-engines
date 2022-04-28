@@ -1252,14 +1252,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "getdmmf_proto"
-version = "0.1.0"
-dependencies = [
- "dmmf",
- "wasm-bindgen",
-]
-
-[[package]]
 name = "getrandom"
 version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
