@@ -353,11 +353,11 @@
 <span id="348">348</span>
 <span id="349">349</span>
 <span id="350">350</span>
-<span id="351">351</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
+</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">validations</span>;
+
+<span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
-    <span class="ident">parser_database::walkers::ModelWalker</span>,
-    <span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>,
+    <span class="ident">parser_database</span>::{<span class="ident">walkers::ModelWalker</span>, <span class="ident">IndexAlgorithm</span>},
     <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeConstructor</span>,
     <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>, <span class="ident">Span</span>,
 };
@@ -457,6 +457,15 @@
     <span class="ident">ConnectorCapability::UsingHashIndex</span>,
     <span class="ident">ConnectorCapability::ImplicitManyToManyRelation</span>,
     <span class="ident">ConnectorCapability::DecimalType</span>,
+];
+
+<span class="kw">const</span> <span class="ident">INDEX_TYPES</span>: <span class="kw-2">&amp;</span>[<span class="ident">IndexAlgorithm</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="ident">IndexAlgorithm::BTree</span>,
+    <span class="ident">IndexAlgorithm::Gist</span>,
+    <span class="ident">IndexAlgorithm::Hash</span>,
+    <span class="ident">IndexAlgorithm::Gin</span>,
+    <span class="ident">IndexAlgorithm::SpGist</span>,
+    <span class="ident">IndexAlgorithm::Brin</span>,
 ];
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresDatamodelConnector</span>;
@@ -589,24 +598,9 @@
 
     <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
-            <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">fields</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">native_type_instance</span>(<span class="self">self</span>) {
-                    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>;
-                    <span class="kw">let</span> <span class="ident">r#type</span>: <span class="ident">PostgresType</span> <span class="op">=</span>
-                        <span class="ident">serde_json::from_value</span>(<span class="ident">native_type</span>.<span class="ident">serialized_native_type</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
-                    <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="ident">native_type</span>);
-
-                    <span class="kw">if</span> <span class="ident">r#type</span> <span class="op">==</span> <span class="ident">PostgresType::Xml</span> {
-                        <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_unique</span>() {
-                            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_unique</span>(<span class="string">&quot;&quot;</span>, <span class="ident">span</span>))
-                        } <span class="kw">else</span> {
-                            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_index</span>(<span class="string">&quot;&quot;</span>, <span class="ident">span</span>))
-                        };
-
-                        <span class="kw">break</span>;
-                    }
-                }
-            }
+            <span class="ident">validations::compatible_native_types</span>(<span class="ident">index</span>, <span class="self">self</span>, <span class="ident">errors</span>);
+            <span class="ident">validations::generalized_index_validations</span>(<span class="ident">index</span>, <span class="self">self</span>, <span class="ident">errors</span>);
+            <span class="ident">validations::spgist_indexed_column_count</span>(<span class="ident">index</span>, <span class="ident">errors</span>);
         }
     }
 
@@ -616,6 +610,10 @@
 
     <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">NativeTypeConstructor</span>] {
         <span class="ident">NATIVE_TYPE_CONSTRUCTORS</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">supported_index_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">IndexAlgorithm</span>] {
+        <span class="ident">INDEX_TYPES</span>
     }
 
     <span class="kw">fn</span> <span class="ident">parse_native_type</span>(

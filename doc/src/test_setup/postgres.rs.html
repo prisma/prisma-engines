@@ -80,6 +80,10 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">runtime::run_with_tokio</span>, <span class="ident">AnyError</span>, <span class="ident">Tags</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude::Queryable</span>, <span class="ident">single::Quaint</span>};
@@ -95,6 +99,10 @@
             <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">tags</span>),
             <span class="prelude-val">Some</span>(<span class="ident">version</span>) =&gt; {
                 <span class="macro">eprintln!</span>(<span class="string">&quot;version: {:?}&quot;</span>, <span class="ident">version</span>);
+
+                <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;9.&quot;</span>) {
+                    <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Postgres9</span>;
+                }
 
                 <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;12.&quot;</span>) {
                     <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Postgres12</span>;

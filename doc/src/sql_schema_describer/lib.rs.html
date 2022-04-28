@@ -791,6 +791,15 @@
 <span id="786">786</span>
 <span id="787">787</span>
 <span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::trivial_regex</span>)]</span> <span class="comment">// this is allowed, because we want to do CoW replaces and these regexes will grow.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::match_bool</span>)]</span> <span class="comment">// we respectfully disagree that it makes the code less readable.</span>
@@ -812,6 +821,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
     <span class="ident">error</span>::{<span class="ident">DescriberError</span>, <span class="ident">DescriberErrorKind</span>, <span class="ident">DescriberResult</span>},
     <span class="ident">ids</span>::<span class="kw-2">*</span>,
+    <span class="ident">postgres</span>::{<span class="ident">SQLOperatorClass</span>, <span class="ident">SQLOperatorClassKind</span>},
 };
 
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
@@ -1061,6 +1071,10 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SQLIndexAlgorithm</span> {
     <span class="ident">BTree</span>,
     <span class="ident">Hash</span>,
+    <span class="ident">Gist</span>,
+    <span class="ident">Gin</span>,
+    <span class="ident">SpGist</span>,
+    <span class="ident">Brin</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SQLIndexAlgorithm</span> {
@@ -1074,6 +1088,10 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::BTree</span> =&gt; <span class="string">&quot;BTREE&quot;</span>,
             <span class="ident"><span class="self">Self</span>::Hash</span> =&gt; <span class="string">&quot;HASH&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Gist</span> =&gt; <span class="string">&quot;GIST&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Gin</span> =&gt; <span class="string">&quot;GIN&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::SpGist</span> =&gt; <span class="string">&quot;SPGIST&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Brin</span> =&gt; <span class="string">&quot;BRIN&quot;</span>,
         }
     }
 }

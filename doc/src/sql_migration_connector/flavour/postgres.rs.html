@@ -654,6 +654,19 @@
 <span id="649">649</span>
 <span id="650">650</span>
 <span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">shadow_db</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -661,6 +674,7 @@
     <span class="ident">sql_renderer::IteratorJoin</span>,
     <span class="ident">SqlFlavour</span>,
 };
+<span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
@@ -670,7 +684,7 @@
     <span class="ident">connector</span>::{<span class="ident">tokio_postgres::error::ErrorPosition</span>, <span class="ident">PostgresUrl</span>},
     <span class="ident">prelude::ConnectionInfo</span>,
 };
-<span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
+<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">postgres::PostgresSchemaExt</span>, <span class="ident">SqlSchema</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">future</span>};
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 <span class="kw">use</span> <span class="ident">user_facing_errors</span>::{
@@ -814,6 +828,18 @@ SET serial_normalization = &#39;sql_sequence&#39;;
                     })<span class="question-mark">?</span>;
 
             <span class="ident"><span class="kw">super</span>::normalize_sql_schema</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>);
+
+            <span class="kw">let</span> <span class="ident">pg_ext</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">downcast_connector_data_mut</span>();
+
+            <span class="comment">// Remove this when the feature is GA</span>
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">params</span>
+                .<span class="ident">connector_params</span>
+                .<span class="ident">preview_features</span>
+                .<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>)
+            {
+                <span class="ident">pg_ext</span>.<span class="ident">opclasses</span>.<span class="ident">clear</span>();
+            }
+
             <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)
         })
     }

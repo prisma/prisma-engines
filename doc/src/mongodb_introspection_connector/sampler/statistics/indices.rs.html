@@ -275,6 +275,7 @@
 <span id="270">270</span>
 <span id="271">271</span>
 <span id="272">272</span>
+<span id="273">273</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">convert_case</span>::{<span class="ident">Case</span>, <span class="ident">Casing</span>};
 <span class="kw">use</span> <span class="ident">introspection_connector::Warning</span>;
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer</span>::{<span class="ident">IndexFieldProperty</span>, <span class="ident">IndexWalker</span>};
@@ -347,6 +348,7 @@
                             <span class="ident">IndexFieldProperty::Descending</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::SortOrder::Desc</span>),
                         },
                         <span class="ident">length</span>: <span class="prelude-val">None</span>,
+                        <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
                     }
                 })
                 .<span class="ident">collect</span>();

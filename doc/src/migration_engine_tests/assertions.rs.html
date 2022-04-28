@@ -873,6 +873,34 @@
 <span id="868">868</span>
 <span id="869">869</span>
 <span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">migration_assertions</span>;
 <span class="kw">mod</span> <span class="ident">quaint_result_set_ext</span>;
 
@@ -882,9 +910,10 @@
 <span class="kw">use</span> <span class="ident">datamodel::datamodel_connector::Connector</span>;
 <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
+<span class="kw">use</span> <span class="ident">sql</span>::{<span class="ident">postgres::PostgresSchemaExt</span>, <span class="ident">IndexFieldId</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
     <span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">Column</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">Index</span>,
-    <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>, <span class="ident">SQLIndexAlgorithm</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
+    <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>, <span class="ident">SQLIndexAlgorithm</span>, <span class="ident">SQLOperatorClassKind</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
 };
 <span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">BitFlags</span>, <span class="ident">Tags</span>};
 
@@ -1495,23 +1524,33 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexColumnAssertion</span> {
     <span class="ident">sort_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SQLSortOrder</span><span class="op">&gt;</span>,
     <span class="ident">length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">operator_class</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SQLOperatorClassKind</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">IndexColumnAssertion</span> {
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_sort_order</span>(<span class="self">self</span>, <span class="ident">sort_order</span>: <span class="ident">SQLSortOrder</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">sort_order</span>, <span class="prelude-val">Some</span>(<span class="ident">sort_order</span>));
 
         <span class="self">self</span>
     }
 
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_length_prefix</span>(<span class="self">self</span>, <span class="ident">length</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">length</span>, <span class="prelude-val">Some</span>(<span class="ident">length</span>));
 
         <span class="self">self</span>
     }
 
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_no_length_prefix</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">length</span>, <span class="prelude-val">None</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_ops</span>(<span class="self">self</span>, <span class="ident">ops</span>: <span class="ident">SQLOperatorClassKind</span>) -&gt; <span class="self">Self</span> {
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">operator_class</span>, <span class="prelude-val">Some</span>(<span class="ident">ops</span>));
         <span class="self">self</span>
     }
 }
@@ -1545,6 +1584,7 @@
         <span class="ident">f</span>(<span class="ident">IndexColumnAssertion</span> {
             <span class="ident">length</span>: <span class="ident">col</span>.<span class="ident">length</span>,
             <span class="ident">sort_order</span>: <span class="ident">col</span>.<span class="ident">sort_order</span>,
+            <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
         });
 
         <span class="self">self</span>
@@ -1733,11 +1773,27 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">IndexColumnAssertion</span>) -&gt; <span class="ident">IndexColumnAssertion</span>,
     {
-        <span class="kw">let</span> <span class="ident">col</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">column_name</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> (<span class="ident">col_idx</span>, <span class="ident">col</span>) <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">index</span>
+            .<span class="ident">columns</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">enumerate</span>()
+            .<span class="ident">find</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">c</span>)<span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">column_name</span>)
+            .<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">operator_class</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Postgres</span>) {
+            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+
+            <span class="ident">ext</span>.<span class="ident">get_opclass</span>(<span class="ident">IndexFieldId</span>(<span class="self">self</span>.<span class="ident">index_id</span>, <span class="ident">col_idx</span> <span class="kw">as</span> <span class="ident">u32</span>))
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">kind</span>.<span class="ident">clone</span>())
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        };
 
         <span class="ident">f</span>(<span class="ident">IndexColumnAssertion</span> {
             <span class="ident">sort_order</span>: <span class="ident">col</span>.<span class="ident">sort_order</span>,
             <span class="ident">length</span>: <span class="ident">col</span>.<span class="ident">length</span>,
+            <span class="ident">operator_class</span>,
         });
 
         <span class="self">self</span>

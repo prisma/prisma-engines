@@ -412,13 +412,52 @@
 <span id="407">407</span>
 <span id="408">408</span>
 <span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
-    <span class="ident">types</span>::{<span class="ident">DefaultAttribute</span>, <span class="ident">FieldWithArgs</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>},
+    <span class="ident">types</span>::{<span class="ident">DefaultAttribute</span>, <span class="ident">FieldWithArgs</span>, <span class="ident">OperatorClassStore</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>},
     <span class="ident">walkers</span>::{<span class="ident">EnumWalker</span>, <span class="ident">ModelWalker</span>, <span class="ident">Walker</span>},
-    <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>,
+    <span class="ident">OperatorClass</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>,
 };
 <span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
+<span class="kw">use</span> <span class="ident">either::Either</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::IndexFieldWalker</span>;
 
@@ -666,6 +705,30 @@
     }
 }
 
+<span class="doccomment">/// An operator class defines the operators allowed in an index. Mostly</span>
+<span class="doccomment">/// a PostgreSQL thing.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OperatorClassWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">class</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">OperatorClassStore</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">OperatorClassWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Gets the operator class of the indexed field.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// @@index(name(ops: InetOps))</span>
+    <span class="doccomment">/// //                ^ Either::Left(InetOps)</span>
+    <span class="doccomment">/// @@index(name(ops: raw(&quot;tsvector_ops&quot;)))</span>
+    <span class="doccomment">/// //                ^ Either::Right(&quot;tsvector_ops&quot;)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="ident">Either</span><span class="op">&lt;</span><span class="ident">OperatorClass</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">class</span>.<span class="ident">inner</span> {
+            <span class="ident">Either::Left</span>(<span class="ident">class</span>) =&gt; <span class="ident">Either::Left</span>(<span class="ident">class</span>),
+            <span class="ident">Either::Right</span>(<span class="ident">id</span>) =&gt; <span class="ident">Either::Right</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>]),
+        }
+    }
+}
+
 <span class="doccomment">/// A scalar field as referenced in a key specification (id, index or unique).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
@@ -688,6 +751,19 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">args</span>().<span class="ident">length</span>
+    }
+
+    <span class="doccomment">/// A custom operator class to control the operators catched by the index.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// @@index([name(ops: InetOps)], type: Gist)</span>
+    <span class="doccomment">///                    ^^^^^^^</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">operator_class</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OperatorClassWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">args</span>()
+            .<span class="ident">operator_class</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">class</span><span class="op">|</span> <span class="ident">OperatorClassWalker</span> { <span class="ident">class</span>, <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span> })
     }
 
     <span class="doccomment">/// The underlying field.</span>

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Circumstances",""]],"struct":[["SqlSchemaDescriber",""]]});
+initSidebarItems({"enum":[["Circumstances",""],["SQLOperatorClassKind",""]],"struct":[["PostgresSchemaExt",""],["SQLOperatorClass",""],["SqlSchemaDescriber",""]]});

@@ -42,7 +42,44 @@
 <span id="37">37</span>
 <span id="38">38</span>
 <span id="39">39</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde</span>::<span class="kw-2">*</span>;
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
+
+<span class="kw">use</span> <span class="ident">serde</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
@@ -73,6 +110,39 @@
     <span class="ident">Xml</span>,
     <span class="ident">Json</span>,
     <span class="ident">JsonB</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">PostgresType</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">PostgresType::SmallInt</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;SmallInt&quot;</span>),
+            <span class="ident">PostgresType::Integer</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Integer&quot;</span>),
+            <span class="ident">PostgresType::BigInt</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;BigInt&quot;</span>),
+            <span class="ident">PostgresType::Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Decimal&quot;</span>),
+            <span class="ident">PostgresType::Money</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Money&quot;</span>),
+            <span class="ident">PostgresType::Inet</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Inet&quot;</span>),
+            <span class="ident">PostgresType::Oid</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Oid&quot;</span>),
+            <span class="ident">PostgresType::Citext</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Citext&quot;</span>),
+            <span class="ident">PostgresType::Real</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Real&quot;</span>),
+            <span class="ident">PostgresType::DoublePrecision</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;DoublePrecision&quot;</span>),
+            <span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;VarChar&quot;</span>),
+            <span class="ident">PostgresType::Char</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Char&quot;</span>),
+            <span class="ident">PostgresType::Text</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Text&quot;</span>),
+            <span class="ident">PostgresType::ByteA</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ByteA&quot;</span>),
+            <span class="ident">PostgresType::Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Timestamp&quot;</span>),
+            <span class="ident">PostgresType::Timestamptz</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Timestamptz&quot;</span>),
+            <span class="ident">PostgresType::Date</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Date&quot;</span>),
+            <span class="ident">PostgresType::Time</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Time&quot;</span>),
+            <span class="ident">PostgresType::Timetz</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Timetz&quot;</span>),
+            <span class="ident">PostgresType::Boolean</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Boolean&quot;</span>),
+            <span class="ident">PostgresType::Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Bit&quot;</span>),
+            <span class="ident">PostgresType::VarBit</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;VarBit&quot;</span>),
+            <span class="ident">PostgresType::Uuid</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Uuid&quot;</span>),
+            <span class="ident">PostgresType::Xml</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Xml&quot;</span>),
+            <span class="ident">PostgresType::Json</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Json&quot;</span>),
+            <span class="ident">PostgresType::JsonB</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;JsonB&quot;</span>),
+        }
+    }
 }
 
 <span class="kw">impl</span> <span class="ident"><span class="kw">super</span>::NativeType</span> <span class="kw">for</span> <span class="ident">PostgresType</span> {

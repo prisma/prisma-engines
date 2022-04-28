@@ -226,6 +226,9 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="ident">Argument</span>, <span class="ident">Attribute</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::dml_to_ast::LowerDmlToAst</span>;
@@ -323,12 +326,15 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields_argument</span>(<span class="ident">index_def</span>, <span class="bool-val">false</span>);
                 <span class="self">self</span>.<span class="ident">push_index_map_argument</span>(<span class="ident">datamodel</span>, <span class="ident">model</span>, <span class="ident">index_def</span>, <span class="kw-2">&amp;mut</span> <span class="ident">args</span>);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Hash</span>) <span class="op">=</span> <span class="ident">index_def</span>.<span class="ident">algorithm</span> {
-                    <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">ast::Argument::new</span>(
-                        <span class="string">&quot;type&quot;</span>,
-                        <span class="ident">ast::Expression::ConstantValue</span>(<span class="string">&quot;Hash&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Span::empty</span>()),
-                    ));
-                };
+                <span class="kw">match</span> <span class="ident">index_def</span>.<span class="ident">algorithm</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::BTree</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; (),
+                    <span class="prelude-val">Some</span>(<span class="ident">algo</span>) =&gt; {
+                        <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">ast::Argument::new</span>(
+                            <span class="string">&quot;type&quot;</span>,
+                            <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">algo</span>.<span class="ident">to_string</span>(), <span class="ident">Span::empty</span>()),
+                        ));
+                    }
+                }
 
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>)
                     <span class="op">&amp;&amp;</span> <span class="macro">matches!</span>(<span class="ident">index_def</span>.<span class="ident">clustered</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>))

@@ -543,6 +543,31 @@
 <span id="538">538</span>
 <span id="539">539</span>
 <span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::PostgresFlavour</span>,
@@ -553,7 +578,10 @@
 <span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">CockroachType</span>, <span class="ident">PostgresType</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">regex::RegexSet</span>;
-<span class="kw">use</span> <span class="ident">sql_schema_describer::walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">IndexWalker</span>};
+<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
+    <span class="ident">postgres::PostgresSchemaExt</span>,
+    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">IndexWalker</span>},
+};
 
 <span class="doccomment">/// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.</span>
 <span class="kw">static</span> <span class="ident">POSTGIS_TABLES_OR_VIEWS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">RegexSet</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
@@ -609,6 +637,28 @@
 
     <span class="kw">fn</span> <span class="ident">indexes_should_be_recreated_after_column_drop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">indexes_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">let</span> <span class="ident">columns_previous</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">columns</span>();
+        <span class="kw">let</span> <span class="ident">columns_next</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">columns</span>();
+
+        <span class="kw">let</span> <span class="ident">pg_ext_previous</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">schema</span>().<span class="ident">downcast_connector_data</span>();
+        <span class="kw">let</span> <span class="ident">pg_ext_next</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">schema</span>().<span class="ident">downcast_connector_data</span>();
+
+        <span class="ident">columns_previous</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">columns_next</span>.<span class="ident">len</span>()
+            <span class="op">&amp;&amp;</span> <span class="ident">columns_previous</span>.<span class="ident">zip</span>(<span class="ident">columns_next</span>).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">col_a</span>, <span class="ident">col_b</span>)<span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">a_class</span> <span class="op">=</span> <span class="ident">pg_ext_previous</span>.<span class="ident">get_opclass</span>(<span class="ident">col_a</span>.<span class="ident">index_field_id</span>());
+                <span class="kw">let</span> <span class="ident">b_class</span> <span class="op">=</span> <span class="ident">pg_ext_next</span>.<span class="ident">get_opclass</span>(<span class="ident">col_b</span>.<span class="ident">index_field_id</span>());
+                <span class="kw">let</span> <span class="ident">a_kind</span> <span class="op">=</span> <span class="ident">a_class</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">kind</span>);
+                <span class="kw">let</span> <span class="ident">b_kind</span> <span class="op">=</span> <span class="ident">b_class</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">kind</span>);
+                <span class="kw">let</span> <span class="ident">a_is_default</span> <span class="op">=</span> <span class="ident">a_class</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_default</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
+                <span class="kw">let</span> <span class="ident">b_is_default</span> <span class="op">=</span> <span class="ident">b_class</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_default</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
+
+                <span class="comment">// the dml doesn&#39;t always have opclass defined if it&#39;s the</span>
+                <span class="comment">// default.</span>
+                <span class="ident">a_kind</span> <span class="op">==</span> <span class="ident">b_kind</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">a_class</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">b_is_default</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">b_class</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">a_is_default</span>)
+            })
     }
 
     <span class="kw">fn</span> <span class="ident">index_should_be_renamed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pair</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {

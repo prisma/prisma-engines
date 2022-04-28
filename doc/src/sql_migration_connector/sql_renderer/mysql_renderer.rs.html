@@ -525,6 +525,9 @@
 <span id="520">520</span>
 <span id="521">521</span>
 <span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">common</span>::<span class="kw-2">*</span>, <span class="ident">IteratorJoin</span>, <span class="ident">SqlRenderer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::MysqlFlavour</span>,
@@ -740,6 +743,7 @@
                             <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
                             <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
                         }),
+                        <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
                     })
                     .<span class="ident">collect</span>(),
             ),
@@ -769,6 +773,7 @@
                                 <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
                                 <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
                             }),
+                            <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
                         })
                         .<span class="ident">collect</span>(),
                 })
@@ -782,6 +787,7 @@
                         <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
                         <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
                     }),
+                    <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
                 })
                 .<span class="ident">collect</span>(),
             <span class="ident">default_character_set</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;utf8mb4&quot;</span>.<span class="ident">into</span>()),

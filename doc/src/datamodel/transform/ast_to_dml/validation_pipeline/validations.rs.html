@@ -184,6 +184,7 @@
 <span id="179">179</span>
 <span id="180">180</span>
 <span id="181">181</span>
+<span id="182">182</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -288,6 +289,7 @@
             <span class="ident">indexes::supports_clustering_setting</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
             <span class="ident">indexes::clustering_setting_preview_enabled</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
             <span class="ident">indexes::clustering_can_be_defined_only_once</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::opclasses_are_not_allowed_with_other_than_normal_indices</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
 
             <span class="kw">for</span> <span class="ident">field_attribute</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>() {
                 <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">index</span>

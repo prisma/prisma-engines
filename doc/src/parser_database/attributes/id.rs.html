@@ -250,6 +250,7 @@
 <span id="245">245</span>
 <span id="246">246</span>
 <span id="247">247</span>
+<span id="248">248</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FieldResolutionError</span>, <span class="ident">FieldResolvingSetup</span>};
@@ -443,6 +444,7 @@
                     <span class="ident">path</span>: <span class="ident">IndexFieldPath::new</span>(<span class="ident">field_id</span>),
                     <span class="ident">sort_order</span>,
                     <span class="ident">length</span>,
+                    <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
                 }],
                 <span class="ident">source_field</span>: <span class="prelude-val">Some</span>(<span class="ident">field_id</span>),
                 <span class="ident">clustered</span>,

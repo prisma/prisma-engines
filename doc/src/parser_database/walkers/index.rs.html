@@ -302,6 +302,11 @@
 <span id="297">297</span>
 <span id="298">298</span>
 <span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="ident">IndexAlgorithm</span>, <span class="ident">IndexAttribute</span>},
@@ -436,9 +441,14 @@
         <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">is_unique</span>()
     }
 
-    <span class="doccomment">/// Is this an `@@fulltext`?</span>
+    <span class="doccomment">/// Is this a `@@fulltext`?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fulltext</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">is_fulltext</span>()
+    }
+
+    <span class="doccomment">/// Is this an `@@index`?</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_normal</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">is_normal</span>()
     }
 
     <span class="doccomment">/// True if it&#39;s our implicit unique index.</span>
