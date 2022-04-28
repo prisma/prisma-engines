@@ -299,11 +299,6 @@ mod tests {
         serde_json::to_string_pretty(&dmmf).expect("Failed to render JSON")
     }
 
-    // fn render_to_dmmf_value(schema: &datamodel::dml::Datamodel) -> serde_json::Value {
-    //     let dmmf = schema_to_dmmf(schema);
-    //     serde_json::to_value(&dmmf).expect("Failed to render JSON")
-    // }
-
     #[test]
     fn test_dmmf_rendering() {
         let test_cases = vec![
