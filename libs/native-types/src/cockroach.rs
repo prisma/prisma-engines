@@ -15,6 +15,7 @@ pub enum CockroachType {
     Int4,
     Int8,
     JsonB,
+    Oid,
     SingleChar,
     String(Option<u32>),
     Time(Option<u32>),

@@ -47,6 +47,7 @@ fn all_cockroach_column_types_must_work(api: TestApi) {
             float_col FLOAT,
             int_col INT,
             numeric_col NUMERIC,
+            oid_col OID,
             smallint_col SMALLINT,
             smallserial_col SMALLSERIAL,
             serial_col SERIAL,
@@ -160,6 +161,10 @@ fn all_cockroach_column_types_must_work(api: TestApi) {
         .assert_column("char_col", |c| {
             c.assert_full_data_type("bpchar")
                 .assert_column_type_family(ColumnTypeFamily::String)
+        })
+        .assert_column("oid_col", |c| {
+            c.assert_full_data_type("oid")
+                .assert_column_type_family(ColumnTypeFamily::Int)
         })
         .assert_column("time_col", |c| {
             c.assert_full_data_type("time")

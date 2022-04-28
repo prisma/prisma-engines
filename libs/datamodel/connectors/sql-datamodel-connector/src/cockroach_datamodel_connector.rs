@@ -19,6 +19,7 @@ const INT2_TYPE_NAME: &str = "Int2";
 const INT4_TYPE_NAME: &str = "Int4";
 const INT8_TYPE_NAME: &str = "Int8";
 const JSON_B_TYPE_NAME: &str = "JsonB";
+const OID_TYPE_NAME: &str = "Oid";
 const SINGLE_CHAR_TYPE_NAME: &str = "SingleChar";
 const STRING_TYPE_NAME: &str = "String";
 const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
@@ -50,6 +51,7 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::without_args(INT4_TYPE_NAME, &[ScalarType::Int]),
     NativeTypeConstructor::without_args(INT8_TYPE_NAME, &[ScalarType::BigInt]),
     NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, &[ScalarType::Json]),
+    NativeTypeConstructor::without_args(OID_TYPE_NAME, &[ScalarType::Int]),
     NativeTypeConstructor::without_args(SINGLE_CHAR_TYPE_NAME, &[ScalarType::String]),
     NativeTypeConstructor::without_args(UUID_TYPE_NAME, &[ScalarType::String]),
 ];
@@ -135,6 +137,7 @@ impl Connector for CockroachDatamodelConnector {
             // Int
             CockroachType::Int2 => ScalarType::Int,
             CockroachType::Int4 => ScalarType::Int,
+            CockroachType::Oid => ScalarType::Int,
             // BigInt
             CockroachType::Int8 => ScalarType::BigInt,
             // Float
@@ -248,6 +251,7 @@ impl Connector for CockroachDatamodelConnector {
             BOOL_TYPE_NAME => CockroachType::Bool,
             DATE_TYPE_NAME => CockroachType::Date,
             JSON_B_TYPE_NAME => CockroachType::JsonB,
+            OID_TYPE_NAME => CockroachType::Oid,
             TIME_TYPE_NAME => CockroachType::Time(parse_one_opt_u32(args, TIME_TYPE_NAME, span)?),
             TIME_TZ_TYPE_NAME => CockroachType::Timetz(parse_one_opt_u32(args, TIME_TZ_TYPE_NAME, span)?),
             UUID_TYPE_NAME => CockroachType::Uuid,
@@ -264,6 +268,7 @@ impl Connector for CockroachDatamodelConnector {
             CockroachType::Int2 => (INT2_TYPE_NAME, vec![]),
             CockroachType::Int4 => (INT4_TYPE_NAME, vec![]),
             CockroachType::Int8 => (INT8_TYPE_NAME, vec![]),
+            CockroachType::Oid => (OID_TYPE_NAME, vec![]),
             CockroachType::Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
             CockroachType::Float4 => (FLOAT4_TYPE_NAME, vec![]),
             CockroachType::Float8 => (FLOAT8_TYPE_NAME, vec![]),

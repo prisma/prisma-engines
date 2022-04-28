@@ -987,6 +987,7 @@ fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
             )),
         ),
         "pg_lsn" | "_pg_lsn" => unsupported_type(),
+        "oid" | "_oid" => (Int, Some(CockroachType::Oid)),
         "time" | "_time" => (DateTime, Some(CockroachType::Time(precision.time_precision))),
         "timetz" | "_timetz" => (DateTime, Some(CockroachType::Timetz(precision.time_precision))),
         "timestamp" | "_timestamp" => (DateTime, Some(CockroachType::Timestamp(precision.time_precision))),

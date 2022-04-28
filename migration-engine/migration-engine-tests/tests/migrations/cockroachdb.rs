@@ -110,6 +110,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
         ("smallint", "Int", "Int2", "int2"),
         ("int", "Int", "Int4", "int4"),
         ("bigint", "BigInt", "Int8", "int8"),
+        ("oid", "Int", "Oid", "oid"),
         ("decimal", "Decimal", "Decimal(4, 2)", "numeric"),
         ("decimaldefault", "Decimal", "Decimal", "numeric"),
         ("float4col", "Float", "Float4", "float4"),
