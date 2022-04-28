@@ -729,6 +729,7 @@ dependencies = [
  "datamodel-connector",
  "diagnostics",
  "dml",
+ "either",
  "enumflags2",
  "expect-test",
  "indoc",

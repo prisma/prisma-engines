@@ -31,6 +31,58 @@ fn hash_index() {
 }
 
 #[test]
+fn hash_index_disallows_ops() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a(ops: Int4MinMaxOps)], type: Hash)
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int4MinMaxOps` is not supported with the `Hash` index type.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int4MinMaxOps)], type: Hash)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn btree_index_disallows_ops() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          a  Int
+
+          @@index([a(ops: Int4MinMaxOps)], type: BTree)
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int4MinMaxOps` is not supported with the `BTree` index type.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int4MinMaxOps)], type: BTree)[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
 fn unique_sort_order() {
     let dml = indoc! {r#"
         model A {

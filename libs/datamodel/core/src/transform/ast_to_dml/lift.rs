@@ -5,7 +5,7 @@ use crate::{
 };
 use ::dml::composite_type::{CompositeType, CompositeTypeField, CompositeTypeFieldType};
 use datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity, ScalarType};
-use itertools::Either;
+use either::Either;
 use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.

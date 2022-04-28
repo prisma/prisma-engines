@@ -473,7 +473,8 @@ pub(crate) fn index_algorithm_is_supported(index: IndexWalker<'_>, ctx: &mut Con
     ctx.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
 }
 
-pub(crate) fn cannot_set_index_field_ops_on_unique(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+/// You can use `ops` argument only with a normal index.
+pub(crate) fn opclasses_are_not_allowed_with_other_than_normal_indices(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
     if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
     }
