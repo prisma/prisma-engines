@@ -218,7 +218,7 @@ fn from_jsonb_ops_to_jsonb_path_ops(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9), preview_features("extendedIndexes"))]
 fn compound_index_with_different_ops(api: TestApi) {
     let dm = r#"
         model A {

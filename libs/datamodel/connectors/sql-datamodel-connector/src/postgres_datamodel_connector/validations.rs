@@ -58,6 +58,11 @@ pub(super) fn generalized_index_validations(
     let algo = index.algorithm().unwrap_or(IndexAlgorithm::BTree);
 
     for field in index.scalar_field_attributes() {
+        // No validation for `raw` needed.
+        if field.operator_class().map(|c| c.get().is_right()).unwrap_or(false) {
+            continue;
+        }
+
         let native_type = field
             .as_index_field()
             .native_type_instance(connector)

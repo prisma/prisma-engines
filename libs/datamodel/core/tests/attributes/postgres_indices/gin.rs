@@ -541,3 +541,31 @@ fn array_ops_invalid_index_type() {
 
     expectation.assert_eq(&error)
 }
+
+#[test]
+fn gin_raw_ops_to_supported_type() {
+    let dm = r#"
+        model A {
+          id   Int     @id @default(autoincrement())
+          data String? @test.VarChar
+
+          @@index([data(ops: raw("gin_trgm_ops"))], type: Gin)
+        }
+    "#;
+
+    let schema = with_header(dm, Provider::Postgres, &["extendedIndexes"]);
+    let schema = parse(&schema);
+
+    let mut field = IndexField::new_in_model("data");
+    field.operator_class = Some(OperatorClass::raw("gin_trgm_ops"));
+
+    schema.assert_has_model("A").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("A_data_idx".to_string()),
+        fields: vec![field],
+        tpe: IndexType::Normal,
+        defined_on_field: false,
+        algorithm: Some(IndexAlgorithm::Gin),
+        clustered: None,
+    });
+}
