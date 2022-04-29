@@ -11,8 +11,9 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
-    postgres::PostgresSchemaExt, walkers::*, ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue,
-    ForeignKeyAction, SQLSortOrder, SqlIndexAlgorithm, SqlSchema,
+    postgres::{PostgresSchemaExt, SqlIndexAlgorithm},
+    walkers::*,
+    ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
 };
 use std::borrow::Cow;
 
@@ -256,7 +257,7 @@ impl SqlRenderer for PostgresFlavour {
             index_name: index.name().into(),
             is_unique: index.index_type().is_unique(),
             table_reference: index.table().name().into(),
-            using: index.algorithm().map(|algo| match algo {
+            using: Some(match pg_ext.index_algorithm(index.index_id()) {
                 SqlIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
                 SqlIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,
                 SqlIndexAlgorithm::Gist => ddl::IndexAlgorithm::Gist,

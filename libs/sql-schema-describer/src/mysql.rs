@@ -557,7 +557,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 name: index_name,
                                 columns: vec![column],
                                 tpe,
-                                algorithm: None,
                             },
                         );
                     }

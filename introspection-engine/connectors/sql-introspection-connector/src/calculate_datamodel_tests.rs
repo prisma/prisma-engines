@@ -423,7 +423,6 @@ mod tests {
                 name: "unique_unique".to_string(),
                 columns: vec![IndexColumn::new("unique")],
                 tpe: IndexType::Unique,
-                algorithm: None,
             }],
             primary_key: None,
             foreign_keys: vec![],
@@ -821,7 +820,6 @@ mod tests {
                 name: "name_last_name_unique".to_string(),
                 columns: vec![IndexColumn::new("name"), IndexColumn::new("lastname")],
                 tpe: IndexType::Unique,
-                algorithm: None,
             }],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("id")],

@@ -8,7 +8,7 @@ use datamodel::{
     dml::{prisma_value, PrismaValue},
     parser_database::{
         walkers::{ModelWalker, ScalarFieldWalker},
-        IndexAlgorithm, IndexType, ScalarFieldType, SortOrder,
+        IndexType, ScalarFieldType, SortOrder,
     },
     schema_ast::ast::{self, FieldArity},
     ValidatedSchema,
@@ -80,21 +80,10 @@ fn push_model_tables(ctx: &mut Context<'_>) {
                     IndexType::Fulltext => sql::IndexType::Fulltext,
                 };
 
-                let algorithm = index.algorithm().map(|algo| match algo {
-                    IndexAlgorithm::BTree => sql::SqlIndexAlgorithm::BTree,
-                    IndexAlgorithm::Hash => sql::SqlIndexAlgorithm::Hash,
-                    IndexAlgorithm::Gist => sql::SqlIndexAlgorithm::Gist,
-                    IndexAlgorithm::Gin => sql::SqlIndexAlgorithm::Gin,
-                    IndexAlgorithm::SpGist => sql::SqlIndexAlgorithm::SpGist,
-                    IndexAlgorithm::Brin => sql::SqlIndexAlgorithm::Brin,
-                });
-
                 sql::Index {
                     name: index.constraint_name(ctx.flavour.datamodel_connector()).into_owned(),
-                    // The model index definition uses the model field names, but the SQL Index wants the column names.
                     columns,
                     tpe: index_type,
-                    algorithm,
                 }
             })
             .collect();
@@ -219,7 +208,6 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                     sql::IndexColumn::new(model_b_column),
                 ],
                 tpe: sql::IndexType::Unique,
-                algorithm: None,
             },
             sql::Index {
                 name: format!(
@@ -228,7 +216,6 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 ),
                 columns: vec![sql::IndexColumn::new(model_b_column)],
                 tpe: sql::IndexType::Normal,
-                algorithm: None,
             },
         ];
 

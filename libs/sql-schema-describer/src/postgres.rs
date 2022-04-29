@@ -23,6 +23,41 @@ pub struct Sequence {
     pub name: String,
 }
 
+#[derive(PartialEq, Debug, Clone, Copy)]
+pub enum SqlIndexAlgorithm {
+    BTree,
+    Hash,
+    Gist,
+    Gin,
+    SpGist,
+    Brin,
+}
+
+impl Default for SqlIndexAlgorithm {
+    fn default() -> Self {
+        Self::BTree
+    }
+}
+
+impl AsRef<str> for SqlIndexAlgorithm {
+    fn as_ref(&self) -> &str {
+        match self {
+            Self::BTree => "BTREE",
+            Self::Hash => "HASH",
+            Self::Gist => "GIST",
+            Self::Gin => "GIN",
+            Self::SpGist => "SPGIST",
+            Self::Brin => "BRIN",
+        }
+    }
+}
+
+impl fmt::Display for SqlIndexAlgorithm {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
+    }
+}
+
 #[enumflags2::bitflags]
 #[derive(Clone, Copy, Debug)]
 #[repr(u8)]
@@ -47,11 +82,19 @@ impl Debug for SqlSchemaDescriber<'_> {
 #[derive(Default, Debug)]
 pub struct PostgresSchemaExt {
     pub opclasses: Vec<(IndexFieldId, SQLOperatorClass)>,
+    pub indexes: Vec<(IndexId, SqlIndexAlgorithm)>,
     /// The schema's sequences.
     pub sequences: Vec<Sequence>,
 }
 
 impl PostgresSchemaExt {
+    pub fn index_algorithm(&self, index_id: IndexId) -> SqlIndexAlgorithm {
+        match self.indexes.binary_search_by_key(&index_id, |(id, _)| *id) {
+            Ok(i) => self.indexes[i].1,
+            Err(_) => panic!("No index algorithm stored for {:?}", index_id),
+        }
+    }
+
     pub fn get_opclass(&self, index_field_id: IndexFieldId) -> Option<&SQLOperatorClass> {
         let idx = self
             .opclasses
@@ -61,13 +104,13 @@ impl PostgresSchemaExt {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct SQLOperatorClass {
     pub kind: SQLOperatorClassKind,
     pub is_default: bool,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum SQLOperatorClassKind {
     /// GiST + inet type
     InetOps,
@@ -338,12 +381,6 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
         let mut pg_ext = PostgresSchemaExt::default();
-
-        self.get_sequences(schema, &mut pg_ext).await?;
-        let enums = self.get_enums(schema).await?;
-        let mut columns = self.get_columns(schema, &enums, &pg_ext.sequences).await?;
-        let mut foreign_keys = self.get_foreign_keys(schema).await?;
-
         let table_names = self.get_table_names(schema).await?;
 
         let table_ids = table_names
@@ -352,18 +389,23 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
             .map(|(idx, name)| (name.clone(), TableId(idx as u32)))
             .collect();
 
+        self.get_sequences(schema, &mut pg_ext).await?;
+        let enums = self.get_enums(schema).await?;
+        let mut columns = self.get_columns(schema, &enums, &table_ids, &pg_ext.sequences).await?;
+        let mut foreign_keys = self.get_foreign_keys(schema).await?;
+
         let mut indexes = self.get_indices(schema, &mut pg_ext, &table_ids).await?;
         let mut tables = Vec::with_capacity(table_names.len());
 
         if self.is_cockroach() {
+            let mut table_columns = HashSet::new();
             // Currently, we ignore all hidden columns from CockroachDB.
             // However, these still show up from get_indices, where CockroachDB can place implicit
             // columns in front of indexes and primary keys.
             // For now, remove all hidden columns from the indexes and PK, removing them as an index
             // or PK if every column is implicit.
-            for (table_name, table_indexes) in indexes.iter_mut() {
-                let mut table_columns = HashSet::new();
-                if let Some(val) = columns.get(table_name) {
+            for (table_id, table_indexes) in indexes.iter_mut() {
+                if let Some(val) = columns.get(table_id) {
                     for c in val {
                         table_columns.insert(c.name.to_string());
                     }
@@ -383,15 +425,26 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
                     index.columns.retain(|c| table_columns.iter().any(|tc| tc == c.name()))
                 }
                 indexes.retain(|i| !i.columns.is_empty());
+                table_columns.clear();
             }
         }
 
-        for table_name in &table_names {
-            tables.push(self.get_table(table_name, &mut columns, &mut foreign_keys, &mut indexes));
+        for (table_idx, table_name) in table_names.iter().enumerate() {
+            tables.push(self.get_table(
+                table_name,
+                TableId(table_idx as u32),
+                &mut columns,
+                &mut foreign_keys,
+                &mut indexes,
+            ));
         }
 
         let views = self.get_views(schema).await?;
         let procedures = self.get_procedures(schema).await?;
+
+        // Make sure the vectors we use binary search on are sorted.
+        pg_ext.indexes.sort_by_key(|(id, _)| *id);
+        pg_ext.opclasses.sort_by_key(|(id, _)| *id);
 
         Ok(SqlSchema {
             enums,
@@ -521,13 +574,14 @@ impl<'a> SqlSchemaDescriber<'a> {
     fn get_table(
         &self,
         name: &str,
-        columns: &mut BTreeMap<String, Vec<Column>>,
+        id: TableId,
+        columns: &mut BTreeMap<TableId, Vec<Column>>,
         foreign_keys: &mut BTreeMap<String, Vec<ForeignKey>>,
-        indices: &mut BTreeMap<String, (Vec<Index>, Option<PrimaryKey>)>,
+        indices: &mut BTreeMap<TableId, (Vec<Index>, Option<PrimaryKey>)>,
     ) -> Table {
-        let (indices, primary_key) = indices.remove(name).unwrap_or_else(|| (Vec::new(), None));
+        let (indices, primary_key) = indices.remove(&id).unwrap_or_else(|| (Vec::new(), None));
         let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
-        let columns = columns.remove(name).unwrap_or_default();
+        let columns = columns.remove(&id).unwrap_or_default();
         Table {
             name: name.to_string(),
             columns,
@@ -562,9 +616,10 @@ impl<'a> SqlSchemaDescriber<'a> {
         &self,
         schema: &str,
         enums: &[Enum],
+        table_ids: &HashMap<String, TableId>,
         sequences: &[Sequence],
-    ) -> DescriberResult<BTreeMap<String, Vec<Column>>> {
-        let mut columns: BTreeMap<String, Vec<Column>> = BTreeMap::new();
+    ) -> DescriberResult<BTreeMap<TableId, Vec<Column>>> {
+        let mut columns: BTreeMap<TableId, Vec<Column>> = BTreeMap::new();
 
         let is_visible_clause = if self.is_cockroach() {
             " AND info.is_hidden = 'NO'"
@@ -609,6 +664,10 @@ impl<'a> SqlSchemaDescriber<'a> {
         for col in rows {
             trace!("Got column: {:?}", col);
             let table_name = col.get_expect_string("table_name");
+            let table_id = match table_ids.get(&table_name) {
+                Some(table_id) => table_id,
+                None => continue, // we only care about columns in tables we have access to
+            };
             let name = col.get_expect_string("column_name");
 
             let is_identity = match col.get_string("is_identity") {
@@ -645,7 +704,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 auto_increment,
             };
 
-            columns.entry(table_name).or_default().push(col);
+            columns.entry(*table_id).or_default().push(col);
         }
 
         trace!("Found table columns: {:?}", columns);
@@ -846,7 +905,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         schema: &str,
         pg_ext: &mut PostgresSchemaExt,
         table_ids: &HashMap<String, TableId>,
-    ) -> DescriberResult<BTreeMap<String, (Vec<Index>, Option<PrimaryKey>)>> {
+    ) -> DescriberResult<BTreeMap<TableId, (Vec<Index>, Option<PrimaryKey>)>> {
         let mut indexes_map = BTreeMap::new();
 
         let sql = r#"
@@ -936,20 +995,22 @@ impl<'a> SqlSchemaDescriber<'a> {
                 ),
             });
 
-            let algorithm = match row.get_string("index_algo").as_deref() {
-                Some("btree") => Some(SqlIndexAlgorithm::BTree),
-                Some("hash") => Some(SqlIndexAlgorithm::Hash),
-                Some("gist") => Some(SqlIndexAlgorithm::Gist),
-                Some("gin") => Some(SqlIndexAlgorithm::Gin),
-                Some("spgist") => Some(SqlIndexAlgorithm::SpGist),
-                Some("brin") => Some(SqlIndexAlgorithm::Brin),
-                _ => None,
+            let algorithm = match row.get_expect_string("index_algo").as_str() {
+                "btree" => SqlIndexAlgorithm::BTree,
+                "hash" => SqlIndexAlgorithm::Hash,
+                "gist" => SqlIndexAlgorithm::Gist,
+                "gin" => SqlIndexAlgorithm::Gin,
+                "spgist" => SqlIndexAlgorithm::SpGist,
+                "brin" => SqlIndexAlgorithm::Brin,
+                other => {
+                    tracing::warn!("Unknown index algorithm on {name}: {other}");
+                    SqlIndexAlgorithm::BTree
+                }
             };
 
             if is_primary_key {
-                let entry: &mut (Vec<_>, Option<PrimaryKey>) = indexes_map
-                    .entry(table_name.clone())
-                    .or_insert_with(|| (Vec::new(), None));
+                let entry: &mut (Vec<_>, Option<PrimaryKey>) =
+                    indexes_map.entry(table_id).or_insert_with(|| (Vec::new(), None));
 
                 match entry.1.as_mut() {
                     Some(pk) => {
@@ -963,27 +1024,29 @@ impl<'a> SqlSchemaDescriber<'a> {
                     }
                 }
             } else {
-                let operator_class = algorithm
-                    .filter(|alg| !matches!(alg, SqlIndexAlgorithm::BTree | SqlIndexAlgorithm::Hash))
-                    .and_then(|_| {
-                        row.get_string("opclass")
-                            .map(|c| (c, row.get_bool("opcdefault").unwrap_or_default()))
-                    })
-                    .map(|(c, is_default)| SQLOperatorClass {
-                        kind: SQLOperatorClassKind::from(c.as_str()),
-                        is_default,
-                    });
+                let operator_class = if !matches!(algorithm, SqlIndexAlgorithm::BTree | SqlIndexAlgorithm::Hash) {
+                    row.get_string("opclass")
+                        .map(|c| (c, row.get_bool("opcdefault").unwrap_or_default()))
+                        .map(|(c, is_default)| SQLOperatorClass {
+                            kind: SQLOperatorClassKind::from(c.as_str()),
+                            is_default,
+                        })
+                } else {
+                    None
+                };
 
-                let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
+                let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_id).or_insert_with(|| (Vec::new(), None));
 
                 let mut column = IndexColumn::new(column_name);
                 column.sort_order = sort_order;
 
                 if let Some(index_id) = entry.0.iter_mut().position(|idx| idx.name == name) {
                     let existing_index = &mut entry.0[index_id];
+                    let index_id = IndexId(table_id, index_id as u32);
+
+                    pg_ext.indexes.push((index_id, algorithm));
 
                     if let Some(opclass) = operator_class {
-                        let index_id = IndexId(table_id, index_id as u32);
                         let index_field_id = IndexFieldId(index_id, existing_index.columns.len() as u32);
 
                         pg_ext.opclasses.push((index_field_id, opclass));
@@ -991,8 +1054,11 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                     existing_index.columns.push(column);
                 } else {
+                    let index_id = IndexId(table_id, entry.0.len() as u32);
+
+                    pg_ext.indexes.push((index_id, algorithm));
+
                     if let Some(opclass) = operator_class {
-                        let index_id = IndexId(table_id, entry.0.len() as u32);
                         let index_field_id = IndexFieldId(index_id, 0);
 
                         pg_ext.opclasses.push((index_field_id, opclass));
@@ -1005,7 +1071,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                             true => IndexType::Unique,
                             false => IndexType::Normal,
                         },
-                        algorithm,
                     })
                 }
             }

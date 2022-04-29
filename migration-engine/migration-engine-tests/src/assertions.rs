@@ -9,8 +9,10 @@ use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use sql::{postgres::PostgresSchemaExt, IndexFieldId};
 use sql_schema_describer::{
-    self as sql, postgres::SQLOperatorClassKind, Column, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey,
-    ForeignKeyAction, Index, IndexType, PrimaryKey, SQLSortOrder, SqlIndexAlgorithm, SqlSchema, Table,
+    self as sql,
+    postgres::{SQLOperatorClassKind, SqlIndexAlgorithm},
+    Column, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
+    PrimaryKey, SQLSortOrder, SqlSchema, Table,
 };
 use test_setup::{BitFlags, Tags};
 
@@ -861,7 +863,9 @@ impl<'a> IndexAssertion<'a> {
     }
 
     pub fn assert_algorithm(self, algo: SqlIndexAlgorithm) -> Self {
-        assert_eq!(self.index.algorithm, Some(algo));
+        let postgres_ext: &PostgresSchemaExt = self.schema.downcast_connector_data();
+        let algorithm = postgres_ext.index_algorithm(self.index_id);
+        assert_eq!(algorithm, algo);
 
         self
     }
