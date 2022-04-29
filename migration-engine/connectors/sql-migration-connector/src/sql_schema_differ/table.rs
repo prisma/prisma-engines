@@ -186,6 +186,5 @@ fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>, flavour: &dy
             names_match && lengths_match && orders_match
         })
         && first.index_type() == second.index_type()
-        && first.algorithm().unwrap_or_default() == second.algorithm().unwrap_or_default()
         && flavour.indexes_match(*first, *second)
 }

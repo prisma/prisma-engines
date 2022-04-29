@@ -168,6 +168,9 @@ impl SqlFlavour for PostgresFlavour {
                 .preview_features
                 .contains(PreviewFeature::ExtendedIndexes)
             {
+                for idx in &mut pg_ext.indexes {
+                    idx.1 = sql_schema_describer::postgres::SqlIndexAlgorithm::BTree;
+                }
                 pg_ext.opclasses.clear();
             }
 

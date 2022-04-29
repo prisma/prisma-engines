@@ -139,6 +139,11 @@ impl ParserDatabase {
     pub fn ast(&self) -> &ast::SchemaAst {
         &self.ast
     }
+
+    /// The total number of models.
+    pub fn models_count(&self) -> usize {
+        self.types.model_attributes.len()
+    }
 }
 
 impl std::fmt::Debug for ParserDatabase {

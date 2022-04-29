@@ -137,20 +137,13 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Intros
         IndexType::Fulltext => datamodel::dml::IndexType::Normal,
     };
 
-    //We do not populate name in client by default. It increases datamodel noise,
-    //and we would need to sanitize it. Users can give their own names if they want
-    //and re-introspection will keep them. This is a change in introspection behaviour,
-    //but due to re-introspection previous datamodels and clients should keep working as before.
+    // We do not populate name in client by default. It increases datamodel noise, and we would
+    // need to sanitize it. Users can give their own names if they want and re-introspection will
+    // keep them. This is a change in introspection behaviour, but due to re-introspection previous
+    // datamodels and clients should keep working as before.
 
     let using = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        index.algorithm().map(|algo| match algo {
-            sql::SqlIndexAlgorithm::BTree => IndexAlgorithm::BTree,
-            sql::SqlIndexAlgorithm::Hash => IndexAlgorithm::Hash,
-            sql::SqlIndexAlgorithm::Gist => IndexAlgorithm::Gist,
-            sql::SqlIndexAlgorithm::Gin => IndexAlgorithm::Gin,
-            sql::SqlIndexAlgorithm::SpGist => IndexAlgorithm::SpGist,
-            sql::SqlIndexAlgorithm::Brin => IndexAlgorithm::Brin,
-        })
+        index_algorithm(index, ctx)
     } else {
         None
     };
@@ -535,6 +528,23 @@ pub fn replace_index_field_names(target: &mut Vec<IndexField>, old_name: &str, n
             }
         })
         .for_each(drop);
+}
+
+fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &IntrospectionContext) -> Option<IndexAlgorithm> {
+    if !ctx.sql_family().is_postgres() {
+        return None;
+    }
+
+    let data: &PostgresSchemaExt = index.schema().downcast_connector_data();
+
+    Some(match data.index_algorithm(index.index_id()) {
+        sql::postgres::SqlIndexAlgorithm::BTree => IndexAlgorithm::BTree,
+        sql::postgres::SqlIndexAlgorithm::Hash => IndexAlgorithm::Hash,
+        sql::postgres::SqlIndexAlgorithm::Gist => IndexAlgorithm::Gist,
+        sql::postgres::SqlIndexAlgorithm::Gin => IndexAlgorithm::Gin,
+        sql::postgres::SqlIndexAlgorithm::SpGist => IndexAlgorithm::SpGist,
+        sql::postgres::SqlIndexAlgorithm::Brin => IndexAlgorithm::Brin,
+    })
 }
 
 fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &IntrospectionContext) -> Option<bool> {

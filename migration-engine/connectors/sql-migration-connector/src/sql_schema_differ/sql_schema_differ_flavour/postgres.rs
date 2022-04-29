@@ -75,8 +75,11 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 
         let pg_ext_previous: &PostgresSchemaExt = a.schema().downcast_connector_data();
         let pg_ext_next: &PostgresSchemaExt = b.schema().downcast_connector_data();
+        let previous_algo = pg_ext_previous.index_algorithm(a.index_id());
+        let next_algo = pg_ext_next.index_algorithm(b.index_id());
 
         columns_previous.len() == columns_next.len()
+            && previous_algo == next_algo
             && columns_previous.zip(columns_next).all(|(col_a, col_b)| {
                 let a_class = pg_ext_previous.get_opclass(col_a.index_field_id());
                 let b_class = pg_ext_next.get_opclass(col_b.index_field_id());

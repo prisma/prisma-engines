@@ -571,7 +571,6 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     length: None,
                 }],
                 tpe: IndexType::Unique,
-                algorithm: Some(SqlIndexAlgorithm::BTree),
             },],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("primary_col")],
@@ -585,6 +584,17 @@ fn all_postgres_column_types_must_work(api: TestApi) {
     let expected_ext = expect![[r#"
         PostgresSchemaExt {
             opclasses: [],
+            indexes: [
+                (
+                    IndexId(
+                        TableId(
+                            0,
+                        ),
+                        0,
+                    ),
+                    BTree,
+                ),
+            ],
             sequences: [
                 Sequence {
                     name: "User_bigserial_col_seq",
@@ -705,6 +715,7 @@ fn postgres_sequences_must_work(api: TestApi) {
     let expected_ext = expect![[r#"
         PostgresSchemaExt {
             opclasses: [],
+            indexes: [],
             sequences: [
                 Sequence {
                     name: "test",

@@ -33,7 +33,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
     }
 
     fn push_connector_data(&self, context: &mut super::super::Context<'_>) {
-        let mut data = PostgresSchemaExt::default();
+        let mut postgres_ext = PostgresSchemaExt::default();
         let db = &context.datamodel.db;
 
         for (table_idx, model) in db.walk_models().enumerate() {
@@ -42,6 +42,16 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             for (index_index, index) in model.indexes().enumerate() {
                 let index_id = sql::IndexId(table_id, index_index as u32);
 
+                let sql_index_algorithm = match index.algorithm() {
+                    Some(IndexAlgorithm::BTree) | None => sql::postgres::SqlIndexAlgorithm::BTree,
+                    Some(IndexAlgorithm::Gin) => sql::postgres::SqlIndexAlgorithm::Gin,
+                    Some(IndexAlgorithm::Hash) => sql::postgres::SqlIndexAlgorithm::Hash,
+                    Some(IndexAlgorithm::SpGist) => sql::postgres::SqlIndexAlgorithm::SpGist,
+                    Some(IndexAlgorithm::Gist) => sql::postgres::SqlIndexAlgorithm::Gist,
+                    Some(IndexAlgorithm::Brin) => sql::postgres::SqlIndexAlgorithm::Brin,
+                };
+                postgres_ext.indexes.push((index_id, sql_index_algorithm));
+
                 for (field_idx, attrs) in index.scalar_field_attributes().enumerate() {
                     if let Some(opclass) = attrs.operator_class() {
                         let field_id = sql::IndexFieldId(index_id, field_idx as u32);
@@ -49,18 +59,35 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                         let opclass = match opclass.get() {
                             Either::Left(class) => convert_opclass(class, index.algorithm()),
                             Either::Right(s) => sql::postgres::SQLOperatorClass {
-                                kind: sql::postgres::SQLOperatorClassKind::Raw(s.to_string()),
+                                kind: sql::postgres::SQLOperatorClassKind::Raw(s.to_owned()),
                                 is_default: false,
                             },
                         };
 
-                        data.opclasses.push((field_id, opclass));
+                        postgres_ext.opclasses.push((field_id, opclass));
                     }
                 }
             }
         }
 
-        context.schema.describer_schema.set_connector_data(Box::new(data));
+        // Add index algorithms for implicit m2m relation tables
+        let models_count = db.models_count();
+        let tables_count = context.schema.describer_schema.tables.len();
+        for table_idx in models_count..tables_count {
+            postgres_ext.indexes.push((
+                sql::IndexId(sql::TableId(table_idx as u32), 0),
+                sql::postgres::SqlIndexAlgorithm::BTree,
+            ));
+            postgres_ext.indexes.push((
+                sql::IndexId(sql::TableId(table_idx as u32), 1),
+                sql::postgres::SqlIndexAlgorithm::BTree,
+            ));
+        }
+
+        context
+            .schema
+            .describer_schema
+            .set_connector_data(Box::new(postgres_ext));
     }
 }
 

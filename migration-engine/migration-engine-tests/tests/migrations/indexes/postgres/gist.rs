@@ -1,5 +1,5 @@
 use migration_engine_tests::test_api::*;
-use sql_schema_describer::{postgres::SQLOperatorClassKind, SqlIndexAlgorithm};
+use sql_schema_describer::postgres::{SQLOperatorClassKind, SqlIndexAlgorithm};
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn gist_preview_disabled(api: TestApi) {

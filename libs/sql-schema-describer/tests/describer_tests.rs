@@ -310,12 +310,6 @@ fn indices_must_work(api: TestApi) {
     assert_eq!("User", user_table.name);
     assert_eq!(expected_columns, user_table.columns);
 
-    let algorithm = if api.is_postgres() && !api.is_cockroach() {
-        Some(SqlIndexAlgorithm::BTree)
-    } else {
-        None
-    };
-
     assert_eq!(
         vec![Index {
             name: "count".to_string(),
@@ -325,7 +319,6 @@ fn indices_must_work(api: TestApi) {
                 length: None,
             }],
             tpe: IndexType::Normal,
-            algorithm,
         }],
         user_table.indices
     );
