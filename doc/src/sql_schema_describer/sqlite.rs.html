@@ -584,7 +584,6 @@
 <span id="579">579</span>
 <span id="580">580</span>
 <span id="581">581</span>
-<span id="582">582</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQLite description.</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::purge_dangling_foreign_keys</span>, <span class="ident">getters::Getter</span>, <span class="ident">parsers::Parser</span>, <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>,
@@ -890,7 +889,6 @@
             <span class="macro">trace!</span>(<span class="string">&quot;Determined that table has primary key with columns {:?}&quot;</span>, <span class="ident">columns</span>);
             <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> {
                 <span class="ident">columns</span>,
-                <span class="ident">sequence</span>: <span class="prelude-val">None</span>,
                 <span class="ident">constraint_name</span>: <span class="prelude-val">None</span>,
             })
         };

@@ -456,7 +456,6 @@
 <span id="451">451</span>
 <span id="452">452</span>
 <span id="453">453</span>
-<span id="454">454</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">sql_schema_calculator_flavour</span>;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use</span> <span class="ident">sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour</span>;
@@ -513,7 +512,6 @@
                     }),
                 })
                 .<span class="ident">collect</span>(),
-            <span class="ident">sequence</span>: <span class="prelude-val">None</span>,
             <span class="ident">constraint_name</span>: <span class="ident">pk</span>
                 .<span class="ident">constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">flavour</span>.<span class="ident">datamodel_connector</span>())
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into_owned</span>()),
@@ -541,12 +539,12 @@
                 };
 
                 <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">algorithm</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">algo</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">algo</span> {
-                    <span class="ident">IndexAlgorithm::BTree</span> =&gt; <span class="ident">sql::SQLIndexAlgorithm::BTree</span>,
-                    <span class="ident">IndexAlgorithm::Hash</span> =&gt; <span class="ident">sql::SQLIndexAlgorithm::Hash</span>,
-                    <span class="ident">IndexAlgorithm::Gist</span> =&gt; <span class="ident">sql::SQLIndexAlgorithm::Gist</span>,
-                    <span class="ident">IndexAlgorithm::Gin</span> =&gt; <span class="ident">sql::SQLIndexAlgorithm::Gin</span>,
-                    <span class="ident">IndexAlgorithm::SpGist</span> =&gt; <span class="ident">sql::SQLIndexAlgorithm::SpGist</span>,
-                    <span class="ident">IndexAlgorithm::Brin</span> =&gt; <span class="ident">sql::SQLIndexAlgorithm::Brin</span>,
+                    <span class="ident">IndexAlgorithm::BTree</span> =&gt; <span class="ident">sql::SqlIndexAlgorithm::BTree</span>,
+                    <span class="ident">IndexAlgorithm::Hash</span> =&gt; <span class="ident">sql::SqlIndexAlgorithm::Hash</span>,
+                    <span class="ident">IndexAlgorithm::Gist</span> =&gt; <span class="ident">sql::SqlIndexAlgorithm::Gist</span>,
+                    <span class="ident">IndexAlgorithm::Gin</span> =&gt; <span class="ident">sql::SqlIndexAlgorithm::Gin</span>,
+                    <span class="ident">IndexAlgorithm::SpGist</span> =&gt; <span class="ident">sql::SqlIndexAlgorithm::SpGist</span>,
+                    <span class="ident">IndexAlgorithm::Brin</span> =&gt; <span class="ident">sql::SqlIndexAlgorithm::Brin</span>,
                 });
 
                 <span class="ident">sql::Index</span> {

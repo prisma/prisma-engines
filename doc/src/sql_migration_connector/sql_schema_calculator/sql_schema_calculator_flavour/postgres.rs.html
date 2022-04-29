@@ -347,13 +347,13 @@
 
                         <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">opclass</span>.<span class="ident">get</span>() {
                             <span class="ident">Either::Left</span>(<span class="ident">class</span>) =&gt; <span class="ident">convert_opclass</span>(<span class="ident">class</span>, <span class="ident">index</span>.<span class="ident">algorithm</span>()),
-                            <span class="ident">Either::Right</span>(<span class="ident">s</span>) =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-                                <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Raw</span>(<span class="ident">s</span>.<span class="ident">to_string</span>()),
+                            <span class="ident">Either::Right</span>(<span class="ident">s</span>) =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+                                <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Raw</span>(<span class="ident">s</span>.<span class="ident">to_string</span>()),
                                 <span class="ident">is_default</span>: <span class="bool-val">false</span>,
                             },
                         };
 
-                        <span class="ident">data</span>.<span class="ident">opclasses</span>.<span class="ident">insert</span>(<span class="ident">field_id</span>, <span class="ident">opclass</span>);
+                        <span class="ident">data</span>.<span class="ident">opclasses</span>.<span class="ident">push</span>((<span class="ident">field_id</span>, <span class="ident">opclass</span>));
                     }
                 }
             }
@@ -363,230 +363,230 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">convert_opclass</span>(<span class="ident">opclass</span>: <span class="ident">OperatorClass</span>, <span class="ident">algo</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span>) -&gt; <span class="ident">sql::SQLOperatorClass</span> {
+<span class="kw">fn</span> <span class="ident">convert_opclass</span>(<span class="ident">opclass</span>: <span class="ident">OperatorClass</span>, <span class="ident">algo</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span>) -&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
     <span class="kw">match</span> <span class="ident">opclass</span> {
-        <span class="ident">OperatorClass::InetOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::InetOps</span>,
+        <span class="ident">OperatorClass::InetOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::InetOps</span>,
             <span class="ident">is_default</span>: <span class="ident">algo</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">is_spgist</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>),
         },
-        <span class="ident">OperatorClass::JsonbOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::JsonbOps</span>,
+        <span class="ident">OperatorClass::JsonbOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::JsonbOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::JsonbPathOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::JsonbPathOps</span>,
+        <span class="ident">OperatorClass::JsonbPathOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::JsonbPathOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::ArrayOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::ArrayOps</span>,
+        <span class="ident">OperatorClass::ArrayOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::ArrayOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::TextOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TextOps</span>,
+        <span class="ident">OperatorClass::TextOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TextOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::BitMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::BitMinMaxOps</span>,
+        <span class="ident">OperatorClass::BitMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::BitMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::VarBitMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::VarBitMinMaxOps</span>,
+        <span class="ident">OperatorClass::VarBitMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::VarBitMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::BpcharBloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::BpcharBloomOps</span>,
+        <span class="ident">OperatorClass::BpcharBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::BpcharBloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::BpcharMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::BpcharMinMaxOps</span>,
+        <span class="ident">OperatorClass::BpcharMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::BpcharMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::ByteaBloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::ByteaBloomOps</span>,
+        <span class="ident">OperatorClass::ByteaBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::ByteaBloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::ByteaMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::ByteaMinMaxOps</span>,
+        <span class="ident">OperatorClass::ByteaMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::ByteaMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::DateBloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::DateBloomOps</span>,
+        <span class="ident">OperatorClass::DateBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::DateBloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::DateMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::DateMinMaxOps</span>,
+        <span class="ident">OperatorClass::DateMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::DateMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::DateMinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::DateMinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::DateMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::DateMinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Float4BloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Float4BloomOps</span>,
+        <span class="ident">OperatorClass::Float4BloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Float4BloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Float4MinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Float4MinMaxOps</span>,
+        <span class="ident">OperatorClass::Float4MinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Float4MinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::Float4MinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Float4MinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::Float4MinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Float4MinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Float8BloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Float8BloomOps</span>,
+        <span class="ident">OperatorClass::Float8BloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Float8BloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Float8MinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Float8MinMaxOps</span>,
+        <span class="ident">OperatorClass::Float8MinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Float8MinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::Float8MinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Float8MinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::Float8MinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Float8MinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::InetInclusionOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::InetInclusionOps</span>,
+        <span class="ident">OperatorClass::InetInclusionOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::InetInclusionOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::InetBloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::InetBloomOps</span>,
+        <span class="ident">OperatorClass::InetBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::InetBloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::InetMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::InetMinMaxOps</span>,
+        <span class="ident">OperatorClass::InetMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::InetMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::InetMinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::InetMinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::InetMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::InetMinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Int2BloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Int2BloomOps</span>,
+        <span class="ident">OperatorClass::Int2BloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int2BloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Int2MinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Int2MinMaxOps</span>,
+        <span class="ident">OperatorClass::Int2MinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int2MinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::Int2MinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Int2MinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::Int2MinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int2MinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Int4BloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Int4BloomOps</span>,
+        <span class="ident">OperatorClass::Int4BloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int4BloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Int4MinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Int4MinMaxOps</span>,
+        <span class="ident">OperatorClass::Int4MinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int4MinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::Int4MinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Int4MinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::Int4MinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int4MinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Int8BloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Int8BloomOps</span>,
+        <span class="ident">OperatorClass::Int8BloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int8BloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Int8MinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Int8MinMaxOps</span>,
+        <span class="ident">OperatorClass::Int8MinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int8MinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::Int8MinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::Int8MinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::Int8MinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int8MinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::NumericBloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::NumericBloomOps</span>,
+        <span class="ident">OperatorClass::NumericBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::NumericBloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::NumericMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::NumericMinMaxOps</span>,
+        <span class="ident">OperatorClass::NumericMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::NumericMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::NumericMinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::NumericMinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::NumericMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::NumericMinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::OidBloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::OidBloomOps</span>,
+        <span class="ident">OperatorClass::OidBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::OidBloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::OidMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::OidMinMaxOps</span>,
+        <span class="ident">OperatorClass::OidMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::OidMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::OidMinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::OidMinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::OidMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::OidMinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TextBloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TextBloomOps</span>,
+        <span class="ident">OperatorClass::TextBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TextBloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TextMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TextMinMaxOps</span>,
+        <span class="ident">OperatorClass::TextMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TextMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::TimestampBloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TimestampBloomOps</span>,
+        <span class="ident">OperatorClass::TimestampBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampBloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimestampMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TimestampMinMaxOps</span>,
+        <span class="ident">OperatorClass::TimestampMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::TimestampMinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TimestampMinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::TimestampMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampMinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimestampTzBloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TimestampTzBloomOps</span>,
+        <span class="ident">OperatorClass::TimestampTzBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampTzBloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimestampTzMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TimestampTzMinMaxOps</span>,
+        <span class="ident">OperatorClass::TimestampTzMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::TimestampTzMinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TimestampTzMinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::TimestampTzMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimeBloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TimeBloomOps</span>,
+        <span class="ident">OperatorClass::TimeBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimeBloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimeMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TimeMinMaxOps</span>,
+        <span class="ident">OperatorClass::TimeMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimeMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::TimeMinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TimeMinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::TimeMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimeMinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimeTzBloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TimeTzBloomOps</span>,
+        <span class="ident">OperatorClass::TimeTzBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimeTzBloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimeTzMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TimeTzMinMaxOps</span>,
+        <span class="ident">OperatorClass::TimeTzMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimeTzMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::TimeTzMinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::TimeTzMinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::TimeTzMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimeTzMinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::UuidBloomOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::UuidBloomOps</span>,
+        <span class="ident">OperatorClass::UuidBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::UuidBloomOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::UuidMinMaxOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::UuidMinMaxOps</span>,
+        <span class="ident">OperatorClass::UuidMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::UuidMinMaxOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::UuidMinMaxMultiOps</span> =&gt; <span class="ident">sql::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::SQLOperatorClassKind::UuidMinMaxMultiOps</span>,
+        <span class="ident">OperatorClass::UuidMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
+            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps</span>,
             <span class="ident">is_default</span>: <span class="bool-val">false</span>,
         },
     }

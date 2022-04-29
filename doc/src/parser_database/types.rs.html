@@ -1034,8 +1034,12 @@
 <span id="1029">1029</span>
 <span id="1030">1030</span>
 <span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::Context</span>, <span class="ident">interner::StringId</span>, <span class="ident">walkers::IndexFieldWalker</span>, <span class="ident">DatamodelError</span>};
 <span class="kw">use</span> <span class="ident">either::Either</span>;
+<span class="kw">use</span> <span class="ident">enumflags2::bitflags</span>;
 <span class="kw">use</span> <span class="ident">schema_ast::ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>},
@@ -1269,7 +1273,9 @@
 <span class="doccomment">/// @@index([a, b], type: Hash)</span>
 <span class="doccomment">///                 ^^^^^^^^^^</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">bitflags</span>]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexAlgorithm</span> {
     <span class="doccomment">/// Binary tree index (the default in most databases)</span>
     <span class="ident">BTree</span>,

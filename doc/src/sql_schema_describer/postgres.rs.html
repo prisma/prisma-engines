@@ -1493,23 +1493,6 @@
 <span id="1488">1488</span>
 <span id="1489">1489</span>
 <span id="1490">1490</span>
-<span id="1491">1491</span>
-<span id="1492">1492</span>
-<span id="1493">1493</span>
-<span id="1494">1494</span>
-<span id="1495">1495</span>
-<span id="1496">1496</span>
-<span id="1497">1497</span>
-<span id="1498">1498</span>
-<span id="1499">1499</span>
-<span id="1500">1500</span>
-<span id="1501">1501</span>
-<span id="1502">1502</span>
-<span id="1503">1503</span>
-<span id="1504">1504</span>
-<span id="1505">1505</span>
-<span id="1506">1506</span>
-<span id="1507">1507</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -1523,11 +1506,17 @@
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">any::type_name</span>,
     <span class="ident">borrow::Cow</span>,
-    <span class="ident">collections::HashSet</span>,
-    <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>},
+    <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
     <span class="ident">convert::TryInto</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing::trace</span>;
+
+<span class="doccomment">/// A SQL sequence.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Sequence</span> {
+    <span class="doccomment">/// Sequence name.</span>
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+}
 
 <span class="attribute">#[<span class="ident">enumflags2::bitflags</span>]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
@@ -1550,14 +1539,20 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresSchemaExt</span> {
-    <span class="kw">pub</span> <span class="ident">opclasses</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">IndexFieldId</span>, <span class="ident">SQLOperatorClass</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">opclasses</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">IndexFieldId</span>, <span class="ident">SQLOperatorClass</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// The schema&#39;s sequences.</span>
+    <span class="kw">pub</span> <span class="ident">sequences</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Sequence</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">PostgresSchemaExt</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_opclass</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index_field_id</span>: <span class="ident">IndexFieldId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SQLOperatorClass</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">opclasses</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">index_field_id</span>)
+        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">opclasses</span>
+            .<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">index_field_id</span>, <span class="op">|</span>(<span class="ident">id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">id</span>)
+            .<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">opclasses</span>[<span class="ident">idx</span>].<span class="number">1</span>)
     }
 }
 
@@ -1839,9 +1834,9 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pg_ext</span> <span class="op">=</span> <span class="ident">PostgresSchemaExt::default</span>();
 
-        <span class="kw">let</span> <span class="ident">sequences</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_sequences</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">get_sequences</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pg_ext</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">enums</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_enums</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_columns</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">enums</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_columns</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">enums</span>, <span class="kw-2">&amp;</span><span class="ident">pg_ext</span>.<span class="ident">sequences</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">foreign_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_foreign_keys</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">table_names</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_table_names</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1852,7 +1847,7 @@
             .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="ident">name</span>)<span class="op">|</span> (<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">TableId</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">u32</span>)))
             .<span class="ident">collect</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indexes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_indices</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pg_ext</span>, <span class="kw-2">&amp;</span><span class="ident">table_ids</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indexes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_indices</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pg_ext</span>, <span class="kw-2">&amp;</span><span class="ident">table_ids</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tables</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">table_names</span>.<span class="ident">len</span>());
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroach</span>() {
@@ -1895,7 +1890,6 @@
 
         <span class="prelude-val">Ok</span>(<span class="ident">SqlSchema</span> {
             <span class="ident">enums</span>,
-            <span class="ident">sequences</span>,
             <span class="ident">tables</span>,
             <span class="ident">views</span>,
             <span class="ident">procedures</span>,
@@ -2345,7 +2339,6 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_indices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">sequences</span>: <span class="kw-2">&amp;</span>[<span class="ident">Sequence</span>],
         <span class="ident">pg_ext</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PostgresSchemaExt</span>,
         <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Index</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKey</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -2364,9 +2357,7 @@
                CASE rawIndex.sort_order &amp; 1
                    WHEN 1 THEN &#39;DESC&#39;
                    ELSE &#39;ASC&#39;
-                   END                                     AS column_order,
-               pg_get_serial_sequence(&#39;&quot;&#39; || $1 || &#39;&quot;.&quot;&#39; || tableInfos.relname || &#39;&quot;&#39;,
-                                      columnInfos.attname) AS sequence_name
+                   END                                     AS column_order
         FROM
             -- pg_class stores infos about tables, indices etc: https://www.postgresql.org/docs/current/catalog-pg-class.html
             pg_class tableInfos,
@@ -2430,7 +2421,6 @@
             <span class="kw">let</span> <span class="ident">is_primary_key</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;is_primary_key&quot;</span>);
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="ident">table_ids</span>[<span class="ident">table_name</span>.<span class="ident">as_str</span>()];
-            <span class="kw">let</span> <span class="ident">sequence_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;sequence_name&quot;</span>);
 
             <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;column_order&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">as_ref</span>() {
                 <span class="string">&quot;ASC&quot;</span> =&gt; <span class="ident">SQLSortOrder::Asc</span>,
@@ -2442,43 +2432,34 @@
             });
 
             <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;index_algo&quot;</span>).<span class="ident">as_deref</span>() {
-                <span class="prelude-val">Some</span>(<span class="string">&quot;btree&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SQLIndexAlgorithm::BTree</span>),
-                <span class="prelude-val">Some</span>(<span class="string">&quot;hash&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SQLIndexAlgorithm::Hash</span>),
-                <span class="prelude-val">Some</span>(<span class="string">&quot;gist&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SQLIndexAlgorithm::Gist</span>),
-                <span class="prelude-val">Some</span>(<span class="string">&quot;gin&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SQLIndexAlgorithm::Gin</span>),
-                <span class="prelude-val">Some</span>(<span class="string">&quot;spgist&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SQLIndexAlgorithm::SpGist</span>),
-                <span class="prelude-val">Some</span>(<span class="string">&quot;brin&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SQLIndexAlgorithm::Brin</span>),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;btree&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SqlIndexAlgorithm::BTree</span>),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;hash&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SqlIndexAlgorithm::Hash</span>),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;gist&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SqlIndexAlgorithm::Gist</span>),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;gin&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SqlIndexAlgorithm::Gin</span>),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;spgist&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SqlIndexAlgorithm::SpGist</span>),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;brin&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SqlIndexAlgorithm::Brin</span>),
                 <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             };
 
             <span class="kw">if</span> <span class="ident">is_primary_key</span> {
-                <span class="kw">let</span> <span class="ident">entry</span>: <span class="kw-2">&amp;mut</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKey</span><span class="op">&gt;</span>) <span class="op">=</span>
-                    <span class="ident">indexes_map</span>.<span class="ident">entry</span>(<span class="ident">table_name</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> (<span class="ident">Vec::new</span>(), <span class="prelude-val">None</span>));
+                <span class="kw">let</span> <span class="ident">entry</span>: <span class="kw-2">&amp;mut</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKey</span><span class="op">&gt;</span>) <span class="op">=</span> <span class="ident">indexes_map</span>
+                    .<span class="ident">entry</span>(<span class="ident">table_name</span>.<span class="ident">clone</span>())
+                    .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> (<span class="ident">Vec::new</span>(), <span class="prelude-val">None</span>));
 
                 <span class="kw">match</span> <span class="ident">entry</span>.<span class="number">1</span>.<span class="ident">as_mut</span>() {
                     <span class="prelude-val">Some</span>(<span class="ident">pk</span>) =&gt; {
                         <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">PrimaryKeyColumn::new</span>(<span class="ident">column_name</span>));
                     }
                     <span class="prelude-val">None</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">sequence</span> <span class="op">=</span> <span class="ident">sequence_name</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">sequence_name</span><span class="op">|</span> {
-                            <span class="kw">let</span> <span class="ident">captures</span> <span class="op">=</span> <span class="ident">RE_SEQ</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">sequence_name</span>).<span class="ident">expect</span>(<span class="string">&quot;get captures&quot;</span>);
-                            <span class="kw">let</span> <span class="ident">sequence_name</span> <span class="op">=</span> <span class="ident">captures</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;get capture&quot;</span>).<span class="ident">as_str</span>();
-                            <span class="ident">sequences</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">sequence_name</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">sequence</span><span class="op">|</span> {
-                                <span class="macro">trace!</span>(<span class="string">&quot;Got sequence corresponding to primary key: {:#?}&quot;</span>, <span class="ident">sequence</span>);
-                                <span class="ident">sequence</span>.<span class="ident">clone</span>()
-                            })
-                        });
-
                         <span class="ident">entry</span>.<span class="number">1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> {
                             <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">PrimaryKeyColumn::new</span>(<span class="ident">column_name</span>)],
-                            <span class="ident">sequence</span>,
                             <span class="ident">constraint_name</span>: <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">clone</span>()),
                         });
                     }
                 }
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">operator_class</span> <span class="op">=</span> <span class="ident">algorithm</span>
-                    .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">alg</span><span class="op">|</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">alg</span>, <span class="ident">SQLIndexAlgorithm::BTree</span> <span class="op">|</span> <span class="ident">SQLIndexAlgorithm::Hash</span>))
+                    .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">alg</span><span class="op">|</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">alg</span>, <span class="ident">SqlIndexAlgorithm::BTree</span> <span class="op">|</span> <span class="ident">SqlIndexAlgorithm::Hash</span>))
                     .<span class="ident">and_then</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
                         <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;opclass&quot;</span>)
                             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> (<span class="ident">c</span>, <span class="ident">row</span>.<span class="ident">get_bool</span>(<span class="string">&quot;opcdefault&quot;</span>).<span class="ident">unwrap_or_default</span>()))
@@ -2500,7 +2481,7 @@
                         <span class="kw">let</span> <span class="ident">index_id</span> <span class="op">=</span> <span class="ident">IndexId</span>(<span class="ident">table_id</span>, <span class="ident">index_id</span> <span class="kw">as</span> <span class="ident">u32</span>);
                         <span class="kw">let</span> <span class="ident">index_field_id</span> <span class="op">=</span> <span class="ident">IndexFieldId</span>(<span class="ident">index_id</span>, <span class="ident">existing_index</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>);
 
-                        <span class="ident">pg_ext</span>.<span class="ident">opclasses</span>.<span class="ident">insert</span>(<span class="ident">index_field_id</span>, <span class="ident">opclass</span>);
+                        <span class="ident">pg_ext</span>.<span class="ident">opclasses</span>.<span class="ident">push</span>((<span class="ident">index_field_id</span>, <span class="ident">opclass</span>));
                     }
 
                     <span class="ident">existing_index</span>.<span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">column</span>);
@@ -2509,7 +2490,7 @@
                         <span class="kw">let</span> <span class="ident">index_id</span> <span class="op">=</span> <span class="ident">IndexId</span>(<span class="ident">table_id</span>, <span class="ident">entry</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>);
                         <span class="kw">let</span> <span class="ident">index_field_id</span> <span class="op">=</span> <span class="ident">IndexFieldId</span>(<span class="ident">index_id</span>, <span class="number">0</span>);
 
-                        <span class="ident">pg_ext</span>.<span class="ident">opclasses</span>.<span class="ident">insert</span>(<span class="ident">index_field_id</span>, <span class="ident">opclass</span>);
+                        <span class="ident">pg_ext</span>.<span class="ident">opclasses</span>.<span class="ident">push</span>((<span class="ident">index_field_id</span>, <span class="ident">opclass</span>));
                     }
 
                     <span class="ident">entry</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">Index</span> {
@@ -2528,24 +2509,16 @@
         <span class="prelude-val">Ok</span>(<span class="ident">indexes_map</span>)
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sequences</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Sequence</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sequences</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">postgres_ext</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PostgresSchemaExt</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;SELECT sequence_name
                   FROM information_schema.sequences
                   WHERE sequence_schema = $1&quot;</span>;
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">sequences</span> <span class="op">=</span> <span class="ident">rows</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">seq</span><span class="op">|</span> {
-                <span class="macro">trace!</span>(<span class="string">&quot;Got sequence: {:?}&quot;</span>, <span class="ident">seq</span>);
-                <span class="ident">Sequence</span> {
-                    <span class="ident">name</span>: <span class="ident">seq</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;sequence_name&quot;</span>),
-                }
-            })
-            .<span class="ident">collect</span>();
-
-        <span class="macro">trace!</span>(<span class="string">&quot;Found sequences: {:?}&quot;</span>, <span class="ident">sequences</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">sequences</span>)
+        <span class="kw">let</span> <span class="ident">sequences</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">seq</span><span class="op">|</span> <span class="ident">Sequence</span> {
+            <span class="ident">name</span>: <span class="ident">seq</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;sequence_name&quot;</span>),
+        });
+        <span class="ident">postgres_ext</span>.<span class="ident">sequences</span>.<span class="ident">extend</span>(<span class="ident">sequences</span>);
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
@@ -2854,8 +2827,6 @@
     }
 }
 
-<span class="kw">static</span> <span class="ident">RE_SEQ</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Regex::new</span>(<span class="string">&quot;^(?:.+\\.)?\&quot;?([^.\&quot;]+)\&quot;?&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;compile regex&quot;</span>));
-
 <span class="kw">static</span> <span class="ident">AUTOINCREMENT_REGEX</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
     <span class="ident">Regex::new</span>(<span class="string">r#&quot;nextval\((\(?)&#39;((.+)\.)?((&quot;(?P&lt;sequence&gt;.+)&quot;)|(?P&lt;sequence2&gt;.+))&#39;(::text\))?::(regclass|REGCLASS)\)&quot;#</span>)
         .<span class="ident">expect</span>(<span class="string">&quot;compile autoincrement regex&quot;</span>)
@@ -2879,15 +2850,10 @@
     <span class="kw">static</span> <span class="ident">POSTGRES_DB_GENERATED_RE</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span>
         <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Regex::new</span>(<span class="string">r#&quot;(^\((.*)\)):{2,3}(\\&quot;)?(.*)(\\&quot;)?$&quot;#</span>).<span class="ident">unwrap</span>());
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">POSTGRES_DB_GENERATED_RE</span>.<span class="ident">is_match</span>(<span class="ident">value</span>) {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">captures</span> <span class="op">=</span> <span class="ident">POSTGRES_DB_GENERATED_RE</span>.<span class="ident">captures</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">fun</span> <span class="op">=</span> <span class="ident">captures</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
-        <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="ident">captures</span>.<span class="ident">get</span>(<span class="number">4</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
-
-        <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{}::{}&quot;</span>, <span class="ident">fun</span>, <span class="ident">suffix</span>))
-    }
+    <span class="kw">let</span> <span class="ident">captures</span> <span class="op">=</span> <span class="ident">POSTGRES_DB_GENERATED_RE</span>.<span class="ident">captures</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">fun</span> <span class="op">=</span> <span class="ident">captures</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
+    <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="ident">captures</span>.<span class="ident">get</span>(<span class="number">4</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
+    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{}::{}&quot;</span>, <span class="ident">fun</span>, <span class="ident">suffix</span>))
 }
 
 <span class="kw">fn</span> <span class="ident">unsuffix_default_literal</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">literal</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">expected_suffixes</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
