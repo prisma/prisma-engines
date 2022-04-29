@@ -9,9 +9,8 @@ mod upsert_nested;
 
 use super::*;
 use crate::{
-    constants::operations,
     query_graph::{NodeRef, QueryGraph},
-    ConnectorContext, ParsedInputMap,
+    ParsedInputMap,
 };
 use connect_nested::*;
 use connect_or_create_nested::*;
@@ -19,6 +18,8 @@ use create_nested::*;
 use delete_nested::*;
 use disconnect_nested::*;
 use prisma_models::RelationFieldRef;
+use schema::ConnectorContext;
+use schema_builder::constants::operations;
 use set_nested::*;
 use update_nested::*;
 use upsert_nested::*;

@@ -1,10 +1,9 @@
 //! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
-use std::ops::{Deref, DerefMut};
-
-use crate::{ObjectTag, OutputFieldRef};
 use indexmap::IndexMap;
 use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
+use schema::{ObjectTag, OutputFieldRef};
+use std::ops::{Deref, DerefMut};
 
 pub type ParsedInputList = Vec<ParsedInputValue>;
 

@@ -7,7 +7,7 @@ use datamodel::ValidatedConfiguration;
 use datamodel::{dml::Datamodel, Configuration};
 use datamodel_connector::ConnectorCapabilities;
 use prisma_models::InternalDataModelBuilder;
-use query_core::{schema::QuerySchemaRef, schema_builder, BuildMode};
+use query_core::{schema::QuerySchemaRef, schema_builder};
 use request_handlers::{dmmf, GraphQlHandler};
 use std::{env, sync::Arc};
 
@@ -21,7 +21,6 @@ pub struct ExecuteRequest {
 
 pub struct DmmfRequest {
     datamodel: Datamodel,
-    build_mode: BuildMode,
     enable_raw_queries: bool,
     config: Configuration,
 }
@@ -53,20 +52,11 @@ impl CliCommand {
 
         match subcommand {
             Subcommand::Cli(ref cliopts) => match cliopts {
-                CliOpt::Dmmf => {
-                    let build_mode = if opts.legacy {
-                        BuildMode::Legacy
-                    } else {
-                        BuildMode::Modern
-                    };
-
-                    Ok(Some(CliCommand::Dmmf(DmmfRequest {
-                        datamodel: opts.datamodel()?,
-                        build_mode,
-                        enable_raw_queries: opts.enable_raw_queries,
-                        config: opts.configuration(true)?.subject,
-                    })))
-                }
+                CliOpt::Dmmf => Ok(Some(CliCommand::Dmmf(DmmfRequest {
+                    datamodel: opts.datamodel()?,
+                    enable_raw_queries: opts.enable_raw_queries,
+                    config: opts.configuration(true)?.subject,
+                }))),
                 CliOpt::GetConfig(input) => Ok(Some(CliCommand::GetConfig(GetConfigRequest {
                     config: opts.configuration(input.ignore_env_var_errors)?,
                     ignore_env_var_errors: input.ignore_env_var_errors,
@@ -111,7 +101,6 @@ impl CliCommand {
         let internal_data_model = InternalDataModelBuilder::from(&request.datamodel).build("".into());
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
-            request.build_mode,
             request.enable_raw_queries,
             capabilities,
             request.config.preview_features().iter().collect(),

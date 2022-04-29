@@ -1,6 +1,7 @@
 use super::*;
-use crate::{constants::args, query_document::*, ReadQuery, RecordQuery};
+use crate::{query_document::*, ReadQuery, RecordQuery};
 use prisma_models::ModelRef;
+use schema_builder::constants::args;
 use std::convert::TryInto;
 
 /// Builds a read query from a parsed incoming read query field.

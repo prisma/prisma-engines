@@ -1,7 +1,8 @@
 use super::*;
-use crate::{constants::aggregations::*, FieldPair, ParsedField, ReadQuery};
+use crate::{FieldPair, ParsedField, ReadQuery};
 use connector::RelAggregationSelection;
 use prisma_models::prelude::*;
+use schema_builder::constants::aggregations::*;
 use std::sync::Arc;
 
 pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {

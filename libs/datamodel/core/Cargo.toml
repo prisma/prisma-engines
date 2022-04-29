@@ -1,5 +1,4 @@
 [package]
-authors = ["Emanuel Joebstl <emanuel.joebstl@gmail.com>"]
 edition = "2021"
 name = "datamodel"
 version = "0.1.0"
@@ -31,5 +30,4 @@ native-types = { path = "../../native-types" }
 pretty_assertions = "0.6.1"
 
 [features]
-default = []
 default_generators = ["dml/default_generators"]

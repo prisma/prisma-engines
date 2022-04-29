@@ -42,11 +42,9 @@ package = "query-connector"
 path = "../query-connector"
 
 [dependencies.prisma-models]
-features = ["sql-ext"]
 path = "../../prisma-models"
 
 [dependencies.prisma-value]
-features = ["sql-ext"]
 path = "../../../libs/prisma-value"
 
 [dependencies.chrono]
@@ -55,6 +53,7 @@ version = "0.4"
 
 [dependencies.datamodel]
 path = "../../../libs/datamodel/core"
+features = ["default_generators"]
 
 [dependencies.serde]
 features = ["derive"]

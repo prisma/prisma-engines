@@ -1,12 +1,12 @@
 use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
 use prisma_models::InternalDataModelBuilder;
-use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchemaRef, TxId};
+use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TxId};
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
 use std::{env, sync::Arc};
 
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
-/// Direct engine runner.   
+/// Direct engine runner.
 pub struct DirectRunner {
     executor: Executor,
     query_schema: QuerySchemaRef,
@@ -26,7 +26,6 @@ impl RunnerInterface for DirectRunner {
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
-            BuildMode::Modern,
             true,
             data_source.capabilities(),
             preview_features,

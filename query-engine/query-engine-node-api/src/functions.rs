@@ -3,7 +3,7 @@ use datamodel_connector::ConnectorCapabilities;
 use napi::{bindgen_prelude::*, JsUnknown};
 use napi_derive::napi;
 use prisma_models::InternalDataModelBuilder;
-use query_core::{schema_builder, BuildMode, QuerySchemaRef};
+use query_core::{schema::QuerySchemaRef, schema_builder};
 use request_handlers::dmmf;
 use std::{
     collections::{BTreeMap, HashMap},
@@ -44,7 +44,6 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
 
     let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
         internal_data_model,
-        BuildMode::Modern,
         true,
         capabilities,
         config.subject.preview_features().iter().collect(),
