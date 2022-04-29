@@ -1,5 +1,5 @@
 use crate::test_api::*;
-use sql_schema_describer::{ColumnTypeFamily, IndexColumn, SQLSortOrder};
+use sql_schema_describer::{postgres::PostgresSchemaExt, ColumnTypeFamily, IndexColumn, SQLSortOrder};
 
 #[test_connector(tags(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
@@ -295,4 +295,64 @@ fn escaped_characters_in_string_defaults(api: TestApi) {
     expect_col("seasonality", r#""summer""#);
     expect_col("contains", r#"'potassium'"#);
     expect_col("sideNames", "top\ndown");
+}
+
+#[test_connector(tags(CockroachDb))]
+fn cockroachdb_sequences_must_work(api: TestApi) {
+    // https://www.cockroachlabs.com/docs/v21.2/create-sequence.html
+    let sql = r#"
+        -- Defaults
+        CREATE SEQUENCE "test";
+
+        -- Not cycling. All crdb sequences are like that.
+        CREATE SEQUENCE "testnotcycling" NO CYCLE;
+
+        -- Other options
+        CREATE SEQUENCE "testmore" 
+            INCREMENT 4
+            MINVALUE 10
+            MAXVALUE 100
+            START 20
+            CACHE 7;
+    "#;
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+    let expected_ext = expect![[r#"
+        PostgresSchemaExt {
+            opclasses: [],
+            indexes: [],
+            sequences: [
+                Sequence {
+                    name: "test",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 9223372036854775807,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 1,
+                },
+                Sequence {
+                    name: "testnotcycling",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 9223372036854775807,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 1,
+                },
+                Sequence {
+                    name: "testmore",
+                    start_value: 20,
+                    min_value: 10,
+                    max_value: 100,
+                    increment_by: 4,
+                    cycle: false,
+                    cache_size: 7,
+                },
+            ],
+        }
+    "#]];
+    expected_ext.assert_debug_eq(&ext);
 }
