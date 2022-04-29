@@ -5,8 +5,7 @@ mod error;
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::prelude::*;
 use serde::de::Unexpected;
-use serde::{ser::Serializer, Deserializer, Serialize as SerializeTrait};
-use serde_derive::{Deserialize, Serialize};
+use serde::{ser::Serializer, Deserialize, Deserializer, Serialize};
 use std::{convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
 
