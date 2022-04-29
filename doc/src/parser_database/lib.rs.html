@@ -159,6 +159,11 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unsafe_code</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">missing_docs</span>)]</span>
 
 <span class="doccomment">//! See the docs on [ParserDatabase](./struct.ParserDatabase.html).</span>
@@ -299,6 +304,11 @@
     <span class="doccomment">/// The parsed AST.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ast</span>
+    }
+
+    <span class="doccomment">/// The total number of models.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">models_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">types</span>.<span class="ident">model_attributes</span>.<span class="ident">len</span>()
     }
 }
 

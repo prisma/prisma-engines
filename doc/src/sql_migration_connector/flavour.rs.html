@@ -274,8 +274,6 @@
 <span id="269">269</span>
 <span id="270">270</span>
 <span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),</span>
 <span class="doccomment">//! in order to avoid cluttering the connector with conditionals. This is a private implementation</span>
 <span class="doccomment">//! detail of the SQL connector.</span>
@@ -526,8 +524,6 @@
 
                     <span class="ident">col</span>.<span class="ident">sort_order</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                 }
-
-                <span class="ident">index</span>.<span class="ident">algorithm</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">remove_index</span> {
                     <span class="ident">kept_indexes</span>.<span class="ident">push</span>(<span class="ident">index</span>);

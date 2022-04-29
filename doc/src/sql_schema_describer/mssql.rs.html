@@ -816,7 +816,6 @@
 <span id="811">811</span>
 <span id="812">812</span>
 <span id="813">813</span>
-<span id="814">814</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">getters::Getter</span>, <span class="ident">ids</span>::<span class="kw-2">*</span>, <span class="ident">parsers::Parser</span>, <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultValue</span>,
     <span class="ident">DescriberError</span>, <span class="ident">DescriberErrorKind</span>, <span class="ident">DescriberResult</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">Index</span>, <span class="ident">IndexColumn</span>, <span class="ident">IndexType</span>,
@@ -1326,7 +1325,6 @@
                         <span class="bool-val">true</span> =&gt; <span class="ident">IndexType::Unique</span>,
                         <span class="bool-val">false</span> =&gt; <span class="ident">IndexType::Normal</span>,
                     },
-                    <span class="ident">algorithm</span>: <span class="prelude-val">None</span>,
                 });
             }
         }

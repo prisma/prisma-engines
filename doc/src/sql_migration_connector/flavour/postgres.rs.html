@@ -667,6 +667,9 @@
 <span id="662">662</span>
 <span id="663">663</span>
 <span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">shadow_db</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -837,6 +840,9 @@ SET serial_normalization = &#39;sql_sequence&#39;;
                 .<span class="ident">preview_features</span>
                 .<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>)
             {
+                <span class="kw">for</span> <span class="ident">idx</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">pg_ext</span>.<span class="ident">indexes</span> {
+                    <span class="ident">idx</span>.<span class="number">1</span> <span class="op">=</span> <span class="ident">sql_schema_describer::postgres::SqlIndexAlgorithm::BTree</span>;
+                }
                 <span class="ident">pg_ext</span>.<span class="ident">opclasses</span>.<span class="ident">clear</span>();
             }
 

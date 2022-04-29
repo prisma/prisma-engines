@@ -297,6 +297,33 @@
 <span id="292">292</span>
 <span id="293">293</span>
 <span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaCalculatorFlavour</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::flavour</span>::{<span class="ident">PostgresFlavour</span>, <span class="ident">SqlFlavour</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
@@ -332,7 +359,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">push_connector_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">PostgresSchemaExt::default</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">postgres_ext</span> <span class="op">=</span> <span class="ident">PostgresSchemaExt::default</span>();
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">context</span>.<span class="ident">datamodel</span>.<span class="ident">db</span>;
 
         <span class="kw">for</span> (<span class="ident">table_idx</span>, <span class="ident">model</span>) <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_models</span>().<span class="ident">enumerate</span>() {
@@ -341,6 +368,16 @@
             <span class="kw">for</span> (<span class="ident">index_index</span>, <span class="ident">index</span>) <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>().<span class="ident">enumerate</span>() {
                 <span class="kw">let</span> <span class="ident">index_id</span> <span class="op">=</span> <span class="ident">sql::IndexId</span>(<span class="ident">table_id</span>, <span class="ident">index_index</span> <span class="kw">as</span> <span class="ident">u32</span>);
 
+                <span class="kw">let</span> <span class="ident">sql_index_algorithm</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">algorithm</span>() {
+                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::BTree</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="ident">sql::postgres::SqlIndexAlgorithm::BTree</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Gin</span>) =&gt; <span class="ident">sql::postgres::SqlIndexAlgorithm::Gin</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Hash</span>) =&gt; <span class="ident">sql::postgres::SqlIndexAlgorithm::Hash</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::SpGist</span>) =&gt; <span class="ident">sql::postgres::SqlIndexAlgorithm::SpGist</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Gist</span>) =&gt; <span class="ident">sql::postgres::SqlIndexAlgorithm::Gist</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Brin</span>) =&gt; <span class="ident">sql::postgres::SqlIndexAlgorithm::Brin</span>,
+                };
+                <span class="ident">postgres_ext</span>.<span class="ident">indexes</span>.<span class="ident">push</span>((<span class="ident">index_id</span>, <span class="ident">sql_index_algorithm</span>));
+
                 <span class="kw">for</span> (<span class="ident">field_idx</span>, <span class="ident">attrs</span>) <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>().<span class="ident">enumerate</span>() {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">opclass</span>) <span class="op">=</span> <span class="ident">attrs</span>.<span class="ident">operator_class</span>() {
                         <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">sql::IndexFieldId</span>(<span class="ident">index_id</span>, <span class="ident">field_idx</span> <span class="kw">as</span> <span class="ident">u32</span>);
@@ -348,18 +385,35 @@
                         <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">opclass</span>.<span class="ident">get</span>() {
                             <span class="ident">Either::Left</span>(<span class="ident">class</span>) =&gt; <span class="ident">convert_opclass</span>(<span class="ident">class</span>, <span class="ident">index</span>.<span class="ident">algorithm</span>()),
                             <span class="ident">Either::Right</span>(<span class="ident">s</span>) =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-                                <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Raw</span>(<span class="ident">s</span>.<span class="ident">to_string</span>()),
+                                <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Raw</span>(<span class="ident">s</span>.<span class="ident">to_owned</span>()),
                                 <span class="ident">is_default</span>: <span class="bool-val">false</span>,
                             },
                         };
 
-                        <span class="ident">data</span>.<span class="ident">opclasses</span>.<span class="ident">push</span>((<span class="ident">field_id</span>, <span class="ident">opclass</span>));
+                        <span class="ident">postgres_ext</span>.<span class="ident">opclasses</span>.<span class="ident">push</span>((<span class="ident">field_id</span>, <span class="ident">opclass</span>));
                     }
                 }
             }
         }
 
-        <span class="ident">context</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">set_connector_data</span>(<span class="ident">Box::new</span>(<span class="ident">data</span>));
+        <span class="comment">// Add index algorithms for implicit m2m relation tables</span>
+        <span class="kw">let</span> <span class="ident">models_count</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">models_count</span>();
+        <span class="kw">let</span> <span class="ident">tables_count</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">tables</span>.<span class="ident">len</span>();
+        <span class="kw">for</span> <span class="ident">table_idx</span> <span class="kw">in</span> <span class="ident">models_count</span>..<span class="ident">tables_count</span> {
+            <span class="ident">postgres_ext</span>.<span class="ident">indexes</span>.<span class="ident">push</span>((
+                <span class="ident">sql::IndexId</span>(<span class="ident">sql::TableId</span>(<span class="ident">table_idx</span> <span class="kw">as</span> <span class="ident">u32</span>), <span class="number">0</span>),
+                <span class="ident">sql::postgres::SqlIndexAlgorithm::BTree</span>,
+            ));
+            <span class="ident">postgres_ext</span>.<span class="ident">indexes</span>.<span class="ident">push</span>((
+                <span class="ident">sql::IndexId</span>(<span class="ident">sql::TableId</span>(<span class="ident">table_idx</span> <span class="kw">as</span> <span class="ident">u32</span>), <span class="number">1</span>),
+                <span class="ident">sql::postgres::SqlIndexAlgorithm::BTree</span>,
+            ));
+        }
+
+        <span class="ident">context</span>
+            .<span class="ident">schema</span>
+            .<span class="ident">describer_schema</span>
+            .<span class="ident">set_connector_data</span>(<span class="ident">Box::new</span>(<span class="ident">postgres_ext</span>));
     }
 }
 

@@ -901,6 +901,10 @@
 <span id="896">896</span>
 <span id="897">897</span>
 <span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">migration_assertions</span>;
 <span class="kw">mod</span> <span class="ident">quaint_result_set_ext</span>;
 
@@ -912,8 +916,10 @@
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">sql</span>::{<span class="ident">postgres::PostgresSchemaExt</span>, <span class="ident">IndexFieldId</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">postgres::SQLOperatorClassKind</span>, <span class="ident">Column</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKey</span>,
-    <span class="ident">ForeignKeyAction</span>, <span class="ident">Index</span>, <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlIndexAlgorithm</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
+    <span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>,
+    <span class="ident">postgres</span>::{<span class="ident">SQLOperatorClassKind</span>, <span class="ident">SqlIndexAlgorithm</span>},
+    <span class="ident">Column</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">Index</span>, <span class="ident">IndexType</span>,
+    <span class="ident">PrimaryKey</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
 };
 <span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">BitFlags</span>, <span class="ident">Tags</span>};
 
@@ -1764,7 +1770,9 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_algorithm</span>(<span class="self">self</span>, <span class="ident">algo</span>: <span class="ident">SqlIndexAlgorithm</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">algorithm</span>, <span class="prelude-val">Some</span>(<span class="ident">algo</span>));
+        <span class="kw">let</span> <span class="ident">postgres_ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+        <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="ident">postgres_ext</span>.<span class="ident">index_algorithm</span>(<span class="self">self</span>.<span class="ident">index_id</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">algorithm</span>, <span class="ident">algo</span>);
 
         <span class="self">self</span>
     }
