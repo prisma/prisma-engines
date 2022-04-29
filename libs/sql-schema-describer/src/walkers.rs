@@ -4,8 +4,8 @@
 
 use crate::{
     Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
-    Index, IndexColumn, IndexFieldId, IndexId, IndexType, PrimaryKey, PrimaryKeyColumn, SQLIndexAlgorithm,
-    SQLSortOrder, SqlSchema, Table, TableId, UserDefinedType, View,
+    Index, IndexColumn, IndexFieldId, IndexId, IndexType, PrimaryKey, PrimaryKeyColumn, SQLSortOrder,
+    SqlIndexAlgorithm, SqlSchema, Table, TableId, UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
 use std::fmt;
@@ -698,7 +698,7 @@ impl<'a> IndexWalker<'a> {
     }
 
     /// The hash algorithm used in the index.
-    pub fn algorithm(&self) -> Option<SQLIndexAlgorithm> {
+    pub fn algorithm(&self) -> Option<SqlIndexAlgorithm> {
         self.get().algorithm
     }
 }

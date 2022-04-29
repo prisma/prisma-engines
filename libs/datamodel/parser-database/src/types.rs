@@ -1,5 +1,6 @@
 use crate::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
 use either::Either;
+use enumflags2::bitflags;
 use schema_ast::ast::{self, WithName};
 use std::{
     collections::{BTreeMap, HashMap},
@@ -233,7 +234,9 @@ pub(crate) struct ModelAttributes {
 /// @@index([a, b], type: Hash)
 ///                 ^^^^^^^^^^
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[bitflags]
+#[repr(u8)]
+#[derive(Debug, Clone, Copy)]
 pub enum IndexAlgorithm {
     /// Binary tree index (the default in most databases)
     BTree,

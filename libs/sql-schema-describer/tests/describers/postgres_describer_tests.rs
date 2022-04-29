@@ -5,7 +5,7 @@ use barrel::{types, Migration};
 use indoc::indoc;
 use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
-use sql_schema_describer::*;
+use sql_schema_describer::{postgres::PostgresSchemaExt, *};
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
@@ -571,18 +571,37 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     length: None,
                 }],
                 tpe: IndexType::Unique,
-                algorithm: Some(SQLIndexAlgorithm::BTree),
+                algorithm: Some(SqlIndexAlgorithm::BTree),
             },],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("primary_col")],
-                sequence: Some(Sequence {
-                    name: "User_primary_col_seq".into(),
-                },),
                 constraint_name: Some("User_pkey".into()),
             }),
             foreign_keys: vec![],
         }
     );
+
+    let ext = extract_ext(&result);
+    let expected_ext = expect![[r#"
+        PostgresSchemaExt {
+            opclasses: [],
+            sequences: [
+                Sequence {
+                    name: "User_bigserial_col_seq",
+                },
+                Sequence {
+                    name: "User_smallserial_col_seq",
+                },
+                Sequence {
+                    name: "User_serial_col_seq",
+                },
+                Sequence {
+                    name: "User_primary_col_seq",
+                },
+            ],
+        }
+    "#]];
+    expected_ext.assert_debug_eq(&ext);
 }
 
 #[test_connector(tags(Postgres))]
@@ -682,9 +701,18 @@ fn postgres_sequences_must_work(api: TestApi) {
     api.raw_cmd(&format!("CREATE SEQUENCE \"{}\".\"test\"", api.schema_name()));
 
     let schema = api.describe();
-    let got_seq = schema.get_sequence("test").expect("get sequence");
-
-    assert_eq!(got_seq, &Sequence { name: "test".into() },);
+    let ext = extract_ext(&schema);
+    let expected_ext = expect![[r#"
+        PostgresSchemaExt {
+            opclasses: [],
+            sequences: [
+                Sequence {
+                    name: "test",
+                },
+            ],
+        }
+    "#]];
+    expected_ext.assert_debug_eq(&ext);
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -901,4 +929,8 @@ fn index_sort_order_composite_type_asc_desc_is_handled(api: TestApi) {
 
     assert_eq!(Some(SQLSortOrder::Asc), columns[0].sort_order());
     assert_eq!(Some(SQLSortOrder::Desc), columns[1].sort_order());
+}
+
+fn extract_ext(schema: &SqlSchema) -> &PostgresSchemaExt {
+    schema.downcast_connector_data()
 }

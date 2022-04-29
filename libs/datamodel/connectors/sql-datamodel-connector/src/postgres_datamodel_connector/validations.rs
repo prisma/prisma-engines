@@ -27,7 +27,7 @@ pub(super) fn compatible_native_types(index: IndexWalker<'_>, connector: &dyn Co
 
 /// Cannot have more than one column in SP-GiST indices.
 pub(super) fn spgist_indexed_column_count(index: IndexWalker<'_>, errors: &mut Diagnostics) {
-    if index.algorithm() != Some(IndexAlgorithm::SpGist) {
+    if !matches!(index.algorithm(), Some(IndexAlgorithm::SpGist)) {
         return;
     }
 
@@ -63,10 +63,10 @@ pub(super) fn generalized_index_validations(
             continue;
         }
 
-        let native_type = field
-            .as_index_field()
-            .native_type_instance(connector)
-            .map(|t| serde_json::from_value(t.serialized_native_type).unwrap());
+        let native_type_instance = field.as_index_field().native_type_instance(connector);
+        let native_type = native_type_instance
+            .as_ref()
+            .map(|t| serde_json::from_value(t.serialized_native_type.clone()).unwrap());
 
         let r#type = field.as_index_field().scalar_field_type();
 
@@ -91,7 +91,7 @@ pub(super) fn generalized_index_validations(
             _ => (),
         }
 
-        let mut err_f = |native_type, opclass| match (native_type, opclass) {
+        let mut err_f = |native_type_name: Option<&str>, opclass| match (native_type_name, opclass) {
             (Some(native_type), Some(opclass)) => {
                 let name = field.as_index_field().name();
 
@@ -136,7 +136,7 @@ pub(super) fn generalized_index_validations(
             match (&native_type, opclass) {
                 // Inet / InetOps
                 (Some(PostgresType::Inet), Some(InetOps)) => (),
-                _ => err_f(native_type, opclass),
+                _ => err_f(native_type_instance.as_ref().map(|i| i.name.as_str()), opclass),
             }
         } else if algo.is_gin() {
             match (&native_type, opclass) {
@@ -180,7 +180,7 @@ pub(super) fn generalized_index_validations(
                         &msg, "@index", attr.span,
                     ));
                 }
-                _ => err_f(native_type, opclass),
+                _ => err_f(native_type_instance.as_ref().map(|i| i.name.as_str()), opclass),
             }
         } else if algo.is_spgist() {
             match (&native_type, opclass) {
@@ -207,7 +207,7 @@ pub(super) fn generalized_index_validations(
                 (Some(PostgresType::VarChar(_)), Some(TextOps) | None) => (),
                 (Some(PostgresType::Char(_)), Some(TextOps) | None) => (),
 
-                _ => err_f(native_type, opclass),
+                _ => err_f(native_type_instance.as_ref().map(|i| i.name.as_str()), opclass),
             }
         } else if algo.is_brin() {
             match (&native_type, opclass) {
@@ -425,7 +425,7 @@ pub(super) fn generalized_index_validations(
                 (Some(PostgresType::Uuid), Some(UuidMinMaxOps)) => (),
                 (Some(PostgresType::Uuid), Some(UuidMinMaxMultiOps)) => (),
 
-                _ => err_f(native_type, opclass),
+                _ => err_f(native_type_instance.as_ref().map(|i| i.name.as_str()), opclass),
             }
         }
     }

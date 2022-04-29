@@ -104,15 +104,6 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::DecimalType,
 ];
 
-const INDEX_TYPES: &[IndexAlgorithm] = &[
-    IndexAlgorithm::BTree,
-    IndexAlgorithm::Gist,
-    IndexAlgorithm::Hash,
-    IndexAlgorithm::Gin,
-    IndexAlgorithm::SpGist,
-    IndexAlgorithm::Brin,
-];
-
 pub struct PostgresDatamodelConnector;
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
@@ -257,8 +248,14 @@ impl Connector for PostgresDatamodelConnector {
         NATIVE_TYPE_CONSTRUCTORS
     }
 
-    fn supported_index_types(&self) -> &'static [IndexAlgorithm] {
-        INDEX_TYPES
+    fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
+        BitFlags::empty()
+            | IndexAlgorithm::BTree
+            | IndexAlgorithm::Gist
+            | IndexAlgorithm::Hash
+            | IndexAlgorithm::Gin
+            | IndexAlgorithm::SpGist
+            | IndexAlgorithm::Brin
     }
 
     fn parse_native_type(

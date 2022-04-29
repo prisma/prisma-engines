@@ -460,7 +460,7 @@ pub(crate) fn index_algorithm_is_supported(index: IndexWalker<'_>, ctx: &mut Con
         None => return,
     };
 
-    if ctx.connector.supports_index_type(&algo) {
+    if ctx.connector.supports_index_type(algo) {
         return;
     }
 

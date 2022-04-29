@@ -1,3 +1,4 @@
+pub use expect_test::expect;
 pub use quaint::{prelude::Queryable, single::Quaint};
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};

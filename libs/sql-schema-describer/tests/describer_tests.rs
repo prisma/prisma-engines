@@ -255,7 +255,6 @@ fn composite_primary_keys_must_work(api: TestApi) {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns,
-                sequence: None,
                 constraint_name: match api.sql_family() {
                     SqlFamily::Postgres => Some("User_pkey".into()),
                     SqlFamily::Mssql => Some("PK_User".into()),
@@ -308,18 +307,11 @@ fn indices_must_work(api: TestApi) {
         },
     ];
 
-    let pk_sequence = match api.sql_family() {
-        SqlFamily::Postgres => Some(Sequence {
-            name: "User_id_seq".to_string(),
-        }),
-        _ => None,
-    };
-
     assert_eq!("User", user_table.name);
     assert_eq!(expected_columns, user_table.columns);
 
     let algorithm = if api.is_postgres() && !api.is_cockroach() {
-        Some(SQLIndexAlgorithm::BTree)
+        Some(SqlIndexAlgorithm::BTree)
     } else {
         None
     };
@@ -354,7 +346,6 @@ fn indices_must_work(api: TestApi) {
     };
 
     assert_eq!(pk.columns, &[pk_col]);
-    assert_eq!(pk_sequence, pk.sequence);
 
     match api.sql_family() {
         SqlFamily::Postgres => assert_eq!(Some("User_pkey"), pk.constraint_name.as_deref()),

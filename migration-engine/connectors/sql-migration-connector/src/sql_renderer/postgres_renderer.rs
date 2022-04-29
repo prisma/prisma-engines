@@ -12,7 +12,7 @@ use regex::Regex;
 use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
     postgres::PostgresSchemaExt, walkers::*, ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue,
-    ForeignKeyAction, SQLIndexAlgorithm, SQLSortOrder, SqlSchema,
+    ForeignKeyAction, SQLSortOrder, SqlIndexAlgorithm, SqlSchema,
 };
 use std::borrow::Cow;
 
@@ -257,13 +257,12 @@ impl SqlRenderer for PostgresFlavour {
             is_unique: index.index_type().is_unique(),
             table_reference: index.table().name().into(),
             using: index.algorithm().map(|algo| match algo {
-                //todo we should think about not rendering this if it is the db default anyways
-                SQLIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
-                SQLIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,
-                SQLIndexAlgorithm::Gist => ddl::IndexAlgorithm::Gist,
-                SQLIndexAlgorithm::Gin => ddl::IndexAlgorithm::Gin,
-                SQLIndexAlgorithm::SpGist => ddl::IndexAlgorithm::SpGist,
-                SQLIndexAlgorithm::Brin => ddl::IndexAlgorithm::Brin,
+                SqlIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
+                SqlIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,
+                SqlIndexAlgorithm::Gist => ddl::IndexAlgorithm::Gist,
+                SqlIndexAlgorithm::Gin => ddl::IndexAlgorithm::Gin,
+                SqlIndexAlgorithm::SpGist => ddl::IndexAlgorithm::SpGist,
+                SqlIndexAlgorithm::Brin => ddl::IndexAlgorithm::Brin,
             }),
             columns: index
                 .columns()

@@ -1,5 +1,5 @@
 use migration_engine_tests::test_api::*;
-use sql_schema_describer::{SQLIndexAlgorithm, SQLOperatorClassKind};
+use sql_schema_describer::{postgres::SQLOperatorClassKind, SqlIndexAlgorithm};
 
 #[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9))]
 fn spgist_preview_disabled(api: TestApi) {
@@ -38,7 +38,7 @@ fn spgist_change_from_btree(api: TestApi) {
     api.assert_schema().assert_table("A", |table| {
         table
             .assert_has_column("data")
-            .assert_index_on_columns(&["data"], |idx| idx.assert_algorithm(SQLIndexAlgorithm::BTree))
+            .assert_index_on_columns(&["data"], |idx| idx.assert_algorithm(SqlIndexAlgorithm::BTree))
     });
 
     let dm = r#"
@@ -55,7 +55,7 @@ fn spgist_change_from_btree(api: TestApi) {
     api.assert_schema().assert_table("A", |table| {
         table
             .assert_has_column("data")
-            .assert_index_on_columns(&["data"], |idx| idx.assert_algorithm(SQLIndexAlgorithm::Gist))
+            .assert_index_on_columns(&["data"], |idx| idx.assert_algorithm(SqlIndexAlgorithm::Gist))
     });
 }
 
@@ -76,7 +76,7 @@ fn spgist_inet_ops(api: TestApi) {
         table
             .assert_has_column("data")
             .assert_index_on_columns(&["data"], |idx| {
-                idx.assert_algorithm(SQLIndexAlgorithm::SpGist)
+                idx.assert_algorithm(SqlIndexAlgorithm::SpGist)
                     .assert_column("data", |attrs| attrs.assert_ops(SQLOperatorClassKind::InetOps))
             })
     });
@@ -101,7 +101,7 @@ fn spgist_inet_ops_default(api: TestApi) {
         table
             .assert_has_column("data")
             .assert_index_on_columns(&["data"], |idx| {
-                idx.assert_algorithm(SQLIndexAlgorithm::SpGist)
+                idx.assert_algorithm(SqlIndexAlgorithm::SpGist)
                     .assert_column("data", |attrs| attrs.assert_ops(SQLOperatorClassKind::InetOps))
             })
     });
@@ -126,7 +126,7 @@ fn spgist_text_ops(api: TestApi) {
         table
             .assert_has_column("data")
             .assert_index_on_columns(&["data"], |idx| {
-                idx.assert_algorithm(SQLIndexAlgorithm::SpGist)
+                idx.assert_algorithm(SqlIndexAlgorithm::SpGist)
                     .assert_column("data", |attrs| attrs.assert_ops(SQLOperatorClassKind::TextOps))
             })
     });
@@ -151,7 +151,7 @@ fn spgist_text_ops_default(api: TestApi) {
         table
             .assert_has_column("data")
             .assert_index_on_columns(&["data"], |idx| {
-                idx.assert_algorithm(SQLIndexAlgorithm::SpGist)
+                idx.assert_algorithm(SqlIndexAlgorithm::SpGist)
                     .assert_column("data", |attrs| attrs.assert_ops(SQLOperatorClassKind::TextOps))
             })
     });
@@ -176,7 +176,7 @@ fn spgist_text_ops_varchar(api: TestApi) {
         table
             .assert_has_column("data")
             .assert_index_on_columns(&["data"], |idx| {
-                idx.assert_algorithm(SQLIndexAlgorithm::SpGist)
+                idx.assert_algorithm(SqlIndexAlgorithm::SpGist)
                     .assert_column("data", |attrs| attrs.assert_ops(SQLOperatorClassKind::TextOps))
             })
     });
@@ -201,7 +201,7 @@ fn spgist_text_ops_varchar_default(api: TestApi) {
         table
             .assert_has_column("data")
             .assert_index_on_columns(&["data"], |idx| {
-                idx.assert_algorithm(SQLIndexAlgorithm::SpGist)
+                idx.assert_algorithm(SqlIndexAlgorithm::SpGist)
                     .assert_column("data", |attrs| attrs.assert_ops(SQLOperatorClassKind::TextOps))
             })
     });
@@ -226,7 +226,7 @@ fn spgist_raw_ops(api: TestApi) {
         table
             .assert_has_column("data")
             .assert_index_on_columns(&["data"], |idx| {
-                idx.assert_algorithm(SQLIndexAlgorithm::SpGist)
+                idx.assert_algorithm(SqlIndexAlgorithm::SpGist)
                     .assert_column("data", |attrs| attrs.assert_ops(SQLOperatorClassKind::raw("box_ops")))
             })
     });
@@ -251,7 +251,7 @@ fn spgist_raw_ops_default(api: TestApi) {
         table
             .assert_has_column("data")
             .assert_index_on_columns(&["data"], |idx| {
-                idx.assert_algorithm(SQLIndexAlgorithm::SpGist)
+                idx.assert_algorithm(SqlIndexAlgorithm::SpGist)
                     .assert_column("data", |attrs| attrs.assert_ops(SQLOperatorClassKind::raw("box_ops")))
             })
     });

@@ -586,7 +586,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("primary_col")],
-                sequence: None,
                 constraint_name: None,
             }),
             foreign_keys: vec![],
@@ -1116,7 +1115,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("primary_col")],
-                sequence: None,
                 constraint_name: None,
             }),
             foreign_keys: vec![],

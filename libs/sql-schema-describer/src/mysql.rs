@@ -528,7 +528,6 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                                 primary_key.replace(PrimaryKey {
                                     columns: vec![column],
-                                    sequence: None,
                                     constraint_name: None,
                                 });
                             }

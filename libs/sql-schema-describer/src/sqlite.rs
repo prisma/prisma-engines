@@ -303,7 +303,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             trace!("Determined that table has primary key with columns {:?}", columns);
             Some(PrimaryKey {
                 columns,
-                sequence: None,
                 constraint_name: None,
             })
         };
