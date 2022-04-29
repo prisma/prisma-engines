@@ -1558,6 +1558,58 @@
 <span id="1553">1553</span>
 <span id="1554">1554</span>
 <span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -1576,11 +1628,24 @@
 };
 <span class="kw">use</span> <span class="ident">tracing::trace</span>;
 
-<span class="doccomment">/// A SQL sequence.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="doccomment">/// A PostgreSQL sequence.</span>
+<span class="doccomment">/// https://www.postgresql.org/docs/current/view-pg-sequences.html</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Sequence</span> {
-    <span class="doccomment">/// Sequence name.</span>
+    <span class="doccomment">/// Sequence name</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Start value of the sequence</span>
+    <span class="kw">pub</span> <span class="ident">start_value</span>: <span class="ident">i64</span>,
+    <span class="doccomment">/// Minimum value of the sequence</span>
+    <span class="kw">pub</span> <span class="ident">min_value</span>: <span class="ident">i64</span>,
+    <span class="doccomment">/// Maximum value of the sequence</span>
+    <span class="kw">pub</span> <span class="ident">max_value</span>: <span class="ident">i64</span>,
+    <span class="doccomment">/// Increment value of the sequence</span>
+    <span class="kw">pub</span> <span class="ident">increment_by</span>: <span class="ident">i64</span>,
+    <span class="doccomment">/// Whether the sequence cycles</span>
+    <span class="kw">pub</span> <span class="ident">cycle</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Cache size of the sequence</span>
+    <span class="kw">pub</span> <span class="ident">cache_size</span>: <span class="ident">i64</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
@@ -2640,14 +2705,48 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sequences</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">postgres_ext</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PostgresSchemaExt</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;SELECT sequence_name
-                  FROM information_schema.sequences
-                  WHERE sequence_schema = $1&quot;</span>;
+        <span class="comment">// On postgres 9, pg_sequences does not exist, and the information schema view does not</span>
+        <span class="comment">// contain the cache size.</span>
+        <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroach</span>() {
+            <span class="string">r#&quot;
+              SELECT
+                  sequencename AS sequence_name,
+                  start_value,
+                  min_value,
+                  max_value,
+                  increment_by,
+                  cycle,
+                  cache_size
+              FROM pg_sequences
+              WHERE schemaname = $1
+            &quot;#</span>
+        } <span class="kw">else</span> {
+            <span class="string">r#&quot;
+              SELECT
+                  sequence_name,
+                  start_value::INT8,
+                  minimum_value::INT8 AS min_value,
+                  maximum_value::INT8 AS max_value,
+                  increment::INT8 AS increment_by,
+                  (CASE cycle_option WHEN &#39;yes&#39; THEN TRUE ELSE FALSE END) AS cycle,
+                  0::INT8 AS cache_size
+              FROM information_schema.sequences
+              WHERE sequence_schema = $1
+            &quot;#</span>
+        };
+
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">sequences</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">seq</span><span class="op">|</span> <span class="ident">Sequence</span> {
             <span class="ident">name</span>: <span class="ident">seq</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;sequence_name&quot;</span>),
+            <span class="ident">start_value</span>: <span class="ident">seq</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;start_value&quot;</span>),
+            <span class="ident">min_value</span>: <span class="ident">seq</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;min_value&quot;</span>),
+            <span class="ident">max_value</span>: <span class="ident">seq</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;max_value&quot;</span>),
+            <span class="ident">increment_by</span>: <span class="ident">seq</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;increment_by&quot;</span>),
+            <span class="ident">cycle</span>: <span class="ident">seq</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;cycle&quot;</span>),
+            <span class="ident">cache_size</span>: <span class="ident">seq</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;cache_size&quot;</span>),
         });
         <span class="ident">postgres_ext</span>.<span class="ident">sequences</span>.<span class="ident">extend</span>(<span class="ident">sequences</span>);
+
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -3079,18 +3178,23 @@
         <span class="kw">let</span> <span class="ident">sequences</span> <span class="op">=</span> <span class="macro">vec!</span>[
             <span class="ident">Sequence</span> {
                 <span class="ident">name</span>: <span class="string">&quot;first_sequence&quot;</span>.<span class="ident">to_string</span>(),
+                ..<span class="ident">Default::default</span>()
             },
             <span class="ident">Sequence</span> {
                 <span class="ident">name</span>: <span class="string">&quot;second_sequence&quot;</span>.<span class="ident">to_string</span>(),
+                ..<span class="ident">Default::default</span>()
             },
             <span class="ident">Sequence</span> {
                 <span class="ident">name</span>: <span class="string">&quot;third_Sequence&quot;</span>.<span class="ident">to_string</span>(),
+                ..<span class="ident">Default::default</span>()
             },
             <span class="ident">Sequence</span> {
                 <span class="ident">name</span>: <span class="string">&quot;fourth_Sequence&quot;</span>.<span class="ident">to_string</span>(),
+                ..<span class="ident">Default::default</span>()
             },
             <span class="ident">Sequence</span> {
                 <span class="ident">name</span>: <span class="string">&quot;fifth_sequence&quot;</span>.<span class="ident">to_string</span>(),
+                ..<span class="ident">Default::default</span>()
             },
         ];
 
