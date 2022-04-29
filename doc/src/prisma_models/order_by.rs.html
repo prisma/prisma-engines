@@ -194,37 +194,13 @@
 <span id="189">189</span>
 <span id="190">190</span>
 <span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CompositeFieldRef</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">ScalarFieldRef</span>};
-<span class="kw">use</span> <span class="ident">quaint::prelude::Order</span>;
 <span class="kw">use</span> <span class="ident">std::string::ToString</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SortOrder</span> {
     <span class="ident">Ascending</span>,
     <span class="ident">Descending</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">SortOrder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_order</span>(<span class="self">self</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Order</span> {
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">reverse</span>) {
-            (<span class="ident">SortOrder::Ascending</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">Order::Asc</span>,
-            (<span class="ident">SortOrder::Descending</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">Order::Desc</span>,
-            (<span class="ident">SortOrder::Ascending</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">Order::Desc</span>,
-            (<span class="ident">SortOrder::Descending</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">Order::Asc</span>,
-        }
-    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>

@@ -166,12 +166,12 @@
 <span id="161">161</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::execute_operation</span>::{<span class="ident">execute_many_operations</span>, <span class="ident">execute_many_self_contained</span>, <span class="ident">execute_single_self_contained</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">OpenTx</span>, <span class="ident">Operation</span>, <span class="ident">QueryExecutor</span>, <span class="ident">QuerySchemaRef</span>, <span class="ident">ResponseData</span>, <span class="ident">TransactionActorManager</span>, <span class="ident">TransactionError</span>,
-    <span class="ident">TransactionManager</span>, <span class="ident">TxId</span>,
+    <span class="ident">OpenTx</span>, <span class="ident">Operation</span>, <span class="ident">QueryExecutor</span>, <span class="ident">ResponseData</span>, <span class="ident">TransactionActorManager</span>, <span class="ident">TransactionError</span>, <span class="ident">TransactionManager</span>, <span class="ident">TxId</span>,
 };
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">connector::Connector</span>;
+<span class="kw">use</span> <span class="ident">schema::QuerySchemaRef</span>;
 <span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="self">self</span>, <span class="ident">Duration</span>};
 
 <span class="doccomment">/// Central query executor and main entry point into the query core.</span>

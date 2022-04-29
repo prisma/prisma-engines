@@ -355,17 +355,15 @@
 <span id="350">350</span>
 <span id="351">351</span>
 <span id="352">352</span>
-<span id="353">353</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">arithmetic</span>;
 
 <span class="kw">mod</span> <span class="ident">error</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sql-ext&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">sql_ext</span>;
 
 <span class="kw">use</span> <span class="ident">bigdecimal</span>::{<span class="ident">BigDecimal</span>, <span class="ident">FromPrimitive</span>, <span class="ident">ToPrimitive</span>};
 <span class="kw">use</span> <span class="ident">chrono::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde::de::Unexpected</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">ser::Serializer</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>};
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">ser::Serializer</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span> <span class="kw">as</span> <span class="ident">SerializeTrait</span>};
+<span class="kw">use</span> <span class="ident">serde_derive</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
 <span class="kw">use</span> <span class="ident">uuid::Uuid</span>;
 

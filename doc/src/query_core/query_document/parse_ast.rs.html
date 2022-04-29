@@ -117,14 +117,12 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
-<span id="115">115</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Parsed query document tree. Naming is WIP.</span>
 <span class="doccomment">//! Structures represent parsed and validated parts of the query document, used by the query builders.</span>
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
-
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ObjectTag</span>, <span class="ident">OutputFieldRef</span>};
 <span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">OrderBy</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>};
+<span class="kw">use</span> <span class="ident">schema</span>::{<span class="ident">ObjectTag</span>, <span class="ident">OutputFieldRef</span>};
+<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ParsedInputList</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span>;
 

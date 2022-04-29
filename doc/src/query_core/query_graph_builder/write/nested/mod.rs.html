@@ -58,6 +58,7 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
+<span id="56">56</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">connect_nested</span>;
 <span class="kw">mod</span> <span class="ident">connect_or_create_nested</span>;
 <span class="kw">mod</span> <span class="ident">create_nested</span>;
@@ -69,9 +70,8 @@
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">constants::operations</span>,
     <span class="ident">query_graph</span>::{<span class="ident">NodeRef</span>, <span class="ident">QueryGraph</span>},
-    <span class="ident">ConnectorContext</span>, <span class="ident">ParsedInputMap</span>,
+    <span class="ident">ParsedInputMap</span>,
 };
 <span class="kw">use</span> <span class="ident">connect_nested</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">connect_or_create_nested</span>::<span class="kw-2">*</span>;
@@ -79,6 +79,8 @@
 <span class="kw">use</span> <span class="ident">delete_nested</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">disconnect_nested</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::RelationFieldRef</span>;
+<span class="kw">use</span> <span class="ident">schema::ConnectorContext</span>;
+<span class="kw">use</span> <span class="ident">schema_builder::constants::operations</span>;
 <span class="kw">use</span> <span class="ident">set_nested</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">update_nested</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">upsert_nested</span>::<span class="kw-2">*</span>;

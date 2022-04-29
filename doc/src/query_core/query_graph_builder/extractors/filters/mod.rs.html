@@ -343,7 +343,6 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::utils</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">constants::filters</span>,
     <span class="ident">query_document</span>::{<span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>},
     <span class="ident">QueryGraphBuilderError</span>, <span class="ident">QueryGraphBuilderResult</span>,
 };
@@ -355,6 +354,7 @@
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{
     <span class="ident">prelude::ParentContainer</span>, <span class="ident">CompositeFieldRef</span>, <span class="ident">Field</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">ScalarFieldRef</span>,
 };
+<span class="kw">use</span> <span class="ident">schema_builder::constants::filters</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">convert::TryInto</span>, <span class="ident">str::FromStr</span>};
 
 <span class="doccomment">/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.</span>

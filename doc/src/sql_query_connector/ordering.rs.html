@@ -185,6 +185,15 @@
 <span id="180">180</span>
 <span id="181">181</span>
 <span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">join_utils</span>::<span class="kw-2">*</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_arguments_ext::QueryArgumentsExt</span>};
 <span class="kw">use</span> <span class="ident">connector_interface::QueryArguments</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
@@ -235,7 +244,7 @@
     <span class="ident">index</span>: <span class="ident">usize</span>,
 ) -&gt; <span class="ident">OrderByDefinition</span> {
     <span class="kw">let</span> (<span class="ident">joins</span>, <span class="ident">order_column</span>) <span class="op">=</span> <span class="ident">compute_joins_scalar</span>(<span class="ident">order_by</span>, <span class="ident">index</span>, <span class="ident">base_model</span>);
-    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">order_by</span>.<span class="ident">sort_order</span>.<span class="ident">into_order</span>(<span class="ident">needs_reversed_order</span>));
+    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="ident">needs_reversed_order</span>));
     <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> (<span class="ident">order_column</span>.<span class="ident">clone</span>().<span class="ident">into</span>(), <span class="ident">order</span>);
 
     <span class="ident">OrderByDefinition</span> {
@@ -248,7 +257,7 @@
 <span class="kw">fn</span> <span class="ident">build_order_relevance</span>(<span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByRelevance</span>, <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>) -&gt; <span class="ident">OrderByDefinition</span> {
     <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">order_by</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">as_column</span>().<span class="ident">into</span>()).<span class="ident">collect</span>();
     <span class="kw">let</span> <span class="ident">order_column</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">text_search_relevance</span>(<span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="ident">order_by</span>.<span class="ident">search</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">order_by</span>.<span class="ident">sort_order</span>.<span class="ident">into_order</span>(<span class="ident">needs_reversed_order</span>));
+    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="ident">needs_reversed_order</span>));
     <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> (<span class="ident">order_column</span>.<span class="ident">clone</span>(), <span class="ident">order</span>);
 
     <span class="ident">OrderByDefinition</span> {
@@ -259,7 +268,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">build_order_aggr_scalar</span>(<span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByScalarAggregation</span>, <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>) -&gt; <span class="ident">OrderByDefinition</span> {
-    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">order_by</span>.<span class="ident">sort_order</span>.<span class="ident">into_order</span>(<span class="ident">needs_reversed_order</span>));
+    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="ident">needs_reversed_order</span>));
     <span class="kw">let</span> <span class="ident">order_column</span> <span class="op">=</span> <span class="ident">order_by</span>.<span class="ident">field</span>.<span class="ident">as_column</span>();
     <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_by</span>.<span class="ident">sort_aggregation</span> {
         <span class="ident">SortAggregation::Count</span> =&gt; (<span class="ident">count</span>(<span class="ident">order_column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>(), <span class="ident">order</span>),
@@ -282,7 +291,7 @@
     <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>,
     <span class="ident">index</span>: <span class="ident">usize</span>,
 ) -&gt; <span class="ident">OrderByDefinition</span> {
-    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">order_by</span>.<span class="ident">sort_order</span>.<span class="ident">into_order</span>(<span class="ident">needs_reversed_order</span>));
+    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="ident">needs_reversed_order</span>));
     <span class="kw">let</span> (<span class="ident">joins</span>, <span class="ident">order_column</span>) <span class="op">=</span> <span class="ident">compute_joins_aggregation</span>(<span class="ident">order_by</span>, <span class="ident">index</span>, <span class="ident">base_model</span>);
     <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_by</span>.<span class="ident">sort_aggregation</span> {
         <span class="ident">SortAggregation::Count</span> =&gt; {
@@ -366,6 +375,15 @@
     };
 
     (<span class="ident">joins</span>, <span class="ident">order_by_column</span>)
+}
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_order</span>(<span class="ident">prisma_order</span>: <span class="ident">SortOrder</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Order</span> {
+    <span class="kw">match</span> (<span class="ident">prisma_order</span>, <span class="ident">reverse</span>) {
+        (<span class="ident">SortOrder::Ascending</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">Order::Asc</span>,
+        (<span class="ident">SortOrder::Descending</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">Order::Desc</span>,
+        (<span class="ident">SortOrder::Ascending</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">Order::Desc</span>,
+        (<span class="ident">SortOrder::Descending</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">Order::Asc</span>,
+    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>

@@ -134,10 +134,12 @@
 <span id="129">129</span>
 <span id="130">130</span>
 <span id="131">131</span>
+<span id="132">132</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::pipeline::QueryPipeline</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IrSerializer</span>, <span class="ident">Operation</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphBuilder</span>, <span class="ident">QueryInterpreter</span>, <span class="ident">QuerySchemaRef</span>, <span class="ident">ResponseData</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IrSerializer</span>, <span class="ident">Operation</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphBuilder</span>, <span class="ident">QueryInterpreter</span>, <span class="ident">ResponseData</span>};
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">Connection</span>, <span class="ident">ConnectionLike</span>, <span class="ident">Connector</span>};
 <span class="kw">use</span> <span class="ident">futures::future</span>;
+<span class="kw">use</span> <span class="ident">schema::QuerySchemaRef</span>;
 <span class="kw">use</span> <span class="ident">tracing_futures::WithSubscriber</span>;
 
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_single_operation</span>(

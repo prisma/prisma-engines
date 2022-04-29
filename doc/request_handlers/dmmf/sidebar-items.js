@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["render_dmmf",""]],"mod":[["schema",""]],"struct":[["DataModelMetaFormat",""],["DmmfModelOperations",""],["DmmfNonModelOperations",""],["DmmfOperationMappings","Model operations are serialized as an array of objects, each one corresponding to a model. All other operations are simply an object of read and write operation names that can be called on the engine."]]});
+initSidebarItems({"fn":[["render_dmmf",""]]});

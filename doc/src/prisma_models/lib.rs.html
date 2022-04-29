@@ -51,6 +51,7 @@
 <span id="46">46</span>
 <span id="47">47</span>
 <span id="48">48</span>
+<span id="49">49</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::from_over_into</span>)]</span>
@@ -95,7 +96,8 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">relation</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">selection_result</span>::<span class="kw-2">*</span>;
 
-<span class="comment">// reexport</span>
+<span class="comment">// Re-exports</span>
+<span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">datamodel</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">prisma_value</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">DomainError</span><span class="op">&gt;</span>;

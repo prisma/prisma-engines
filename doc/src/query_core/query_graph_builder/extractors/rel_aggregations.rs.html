@@ -17,7 +17,7 @@
 <span id="12">12</span>
 <span id="13">13</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::aggregations</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">schema_builder::constants::aggregations</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_nested_rel_aggr_selections</span>(<span class="ident">field_pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldPair</span><span class="op">&gt;</span>) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldPair</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldPair</span><span class="op">&gt;</span>) {
     <span class="ident">field_pairs</span>.<span class="ident">into_iter</span>().<span class="ident">partition</span>(<span class="ident">is_aggr_selection</span>)

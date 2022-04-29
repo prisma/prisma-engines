@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["render_to_dmmf",""],["render_to_dmmf_value",""]],"struct":[["Datamodel",""],["Enum",""],["EnumValue",""],["Field",""],["Function",""],["Model",""],["PrimaryKey",""],["UniqueIndex",""]]});
+initSidebarItems({"fn":[["dmmf_from_schema",""],["dmmf_json_from_schema",""],["from_precomputed_parts",""]],"struct":[["DataModelMetaFormat","The main DMMF serialization struct."]]});
