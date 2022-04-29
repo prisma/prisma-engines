@@ -580,6 +580,10 @@ fn all_postgres_column_types_must_work(api: TestApi) {
         }
     );
 
+    if api.connector_tags().contains(Tags::Postgres9) {
+        return; // sequence max values work differently on postgres 9
+    }
+
     let ext = extract_ext(&result);
     let expected_ext = expect![[r#"
         PostgresSchemaExt {
@@ -598,15 +602,39 @@ fn all_postgres_column_types_must_work(api: TestApi) {
             sequences: [
                 Sequence {
                     name: "User_bigserial_col_seq",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 9223372036854775807,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 0,
                 },
                 Sequence {
                     name: "User_smallserial_col_seq",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 32767,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 0,
                 },
                 Sequence {
                     name: "User_serial_col_seq",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 2147483647,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 0,
                 },
                 Sequence {
                     name: "User_primary_col_seq",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 2147483647,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 0,
                 },
             ],
         }
@@ -706,7 +734,7 @@ fn postgres_enums_must_work(api: TestApi) {
     assert_eq!(got_enum.values, values);
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn postgres_sequences_must_work(api: TestApi) {
     api.raw_cmd(&format!("CREATE SEQUENCE \"{}\".\"test\"", api.schema_name()));
 
@@ -719,6 +747,12 @@ fn postgres_sequences_must_work(api: TestApi) {
             sequences: [
                 Sequence {
                     name: "test",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 9223372036854775807,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 0,
                 },
             ],
         }

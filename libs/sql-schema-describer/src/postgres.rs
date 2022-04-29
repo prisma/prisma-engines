@@ -16,11 +16,24 @@ use std::{
 };
 use tracing::trace;
 
-/// A SQL sequence.
-#[derive(Debug)]
+/// A PostgreSQL sequence.
+/// https://www.postgresql.org/docs/current/view-pg-sequences.html
+#[derive(Debug, Default)]
 pub struct Sequence {
-    /// Sequence name.
+    /// Sequence name
     pub name: String,
+    /// Start value of the sequence
+    pub start_value: i64,
+    /// Minimum value of the sequence
+    pub min_value: i64,
+    /// Maximum value of the sequence
+    pub max_value: i64,
+    /// Increment value of the sequence
+    pub increment_by: i64,
+    /// Whether the sequence cycles
+    pub cycle: bool,
+    /// Cache size of the sequence
+    pub cache_size: i64,
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -1080,14 +1093,48 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     async fn get_sequences(&self, schema: &str, postgres_ext: &mut PostgresSchemaExt) -> DescriberResult<()> {
-        let sql = "SELECT sequence_name
-                  FROM information_schema.sequences
-                  WHERE sequence_schema = $1";
+        // On postgres 9, pg_sequences does not exist, and the information schema view does not
+        // contain the cache size.
+        let sql = if self.is_cockroach() {
+            r#"
+              SELECT
+                  sequencename AS sequence_name,
+                  start_value,
+                  min_value,
+                  max_value,
+                  increment_by,
+                  cycle,
+                  cache_size
+              FROM pg_sequences
+              WHERE schemaname = $1
+            "#
+        } else {
+            r#"
+              SELECT
+                  sequence_name,
+                  start_value::INT8,
+                  minimum_value::INT8 AS min_value,
+                  maximum_value::INT8 AS max_value,
+                  increment::INT8 AS increment_by,
+                  (CASE cycle_option WHEN 'yes' THEN TRUE ELSE FALSE END) AS cycle,
+                  0::INT8 AS cache_size
+              FROM information_schema.sequences
+              WHERE sequence_schema = $1
+            "#
+        };
+
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
         let sequences = rows.into_iter().map(|seq| Sequence {
             name: seq.get_expect_string("sequence_name"),
+            start_value: seq.get_expect_i64("start_value"),
+            min_value: seq.get_expect_i64("min_value"),
+            max_value: seq.get_expect_i64("max_value"),
+            increment_by: seq.get_expect_i64("increment_by"),
+            cycle: seq.get_expect_bool("cycle"),
+            cache_size: seq.get_expect_i64("cache_size"),
         });
         postgres_ext.sequences.extend(sequences);
+
         Ok(())
     }
 
@@ -1519,18 +1566,23 @@ mod tests {
         let sequences = vec![
             Sequence {
                 name: "first_sequence".to_string(),
+                ..Default::default()
             },
             Sequence {
                 name: "second_sequence".to_string(),
+                ..Default::default()
             },
             Sequence {
                 name: "third_Sequence".to_string(),
+                ..Default::default()
             },
             Sequence {
                 name: "fourth_Sequence".to_string(),
+                ..Default::default()
             },
             Sequence {
                 name: "fifth_sequence".to_string(),
+                ..Default::default()
             },
         ];
 
