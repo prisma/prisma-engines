@@ -86,7 +86,10 @@ impl ParserDatabase {
                 model_id: *model_id,
                 field_id: *field_id,
                 db: self,
-                default: self.types.scalar_fields[&(*model_id, *field_id)].default.as_ref().unwrap(),
+                default: self.types.scalar_fields[&(*model_id, *field_id)]
+                    .default
+                    .as_ref()
+                    .unwrap(),
             })
     }
 
