@@ -9,6 +9,7 @@ mod one2one_req {
         let schema = indoc! {
             r#"model Parent {
                 #id(id, Int, @id)
+                name String?
                 uniq Int @unique
                 child Child?
               }
@@ -77,6 +78,12 @@ mod one2one_req {
         insta::assert_snapshot!(
           run_query!(runner, r#"query { findManyParent { uniq child { parentUniq child2 { childUniq } } } }"#),
           @r###"{"data":{"findManyParent":[{"uniq":4,"child":{"parentUniq":4,"child2":{"childUniq":4}}}]}}"###
+        );
+
+        // Checks that it work when no FK is updated
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation { upsertOneParent(where: { id: 1 }, update: { name: "Bob" }, create: { id: 1, uniq: 1 }) { name uniq } }"#),
+          @r###"{"data":{"upsertOneParent":{"uniq":4}}}"###
         );
 
         Ok(())
@@ -160,6 +167,7 @@ mod one2one_opt {
         schema.to_owned()
     }
 
+    // Updating the parent updates the child FK as well.
     #[connector_test(schema(optional))]
     async fn update_parent_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -261,40 +269,44 @@ mod one2one_opt {
 
     fn diff_id_name() -> String {
         let schema = indoc! {
-            r#"model User {
+            r#"model Parent {
               #id(id, Int, @id)
-              name          String?
-              profile       Profile?
+              uniq    Int? @unique
+              child   Child?
             }
             
-            model Profile {
-              #id(profileId, Int, @id)
-              user      User     @relation(fields: [profileId], references: [id], onUpdate: Cascade)
+            model Child {
+              #id(childId, Int, @id)
+              childUniq       Int?
+              parent           Parent? @relation(fields: [childUniq], references: [uniq], onUpdate: Cascade)
             }"#
         };
 
         schema.to_owned()
     }
 
+    // Updating the parent updates the child FK as well.
+    // Checks that it works even with different parent/child primary identifier names
     #[connector_test(schema(diff_id_name))]
     async fn update_parent_diff_id_name(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
-            r#"mutation { createOneUser(data: { id: 1, name: "Bob", profile: { create: {} } }) { id } }"#
+            r#"mutation { createOneParent(data: { id: 1, uniq: 1, child: { create: { childId: 1 } } }) { id } }"#
         );
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
-            updateOneUser(
+            updateOneParent(
               where: { id: 1 }
-              data: { name: { set: "updated" } }
+              data: { uniq: 2 }
             ) {
               id
-              name
+              uniq
+              child { childId childUniq }
             }
           }
           "#),
-          @r###"{"data":{"updateOneUser":{"id":1,"name":"updated"}}}"###
+          @r###"{"data":{"updateOneParent":{"id":1,"uniq":2,"child":{"childId":1,"childUniq":2}}}}"###
         );
 
         Ok(())
