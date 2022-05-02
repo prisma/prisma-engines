@@ -32,6 +32,10 @@ pub(super) struct Types {
     pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField>,
     pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes>,
     pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes>,
+    /// Sorted array of scalar fields that have an `@default()` attribute with a function that is
+    /// not part of the base Prisma ones. This is meant for later validation in the datamodel
+    /// connector.
+    pub(super) unknown_function_defaults: Vec<(ast::ModelId, ast::FieldId)>,
 }
 
 impl Types {

@@ -174,10 +174,10 @@ impl<'db> ScalarFieldWalker<'db> {
 /// An `@default()` attribute on a field.
 #[derive(Clone, Copy)]
 pub struct DefaultValueWalker<'db> {
-    model_id: ast::ModelId,
-    field_id: ast::FieldId,
-    db: &'db ParserDatabase,
-    default: &'db DefaultAttribute,
+    pub(super) model_id: ast::ModelId,
+    pub(super) field_id: ast::FieldId,
+    pub(super) db: &'db ParserDatabase,
+    pub(super) default: &'db DefaultAttribute,
 }
 
 impl<'db> DefaultValueWalker<'db> {

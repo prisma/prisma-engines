@@ -77,6 +77,19 @@ impl ParserDatabase {
             .map(move |ctid| CompositeTypeWalker { ctid, db: self })
     }
 
+    /// Walk all scalar field defaults with a function not part of the common ones.
+    pub fn walk_scalar_field_defaults_with_unknown_function(&self) -> impl Iterator<Item = DefaultValueWalker<'_>> {
+        self.types
+            .unknown_function_defaults
+            .iter()
+            .map(|(model_id, field_id)| DefaultValueWalker {
+                model_id: *model_id,
+                field_id: *field_id,
+                db: self,
+                default: self.types.scalar_fields[&(*model_id, *field_id)].default.as_ref().unwrap(),
+            })
+    }
+
     /// Walk all the relations in the schema. A relation may be defined by one or two fields; in
     /// both cases, it is still a single relation.
     pub fn walk_relations(&self) -> impl Iterator<Item = RelationWalker<'_>> + '_ {
