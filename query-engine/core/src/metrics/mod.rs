@@ -1,6 +1,10 @@
-use metrics::KeyName;
+use indexmap::IndexMap;
 use metrics::{Counter, CounterFn, Gauge, GaugeFn, Histogram, HistogramFn, Key, Recorder, Unit};
-use metrics_util::registry::{GenerationalAtomicStorage, GenerationalStorage, Registry};
+use metrics::{KeyName, Label};
+use metrics_util::{
+    registry::{GenerationalAtomicStorage, GenerationalStorage, Registry},
+    Histogram as HistogramUtil,
+};
 use parking_lot::RwLock;
 use std::collections::HashMap;
 use std::sync::atomic::Ordering;
@@ -12,15 +16,26 @@ use tracing::{
 };
 use tracing_subscriber::Layer;
 
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
 const METRIC_TARGET: &str = "qe_metrics";
 const METRIC_COUNTER: &str = "counter";
 const METRIC_GAUGE: &str = "gauge";
 const METRIC_HISTOGRAM: &str = "histogram";
 const METRIC_DESCRIPTION: &str = "description";
 
+mod formatters;
+use formatters::{metrics_to_json, Metric, MetricValue, Snapshot};
+
+// At the moment the histogram is only used for timings. So the bounds are hard coded here
+// The buckets are for ms
+const HISTOGRAM_BOUNDS: [f64; 9] = [10.0, 20.0, 50.0, 100.0, 200.0, 500.0, 1000.0, 2000.0, 5000.0];
+
 struct Inner {
     descriptions: RwLock<HashMap<String, String>>,
     register: Registry<Key, GenerationalAtomicStorage>,
+    pub global_labels: IndexMap<String, String>,
 }
 
 impl Inner {
@@ -28,7 +43,41 @@ impl Inner {
         Self {
             descriptions: RwLock::new(HashMap::new()),
             register: Registry::new(GenerationalStorage::atomic()),
+            global_labels: IndexMap::default(),
         }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+struct KeyLabels {
+    name: String,
+    labels: IndexMap<String, String>,
+}
+
+impl From<Key> for KeyLabels {
+    fn from(key: Key) -> Self {
+        let mut kl = KeyLabels {
+            name: key.name().to_string(),
+            labels: IndexMap::new(),
+        };
+
+        key.labels().for_each(|label| {
+            kl.labels.insert(label.key().to_string(), label.value().to_string());
+        });
+
+        kl
+    }
+}
+
+impl From<KeyLabels> for Key {
+    fn from(kl: KeyLabels) -> Self {
+        let labels: Vec<Label> = kl
+            .labels
+            .into_iter()
+            .map(|(key, value)| Label::from(&(key, value)))
+            .collect();
+
+        Key::from_parts(kl.name, labels)
     }
 }
 
@@ -43,6 +92,10 @@ impl MetricRegistry {
             inner: Arc::new(Inner::new()),
         }
     }
+
+    // pub fn add_global_label(&mut self, key: String, value: String) {
+    //     self.inner.global_labels.insert(key, value);
+    // }
 
     pub fn record(&self, metric: &MetricVisitor) {
         match metric.metric_type {
@@ -108,9 +161,74 @@ impl MetricRegistry {
         Some(val)
     }
 
+    pub fn histogram_values(&self, name: &'static str) -> Option<HistogramUtil> {
+        let mut histogram = HistogramUtil::new(&HISTOGRAM_BOUNDS)?;
+        let key = Key::from_name(name);
+        let histograms = self.inner.register.get_histogram_handles();
+        let samples = histograms.get(&key)?;
+
+        samples.get_inner().data_with(|s| {
+            histogram.record_many(s);
+        });
+        Some(histogram)
+    }
+
     pub fn get_descriptions(&self) -> HashMap<String, String> {
         let descriptions = self.inner.descriptions.read();
         descriptions.clone()
+    }
+
+    fn get_snapshot(&self) -> Snapshot {
+        let counter_handles = self.inner.register.get_counter_handles();
+        let gauge_handles = self.inner.register.get_gauge_handles();
+        let histogram_handles = self.inner.register.get_histogram_handles();
+        let descriptions = self.get_descriptions();
+
+        let counters: Vec<Metric> = counter_handles
+            .into_iter()
+            .map(|(key, counter)| {
+                let key_name = key.name();
+                let value = counter.get_inner().load(Ordering::Acquire);
+                let description = descriptions.get(key_name).cloned().unwrap_or_default();
+                Metric::new(key, description, MetricValue::Counter(value))
+            })
+            .collect();
+
+        let gauges: Vec<Metric> = gauge_handles
+            .into_iter()
+            .map(|(key, gauge)| {
+                let key_name = key.name();
+                let description = descriptions.get(key_name).cloned().unwrap_or_default();
+                let value = f64::from_bits(gauge.get_inner().load(Ordering::Acquire));
+                Metric::new(key, description, MetricValue::Gauge(value))
+            })
+            .collect();
+
+        let histograms: Vec<Metric> = histogram_handles
+            .into_iter()
+            .map(|(key, samples)| {
+                let mut histogram = HistogramUtil::new(&HISTOGRAM_BOUNDS).unwrap();
+                samples.get_inner().data_with(|s| {
+                    histogram.record_many(s);
+                });
+
+                let key_name = key.name();
+                let description = descriptions.get(key_name).cloned().unwrap_or_default();
+                let value = histogram.buckets();
+                Metric::new(key, description, MetricValue::Histogram(value))
+            })
+            .collect();
+
+        Snapshot {
+            counters,
+            gauges,
+            histograms,
+        }
+    }
+
+    pub fn to_json(&self) -> Value {
+        let metrics = self.get_snapshot();
+        metrics_to_json(metrics)
     }
 }
 
@@ -118,7 +236,7 @@ impl MetricRegistry {
 enum MetricType {
     Counter,
     Gauge,
-    Histogram,
+    Histogram, // Histograms are cumulative
     Description,
 }
 
@@ -181,13 +299,17 @@ impl Visit for MetricVisitor {
     }
 
     fn record_str(&mut self, field: &Field, value: &str) {
-        println!("name {}", field.name());
+        println!("name {} {}", field.name(), value);
         match (field.name(), value) {
             ("metric_type", METRIC_COUNTER) => self.metric_type = MetricType::Counter,
             ("metric_type", METRIC_GAUGE) => self.metric_type = MetricType::Gauge,
             ("metric_type", METRIC_HISTOGRAM) => self.metric_type = MetricType::Histogram,
             ("metric_type", METRIC_DESCRIPTION) => self.metric_type = MetricType::Description,
             ("name", _) => self.name = Key::from_name(value.to_string()),
+            ("key_labels", _) => {
+                let key_labels: KeyLabels = serde_json::from_str(value).unwrap();
+                self.name = key_labels.into();
+            }
             (METRIC_DESCRIPTION, _) => self.action = MetricAction::Description(value.to_string()),
             _ => (),
         }
@@ -205,6 +327,7 @@ impl<S: Subscriber> Layer<S> for MetricRegistry {
 
         let mut visitor = MetricVisitor::new();
         event.record(&mut visitor);
+
         self.record(&visitor);
     }
 }
@@ -262,9 +385,12 @@ impl GaugeFn for MetricHandle {
 
 impl HistogramFn for MetricHandle {
     fn record(&self, value: f64) {
+        let keylabels: KeyLabels = self.0.clone().into();
+        let json_string = serde_json::to_string(&keylabels).unwrap();
         trace!(
             target: METRIC_TARGET,
-            name = self.0.name(),
+            // name = self.0.name(),
+            key_labels = json_string.as_str(),
             metric_type = METRIC_HISTOGRAM,
             hist_record = value,
         );
@@ -320,9 +446,10 @@ pub fn set_recorder() {
 mod tests {
     use super::*;
     use metrics::{
-        absolute_counter, decrement_gauge, describe_counter, gauge, increment_counter, increment_gauge,
-        register_counter, register_gauge,
+        absolute_counter, decrement_gauge, describe_counter, gauge, histogram, increment_counter, increment_gauge,
+        register_counter, register_gauge, register_histogram,
     };
+    use serde_json::json;
     use tracing::instrument::WithSubscriber;
     use tracing::Dispatch;
     use tracing_subscriber::layer::SubscriberExt;
@@ -419,6 +546,56 @@ mod tests {
     }
 
     #[test]
+    fn test_histograms() {
+        RT.block_on(async {
+            let metrics = MetricRegistry::new();
+            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            async {
+                let hist = register_histogram!("test_histogram");
+                hist.record(9.0);
+
+                histogram!("test_histogram", 100.0);
+                histogram!("test_histogram", 0.1);
+
+                histogram!("test_histogram", 1999.0);
+                histogram!("test_histogram", 3999.0);
+                histogram!("test_histogram", 610.0);
+
+                let hist = metrics.histogram_values("test_histogram").unwrap();
+                let expected: Vec<(f64, u64)> = Vec::from([
+                    (10.0, 2),
+                    (20.0, 2),
+                    (50.0, 2),
+                    (100.0, 3),
+                    (200.0, 3),
+                    (500.0, 3),
+                    (1000.0, 4),
+                    (2000.0, 5),
+                    (5000.0, 6),
+                ]);
+
+                assert_eq!(hist.buckets(), expected);
+            }
+            .with_subscriber(dispatch)
+            .await;
+        });
+    }
+
+    #[test]
+    fn test_labels() {
+        RT.block_on(async {
+            let metrics = MetricRegistry::new();
+            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            async {
+                let hist = register_histogram!("test_histogram", "label" => "one", "two" => "another");
+                hist.record(9.0);
+            }
+            .with_subscriber(dispatch)
+            .await;
+        });
+    }
+
+    #[test]
     fn test_set_and_read_descriptions() {
         RT.block_on(async {
             let metrics = MetricRegistry::new();
@@ -427,10 +604,66 @@ mod tests {
                 describe_counter!("test_counter", "This is a counter");
 
                 let descriptions = metrics.get_descriptions();
-                println!("d {:?}", descriptions);
                 let description = descriptions.get("test_counter").unwrap();
 
                 assert_eq!("This is a counter", description);
+            }
+            .with_subscriber(dispatch)
+            .await;
+        });
+    }
+
+    #[test]
+    fn test_to_json() {
+        RT.block_on(async {
+            let metrics = MetricRegistry::new();
+            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            async {
+                absolute_counter!("counter_1", 4);
+                absolute_counter!("counter_2", 2);
+
+                gauge!("gauge_1", 7.0);
+                gauge!("gauge_2", 3.0);
+
+                let json = metrics.to_json();
+                println!("JSON {}", json);
+
+                let resp = json!({
+                    "counters": [
+                        {
+                            "key": "counter_1",
+                            "value": 4,
+                            "labels": ["Global label"],
+                            "description": "counter_1 is a basic counter"
+
+                        },
+                        {
+                            "key": "counter_1",
+                            "value": 2,
+                            "labels": ["Global label", "metric label"],
+                            "description": "counter_2 is another basic counter"
+
+                        }
+                    ],
+                    "gauges": [
+                        {
+                            "key": "gauge_1",
+                            "value": 7,
+                            "labels": ["Global label", "metric label"],
+                            "description": "gauge_1 is a gauge"
+
+                        },
+                        {
+                            "key": "gauge_1",
+                            "value": 3,
+                            "labels": ["Global label", "gauge label"],
+                            "description": "gauge_2 is another gauge"
+
+                        }
+                    ]
+                });
+
+                assert_eq!(resp, json);
             }
             .with_subscriber(dispatch)
             .await;
