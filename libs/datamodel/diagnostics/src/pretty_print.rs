@@ -68,6 +68,7 @@ fn format_line_number_with_line(line_number: usize, lines: &[&str]) -> colored::
         format_line_number(line_number)
     }
 }
+
 fn format_line_number(line_number: usize) -> colored::ColoredString {
     if line_number > 0 {
         format!("{:2} | ", line_number).bold().bright_blue()

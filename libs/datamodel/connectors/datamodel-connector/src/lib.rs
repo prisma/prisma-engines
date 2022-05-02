@@ -20,7 +20,7 @@ pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
     native_type_instance::NativeTypeInstance,
 };
-pub use diagnostics::{ConnectorErrorFactory, DatamodelError, Diagnostics, Span};
+pub use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 pub use empty_connector::EmptyDatamodelConnector;
 pub use native_type_constructor::NativeTypeConstructor;
 pub use parser_database::{self, ReferentialAction, ScalarType};
@@ -236,8 +236,8 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
 
-    fn native_instance_error(&self, instance: &NativeTypeInstance) -> ConnectorErrorFactory {
-        ConnectorErrorFactory::new(instance.to_string(), self.name().to_owned())
+    fn native_instance_error(&self, instance: &NativeTypeInstance) -> NativeTypeErrorFactory {
+        NativeTypeErrorFactory::new(instance.to_string(), self.name().to_owned())
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String>;

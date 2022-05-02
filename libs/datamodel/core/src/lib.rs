@@ -69,13 +69,19 @@ pub use parser_database::is_reserved_type_name;
 pub use schema_ast::{self, ast};
 
 use crate::common::preview_features::PreviewFeature;
-use diagnostics::{Diagnostics, Validated};
+use diagnostics::Diagnostics;
 use enumflags2::BitFlags;
 use parser_database::ParserDatabase;
 use transform::{
     ast_to_dml::{validate, DatasourceLoader, GeneratorLoader},
     dml_to_ast::{self, GeneratorSerializer, LowerDmlToAst},
 };
+
+#[derive(Debug)]
+pub struct Validated<T> {
+    pub subject: T,
+    pub warnings: Vec<diagnostics::DatamodelWarning>,
+}
 
 pub type ValidatedDatamodel = Validated<dml::Datamodel>;
 pub type ValidatedConfiguration = Validated<Configuration>;
