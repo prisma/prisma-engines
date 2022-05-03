@@ -68,6 +68,7 @@ pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
                         path: IndexFieldPath::new(*f),
                         sort_order: None,
                         length: None,
+                        operator_class: None,
                     })
                     .collect(),
                 source_field,

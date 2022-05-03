@@ -331,6 +331,10 @@ impl<'a> Display for CreateEnum<'a> {
 pub enum IndexAlgorithm {
     BTree,
     Hash,
+    Gist,
+    Gin,
+    SpGist,
+    Brin,
 }
 
 pub struct CreateIndex<'a> {
@@ -345,6 +349,10 @@ impl<'a> Display for CreateIndex<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let using = match self.using {
             Some(IndexAlgorithm::Hash) => " USING HASH ",
+            Some(IndexAlgorithm::Gist) => " USING GIST ",
+            Some(IndexAlgorithm::Gin) => " USING GIN ",
+            Some(IndexAlgorithm::SpGist) => " USING SPGIST ",
+            Some(IndexAlgorithm::Brin) => " USING BRIN ",
             _ => "",
         };
 
@@ -361,6 +369,11 @@ impl<'a> Display for CreateIndex<'a> {
             .iter()
             .map(|c| {
                 let mut rendered = Ident(&c.name).to_string();
+
+                if let Some(opclass) = &c.operator_class {
+                    rendered.push(' ');
+                    rendered.push_str(opclass.as_ref());
+                }
 
                 if let Some(sort_order) = c.sort_order {
                     rendered.push(' ');

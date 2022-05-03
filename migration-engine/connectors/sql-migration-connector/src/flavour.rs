@@ -249,8 +249,6 @@ fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<P
                     col.sort_order = None;
                 }
 
-                index.algorithm = None;
-
                 if !remove_index {
                     kept_indexes.push(index);
                 }

@@ -22,7 +22,7 @@ use test_setup::{sqlite_test_url, DatasourceBlock, TestApiArgs};
 use tracing::Instrument;
 
 pub struct TestApi {
-    api: SqlIntrospectionConnector,
+    pub api: SqlIntrospectionConnector,
     database: Quaint,
     args: TestApiArgs,
     connection_string: String,

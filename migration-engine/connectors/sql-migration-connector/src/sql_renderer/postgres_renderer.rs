@@ -6,13 +6,14 @@ use crate::{
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
 use datamodel::dml::PrismaValue;
-use native_types::PostgresType;
+use native_types::{CockroachType, PostgresType};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
-    walkers::*, ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLIndexAlgorithm,
-    SQLSortOrder, SqlSchema,
+    postgres::{PostgresSchemaExt, SqlIndexAlgorithm},
+    walkers::*,
+    ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
 };
 use std::borrow::Cow;
 
@@ -250,14 +251,19 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+        let pg_ext: &PostgresSchemaExt = index.schema().downcast_connector_data();
+
         ddl::CreateIndex {
             index_name: index.name().into(),
             is_unique: index.index_type().is_unique(),
             table_reference: index.table().name().into(),
-            using: index.algorithm().map(|algo| match algo {
-                //todo we should think about not rendering this if it is the db default anyways
-                SQLIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
-                SQLIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,
+            using: Some(match pg_ext.index_algorithm(index.index_id()) {
+                SqlIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
+                SqlIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,
+                SqlIndexAlgorithm::Gist => ddl::IndexAlgorithm::Gist,
+                SqlIndexAlgorithm::Gin => ddl::IndexAlgorithm::Gin,
+                SqlIndexAlgorithm::SpGist => ddl::IndexAlgorithm::SpGist,
+                SqlIndexAlgorithm::Brin => ddl::IndexAlgorithm::Brin,
             }),
             columns: index
                 .columns()
@@ -268,6 +274,7 @@ impl SqlRenderer for PostgresFlavour {
                         SQLSortOrder::Asc => SortOrder::Asc,
                         SQLSortOrder::Desc => SortOrder::Desc,
                     }),
+                    operator_class: pg_ext.get_opclass(c.index_field_id()).map(|c| c.kind.as_ref().into()),
                 })
                 .collect(),
         }
@@ -418,8 +425,6 @@ impl SqlRenderer for PostgresFlavour {
 
 fn render_column_type(col: &ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'static, str> {
     let t = col.column_type();
-    let is_autoincrement = col.is_autoincrement();
-
     if let ColumnTypeFamily::Enum(name) = &t.family {
         return format!("\"{}\"{}", name, if t.arity.is_list() { "[]" } else { "" }).into();
     }
@@ -428,23 +433,20 @@ fn render_column_type(col: &ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<
         return format!("{}{}", description, if t.arity.is_list() { "[]" } else { "" }).into();
     }
 
+    if flavour.is_cockroachdb() {
+        render_column_type_cockroachdb(col)
+    } else {
+        render_column_type_postgres(col)
+    }
+}
+
+fn render_column_type_postgres(col: &ColumnWalker<'_>) -> Cow<'static, str> {
+    let t = col.column_type();
+    let is_autoincrement = col.is_autoincrement();
+
     let native_type = col
         .column_native_type()
         .expect("Missing native type in postgres_renderer::render_column_type()");
-
-    fn render(input: Option<u32>) -> String {
-        match input {
-            None => "".to_string(),
-            Some(arg) => format!("({})", arg),
-        }
-    }
-
-    fn render_decimal(input: Option<(u32, u32)>) -> String {
-        match input {
-            None => "".to_string(),
-            Some((precision, scale)) => format!("({},{})", precision, scale),
-        }
-    }
 
     let tpe: Cow<'_, str> = match native_type {
         PostgresType::Citext => "CITEXT".into(),
@@ -453,39 +455,25 @@ fn render_column_type(col: &ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<
         PostgresType::Money => "MONEY".into(),
         PostgresType::SmallInt if is_autoincrement => "SMALLSERIAL".into(),
         PostgresType::SmallInt => "SMALLINT".into(),
-        PostgresType::Integer if is_autoincrement && flavour.is_cockroachdb() => "SERIAL4".into(),
         PostgresType::Integer if is_autoincrement => "SERIAL".into(),
-        PostgresType::Integer => {
-            if flavour.is_cockroachdb() {
-                "INT4".into()
-            } else {
-                "INTEGER".into()
-            }
-        }
+        PostgresType::Integer => "INTEGER".into(),
         PostgresType::BigInt if is_autoincrement => "BIGSERIAL".into(),
         PostgresType::BigInt => "BIGINT".into(),
-        PostgresType::Decimal(precision) => format!("DECIMAL{}", render_decimal(precision)).into(),
+        PostgresType::Decimal(precision) => format!("DECIMAL{}", render_decimal_args(precision)).into(),
         PostgresType::Real => "REAL".into(),
         PostgresType::DoublePrecision => "DOUBLE PRECISION".into(),
-        PostgresType::VarChar(length) => format!("VARCHAR{}", render(length)).into(),
-        PostgresType::Char(length) => {
-            // https://www.cockroachlabs.com/docs/stable/string.html
-            if flavour.is_cockroachdb() && length.is_none() {
-                r#""char""#.into()
-            } else {
-                format!("CHAR{}", render(length)).into()
-            }
-        }
+        PostgresType::VarChar(length) => format!("VARCHAR{}", render_optional_args(length)).into(),
+        PostgresType::Char(length) => format!("CHAR{}", render_optional_args(length)).into(),
         PostgresType::Text => "TEXT".into(),
         PostgresType::ByteA => "BYTEA".into(),
         PostgresType::Date => "DATE".into(),
-        PostgresType::Timestamp(precision) => format!("TIMESTAMP{}", render(precision)).into(),
-        PostgresType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render(precision)).into(),
-        PostgresType::Time(precision) => format!("TIME{}", render(precision)).into(),
-        PostgresType::Timetz(precision) => format!("TIMETZ{}", render(precision)).into(),
+        PostgresType::Timestamp(precision) => format!("TIMESTAMP{}", render_optional_args(precision)).into(),
+        PostgresType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render_optional_args(precision)).into(),
+        PostgresType::Time(precision) => format!("TIME{}", render_optional_args(precision)).into(),
+        PostgresType::Timetz(precision) => format!("TIMETZ{}", render_optional_args(precision)).into(),
         PostgresType::Boolean => "BOOLEAN".into(),
-        PostgresType::Bit(length) => format!("BIT{}", render(length)).into(),
-        PostgresType::VarBit(length) => format!("VARBIT{}", render(length)).into(),
+        PostgresType::Bit(length) => format!("BIT{}", render_optional_args(length)).into(),
+        PostgresType::VarBit(length) => format!("VARBIT{}", render_optional_args(length)).into(),
         PostgresType::Uuid => "UUID".into(),
         PostgresType::Xml => "XML".into(),
         PostgresType::Json => "JSON".into(),
@@ -496,6 +484,65 @@ fn render_column_type(col: &ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<
         format!("{}[]", tpe.to_owned()).into()
     } else {
         tpe
+    }
+}
+
+fn render_column_type_cockroachdb(col: &ColumnWalker<'_>) -> Cow<'static, str> {
+    let t = col.column_type();
+    let is_autoincrement = col.is_autoincrement();
+    let native_type = col
+        .column_native_type()
+        .expect("Missing native type in postgres_renderer::render_column_type()");
+
+    let tpe: Cow<'_, str> = match native_type {
+        CockroachType::Inet => "INET".into(),
+        CockroachType::Int2 if is_autoincrement => "SERIAL2".into(),
+        CockroachType::Int2 => "INT2".into(),
+        CockroachType::Int4 if is_autoincrement => "SERIAL4".into(),
+        CockroachType::Int4 => "INT4".into(),
+        CockroachType::Int8 if is_autoincrement => "SERIAL8".into(),
+        CockroachType::Int8 => "INT8".into(),
+        CockroachType::Oid => "OID".into(),
+        CockroachType::Decimal(precision) => format!("DECIMAL{}", render_decimal_args(precision)).into(),
+        CockroachType::Float4 => "FLOAT4".into(),
+        CockroachType::Float8 => "FLOAT8".into(),
+        CockroachType::String(length) => format!("STRING{}", render_optional_args(length)).into(),
+
+        // https://www.cockroachlabs.com/docs/stable/string.html
+        CockroachType::Char(length) => format!("CHAR{}", render_optional_args(length)).into(),
+        CockroachType::SingleChar => r#""char""#.into(),
+
+        CockroachType::Bytes => "BYTES".into(),
+        CockroachType::Date => "DATE".into(),
+        CockroachType::Timestamp(precision) => format!("TIMESTAMP{}", render_optional_args(precision)).into(),
+        CockroachType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render_optional_args(precision)).into(),
+        CockroachType::Time(precision) => format!("TIME{}", render_optional_args(precision)).into(),
+        CockroachType::Timetz(precision) => format!("TIMETZ{}", render_optional_args(precision)).into(),
+        CockroachType::Bool => "BOOL".into(),
+        CockroachType::Bit(length) => format!("BIT{}", render_optional_args(length)).into(),
+        CockroachType::VarBit(length) => format!("VARBIT{}", render_optional_args(length)).into(),
+        CockroachType::Uuid => "UUID".into(),
+        CockroachType::JsonB => "JSONB".into(),
+    };
+
+    if t.arity.is_list() {
+        format!("{}[]", tpe.to_owned()).into()
+    } else {
+        tpe
+    }
+}
+
+fn render_optional_args(input: Option<u32>) -> String {
+    match input {
+        None => "".to_string(),
+        Some(arg) => format!("({})", arg),
+    }
+}
+
+fn render_decimal_args(input: Option<(u32, u32)>) -> String {
+    match input {
+        None => "".to_string(),
+        Some((precision, scale)) => format!("({},{})", precision, scale),
     }
 }
 

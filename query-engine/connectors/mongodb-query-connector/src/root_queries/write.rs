@@ -35,7 +35,7 @@ pub async fn create_record<'conn>(
     //       query capability (e.g. query for field: null may need to check for exist as well?)
     let fields: Vec<_> = model
         .fields()
-        .all
+        .non_relational()
         .iter()
         .filter(|field| args.has_arg_for(field.db_name()))
         .map(Clone::clone)
@@ -73,13 +73,7 @@ pub async fn create_records<'conn>(
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
     let num_records = args.len();
-    let fields: Vec<_> = model
-        .fields()
-        .all
-        .iter()
-        .filter(|field| matches!(field, Field::Scalar(_) | Field::Composite(_)))
-        .map(Clone::clone)
-        .collect();
+    let fields: Vec<_> = model.fields().non_relational();
 
     let docs = args
         .into_iter()

@@ -25,6 +25,7 @@ fn basic_unique_index_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -107,6 +108,7 @@ fn the_name_argument_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -143,6 +145,7 @@ fn multiple_unique_must_work() {
                         ],
                         sort_order: None,
                         length: None,
+                        operator_class: None,
                     },
                     IndexField {
                         path: [
@@ -153,9 +156,11 @@ fn multiple_unique_must_work() {
                         ],
                         sort_order: None,
                         length: None,
+                        operator_class: None,
                     },
                 ],
                 tpe: Unique,
+                clustered: None,
                 algorithm: None,
                 defined_on_field: false,
             },
@@ -176,6 +181,7 @@ fn multiple_unique_must_work() {
                         ],
                         sort_order: None,
                         length: None,
+                        operator_class: None,
                     },
                     IndexField {
                         path: [
@@ -186,9 +192,11 @@ fn multiple_unique_must_work() {
                         ],
                         sort_order: None,
                         length: None,
+                        operator_class: None,
                     },
                 ],
                 tpe: Unique,
+                clustered: None,
                 algorithm: None,
                 defined_on_field: false,
             },
@@ -242,6 +250,7 @@ fn multi_field_unique_indexes_on_enum_fields_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -268,6 +277,7 @@ fn single_field_unique_indexes_on_enum_fields_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: true,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -311,6 +321,7 @@ fn named_multi_field_unique_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -337,6 +348,7 @@ fn mapped_multi_field_unique_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -365,6 +377,7 @@ fn mapped_singular_unique_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: true,
         algorithm: None,
+        clustered: None,
     });
 
     let model2 = datamodel.assert_has_model("Model2");
@@ -375,6 +388,7 @@ fn mapped_singular_unique_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: true,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -401,6 +415,7 @@ fn named_and_mapped_multi_field_unique_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -427,6 +442,7 @@ fn implicit_names_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 
     model.assert_has_index(IndexDefinition {
@@ -436,6 +452,7 @@ fn implicit_names_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: true,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -462,6 +479,7 @@ fn defined_on_field_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: true,
         algorithm: None,
+        clustered: None,
     });
 
     model.assert_has_index(IndexDefinition {
@@ -471,6 +489,7 @@ fn defined_on_field_must_work() {
         tpe: IndexType::Unique,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -498,6 +517,7 @@ fn mapping_unique_to_a_field_name_should_work() {
         tpe: IndexType::Unique,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -531,6 +551,7 @@ fn duplicate_custom_names_on_different_model_should_work() {
         tpe: IndexType::Unique,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 
     let post = datamodel.assert_has_model("Post");
@@ -544,5 +565,6 @@ fn duplicate_custom_names_on_different_model_should_work() {
         tpe: IndexType::Unique,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }

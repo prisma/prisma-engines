@@ -132,14 +132,25 @@ impl<'db> IndexWalker<'db> {
         self.index_attribute.is_unique()
     }
 
-    /// Is this an `@@fulltext`?
+    /// Is this a `@@fulltext`?
     pub fn is_fulltext(self) -> bool {
         self.index_attribute.is_fulltext()
+    }
+
+    /// Is this an `@@index`?
+    pub fn is_normal(self) -> bool {
+        self.index_attribute.is_normal()
     }
 
     /// True if it's our implicit unique index.
     pub fn is_implicit(self) -> bool {
         self.index.is_none()
+    }
+
+    /// If true, the index defines the storage and ordering of the row. Mostly
+    /// matters on SQL Server where one can change the clustering.
+    pub fn clustered(self) -> Option<bool> {
+        self.index_attribute.clustered
     }
 
     /// The model the index is defined on.

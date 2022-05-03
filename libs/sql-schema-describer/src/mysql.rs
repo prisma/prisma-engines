@@ -98,8 +98,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
             enums,
             views,
             procedures,
-            sequences: vec![],
-            user_defined_types: vec![],
+            ..Default::default()
         })
     }
 
@@ -529,7 +528,6 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                                 primary_key.replace(PrimaryKey {
                                     columns: vec![column],
-                                    sequence: None,
                                     constraint_name: None,
                                 });
                             }
@@ -559,7 +557,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 name: index_name,
                                 columns: vec![column],
                                 tpe,
-                                algorithm: None,
                             },
                         );
                     }

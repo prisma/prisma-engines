@@ -201,6 +201,25 @@ impl<'a> LowerDmlToAst<'a> {
                     args.extend(ordering);
                 }
 
+                if let Some(opclass) = &f.operator_class {
+                    let expr = if opclass.is_raw() {
+                        let args = ast::ArgumentsList {
+                            arguments: vec![ast::Argument {
+                                name: None,
+                                value: ast::Expression::StringValue(opclass.to_string(), ast::Span::empty()),
+                                span: ast::Span::empty(),
+                            }],
+                            empty_arguments: Vec::new(),
+                            trailing_comma: None,
+                        };
+                        ast::Expression::Function("raw".to_string(), args, ast::Span::empty())
+                    } else {
+                        ast::Expression::ConstantValue(opclass.to_string(), ast::Span::empty())
+                    };
+
+                    args.push(ast::Argument::new("ops", expr));
+                }
+
                 let name = f.path.iter().map(|(name, _)| name).join(".");
 
                 if args.is_empty() {

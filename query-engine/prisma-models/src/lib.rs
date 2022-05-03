@@ -42,7 +42,8 @@ pub use record::*;
 pub use relation::*;
 pub use selection_result::*;
 
-// reexport
+// Re-exports
+pub extern crate datamodel;
 pub use prisma_value::*;
 
 pub type Result<T> = std::result::Result<T, DomainError>;
