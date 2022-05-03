@@ -69,15 +69,9 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         let views = self.get_views().await?;
 
         Ok(SqlSchema {
-            // There's no enum type in SQLite.
-            enums: vec![],
-            // There are no sequences in SQLite.
-            sequences: vec![],
-            // There are no procedures in SQLite (phew).
-            procedures: vec![],
             tables,
             views,
-            user_defined_types: vec![],
+            ..Default::default()
         })
     }
 
@@ -309,7 +303,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             trace!("Determined that table has primary key with columns {:?}", columns);
             Some(PrimaryKey {
                 columns,
-                sequence: None,
                 constraint_name: None,
             })
         };
@@ -464,7 +457,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                     false => IndexType::Normal,
                 },
                 columns: vec![],
-                algorithm: None,
             };
 
             let sql = format!(r#"PRAGMA index_info("{}");"#, name);

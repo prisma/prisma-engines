@@ -13,6 +13,7 @@ use tracing::debug;
 #[derive(Debug)]
 pub struct VersionChecker {
     sql_family: SqlFamily,
+    is_cockroachdb: bool,
     has_migration_table: bool,
     has_relay_table: bool,
     has_prisma_1_join_table: bool,
@@ -53,6 +54,7 @@ impl VersionChecker {
     pub fn new(schema: &SqlSchema, ctx: &IntrospectionContext) -> VersionChecker {
         VersionChecker {
             sql_family: ctx.sql_family(),
+            is_cockroachdb: ctx.source.active_provider == "cockroachdb",
             has_migration_table: schema.tables.iter().any(is_old_migration_table),
             has_relay_table: schema.tables.iter().any(is_relay_table),
             has_prisma_1_join_table: schema.tables.iter().any(is_prisma_1_point_0_join_table),
@@ -68,6 +70,9 @@ impl VersionChecker {
 
     pub fn check_column_for_type_and_default_value(&mut self, column: &Column) {
         match self.sql_family {
+            SqlFamily::Postgres if self.is_cockroachdb => {
+                self.uses_non_prisma_types = true; // we can be sure it's not prisma 1
+            }
             SqlFamily::Postgres => {
                 if let Some(native_type) = &column.tpe.native_type {
                     let native_type: PostgresType = serde_json::from_value(native_type.clone()).unwrap();
@@ -120,6 +125,11 @@ impl VersionChecker {
     }
 
     pub fn has_p1_compatible_primary_key_column(&mut self, table: &Table) {
+        if self.is_cockroachdb {
+            // we rule out crdb + P1
+            return;
+        }
+
         if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) {
             if let Some(PrimaryKey { columns, .. }) = &table.primary_key {
                 if columns.len() == 1 {

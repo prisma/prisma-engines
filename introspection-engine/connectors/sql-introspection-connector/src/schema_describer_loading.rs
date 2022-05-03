@@ -7,6 +7,7 @@ use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
 pub async fn load_describer<'a>(
     connection: &'a dyn Queryable,
     connection_info: &ConnectionInfo,
+    provider: Option<&str>,
     preview_features: BitFlags<PreviewFeature>,
 ) -> Result<Box<dyn SqlSchemaDescriberBackend + 'a>, crate::SqlError> {
     let version = connection.version().await?;
@@ -17,6 +18,10 @@ pub async fn load_describer<'a>(
 
             if version.map(|version| version.contains("CockroachDB")).unwrap_or(false) {
                 circumstances |= Circumstances::Cockroach;
+
+                if provider == Some(datamodel::common::provider_names::POSTGRES_SOURCE_NAME) {
+                    circumstances |= Circumstances::CockroachWithPostgresNativeTypes;
+                }
             }
 
             Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(

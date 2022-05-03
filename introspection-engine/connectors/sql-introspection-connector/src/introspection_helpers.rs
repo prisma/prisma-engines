@@ -1,19 +1,18 @@
-use crate::Dedup;
-use crate::SqlError;
+use crate::{Dedup, SqlError, SqlFamilyTrait};
 use datamodel::{
     common::{preview_features::PreviewFeature, RelationNames},
     dml::{
         Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, Model,
-        PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder,
-        ValueGenerator as VG,
+        OperatorClass, PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType,
+        SortOrder, ValueGenerator as VG,
     },
 };
 use introspection_connector::IntrospectionContext;
-use sql_schema_describer::SQLIndexAlgorithm;
+use sql::{mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, IndexFieldId};
 use sql_schema_describer::{
-    Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SQLSortOrder, SqlSchema, Table,
+    self as sql, ColumnArity, ColumnTypeFamily, DefaultKind, ForeignKey, ForeignKeyAction, IndexType, SQLSortOrder,
+    SqlSchema, Table,
 };
-use sql_schema_describer::{DefaultKind, ForeignKeyAction};
 use tracing::debug;
 
 //checks
@@ -128,9 +127,8 @@ pub fn calculate_many_to_many_field(
     RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
 }
 
-pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> IndexDefinition {
-    debug!("Handling index  {:?}", index);
-    let tpe = match index.tpe {
+pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &IntrospectionContext) -> IndexDefinition {
+    let tpe = match index.index_type() {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
         IndexType::Normal => datamodel::dml::IndexType::Normal,
         IndexType::Fulltext if ctx.preview_features.contains(PreviewFeature::FullTextIndex) => {
@@ -139,50 +137,60 @@ pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> Inde
         IndexType::Fulltext => datamodel::dml::IndexType::Normal,
     };
 
-    //We do not populate name in client by default. It increases datamodel noise,
-    //and we would need to sanitize it. Users can give their own names if they want
-    //and re-introspection will keep them. This is a change in introspection behaviour,
-    //but due to re-introspection previous datamodels and clients should keep working as before.
+    // We do not populate name in client by default. It increases datamodel noise, and we would
+    // need to sanitize it. Users can give their own names if they want and re-introspection will
+    // keep them. This is a change in introspection behaviour, but due to re-introspection previous
+    // datamodels and clients should keep working as before.
 
     let using = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        index.algorithm.map(|algo| match algo {
-            SQLIndexAlgorithm::BTree => IndexAlgorithm::BTree,
-            SQLIndexAlgorithm::Hash => IndexAlgorithm::Hash,
-        })
+        index_algorithm(index, ctx)
+    } else {
+        None
+    };
+
+    let clustered = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        index_is_clustered(index.index_id(), index.schema(), ctx)
     } else {
         None
     };
 
     IndexDefinition {
         name: None,
-        db_name: Some(index.name.clone()),
+        db_name: Some(index.name().to_owned()),
         fields: index
-            .columns
-            .iter()
-            .map(|c| {
-                let (sort_order, length) = if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                    (None, None)
-                } else {
-                    let sort_order = c.sort_order.map(|sort| match sort {
-                        SQLSortOrder::Asc => SortOrder::Asc,
-                        SQLSortOrder::Desc => SortOrder::Desc,
-                    });
-                    (sort_order, c.length)
-                };
+            .columns()
+            .enumerate()
+            .map(|(i, c)| {
+                let (sort_order, length, operator_class) =
+                    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+                        (None, None, None)
+                    } else {
+                        let sort_order = c.sort_order().map(|sort| match sort {
+                            SQLSortOrder::Asc => SortOrder::Asc,
+                            SQLSortOrder::Desc => SortOrder::Desc,
+                        });
+
+                        let index_field_id = IndexFieldId(index.index_id(), i as u32);
+
+                        (sort_order, c.length(), get_opclass(index_field_id, index.schema(), ctx))
+                    };
+
                 IndexField {
-                    path: vec![(c.name().to_string(), None)],
+                    path: vec![(c.as_column().name().to_owned(), None)],
                     sort_order,
                     length,
+                    operator_class,
                 }
             })
             .collect(),
         tpe,
-        defined_on_field: index.columns.len() == 1,
+        defined_on_field: index.columns().len() == 1,
         algorithm: using,
+        clustered,
     }
 }
 
-pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &IntrospectionContext) -> ScalarField {
+pub(crate) fn calculate_scalar_field(table: &Table, column: &sql::Column, ctx: &IntrospectionContext) -> ScalarField {
     debug!("Handling column {:?}", column);
 
     let field_type = calculate_scalar_field_type_with_native_types(column, ctx);
@@ -237,7 +245,7 @@ pub(crate) fn calculate_relation_field(
         on_update: Some(map_action(foreign_key.on_update_action)),
     };
 
-    let columns: Vec<&Column> = foreign_key
+    let columns: Vec<&sql::Column> = foreign_key
         .columns
         .iter()
         .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
@@ -315,7 +323,7 @@ pub(crate) fn calculate_backrelation_field(
     }
 }
 
-pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DMLDef> {
+pub(crate) fn calculate_default(table: &sql::Table, column: &sql::Column, arity: &FieldArity) -> Option<DMLDef> {
     match (column.default.as_ref().map(|d| d.kind()), &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
         (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::new_expression(VG::new_autoincrement())),
@@ -339,7 +347,7 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
     }
 }
 
-fn set_default(mut default: DMLDef, column: &Column) -> DMLDef {
+fn set_default(mut default: DMLDef, column: &sql::Column) -> DMLDef {
     let db_name = column.default.as_ref().and_then(|df| df.constraint_name());
 
     if let Some(name) = db_name {
@@ -349,7 +357,7 @@ fn set_default(mut default: DMLDef, column: &Column) -> DMLDef {
     default
 }
 
-pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
+pub(crate) fn is_id(column: &sql::Column, table: &sql::Table) -> bool {
     table
         .primary_key
         .as_ref()
@@ -357,11 +365,11 @@ pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
         .unwrap_or(false)
 }
 
-pub(crate) fn is_sequence(column: &Column, table: &Table) -> bool {
+pub(crate) fn is_sequence(column: &sql::Column, table: &sql::Table) -> bool {
     table
         .primary_key
         .as_ref()
-        .map(|pk| pk.is_single_primary_key(&column.name) && pk.sequence.is_some())
+        .map(|pk| pk.is_single_primary_key(&column.name) && matches!(&column.default, Some(d) if d.is_sequence()))
         .unwrap_or(false)
 }
 
@@ -371,7 +379,7 @@ pub(crate) fn calculate_relation_name(
     table: &Table,
     m2m_table_names: &[String],
 ) -> Result<String, SqlError> {
-    //this is not called for prisma many to many relations. for them the name is just the name of the join table.
+    // This is not called for prisma many to many relations. For them the name is just the name of the join table.
     let referenced_model = &fk.referenced_table;
     let model_with_fk = &table.name;
     let fk_column_name = fk.columns.join("_");
@@ -412,7 +420,7 @@ pub(crate) fn calculate_relation_name(
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> FieldType {
+pub(crate) fn calculate_scalar_field_type_for_native_type(column: &sql::Column) -> FieldType {
     debug!("Calculating field type for '{}'", column.name);
     let fdt = column.tpe.full_data_type.to_owned();
 
@@ -432,7 +440,10 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, ctx: &IntrospectionContext) -> FieldType {
+pub(crate) fn calculate_scalar_field_type_with_native_types(
+    column: &sql::Column,
+    ctx: &IntrospectionContext,
+) -> FieldType {
     debug!("Calculating native field type for '{}'", column.name);
     let scalar_type = calculate_scalar_field_type_for_native_type(column);
 
@@ -517,4 +528,125 @@ pub fn replace_index_field_names(target: &mut Vec<IndexField>, old_name: &str, n
             }
         })
         .for_each(drop);
+}
+
+fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &IntrospectionContext) -> Option<IndexAlgorithm> {
+    if !ctx.sql_family().is_postgres() {
+        return None;
+    }
+
+    let data: &PostgresSchemaExt = index.schema().downcast_connector_data();
+
+    Some(match data.index_algorithm(index.index_id()) {
+        sql::postgres::SqlIndexAlgorithm::BTree => IndexAlgorithm::BTree,
+        sql::postgres::SqlIndexAlgorithm::Hash => IndexAlgorithm::Hash,
+        sql::postgres::SqlIndexAlgorithm::Gist => IndexAlgorithm::Gist,
+        sql::postgres::SqlIndexAlgorithm::Gin => IndexAlgorithm::Gin,
+        sql::postgres::SqlIndexAlgorithm::SpGist => IndexAlgorithm::SpGist,
+        sql::postgres::SqlIndexAlgorithm::Brin => IndexAlgorithm::Brin,
+    })
+}
+
+fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &IntrospectionContext) -> Option<bool> {
+    if !ctx.sql_family().is_mssql() {
+        return None;
+    }
+
+    let ext: &MssqlSchemaExt = schema.downcast_connector_data();
+
+    Some(ext.index_is_clustered(index_id))
+}
+
+pub(crate) fn primary_key_is_clustered(
+    table_id: sql::TableId,
+    schema: &SqlSchema,
+    ctx: &IntrospectionContext,
+) -> Option<bool> {
+    if !ctx.sql_family().is_mssql() {
+        return None;
+    }
+
+    let ext: &MssqlSchemaExt = schema.downcast_connector_data();
+
+    Some(ext.pk_is_clustered(table_id))
+}
+
+fn get_opclass(
+    index_field_id: sql::IndexFieldId,
+    schema: &SqlSchema,
+    ctx: &IntrospectionContext,
+) -> Option<OperatorClass> {
+    if !ctx.sql_family().is_postgres() {
+        return None;
+    }
+
+    let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+
+    let opclass = match ext.get_opclass(index_field_id) {
+        Some(opclass) => opclass,
+        None => return None,
+    };
+
+    match &opclass.kind {
+        _ if opclass.is_default => None,
+        sql::postgres::SQLOperatorClassKind::InetOps => Some(OperatorClass::InetOps),
+        sql::postgres::SQLOperatorClassKind::JsonbOps => Some(OperatorClass::JsonbOps),
+        sql::postgres::SQLOperatorClassKind::JsonbPathOps => Some(OperatorClass::JsonbPathOps),
+        sql::postgres::SQLOperatorClassKind::ArrayOps => Some(OperatorClass::ArrayOps),
+        sql::postgres::SQLOperatorClassKind::TextOps => Some(OperatorClass::TextOps),
+        sql::postgres::SQLOperatorClassKind::BitMinMaxOps => Some(OperatorClass::BitMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::VarBitMinMaxOps => Some(OperatorClass::VarBitMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::BpcharBloomOps => Some(OperatorClass::BpcharBloomOps),
+        sql::postgres::SQLOperatorClassKind::BpcharMinMaxOps => Some(OperatorClass::BpcharMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::ByteaBloomOps => Some(OperatorClass::ByteaBloomOps),
+        sql::postgres::SQLOperatorClassKind::ByteaMinMaxOps => Some(OperatorClass::ByteaMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::DateBloomOps => Some(OperatorClass::DateBloomOps),
+        sql::postgres::SQLOperatorClassKind::DateMinMaxOps => Some(OperatorClass::DateMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::DateMinMaxMultiOps => Some(OperatorClass::DateMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Float4BloomOps => Some(OperatorClass::Float4BloomOps),
+        sql::postgres::SQLOperatorClassKind::Float4MinMaxOps => Some(OperatorClass::Float4MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Float4MinMaxMultiOps => Some(OperatorClass::Float4MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Float8BloomOps => Some(OperatorClass::Float8BloomOps),
+        sql::postgres::SQLOperatorClassKind::Float8MinMaxOps => Some(OperatorClass::Float8MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Float8MinMaxMultiOps => Some(OperatorClass::Float8MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::InetInclusionOps => Some(OperatorClass::InetInclusionOps),
+        sql::postgres::SQLOperatorClassKind::InetBloomOps => Some(OperatorClass::InetBloomOps),
+        sql::postgres::SQLOperatorClassKind::InetMinMaxOps => Some(OperatorClass::InetMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::InetMinMaxMultiOps => Some(OperatorClass::InetMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Int2BloomOps => Some(OperatorClass::Int2BloomOps),
+        sql::postgres::SQLOperatorClassKind::Int2MinMaxOps => Some(OperatorClass::Int2MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Int2MinMaxMultiOps => Some(OperatorClass::Int2MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Int4BloomOps => Some(OperatorClass::Int4BloomOps),
+        sql::postgres::SQLOperatorClassKind::Int4MinMaxOps => Some(OperatorClass::Int4MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Int4MinMaxMultiOps => Some(OperatorClass::Int4MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Int8BloomOps => Some(OperatorClass::Int8BloomOps),
+        sql::postgres::SQLOperatorClassKind::Int8MinMaxOps => Some(OperatorClass::Int8MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Int8MinMaxMultiOps => Some(OperatorClass::Int8MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::NumericBloomOps => Some(OperatorClass::NumericBloomOps),
+        sql::postgres::SQLOperatorClassKind::NumericMinMaxOps => Some(OperatorClass::NumericMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::NumericMinMaxMultiOps => Some(OperatorClass::NumericMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::OidBloomOps => Some(OperatorClass::OidBloomOps),
+        sql::postgres::SQLOperatorClassKind::OidMinMaxOps => Some(OperatorClass::OidMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::OidMinMaxMultiOps => Some(OperatorClass::OidMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::TextBloomOps => Some(OperatorClass::TextBloomOps),
+        sql::postgres::SQLOperatorClassKind::TextMinMaxOps => Some(OperatorClass::TextMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimestampBloomOps => Some(OperatorClass::TimestampBloomOps),
+        sql::postgres::SQLOperatorClassKind::TimestampMinMaxOps => Some(OperatorClass::TimestampMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimestampMinMaxMultiOps => Some(OperatorClass::TimestampMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::TimestampTzBloomOps => Some(OperatorClass::TimestampTzBloomOps),
+        sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxOps => Some(OperatorClass::TimestampTzMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxMultiOps => {
+            Some(OperatorClass::TimestampTzMinMaxMultiOps)
+        }
+        sql::postgres::SQLOperatorClassKind::TimeBloomOps => Some(OperatorClass::TimeBloomOps),
+        sql::postgres::SQLOperatorClassKind::TimeMinMaxOps => Some(OperatorClass::TimeMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimeMinMaxMultiOps => Some(OperatorClass::TimeMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::TimeTzBloomOps => Some(OperatorClass::TimeTzBloomOps),
+        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxOps => Some(OperatorClass::TimeTzMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxMultiOps => Some(OperatorClass::TimeTzMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::UuidBloomOps => Some(OperatorClass::UuidBloomOps),
+        sql::postgres::SQLOperatorClassKind::UuidMinMaxOps => Some(OperatorClass::UuidMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps => Some(OperatorClass::UuidMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Raw(c) => Some(OperatorClass::Raw(c.to_string().into())),
+    }
 }

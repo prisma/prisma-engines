@@ -1,5 +1,5 @@
 use super::*;
-use crate::{query_document::ParsedField, AggregateRecordsQuery, ReadQuery};
+use crate::{query_document::ParsedField, AggregateRecordsQuery};
 use prisma_models::ModelRef;
 
 #[tracing::instrument(skip(field, model))]

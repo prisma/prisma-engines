@@ -1,13 +1,11 @@
 use super::*;
-use crate::{
-    constants::{args, json_null, operations},
-    query_document::{ParsedInputMap, ParsedInputValue},
-    ObjectTag,
-};
+use crate::query_document::{ParsedInputMap, ParsedInputValue};
 use connector::{DatasourceFieldName, WriteArgs, WriteOperation};
 use prisma_models::{
     CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier,
 };
+use schema::ObjectTag;
+use schema_builder::constants::{args, json_null, operations};
 use std::{convert::TryInto, sync::Arc};
 
 #[derive(Default, Debug)]

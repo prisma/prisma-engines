@@ -1,11 +1,20 @@
 version: "3"
 services:
-  cockroach:
+  cockroach_22_1_0_alpha_1:
     image: cockroachdb/cockroach-unstable:v22.1.0-alpha.1
     restart: always
     command: start-single-node --insecure --store=type=mem,size=0.25
     ports:
       - "26257:26257"
+    networks:
+      - databases
+
+  cockroach_21_2_0_patched:
+    image: prismagraphql/cockroachdb-custom:21.2.0-patched
+    restart: always
+    command: start-single-node --insecure
+    ports:
+      - "26258:26257"
     networks:
       - databases
 
@@ -30,12 +39,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs9"
     ports:
       - "5431:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs9:size=4g
 
   postgres10:
     image: postgres:10
@@ -43,12 +50,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs10"
     ports:
       - "5432:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs10:size=4g
 
   postgres11:
     image: postgres:11
@@ -56,12 +61,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs11"
     ports:
       - "5433:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs11:size=4g
 
   postgres12:
     image: postgres:12
@@ -69,12 +72,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs12"
     ports:
       - "5434:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs12:size=4g
 
   postgres13:
     image: postgres:13
@@ -82,12 +83,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs13"
     ports:
       - "5435:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs13:size=4g
 
   postgres14:
     image: postgres:14

@@ -1,14 +1,12 @@
 use super::*;
-use crate::{
-    constants::{aggregations::*, output_fields::*},
-    schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
-    CoreError, DatabaseEnumType, EnumType, OutputFieldRef, QueryResult, RecordAggregations, RecordSelection,
-};
+use crate::{CoreError, QueryResult, RecordAggregations, RecordSelection};
 use bigdecimal::ToPrimitive;
 use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
 use indexmap::IndexMap;
 use itertools::Itertools;
 use prisma_models::{CompositeFieldRef, Field, PrismaValue, SelectionResult};
+use schema::*;
+use schema_builder::constants::{aggregations::*, output_fields::*};
 use std::{borrow::Borrow, collections::HashMap};
 
 /// A grouping of items to their parent record.

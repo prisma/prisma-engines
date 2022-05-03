@@ -25,6 +25,7 @@ fn basic_index_must_work() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -53,6 +54,7 @@ fn indexes_on_enum_fields_must_work() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -81,6 +83,7 @@ fn the_name_argument_must_work() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -113,6 +116,7 @@ fn the_map_argument_must_work() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -142,6 +146,7 @@ fn multiple_index_must_work() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 
     user_model.assert_has_index(IndexDefinition {
@@ -154,6 +159,7 @@ fn multiple_index_must_work() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -207,6 +213,7 @@ fn index_accepts_three_different_notations() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 
     user_model.assert_has_index(IndexDefinition {
@@ -219,6 +226,7 @@ fn index_accepts_three_different_notations() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 
     user_model.assert_has_index(IndexDefinition {
@@ -231,6 +239,7 @@ fn index_accepts_three_different_notations() {
         tpe: IndexType::Normal,
         defined_on_field: false,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -252,10 +261,12 @@ fn mysql_allows_unique_length_prefix() {
             path: vec![("id".to_string(), None)],
             sort_order: None,
             length: Some(30),
+            operator_class: None,
         }],
         tpe: IndexType::Unique,
         defined_on_field: true,
         algorithm: None,
+        clustered: None,
     });
 }
 
@@ -301,18 +312,6 @@ fn mysql_allows_unique_sort_order() {
 }
 
 #[test]
-fn postgres_allows_unique_sort_order() {
-    let dml = indoc! {r#"
-        model A {
-          id String @unique(sort: Desc)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
-}
-
-#[test]
 fn sqlite_allows_unique_sort_order() {
     let dml = indoc! {r#"
         model A {
@@ -347,20 +346,6 @@ fn mysql_allows_compound_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
-}
-
-#[test]
-fn postgres_allows_compound_unique_sort_order() {
-    let dml = indoc! {r#"
-        model A {
-          a String
-          b String
-          @@unique([a(sort: Desc), b(sort: Asc)])
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -408,21 +393,6 @@ fn mysql_allows_index_sort_order() {
 }
 
 #[test]
-fn postrgres_allows_index_sort_order() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a String
-
-          @@index([a(sort: Desc)])
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
-}
-
-#[test]
 fn sqlserver_allows_index_sort_order() {
     let dml = indoc! {r#"
         model A {
@@ -435,30 +405,6 @@ fn sqlserver_allows_index_sort_order() {
 
     let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
     assert!(datamodel::parse_schema(&schema).is_ok());
-}
-
-#[test]
-fn hash_index_works_on_postgres() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a  Int
-
-          @@index([a], type: Hash)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
-    let schema = parse(&schema);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![IndexField::new_in_model("a")],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Hash),
-    });
 }
 
 #[test]
@@ -482,6 +428,7 @@ fn mysql_fulltext_index() {
         tpe: IndexType::Fulltext,
         algorithm: None,
         defined_on_field: false,
+        clustered: None,
     });
 }
 
@@ -506,6 +453,7 @@ fn mysql_fulltext_index_map() {
         tpe: IndexType::Fulltext,
         algorithm: None,
         defined_on_field: false,
+        clustered: None,
     });
 }
 
@@ -530,6 +478,7 @@ fn fulltext_index_mongodb() {
         tpe: IndexType::Fulltext,
         algorithm: None,
         defined_on_field: false,
+        clustered: None,
     });
 }
 
@@ -554,10 +503,12 @@ fn duplicate_index_different_sort_order_mongodb() {
             path: vec![("a".to_string(), None)],
             sort_order: Some(SortOrder::Asc),
             length: None,
+            operator_class: None,
         }],
         tpe: IndexType::Normal,
         algorithm: None,
         defined_on_field: false,
+        clustered: None,
     });
 
     parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
@@ -567,10 +518,12 @@ fn duplicate_index_different_sort_order_mongodb() {
             path: vec![("a".to_string(), None)],
             sort_order: Some(SortOrder::Desc),
             length: None,
+            operator_class: None,
         }],
         tpe: IndexType::Normal,
         algorithm: None,
         defined_on_field: false,
+        clustered: None,
     });
 }
 
@@ -597,11 +550,13 @@ fn fulltext_index_sort_mongodb() {
                 path: vec![("b".to_string(), None)],
                 sort_order: Some(SortOrder::Desc),
                 length: None,
+                operator_class: None,
             },
         ],
         tpe: IndexType::Fulltext,
         algorithm: None,
         defined_on_field: false,
+        clustered: None,
     });
 }
 
@@ -631,6 +586,7 @@ fn multiple_fulltext_indexes_allowed_per_model_in_mysql() {
             tpe: IndexType::Fulltext,
             algorithm: None,
             defined_on_field: false,
+            clustered: None,
         })
         .assert_has_index(IndexDefinition {
             name: None,
@@ -644,5 +600,6 @@ fn multiple_fulltext_indexes_allowed_per_model_in_mysql() {
             tpe: IndexType::Fulltext,
             algorithm: None,
             defined_on_field: false,
+            clustered: None,
         });
 }
