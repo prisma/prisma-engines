@@ -1,4 +1,5 @@
 mod brin;
+mod cockroachdb;
 mod gin;
 mod gist;
 mod spgist;
