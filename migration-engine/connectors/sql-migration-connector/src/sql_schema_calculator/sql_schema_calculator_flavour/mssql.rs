@@ -4,7 +4,7 @@ use datamodel::{
     datamodel_connector::walker_ext_traits::DefaultValueExt,
     parser_database::{walkers::*, ScalarType},
 };
-use sql_schema_describer::ForeignKeyAction;
+use sql_schema_describer::{mssql::MssqlSchemaExt, ForeignKeyAction};
 
 impl SqlSchemaCalculatorFlavour for MssqlFlavour {
     fn default_constraint_name(&self, default_value: DefaultValueWalker<'_>) -> Option<String> {
@@ -22,5 +22,25 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
         } else {
             ForeignKeyAction::Cascade
         }
+    }
+
+    fn push_connector_data(&self, context: &mut super::super::Context<'_>) {
+        let mut data = MssqlSchemaExt::default();
+
+        for (table_idx, model) in context.datamodel.db.walk_models().enumerate() {
+            let table_id = sql_schema_describer::TableId(table_idx as u32);
+            if model.primary_key().and_then(|pk| pk.clustered()) == Some(false) {
+                data.nonclustered_primary_keys.push(table_id);
+            }
+
+            for (index_index, index) in model.indexes().enumerate() {
+                if index.clustered() == Some(true) {
+                    data.clustered_indexes
+                        .push(sql_schema_describer::IndexId(table_id, index_index as u32))
+                }
+            }
+        }
+
+        context.schema.describer_schema.set_connector_data(Box::new(data));
     }
 }

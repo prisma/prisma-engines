@@ -8,7 +8,7 @@ use datamodel::{
     dml::{prisma_value, PrismaValue},
     parser_database::{
         walkers::{ModelWalker, ScalarFieldWalker},
-        IndexAlgorithm, IndexType, ScalarFieldType, SortOrder,
+        IndexType, ScalarFieldType, SortOrder,
     },
     schema_ast::ast::{self, FieldArity},
     ValidatedSchema,
@@ -29,6 +29,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     push_model_tables(&mut context);
     push_relation_tables(&mut context);
+    flavour.push_connector_data(&mut context);
 
     schema
 }
@@ -53,7 +54,6 @@ fn push_model_tables(ctx: &mut Context<'_>) {
                     }),
                 })
                 .collect(),
-            sequence: None,
             constraint_name: pk
                 .constraint_name(ctx.flavour.datamodel_connector())
                 .map(|c| c.into_owned()),
@@ -80,17 +80,10 @@ fn push_model_tables(ctx: &mut Context<'_>) {
                     IndexType::Fulltext => sql::IndexType::Fulltext,
                 };
 
-                let algorithm = index.algorithm().map(|algo| match algo {
-                    IndexAlgorithm::BTree => sql::SQLIndexAlgorithm::BTree,
-                    IndexAlgorithm::Hash => sql::SQLIndexAlgorithm::Hash,
-                });
-
                 sql::Index {
                     name: index.constraint_name(ctx.flavour.datamodel_connector()).into_owned(),
-                    // The model index definition uses the model field names, but the SQL Index wants the column names.
                     columns,
                     tpe: index_type,
-                    algorithm,
                 }
             })
             .collect();
@@ -215,7 +208,6 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                     sql::IndexColumn::new(model_b_column),
                 ],
                 tpe: sql::IndexType::Unique,
-                algorithm: None,
             },
             sql::Index {
                 name: format!(
@@ -224,7 +216,6 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 ),
                 columns: vec![sql::IndexColumn::new(model_b_column)],
                 tpe: sql::IndexType::Normal,
-                algorithm: None,
             },
         ];
 
@@ -422,7 +413,7 @@ fn column_arity(arity: FieldArity) -> sql::ColumnArity {
     }
 }
 
-struct Context<'a> {
+pub(crate) struct Context<'a> {
     datamodel: &'a ValidatedSchema,
     schema: &'a mut SqlDatabaseSchema,
     flavour: &'a dyn SqlFlavour,

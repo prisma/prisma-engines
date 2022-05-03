@@ -35,6 +35,10 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         }
     }
 
+    // Model validations
+    ctx.connector
+        .validate_scalar_field_unknown_default_functions(ctx.db, ctx.diagnostics);
+
     for model in db.walk_models() {
         models::has_a_strict_unique_criteria(model, ctx);
         models::has_a_unique_primary_key_name(model, &names, ctx);
@@ -54,6 +58,10 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
                 let attribute = ("id", span);
                 fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
             }
+
+            fields::id_supports_clustering_setting(pk, ctx);
+            fields::clustering_setting_preview_enabled(pk, ctx);
+            fields::clustering_can_be_defined_only_once(pk, ctx);
         }
 
         for field in model.scalar_fields() {
@@ -95,6 +103,10 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             indexes::fulltext_column_sort_is_supported(index, ctx);
             indexes::fulltext_text_columns_should_be_bundled_together(index, ctx);
             indexes::has_valid_mapped_name(index, ctx);
+            indexes::supports_clustering_setting(index, ctx);
+            indexes::clustering_setting_preview_enabled(index, ctx);
+            indexes::clustering_can_be_defined_only_once(index, ctx);
+            indexes::opclasses_are_not_allowed_with_other_than_normal_indices(index, ctx);
 
             for field_attribute in index.scalar_field_attributes() {
                 let span = index

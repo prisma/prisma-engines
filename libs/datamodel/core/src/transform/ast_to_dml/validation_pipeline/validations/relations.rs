@@ -4,8 +4,8 @@ pub(super) mod one_to_one;
 
 mod visited_relation;
 
+use super::constraint_namespace::ConstraintName;
 use crate::{
-    common::provider_names::MONGODB_SOURCE_NAME,
     diagnostics::DatamodelError,
     transform::ast_to_dml::{
         db::{
@@ -23,8 +23,6 @@ use std::{
     rc::Rc,
 };
 use visited_relation::*;
-
-use super::constraint_namespace::ConstraintName;
 
 const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automatically.";
 const RELATION_ATTRIBUTE_NAME: &str = "relation";
@@ -499,16 +497,6 @@ fn cascade_error_with_default_values(
 
 /// The types of the referencing and referenced scalar fields in a relation must be compatible.
 pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
-    // see https://github.com/prisma/prisma/issues/10105
-    if ctx
-        .datasource
-        .as_ref()
-        .map(|source| source.provider == MONGODB_SOURCE_NAME)
-        .unwrap_or(false)
-    {
-        return;
-    }
-
     let referencing_fields = match relation.referencing_fields() {
         ReferencingFields::Concrete(fields) => fields,
         _ => return,

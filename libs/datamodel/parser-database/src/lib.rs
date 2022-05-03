@@ -39,7 +39,7 @@ mod value_validator;
 pub use names::is_reserved_type_name;
 pub use relations::ReferentialAction;
 pub use schema_ast::ast;
-pub use types::{IndexAlgorithm, IndexFieldPath, IndexType, ScalarFieldType, ScalarType, SortOrder};
+pub use types::{IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SortOrder};
 pub use value_validator::{ValueListValidator, ValueValidator};
 
 use self::{context::Context, interner::StringId, relations::Relations, types::Types};
@@ -138,6 +138,11 @@ impl ParserDatabase {
     /// The parsed AST.
     pub fn ast(&self) -> &ast::SchemaAst {
         &self.ast
+    }
+
+    /// The total number of models.
+    pub fn models_count(&self) -> usize {
+        self.types.model_attributes.len()
     }
 }
 

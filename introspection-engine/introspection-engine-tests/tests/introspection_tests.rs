@@ -1,4 +1,5 @@
 mod add_prisma1_defaults;
+mod cockroachdb;
 mod commenting_out;
 mod enums;
 mod errors;

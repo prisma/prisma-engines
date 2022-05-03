@@ -1,7 +1,7 @@
 use super::{differ_database::DifferDatabase, ColumnTypeChange};
 use crate::{pair::Pair, sql_migration::SqlMigrationStep, sql_schema_differ};
 use sql_schema_describer::{
-    walkers::{ColumnWalker, IndexWalker},
+    walkers::{ColumnWalker, IndexWalker, TableWalker},
     ColumnId,
 };
 
@@ -48,6 +48,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Push enum-related steps.
     fn push_enum_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
 
+    /// Connector-specific criterias deciding whether two indexes match.
+    fn indexes_match(&self, _a: IndexWalker<'_>, _b: IndexWalker<'_>) -> bool {
+        true
+    }
+
     /// Returns whether the underlying database implicitly drops indexes on dropped (and potentially recreated) columns.
     fn indexes_should_be_recreated_after_column_drop(&self) -> bool {
         false
@@ -59,6 +64,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     fn lower_cases_table_names(&self) -> bool {
+        false
+    }
+
+    /// Did something connector-specific change in the primary key definition?
+    fn primary_key_changed(&self, _tables: Pair<TableWalker<'_>>) -> bool {
         false
     }
 

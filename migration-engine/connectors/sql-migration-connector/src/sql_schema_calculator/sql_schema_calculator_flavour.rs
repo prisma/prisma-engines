@@ -43,4 +43,6 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     fn m2m_foreign_key_action(&self, _model_a: ModelWalker<'_>, _model_b: ModelWalker<'_>) -> sql::ForeignKeyAction {
         sql::ForeignKeyAction::Cascade
     }
+
+    fn push_connector_data(&self, _context: &mut super::Context<'_>) {}
 }

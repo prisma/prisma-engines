@@ -87,11 +87,11 @@ fn must_error_if_unknown_function_is_used() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The function `unknown_function` is not a known function. You can read about the available functions here: https://pris.ly/d/attribute-functions.[0m
+        [1;91merror[0m: [1mUnknown function in @default(): `unknown_function` is not known. You can read about the available functions here: https://pris.ly/d/attribute-functions[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
         [1;94m 1 | [0mtype Composite {
-        [1;94m 2 | [0m  rel DateTime @[1;91mdefault(unknown_function())[0m
+        [1;94m 2 | [0m  rel DateTime @default([1;91munknown_function()[0m)
         [1;94m   | [0m
     "#]];
 

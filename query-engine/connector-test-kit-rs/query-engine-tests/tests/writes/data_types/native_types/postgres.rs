@@ -94,8 +94,8 @@ mod postgres {
         let schema = indoc! {
             r#"model Model {
               #id(id, String, @id, @default(cuid()))
-              float    Float   @test.Real
-              dfloat   Float   @test.DoublePrecision
+              float    Float   @test.Float4
+              dfloat   Float   @test.Float8
               decFloat Decimal @test.Decimal(2, 1)
             }"#
         };
@@ -221,8 +221,8 @@ mod postgres {
         let schema = indoc! {
             r#"model Model {
               #id(id, String, @id, @default(cuid()))
-              bool  Boolean @test.Boolean
-              byteA Bytes   @test.ByteA
+              bool  Boolean @test.Bool
+              byteA Bytes   @test.Bytes
               jsonb Json    @test.JsonB
             }"#
         };

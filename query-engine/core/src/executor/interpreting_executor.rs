@@ -1,11 +1,11 @@
 use super::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
 use crate::{
-    OpenTx, Operation, QueryExecutor, QuerySchemaRef, ResponseData, TransactionActorManager, TransactionError,
-    TransactionManager, TxId,
+    OpenTx, Operation, QueryExecutor, ResponseData, TransactionActorManager, TransactionError, TransactionManager, TxId,
 };
 
 use async_trait::async_trait;
 use connector::Connector;
+use schema::QuerySchemaRef;
 use tokio::time::{self, Duration};
 
 /// Central query executor and main entry point into the query core.

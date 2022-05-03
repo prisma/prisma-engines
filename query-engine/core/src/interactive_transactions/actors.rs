@@ -1,18 +1,16 @@
-use crate::{execute_many_operations, execute_single_operation, OpenTx, Operation, TxId};
-use crate::{QuerySchemaRef, ResponseData};
+use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
+use crate::{execute_many_operations, execute_single_operation, OpenTx, Operation, ResponseData, TxId};
+use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
-use tokio::sync::mpsc::channel;
-use tokio::task::JoinHandle;
 use tokio::{
     sync::{
-        mpsc::{Receiver, Sender},
+        mpsc::{channel, Receiver, Sender},
         oneshot, RwLock,
     },
+    task::JoinHandle,
     time::{self, Duration},
 };
 use tracing_futures::WithSubscriber;
-
-use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 
 #[derive(PartialEq)]
 enum RunState {

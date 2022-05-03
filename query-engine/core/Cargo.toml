@@ -43,3 +43,5 @@ uuid = "0.8"
 cuid = { git = "https://github.com/prisma/cuid-rust" }
 pin-utils = "0.1"
 lazy_static = "1.4"
+schema = { path = "../schema" }
+schema-builder = { path = "../schema-builder" }

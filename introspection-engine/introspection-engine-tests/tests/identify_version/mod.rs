@@ -95,7 +95,7 @@ async fn introspect_postgres_non_prisma(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn introspect_postgres_prisma_1(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -127,7 +127,39 @@ async fn introspect_postgres_prisma_1(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(CockroachDb))]
+async fn introspect_cockroach_prisma_1(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.inject_custom("id character varying(25) Not Null Primary Key");
+                t.inject_custom("createdAt timestamp(3)");
+                t.inject_custom("updatedAt timestamp(3)");
+                t.inject_custom("string text");
+                t.inject_custom("int Integer");
+                t.inject_custom("float Decimal(65,30)");
+                t.inject_custom("boolean boolean");
+            });
+            migration.create_table("_RelayId", |t| {
+                t.inject_custom("id character varying(25) Primary Key ");
+                t.inject_custom("stableModelIdentifier character varying(25) Not Null");
+            });
+
+            migration.create_table("Book_tags", |t| {
+                t.inject_custom("nodeid character varying(25) references \"Book\"(\"id\")");
+                t.inject_custom("position integer");
+                t.inject_custom("value integer NOT NULL");
+                t.inject_custom("CONSTRAINT \"BookTags_list_pkey\" PRIMARY KEY (\"nodeid\", \"position\")");
+            });
+        })
+        .await?;
+
+    assert_eq!(Version::NonPrisma, api.introspect_version().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn introspect_postgres_prisma_1_1(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -153,7 +185,7 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn introspect_postgres_prisma2(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

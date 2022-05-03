@@ -7,6 +7,7 @@ use crate::{
 };
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use sql_schema_describer::{
+    mssql::MssqlSchemaExt,
     walkers::{ColumnWalker, IndexWalker},
     ColumnId, ColumnTypeFamily,
 };
@@ -14,6 +15,13 @@ use sql_schema_describer::{
 impl SqlSchemaDifferFlavour for MssqlFlavour {
     fn can_rename_foreign_key(&self) -> bool {
         true
+    }
+
+    fn indexes_match(&self, a: IndexWalker<'_>, b: IndexWalker<'_>) -> bool {
+        let mssql_ext_previous: &MssqlSchemaExt = a.schema().downcast_connector_data();
+        let mssql_ext_next: &MssqlSchemaExt = b.schema().downcast_connector_data();
+
+        mssql_ext_previous.index_is_clustered(a.index_id()) == mssql_ext_next.index_is_clustered(b.index_id())
     }
 
     fn should_skip_index_for_new_table(&self, index: &IndexWalker<'_>) -> bool {
@@ -59,6 +67,13 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
             (None, _) | (_, None) => family_change_riskyness(previous_family, next_family),
             (Some(previous), Some(next)) => native_type_change_riskyness(previous, next),
         }
+    }
+
+    fn primary_key_changed(&self, tables: Pair<sql_schema_describer::walkers::TableWalker<'_>>) -> bool {
+        let previous_ext: &MssqlSchemaExt = tables.previous().schema().downcast_connector_data();
+        let next_ext: &MssqlSchemaExt = tables.next().schema().downcast_connector_data();
+
+        previous_ext.pk_is_clustered(tables.previous().table_id()) != next_ext.pk_is_clustered(tables.next().table_id())
     }
 
     fn push_index_changes_for_column_changes(

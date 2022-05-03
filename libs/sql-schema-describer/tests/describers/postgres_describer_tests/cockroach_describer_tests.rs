@@ -1,5 +1,5 @@
 use crate::test_api::*;
-use sql_schema_describer::{ColumnTypeFamily, IndexColumn, SQLSortOrder};
+use sql_schema_describer::{postgres::PostgresSchemaExt, ColumnTypeFamily, IndexColumn, SQLSortOrder};
 
 #[test_connector(tags(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
@@ -47,6 +47,7 @@ fn all_cockroach_column_types_must_work(api: TestApi) {
             float_col FLOAT,
             int_col INT,
             numeric_col NUMERIC,
+            oid_col OID,
             smallint_col SMALLINT,
             smallserial_col SMALLSERIAL,
             serial_col SERIAL,
@@ -161,6 +162,10 @@ fn all_cockroach_column_types_must_work(api: TestApi) {
             c.assert_full_data_type("bpchar")
                 .assert_column_type_family(ColumnTypeFamily::String)
         })
+        .assert_column("oid_col", |c| {
+            c.assert_full_data_type("oid")
+                .assert_column_type_family(ColumnTypeFamily::Int)
+        })
         .assert_column("time_col", |c| {
             c.assert_full_data_type("time")
                 .assert_column_type_family(ColumnTypeFamily::DateTime)
@@ -236,12 +241,12 @@ fn cockroach_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestAp
             IndexColumn {
                 name: "name".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
             IndexColumn {
                 name: "age".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
         ]
     );
@@ -256,12 +261,12 @@ fn cockroach_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestAp
             IndexColumn {
                 name: "age".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
             IndexColumn {
                 name: "name".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
         ]
     );
@@ -290,4 +295,64 @@ fn escaped_characters_in_string_defaults(api: TestApi) {
     expect_col("seasonality", r#""summer""#);
     expect_col("contains", r#"'potassium'"#);
     expect_col("sideNames", "top\ndown");
+}
+
+#[test_connector(tags(CockroachDb))]
+fn cockroachdb_sequences_must_work(api: TestApi) {
+    // https://www.cockroachlabs.com/docs/v21.2/create-sequence.html
+    let sql = r#"
+        -- Defaults
+        CREATE SEQUENCE "test";
+
+        -- Not cycling. All crdb sequences are like that.
+        CREATE SEQUENCE "testnotcycling" NO CYCLE;
+
+        -- Other options
+        CREATE SEQUENCE "testmore" 
+            INCREMENT 4
+            MINVALUE 10
+            MAXVALUE 100
+            START 20
+            CACHE 7;
+    "#;
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+    let expected_ext = expect![[r#"
+        PostgresSchemaExt {
+            opclasses: [],
+            indexes: [],
+            sequences: [
+                Sequence {
+                    name: "test",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 9223372036854775807,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 1,
+                },
+                Sequence {
+                    name: "testnotcycling",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 9223372036854775807,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 1,
+                },
+                Sequence {
+                    name: "testmore",
+                    start_value: 20,
+                    min_value: 10,
+                    max_value: 100,
+                    increment_by: 4,
+                    cycle: false,
+                    cache_size: 7,
+                },
+            ],
+        }
+    "#]];
+    expected_ext.assert_debug_eq(&ext);
 }

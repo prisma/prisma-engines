@@ -1,4 +1,4 @@
-use crate::{helper::pretty_print, Span};
+use crate::{pretty_print::pretty_print, Span};
 use thiserror::Error;
 
 /// Enum for different warnings which can happen during parsing or validation.

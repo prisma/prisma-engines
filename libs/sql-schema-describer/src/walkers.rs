@@ -4,7 +4,7 @@
 
 use crate::{
     Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
-    Index, IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SQLIndexAlgorithm, SQLSortOrder, SqlSchema, Table,
+    Index, IndexColumn, IndexFieldId, IndexId, IndexType, PrimaryKey, PrimaryKeyColumn, SQLSortOrder, SqlSchema, Table,
     TableId, UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
@@ -382,6 +382,11 @@ impl<'a> TableWalker<'a> {
             .map(|pk| pk.columns.iter().map(|c| c.name().to_string()).collect())
     }
 
+    /// The SQLSchema the table belongs to.
+    pub fn schema(self) -> &'a SqlSchema {
+        self.schema
+    }
+
     /// Reference to the underlying `Table` struct.
     pub fn table(&self) -> &'a Table {
         &self.schema[self.table_id]
@@ -604,6 +609,11 @@ impl<'a> IndexColumnWalker<'a> {
             table_id: self.table_id,
         }
     }
+
+    /// The identifier of the index column.
+    pub fn index_field_id(&self) -> IndexFieldId {
+        IndexFieldId(self.index().index_id(), self.index_column_id as u32)
+    }
 }
 
 /// Traverse an index.
@@ -659,6 +669,11 @@ impl<'a> IndexWalker<'a> {
         self.index_index
     }
 
+    /// The identifier of the index.
+    pub fn index_id(&self) -> IndexId {
+        IndexId(self.table_id, self.index_index as u32)
+    }
+
     /// The IndexType
     pub fn index_type(&self) -> IndexType {
         self.get().tpe
@@ -669,17 +684,17 @@ impl<'a> IndexWalker<'a> {
         &self.get().name
     }
 
+    /// The SqlSchema the index belongs to
+    pub fn schema(self) -> &'a SqlSchema {
+        self.schema
+    }
+
     /// Traverse to the table of the index.
     pub fn table(&self) -> TableWalker<'a> {
         TableWalker {
             table_id: self.table_id,
             schema: self.schema,
         }
-    }
-
-    /// The hash algorithm used in the index.
-    pub fn algorithm(&self) -> Option<SQLIndexAlgorithm> {
-        self.get().algorithm
     }
 }
 
