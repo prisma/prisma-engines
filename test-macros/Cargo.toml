@@ -8,7 +8,6 @@ edition = "2018"
 proc-macro = true
 
 [dependencies]
-quaint = { path = "../" }
 darling = "0.10.1"
 syn = "1.0.5"
 quote = "1.0.2"

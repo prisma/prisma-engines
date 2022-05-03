@@ -83,7 +83,7 @@ test_type!(real(mssql, "real", Value::Float(None), Value::float(1.123456)));
 test_type!(float_53(
     mssql,
     "float(53)",
-    Value::Float(None),
+    Value::Double(None),
     Value::double(1.1234567891)
 ));
 

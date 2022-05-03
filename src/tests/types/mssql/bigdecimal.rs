@@ -175,7 +175,7 @@ test_type!(real(
 test_type!(float_53(
     mssql,
     "float(53)",
-    (Value::Numeric(None), Value::Float(None)),
+    (Value::Numeric(None), Value::Double(None)),
     (
         Value::numeric(BigDecimal::from_str("1.123456789012345")?),
         Value::double(1.123456789012345)
