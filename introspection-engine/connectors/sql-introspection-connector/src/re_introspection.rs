@@ -32,6 +32,7 @@ pub fn enrich(
     merge_prisma_level_defaults(old_data_model, new_data_model, warnings);
     merge_ignores(old_data_model, new_data_model, warnings);
     merge_comments(old_data_model, new_data_model);
+    keep_index_ordering(old_data_model, new_data_model);
 
     // restore old model order
     new_data_model.models.sort_by(|model_a, model_b| {
@@ -48,6 +49,22 @@ pub fn enrich(
 
         re_order_putting_new_ones_last(enum_a_idx, enum_b_idx)
     });
+}
+
+fn keep_index_ordering(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
+    for old_model in old_data_model.models() {
+        let new_model = match new_data_model.models_mut().find(|m| m.name == *old_model.name()) {
+            Some(m) => m,
+            None => continue,
+        };
+
+        new_model.indices.sort_by(|idx_a, idx_b| {
+            let idx_a_idx = old_model.indices.iter().position(|idx| idx.db_name == idx_a.db_name);
+            let idx_b_idx = old_model.indices.iter().position(|idx| idx.db_name == idx_b.db_name);
+
+            re_order_putting_new_ones_last(idx_a_idx, idx_b_idx)
+        });
+    }
 }
 
 fn re_order_putting_new_ones_last(enum_a_idx: Option<usize>, enum_b_idx: Option<usize>) -> Ordering {
