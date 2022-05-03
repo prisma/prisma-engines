@@ -184,7 +184,7 @@ impl MetricRegistry {
         let histogram_handles = self.inner.register.get_histogram_handles();
         let descriptions = self.get_descriptions();
 
-        let counters: Vec<Metric> = counter_handles
+        let mut counters: Vec<Metric> = counter_handles
             .into_iter()
             .map(|(key, counter)| {
                 let key_name = key.name();
@@ -194,7 +194,7 @@ impl MetricRegistry {
             })
             .collect();
 
-        let gauges: Vec<Metric> = gauge_handles
+        let mut gauges: Vec<Metric> = gauge_handles
             .into_iter()
             .map(|(key, gauge)| {
                 let key_name = key.name();
@@ -204,7 +204,7 @@ impl MetricRegistry {
             })
             .collect();
 
-        let histograms: Vec<Metric> = histogram_handles
+        let mut histograms: Vec<Metric> = histogram_handles
             .into_iter()
             .map(|(key, samples)| {
                 let mut histogram = HistogramUtil::new(&HISTOGRAM_BOUNDS).unwrap();
@@ -218,6 +218,11 @@ impl MetricRegistry {
                 Metric::new(key, description, MetricValue::Histogram(value))
             })
             .collect();
+
+        // Sort them so that they are in ordered by key name
+        counters.sort_by(|a, b| a.key.cmp(&b.key));
+        gauges.sort_by(|a, b| a.key.cmp(&b.key));
+        histograms.sort_by(|a, b| a.key.cmp(&b.key));
 
         Snapshot {
             counters,
@@ -299,7 +304,6 @@ impl Visit for MetricVisitor {
     }
 
     fn record_str(&mut self, field: &Field, value: &str) {
-        println!("name {} {}", field.name(), value);
         match (field.name(), value) {
             ("metric_type", METRIC_COUNTER) => self.metric_type = MetricType::Counter,
             ("metric_type", METRIC_GAUGE) => self.metric_type = MetricType::Gauge,
@@ -327,7 +331,6 @@ impl<S: Subscriber> Layer<S> for MetricRegistry {
 
         let mut visitor = MetricVisitor::new();
         event.record(&mut visitor);
-
         self.record(&visitor);
     }
 }
@@ -336,18 +339,22 @@ struct MetricHandle(Key);
 
 impl CounterFn for MetricHandle {
     fn increment(&self, value: u64) {
+        let keylabels: KeyLabels = self.0.clone().into();
+        let json_string = serde_json::to_string(&keylabels).unwrap();
         trace!(
             target: METRIC_TARGET,
-            name = self.0.name(),
+            key_labels = json_string.as_str(),
             metric_type = METRIC_COUNTER,
             increment = value,
         );
     }
 
     fn absolute(&self, value: u64) {
+        let keylabels: KeyLabels = self.0.clone().into();
+        let json_string = serde_json::to_string(&keylabels).unwrap();
         trace!(
             target: METRIC_TARGET,
-            name = self.0.name(),
+            key_labels = json_string.as_str(),
             metric_type = METRIC_COUNTER,
             absolute = value,
         );
@@ -356,27 +363,33 @@ impl CounterFn for MetricHandle {
 
 impl GaugeFn for MetricHandle {
     fn increment(&self, value: f64) {
+        let keylabels: KeyLabels = self.0.clone().into();
+        let json_string = serde_json::to_string(&keylabels).unwrap();
         trace!(
             target: METRIC_TARGET,
-            name = self.0.name(),
+            key_labels = json_string.as_str(),
             metric_type = METRIC_GAUGE,
             gauge_inc = value,
         );
     }
 
     fn decrement(&self, value: f64) {
+        let keylabels: KeyLabels = self.0.clone().into();
+        let json_string = serde_json::to_string(&keylabels).unwrap();
         trace!(
             target: METRIC_TARGET,
-            name = self.0.name(),
+            key_labels = json_string.as_str(),
             metric_type = METRIC_GAUGE,
             gauge_dec = value,
         );
     }
 
     fn set(&self, value: f64) {
+        let keylabels: KeyLabels = self.0.clone().into();
+        let json_string = serde_json::to_string(&keylabels).unwrap();
         trace!(
             target: METRIC_TARGET,
-            name = self.0.name(),
+            key_labels = json_string.as_str(),
             metric_type = METRIC_GAUGE,
             gauge_set = value,
         );
@@ -389,7 +402,6 @@ impl HistogramFn for MetricHandle {
         let json_string = serde_json::to_string(&keylabels).unwrap();
         trace!(
             target: METRIC_TARGET,
-            // name = self.0.name(),
             key_labels = json_string.as_str(),
             metric_type = METRIC_HISTOGRAM,
             hist_record = value,
@@ -416,11 +428,11 @@ impl Recorder for MetricRecorder {
         self.register_description(key_name.as_str(), description);
     }
 
-    fn describe_gauge(&self, key_name: KeyName, unit: Option<Unit>, description: &'static str) {
+    fn describe_gauge(&self, key_name: KeyName, _unit: Option<Unit>, description: &'static str) {
         self.register_description(key_name.as_str(), description);
     }
 
-    fn describe_histogram(&self, key_name: KeyName, unit: Option<Unit>, description: &'static str) {
+    fn describe_histogram(&self, key_name: KeyName, _unit: Option<Unit>, description: &'static str) {
         self.register_description(key_name.as_str(), description);
     }
 
@@ -446,8 +458,8 @@ pub fn set_recorder() {
 mod tests {
     use super::*;
     use metrics::{
-        absolute_counter, decrement_gauge, describe_counter, gauge, histogram, increment_counter, increment_gauge,
-        register_counter, register_gauge, register_histogram,
+        absolute_counter, decrement_gauge, describe_counter, describe_gauge, describe_histogram, gauge, histogram,
+        increment_counter, increment_gauge, register_counter, register_gauge, register_histogram,
     };
     use serde_json::json;
     use tracing::instrument::WithSubscriber;
@@ -619,54 +631,97 @@ mod tests {
             let metrics = MetricRegistry::new();
             let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
             async {
-                absolute_counter!("counter_1", 4);
-                absolute_counter!("counter_2", 2);
-
-                gauge!("gauge_1", 7.0);
-                gauge!("gauge_2", 3.0);
-
-                let json = metrics.to_json();
-                println!("JSON {}", json);
-
-                let resp = json!({
-                    "counters": [
-                        {
-                            "key": "counter_1",
-                            "value": 4,
-                            "labels": ["Global label"],
-                            "description": "counter_1 is a basic counter"
-
-                        },
-                        {
-                            "key": "counter_1",
-                            "value": 2,
-                            "labels": ["Global label", "metric label"],
-                            "description": "counter_2 is another basic counter"
-
-                        }
-                    ],
-                    "gauges": [
-                        {
-                            "key": "gauge_1",
-                            "value": 7,
-                            "labels": ["Global label", "metric label"],
-                            "description": "gauge_1 is a gauge"
-
-                        },
-                        {
-                            "key": "gauge_1",
-                            "value": 3,
-                            "labels": ["Global label", "gauge label"],
-                            "description": "gauge_2 is another gauge"
-
-                        }
-                    ]
+                let empty = json!({
+                    "counters": [],
+                    "gauges": [],
+                    "histograms": []
                 });
 
-                assert_eq!(resp, json);
+                assert_eq!(metrics.to_json(), empty);
+
+                absolute_counter!("counter_1", 4, "label" => "one");
+                let _ = describe_counter!("counter_2", "this is a description for counter 2");
+                absolute_counter!("counter_2", 2, "label" => "one", "another_label" => "two");
+
+                describe_gauge!("gauge_1", "a description for gauge 1");
+                gauge!("gauge_1", 7.0);
+                gauge!("gauge_2", 3.0, "label" => "three");
+
+                describe_histogram!("histogram_1", "a description for histogram");
+                let hist = register_histogram!("histogram_1", "label" => "one", "hist_two" => "two");
+                hist.record(9.0);
+
+                histogram!("histogram_2", 1000.0);
+
+                let json = metrics.to_json();
+                println!("J {}", json);
+
+                let expected = json!({
+                    "counters": [{
+                        "key": "counter_1",
+                        "value": 4,
+                        "labels": {"label": "one"},
+                        "description": ""
+                    },{
+                        "key": "counter_2",
+                        "value": 2,
+                        "labels": {"label": "one", "another_label": "two"},
+                        "description": "this is a description for counter 2"
+                    }],
+                    "gauges": [{
+                        "key": "gauge_1",
+                        "value": 7.0,
+                        "labels": {},
+                        "description": "a description for gauge 1"
+                    }, {
+                        "key": "gauge_2",
+                        "value": 3.0,
+                        "labels": {"label": "three"},
+                        "description": ""
+                    }],
+                    "histograms": [{
+                        "key": "histogram_1",
+                        "value":[[10.0,1],[20.0,1],[50.0,1],[100.0,1],[200.0,1],[500.0,1],[1000.0,1],[2000.0,1],[5000.0,1]],
+                        "labels": {"label": "one", "hist_two": "two"},
+                        "description": "a description for histogram"
+                    }, {
+                        "key": "histogram_2",
+                        "value":[[10.0,0],[20.0,0],[50.0,0],[100.0,0],[200.0,0],[500.0,0],[1000.0,1],[2000.0,1],[5000.0,1]],
+                        "labels": {},
+                        "description": ""
+                    }]
+                });
+
+                println!("E {}", expected);
+
+
+                assert_eq!(expected, json);
             }
             .with_subscriber(dispatch)
             .await;
         });
     }
+
+    // fn assert_obj_equal(expected: Value, json: Value) {
+    //     for (_, metrics) in expected.as_object().unwrap().iter() {
+    //         for metric_json in metrics.as_array().unwrap() {
+    //             let metric = metric_json.as_object().unwrap();
+    //             let key = metric.get("key").unwrap().as_str().unwrap();
+    //         }
+    //     }
+    // }
+
+    // fn get_metric(key: &str, json: Value) -> Value {
+    //     for (_, metrics) in expected.as_object().unwrap().iter() {
+    //         for metric_json in metrics.as_array().unwrap() {
+    //             let metric = metric_json.as_object().unwrap();
+    //             let found_key = metric.get("key").unwrap().as_str().unwrap();
+    //             if found_key == key {
+    //                 return found_key;
+    //             }
+    //         }
+    //     }
+
+    //     panic!(format!("count not find key {} in results", key));
+    // }
 }

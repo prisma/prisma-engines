@@ -6,6 +6,7 @@ use serde_json::value::Value;
 use std::collections::HashMap;
 
 #[derive(Serialize)]
+#[serde(untagged)]
 pub enum MetricValue {
     Counter(u64),
     Gauge(f64),
@@ -14,10 +15,10 @@ pub enum MetricValue {
 
 #[derive(Serialize)]
 pub struct Metric {
+    pub key: String,
     labels: IndexMap<String, String>,
     value: MetricValue,
     description: String,
-    key: String,
 }
 
 impl Metric {
@@ -49,38 +50,3 @@ pub struct Snapshot {
 pub fn metrics_to_json(snapshot: Snapshot) -> Value {
     serde_json::to_value(snapshot).unwrap()
 }
-
-// let resp = json!({
-//     "counters": [
-//         {
-//             "key": "counter_1",
-//             "value": 4,
-//             "labels": ["Global label"],
-//             "description": "counter_1 is a basic counter"
-
-//         },
-//         {
-//             "key": "counter_1",
-//             "value": 2,
-//             "labels": ["Global label", "metric label"],
-//             "description": "counter_2 is another basic counter"
-
-//         }
-//     ],
-//     "gauges": [
-//         {
-//             "key": "gauge_1",
-//             "value": 7,
-//             "labels": ["Global label", "metric label"],
-//             "description": "gauge_1 is a gauge"
-
-//         },
-//         {
-//             "key": "gauge_1",
-//             "value": 3,
-//             "labels": ["Global label", "gauge label"],
-//             "description": "gauge_2 is another gauge"
-
-//         }
-//     ]
-// });
