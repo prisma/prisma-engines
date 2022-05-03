@@ -626,10 +626,10 @@
 <span class="doccomment">/// An `@default()` attribute on a field.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
-    <span class="ident">default</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">DefaultAttribute</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">default</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">DefaultAttribute</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {

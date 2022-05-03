@@ -304,7 +304,6 @@
 <span id="299">299</span>
 <span id="300">300</span>
 <span id="301">301</span>
-<span id="302">302</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This crate is responsible for parsing, rendering and formatting a Prisma Schema.</span>
 <span class="doccomment">//! A Prisma Schema consists out of two parts:</span>
 <span class="doccomment">//! 1. The `Datamodel` part refers to the model and enum definitions.</span>
@@ -412,8 +411,7 @@
     }
 }
 
-<span class="doccomment">/// Parse and validate the whole schema. This function&#39;s signature is obviously less than optimal,</span>
-<span class="doccomment">/// let&#39;s work towards something simpler.</span>
+<span class="doccomment">/// Parse and validate the whole schema.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_schema_parserdb</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValidatedSchema</span>, <span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">Diagnostics::new</span>();
     <span class="ident">diagnostics</span>

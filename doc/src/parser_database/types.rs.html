@@ -1037,6 +1037,10 @@
 <span id="1032">1032</span>
 <span id="1033">1033</span>
 <span id="1034">1034</span>
+<span id="1035">1035</span>
+<span id="1036">1036</span>
+<span id="1037">1037</span>
+<span id="1038">1038</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::Context</span>, <span class="ident">interner::StringId</span>, <span class="ident">walkers::IndexFieldWalker</span>, <span class="ident">DatamodelError</span>};
 <span class="kw">use</span> <span class="ident">either::Either</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::bitflags</span>;
@@ -1071,6 +1075,10 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">relation_fields</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">ast::FieldId</span>), <span class="ident">RelationField</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">enum_attributes</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ast::EnumId</span>, <span class="ident">EnumAttributes</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">model_attributes</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ast::ModelId</span>, <span class="ident">ModelAttributes</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Sorted array of scalar fields that have an `@default()` attribute with a function that is</span>
+    <span class="doccomment">/// not part of the base Prisma ones. This is meant for later validation in the datamodel</span>
+    <span class="doccomment">/// connector.</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">unknown_function_defaults</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">ast::FieldId</span>)<span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Types</span> {

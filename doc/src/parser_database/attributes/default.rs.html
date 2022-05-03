@@ -390,6 +390,7 @@
 <span id="385">385</span>
 <span id="386">386</span>
 <span id="387">387</span>
+<span id="388">388</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
     <span class="ident">context::Context</span>,
@@ -453,9 +454,14 @@
                     <span class="ident">bad_value</span> =&gt; <span class="ident">validate_invalid_default_enum_expr</span>(<span class="ident">bad_value</span>, <span class="ident">ctx</span>),
                 };
             }
-            <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; {
-                <span class="ident">validate_model_builtin_scalar_type_default</span>(<span class="ident">scalar_type</span>, <span class="ident">value</span>.<span class="ident">value</span>, <span class="ident">mapped_name</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>)
-            }
+            <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; <span class="ident">validate_model_builtin_scalar_type_default</span>(
+                <span class="ident">scalar_type</span>,
+                <span class="ident">value</span>.<span class="ident">value</span>,
+                <span class="ident">mapped_name</span>,
+                <span class="ident">accept</span>,
+                (<span class="ident">model_id</span>, <span class="ident">field_id</span>),
+                <span class="ident">ctx</span>,
+            ),
             <span class="ident">ScalarFieldType::Alias</span>(<span class="ident">alias_id</span>) =&gt; {
                 <span class="ident">r#type</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">type_aliases</span>[<span class="kw-2">&amp;</span><span class="ident">alias_id</span>];
                 <span class="kw">continue</span>;
@@ -541,6 +547,7 @@
     <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>,
     <span class="ident">mapped_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StringId</span><span class="op">&gt;</span>,
     <span class="kw-2">mut</span> <span class="ident">accept</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(),
+    <span class="ident">field_id</span>: (<span class="ident">ast::ModelId</span>, <span class="ident">ast::FieldId</span>),
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) {
     <span class="kw">match</span> (<span class="ident">scalar_type</span>, <span class="ident">value</span>) {
@@ -585,12 +592,13 @@
         }
 
         (<span class="kw">_</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="kw">_</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">KNOWN_FUNCTIONS</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">funcname</span>.<span class="ident">as_str</span>()) =&gt; {
-            <span class="ident">validate_unknown_function_default</span>(<span class="ident">funcname</span>, <span class="ident">ctx</span>);
+            <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">unknown_function_defaults</span>.<span class="ident">push</span>(<span class="ident">field_id</span>);
+            <span class="ident">accept</span>();
         }
 
         <span class="comment">// Invalid function default.</span>
         (<span class="ident">scalar_type</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="kw">_</span>, <span class="kw">_</span>)) =&gt; {
-            <span class="ident">validate_invalid_funtion_default</span>(<span class="ident">funcname</span>, <span class="ident">scalar_type</span>, <span class="ident">ctx</span>);
+            <span class="ident">validate_invalid_function_default</span>(<span class="ident">funcname</span>, <span class="ident">scalar_type</span>, <span class="ident">ctx</span>);
         }
 
         <span class="comment">// Invalid scalar default.</span>
@@ -636,12 +644,12 @@
                 <span class="string">&quot;The function `{funcname}()` is not supported on composite fields.&quot;</span>,
             ));
         }
-        (<span class="kw">_</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="kw">_</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">KNOWN_FUNCTIONS</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">funcname</span>.<span class="ident">as_str</span>()) =&gt; {
-            <span class="ident">validate_unknown_function_default</span>(<span class="ident">funcname</span>, <span class="ident">ctx</span>);
+        (<span class="kw">_</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="kw">_</span>, <span class="ident">span</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">KNOWN_FUNCTIONS</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">funcname</span>.<span class="ident">as_str</span>()) =&gt; {
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_default_unknown_function</span>(<span class="ident">funcname</span>, <span class="kw-2">*</span><span class="ident">span</span>));
         }
         <span class="comment">// Invalid function default.</span>
         (<span class="ident">scalar_type</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="kw">_</span>, <span class="kw">_</span>)) =&gt; {
-            <span class="ident">validate_invalid_funtion_default</span>(<span class="ident">funcname</span>, <span class="ident">scalar_type</span>, <span class="ident">ctx</span>);
+            <span class="ident">validate_invalid_function_default</span>(<span class="ident">funcname</span>, <span class="ident">scalar_type</span>, <span class="ident">ctx</span>);
         }
         <span class="comment">// Invalid scalar default.</span>
         (<span class="ident">scalar_type</span>, <span class="ident">value</span>) =&gt; {
@@ -691,12 +699,6 @@
     <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Expected an enum value, but found `{bad_value}`.&quot;</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">validate_unknown_function_default</span>(<span class="ident">fn_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-        <span class="string">&quot;The function `{fn_name}` is not a known function. You can read about the available functions here: https://pris.ly/d/attribute-functions.&quot;</span>,
-    ));
-}
-
 <span class="kw">fn</span> <span class="ident">validate_invalid_scalar_default</span>(<span class="ident">scalar_type</span>: <span class="ident">ScalarType</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
         <span class="string">&quot;Expected a {scalar_type} value, but found `{bad_value}`.&quot;</span>,
@@ -705,7 +707,7 @@
     ));
 }
 
-<span class="kw">fn</span> <span class="ident">validate_invalid_funtion_default</span>(<span class="ident">fn_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">scalar_type</span>: <span class="ident">ScalarType</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">fn</span> <span class="ident">validate_invalid_function_default</span>(<span class="ident">fn_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">scalar_type</span>: <span class="ident">ScalarType</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
         <span class="string">&quot;The function `{fn_name}()` cannot be used on fields of type `{scalar_type}`.&quot;</span>,
         <span class="ident">scalar_type</span> <span class="op">=</span> <span class="ident">scalar_type</span>.<span class="ident">as_str</span>()

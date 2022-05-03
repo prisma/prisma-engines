@@ -185,6 +185,10 @@
 <span id="180">180</span>
 <span id="181">181</span>
 <span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -221,6 +225,10 @@
             }
         }
     }
+
+    <span class="comment">// Model validations</span>
+    <span class="ident">ctx</span>.<span class="ident">connector</span>
+        .<span class="ident">validate_scalar_field_unknown_default_functions</span>(<span class="ident">ctx</span>.<span class="ident">db</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
 
     <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_models</span>() {
         <span class="ident">models::has_a_strict_unique_criteria</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
