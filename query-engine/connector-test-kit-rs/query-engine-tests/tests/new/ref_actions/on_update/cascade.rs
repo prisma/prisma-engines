@@ -83,7 +83,7 @@ mod one2one_req {
         // Checks that it work when no FK is updated
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation { upsertOneParent(where: { id: 1 }, update: { name: "Bob" }, create: { id: 1, uniq: 1 }) { name uniq } }"#),
-          @r###"{"data":{"upsertOneParent":{"uniq":4}}}"###
+          @r###"{"data":{"upsertOneParent":{"name":"Bob","uniq":4}}}"###
         );
 
         Ok(())
