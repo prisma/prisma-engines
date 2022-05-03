@@ -176,6 +176,7 @@ impl SqlMigrationConnector {
                             let columns = tables.columns(column_ides);
 
                             let arity_change_is_safe = match (&columns.previous().arity(), &columns.next().arity()) {
+                                (a, b) if a == b => true,
                                 // column became required
                                 (ColumnArity::Nullable, ColumnArity::Required) => false,
                                 // column became nullable
