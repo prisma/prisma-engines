@@ -95,7 +95,7 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Tries to convert the wrapped value to a Prisma Integer.
-    pub(crate) fn as_int(&self) -> Result<i64, DatamodelError> {
+    pub fn as_int(&self) -> Result<i64, DatamodelError> {
         match &self.value {
             ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<i64>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
@@ -124,7 +124,7 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Unwraps the wrapped value as a boolean.
-    pub(crate) fn as_bool(&self) -> Result<bool, DatamodelError> {
+    pub fn as_bool(&self) -> Result<bool, DatamodelError> {
         match self.as_constant_literal() {
             Ok("true") => Ok(true),
             Ok("false") => Ok(false),

@@ -1,7 +1,8 @@
 use datamodel_connector::{
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    parser_database, Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics,
-    NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
+    parser_database::{self, ast, ValueValidator},
+    Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
+    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
 };
 use enumflags2::BitFlags;
 use native_types::{CockroachType, NativeType};
@@ -96,7 +97,7 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
     (ScalarType::Json, CockroachType::JsonB),
 ];
 
-pub struct CockroachDatamodelConnector;
+pub(crate) struct CockroachDatamodelConnector;
 
 impl Connector for CockroachDatamodelConnector {
     fn name(&self) -> &str {
@@ -215,6 +216,22 @@ impl Connector for CockroachDatamodelConnector {
 
     fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _diagnostics: &mut Diagnostics) {}
 
+    fn validate_scalar_field_unknown_default_functions(
+        &self,
+        db: &parser_database::ParserDatabase,
+        diagnostics: &mut Diagnostics,
+    ) {
+        for d in db.walk_scalar_field_defaults_with_unknown_function() {
+            let (func_name, args, span) = d.value().as_function().unwrap();
+            match func_name {
+                "sequence" => {
+                    SequenceFunction::validate(args, diagnostics);
+                }
+                _ => diagnostics.push_error(DatamodelError::new_default_unknown_function(func_name, span)),
+            }
+        }
+    }
+
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         CONSTRAINT_SCOPES
     }
@@ -302,5 +319,70 @@ impl Connector for CockroachDatamodelConnector {
         }
 
         Ok(())
+    }
+}
+
+/// An `@default(sequence())` function.
+#[derive(Default, Debug)]
+pub struct SequenceFunction {
+    pub r#virtual: Option<bool>,
+    pub cache: Option<i64>,
+    pub increment: Option<i64>,
+    pub min_value: Option<i64>,
+    pub max_value: Option<i64>,
+    pub start: Option<i64>,
+    pub no_cycle: Option<bool>,
+}
+
+impl SequenceFunction {
+    pub fn build_unchecked(args: &ast::ArgumentsList) -> Self {
+        Self::validate(args, &mut Diagnostics::default())
+    }
+
+    pub fn validate(args: &ast::ArgumentsList, diagnostics: &mut Diagnostics) -> Self {
+        let mut this = SequenceFunction::default();
+
+        for arg in &args.arguments {
+            let span = arg.span;
+            match (
+                arg.name.as_ref().map(|arg| arg.name.as_str()),
+                ValueValidator::new(&arg.value),
+            ) {
+                (Some("virtual"), expr) => match expr.as_bool() {
+                    Ok(b) => this.r#virtual = Some(b),
+                    Err(err) => diagnostics.push_error(err),
+                },
+                (Some("noCycle"), expr) => match expr.as_bool() {
+                    Ok(b) => this.no_cycle = Some(b),
+                    Err(err) => diagnostics.push_error(err),
+                },
+                (Some("cache"), expr) => match expr.as_int() {
+                    Ok(i) => this.cache = Some(i),
+                    Err(err) => diagnostics.push_error(err),
+                },
+                (Some("increment"), expr) => match expr.as_int() {
+                    Ok(i) => this.increment = Some(i),
+                    Err(err) => diagnostics.push_error(err),
+                },
+                (Some("minValue"), expr) => match expr.as_int() {
+                    Ok(i) => this.min_value = Some(i),
+                    Err(err) => diagnostics.push_error(err),
+                },
+                (Some("maxValue"), expr) => match expr.as_int() {
+                    Ok(i) => this.max_value = Some(i),
+                    Err(err) => diagnostics.push_error(err),
+                },
+                (Some("start"), expr) => match expr.as_int() {
+                    Ok(i) => this.start = Some(i),
+                    Err(err) => diagnostics.push_error(err),
+                },
+                (Some(_), _) | (None, _) => diagnostics.push_error(DatamodelError::new(
+                    "Unexpected argument in `sequence()` function call".into(),
+                    span,
+                )),
+            }
+        }
+
+        this
     }
 }

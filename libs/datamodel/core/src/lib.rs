@@ -105,8 +105,7 @@ impl ValidatedSchema {
     }
 }
 
-/// Parse and validate the whole schema. This function's signature is obviously less than optimal,
-/// let's work towards something simpler.
+/// Parse and validate the whole schema.
 pub fn parse_schema_parserdb(src: &str) -> Result<ValidatedSchema, String> {
     let mut diagnostics = Diagnostics::new();
     diagnostics

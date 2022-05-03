@@ -97,7 +97,18 @@ pub trait Connector: Send + Sync {
     ) {
     }
 
-    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _: &mut diagnostics::Diagnostics) {}
+    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
+
+    fn validate_scalar_field_unknown_default_functions(
+        &self,
+        db: &parser_database::ParserDatabase,
+        diagnostics: &mut Diagnostics,
+    ) {
+        for d in db.walk_scalar_field_defaults_with_unknown_function() {
+            let (func_name, _, span) = d.value().as_function().unwrap();
+            diagnostics.push_error(DatamodelError::new_default_unknown_function(func_name, span));
+        }
+    }
 
     /// The scopes in which a constraint name should be validated. If empty, doesn't check for name
     /// clashes in the validation phase.

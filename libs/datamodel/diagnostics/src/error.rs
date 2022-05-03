@@ -99,9 +99,6 @@ enum DatamodelErrorKind {
   #[error("Attribute not known: \"@{}\".", attribute_name)]
   AttributeNotKnownError { attribute_name: String, span: Span },
 
-  #[error("Function not known: \"{}\".", function_name)]
-  FunctionNotKnownError { function_name: String, span: Span },
-
   #[error("Property not known: \"{}\".", property_name)]
   PropertyNotKnownError { property_name: String, span: Span },
 
@@ -521,12 +518,12 @@ impl DatamodelError {
         .into()
     }
 
-    pub fn new_function_not_known_error(function_name: &str, span: Span) -> DatamodelError {
-        DatamodelErrorKind::FunctionNotKnownError {
-            function_name: String::from(function_name),
-            span,
-        }
-        .into()
+    pub fn new_default_unknown_function(function_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::new(format!(
+                "Unknown function in @default(): `{function_name}` is not known. You can read about the available functions here: https://pris.ly/d/attribute-functions"
+            ).into(),
+            span
+        )
     }
 
     pub fn new_invalid_model_error(msg: &str, span: Span) -> DatamodelError {
@@ -619,7 +616,6 @@ impl DatamodelError {
             DatamodelErrorKind::AttributeValidationError { span, .. } => *span,
             DatamodelErrorKind::AttributeNotKnownError { span, .. } => *span,
             DatamodelErrorKind::ReservedScalarTypeError { span, .. } => *span,
-            DatamodelErrorKind::FunctionNotKnownError { span, .. } => *span,
             DatamodelErrorKind::DatasourceProviderNotKnownError { span, .. } => *span,
             DatamodelErrorKind::LiteralParseError { span, .. } => *span,
             DatamodelErrorKind::NativeTypeArgumentCountMismatchError { span, .. } => *span,

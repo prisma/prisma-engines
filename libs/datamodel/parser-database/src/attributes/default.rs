@@ -61,9 +61,14 @@ pub(super) fn visit_model_field_default(
                     bad_value => validate_invalid_default_enum_expr(bad_value, ctx),
                 };
             }
-            ScalarFieldType::BuiltInScalar(scalar_type) => {
-                validate_model_builtin_scalar_type_default(scalar_type, value.value, mapped_name, accept, ctx)
-            }
+            ScalarFieldType::BuiltInScalar(scalar_type) => validate_model_builtin_scalar_type_default(
+                scalar_type,
+                value.value,
+                mapped_name,
+                accept,
+                (model_id, field_id),
+                ctx,
+            ),
             ScalarFieldType::Alias(alias_id) => {
                 r#type = ctx.types.type_aliases[&alias_id];
                 continue;
@@ -149,6 +154,7 @@ fn validate_model_builtin_scalar_type_default(
     value: &ast::Expression,
     mapped_name: Option<StringId>,
     mut accept: impl FnMut(),
+    field_id: (ast::ModelId, ast::FieldId),
     ctx: &mut Context<'_>,
 ) {
     match (scalar_type, value) {
@@ -193,12 +199,13 @@ fn validate_model_builtin_scalar_type_default(
         }
 
         (_, ast::Expression::Function(funcname, _, _)) if !KNOWN_FUNCTIONS.contains(&funcname.as_str()) => {
-            validate_unknown_function_default(funcname, ctx);
+            ctx.types.unknown_function_defaults.push(field_id);
+            accept();
         }
 
         // Invalid function default.
         (scalar_type, ast::Expression::Function(funcname, _, _)) => {
-            validate_invalid_funtion_default(funcname, scalar_type, ctx);
+            validate_invalid_function_default(funcname, scalar_type, ctx);
         }
 
         // Invalid scalar default.
@@ -244,12 +251,12 @@ fn validate_composite_builtin_scalar_type_default(
                 "The function `{funcname}()` is not supported on composite fields.",
             ));
         }
-        (_, ast::Expression::Function(funcname, _, _)) if !KNOWN_FUNCTIONS.contains(&funcname.as_str()) => {
-            validate_unknown_function_default(funcname, ctx);
+        (_, ast::Expression::Function(funcname, _, span)) if !KNOWN_FUNCTIONS.contains(&funcname.as_str()) => {
+            ctx.push_error(DatamodelError::new_default_unknown_function(funcname, *span));
         }
         // Invalid function default.
         (scalar_type, ast::Expression::Function(funcname, _, _)) => {
-            validate_invalid_funtion_default(funcname, scalar_type, ctx);
+            validate_invalid_function_default(funcname, scalar_type, ctx);
         }
         // Invalid scalar default.
         (scalar_type, value) => {
@@ -299,12 +306,6 @@ fn validate_invalid_default_enum_expr(bad_value: &ast::Expression, ctx: &mut Con
     ctx.push_attribute_validation_error(&format!("Expected an enum value, but found `{bad_value}`."))
 }
 
-fn validate_unknown_function_default(fn_name: &str, ctx: &mut Context<'_>) {
-    ctx.push_attribute_validation_error(&format!(
-        "The function `{fn_name}` is not a known function. You can read about the available functions here: https://pris.ly/d/attribute-functions.",
-    ));
-}
-
 fn validate_invalid_scalar_default(scalar_type: ScalarType, value: &ast::Expression, ctx: &mut Context<'_>) {
     ctx.push_attribute_validation_error(&format!(
         "Expected a {scalar_type} value, but found `{bad_value}`.",
@@ -313,7 +314,7 @@ fn validate_invalid_scalar_default(scalar_type: ScalarType, value: &ast::Express
     ));
 }
 
-fn validate_invalid_funtion_default(fn_name: &str, scalar_type: ScalarType, ctx: &mut Context<'_>) {
+fn validate_invalid_function_default(fn_name: &str, scalar_type: ScalarType, ctx: &mut Context<'_>) {
     ctx.push_attribute_validation_error(&format!(
         "The function `{fn_name}()` cannot be used on fields of type `{scalar_type}`.",
         scalar_type = scalar_type.as_str()
