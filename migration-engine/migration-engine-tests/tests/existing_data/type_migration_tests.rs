@@ -164,7 +164,7 @@ fn changing_an_int_array_column_to_scalar_is_not_possible(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 fn int_to_string_conversions_work(api: TestApi) {
     let dm1 = r#"
         model Cat {
@@ -193,7 +193,7 @@ fn int_to_string_conversions_work(api: TestApi) {
         .assert_single_row(|row| row.assert_text_value("tag", "20"));
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 fn string_to_int_conversions_are_risky(api: TestApi) {
     let dm1 = r#"
         model Cat {

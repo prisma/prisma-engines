@@ -34,6 +34,8 @@ pub struct Sequence {
     pub cycle: bool,
     /// Cache size of the sequence
     pub cache_size: i64,
+    /// Whether the sequence is a cockroachdb virtual sequence
+    pub r#virtual: bool,
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -1139,6 +1141,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             increment_by: seq.get_expect_i64("increment_by"),
             cycle: seq.get_expect_bool("cycle"),
             cache_size: seq.get_expect_i64("cache_size"),
+            r#virtual: false,
         });
         postgres_ext.sequences.extend(sequences);
 
@@ -1186,97 +1189,100 @@ impl<'a> SqlSchemaDescriber<'a> {
         sequences: &[Sequence],
         schema: &str,
     ) -> Option<DefaultValue> {
-        match col.get("column_default") {
+        let param_value = col.get("column_default")?;
+        match param_value.to_string() {
             None => None,
-            Some(param_value) => match param_value.to_string() {
-                None => None,
-                Some(x) if x.starts_with("NULL") => None,
-                Some(default_string) => {
-                    Some(match &tpe.family {
-                        ColumnTypeFamily::Int | ColumnTypeFamily::BigInt => {
-                            let default_expr = unsuffix_default_literal(
-                                &default_string,
-                                &[data_type, &tpe.full_data_type, "integer", "INT8", "INT4"],
-                            )
-                            .unwrap_or_else(|| default_string.as_str().into());
-                            let default_expr = process_string_literal(&default_expr);
+            Some(x) if x.starts_with("NULL") => None,
+            Some(default_string) => {
+                Some(match &tpe.family {
+                    ColumnTypeFamily::Int | ColumnTypeFamily::BigInt => {
+                        let default_expr = unsuffix_default_literal(
+                            &default_string,
+                            &[data_type, &tpe.full_data_type, "integer", "INT8", "INT4"],
+                        )
+                        .unwrap_or_else(|| default_string.as_str().into());
+                        let default_expr = process_string_literal(&default_expr);
 
-                            match default_expr.parse::<i64>().ok() {
-                                Some(int_value) => DefaultValue::value(if tpe.family.is_int() {
-                                    PrismaValue::Int(int_value)
-                                } else {
-                                    PrismaValue::BigInt(int_value)
-                                }),
-                                None => match is_autoincrement(&default_string, sequences) {
-                                    Some(seq) => DefaultValue::sequence(seq),
-                                    None => DefaultValue::db_generated(default_string),
-                                },
-                            }
-                        }
-                        ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
-                            Some(float_value) => DefaultValue::value(float_value),
-                            None => DefaultValue::db_generated(default_string),
-                        },
-                        ColumnTypeFamily::Decimal => match Self::parse_float(&default_string) {
-                            Some(float_value) => DefaultValue::value(float_value),
-                            None => DefaultValue::db_generated(default_string),
-                        },
-                        ColumnTypeFamily::Boolean => match Self::parse_bool(&default_string) {
-                            Some(bool_value) => DefaultValue::value(bool_value),
-                            None => DefaultValue::db_generated(default_string),
-                        },
-                        ColumnTypeFamily::String => match fetch_dbgenerated(&default_string) {
-                            Some(fun) => DefaultValue::db_generated(fun),
+                        match default_expr.parse::<i64>().ok() {
+                            Some(int_value) => DefaultValue::value(if tpe.family.is_int() {
+                                PrismaValue::Int(int_value)
+                            } else {
+                                PrismaValue::BigInt(int_value)
+                            }),
                             None => {
-                                let literal = unsuffix_default_literal(
-                                    &default_string,
-                                    &[data_type, &tpe.full_data_type, "STRING"],
-                                );
-
-                                match literal {
-                                    Some(default_literal) => DefaultValue::value(
-                                        process_string_literal(default_literal.as_ref()).into_owned(),
-                                    ),
-                                    None => DefaultValue::db_generated(default_string),
+                                if let Some(seq) = is_sequence(&default_string, sequences) {
+                                    return Some(DefaultValue::sequence(seq));
                                 }
-                            }
-                        },
-                        ColumnTypeFamily::DateTime => {
-                            match default_string.to_lowercase().as_str() {
-                                "now()"
-                                | "now():::timestamp"
-                                | "now():::timestamptz"
-                                | "now():::date"
-                                | "current_timestamp"
-                                | "current_timestamp():::timestamp"
-                                | "current_timestamp():::timestamptz"
-                                | "current_timestamp():::date" => DefaultValue::now(),
-                                _ => DefaultValue::db_generated(default_string), //todo parse values
+
+                                if default_string.eq_ignore_ascii_case("unique_rowid()") {
+                                    return Some(DefaultValue::unique_rowid());
+                                }
+
+                                DefaultValue::db_generated(default_string)
                             }
                         }
-                        ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
-                        // JSON/JSONB defaults come in the '{}'::jsonb form.
-                        ColumnTypeFamily::Json => {
-                            unsuffix_default_literal(&default_string, &[data_type, &tpe.full_data_type])
-                                .map(|default| DefaultValue::value(PrismaValue::Json(unquote_string(&default))))
-                                .unwrap_or_else(move || DefaultValue::db_generated(default_string))
-                        }
-                        ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
-                        ColumnTypeFamily::Enum(enum_name) => {
-                            let expected_suffixes: &[Cow<'_, str>] = &[
-                                Cow::Borrowed(enum_name),
-                                Cow::Owned(format!("\"{}\"", enum_name)),
-                                Cow::Owned(format!("{}.{}", schema, enum_name)),
-                            ];
-                            match unsuffix_default_literal(&default_string, expected_suffixes) {
-                                Some(value) => DefaultValue::value(PrismaValue::Enum(Self::unquote_string(&value))),
+                    }
+                    ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
+                        Some(float_value) => DefaultValue::value(float_value),
+                        None => DefaultValue::db_generated(default_string),
+                    },
+                    ColumnTypeFamily::Decimal => match Self::parse_float(&default_string) {
+                        Some(float_value) => DefaultValue::value(float_value),
+                        None => DefaultValue::db_generated(default_string),
+                    },
+                    ColumnTypeFamily::Boolean => match Self::parse_bool(&default_string) {
+                        Some(bool_value) => DefaultValue::value(bool_value),
+                        None => DefaultValue::db_generated(default_string),
+                    },
+                    ColumnTypeFamily::String => match fetch_dbgenerated(&default_string) {
+                        Some(fun) => DefaultValue::db_generated(fun),
+                        None => {
+                            let literal =
+                                unsuffix_default_literal(&default_string, &[data_type, &tpe.full_data_type, "STRING"]);
+
+                            match literal {
+                                Some(default_literal) => {
+                                    DefaultValue::value(process_string_literal(default_literal.as_ref()).into_owned())
+                                }
                                 None => DefaultValue::db_generated(default_string),
                             }
                         }
-                        ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
-                    })
-                }
-            },
+                    },
+                    ColumnTypeFamily::DateTime => {
+                        match default_string.to_lowercase().as_str() {
+                            "now()"
+                            | "now():::timestamp"
+                            | "now():::timestamptz"
+                            | "now():::date"
+                            | "current_timestamp"
+                            | "current_timestamp():::timestamp"
+                            | "current_timestamp():::timestamptz"
+                            | "current_timestamp():::date" => DefaultValue::now(),
+                            _ => DefaultValue::db_generated(default_string), //todo parse values
+                        }
+                    }
+                    ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
+                    // JSON/JSONB defaults come in the '{}'::jsonb form.
+                    ColumnTypeFamily::Json => {
+                        unsuffix_default_literal(&default_string, &[data_type, &tpe.full_data_type])
+                            .map(|default| DefaultValue::value(PrismaValue::Json(unquote_string(&default))))
+                            .unwrap_or_else(move || DefaultValue::db_generated(default_string))
+                    }
+                    ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
+                    ColumnTypeFamily::Enum(enum_name) => {
+                        let expected_suffixes: &[Cow<'_, str>] = &[
+                            Cow::Borrowed(enum_name),
+                            Cow::Owned(format!("\"{}\"", enum_name)),
+                            Cow::Owned(format!("{}.{}", schema, enum_name)),
+                        ];
+                        match unsuffix_default_literal(&default_string, expected_suffixes) {
+                            Some(value) => DefaultValue::value(PrismaValue::Enum(Self::unquote_string(&value))),
+                            None => DefaultValue::db_generated(default_string),
+                        }
+                    }
+                    ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
+                })
+            }
         }
     }
 }
@@ -1456,8 +1462,9 @@ static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
         .expect("compile autoincrement regex")
 });
 
-/// Returns the name of the sequence in the schema that the defaultvalue matches if it is drawn from one of them
-fn is_autoincrement(value: &str, sequences: &[Sequence]) -> Option<String> {
+/// Returns the name of the sequence in the schema that the defaultvalue matches if it is drawn
+/// from one of them
+fn is_sequence(value: &str, sequences: &[Sequence]) -> Option<String> {
     AUTOINCREMENT_REGEX.captures(value).and_then(|captures| {
         let sequence_name = captures.name("sequence").or_else(|| captures.name("sequence2"));
 
@@ -1594,21 +1601,21 @@ mod tests {
         ];
 
         let first_autoincrement = r#"nextval('first_sequence'::regclass)"#;
-        assert!(is_autoincrement(first_autoincrement, &sequences).is_some());
+        assert!(is_sequence(first_autoincrement, &sequences).is_some());
 
         let second_autoincrement = r#"nextval('schema_name.second_sequence'::regclass)"#;
-        assert!(is_autoincrement(second_autoincrement, &sequences).is_some());
+        assert!(is_sequence(second_autoincrement, &sequences).is_some());
 
         let third_autoincrement = r#"nextval('"third_Sequence"'::regclass)"#;
-        assert!(is_autoincrement(third_autoincrement, &sequences).is_some());
+        assert!(is_sequence(third_autoincrement, &sequences).is_some());
 
         let fourth_autoincrement = r#"nextval('"schema_Name"."fourth_Sequence"'::regclass)"#;
-        assert!(is_autoincrement(fourth_autoincrement, &sequences).is_some());
+        assert!(is_sequence(fourth_autoincrement, &sequences).is_some());
 
         let fifth_autoincrement = r#"nextval(('fifth_sequence'::text)::regclass)"#;
-        assert!(is_autoincrement(fifth_autoincrement, &sequences).is_some());
+        assert!(is_sequence(fifth_autoincrement, &sequences).is_some());
 
         let non_autoincrement = r#"string_default_named_seq"#;
-        assert!(is_autoincrement(non_autoincrement, &sequences).is_none());
+        assert!(is_sequence(non_autoincrement, &sequences).is_none());
     }
 }

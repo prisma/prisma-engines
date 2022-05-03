@@ -332,6 +332,7 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
                     increment_by: 1,
                     cycle: false,
                     cache_size: 1,
+                    virtual: false,
                 },
                 Sequence {
                     name: "testnotcycling",
@@ -341,6 +342,7 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
                     increment_by: 1,
                     cycle: false,
                     cache_size: 1,
+                    virtual: false,
                 },
                 Sequence {
                     name: "testmore",
@@ -350,6 +352,7 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
                     increment_by: 4,
                     cycle: false,
                     cache_size: 7,
+                    virtual: false,
                 },
             ],
         }

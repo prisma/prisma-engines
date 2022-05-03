@@ -1,4 +1,4 @@
-use crate::{Dedup, SqlError, SqlFamilyTrait};
+use crate::{calculate_datamodel::CalculateDatamodelContext as Context, Dedup, SqlError, SqlFamilyTrait};
 use datamodel::{
     common::{preview_features::PreviewFeature, RelationNames},
     dml::{
@@ -7,11 +7,9 @@ use datamodel::{
         SortOrder, ValueGenerator as VG,
     },
 };
-use introspection_connector::IntrospectionContext;
 use sql::{mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, IndexFieldId};
 use sql_schema_describer::{
-    self as sql, ColumnArity, ColumnTypeFamily, DefaultKind, ForeignKey, ForeignKeyAction, IndexType, SQLSortOrder,
-    SqlSchema, Table,
+    self as sql, ColumnArity, ColumnTypeFamily, ForeignKey, ForeignKeyAction, IndexType, SQLSortOrder, SqlSchema, Table,
 };
 use tracing::debug;
 
@@ -127,7 +125,7 @@ pub fn calculate_many_to_many_field(
     RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
 }
 
-pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &IntrospectionContext) -> IndexDefinition {
+pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Context) -> IndexDefinition {
     let tpe = match index.index_type() {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
         IndexType::Normal => datamodel::dml::IndexType::Normal,
@@ -190,7 +188,7 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Intros
     }
 }
 
-pub(crate) fn calculate_scalar_field(table: &Table, column: &sql::Column, ctx: &IntrospectionContext) -> ScalarField {
+pub(crate) fn calculate_scalar_field(table: &Table, column: &sql::Column, ctx: &mut Context) -> ScalarField {
     debug!("Handling column {:?}", column);
 
     let field_type = calculate_scalar_field_type_with_native_types(column, ctx);
@@ -203,7 +201,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &sql::Column, ctx: &
         ColumnArity::List => FieldArity::List,
     };
 
-    let default_value = calculate_default(table, column, &arity);
+    let default_value = calculate_default(table, column, &arity, ctx);
 
     ScalarField {
         name: column.name.clone(),
@@ -323,9 +321,48 @@ pub(crate) fn calculate_backrelation_field(
     }
 }
 
-pub(crate) fn calculate_default(table: &sql::Table, column: &sql::Column, arity: &FieldArity) -> Option<DMLDef> {
+pub(crate) fn calculate_default(
+    table: &sql::Table,
+    column: &sql::Column,
+    arity: &FieldArity,
+    ctx: &mut Context,
+) -> Option<DMLDef> {
     match (column.default.as_ref().map(|d| d.kind()), &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
+        (Some(sql::DefaultKind::Sequence(name)), _) if ctx.is_cockroach() => {
+            use prisma_value::PrismaValue;
+
+            let connector_data: &PostgresSchemaExt = ctx.schema.downcast_connector_data();
+            let sequence_idx = connector_data
+                .sequences
+                .binary_search_by_key(&name, |s| &s.name)
+                .unwrap();
+            let sequence = &connector_data.sequences[sequence_idx];
+
+            let mut args = Vec::new();
+
+            if sequence.min_value != 1 {
+                args.push((Some("minValue".to_owned()), PrismaValue::Int(sequence.min_value)));
+            }
+
+            if sequence.max_value != i64::MAX {
+                args.push((Some("maxValue".to_owned()), PrismaValue::Int(sequence.max_value)));
+            }
+
+            if sequence.cache_size != 1 {
+                args.push((Some("cache".to_owned()), PrismaValue::Int(sequence.cache_size)));
+            }
+
+            if sequence.increment_by != 1 {
+                args.push((Some("increment".to_owned()), PrismaValue::Int(sequence.increment_by)));
+            }
+
+            if sequence.start_value != 1 {
+                args.push((Some("start".to_owned()), PrismaValue::Int(sequence.start_value)));
+            }
+
+            Some(DMLDef::new_expression(VG::new_sequence(args)))
+        }
         (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::new_expression(VG::new_autoincrement())),
         (_, ColumnTypeFamily::BigInt) if column.auto_increment => Some(DMLDef::new_expression(VG::new_autoincrement())),
         (_, ColumnTypeFamily::Int) if is_sequence(column, table) => {
@@ -334,15 +371,16 @@ pub(crate) fn calculate_default(table: &sql::Table, column: &sql::Column, arity:
         (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
             Some(DMLDef::new_expression(VG::new_autoincrement()))
         }
-        (Some(DefaultKind::Sequence(_)), _) => Some(DMLDef::new_expression(VG::new_autoincrement())),
-        (Some(DefaultKind::Now), ColumnTypeFamily::DateTime) => {
+        (Some(sql::DefaultKind::Sequence(_)), _) => Some(DMLDef::new_expression(VG::new_autoincrement())),
+        (Some(sql::DefaultKind::Now), ColumnTypeFamily::DateTime) => {
             Some(set_default(DMLDef::new_expression(VG::new_now()), column))
         }
-        (Some(DefaultKind::DbGenerated(default_string)), _) => Some(set_default(
+        (Some(sql::DefaultKind::DbGenerated(default_string)), _) => Some(set_default(
             DMLDef::new_expression(VG::new_dbgenerated(default_string.clone())),
             column,
         )),
-        (Some(DefaultKind::Value(val)), _) => Some(set_default(DMLDef::new_single(val.clone()), column)),
+        (Some(sql::DefaultKind::Value(val)), _) => Some(set_default(DMLDef::new_single(val.clone()), column)),
+        (Some(sql::DefaultKind::UniqueRowid), _) => Some(DMLDef::new_expression(VG::new_autoincrement())),
         _ => None,
     }
 }
@@ -440,10 +478,7 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &sql::Column) 
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_with_native_types(
-    column: &sql::Column,
-    ctx: &IntrospectionContext,
-) -> FieldType {
+pub(crate) fn calculate_scalar_field_type_with_native_types(column: &sql::Column, ctx: &mut Context) -> FieldType {
     debug!("Calculating native field type for '{}'", column.name);
     let scalar_type = calculate_scalar_field_type_for_native_type(column);
 
@@ -530,7 +565,7 @@ pub fn replace_index_field_names(target: &mut Vec<IndexField>, old_name: &str, n
         .for_each(drop);
 }
 
-fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &IntrospectionContext) -> Option<IndexAlgorithm> {
+fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &mut Context) -> Option<IndexAlgorithm> {
     if !ctx.sql_family().is_postgres() {
         return None;
     }
@@ -547,7 +582,7 @@ fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &IntrospectionCont
     })
 }
 
-fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &IntrospectionContext) -> Option<bool> {
+fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &mut Context) -> Option<bool> {
     if !ctx.sql_family().is_mssql() {
         return None;
     }
@@ -557,25 +592,17 @@ fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &Introspe
     Some(ext.index_is_clustered(index_id))
 }
 
-pub(crate) fn primary_key_is_clustered(
-    table_id: sql::TableId,
-    schema: &SqlSchema,
-    ctx: &IntrospectionContext,
-) -> Option<bool> {
+pub(crate) fn primary_key_is_clustered(table_id: sql::TableId, ctx: &mut Context) -> Option<bool> {
     if !ctx.sql_family().is_mssql() {
         return None;
     }
 
-    let ext: &MssqlSchemaExt = schema.downcast_connector_data();
+    let ext: &MssqlSchemaExt = ctx.schema.downcast_connector_data();
 
     Some(ext.pk_is_clustered(table_id))
 }
 
-fn get_opclass(
-    index_field_id: sql::IndexFieldId,
-    schema: &SqlSchema,
-    ctx: &IntrospectionContext,
-) -> Option<OperatorClass> {
+fn get_opclass(index_field_id: sql::IndexFieldId, schema: &SqlSchema, ctx: &mut Context) -> Option<OperatorClass> {
     if !ctx.sql_family().is_postgres() {
         return None;
     }

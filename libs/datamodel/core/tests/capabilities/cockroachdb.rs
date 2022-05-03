@@ -128,7 +128,7 @@ fn auto_increment_on_non_primary_column_support() {
 
         model Todo {
           id           Int    @id
-          non_primary  Int    @default(autoincrement()) @unique
+          non_primary  BigInt    @default(autoincrement()) @unique
         }
     "#};
 

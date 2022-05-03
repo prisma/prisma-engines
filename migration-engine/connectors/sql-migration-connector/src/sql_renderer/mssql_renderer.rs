@@ -537,6 +537,6 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
         DefaultKind::Value(PrismaValue::DateTime(val)) => Quoted::mssql_string(val).to_string().into(),
         DefaultKind::Value(PrismaValue::Boolean(val)) => Cow::from(if *val { "1" } else { "0" }),
         DefaultKind::Value(val) => val.to_string().into(),
-        DefaultKind::Sequence(_) => "".into(),
+        DefaultKind::Sequence(_) | DefaultKind::UniqueRowid => unreachable!(),
     }
 }

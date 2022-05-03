@@ -217,6 +217,8 @@ impl Connector for CockroachDatamodelConnector {
     }
 
     fn validate_model(&self, model: ModelWalker<'_>, diagnostics: &mut Diagnostics) {
+        validations::autoincrement_validations(model, diagnostics);
+
         for index in model.indexes() {
             validations::inverted_index_validations(index, diagnostics);
         }

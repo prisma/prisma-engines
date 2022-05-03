@@ -125,6 +125,13 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         POSTGIS_TABLES_OR_VIEWS.is_match(view_name) || EXTENSION_VIEWS.is_match(view_name)
     }
 
+    fn sequence_changed(&self, previous: ColumnWalker<'_>, next: ColumnWalker<'_>) -> bool {
+        let previous_has_sequence_default = previous.default().map(|d| d.is_sequence()).unwrap_or(false);
+        let next_has_sequence_default = next.default().map(|d| d.is_sequence()).unwrap_or(false);
+
+        previous_has_sequence_default != next_has_sequence_default
+    }
+
     fn set_tables_to_redefine(&self, db: &mut DifferDatabase<'_>) {
         if !self.is_cockroachdb() {
             return;

@@ -1,3 +1,4 @@
+mod cockroachdb;
 mod mssql;
 mod vitess;
 
@@ -200,19 +201,19 @@ fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Sqlite), preview_features("referentialIntegrity"))]
+#[test_connector(exclude(Sqlite, CockroachDb), preview_features("referentialIntegrity"))]
 fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created(api: TestApi) {
     let dm = r#"
         model List {
             id        Int  @id @default(autoincrement())
             uList     String? @unique
-            todoId    Int @default(1)
+            todoId    BigInt @default(1)
             todoName  String
             todo      Todo   @relation(fields: [todoId, todoName], references: [id, uTodo])
         }
 
         model Todo {
-            id     Int @default(autoincrement())
+            id     BigInt @default(autoincrement())
             uTodo  String
             lists  List[]
 
@@ -230,7 +231,7 @@ fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-#[test_connector(exclude(Sqlite))]
+#[test_connector(exclude(Sqlite, CockroachDb))]
 fn making_an_existing_id_field_autoincrement_works(api: TestApi) {
     use quaint::ast::{Insert, Select};
 
@@ -303,7 +304,8 @@ fn making_an_existing_id_field_autoincrement_works(api: TestApi) {
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-#[test_connector(exclude(Sqlite))]
+// We test this separately on cockroachdb.
+#[test_connector(exclude(Sqlite, CockroachDb))]
 fn removing_autoincrement_from_an_existing_field_works(api: TestApi) {
     use quaint::ast::{Insert, Select};
 
@@ -434,7 +436,8 @@ fn making_an_existing_id_field_autoincrement_works_with_indices(api: TestApi) {
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-#[test_connector(exclude(Sqlite))]
+// Cockroachdb is tested separately.
+#[test_connector(exclude(Sqlite, CockroachDb))]
 fn flipping_autoincrement_on_and_off_works(api: TestApi) {
     let dm_without = r#"
         model Post {

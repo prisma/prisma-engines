@@ -247,7 +247,7 @@ fn a_default_can_be_dropped(api: TestApi) {
     let dm1 = api.datamodel_with_provider(
         r#"
         model User {
-            id   Int     @id @default(autoincrement())
+            id   BigInt     @id @default(autoincrement())
             name String  @default("Musti")
         }
     "#,
@@ -258,7 +258,7 @@ fn a_default_can_be_dropped(api: TestApi) {
     let dm2 = api.datamodel_with_provider(
         r#"
         model User {
-            id   Int     @id @default(autoincrement())
+            id   BigInt     @id @default(autoincrement())
             name String?
         }
     "#,
@@ -283,7 +283,7 @@ fn schemas_with_dbgenerated_work(api: TestApi) {
         createdAt   DateTime  @default(dbgenerated())
         email       String?
         firstName   String    @default("")
-        id          Int       @id @default(autoincrement())
+        id          BigInt    @id @default(autoincrement())
         lastName    String    @default("")
         password    String?
         updatedAt   DateTime  @default(dbgenerated())

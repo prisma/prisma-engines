@@ -1,7 +1,12 @@
 /// Test cockroachdb failure modes
 mod failure_modes;
 
+use datamodel::dml::ReferentialAction;
 use migration_engine_tests::test_api::*;
+use prisma_value::PrismaValue;
+use quaint::prelude::Insert;
+use serde_json::json;
+use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};
 use std::fmt::Write as _;
 
 #[test_connector(tags(CockroachDb))]
@@ -310,7 +315,7 @@ fn bigint_primary_keys_are_idempotent(api: TestApi) {
 fn typescript_starter_schema_with_different_native_types_is_idempotent(api: TestApi) {
     let dm = r#"
         model Post {
-            id        Int     @id @default(autoincrement())
+            id        BigInt     @id @default(autoincrement())
             title     String
             content   String?
             published Boolean @default(false)
@@ -319,7 +324,7 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
         }
 
         model User {
-            id    Int     @id @default(autoincrement())
+            id    Int     @id 
             email String  @unique
             name  String?
             posts Post[]
@@ -328,7 +333,7 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
 
     let dm2 = r#"
         model Post {
-            id        Int     @id @default(autoincrement()) @db.Int4
+            id        BigInt  @id @default(autoincrement()) @db.Int8
             title     String  @db.String(100)
             content   String? @db.String(100)
             published Boolean @default(false) @db.Bool
@@ -337,7 +342,7 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
         }
 
         model User {
-            id    Int     @id @default(autoincrement()) @db.Int4
+            id    Int     @id @db.Int4
             email String  @unique @db.String(100)
             name  String? @db.String(100)
             posts Post[]
@@ -370,16 +375,16 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
 fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
     let dm = r#"
         model Post {
-            id        Int     @id @default(autoincrement())
+            id        BigInt     @id @default(autoincrement())
             title     String
             content   String?
             published Boolean @default(false)
             author    User?   @relation(fields: [authorId], references: [id])
-            authorId  Int?
+            authorId  BigInt?
         }
 
         model User {
-            id    Int     @id @default(autoincrement())
+            id    BigInt     @id @default(autoincrement())
             email String  @unique
             name  String?
             posts Post[]
@@ -388,16 +393,16 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
 
     let dm2 = r#"
         model Post {
-            id        Int     @id @default(autoincrement()) @db.Int4
+            id        BigInt     @id @default(autoincrement()) @db.Int8
             title     String  @db.String
             content   String? @db.String
             published Boolean @default(false) @db.Bool
             author    User?   @relation(fields: [authorId], references: [id])
-            authorId  Int?    @db.Int4
+            authorId  BigInt?    @db.Int8
         }
 
         model User {
-            id    Int     @id @default(autoincrement()) @db.Int4
+            id    BigInt     @id @default(autoincrement()) @db.Int8
             email String  @unique @db.String
             name  String? @db.String
             posts Post[]
@@ -471,4 +476,578 @@ fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_without_pr
         }),
     )
     .unwrap();
+}
+
+#[test_connector(tags(CockroachDb))]
+fn int_to_string_conversions_work(api: TestApi) {
+    let dm1 = r#"
+        model Cat {
+            id  BigInt @id @default(autoincrement())
+            tag Int
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    api.insert("Cat").value("tag", 20).result_raw();
+
+    let dm2 = r#"
+        model Cat {
+            id  BigInt @id @default(autoincrement())
+            tag String
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm2)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+
+    api.dump_table("Cat")
+        .assert_single_row(|row| row.assert_text_value("tag", "20"));
+}
+
+#[test_connector(tags(CockroachDb))]
+fn adding_an_unsupported_type_must_work(api: TestApi) {
+    let dm = r#"
+        model Post {
+            id            Int                     @id
+            /// This type is currently not supported.
+            user_ip  Unsupported("interval")
+            User          User                    @relation(fields: [user_ip], references: [balance])
+        }
+
+        model User {
+            id            Int                     @id
+            /// This type is currently not supported.
+            balance       Unsupported("interval")  @unique
+            Post          Post[]
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("Post", |table| {
+        table
+            .assert_columns_count(2)
+            .assert_column("id", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::Int)
+            })
+            .assert_column("user_ip", |c| {
+                c.assert_is_required()
+                    .assert_type_family(ColumnTypeFamily::Unsupported("interval".to_string()))
+            })
+    });
+
+    api.assert_schema().assert_table("User", |table| {
+        table
+            .assert_columns_count(2)
+            .assert_column("id", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::Int)
+            })
+            .assert_column("balance", |c| {
+                c.assert_is_required()
+                    .assert_type_family(ColumnTypeFamily::Unsupported("interval".to_string()))
+            })
+    });
+}
+
+#[test_connector(tags(CockroachDb))]
+fn switching_an_unsupported_type_to_supported_must_work(api: TestApi) {
+    let dm1 = r#"
+        model Post {
+            id              BigInt                     @id @default(autoincrement())
+            user_home       Unsupported("interval")
+            user_location   Unsupported("interval")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    let dm2 = r#"
+        model Post {
+            id            BigInt                     @id @default(autoincrement())
+            user_home     String
+            user_location String
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+    api.schema_push_w_datasource(dm2).send().assert_no_steps();
+
+    api.assert_schema().assert_table("Post", |table| {
+        table
+            .assert_columns_count(3)
+            .assert_column("id", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::BigInt)
+            })
+            .assert_column("user_home", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::String)
+            })
+            .assert_column("user_location", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::String)
+            })
+    });
+}
+
+#[test_connector(tags(CockroachDb))]
+fn column_defaults_can_safely_be_changed(api: TestApi) {
+    let combinations = &[
+        ("Meow", Some(PrismaValue::String("Cats".to_string())), None),
+        ("Freedom", None, Some(PrismaValue::String("Braveheart".to_string()))),
+        (
+            "OutstandingMovies",
+            Some(PrismaValue::String("Cats".to_string())),
+            Some(PrismaValue::String("Braveheart".to_string())),
+        ),
+    ];
+
+    for (model_name, first_default, second_default) in combinations {
+        let span = tracing::info_span!("Combination", model_name, ?first_default, ?second_default);
+        let _combination_scope = span.enter();
+        tracing::info!("Testing new combination");
+
+        // Set up the initial schema
+        {
+            let dm1 = format!(
+                r#"
+                    model {} {{
+                        id String @id
+                        name String? {}
+                    }}
+                "#,
+                model_name,
+                first_default
+                    .as_ref()
+                    .map(|default| format!("@default(\"{}\")", default))
+                    .unwrap_or_else(String::new)
+            );
+
+            api.schema_push_w_datasource(dm1).force(true).send();
+
+            api.assert_schema().assert_table(model_name, |table| {
+                table.assert_column("name", |column| {
+                    if let Some(first_default) = first_default.as_ref() {
+                        column.assert_default_value(first_default)
+                    } else {
+                        column.assert_has_no_default()
+                    }
+                })
+            });
+        }
+
+        // Insert data
+        {
+            let insert_span = tracing::info_span!("Data insertion");
+            let _insert_scope = insert_span.enter();
+
+            let query = Insert::single_into(api.render_table_name(model_name)).value("id", "abc");
+
+            api.query(query.into());
+
+            let query = Insert::single_into(api.render_table_name(model_name))
+                .value("id", "def")
+                .value("name", "Waterworld");
+
+            api.query(query.into());
+
+            let data = api.dump_table(model_name);
+            let names: Vec<PrismaValue> = data
+                .into_iter()
+                .filter_map(|row| {
+                    row.get("name")
+                        .map(|val| val.to_string().map(PrismaValue::String).unwrap_or(PrismaValue::Null))
+                })
+                .collect();
+
+            assert_eq!(
+                &[
+                    first_default.as_ref().cloned().unwrap_or(PrismaValue::Null),
+                    PrismaValue::String("Waterworld".to_string())
+                ],
+                names.as_slice()
+            );
+        }
+
+        // Migrate
+        {
+            let dm2 = format!(
+                r#"
+                    model {} {{
+                        id String @id
+                        name String? {}
+                    }}
+                "#,
+                model_name,
+                second_default
+                    .as_ref()
+                    .map(|default| format!(r#"@default("{}")"#, default))
+                    .unwrap_or_else(String::new)
+            );
+
+            api.schema_push_w_datasource(dm2).send().assert_green();
+        }
+
+        // Check that the data is still there
+        {
+            let data = api.dump_table(model_name);
+            let names: Vec<PrismaValue> = data
+                .into_iter()
+                .filter_map(|row| {
+                    row.get("name")
+                        .map(|val| val.to_string().map(PrismaValue::String).unwrap_or(PrismaValue::Null))
+                })
+                .collect();
+            assert_eq!(
+                &[
+                    first_default.as_ref().cloned().unwrap_or(PrismaValue::Null),
+                    PrismaValue::String("Waterworld".to_string())
+                ],
+                names.as_slice()
+            );
+
+            api.assert_schema().assert_table(model_name, |table| {
+                table.assert_column("name", |column| {
+                    if let Some(second_default) = second_default.as_ref() {
+                        column.assert_default_value(second_default)
+                    } else {
+                        column.assert_has_no_default()
+                    }
+                })
+            });
+        }
+    }
+}
+
+#[test_connector(tags(CockroachDb))]
+fn removing_autoincrement_from_an_existing_field_works(api: TestApi) {
+    use quaint::ast::{Insert, Select};
+
+    let dm1 = r#"
+        model Post {
+            id        BigInt         @id @default(autoincrement())
+            content   String?
+            createdAt DateTime    @default(now())
+            published Boolean     @default(false)
+            title     String      @default("")
+            updatedAt DateTime    @default(now())
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    // Data to see we don't lose anything in the translation.
+    for content in &["A", "B", "C"] {
+        let insert = Insert::single_into(api.render_table_name("Post")).value("content", *content);
+        api.query(insert.into());
+    }
+
+    assert_eq!(
+        3,
+        api.query(Select::from_table(api.render_table_name("Post")).into())
+            .len()
+    );
+
+    let dm2 = r#"
+        model Post {
+            id        BigInt         @id
+            content   String?
+            createdAt DateTime    @default(now())
+            published Boolean     @default(false)
+            title     String      @default("")
+            updatedAt DateTime    @default(now())
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    api.assert_schema().assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_no_autoincrement())
+    });
+
+    // Check that the migration is idempotent.
+    api.schema_push_w_datasource(dm2)
+        .migration_id(Some("idempotency-check"))
+        .send()
+        .assert_green()
+        .assert_no_steps();
+
+    assert_eq!(
+        3,
+        api.query(Select::from_table(api.render_table_name("Post")).into())
+            .len()
+    );
+}
+
+#[test_connector(tags(CockroachDb))]
+fn on_delete_referential_actions_should_work(api: TestApi) {
+    let actions = &[
+        (ReferentialAction::SetNull, ForeignKeyAction::SetNull),
+        (ReferentialAction::Cascade, ForeignKeyAction::Cascade),
+        (ReferentialAction::NoAction, ForeignKeyAction::NoAction),
+    ];
+
+    for (ra, fka) in actions {
+        let dm = format!(
+            r#"
+            model A {{
+                id BigInt @id @default(autoincrement())
+                b      B[]
+            }}
+
+            model B {{
+                id   BigInt @id
+                aId  BigInt?
+                a    A?    @relation(fields: [aId], references: [id], onDelete: {})
+            }}
+        "#,
+            ra
+        );
+
+        api.schema_push_w_datasource(&dm).send().assert_green();
+
+        api.assert_schema().assert_table("B", |table| {
+            table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
+                fk.assert_references("A", &["id"])
+                    .assert_referential_action_on_delete(*fka)
+            })
+        });
+
+        api.schema_push_w_datasource("").send().assert_green();
+    }
+}
+
+#[test_connector(tags(CockroachDb))]
+fn changing_all_referenced_columns_of_foreign_key_works(api: TestApi) {
+    let dm1 = r#"
+       model Post {
+          id        BigInt     @default(autoincrement()) @id
+          author    User?      @relation(fields: [authorId], references: [id])
+          authorId  BigInt?
+        }
+
+        model User {
+          id       BigInt     @default(autoincrement()) @id
+          posts    Post[]
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    let dm2 = r#"
+        model Post {
+          id        BigInt     @default(autoincrement()) @id
+          author    User?      @relation(fields: [authorId], references: [uid])
+          authorId  BigInt?
+        }
+
+        model User {
+          uid   BigInt    @id
+          posts Post[]
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+}
+
+#[test_connector(tags(CockroachDb))]
+fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi) {
+    let dm = r#"
+        model Fruit {
+            id   BigInt @id @default(autoincrement())
+            name String
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    let insert = Insert::multi_into(api.render_table_name("Fruit"), &["name"])
+        .values(("banana",))
+        .values(("apple",))
+        .values(("banana",));
+
+    api.query(insert.into());
+
+    let dm2 = r#"
+        model Fruit {
+            id   BigInt @id @default(autoincrement())
+            name String @unique
+        }
+    "#;
+
+    let res = api
+        .schema_push_w_datasource(dm2)
+        .force(true)
+        .migration_id(Some("the-migration"))
+        .send_unwrap_err()
+        .to_user_facing();
+
+    let json_error = serde_json::to_value(&res).unwrap();
+
+    let expected_msg = if api.is_vitess() {
+        "Unique constraint failed on the (not available)"
+    } else if api.is_mysql() || api.is_mssql() {
+        "Unique constraint failed on the constraint: `Fruit_name_key`"
+    } else {
+        "Unique constraint failed on the fields: (`name`)"
+    };
+
+    let expected_target = if api.is_vitess() {
+        serde_json::Value::Null
+    } else if api.is_mysql() || api.is_mssql() {
+        json!("Fruit_name_key")
+    } else {
+        json!(["name"])
+    };
+
+    let expected_json = json!({
+        "is_panic": false,
+        "message": expected_msg,
+        "meta": {
+            "target": expected_target,
+        },
+        "error_code": "P2002",
+    });
+
+    assert_eq!(json_error, expected_json);
+}
+
+#[test_connector(tags(CockroachDb))]
+fn created_at_does_not_get_arbitrarily_migrated(api: TestApi) {
+    use quaint::ast::Insert;
+
+    let dm1 = r#"
+        model Fruit {
+            id BigInt @id @default(autoincrement())
+            name String
+            createdAt DateTime @default(now())
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+    api.assert_schema().assert_table("Fruit", |t| {
+        t.assert_column("createdAt", |c| {
+            c.assert_default_kind(Some(sql_schema_describer::DefaultKind::Now))
+        })
+    });
+
+    let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");
+    api.query(insert.into());
+
+    api.schema_push_w_datasource(dm1)
+        .send()
+        .assert_green()
+        .assert_no_steps();
+}
+
+#[test_connector(tags(CockroachDb))]
+fn sequences_without_options_can_be_created(api: TestApi) {
+    let dm = r#"
+        datasource test {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
+        }
+
+        model Test {
+            Id Int @id @default(sequence())
+        }
+    "#;
+
+    api.schema_push(dm).send().assert_green();
+    api.schema_push(dm).send().assert_green().assert_no_steps();
+
+    let sql = expect![[r#"
+        -- CreateTable
+        CREATE TABLE "Test" (
+            "Id" INT4 NOT NULL GENERATED BY DEFAULT AS IDENTITY,
+
+            CONSTRAINT "Test_pkey" PRIMARY KEY ("Id")
+        );
+    "#]];
+    api.expect_sql_for_schema(dm, &sql);
+}
+
+#[test_connector(tags(CockroachDb))]
+fn sequences_with_options_can_be_created(api: TestApi) {
+    let dm = r#"
+        datasource test {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
+        }
+
+        model Test {
+            Id Int @id @default(sequence(minValue: 10, maxValue: 39, cache: 4, increment: 3, start: 12))
+        }
+    "#;
+
+    api.schema_push(dm).send().assert_green();
+    api.schema_push(dm).send().assert_green().assert_no_steps();
+
+    let sql = expect![[r#"
+        -- CreateTable
+        CREATE TABLE "Test" (
+            "Id" INT4 NOT NULL GENERATED BY DEFAULT AS IDENTITY (INCREMENT 3 CACHE 4 START 12 MINVALUE 10 MAXVALUE 39),
+
+            CONSTRAINT "Test_pkey" PRIMARY KEY ("Id")
+        );
+    "#]];
+    api.expect_sql_for_schema(dm, &sql);
+}
+
+#[test_connector(tags(CockroachDb))]
+fn sequences_without_options_can_be_created_on_non_id_fields(api: TestApi) {
+    let dm = r#"
+        datasource test {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
+        }
+
+        model Test {
+            id BigInt @id @default(autoincrement())
+            seqCol Int @default(sequence())
+        }
+    "#;
+
+    api.schema_push(dm).send().assert_green();
+    api.schema_push(dm).send().assert_green().assert_no_steps();
+
+    let sql = expect![[r#"
+        -- CreateTable
+        CREATE TABLE "Test" (
+            "id" INT8 NOT NULL DEFAULT unique_rowid(),
+            "seqCol" INT4 NOT NULL GENERATED BY DEFAULT AS IDENTITY,
+
+            CONSTRAINT "Test_pkey" PRIMARY KEY ("id")
+        );
+    "#]];
+    api.expect_sql_for_schema(dm, &sql);
+}
+
+#[test_connector(tags(CockroachDb))]
+fn autoincrement_is_idempotent(api: TestApi) {
+    // https://github.com/prisma/prisma/issues/12244
+
+    let dm1 = r#"
+        model order {
+          orderId BigInt @id @default(autoincrement())
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+    api.schema_push_w_datasource(dm1).send().assert_no_steps();
 }
