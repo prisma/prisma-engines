@@ -1,8 +1,8 @@
-use crate::{helper::pretty_print, Span};
+use crate::{pretty_print::pretty_print, Span};
 use std::{borrow::Cow, fmt};
 use thiserror::Error;
 
-#[derive(Debug, Error, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DatamodelError(DatamodelErrorKind);
 
 impl fmt::Display for DatamodelError {
