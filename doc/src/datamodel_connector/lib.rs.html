@@ -323,7 +323,7 @@
     <span class="ident">capabilities</span>::{<span class="ident">ConnectorCapabilities</span>, <span class="ident">ConnectorCapability</span>},
     <span class="ident">native_type_instance::NativeTypeInstance</span>,
 };
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">ConnectorErrorFactory</span>, <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">Span</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeErrorFactory</span>, <span class="ident">Span</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">empty_connector::EmptyDatamodelConnector</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">native_type_constructor::NativeTypeConstructor</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="self">self</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>};
@@ -539,8 +539,8 @@
         <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::RelationFieldsInArbitraryOrder</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">instance</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; <span class="ident">ConnectorErrorFactory</span> {
-        <span class="ident">ConnectorErrorFactory::new</span>(<span class="ident">instance</span>.<span class="ident">to_string</span>(), <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
+    <span class="kw">fn</span> <span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">instance</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; <span class="ident">NativeTypeErrorFactory</span> {
+        <span class="ident">NativeTypeErrorFactory::new</span>(<span class="ident">instance</span>.<span class="ident">to_string</span>(), <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
     }
 
     <span class="kw">fn</span> <span class="ident">validate_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span>;
