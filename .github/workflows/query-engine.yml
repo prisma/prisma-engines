@@ -61,6 +61,7 @@ jobs:
       matrix:
         database:
           - "cockroach_22_1_0_alpha_1"
+          - "cockroach_22_1_0_beta_5"
           - "cockroach_21_2_0_patched"
 
     runs-on: buildjet-4vcpu-ubuntu-2004 # ubuntu-latest
