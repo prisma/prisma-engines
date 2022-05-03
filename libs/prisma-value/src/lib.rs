@@ -1,8 +1,6 @@
 pub mod arithmetic;
 
 mod error;
-#[cfg(feature = "sql-ext")]
-mod sql_ext;
 
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::prelude::*;

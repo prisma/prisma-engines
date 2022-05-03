@@ -1,22 +1,10 @@
 use crate::{CompositeFieldRef, RelationFieldRef, ScalarFieldRef};
-use quaint::prelude::Order;
 use std::string::ToString;
 
 #[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
 pub enum SortOrder {
     Ascending,
     Descending,
-}
-
-impl SortOrder {
-    pub fn into_order(self, reverse: bool) -> Order {
-        match (self, reverse) {
-            (SortOrder::Ascending, false) => Order::Asc,
-            (SortOrder::Descending, false) => Order::Desc,
-            (SortOrder::Ascending, true) => Order::Desc,
-            (SortOrder::Descending, true) => Order::Asc,
-        }
-    }
 }
 
 #[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]

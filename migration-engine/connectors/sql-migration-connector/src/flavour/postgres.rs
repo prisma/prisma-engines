@@ -5,6 +5,7 @@ use crate::{
     sql_renderer::IteratorJoin,
     SqlFlavour,
 };
+use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{
@@ -14,7 +15,7 @@ use quaint::{
     connector::{tokio_postgres::error::ErrorPosition, PostgresUrl},
     prelude::ConnectionInfo,
 };
-use sql_schema_describer::SqlSchema;
+use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 use std::{collections::HashMap, future};
 use url::Url;
 use user_facing_errors::{
@@ -127,7 +128,11 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
-        sql_datamodel_connector::POSTGRES
+        if self.is_cockroachdb() {
+            sql_datamodel_connector::COCKROACH
+        } else {
+            sql_datamodel_connector::POSTGRES
+        }
     }
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
@@ -154,6 +159,21 @@ impl SqlFlavour for PostgresFlavour {
                     })?;
 
             super::normalize_sql_schema(&mut schema, params.connector_params.preview_features);
+
+            let pg_ext: &mut PostgresSchemaExt = schema.downcast_connector_data_mut();
+
+            // Remove this when the feature is GA
+            if !params
+                .connector_params
+                .preview_features
+                .contains(PreviewFeature::ExtendedIndexes)
+            {
+                for idx in &mut pg_ext.indexes {
+                    idx.1 = sql_schema_describer::postgres::SqlIndexAlgorithm::BTree;
+                }
+                pg_ext.opclasses.clear();
+            }
+
             Ok(schema)
         })
     }

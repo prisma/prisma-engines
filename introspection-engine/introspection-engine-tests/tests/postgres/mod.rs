@@ -1,3 +1,8 @@
+mod brin;
+mod gin;
+mod gist;
+mod spgist;
+
 use indoc::{formatdoc, indoc};
 use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
@@ -87,7 +92,7 @@ async fn dbgenerated_type_casts_should_work_cockroach(api: &TestApi) -> TestResu
 
     let dm = indoc! {r#"
         model A {
-          id String @id @default(dbgenerated("now():::TIMESTAMPTZ::STRING")) @db.VarChar(30)
+          id String @id @default(dbgenerated("now():::TIMESTAMPTZ::STRING")) @db.String(30)
         }
     "#};
 

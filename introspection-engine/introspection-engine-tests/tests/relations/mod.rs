@@ -1,3 +1,4 @@
+mod cockroachdb;
 mod mssql;
 mod mysql;
 mod postgres;
@@ -159,7 +160,7 @@ async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Sqlite, Mysql))]
+#[test_connector(exclude(Sqlite, Mysql, CockroachDb))]
 async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

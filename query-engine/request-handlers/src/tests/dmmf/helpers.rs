@@ -1,7 +1,7 @@
 use crate::dmmf::{schema::*, DataModelMetaFormat};
 use datamodel_connector::ConnectorCapabilities;
 use prisma_models::InternalDataModelBuilder;
-use query_core::{schema_builder, BuildMode, QuerySchema};
+use query_core::{schema::QuerySchema, schema_builder};
 use std::collections::HashMap;
 
 pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
@@ -19,7 +19,6 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml:
     let internal_ref = internal_dm_template.build("db".to_owned());
     let schema = schema_builder::build(
         internal_ref,
-        BuildMode::Modern,
         false,
         capabilities,
         config.subject.preview_features().iter().collect(),

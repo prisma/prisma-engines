@@ -1,7 +1,8 @@
 use super::extract_filter;
-use crate::{constants::filters, ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
+use crate::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
 use connector::{Filter, RelationCompare};
 use prisma_models::RelationFieldRef;
+use schema_builder::constants::filters;
 use std::convert::TryInto;
 
 #[tracing::instrument(name = "parse_relation_field", skip(filter_key, field, input))]

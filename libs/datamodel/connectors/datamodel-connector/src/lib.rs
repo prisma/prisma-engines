@@ -20,13 +20,14 @@ pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
     native_type_instance::NativeTypeInstance,
 };
-pub use diagnostics::{ConnectorErrorFactory, DatamodelError, Diagnostics, Span};
+pub use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 pub use empty_connector::EmptyDatamodelConnector;
 pub use native_type_constructor::NativeTypeConstructor;
 pub use parser_database::{self, ReferentialAction, ScalarType};
 pub use referential_integrity::ReferentialIntegrity;
 
 use enumflags2::BitFlags;
+use parser_database::IndexAlgorithm;
 use std::{borrow::Cow, collections::BTreeMap};
 
 /// The datamodel connector API.
@@ -96,7 +97,18 @@ pub trait Connector: Send + Sync {
     ) {
     }
 
-    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _: &mut diagnostics::Diagnostics) {}
+    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
+
+    fn validate_scalar_field_unknown_default_functions(
+        &self,
+        db: &parser_database::ParserDatabase,
+        diagnostics: &mut Diagnostics,
+    ) {
+        for d in db.walk_scalar_field_defaults_with_unknown_function() {
+            let (func_name, _, span) = d.value().as_function().unwrap();
+            diagnostics.push_error(DatamodelError::new_default_unknown_function(func_name, span));
+        }
+    }
 
     /// The scopes in which a constraint name should be validated. If empty, doesn't check for name
     /// clashes in the validation phase.
@@ -223,12 +235,20 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::DecimalType)
     }
 
+    fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
+        IndexAlgorithm::BTree.into()
+    }
+
+    fn supports_index_type(&self, algo: IndexAlgorithm) -> bool {
+        self.supported_index_types().contains(algo)
+    }
+
     fn allows_relation_fields_in_arbitrary_order(&self) -> bool {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
 
-    fn native_instance_error(&self, instance: &NativeTypeInstance) -> ConnectorErrorFactory {
-        ConnectorErrorFactory::new(instance.to_string(), self.name().to_owned())
+    fn native_instance_error(&self, instance: &NativeTypeInstance) -> NativeTypeErrorFactory {
+        NativeTypeErrorFactory::new(instance.to_string(), self.name().to_owned())
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String>;

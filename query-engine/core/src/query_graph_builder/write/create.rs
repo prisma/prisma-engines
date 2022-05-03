@@ -1,12 +1,13 @@
 use super::*;
 use crate::{
-    constants::args,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ConnectorContext, ParsedField, ParsedInputList, ParsedInputMap,
+    ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
 };
 use connector::IntoFilter;
 use prisma_models::ModelRef;
+use schema::ConnectorContext;
+use schema_builder::constants::args;
 use std::{convert::TryInto, sync::Arc};
 use write_args_parser::*;
 

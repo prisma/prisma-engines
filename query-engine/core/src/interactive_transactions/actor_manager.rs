@@ -1,5 +1,6 @@
-use crate::{Operation, QuerySchemaRef, ResponseData};
+use crate::{Operation, ResponseData};
 use once_cell::sync::Lazy;
+use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
 use tokio::{
     sync::{

@@ -108,8 +108,7 @@ impl<'a> Logger<'a> {
 
             builder = builder.with_exporter(exporter);
 
-            // TODO: Use async batch exporter
-            let tracer = builder.install_batch(opentelemetry::runtime::Tokio).unwrap();
+            let tracer = builder.install_simple().unwrap();
 
             let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
 

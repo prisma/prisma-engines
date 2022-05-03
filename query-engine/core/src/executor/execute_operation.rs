@@ -1,7 +1,8 @@
 use super::pipeline::QueryPipeline;
-use crate::{IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, ResponseData};
+use crate::{IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, ResponseData};
 use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
+use schema::QuerySchemaRef;
 use tracing_futures::WithSubscriber;
 
 pub async fn execute_single_operation(
