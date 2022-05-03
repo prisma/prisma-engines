@@ -1,14 +1,12 @@
 mod collection;
-mod connector_error;
 mod error;
-mod helper;
+mod native_type_error_factory;
+mod pretty_print;
 mod span;
-mod validated;
 mod warning;
 
 pub use collection::Diagnostics;
-pub use connector_error::ConnectorErrorFactory;
 pub use error::DatamodelError;
+pub use native_type_error_factory::NativeTypeErrorFactory;
 pub use span::Span;
-pub use validated::Validated;
 pub use warning::DatamodelWarning;

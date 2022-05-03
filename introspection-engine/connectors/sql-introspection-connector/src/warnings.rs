@@ -207,7 +207,7 @@ pub fn warning_models_without_columns(affected: &[Model]) -> Warning {
 pub fn warning_enriched_models_with_ignore(affected: &[Model]) -> Warning {
     Warning {
         code: 15,
-        message: "The following models were enriched with an @@ignore taken from your previous datamodel".into(),
+        message: "The following models were enriched with an @@ignore taken from your previous Prisma schema.".into(),
         affected: serde_json::to_value(&affected).unwrap(),
     }
 }
@@ -215,7 +215,7 @@ pub fn warning_enriched_models_with_ignore(affected: &[Model]) -> Warning {
 pub fn warning_enriched_fields_with_ignore(affected: &[ModelAndField]) -> Warning {
     Warning {
         code: 16,
-        message: "The following fields were enriched with an @ignore taken from your previous datamodel".into(),
+        message: "The following fields were enriched with an @ignore taken from your previous Prisma schema.".into(),
         affected: serde_json::to_value(&affected).unwrap(),
     }
 }

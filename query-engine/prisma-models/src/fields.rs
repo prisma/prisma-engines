@@ -124,6 +124,14 @@ impl Fields {
             .as_slice()
     }
 
+    pub fn non_relational(&self) -> Vec<Field> {
+        self.scalar()
+            .into_iter()
+            .map(Field::from)
+            .chain(self.composite().into_iter().map(Field::from))
+            .collect()
+    }
+
     pub fn find_many_from_all(&self, names: &BTreeSet<String>) -> Vec<&Field> {
         self.all.iter().filter(|field| names.contains(field.name())).collect()
     }

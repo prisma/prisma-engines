@@ -586,7 +586,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("primary_col")],
-                sequence: None,
                 constraint_name: None,
             }),
             foreign_keys: vec![],
@@ -1116,7 +1115,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("primary_col")],
-                sequence: None,
                 constraint_name: None,
             }),
             foreign_keys: vec![],
@@ -1204,7 +1202,6 @@ fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
             name: "age_and_name_index".into(),
             columns,
             tpe: IndexType::Unique,
-            algorithm: None,
         }]
     );
 }
@@ -1243,7 +1240,6 @@ fn old_mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
             name: "age_and_name_index".into(),
             columns,
             tpe: IndexType::Unique,
-            algorithm: None,
         }]
     );
 }

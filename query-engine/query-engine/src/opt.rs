@@ -28,6 +28,13 @@ pub struct GetConfigInput {
     pub ignore_env_var_errors: bool,
 }
 
+#[derive(Debug, Clone, StructOpt)]
+#[structopt(rename_all = "camelCase")]
+pub struct DebugPanicInput {
+    #[structopt(long)]
+    pub message: Option<String>,
+}
+
 #[derive(Debug, StructOpt, Clone)]
 pub enum CliOpt {
     /// Output the DMMF from the loaded data model.
@@ -36,6 +43,8 @@ pub enum CliOpt {
     GetConfig(GetConfigInput),
     /// Executes one request and then terminates.
     ExecuteRequest(ExecuteRequestInput),
+    /// Artificially panic (for testing the CLI) with an optional message.
+    DebugPanic(DebugPanicInput),
 }
 
 #[derive(Debug, StructOpt, Clone)]

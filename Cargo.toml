@@ -27,6 +27,8 @@ members = [
   "query-engine/connector-test-kit-rs/query-engine-tests",
   "query-engine/prisma-models",
   "query-engine/request-handlers",
+  "query-engine/schema",
+  "query-engine/schema-builder",
   "prisma-fmt",
   "libs/datamodel/core",
   "libs/datamodel/diagnostics",

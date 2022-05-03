@@ -36,6 +36,7 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
             .filter(|differ| {
                 differ.created_primary_key().is_some()
                     || differ.dropped_primary_key().is_some()
+                    || differ.primary_key_changed()
                     || differ.dropped_columns().next().is_some()
                     || differ.added_columns().any(|col| col.arity().is_required())
                     || differ.any_column_changed()

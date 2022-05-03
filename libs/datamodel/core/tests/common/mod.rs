@@ -508,6 +508,14 @@ pub(crate) fn parse_error(datamodel_string: &str) -> Diagnostics {
     }
 }
 
+#[track_caller]
+pub(crate) fn assert_valid(schema: &str) {
+    match datamodel::parse_schema_parserdb(schema) {
+        Ok(_) => (),
+        Err(err) => panic!("{err}"),
+    }
+}
+
 pub(crate) const SQLITE_SOURCE: &str = r#"
     datasource db {
         provider = "sqlite"

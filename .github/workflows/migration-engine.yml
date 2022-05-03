@@ -13,7 +13,7 @@ on:
 
 jobs:
   test-mongodb-introspection-and-migration-connector:
-    name: "Test ${{ matrix.database.name }} on Linux"
+    name: "Test ${{ matrix.database.name }} on Linux (MongoDB)"
     strategy:
       fail-fast: false
       matrix:
@@ -64,47 +64,65 @@ jobs:
           - name: mssql_2017
             url: "sqlserver://localhost:1434;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
             single_threaded: true
+            allow_failure: false
           - name: mssql_2019
             url: "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
             single_threaded: true
+            allow_failure: false
           - name: mysql_5_6
             url: "mysql://root:prisma@localhost:3309"
+            allow_failure: false
           - name: mysql_5_7
             url: "mysql://root:prisma@localhost:3306"
+            allow_failure: false
           - name: mysql_8
             url: "mysql://root:prisma@localhost:3307"
+            allow_failure: false
           - name: mysql_mariadb
             url: "mysql://root:prisma@localhost:3308"
+            allow_failure: false
           - name: postgres9
             url: "postgresql://postgres:prisma@localhost:5431"
+            allow_failure: false
           - name: postgres10
             url: "postgresql://postgres:prisma@localhost:5432"
+            allow_failure: false
           - name: postgres11
             url: "postgresql://postgres:prisma@localhost:5433"
+            allow_failure: false
           - name: postgres12
             url: "postgresql://postgres:prisma@localhost:5434"
+            allow_failure: false
           - name: postgres13
             url: "postgresql://postgres:prisma@localhost:5435"
+            allow_failure: false
           - name: postgres14
             url: "postgresql://postgres:prisma@localhost:5437"
+            allow_failure: false
           - name: cockroach_22_1_0_alpha_1
             url: "postgresql://prisma@localhost:26257"
+            allow_failure: false
           - name: cockroach_21_2_0_patched
             url: "postgresql://prisma@localhost:26258"
+            allow_failure: true
           - name: sqlite
             url: sqlite
+            allow_failure: false
           - name: vitess_5_7
             url: "mysql://root:prisma@localhost:33577/test"
             shadow_database_url: "mysql://root:prisma@localhost:33578/shadow"
             is_vitess: true
             single_threaded: true
+            allow_failure: false
           - name: vitess_8_0
             url: "mysql://root:prisma@localhost:33807/test"
             shadow_database_url: "mysql://root:prisma@localhost:33808/shadow"
             is_vitess: true
             single_threaded: true
+            allow_failure: false
 
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.database.allow_failure }}
     steps:
       - uses: actions/checkout@v2
 
@@ -124,39 +142,83 @@ jobs:
       #       target
       #     key: me-ie-${{ runner.os }}-${{ matrix.database.name }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: cargo test -p introspection-engine-tests
+      - name: cargo test -p introspection-engine-tests | !matrix.database.single_threaded
+        run: cargo test -p introspection-engine-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p sql-schema-describer
+      - name: cargo test -p sql-schema-describer | !matrix.database.single_threaded
+        run: cargo test -p sql-schema-describer
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p migration-engine-tests
+      - name: cargo test -p migration-engine-tests | !matrix.database.single_threaded
+        run: cargo test -p migration-engine-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           RUST_LOG: debug
 
-      - run: cargo test -p migration-engine-cli
-        if: ${{ !matrix.database.single_threaded }}
+      - name: cargo test -p migration-engine-cli | !matrix.database.single_threaded
+        run: cargo test -p migration-engine-cli
+        if: ${{ !matrix.database.single_threaded && (matrix.database.allow_failure && always()) }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p introspection-engine-tests -- --test-threads=1
+
+      - name: cargo test -p introspection-engine-tests -- --test-threads=1 | !matrix.database.is_vitess && matrix.database.single_threaded
+        run: cargo test -p introspection-engine-tests -- --test-threads=1
+        if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ matrix.database.url }}
+
+      - name: cargo test -p sql-schema-describer -- --test-threads=1 | !matrix.database.is_vitess && matrix.database.single_threaded
+        run: cargo test -p sql-schema-describer -- --test-threads=1
+        if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ matrix.database.url }}
+
+      - name: cargo test -p migration-engine-tests -- --test-threads=1 | !matrix.database.is_vitess && matrix.database.single_threaded
+        run: cargo test -p migration-engine-tests -- --test-threads=1
+        if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ matrix.database.url }}
+          RUST_LOG: debug
+
+      - name: cargo test -p migration-engine-cli -- --test-threads=1 | !matrix.database.is_vitess && matrix.database.single_threaded
+        run: cargo test -p migration-engine-cli -- --test-threads=1
+        if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ matrix.database.url }}
+
+
+      - name: cargo test -p introspection-engine-tests -- --test-threads=1 | matrix.database.is_vitess
+        run: cargo test -p introspection-engine-tests -- --test-threads=1
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           TEST_SHADOW_DATABASE_URL: ${{ matrix.database.shadow_database_url }}
 
-      - run: cargo test -p migration-engine-tests -- --test-threads=1
+      #- name: cargo test -p sql-schema-describer -- --test-threads=1 | matrix.database.is_vitess
+      #  run: cargo test -p sql-schema-describer -- --test-threads=1
+      #  if: ${{ matrix.database.is_vitess }}
+      #  env:
+      #    CLICOLOR_FORCE: 1
+      #    TEST_DATABASE_URL: ${{ matrix.database.url }}
+          
+      - name: cargo test -p migration-engine-tests -- --test-threads=1 | matrix.database.is_vitess
+        run: cargo test -p migration-engine-tests -- --test-threads=1
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
@@ -164,38 +226,14 @@ jobs:
           TEST_SHADOW_DATABASE_URL: ${{ matrix.database.shadow_database_url }}
           RUST_LOG: debug
 
-      - run: cargo test -p migration-engine-cli -- --test-threads=1
+      - name: cargo test -p migration-engine-cli -- --test-threads=1 | matrix.database.is_vitess
+        run: cargo test -p migration-engine-cli -- --test-threads=1
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           TEST_SHADOW_DATABASE_URL: ${{ matrix.database.shadow_database_url }}
-
-      - run: cargo test -p sql-schema-describer -- --test-threads=1
-        if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
-        env:
-          CLICOLOR_FORCE: 1
-          TEST_DATABASE_URL: ${{ matrix.database.url }}
-
-      - run: cargo test -p introspection-engine-tests -- --test-threads=1
-        if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
-        env:
-          CLICOLOR_FORCE: 1
-          TEST_DATABASE_URL: ${{ matrix.database.url }}
-
-      - run: cargo test -p migration-engine-tests -- --test-threads=1
-        if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
-        env:
-          CLICOLOR_FORCE: 1
-          TEST_DATABASE_URL: ${{ matrix.database.url }}
-          RUST_LOG: debug
-
-      - run: cargo test -p migration-engine-cli -- --test-threads=1
-        if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
-        env:
-          CLICOLOR_FORCE: 1
-          TEST_DATABASE_URL: ${{ matrix.database.url }}
-
+          
   test-windows:
     strategy:
       fail-fast: false

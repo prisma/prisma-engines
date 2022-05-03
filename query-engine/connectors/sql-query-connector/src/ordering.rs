@@ -48,7 +48,7 @@ fn build_order_scalar(
     index: usize,
 ) -> OrderByDefinition {
     let (joins, order_column) = compute_joins_scalar(order_by, index, base_model);
-    let order: Option<Order> = Some(order_by.sort_order.into_order(needs_reversed_order));
+    let order: Option<Order> = Some(into_order(order_by.sort_order, needs_reversed_order));
     let order_definition: OrderDefinition = (order_column.clone().into(), order);
 
     OrderByDefinition {
@@ -61,7 +61,7 @@ fn build_order_scalar(
 fn build_order_relevance(order_by: &OrderByRelevance, needs_reversed_order: bool) -> OrderByDefinition {
     let columns: Vec<Expression> = order_by.fields.iter().map(|sf| sf.as_column().into()).collect();
     let order_column: Expression = text_search_relevance(&columns, order_by.search.clone()).into();
-    let order: Option<Order> = Some(order_by.sort_order.into_order(needs_reversed_order));
+    let order: Option<Order> = Some(into_order(order_by.sort_order, needs_reversed_order));
     let order_definition: OrderDefinition = (order_column.clone(), order);
 
     OrderByDefinition {
@@ -72,7 +72,7 @@ fn build_order_relevance(order_by: &OrderByRelevance, needs_reversed_order: bool
 }
 
 fn build_order_aggr_scalar(order_by: &OrderByScalarAggregation, needs_reversed_order: bool) -> OrderByDefinition {
-    let order: Option<Order> = Some(order_by.sort_order.into_order(needs_reversed_order));
+    let order: Option<Order> = Some(into_order(order_by.sort_order, needs_reversed_order));
     let order_column = order_by.field.as_column();
     let order_definition: OrderDefinition = match order_by.sort_aggregation {
         SortAggregation::Count => (count(order_column.clone()).into(), order),
@@ -95,7 +95,7 @@ fn build_order_aggr_rel(
     needs_reversed_order: bool,
     index: usize,
 ) -> OrderByDefinition {
-    let order: Option<Order> = Some(order_by.sort_order.into_order(needs_reversed_order));
+    let order: Option<Order> = Some(into_order(order_by.sort_order, needs_reversed_order));
     let (joins, order_column) = compute_joins_aggregation(order_by, index, base_model);
     let order_definition: OrderDefinition = match order_by.sort_aggregation {
         SortAggregation::Count => {
@@ -179,4 +179,13 @@ pub fn compute_joins_scalar(
     };
 
     (joins, order_by_column)
+}
+
+pub fn into_order(prisma_order: SortOrder, reverse: bool) -> Order {
+    match (prisma_order, reverse) {
+        (SortOrder::Ascending, false) => Order::Asc,
+        (SortOrder::Descending, false) => Order::Desc,
+        (SortOrder::Ascending, true) => Order::Desc,
+        (SortOrder::Descending, true) => Order::Asc,
+    }
 }

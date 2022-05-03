@@ -3,7 +3,7 @@ use expect_test::expect;
 use introspection_engine_tests::{test_api::*, TestResult};
 use test_macros::test_connector;
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn add_cuid_default_postgres(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -53,7 +53,7 @@ async fn add_cuid_default_mysql(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn add_uuid_default_postgres(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

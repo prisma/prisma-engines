@@ -1,6 +1,7 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 
-mod cockroach_datamodel_connector;
+pub mod cockroach_datamodel_connector;
+
 mod mssql_datamodel_connector;
 mod mysql_datamodel_connector;
 mod postgres_datamodel_connector;

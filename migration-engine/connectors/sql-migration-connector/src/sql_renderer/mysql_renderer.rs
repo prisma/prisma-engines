@@ -213,6 +213,7 @@ impl SqlRenderer for MysqlFlavour {
                             SQLSortOrder::Asc => SortOrder::Asc,
                             SQLSortOrder::Desc => SortOrder::Desc,
                         }),
+                        operator_class: None,
                     })
                     .collect(),
             ),
@@ -242,6 +243,7 @@ impl SqlRenderer for MysqlFlavour {
                                 SQLSortOrder::Asc => SortOrder::Asc,
                                 SQLSortOrder::Desc => SortOrder::Desc,
                             }),
+                            operator_class: None,
                         })
                         .collect(),
                 })
@@ -255,6 +257,7 @@ impl SqlRenderer for MysqlFlavour {
                         SQLSortOrder::Asc => SortOrder::Asc,
                         SQLSortOrder::Desc => SortOrder::Desc,
                     }),
+                    operator_class: None,
                 })
                 .collect(),
             default_character_set: Some("utf8mb4".into()),

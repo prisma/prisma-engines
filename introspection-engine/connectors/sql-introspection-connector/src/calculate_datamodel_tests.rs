@@ -17,7 +17,7 @@ mod tests {
     use pretty_assertions::assert_eq;
     use sql_schema_describer::{
         Column, ColumnArity, ColumnType, ColumnTypeFamily, Enum, ForeignKey, ForeignKeyAction, Index, IndexColumn,
-        IndexType, PrimaryKey, PrimaryKeyColumn, Sequence, SqlSchema, Table,
+        IndexType, PrimaryKey, PrimaryKeyColumn, SqlSchema, Table,
     };
 
     fn postgres_context() -> IntrospectionContext {
@@ -121,6 +121,7 @@ mod tests {
                                     },
                                 ],
                                 defined_on_field: true,
+                                clustered: None,
                             },
                         ),
                         is_generated: false,
@@ -158,7 +159,6 @@ mod tests {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("required")],
-                sequence: None,
                 constraint_name: None,
             }),
             foreign_keys: vec![],
@@ -208,6 +208,7 @@ mod tests {
                         db_name: None,
                         fields: vec![PrimaryKeyField::new("primary")],
                         defined_on_field: true,
+                        clustered: None,
                     }),
                 },
                 // Model with non-auto-incrementing primary key
@@ -244,6 +245,7 @@ mod tests {
                         db_name: None,
                         fields: vec![PrimaryKeyField::new("primary")],
                         defined_on_field: true,
+                        clustered: None,
                     }),
                 },
                 // Model with primary key seeded by sequence
@@ -280,6 +282,7 @@ mod tests {
                         db_name: None,
                         fields: vec![PrimaryKeyField::new("primary")],
                         defined_on_field: true,
+                        clustered: None,
                     }),
                 },
             ],
@@ -304,7 +307,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("primary")],
-                    sequence: None,
                     constraint_name: None,
                 }),
                 foreign_keys: vec![],
@@ -325,7 +327,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("primary")],
-                    sequence: None,
                     constraint_name: None,
                 }),
                 foreign_keys: vec![],
@@ -346,9 +347,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("primary")],
-                    sequence: Some(Sequence {
-                        name: "sequence".to_string(),
-                    }),
                     constraint_name: None,
                 }),
                 foreign_keys: vec![],
@@ -397,6 +395,7 @@ mod tests {
                     tpe: dml::IndexType::Unique,
                     defined_on_field: true,
                     algorithm: None,
+                    clustered: None,
                 }],
                 primary_key: None,
             }],
@@ -424,7 +423,6 @@ mod tests {
                 name: "unique_unique".to_string(),
                 columns: vec![IndexColumn::new("unique")],
                 tpe: IndexType::Unique,
-                algorithm: None,
             }],
             primary_key: None,
             foreign_keys: vec![],
@@ -502,6 +500,7 @@ mod tests {
                         db_name: None,
                         fields: vec![PrimaryKeyField::new("id")],
                         defined_on_field: true,
+                        clustered: None,
                     }),
                 },
                 Model {
@@ -599,6 +598,7 @@ mod tests {
                         db_name: None,
                         fields: vec![PrimaryKeyField::new("id")],
                         defined_on_field: true,
+                        clustered: None,
                     }),
                 },
             ],
@@ -636,7 +636,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("id")],
-                    sequence: None,
                     constraint_name: None,
                 }),
                 foreign_keys: vec![],
@@ -681,7 +680,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("id")],
-                    sequence: None,
                     constraint_name: None,
                 }),
                 foreign_keys: vec![ForeignKey {
@@ -767,12 +765,14 @@ mod tests {
                     tpe: datamodel::dml::IndexType::Unique,
                     defined_on_field: false,
                     algorithm: None,
+                    clustered: None,
                 }],
                 primary_key: Some(PrimaryKeyDefinition {
                     name: None,
                     db_name: None,
                     fields: vec![PrimaryKeyField::new("id")],
                     defined_on_field: true,
+                    clustered: None,
                 }),
             }],
             enums: vec![],
@@ -820,11 +820,9 @@ mod tests {
                 name: "name_last_name_unique".to_string(),
                 columns: vec![IndexColumn::new("name"), IndexColumn::new("lastname")],
                 tpe: IndexType::Unique,
-                algorithm: None,
             }],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("id")],
-                sequence: None,
                 constraint_name: None,
             }),
             foreign_keys: vec![],
@@ -902,6 +900,7 @@ mod tests {
                         db_name: None,
                         fields: vec![PrimaryKeyField::new("id")],
                         defined_on_field: true,
+                        clustered: None,
                     }),
                 },
                 Model {
@@ -972,6 +971,7 @@ mod tests {
                         db_name: None,
                         fields: vec![PrimaryKeyField::new("id")],
                         defined_on_field: true,
+                        clustered: None,
                     }),
                 },
             ],
@@ -1009,7 +1009,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("id")],
-                    sequence: None,
                     constraint_name: None,
                 }),
                 foreign_keys: vec![],
@@ -1043,7 +1042,6 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec![PrimaryKeyColumn::new("id")],
-                    sequence: None,
                     constraint_name: None,
                 }),
                 foreign_keys: vec![ForeignKey {

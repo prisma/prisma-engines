@@ -1,3 +1,5 @@
+mod mssql;
+
 use migration_engine_tests::test_api::*;
 
 #[test_connector]

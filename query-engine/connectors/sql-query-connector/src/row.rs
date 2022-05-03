@@ -1,4 +1,4 @@
-use crate::{column_metadata::ColumnMetadata, error::SqlError};
+use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_value};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
@@ -8,7 +8,7 @@ use quaint::{
     ast::{Expression, Value},
     connector::ResultRow,
 };
-use std::{convert::TryFrom, io, str::FromStr};
+use std::{io, str::FromStr};
 use uuid::Uuid;
 
 /// An allocated representation of a `Row` returned from the database.
@@ -237,7 +237,7 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
             Value::Text(Some(ref txt)) => {
                 PrismaValue::Int(i64::from_str(txt.trim_start_matches('\0')).map_err(|_| create_error(&p_value))?)
             }
-            other => PrismaValue::try_from(other)?,
+            other => to_prisma_value(other)?,
         },
         TypeIdentifier::String => match p_value {
             value if value.is_null() => PrismaValue::Null,
@@ -245,7 +245,7 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
             Value::Json(Some(ref json_value)) => {
                 PrismaValue::String(serde_json::to_string(json_value).map_err(|_| create_error(&p_value))?)
             }
-            other => PrismaValue::try_from(other)?,
+            other => to_prisma_value(other)?,
         },
         TypeIdentifier::Bytes => match p_value {
             value if value.is_null() => PrismaValue::Null,

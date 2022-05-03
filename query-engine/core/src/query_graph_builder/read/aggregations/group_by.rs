@@ -1,12 +1,10 @@
 use std::convert::TryInto;
 
 use super::*;
-use crate::{
-    constants::args, query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue,
-    ReadQuery,
-};
+use crate::{query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue, ReadQuery};
 use connector::Filter;
 use prisma_models::{ModelRef, OrderBy, ScalarFieldRef};
+use schema_builder::constants::args;
 
 #[tracing::instrument(skip(field, model))]
 pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {

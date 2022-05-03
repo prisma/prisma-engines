@@ -10,6 +10,7 @@ use datamodel::dml::PrismaValue;
 use indoc::{formatdoc, indoc};
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use sql_schema_describer::{
+    mssql::MssqlSchemaExt,
     walkers::{
         ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
@@ -127,6 +128,7 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+        let mssql_schema_ext: &MssqlSchemaExt = index.schema().downcast_connector_data();
         let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
@@ -147,13 +149,15 @@ impl SqlRenderer for MssqlFlavour {
             rendered
         });
 
-        format!(
-            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
-            index_type = index_type,
-            index_name = index_name,
-            table_reference = table_reference,
-            columns = columns.join(", "),
-        )
+        let clustering = if mssql_schema_ext.index_is_clustered(index.index_id()) {
+            "CLUSTERED "
+        } else {
+            "NONCLUSTERED "
+        };
+
+        let columns = columns.join(", ");
+
+        format!("CREATE {index_type}{clustering}INDEX {index_name} ON {table_reference}({columns})",)
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
@@ -161,6 +165,7 @@ impl SqlRenderer for MssqlFlavour {
             .columns()
             .map(|column| self.render_column(&column))
             .join(",\n    ");
+        let mssql_schema_ext: &MssqlSchemaExt = table.schema().downcast_connector_data();
 
         let primary_key = if let Some(pk) = table.primary_key() {
             let column_names = pk
@@ -178,11 +183,15 @@ impl SqlRenderer for MssqlFlavour {
                 })
                 .join(",");
 
-            format!(
-                ",\n    CONSTRAINT {} PRIMARY KEY ({})",
-                self.quote(pk.constraint_name.as_ref().unwrap()),
-                column_names
-            )
+            let clustering = if mssql_schema_ext.pk_is_clustered(table.table_id()) {
+                " CLUSTERED"
+            } else {
+                " NONCLUSTERED"
+            };
+
+            let constraint_name = self.quote(pk.constraint_name.as_ref().unwrap());
+
+            format!(",\n    CONSTRAINT {constraint_name} PRIMARY KEY{clustering} ({column_names})",)
         } else {
             String::new()
         };
@@ -207,7 +216,16 @@ impl SqlRenderer for MssqlFlavour {
                         rendered
                     });
 
-                    format!("CONSTRAINT {} UNIQUE ({})", self.quote(index.name()), columns.join(","))
+                    let constraint_name = self.quote(index.name());
+                    let column_names = columns.join(",");
+
+                    let clustering = if mssql_schema_ext.index_is_clustered(index.index_id()) {
+                        " CLUSTERED"
+                    } else {
+                        " NONCLUSTERED"
+                    };
+
+                    format!("CONSTRAINT {constraint_name} UNIQUE{clustering} ({column_names})")
                 })
                 .join(",\n    ");
 

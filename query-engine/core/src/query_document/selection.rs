@@ -1,8 +1,7 @@
-use crate::constants::filters;
-
 use super::QueryValue;
 use indexmap::IndexMap;
 use itertools::Itertools;
+use schema_builder::constants::filters;
 use std::borrow::Cow;
 
 #[derive(Debug, Clone, PartialEq)]

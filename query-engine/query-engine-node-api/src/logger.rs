@@ -1,43 +1,116 @@
 use core::fmt;
-
 use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
+use napi::Result;
+use opentelemetry::global;
+use opentelemetry::sdk::propagation::TraceContextPropagator;
+use opentelemetry::{
+    sdk::{trace::Config, Resource},
+    KeyValue,
+};
+use opentelemetry_otlp::WithExportConfig;
 use serde_json::Value;
 use std::collections::BTreeMap;
+use tokio::sync::RwLock;
 use tracing::{
     field::{Field, Visit},
     level_filters::LevelFilter,
     Dispatch, Level, Subscriber,
 };
+
 use tracing_subscriber::{
     filter::{filter_fn, FilterExt},
     layer::SubscriberExt,
     Layer, Registry,
 };
 
-pub(crate) fn create_log_dispatch(
+pub(crate) struct Logger {
+    // We need the original parameters in case we move to tracing
     log_queries: bool,
     log_level: LevelFilter,
     log_callback: ThreadsafeFunction<String>,
-) -> Dispatch {
-    // is a sql query?
-    let is_sql_query = filter_fn(|meta| {
-        meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
-    });
-    // is a mongodb query?
-    let is_mongo_query = filter_fn(|meta| meta.target() == "mongodb_query_connector::query");
+    __dispatcher: RwLock<Dispatch>,
+}
 
-    // We need to filter the messages to send to our callback logging mechanism
-    let filters = if log_queries {
-        // Filter trace query events (for query log) or based in the defined log level
-        is_sql_query.or(is_mongo_query).or(log_level).boxed()
-    } else {
-        // Filter based in the defined log level
-        log_level.boxed()
-    };
+impl Logger {
+    /// Creates a new logger using a call layer
+    pub fn new(log_queries: bool, log_level: LevelFilter, log_callback: ThreadsafeFunction<String>) -> Self {
+        let is_sql_query = filter_fn(|meta| {
+            meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
+        });
+        // is a mongodb query?
+        let is_mongo_query = filter_fn(|meta| meta.target() == "mongodb_query_connector::query");
 
-    let logger = CallbackLayer::new(log_callback).with_filter(filters);
+        // We need to filter the messages to send to our callback logging mechanism
+        let filters = if log_queries {
+            // Filter trace query events (for query log) or based in the defined log level
+            is_sql_query.or(is_mongo_query).or(log_level).boxed()
+        } else {
+            // Filter based in the defined log level
+            log_level.boxed()
+        };
 
-    Dispatch::new(Registry::default().with(logger))
+        let layer = CallbackLayer::new(log_callback.clone()).with_filter(filters);
+
+        Self {
+            log_queries,
+            log_level,
+            log_callback,
+            __dispatcher: RwLock::new(Dispatch::new(Registry::default().with(layer))),
+        }
+    }
+
+    /// Sets the Logger to use telemetry
+    pub async fn enable_telemetry(&self, endpoint: Option<String>, name: Option<String>) -> Result<()> {
+        global::set_text_map_propagator(TraceContextPropagator::new());
+
+        let name = name.unwrap_or_else(|| String::from("prisma-query-engine"));
+
+        let resource = Resource::new(vec![KeyValue::new("service.name", name)]);
+        let config = Config::default().with_resource(resource);
+
+        let builder = opentelemetry_otlp::new_pipeline().tracing().with_trace_config(config);
+
+        let mut exporter = opentelemetry_otlp::new_exporter().tonic();
+
+        if let Some(endpoint) = endpoint {
+            exporter = exporter.with_endpoint(endpoint);
+        }
+
+        let builder = builder.with_exporter(exporter);
+        let tracer = builder.install_simple().unwrap();
+
+        let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+
+        let is_sql_query = filter_fn(|meta| {
+            meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
+        });
+        // is a mongodb query?
+        let is_mongo_query = filter_fn(|meta| meta.target() == "mongodb_query_connector::query");
+
+        // We need to filter the messages to send to our callback logging mechanism
+        let filters = if self.log_queries {
+            // Filter trace query events (for query log) or based in the defined log level
+            is_sql_query.or(is_mongo_query).or(self.log_level).boxed()
+        } else {
+            // Filter based in the defined log level
+            self.log_level.boxed()
+        };
+
+        let layer = CallbackLayer::new(self.log_callback.clone()).with_filter(filters);
+
+        let registry = Registry::default().with(telemetry).with(layer);
+
+        // Assign a new dispatcher now with the telemetry layer assigned
+        let mut dispatcher = self.__dispatcher.write().await;
+        *dispatcher = Dispatch::new(registry);
+
+        Ok(())
+    }
+
+    /// Returns a tracing dispatcher
+    pub async fn dispatcher(&self) -> Dispatch {
+        self.__dispatcher.read().await.clone()
+    }
 }
 
 pub struct JsonVisitor<'a> {

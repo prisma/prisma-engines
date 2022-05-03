@@ -10,6 +10,7 @@ pub trait Getter {
 
     fn get_char(&self, name: &str) -> Option<char>;
     fn get_string(&self, name: &str) -> Option<String>;
+    fn get_bool(&self, name: &str) -> Option<bool>;
     fn get_u32(&self, name: &str) -> Option<u32>;
     fn get_i64(&self, name: &str) -> Option<i64>;
 }
@@ -36,35 +37,38 @@ impl Getter for ResultRow {
             .unwrap()
     }
 
-    // At least on MySQL, the encoding of booleans in the information schema
-    // seems to be somewhat flexible, so we try to match "0", "1", 0 and 1
-    // additionally. See https://github.com/prisma/prisma/issues/5235 for
-    // example.
     fn get_expect_bool(&self, name: &str) -> bool {
-        self.get(name)
-            .and_then(|x| {
-                x.as_bool()
-                    .or_else(|| {
-                        x.as_i64().and_then(|n| match n {
-                            0 => Some(false),
-                            1 => Some(true),
-                            _ => None,
-                        })
-                    })
-                    .or_else(|| {
-                        x.to_string().and_then(|s| match s.trim() {
-                            "0" => Some(false),
-                            "1" => Some(true),
-                            _ => None,
-                        })
-                    })
-            })
+        self.get_bool(name)
             .ok_or_else(|| format!("Getting {} from Resultrow {:?} as bool failed", name, &self))
             .unwrap()
     }
 
     fn get_char(&self, name: &str) -> Option<char> {
         self.get(name).and_then(|x| x.as_char())
+    }
+
+    // At least on MySQL, the encoding of booleans in the information schema
+    // seems to be somewhat flexible, so we try to match "0", "1", 0 and 1
+    // additionally. See https://github.com/prisma/prisma/issues/5235 for
+    // example.
+    fn get_bool(&self, name: &str) -> Option<bool> {
+        self.get(name).and_then(|x| {
+            x.as_bool()
+                .or_else(|| {
+                    x.as_i64().and_then(|n| match n {
+                        0 => Some(false),
+                        1 => Some(true),
+                        _ => None,
+                    })
+                })
+                .or_else(|| {
+                    x.to_string().and_then(|s| match s.trim() {
+                        "0" => Some(false),
+                        "1" => Some(true),
+                        _ => None,
+                    })
+                })
+        })
     }
 
     fn get_string(&self, name: &str) -> Option<String> {

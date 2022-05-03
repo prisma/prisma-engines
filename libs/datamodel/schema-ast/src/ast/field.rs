@@ -99,6 +99,7 @@ impl FieldArity {
 #[derive(Debug, Clone, PartialEq)]
 pub enum FieldType {
     Supported(Identifier),
+    /// Unsupported("...")
     Unsupported(String, Span),
 }
 

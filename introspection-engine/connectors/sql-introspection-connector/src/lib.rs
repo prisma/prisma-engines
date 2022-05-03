@@ -72,22 +72,26 @@ impl SqlIntrospectionConnector {
         })
     }
 
-    async fn describer(&self) -> SqlIntrospectionResult<Box<dyn SqlSchemaDescriberBackend + '_>> {
+    async fn describer(
+        &self,
+        provider: Option<&str>,
+    ) -> SqlIntrospectionResult<Box<dyn SqlSchemaDescriberBackend + '_>> {
         load_describer(
             &self.connection,
             self.connection.connection_info(),
+            provider,
             self.preview_features,
         )
         .await
     }
 
     async fn list_databases_internal(&self) -> SqlIntrospectionResult<Vec<String>> {
-        Ok(self.describer().await?.list_databases().await?)
+        Ok(self.describer(None).await?.list_databases().await?)
     }
 
     async fn get_metadata_internal(&self) -> SqlIntrospectionResult<DatabaseMetadata> {
         let sql_metadata = self
-            .describer()
+            .describer(None)
             .await?
             .get_metadata(self.connection.connection_info().schema_name())
             .await?;
@@ -106,9 +110,9 @@ impl SqlIntrospectionConnector {
     }
 
     /// Exported for tests
-    pub async fn describe(&self) -> SqlIntrospectionResult<SqlSchema> {
+    pub async fn describe(&self, provider: Option<&str>) -> SqlIntrospectionResult<SqlSchema> {
         Ok(self
-            .describer()
+            .describer(provider)
             .await?
             .describe(self.connection.connection_info().schema_name())
             .await?)
@@ -116,7 +120,7 @@ impl SqlIntrospectionConnector {
 
     async fn version(&self) -> SqlIntrospectionResult<String> {
         Ok(self
-            .describer()
+            .describer(None)
             .await?
             .version(self.connection.connection_info().schema_name())
             .await?
@@ -135,7 +139,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     }
 
     async fn get_database_description(&self) -> ConnectorResult<String> {
-        let sql_schema = self.catch(self.describe()).await?;
+        let sql_schema = self.catch(self.describe(None)).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
         let description = serde_json::to_string_pretty(&sql_schema).unwrap();
         Ok(description)
@@ -153,7 +157,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         previous_data_model: &Datamodel,
         ctx: IntrospectionContext,
     ) -> ConnectorResult<IntrospectionResult> {
-        let sql_schema = self.catch(self.describe()).await?;
+        let sql_schema = self.catch(self.describe(Some(&ctx.source.active_provider))).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
 
         let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, previous_data_model, ctx)

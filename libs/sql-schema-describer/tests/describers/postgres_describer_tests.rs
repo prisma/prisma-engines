@@ -5,7 +5,7 @@ use barrel::{types, Migration};
 use indoc::indoc;
 use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
-use sql_schema_describer::*;
+use sql_schema_describer::{postgres::PostgresSchemaExt, *};
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
@@ -571,18 +571,75 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     length: None,
                 }],
                 tpe: IndexType::Unique,
-                algorithm: Some(SQLIndexAlgorithm::BTree),
             },],
             primary_key: Some(PrimaryKey {
                 columns: vec![PrimaryKeyColumn::new("primary_col")],
-                sequence: Some(Sequence {
-                    name: "User_primary_col_seq".into(),
-                },),
                 constraint_name: Some("User_pkey".into()),
             }),
             foreign_keys: vec![],
         }
     );
+
+    if api.connector_tags().contains(Tags::Postgres9) {
+        return; // sequence max values work differently on postgres 9
+    }
+
+    let ext = extract_ext(&result);
+    let expected_ext = expect![[r#"
+        PostgresSchemaExt {
+            opclasses: [],
+            indexes: [
+                (
+                    IndexId(
+                        TableId(
+                            0,
+                        ),
+                        0,
+                    ),
+                    BTree,
+                ),
+            ],
+            sequences: [
+                Sequence {
+                    name: "User_bigserial_col_seq",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 9223372036854775807,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 0,
+                },
+                Sequence {
+                    name: "User_smallserial_col_seq",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 32767,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 0,
+                },
+                Sequence {
+                    name: "User_serial_col_seq",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 2147483647,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 0,
+                },
+                Sequence {
+                    name: "User_primary_col_seq",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 2147483647,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 0,
+                },
+            ],
+        }
+    "#]];
+    expected_ext.assert_debug_eq(&ext);
 }
 
 #[test_connector(tags(Postgres))]
@@ -677,14 +734,30 @@ fn postgres_enums_must_work(api: TestApi) {
     assert_eq!(got_enum.values, values);
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn postgres_sequences_must_work(api: TestApi) {
     api.raw_cmd(&format!("CREATE SEQUENCE \"{}\".\"test\"", api.schema_name()));
 
     let schema = api.describe();
-    let got_seq = schema.get_sequence("test").expect("get sequence");
-
-    assert_eq!(got_seq, &Sequence { name: "test".into() },);
+    let ext = extract_ext(&schema);
+    let expected_ext = expect![[r#"
+        PostgresSchemaExt {
+            opclasses: [],
+            indexes: [],
+            sequences: [
+                Sequence {
+                    name: "test",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 9223372036854775807,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 0,
+                },
+            ],
+        }
+    "#]];
+    expected_ext.assert_debug_eq(&ext);
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -715,12 +788,12 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
             IndexColumn {
                 name: "name".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
             IndexColumn {
                 name: "age".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
         ]
     );
@@ -735,12 +808,12 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
             IndexColumn {
                 name: "age".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
             IndexColumn {
                 name: "name".to_string(),
                 sort_order: Some(SQLSortOrder::Asc),
-                length: None
+                length: None,
             },
         ]
     );
@@ -901,4 +974,8 @@ fn index_sort_order_composite_type_asc_desc_is_handled(api: TestApi) {
 
     assert_eq!(Some(SQLSortOrder::Asc), columns[0].sort_order());
     assert_eq!(Some(SQLSortOrder::Desc), columns[1].sort_order());
+}
+
+fn extract_ext(schema: &SqlSchema) -> &PostgresSchemaExt {
+    schema.downcast_connector_data()
 }

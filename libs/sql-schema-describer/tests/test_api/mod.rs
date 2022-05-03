@@ -1,3 +1,4 @@
+pub use expect_test::expect;
 pub use quaint::{prelude::Queryable, single::Quaint};
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
@@ -123,10 +124,6 @@ impl TestApi {
 
     pub(crate) fn is_mssql(&self) -> bool {
         self.tags.contains(Tags::Mssql)
-    }
-
-    pub(crate) fn is_postgres(&self) -> bool {
-        self.tags.contains(Tags::Postgres)
     }
 
     pub(crate) fn is_cockroach(&self) -> bool {

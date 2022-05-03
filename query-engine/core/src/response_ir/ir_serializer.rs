@@ -1,7 +1,7 @@
 use super::{internal::serialize_internal, response::*, *};
-use crate::{CoreError, ExpressionResult, OutputFieldRef, OutputType, QueryResult};
-
+use crate::{CoreError, ExpressionResult, QueryResult};
 use prisma_models::PrismaValue;
+use schema::{OutputFieldRef, OutputType};
 use std::borrow::Borrow;
 
 #[derive(Debug)]
