@@ -728,67 +728,62 @@ fn one_to_one_inlined_parent(
 /// Handles one-to-one relations where the inlining is done on the child record
 /// The resulting graph:
 /// ```text
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
-/// ┌──          Parent         │─────────────────────────┬──────────────────────────────────────────┐
-/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                          │                                          │
-/// │               │                                     │(If non-create)                           │
-/// │                                      ┌───  ────  ───┼  ────  ────  ────  ────  ────  ────  ──┐ │
-/// │               │                                     ▼                                        │ │
-/// │               ▼                        ┌────────────────────────┐                              │
-/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─           │ │     Read ex. child     │──┐                           │
-/// │         Read Result       │          │ └────────────────────────┘  │                         │ │
-/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─           │              │              │                         │ │
-/// │                                      │              ▼              │(Fail on c > 0 if child  │ │
-/// ├───────────────┐                        ┌────────────────────────┐  │     side required)      │ │
-/// │               │                        │ If c > 0 && c. inlined │  │                           │
-/// │               │                      │ └────────────────────────┘  │                           │
-/// │               │                      │         then │              │                         │ │
-/// │               │                      │              ▼              │                         │ │
-/// │               │                      │ ┌────────────────────────┐  │                         │ │
-/// │               │                        │    Update ex. child    │◀─┘                   ┌───┐ │ │
-/// │               │                        └────────────────────────┘                      │ 2 │   │
-/// │               ▼                      │                                                 └───┘   │
-/// │  ┌────────────────────────┐          └──  ────  ────  ────  ────  ────  ────  ────  ────  ───┘ │
-/// │  │       Read Child       │━━━┳─────────────────┐                                              │
-/// │  └────────────────────────┘   ┃                 │                                              │
-/// │               │               ┃                 │                                              │
-/// │               │               ┃                 │                                              │
-/// │               ▼               ┃                 │                                              │
-/// │  ┌────────────────────────┐   ┃                 │                                              │
-/// │  │      If (exists)       │───╋──────Then───────┤                                              │
-/// │  └────────────────────────┘   ┃                 │                                              │
-/// │               │Else           ┃                 │                                              │
-/// │               │               ┃                 │                                              │
-/// │               ▼               ┃  ┌─── ──── ──── ▼─── ──── ──── ──── ──── ──── ──── ──── ─┐     │
-/// │  ┌────────────────────────┐   ┃  │ ┌────────────────────────┐                            │     │
-/// └─▶│      Create Child      │   ┃ ┌┼─│    Read ex. Parent     │──┐                         │     │
-///    └────────────────────────┘   ┃ ││ └────────────────────────┘  │                               │
-///                                 ┃ ││              │              │                         │     │
-///                                 ┃ │               ▼              │(Fail on p > 0 if parent │     │
-///                                 ┃ ││ ┌────────────────────────┐  │     side required)      │     │
-///                                 ┃ ││ │ If p > 0 && p. inlined │  │                         │     │
-///                                 ┃ ││ └────────────────────────┘  │                               │
-///                                 ┃ ││              │              │                         │     │
-///                                 ┃ │               ▼              │                         │     │
-///                                 ┃ ││ ┌────────────────────────┐  │                         │     │
-///                                 ┃ ││ │   Update ex. parent    │◀─┘                         │     │
-///                                 ┃ ││ └────────────────────────┘                      ┌───┐       │
-///                                 ┃ ││         then                                    │ 1 │ │     │
-///                                 ┃ │                                                  └───┘ │     │
-///                                 ┃ │└─── ──── ──── ──── ──── ──── ──── ──── ──── ──── ──── ─┘     │
-///                                 ┃ │                                                              │
-///                                 ┃ │                                                              │
-///                                 ┃ │  ┌────────────────────────┐                                  │
-///                                 ┗━┻━▶│      Update Child      │◀─────────────────────────────────┘
-///                                      └────────────────────────┘
+///            ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// ┌──────┬───          Parent         │──────────────────────────┬──────────────────────────┐
+/// │      │   └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                           │                          │
+/// │      │                │                                      │                          │
+/// │      │                │                                      │                          │
+/// │      │                ▼                                      │                          │
+/// │      │   ┌────────────────────────┐                          │                          │
+/// │ ┌──┬─┼───│     Read new child     │────────────────────────────────────────────────┐    │
+/// │ │  │ │   └────────────────────────┘                          │                     │    │
+/// │ │  │ │                │                                      │                     │    │
+/// │ │  │ │                │                                      │                     │    │
+/// │ │  │ │                ▼                                      ▼                     │    │
+/// │ │  │ │   ┌────────────────────────┐             ┌────────────────────────┐         │    │
+/// │ │  │ │   │      If (exists)       │──────Else──▶│      Create Child      │         │    │
+/// │ │  │ │   └────────────────────────┘             └────────────────────────┘         │    │
+/// │ │  │ │                │                                                            │    │
+/// │ │  │ │                │                                                            │    │
+/// │ │  │ │              Then                                                           │    │
+/// │ │  │ │                │                                 (If create)                │    │
+/// │ │  │ │                ├─────────────────────────────────────────────┐              │    │
+/// │ │  │ │                │                                             │              │    │
+/// │ │  │ │                │(If non-create)                              │              │    │
+/// │ │  │ │┌───  ────  ────│ ────  ────  ────  ────  ──┐  ┌───  ────  ───┼  ────  ────  │    │
+/// │ │  │ ││               ▼                           │                 ▼              │    │
+/// │ │  │ ││  ┌────────────────────────┐                    ┌────────────────────────┐  │    │
+/// │ │  │ └┼─▶│     Read old child     │────────┐         │ │    Update new child    │◀─┘────┘
+/// │ │  │  │  └────────────────────────┘        │      │  │ └────────────────────────┘
+/// │ │  │                  │                    │      │  │
+/// │ │  │                  ▼                    │      │  └  ────  ────  ────  ────  ───┘
+/// │ │  │  │  ┌────────────────────────┐        │      │
+/// │ │  └──┼─▶│          Diff          │        │
+/// │ │     │  └────────────────────────┘     Fail if
+/// │ │     │               │               relation to │
+/// │ │                     ▼                 parent    │
+/// │ │        ┌────────────────────────┐    required   │
+/// │ │     │  │   If (not the same)    │        │      │
+/// │ │     │  └────────────────────────┘        │
+/// │ │     │               │                    │
+/// │ │     │             Then                   │      │
+/// │ │                     │                    │      │
+/// │ │                     ▼                    │      │
+/// │ │     │  ┌────────────────────────┐        │      │
+/// │ │     │  │    Update old child    │        │
+/// │ │     │  │      (disconnect)      │◀───────┘
+/// │ │     │  └────────────────────────┘               │
+/// │ │                     │                           │
+/// │ │                     │                           │
+/// │ │     │               ▼                           │
+/// │ │     │  ┌────────────────────────┐
+/// └─┴─────┼─▶│    Update new child    │
+///         │  └────────────────────────┘               │
+///                                                     │
+///          ────  ────  ────  ────  ────  ────  ────  ─┘
 /// ```
-/// - Checks in [1] are required because the child exists, which in turn implies that a parent must exist if the relation is required.
-///   If this would disconnect the existing parent, we error out. If it doesn't require the parent but exists, we disconnect the relation first.
-/// - Checks in [2] are required if the parent is NOT a create operation, as this means the parent record exists in some form. If this disconnects
-///   a child record that requires a parent record, we error out. If it doesn't require the parent but exists, we disconnect the relation first.
-///
-/// Important note: We can't inject directly from the if node into the parent if the parent is a non-create, because we need to perform a check in between,
-/// and updating the record with the injection beforehand prevents that check. Instead, we need an additional update.
+/// Note that two versions of this graph can be build: the create and non-create case,
+/// but they're never build at the same time (denoted by the dashed boxes).
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter, create_data, child_model))]
 fn one_to_one_inlined_child(
     graph: &mut QueryGraph,
