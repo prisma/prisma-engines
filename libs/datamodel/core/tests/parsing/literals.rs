@@ -284,3 +284,64 @@ fn mysql_absolute_sslcert_should_not_be_modified() {
 
     assert_eq!("mysql://localhost:420/?foo=bar&sslcert=%2Fwe%2Fare%2Fhere.crt", url)
 }
+
+#[test]
+fn sql_server_relative_ca_file_can_be_modified() {
+    let schema = indoc!(
+        r#"
+        datasource boo {
+          provider = "sqlserver"
+          url = "sqlserver://localhost:1433;trustServerCertificateCA=customCA.crt"
+        }"#
+    );
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0].load_url_with_config_dir(Path::new("/path/to/prisma"), from_env);
+
+    assert_eq!(
+        "sqlserver://localhost:1433;trustServerCertificateCA={/}path{/}to{/}prisma{/}customCA.crt",
+        url.unwrap()
+    )
+}
+
+#[test]
+fn sql_server_absolute_ca_file_should_not_be_modified() {
+    let schema = indoc!(
+        r#"
+        datasource boo {
+          provider = "sqlserver"
+          url = "sqlserver://localhost:1433;trustServerCertificateCA={/}foo{/}bar{/}customCA.crt"
+        }"#
+    );
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0]
+        .load_url_with_config_dir(Path::new("/path/to/prisma"), from_env)
+        .unwrap();
+
+    assert_eq!(
+        "sqlserver://localhost:1433;trustServerCertificateCA={/}foo{/}bar{/}customCA.crt",
+        url
+    )
+}
+
+#[test]
+fn sql_server_absolute_windows_ca_file_should_not_be_modified() {
+    let schema = indoc!(
+        r#"
+        datasource boo {
+          provider = "sqlserver"
+          url = "sqlserver://localhost:1433;trustServerCertificateCA=C:{\\\\}path{\\}customCA.crt"
+        }"#
+    );
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0]
+        .load_url_with_config_dir(Path::new("/path/to/prisma"), from_env)
+        .unwrap();
+
+    assert_eq!(
+        r#"sqlserver://localhost:1433;trustServerCertificateCA=C:{\\}path{\}customCA.crt"#,
+        url
+    )
+}
