@@ -8,6 +8,7 @@ use crate::{
     prelude::*,
 };
 use test_macros::test_each_connector;
+use test_setup::Tags;
 
 #[test_each_connector]
 async fn single_value(api: &mut dyn TestApi) -> crate::Result<()> {
@@ -31,7 +32,7 @@ async fn aliased_value(api: &mut dyn TestApi) -> crate::Result<()> {
 
 #[test_each_connector]
 async fn aliased_null(api: &mut dyn TestApi) -> crate::Result<()> {
-    let query = Select::default().value(val!(Value::Integer(None)).alias("test"));
+    let query = Select::default().value(val!(Value::Int64(None)).alias("test"));
 
     let res = api.conn().select(query).await?;
     let row = res.get(0).unwrap();
@@ -52,8 +53,14 @@ async fn select_star_from(api: &mut dyn TestApi) -> crate::Result<()> {
     let select = Select::from_table(&table);
     let row = api.conn().select(select).await?.into_single()?;
 
-    assert_eq!(Value::integer(4), row["id"]);
-    assert_eq!(Value::integer(3), row["value"]);
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Value::int64(4), row["id"]);
+        assert_eq!(Value::int64(3), row["value"]);
+    } else {
+        assert_eq!(Value::int32(4), row["id"]);
+        assert_eq!(Value::int32(3), row["value"]);
+    }
 
     Ok(())
 }
@@ -71,7 +78,12 @@ async fn transactions(api: &mut dyn TestApi) -> crate::Result<()> {
     let select = Select::from_table(&table).column("value");
     let res = api.conn().select(select).await?.into_single()?;
 
-    assert_eq!(Value::integer(10), res[0]);
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Value::int64(10), res[0]);
+    } else {
+        assert_eq!(Value::int32(10), res[0]);
+    }
 
     tx.rollback().await?;
 
@@ -99,13 +111,24 @@ async fn in_values_singular(api: &mut dyn TestApi) -> crate::Result<()> {
     let res = api.conn().select(query).await?;
     assert_eq!(2, res.len());
 
-    let row1 = res.get(0).unwrap();
-    assert_eq!(Some(1), row1["id"].as_i64());
-    assert_eq!(Some(2), row1["id2"].as_i64());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        let row1 = res.get(0).unwrap();
+        assert_eq!(Some(1), row1["id"].as_i64());
+        assert_eq!(Some(2), row1["id2"].as_i64());
 
-    let row2 = res.get(1).unwrap();
-    assert_eq!(Some(3), row2["id"].as_i64());
-    assert_eq!(Some(4), row2["id2"].as_i64());
+        let row2 = res.get(1).unwrap();
+        assert_eq!(Some(3), row2["id"].as_i64());
+        assert_eq!(Some(4), row2["id2"].as_i64());
+    } else {
+        let row1 = res.get(0).unwrap();
+        assert_eq!(Some(1), row1["id"].as_i32());
+        assert_eq!(Some(2), row1["id2"].as_i32());
+
+        let row2 = res.get(1).unwrap();
+        assert_eq!(Some(3), row2["id"].as_i32());
+        assert_eq!(Some(4), row2["id2"].as_i32());
+    }
 
     Ok(())
 }
@@ -127,8 +150,14 @@ async fn not_in_values_singular(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(1, res.len());
 
     let row1 = res.get(0).unwrap();
-    assert_eq!(Some(5), row1["id"].as_i64());
-    assert_eq!(Some(6), row1["id2"].as_i64());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Some(5), row1["id"].as_i64());
+        assert_eq!(Some(6), row1["id2"].as_i64());
+    } else {
+        assert_eq!(Some(5), row1["id"].as_i32());
+        assert_eq!(Some(6), row1["id2"].as_i32());
+    }
 
     Ok(())
 }
@@ -150,13 +179,24 @@ async fn in_values_tuple(api: &mut dyn TestApi) -> crate::Result<()> {
     let res = api.conn().select(query).await?;
     assert_eq!(2, res.len());
 
-    let row1 = res.get(0).unwrap();
-    assert_eq!(Some(1), row1["id"].as_i64());
-    assert_eq!(Some(2), row1["id2"].as_i64());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        let row1 = res.get(0).unwrap();
+        assert_eq!(Some(1), row1["id"].as_i64());
+        assert_eq!(Some(2), row1["id2"].as_i64());
 
-    let row2 = res.get(1).unwrap();
-    assert_eq!(Some(3), row2["id"].as_i64());
-    assert_eq!(Some(4), row2["id2"].as_i64());
+        let row2 = res.get(1).unwrap();
+        assert_eq!(Some(3), row2["id"].as_i64());
+        assert_eq!(Some(4), row2["id2"].as_i64());
+    } else {
+        let row1 = res.get(0).unwrap();
+        assert_eq!(Some(1), row1["id"].as_i32());
+        assert_eq!(Some(2), row1["id2"].as_i32());
+
+        let row2 = res.get(1).unwrap();
+        assert_eq!(Some(3), row2["id"].as_i32());
+        assert_eq!(Some(4), row2["id2"].as_i32());
+    }
 
     Ok(())
 }
@@ -179,8 +219,14 @@ async fn not_in_values_tuple(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(5), row["id"].as_i64());
-    assert_eq!(Some(6), row["id2"].as_i64());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Some(5), row["id"].as_i64());
+        assert_eq!(Some(6), row["id2"].as_i64());
+    } else {
+        assert_eq!(Some(5), row["id"].as_i32());
+        assert_eq!(Some(6), row["id2"].as_i32());
+    }
 
     Ok(())
 }
@@ -202,16 +248,31 @@ async fn order_by_ascend(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(3, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
-    assert_eq!(Some(2), row["id2"].as_i64());
 
-    let row = res.get(1).unwrap();
-    assert_eq!(Some(3), row["id"].as_i64());
-    assert_eq!(Some(4), row["id2"].as_i64());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Some(1), row["id"].as_i64());
+        assert_eq!(Some(2), row["id2"].as_i64());
 
-    let row = res.get(2).unwrap();
-    assert_eq!(Some(5), row["id"].as_i64());
-    assert_eq!(Some(6), row["id2"].as_i64());
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(3), row["id"].as_i64());
+        assert_eq!(Some(4), row["id2"].as_i64());
+
+        let row = res.get(2).unwrap();
+        assert_eq!(Some(5), row["id"].as_i64());
+        assert_eq!(Some(6), row["id2"].as_i64());
+    } else {
+        assert_eq!(Some(1), row["id"].as_i32());
+        assert_eq!(Some(2), row["id2"].as_i32());
+
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(3), row["id"].as_i32());
+        assert_eq!(Some(4), row["id2"].as_i32());
+
+        let row = res.get(2).unwrap();
+        assert_eq!(Some(5), row["id"].as_i32());
+        assert_eq!(Some(6), row["id2"].as_i32());
+    }
 
     Ok(())
 }
@@ -232,17 +293,32 @@ async fn order_by_descend(api: &mut dyn TestApi) -> crate::Result<()> {
     let res = api.conn().select(query).await?;
     assert_eq!(3, res.len());
 
-    let row = res.get(0).unwrap();
-    assert_eq!(Some(5), row["id"].as_i64());
-    assert_eq!(Some(6), row["id2"].as_i64());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        let row = res.get(0).unwrap();
+        assert_eq!(Some(5), row["id"].as_i64());
+        assert_eq!(Some(6), row["id2"].as_i64());
 
-    let row = res.get(1).unwrap();
-    assert_eq!(Some(3), row["id"].as_i64());
-    assert_eq!(Some(4), row["id2"].as_i64());
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(3), row["id"].as_i64());
+        assert_eq!(Some(4), row["id2"].as_i64());
 
-    let row = res.get(2).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
-    assert_eq!(Some(2), row["id2"].as_i64());
+        let row = res.get(2).unwrap();
+        assert_eq!(Some(1), row["id"].as_i64());
+        assert_eq!(Some(2), row["id2"].as_i64());
+    } else {
+        let row = res.get(0).unwrap();
+        assert_eq!(Some(5), row["id"].as_i32());
+        assert_eq!(Some(6), row["id2"].as_i32());
+
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(3), row["id"].as_i32());
+        assert_eq!(Some(4), row["id2"].as_i32());
+
+        let row = res.get(2).unwrap();
+        assert_eq!(Some(1), row["id"].as_i32());
+        assert_eq!(Some(2), row["id2"].as_i32());
+    }
 
     Ok(())
 }
@@ -602,7 +678,12 @@ async fn single_default_value_insert(api: &mut dyn TestApi) -> crate::Result<()>
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Some(1), row["id"].as_i64());
+    } else {
+        assert_eq!(Some(1), row["id"].as_i32());
+    }
     assert_eq!(Some("Musti"), row["name"].as_str());
 
     Ok(())
@@ -634,7 +715,12 @@ async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Some(1), row["id"].as_i64());
+    } else {
+        assert_eq!(Some(1), row["id"].as_i32());
+    }
     assert_eq!(Some("Naukio"), row["name"].as_str());
 
     Ok(())
@@ -660,7 +746,7 @@ async fn returning_decimal_insert_with_type_defs(api: &mut dyn TestApi) -> crate
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(2), row["id"].as_i64());
+    assert_eq!(Some(2), row["id"].as_i32());
     assert_eq!(Some(&dec), row["val"].as_numeric());
 
     Ok(())
@@ -682,7 +768,7 @@ async fn returning_constant_nvarchar_insert_with_type_defs(api: &mut dyn TestApi
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(2), row["id"].as_i64());
+    assert_eq!(Some(2), row["id"].as_i32());
     assert_eq!(Some("meowmeow"), row["val"].as_str());
 
     Ok(())
@@ -704,7 +790,7 @@ async fn returning_max_nvarchar_insert_with_type_defs(api: &mut dyn TestApi) -> 
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(2), row["id"].as_i64());
+    assert_eq!(Some(2), row["id"].as_i32());
     assert_eq!(Some("meowmeow"), row["val"].as_str());
 
     Ok(())
@@ -726,7 +812,7 @@ async fn returning_constant_varchar_insert_with_type_defs(api: &mut dyn TestApi)
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(2), row["id"].as_i64());
+    assert_eq!(Some(2), row["id"].as_i32());
     assert_eq!(Some("meowmeow"), row["val"].as_str());
 
     Ok(())
@@ -748,7 +834,7 @@ async fn returning_max_varchar_insert_with_type_defs(api: &mut dyn TestApi) -> c
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(2), row["id"].as_i64());
+    assert_eq!(Some(2), row["id"].as_i32());
     assert_eq!(Some("meowmeow"), row["val"].as_str());
 
     Ok(())
@@ -766,8 +852,8 @@ async fn multiple_resultset_should_return_the_last_one(api: &mut dyn TestApi) ->
 
     let row = res.into_single()?;
 
-    assert_eq!(Some(&Value::Integer(Some(1))), row.get("foo"));
-    assert_eq!(Some(&Value::Integer(Some(2))), row.get("bar"));
+    assert_eq!(Some(&Value::int32(1)), row.get("foo"));
+    assert_eq!(Some(&Value::int32(2)), row.get("bar"));
 
     Ok(())
 }
@@ -801,13 +887,24 @@ async fn single_insert_conflict_do_nothing_single_unique(api: &mut dyn TestApi) 
     let res = api.conn().select(Select::from_table(table)).await?;
     assert_eq!(2, res.len());
 
-    let row = res.get(0).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
-    assert_eq!(Some("Musti"), row["name"].as_str());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        let row = res.get(0).unwrap();
+        assert_eq!(Some(1), row["id"].as_i64());
+        assert_eq!(Some("Musti"), row["name"].as_str());
 
-    let row = res.get(1).unwrap();
-    assert_eq!(Some(2), row["id"].as_i64());
-    assert_eq!(Some("Belka"), row["name"].as_str());
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(2), row["id"].as_i64());
+        assert_eq!(Some("Belka"), row["name"].as_str());
+    } else {
+        let row = res.get(0).unwrap();
+        assert_eq!(Some(1), row["id"].as_i32());
+        assert_eq!(Some("Musti"), row["name"].as_str());
+
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(2), row["id"].as_i32());
+        assert_eq!(Some("Belka"), row["name"].as_str());
+    }
 
     Ok(())
 }
@@ -841,7 +938,12 @@ async fn single_insert_conflict_do_nothing_single_unique_with_default(api: &mut 
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(10), row["id"].as_i64());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Some(10), row["id"].as_i64());
+    } else {
+        assert_eq!(Some(10), row["id"].as_i32());
+    }
     assert_eq!(Some("Musti"), row["name"].as_str());
 
     Ok(())
@@ -873,7 +975,13 @@ async fn single_insert_conflict_do_nothing_single_unique_with_autogen_default(
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
+
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Some(1), row["id"].as_i64());
+    } else {
+        assert_eq!(Some(1), row["id"].as_i32());
+    }
     assert_eq!(Some("Naukio"), row["name"].as_str());
 
     Ok(())
@@ -950,13 +1058,24 @@ async fn single_insert_conflict_do_nothing_two_uniques(api: &mut dyn TestApi) ->
     let res = api.conn().select(select).await?;
     assert_eq!(2, res.len());
 
-    let row = res.get(0).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
-    assert_eq!(Some("Musti"), row["name"].as_str());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        let row = res.get(0).unwrap();
+        assert_eq!(Some(1), row["id"].as_i64());
+        assert_eq!(Some("Musti"), row["name"].as_str());
 
-    let row = res.get(1).unwrap();
-    assert_eq!(Some(2), row["id"].as_i64());
-    assert_eq!(Some("Belka"), row["name"].as_str());
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(2), row["id"].as_i64());
+        assert_eq!(Some("Belka"), row["name"].as_str());
+    } else {
+        let row = res.get(0).unwrap();
+        assert_eq!(Some(1), row["id"].as_i32());
+        assert_eq!(Some("Musti"), row["name"].as_str());
+
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(2), row["id"].as_i32());
+        assert_eq!(Some("Belka"), row["name"].as_str());
+    }
 
     Ok(())
 }
@@ -998,7 +1117,12 @@ async fn single_insert_conflict_do_nothing_two_uniques_with_default(api: &mut dy
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Some(1), row["id"].as_i64());
+    } else {
+        assert_eq!(Some(1), row["id"].as_i32());
+    }
     assert_eq!(Some("Musti"), row["name"].as_str());
 
     Ok(())
@@ -1034,13 +1158,24 @@ async fn single_insert_conflict_do_nothing_compoud_unique(api: &mut dyn TestApi)
     let res = api.conn().select(select).await?;
     assert_eq!(2, res.len());
 
-    let row = res.get(0).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
-    assert_eq!(Some("Musti"), row["name"].as_str());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        let row = res.get(0).unwrap();
+        assert_eq!(Some(1), row["id"].as_i64());
+        assert_eq!(Some("Musti"), row["name"].as_str());
 
-    let row = res.get(1).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
-    assert_eq!(Some("Naukio"), row["name"].as_str());
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(1), row["id"].as_i64());
+        assert_eq!(Some("Naukio"), row["name"].as_str());
+    } else {
+        let row = res.get(0).unwrap();
+        assert_eq!(Some(1), row["id"].as_i32());
+        assert_eq!(Some("Musti"), row["name"].as_str());
+
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(1), row["id"].as_i32());
+        assert_eq!(Some("Naukio"), row["name"].as_str());
+    }
 
     Ok(())
 }
@@ -1073,7 +1208,12 @@ async fn single_insert_conflict_do_nothing_compoud_unique_with_default(api: &mut
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Some(1), row["id"].as_i64());
+    } else {
+        assert_eq!(Some(1), row["id"].as_i32());
+    }
     assert_eq!(Some("Musti"), row["name"].as_str());
 
     Ok(())
@@ -1106,13 +1246,24 @@ async fn single_insert_conflict_do_nothing_unique_with_autogen(api: &mut dyn Tes
     let res = api.conn().select(select).await?;
     assert_eq!(2, res.len());
 
-    let row = res.get(0).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
-    assert_eq!(Some("Musti"), row["name"].as_str());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        let row = res.get(0).unwrap();
+        assert_eq!(Some(1), row["id"].as_i64());
+        assert_eq!(Some("Musti"), row["name"].as_str());
 
-    let row = res.get(1).unwrap();
-    assert_eq!(Some(2), row["id"].as_i64());
-    assert_eq!(Some("Naukio"), row["name"].as_str());
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(2), row["id"].as_i64());
+        assert_eq!(Some("Naukio"), row["name"].as_str());
+    } else {
+        let row = res.get(0).unwrap();
+        assert_eq!(Some(1), row["id"].as_i32());
+        assert_eq!(Some("Musti"), row["name"].as_str());
+
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(2), row["id"].as_i32());
+        assert_eq!(Some("Naukio"), row["name"].as_str());
+    }
 
     Ok(())
 }
@@ -1149,13 +1300,24 @@ async fn single_insert_conflict_do_nothing_compoud_unique_with_autogen_default(
     let res = api.conn().select(select).await?;
     assert_eq!(2, res.len());
 
-    let row = res.get(0).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
-    assert_eq!(Some("Musti"), row["name"].as_str());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        let row = res.get(0).unwrap();
+        assert_eq!(Some(1), row["id"].as_i64());
+        assert_eq!(Some("Musti"), row["name"].as_str());
 
-    let row = res.get(1).unwrap();
-    assert_eq!(Some(2), row["id"].as_i64());
-    assert_eq!(Some("Musti"), row["name"].as_str());
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(2), row["id"].as_i64());
+        assert_eq!(Some("Musti"), row["name"].as_str());
+    } else {
+        let row = res.get(0).unwrap();
+        assert_eq!(Some(1), row["id"].as_i32());
+        assert_eq!(Some("Musti"), row["name"].as_str());
+
+        let row = res.get(1).unwrap();
+        assert_eq!(Some(2), row["id"].as_i32());
+        assert_eq!(Some("Musti"), row["name"].as_str());
+    }
 
     Ok(())
 }
@@ -1177,7 +1339,12 @@ async fn updates(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(1), row["id"].as_i64());
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Some(1), row["id"].as_i64());
+    } else {
+        assert_eq!(Some(1), row["id"].as_i32());
+    }
     assert_eq!(Some("Naukio"), row["name"].as_str());
 
     Ok(())
@@ -1338,7 +1505,7 @@ async fn json_filtering_works(api: &mut dyn TestApi) -> crate::Result<()> {
         assert_eq!(result.len(), 1);
 
         let row = result.into_single()?;
-        assert_eq!(Some(2), row["id"].as_i64());
+        assert_eq!(Some(2), row["id"].as_i32());
     }
 
     // Not equals
@@ -1351,7 +1518,7 @@ async fn json_filtering_works(api: &mut dyn TestApi) -> crate::Result<()> {
         assert_eq!(result.len(), 1);
 
         let row = result.into_single()?;
-        assert_eq!(Some(2), row["id"].as_i64());
+        assert_eq!(Some(2), row["id"].as_i32());
     }
 
     Ok(())
@@ -1378,7 +1545,7 @@ async fn xml_filtering_works(api: &mut dyn TestApi) -> crate::Result<()> {
         assert_eq!(result.len(), 1);
 
         let row = result.into_single()?;
-        assert_eq!(Some(2), row["id"].as_i64());
+        assert_eq!(Some(2), row["id"].as_i32());
     }
 
     // Not equals
@@ -1389,7 +1556,7 @@ async fn xml_filtering_works(api: &mut dyn TestApi) -> crate::Result<()> {
         assert_eq!(result.len(), 1);
 
         let row = result.into_single()?;
-        assert_eq!(Some(1), row["id"].as_i64());
+        assert_eq!(Some(1), row["id"].as_i32());
     }
 
     Ok(())
@@ -1425,7 +1592,7 @@ async fn op_test_add_one_level(api: &mut dyn TestApi) -> crate::Result<()> {
     let q = Select::from_table(&table).value(col!("a") + col!("b"));
     let row = api.conn().select(q).await?.into_single()?;
 
-    assert_eq!(Some(3), row[0].as_i64());
+    assert_eq!(Some(3), row[0].as_integer());
 
     Ok(())
 }
@@ -1440,7 +1607,7 @@ async fn op_test_add_two_levels(api: &mut dyn TestApi) -> crate::Result<()> {
     let q = Select::from_table(&table).value(col!("a") + val!(col!("b") + col!("c")));
     let row = api.conn().select(q).await?.into_single()?;
 
-    assert_eq!(Some(7), row[0].as_i64());
+    assert_eq!(Some(7), row[0].as_integer());
 
     Ok(())
 }
@@ -1455,7 +1622,7 @@ async fn op_test_sub_one_level(api: &mut dyn TestApi) -> crate::Result<()> {
     let q = Select::from_table(&table).value(col!("a") - col!("b"));
     let row = api.conn().select(q).await?.into_single()?;
 
-    assert_eq!(Some(1), row[0].as_i64());
+    assert_eq!(Some(1), row[0].as_integer());
 
     Ok(())
 }
@@ -1470,7 +1637,7 @@ async fn op_test_sub_three_items(api: &mut dyn TestApi) -> crate::Result<()> {
     let q = Select::from_table(&table).value(col!("a") - col!("b") - col!("c"));
     let row = api.conn().select(q).await?.into_single()?;
 
-    assert_eq!(Some(0), row[0].as_i64());
+    assert_eq!(Some(0), row[0].as_integer());
 
     Ok(())
 }
@@ -1485,7 +1652,7 @@ async fn op_test_sub_two_levels(api: &mut dyn TestApi) -> crate::Result<()> {
     let q = Select::from_table(&table).value(col!("a") - val!(col!("b") + col!("c")));
     let row = api.conn().select(q).await?.into_single()?;
 
-    assert_eq!(Some(-2), row[0].as_i64());
+    assert_eq!(Some(-2), row[0].as_integer());
 
     Ok(())
 }
@@ -1500,7 +1667,7 @@ async fn op_test_mul_one_level(api: &mut dyn TestApi) -> crate::Result<()> {
     let q = Select::from_table(&table).value(col!("a") * col!("a"));
     let row = api.conn().select(q).await?.into_single()?;
 
-    assert_eq!(Some(36), row[0].as_i64());
+    assert_eq!(Some(36), row[0].as_integer());
 
     Ok(())
 }
@@ -1515,7 +1682,7 @@ async fn op_test_mul_two_levels(api: &mut dyn TestApi) -> crate::Result<()> {
     let q = Select::from_table(&table).value(col!("a") * (col!("a") - col!("b")));
     let row = api.conn().select(q).await?.into_single()?;
 
-    assert_eq!(Some(30), row[0].as_i64());
+    assert_eq!(Some(30), row[0].as_integer());
 
     Ok(())
 }
@@ -1530,7 +1697,7 @@ async fn op_multiple_operations(api: &mut dyn TestApi) -> crate::Result<()> {
     let q = Select::from_table(&table).value(col!("a") - col!("b") * col!("b"));
     let row = api.conn().select(q).await?.into_single()?;
 
-    assert_eq!(Some(0), row[0].as_i64());
+    assert_eq!(Some(0), row[0].as_integer());
 
     Ok(())
 }
@@ -1640,10 +1807,13 @@ async fn single_common_table_expression(api: &mut dyn TestApi) -> crate::Result<
     let res = api.conn().select(select).await?;
     let row = res.get(0).unwrap();
 
-    if api.system() == "postgres" {
+    if api.connector_tag().intersects(Tags::POSTGRES) {
         assert_eq!(Some(&Value::text("1")), row.at(0));
+    } else if api.connector_tag().intersects(Tags::SQLITE) {
+        // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+        assert_eq!(Some(&Value::int64(1)), row.at(0));
     } else {
-        assert_eq!(Some(&Value::integer(1)), row.at(0));
+        assert_eq!(Some(&Value::int32(1)), row.at(0));
     }
 
     Ok(())
@@ -1671,12 +1841,16 @@ async fn multiple_common_table_expressions(api: &mut dyn TestApi) -> crate::Resu
     let res = api.conn().select(select).await?;
     let row = res.get(0).unwrap();
 
-    if api.system() == "postgres" {
+    if api.connector_tag().intersects(Tags::POSTGRES) {
         assert_eq!(Some(&Value::text("1")), row.at(0));
         assert_eq!(Some(&Value::text("2")), row.at(1));
+    } else if api.connector_tag().intersects(Tags::SQLITE) {
+        // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+        assert_eq!(Some(&Value::int64(1)), row.at(0));
+        assert_eq!(Some(&Value::int64(2)), row.at(1));
     } else {
-        assert_eq!(Some(&Value::integer(1)), row.at(0));
-        assert_eq!(Some(&Value::integer(2)), row.at(1));
+        assert_eq!(Some(&Value::int32(1)), row.at(0));
+        assert_eq!(Some(&Value::int32(2)), row.at(1));
     }
 
     Ok(())
@@ -1827,8 +2001,14 @@ async fn join_with_compound_columns(api: &mut dyn TestApi) -> crate::Result<()> 
 
     let row = res.get(0).unwrap();
 
-    assert_eq!(Some(&Value::integer(1)), row.at(0));
-    assert_eq!(Some(&Value::integer(2)), row.at(1));
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Some(&Value::int64(1)), row.at(0));
+        assert_eq!(Some(&Value::int64(2)), row.at(1));
+    } else {
+        assert_eq!(Some(&Value::int32(1)), row.at(0));
+        assert_eq!(Some(&Value::int32(2)), row.at(1));
+    }
 
     Ok(())
 }
@@ -1869,8 +2049,14 @@ async fn join_with_non_matching_compound_columns(api: &mut dyn TestApi) -> crate
 
     let row = res.get(0).unwrap();
 
-    assert_eq!(Some(&Value::integer(2)), row.at(0));
-    assert_eq!(Some(&Value::integer(3)), row.at(1));
+    // TODO: Make SQLite expect i32 once we differentiate i32 from i64
+    if api.connector_tag().intersects(Tags::SQLITE) {
+        assert_eq!(Some(&Value::int64(2)), row.at(0));
+        assert_eq!(Some(&Value::int64(3)), row.at(1));
+    } else {
+        assert_eq!(Some(&Value::int32(2)), row.at(0));
+        assert_eq!(Some(&Value::int32(3)), row.at(1));
+    }
 
     Ok(())
 }
@@ -1888,8 +2074,8 @@ async fn insert_default_keyword(api: &mut dyn TestApi) -> crate::Result<()> {
     let select = Select::from_table(&table);
     let row = api.conn().select(select).await?.into_single()?;
 
-    assert_eq!(Value::integer(4), row["id"]);
-    assert_eq!(Value::integer(1), row["value"]);
+    assert_eq!(Value::int32(4), row["id"]);
+    assert_eq!(Value::int32(1), row["value"]);
 
     Ok(())
 }
@@ -2101,8 +2287,6 @@ async fn json_extract_array_path_fun_on_json(api: &mut dyn TestApi) -> crate::Re
 
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 async fn json_array_contains(api: &mut dyn TestApi, json_type: &str) -> crate::Result<()> {
-    use test_setup::Tags;
-
     let table = api
         .create_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
         .await?;

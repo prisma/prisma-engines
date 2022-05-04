@@ -281,7 +281,8 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
         let res = match value {
-            Value::Integer(i) => i.map(|i| self.write(i)),
+            Value::Int32(i) => i.map(|i| self.write(i)),
+            Value::Int64(i) => i.map(|i| self.write(i)),
             Value::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
@@ -696,11 +697,11 @@ mod tests {
     #[test]
     fn test_aliased_null() {
         let expected_sql = "SELECT @P1 AS [test]";
-        let query = Select::default().value(val!(Value::Integer(None)).alias("test"));
+        let query = Select::default().value(val!(Value::Int32(None)).alias("test"));
         let (sql, params) = Mssql::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::Integer(None)], params);
+        assert_eq!(vec![Value::Int32(None)], params);
     }
 
     #[test]
@@ -727,12 +728,7 @@ mod tests {
 
         assert_eq!(expected_sql, sql);
         assert_eq!(
-            vec![
-                Value::integer(1),
-                Value::integer(2),
-                Value::integer(3),
-                Value::integer(4),
-            ],
+            vec![Value::int32(1), Value::int32(2), Value::int32(3), Value::int32(4),],
             params
         );
     }
@@ -751,12 +747,7 @@ mod tests {
 
         assert_eq!(expected_sql, sql);
         assert_eq!(
-            vec![
-                Value::integer(1),
-                Value::integer(2),
-                Value::integer(3),
-                Value::integer(4),
-            ],
+            vec![Value::int32(1), Value::int32(2), Value::int32(3), Value::int32(4),],
             params
         );
     }
@@ -784,7 +775,7 @@ mod tests {
         let expected_sql = "SELECT [test].* FROM [test] WHERE [id1] IN (@P1,@P2)";
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::integer(1), Value::integer(2),], params)
+        assert_eq!(vec![Value::int32(1), Value::int32(2),], params)
     }
 
     #[test]
@@ -959,7 +950,7 @@ mod tests {
     fn test_select_and() {
         let expected_sql = "SELECT [naukio].* FROM [naukio] WHERE ([word] = @P1 AND [age] < @P2 AND [paw] = @P3)";
 
-        let expected_params = vec![Value::text("meow"), Value::integer(10), Value::text("warm")];
+        let expected_params = vec![Value::text("meow"), Value::int32(10), Value::text("warm")];
 
         let conditions = "word".equals("meow").and("age".less_than(10)).and("paw".equals("warm"));
         let query = Select::from_table("naukio").so_that(conditions);
@@ -973,7 +964,7 @@ mod tests {
     fn test_select_and_different_execution_order() {
         let expected_sql = "SELECT [naukio].* FROM [naukio] WHERE ([word] = @P1 AND ([age] < @P2 AND [paw] = @P3))";
 
-        let expected_params = vec![Value::text("meow"), Value::integer(10), Value::text("warm")];
+        let expected_params = vec![Value::text("meow"), Value::int32(10), Value::text("warm")];
 
         let conditions = "word".equals("meow").and("age".less_than(10).and("paw".equals("warm")));
         let query = Select::from_table("naukio").so_that(conditions);
@@ -987,7 +978,7 @@ mod tests {
     fn test_select_or() {
         let expected_sql = "SELECT [naukio].* FROM [naukio] WHERE (([word] = @P1 OR [age] < @P2) AND [paw] = @P3)";
 
-        let expected_params = vec![Value::text("meow"), Value::integer(10), Value::text("warm")];
+        let expected_params = vec![Value::text("meow"), Value::int32(10), Value::text("warm")];
 
         let conditions = "word".equals("meow").or("age".less_than(10)).and("paw".equals("warm"));
 
@@ -1004,7 +995,7 @@ mod tests {
         let expected_sql =
             "SELECT [naukio].* FROM [naukio] WHERE (NOT (([word] = @P1 OR [age] < @P2) AND [paw] = @P3))";
 
-        let expected_params = vec![Value::text("meow"), Value::integer(10), Value::text("warm")];
+        let expected_params = vec![Value::text("meow"), Value::int32(10), Value::text("warm")];
 
         let conditions = "word"
             .equals("meow")
@@ -1025,7 +1016,7 @@ mod tests {
         let expected_sql =
             "SELECT [naukio].* FROM [naukio] WHERE (NOT (([word] = @P1 OR [age] < @P2) AND [paw] = @P3))";
 
-        let expected_params = vec![Value::text("meow"), Value::integer(10), Value::text("warm")];
+        let expected_params = vec![Value::text("meow"), Value::int32(10), Value::text("warm")];
 
         let conditions = ConditionTree::not("word".equals("meow").or("age".less_than(10)).and("paw".equals("warm")));
         let query = Select::from_table("naukio").so_that(conditions);
@@ -1108,7 +1099,7 @@ mod tests {
         let (sql, params) = Mssql::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::integer(0), Value::integer(10)], params);
+        assert_eq!(vec![Value::int32(0), Value::int64(10)], params);
     }
 
     #[test]
@@ -1626,7 +1617,7 @@ mod tests {
         let (sql, params) = Mssql::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::integer(1), Value::integer(2)], params);
+        assert_eq!(vec![Value::int32(1), Value::int32(2)], params);
     }
 
     #[test]
@@ -1645,7 +1636,7 @@ mod tests {
         let (sql, params) = Mssql::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::integer(1), Value::integer(2)], params);
+        assert_eq!(vec![Value::int32(1), Value::int32(2)], params);
     }
 
     #[test]
@@ -1672,12 +1663,7 @@ mod tests {
         assert_eq!(expected_sql, sql);
 
         assert_eq!(
-            vec![
-                Value::integer(1),
-                Value::integer(2),
-                Value::text("bar"),
-                Value::text("foo")
-            ],
+            vec![Value::int32(1), Value::int32(2), Value::text("bar"), Value::text("foo")],
             params
         );
     }
@@ -1705,12 +1691,7 @@ mod tests {
         assert_eq!(expected_sql, sql);
 
         assert_eq!(
-            vec![
-                Value::integer(1),
-                Value::integer(2),
-                Value::text("bar"),
-                Value::text("foo")
-            ],
+            vec![Value::int32(1), Value::int32(2), Value::text("bar"), Value::text("foo")],
             params
         );
     }
@@ -1741,12 +1722,7 @@ mod tests {
         assert_eq!(expected_sql, sql);
 
         assert_eq!(
-            vec![
-                Value::integer(1),
-                Value::integer(2),
-                Value::integer(3),
-                Value::integer(4)
-            ],
+            vec![Value::int32(1), Value::int32(2), Value::int32(3), Value::int32(4)],
             params
         );
     }

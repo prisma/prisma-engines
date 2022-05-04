@@ -533,7 +533,7 @@ impl<'a> Select<'a> {
     /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` LIMIT ?", sql);
-    /// assert_eq!(vec![Value::from(10)], params);
+    /// assert_eq!(vec![Value::from(10_i64)], params);
     /// # Ok(())
     /// # }
     pub fn limit(mut self, limit: usize) -> Self {
@@ -550,7 +550,7 @@ impl<'a> Select<'a> {
     /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` LIMIT ? OFFSET ?", sql);
-    /// assert_eq!(vec![Value::from(-1), Value::from(10)], params);
+    /// assert_eq!(vec![Value::from(-1), Value::from(10_i64)], params);
     /// # Ok(())
     /// # }
     pub fn offset(mut self, offset: usize) -> Self {

@@ -23,9 +23,9 @@ test_type!(boolean_array(
 test_type!(int2(
     postgresql,
     "int2",
-    Value::Integer(None),
-    Value::integer(i16::MIN),
-    Value::integer(i16::MAX),
+    Value::Int32(None),
+    Value::int32(i16::MIN),
+    Value::int32(i16::MAX),
 ));
 
 test_type!(int2_array(
@@ -38,9 +38,9 @@ test_type!(int2_array(
 test_type!(int4(
     postgresql,
     "int4",
-    Value::Integer(None),
-    Value::integer(i32::MIN),
-    Value::integer(i32::MAX),
+    Value::Int32(None),
+    Value::int32(i32::MIN),
+    Value::int32(i32::MAX),
 ));
 
 test_type!(int4_array(
@@ -53,16 +53,16 @@ test_type!(int4_array(
 test_type!(int8(
     postgresql,
     "int8",
-    Value::Integer(None),
-    Value::integer(i64::MIN),
-    Value::integer(i64::MAX),
+    Value::Int64(None),
+    Value::int64(i64::MIN),
+    Value::int64(i64::MAX),
 ));
 
 test_type!(int8_array(
     postgresql,
     "int8[]",
     Value::Array(None),
-    Value::array(vec![1, 2, 3]),
+    Value::array(vec![1_64, 2_i64, 3_i64]),
 ));
 
 test_type!(float4(postgresql, "float4", Value::Float(None), Value::float(1.234)));
@@ -88,34 +88,34 @@ test_type!(float8_array(
     Value::array(vec![1.1234_f64, 4.321_f64])
 ));
 
-test_type!(oid(postgresql, "oid", Value::Integer(None), Value::integer(10000)));
+test_type!(oid(postgresql, "oid", Value::Int64(None), Value::integer(10000)));
 
 test_type!(oid_array(
     postgresql,
     "oid[]",
     Value::Array(None),
-    Value::array(vec![1, 2, 3]),
+    Value::array(vec![1_i64, 2_i64, 3_i64]),
 ));
 
 test_type!(serial2(
     postgresql,
     "serial2",
-    Value::integer(i16::MIN),
-    Value::integer(i16::MAX),
+    Value::int32(i16::MIN),
+    Value::int32(i16::MAX),
 ));
 
 test_type!(serial4(
     postgresql,
     "serial4",
-    Value::integer(i32::MIN),
-    Value::integer(i32::MAX),
+    Value::int32(i32::MIN),
+    Value::int32(i32::MAX),
 ));
 
 test_type!(serial8(
     postgresql,
     "serial8",
-    Value::integer(i64::MIN),
-    Value::integer(i64::MAX),
+    Value::int64(i64::MIN),
+    Value::int64(i64::MAX),
 ));
 
 test_type!(char(postgresql, "char(6)", Value::Text(None), Value::text("foobar")));

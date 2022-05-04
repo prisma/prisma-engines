@@ -112,7 +112,8 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
         let res = match value {
-            Value::Integer(i) => i.map(|i| self.write(i)),
+            Value::Int32(i) => i.map(|i| self.write(i)),
+            Value::Int64(i) => i.map(|i| self.write(i)),
             Value::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
@@ -256,7 +257,8 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
             }
-            (None, Some(Value::Integer(Some(offset)))) if offset < 1 => Ok(()),
+            (None, Some(Value::Int32(Some(offset)))) if offset < 1 => Ok(()),
+            (None, Some(Value::Int64(Some(offset)))) if offset < 1 => Ok(()),
             (None, Some(offset)) => {
                 self.write(" LIMIT ")?;
                 self.visit_parameterized(Value::from(9_223_372_036_854_775_807i64))?;
@@ -563,7 +565,7 @@ mod tests {
 
     #[test]
     fn test_limit_and_offset_when_both_are_set() {
-        let expected = expected_values("SELECT `users`.* FROM `users` LIMIT ? OFFSET ?", vec![10, 2]);
+        let expected = expected_values("SELECT `users`.* FROM `users` LIMIT ? OFFSET ?", vec![10_i64, 2_i64]);
         let query = Select::from_table("users").limit(10).offset(2);
         let (sql, params) = Mysql::build(query).unwrap();
 
@@ -587,7 +589,7 @@ mod tests {
 
     #[test]
     fn test_limit_and_offset_when_only_limit_is_set() {
-        let expected = expected_values("SELECT `users`.* FROM `users` LIMIT ?", vec![10]);
+        let expected = expected_values("SELECT `users`.* FROM `users` LIMIT ?", vec![10_i64]);
         let query = Select::from_table("users").limit(10);
         let (sql, params) = Mysql::build(query).unwrap();
 
@@ -607,12 +609,7 @@ mod tests {
 
         assert_eq!(expected_sql, sql);
         assert_eq!(
-            vec![
-                Value::integer(1),
-                Value::integer(2),
-                Value::integer(3),
-                Value::integer(4),
-            ],
+            vec![Value::int32(1), Value::int32(2), Value::int32(3), Value::int32(4),],
             params
         );
     }

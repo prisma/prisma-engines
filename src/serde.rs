@@ -76,7 +76,7 @@ impl<'de> Deserializer<'de> for RowDeserializer {
         let kvs = columns.iter().enumerate().map(move |(v, k)| {
             // The unwrap is safe if `columns` is correct.
             let value = values.get_mut(v).unwrap();
-            let taken_value = std::mem::replace(value, Value::Integer(None));
+            let taken_value = std::mem::replace(value, Value::Int64(None));
             (k.as_str(), taken_value)
         });
 
@@ -114,8 +114,10 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             Value::Bytes(None) => visitor.visit_none(),
             Value::Enum(Some(s)) => visitor.visit_string(s.into_owned()),
             Value::Enum(None) => visitor.visit_none(),
-            Value::Integer(Some(i)) => visitor.visit_i64(i),
-            Value::Integer(None) => visitor.visit_none(),
+            Value::Int32(Some(i)) => visitor.visit_i32(i),
+            Value::Int32(None) => visitor.visit_none(),
+            Value::Int64(Some(i)) => visitor.visit_i64(i),
+            Value::Int64(None) => visitor.visit_none(),
             Value::Boolean(Some(b)) => visitor.visit_bool(b),
             Value::Boolean(None) => visitor.visit_none(),
             Value::Char(Some(c)) => visitor.visit_char(c),

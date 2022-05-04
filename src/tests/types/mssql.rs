@@ -47,33 +47,33 @@ test_type!(text(mssql, "TEXT", Value::Text(None), Value::text("foobar")));
 test_type!(tinyint(
     mssql,
     "tinyint",
-    Value::Integer(None),
-    Value::integer(u8::MIN),
-    Value::integer(u8::MAX),
+    Value::Int32(None),
+    Value::int32(u8::MIN),
+    Value::int32(u8::MAX),
 ));
 
 test_type!(smallint(
     mssql,
     "smallint",
-    Value::Integer(None),
-    Value::integer(i16::MIN),
-    Value::integer(i16::MAX),
+    Value::Int32(None),
+    Value::int32(i16::MIN),
+    Value::int32(i16::MAX),
 ));
 
 test_type!(int(
     mssql,
     "int",
-    Value::Integer(None),
-    Value::integer(i32::MIN),
-    Value::integer(i32::MAX),
+    Value::Int32(None),
+    Value::int32(i32::MIN),
+    Value::int32(i32::MAX),
 ));
 
 test_type!(bigint(
     mssql,
     "bigint",
-    Value::Integer(None),
-    Value::integer(i64::MIN),
-    Value::integer(i64::MAX),
+    Value::Int64(None),
+    Value::int64(i64::MIN),
+    Value::int64(i64::MAX),
 ));
 
 test_type!(float_24(mssql, "float(24)", Value::Float(None), Value::float(1.23456),));

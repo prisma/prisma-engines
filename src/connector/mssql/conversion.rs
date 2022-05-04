@@ -11,7 +11,8 @@ use tiberius::{ColumnData, FromSql, IntoSql};
 impl<'a> IntoSql<'a> for &'a Value<'a> {
     fn into_sql(self) -> ColumnData<'a> {
         match self {
-            Value::Integer(val) => val.into_sql(),
+            Value::Int32(val) => val.into_sql(),
+            Value::Int64(val) => val.into_sql(),
             Value::Float(val) => val.into_sql(),
             Value::Double(val) => val.into_sql(),
             Value::Text(val) => val.as_deref().into_sql(),
@@ -42,10 +43,10 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
 
     fn try_from(cd: ColumnData<'static>) -> crate::Result<Self> {
         let res = match cd {
-            ColumnData::U8(num) => Value::Integer(num.map(i64::from)),
-            ColumnData::I16(num) => Value::Integer(num.map(i64::from)),
-            ColumnData::I32(num) => Value::Integer(num.map(i64::from)),
-            ColumnData::I64(num) => Value::Integer(num.map(i64::from)),
+            ColumnData::U8(num) => Value::Int32(num.map(i32::from)),
+            ColumnData::I16(num) => Value::Int32(num.map(i32::from)),
+            ColumnData::I32(num) => Value::Int32(num.map(i32::from)),
+            ColumnData::I64(num) => Value::Int64(num.map(i64::from)),
             ColumnData::F32(num) => Value::Float(num),
             ColumnData::F64(num) => Value::Double(num),
             ColumnData::Bit(b) => Value::Boolean(b),

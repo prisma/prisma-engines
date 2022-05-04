@@ -22,7 +22,8 @@ pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
 
         for pv in params {
             let res = match pv {
-                Value::Integer(i) => i.map(my::Value::Int),
+                Value::Int32(i) => i.map(|i| my::Value::Int(i as i64)),
+                Value::Int64(i) => i.map(my::Value::Int),
                 Value::Float(f) => f.map(my::Value::Float),
                 Value::Double(f) => f.map(my::Value::Double),
                 Value::Text(s) => s.clone().map(|s| my::Value::Bytes((&*s).as_bytes().to_vec())),
@@ -105,17 +106,33 @@ impl TypeIdentifier for my::Column {
         matches!(self.column_type(), MYSQL_TYPE_DOUBLE)
     }
 
-    fn is_integer(&self) -> bool {
+    fn is_int32(&self) -> bool {
         use ColumnType::*;
 
+        // https://dev.mysql.com/doc/internals/en/binary-protocol-value.html#packet-ProtocolBinary
+        // MYSQL_TYPE_TINY  = i8
+        // MYSQL_TYPE_SHORT = i16
+        // MYSQL_TYPE_YEAR  = i16
+        // MYSQL_TYPE_LONG  = i32
+        // MYSQL_TYPE_INT24 = i32
         matches!(
             self.column_type(),
-            MYSQL_TYPE_TINY
-                | MYSQL_TYPE_SHORT
-                | MYSQL_TYPE_LONG
-                | MYSQL_TYPE_LONGLONG
-                | MYSQL_TYPE_YEAR
-                | MYSQL_TYPE_INT24
+            MYSQL_TYPE_TINY | MYSQL_TYPE_SHORT | MYSQL_TYPE_YEAR | MYSQL_TYPE_LONG | MYSQL_TYPE_INT24
+        )
+    }
+
+    fn is_int64(&self) -> bool {
+        use ColumnType::*;
+
+        // https://dev.mysql.com/doc/internals/en/binary-protocol-value.html#packet-ProtocolBinary
+        // MYSQL_TYPE_LONGLONG = i64
+        // UNSIGNED MYSQL_TYPE_LONG = u32
+        // UNSIGNED MYSQL_TYPE_INT24 = u32
+        matches!(
+            (self.column_type(), self.flags()),
+            (MYSQL_TYPE_LONGLONG, _)
+                | (MYSQL_TYPE_LONG, ColumnFlags::UNSIGNED_FLAG)
+                | (MYSQL_TYPE_INT24, ColumnFlags::UNSIGNED_FLAG)
         )
     }
 
@@ -244,8 +261,9 @@ impl TakeRow for my::Row {
                 // https://dev.mysql.com/doc/internals/en/character-set.html
                 my::Value::Bytes(b) if column.character_set() == 63 => Value::bytes(b),
                 my::Value::Bytes(s) => Value::text(String::from_utf8(s)?),
-                my::Value::Int(i) => Value::integer(i),
-                my::Value::UInt(i) => Value::integer(i64::try_from(i).map_err(|_| {
+                my::Value::Int(i) if column.is_int64() => Value::int64(i),
+                my::Value::Int(i) => Value::int32(i as i32),
+                my::Value::UInt(i) => Value::int64(i64::try_from(i).map_err(|_| {
                     let msg = "Unsigned integers larger than 9_223_372_036_854_775_807 are currently not handled.";
                     let kind = ErrorKind::value_out_of_range(msg);
 
@@ -289,8 +307,9 @@ impl TakeRow for my::Row {
                 my::Value::NULL => match column {
                     t if t.is_bool() => Value::Boolean(None),
                     t if t.is_enum() => Value::Enum(None),
-                    t if t.is_null() => Value::Integer(None),
-                    t if t.is_integer() => Value::Integer(None),
+                    t if t.is_null() => Value::Int32(None),
+                    t if t.is_int64() => Value::Int64(None),
+                    t if t.is_int32() => Value::Int32(None),
                     t if t.is_float() => Value::Float(None),
                     t if t.is_double() => Value::Double(None),
                     t if t.is_text() => Value::Text(None),

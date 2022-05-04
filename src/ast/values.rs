@@ -40,8 +40,10 @@ where
 /// compatibility.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value<'a> {
+    /// 32-bit signed integer.
+    Int32(Option<i32>),
     /// 64-bit signed integer.
-    Integer(Option<i64>),
+    Int64(Option<i64>),
     /// 32-bit floating point.
     Float(Option<f32>),
     /// 64-bit floating point.
@@ -107,7 +109,8 @@ impl<'a> fmt::Display for Params<'a> {
 impl<'a> fmt::Display for Value<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res = match self {
-            Value::Integer(val) => val.map(|v| write!(f, "{}", v)),
+            Value::Int32(val) => val.map(|v| write!(f, "{}", v)),
+            Value::Int64(val) => val.map(|v| write!(f, "{}", v)),
             Value::Float(val) => val.map(|v| write!(f, "{}", v)),
             Value::Double(val) => val.map(|v| write!(f, "{}", v)),
             Value::Text(val) => val.as_ref().map(|v| write!(f, "\"{}\"", v)),
@@ -155,7 +158,8 @@ impl<'a> fmt::Display for Value<'a> {
 impl<'a> From<Value<'a>> for serde_json::Value {
     fn from(pv: Value<'a>) -> Self {
         let res = match pv {
-            Value::Integer(i) => i.map(|i| serde_json::Value::Number(Number::from(i))),
+            Value::Int32(i) => i.map(|i| serde_json::Value::Number(Number::from(i))),
+            Value::Int64(i) => i.map(|i| serde_json::Value::Number(Number::from(i))),
             Value::Float(f) => f.map(|f| match Number::from_f64(f as f64) {
                 Some(number) => serde_json::Value::Number(number),
                 None => serde_json::Value::Null,
@@ -201,12 +205,28 @@ impl<'a> From<Value<'a>> for serde_json::Value {
 }
 
 impl<'a> Value<'a> {
-    /// Creates a new integer value.
+    /// Creates a new 32-bit signed integer.
+    pub fn int32<I>(value: I) -> Self
+    where
+        I: Into<i32>,
+    {
+        Value::Int32(Some(value.into()))
+    }
+
+    /// Creates a new 64-bit signed integer.
+    pub fn int64<I>(value: I) -> Self
+    where
+        I: Into<i64>,
+    {
+        Value::Int64(Some(value.into()))
+    }
+
+    /// Creates a new 64-bit signed integer.
     pub fn integer<I>(value: I) -> Self
     where
         I: Into<i64>,
     {
-        Value::Integer(Some(value.into()))
+        Value::Int64(Some(value.into()))
     }
 
     /// Creates a new decimal value.
@@ -321,7 +341,8 @@ impl<'a> Value<'a> {
     /// `true` if the `Value` is null.
     pub const fn is_null(&self) -> bool {
         match self {
-            Value::Integer(i) => i.is_none(),
+            Value::Int32(i) => i.is_none(),
+            Value::Int64(i) => i.is_none(),
             Value::Float(i) => i.is_none(),
             Value::Double(i) => i.is_none(),
             Value::Text(t) => t.is_none(),
@@ -410,15 +431,42 @@ impl<'a> Value<'a> {
         }
     }
 
-    /// `true` if the `Value` is an integer.
-    pub const fn is_integer(&self) -> bool {
-        matches!(self, Value::Integer(_))
+    /// `true` if the `Value` is a 32-bit signed integer.
+    pub const fn is_i32(&self) -> bool {
+        matches!(self, Value::Int32(_))
     }
 
-    /// Returns an `i64` if the value is an integer, otherwise `None`.
+    /// `true` if the `Value` is a 64-bit signed integer.
+    pub const fn is_i64(&self) -> bool {
+        matches!(self, Value::Int64(_))
+    }
+
+    /// `true` if the `Value` is a signed integer.
+    pub const fn is_integer(&self) -> bool {
+        matches!(self, Value::Int32(_) | Value::Int64(_))
+    }
+
+    /// Returns an `i64` if the value is a 64-bit signed integer, otherwise `None`.
     pub const fn as_i64(&self) -> Option<i64> {
         match self {
-            Value::Integer(i) => *i,
+            Value::Int64(i) => *i,
+            _ => None,
+        }
+    }
+
+    /// Returns an `i32` if the value is a 32-bit signed integer, otherwise `None`.
+    pub const fn as_i32(&self) -> Option<i32> {
+        match self {
+            Value::Int32(i) => *i,
+            _ => None,
+        }
+    }
+
+    /// Returns an `i64` if the value is a signed integer, otherwise `None`.
+    pub fn as_integer(&self) -> Option<i64> {
+        match self {
+            Value::Int32(i) => i.map(|i| i as i64),
+            Value::Int64(i) => *i,
             _ => None,
         }
     }
@@ -475,7 +523,8 @@ impl<'a> Value<'a> {
         match self {
             Value::Boolean(_) => true,
             // For schemas which don't tag booleans
-            Value::Integer(Some(i)) if *i == 0 || *i == 1 => true,
+            Value::Int32(Some(i)) if *i == 0 || *i == 1 => true,
+            Value::Int64(Some(i)) if *i == 0 || *i == 1 => true,
             _ => false,
         }
     }
@@ -485,7 +534,8 @@ impl<'a> Value<'a> {
         match self {
             Value::Boolean(b) => *b,
             // For schemas which don't tag booleans
-            Value::Integer(Some(i)) if *i == 0 || *i == 1 => Some(*i == 1),
+            Value::Int32(Some(i)) if *i == 0 || *i == 1 => Some(*i == 1),
+            Value::Int64(Some(i)) if *i == 0 || *i == 1 => Some(*i == 1),
             _ => None,
         }
     }
@@ -609,12 +659,12 @@ impl<'a> Value<'a> {
     }
 }
 
-value!(val: i64, Integer, val);
+value!(val: i64, Int64, val);
+value!(val: i32, Int32, val);
 value!(val: bool, Boolean, val);
 value!(val: &'a str, Text, val.into());
 value!(val: String, Text, val.into());
-value!(val: usize, Integer, i64::try_from(val).unwrap());
-value!(val: i32, Integer, i64::try_from(val).unwrap());
+value!(val: usize, Int64, i64::try_from(val).unwrap());
 value!(val: &'a [u8], Bytes, val.into());
 value!(val: f64, Double, val);
 value!(val: f32, Float, val);
@@ -644,6 +694,16 @@ impl<'a> TryFrom<Value<'a>> for i64 {
         value
             .as_i64()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not an i64")).build())
+    }
+}
+
+impl<'a> TryFrom<Value<'a>> for i32 {
+    type Error = Error;
+
+    fn try_from(value: Value<'a>) -> Result<i32, Self::Error> {
+        value
+            .as_i32()
+            .ok_or_else(|| Error::builder(ErrorKind::conversion("Not an i32")).build())
     }
 }
 
@@ -792,8 +852,15 @@ mod tests {
     use std::str::FromStr;
 
     #[test]
-    fn a_parameterized_value_of_ints_can_be_converted_into_a_vec() {
+    fn a_parameterized_value_of_ints32_can_be_converted_into_a_vec() {
         let pv = Value::array(vec![1]);
+        let values: Vec<i32> = pv.into_vec().expect("convert into Vec<i32>");
+        assert_eq!(values, vec![1]);
+    }
+
+    #[test]
+    fn a_parameterized_value_of_ints64_can_be_converted_into_a_vec() {
+        let pv = Value::array(vec![1_i64]);
         let values: Vec<i64> = pv.into_vec().expect("convert into Vec<i64>");
         assert_eq!(values, vec![1]);
     }

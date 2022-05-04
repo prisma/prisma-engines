@@ -20,44 +20,49 @@ impl TypeIdentifier for Column<'_> {
         match self.decl_type() {
             Some(n) if n.starts_with("DECIMAL") => true,
             Some(n) if n.starts_with("decimal") => true,
-            Some("NUMERIC") | Some("REAL") => true,
-            Some("numeric") | Some("real") => true,
+            Some("NUMERIC") | Some("numeric") | Some("REAL") | Some("real") => true,
             _ => false,
         }
     }
 
     fn is_float(&self) -> bool {
-        matches!(self.decl_type(), Some("float") | Some("FLOAT"))
+        matches!(self.decl_type(), Some("FLOAT") | Some("float"))
     }
 
     fn is_double(&self) -> bool {
         matches!(
             self.decl_type(),
-            Some("double") | Some("DOUBLE") | Some("DOUBLE PRECISION") | Some("double precision")
+            Some("DOUBLE") | Some("double") | Some("DOUBLE PRECISION") | Some("double precision")
         )
     }
 
-    fn is_integer(&self) -> bool {
+    fn is_int32(&self) -> bool {
         matches!(
             self.decl_type(),
-            Some("INT")
-                | Some("int")
-                | Some("INTEGER")
-                | Some("integer")
-                | Some("SERIAL")
-                | Some("serial")
-                | Some("TINYINT")
+            Some("TINYINT")
                 | Some("tinyint")
                 | Some("SMALLINT")
                 | Some("smallint")
                 | Some("MEDIUMINT")
                 | Some("mediumint")
-                | Some("BIGINT")
+                | Some("INT")
+                | Some("int")
+                | Some("INTEGER")
+                | Some("integer")
+                | Some("SERIAL")
+                | Some("serial")
+                | Some("INT2")
+                | Some("int2")
+        )
+    }
+
+    fn is_int64(&self) -> bool {
+        matches!(
+            self.decl_type(),
+            Some("BIGINT")
                 | Some("bigint")
                 | Some("UNSIGNED BIG INT")
                 | Some("unsigned big int")
-                | Some("INT2")
-                | Some("int2")
                 | Some("INT8")
                 | Some("int8")
         )
@@ -80,8 +85,8 @@ impl TypeIdentifier for Column<'_> {
 
     fn is_text(&self) -> bool {
         match self.decl_type() {
-            Some("TEXT") | Some("CLOB") => true,
-            Some("text") | Some("clob") => true,
+            Some("TEXT") | Some("text") => true,
+            Some("CLOB") | Some("clob") => true,
             Some(n) if n.starts_with("CHARACTER") => true,
             Some(n) if n.starts_with("character") => true,
             Some(n) if n.starts_with("VARCHAR") => true,
@@ -124,7 +129,7 @@ impl<'a> GetRow for SqliteRow<'a> {
         for (i, column) in self.columns().iter().enumerate() {
             let pv = match self.get_ref_unwrap(i) {
                 ValueRef::Null => match column {
-                    c if c.is_integer() | c.is_null() => Value::Integer(None),
+                    c if c.is_int32() | c.is_int64() | c.is_null() => Value::Int64(None),
                     c if c.is_text() => Value::Text(None),
                     c if c.is_bytes() => Value::Bytes(None),
                     c if c.is_float() => Value::Float(None),
@@ -143,7 +148,7 @@ impl<'a> GetRow for SqliteRow<'a> {
 
                             return Err(Error::builder(kind).build());
                         }
-                        None => Value::Integer(None),
+                        None => Value::Int64(None),
                     },
                 },
                 ValueRef::Integer(i) => match column {
@@ -164,7 +169,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                         let dt = chrono::Utc.timestamp_millis(i);
                         Value::datetime(dt)
                     }
-                    _ => Value::integer(i),
+                    _ => Value::int64(i),
                 },
                 #[cfg(feature = "bigdecimal")]
                 ValueRef::Real(f) if column.is_real() => {
@@ -222,7 +227,8 @@ impl<'a> ToColumnNames for SqliteRows<'a> {
 impl<'a> ToSql for Value<'a> {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
         let value = match self {
-            Value::Integer(integer) => integer.map(ToSqlOutput::from),
+            Value::Int32(integer) => integer.map(ToSqlOutput::from),
+            Value::Int64(integer) => integer.map(ToSqlOutput::from),
             Value::Float(float) => float.map(|f| f as f64).map(ToSqlOutput::from),
             Value::Double(double) => double.map(ToSqlOutput::from),
             Value::Text(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),

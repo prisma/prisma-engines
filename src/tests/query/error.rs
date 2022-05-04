@@ -129,7 +129,7 @@ async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
     let insert = Insert::single_into(&table).value("id1", 50).value("id2", 55);
     api.conn().insert(insert.into()).await?;
 
-    let update = Update::table(&table).set("id2", Value::Integer(None));
+    let update = Update::table(&table).set("id2", Value::Int64(None));
     let res = api.conn().update(update).await;
 
     assert!(res.is_err());
@@ -334,7 +334,7 @@ async fn should_execute_multi_statement_queries_with_raw_cmd(api: &mut dyn TestA
 
     let results: Vec<i64> = results
         .into_iter()
-        .map(|row| row.get("id").unwrap().as_i64().unwrap())
+        .map(|row| row.get("id").unwrap().as_integer().unwrap())
         .collect();
 
     assert_eq!(results, &[51]);
@@ -346,7 +346,7 @@ async fn should_execute_multi_statement_queries_with_raw_cmd(api: &mut dyn TestA
 
     let results: Vec<i64> = results
         .into_iter()
-        .map(|row| row.get("id").unwrap().as_i64().unwrap())
+        .map(|row| row.get("id").unwrap().as_integer().unwrap())
         .collect();
 
     assert_eq!(results, &[52]);
