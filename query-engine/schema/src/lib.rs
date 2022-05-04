@@ -32,6 +32,7 @@ pub type EnumTypeRef = Arc<EnumType>;
 /// Since we have the invariant that the weak refs that are used throughout the query
 /// schema have to be always valid, we use this simple trait to keep the code clutter low.
 pub trait IntoArc<T> {
+    #[allow(clippy::wrong_self_convention)]
     fn into_arc(&self) -> Arc<T>;
 }
 
