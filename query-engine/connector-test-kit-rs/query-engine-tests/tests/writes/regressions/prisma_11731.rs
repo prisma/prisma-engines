@@ -14,7 +14,6 @@ mod connect_or_create {
                 name   String
                 itemId Int?   @unique
                 item   Item?  @relation(references: [id], fields: [itemId])
-
             }
 
             model Item {
@@ -79,7 +78,21 @@ mod connect_or_create {
                 }
               }
             }"#),
-          @r###""###
+          @r###"{"data":{"updateOneItem":{"id":1,"name":"item 1","myModel":{"id":1,"name":"MyModel 1"}}}}"###
+        );
+
+        // There's only one MyModel
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"
+            {
+              findManyMyModel {
+                id
+                item {
+                  id
+                }
+              }
+            }"#),
+          @r###"{"data":{"findManyMyModel":[{"id":1,"item":{"id":1}}]}}"###
         );
 
         Ok(())
