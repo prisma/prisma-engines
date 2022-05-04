@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/8a61d46/postgres-native-tls/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/5ec2a4f/postgres-native-tls/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../postgres_native_tls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -178,16 +178,25 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
 </pre><pre class="rust"><code><span class="doccomment">//! TLS support for `tokio-postgres` and `postgres` via `native-tls`.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Examples</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```no_run</span>
 <span class="doccomment">//! use native_tls::{Certificate, TlsConnector};</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;runtime&quot;)]</span>
 <span class="doccomment">//! use postgres_native_tls::MakeTlsConnector;</span>
 <span class="doccomment">//! use std::fs;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;runtime&quot;)] {</span>
 <span class="doccomment">//! let cert = fs::read(&quot;database_cert.pem&quot;)?;</span>
 <span class="doccomment">//! let cert = Certificate::from_pem(&amp;cert)?;</span>
 <span class="doccomment">//! let connector = TlsConnector::builder()</span>
@@ -199,6 +208,7 @@
 <span class="doccomment">//!     &quot;host=localhost user=postgres sslmode=require&quot;,</span>
 <span class="doccomment">//!     connector,</span>
 <span class="doccomment">//! );</span>
+<span class="doccomment">//! # }</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // ...</span>
 <span class="doccomment">//! # Ok(())</span>
@@ -207,10 +217,12 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```no_run</span>
 <span class="doccomment">//! use native_tls::{Certificate, TlsConnector};</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;runtime&quot;)]</span>
 <span class="doccomment">//! use postgres_native_tls::MakeTlsConnector;</span>
 <span class="doccomment">//! use std::fs;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;runtime&quot;)] {</span>
 <span class="doccomment">//! let cert = fs::read(&quot;database_cert.pem&quot;)?;</span>
 <span class="doccomment">//! let cert = Certificate::from_pem(&amp;cert)?;</span>
 <span class="doccomment">//! let connector = TlsConnector::builder()</span>
@@ -222,6 +234,7 @@
 <span class="doccomment">//!     &quot;host=localhost user=postgres sslmode=require&quot;,</span>
 <span class="doccomment">//!     connector,</span>
 <span class="doccomment">//! )?;</span>
+<span class="doccomment">//! # }</span>
 <span class="doccomment">//! # Ok(())</span>
 <span class="doccomment">//! # }</span>
 <span class="doccomment">//! ```</span>
@@ -231,7 +244,7 @@
 <span class="kw">use</span> <span class="ident">std::io</span>;
 <span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 <span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ReadBuf</span>};
+<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">BufReader</span>, <span class="ident">ReadBuf</span>};
 <span class="kw">use</span> <span class="ident">tokio_postgres::tls</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tokio_postgres::tls::MakeTlsConnect</span>;
@@ -295,6 +308,7 @@
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">native_tls::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
+        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">BufReader::with_capacity</span>(<span class="number">8192</span>, <span class="ident">stream</span>);
         <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">domain</span>, <span class="ident">stream</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -306,7 +320,7 @@
 }
 
 <span class="doccomment">/// The stream returned by `TlsConnector`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">tokio_native_tls::TlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">tokio_native_tls::TlsStream</span><span class="op">&lt;</span><span class="ident">BufReader</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
 <span class="kw">where</span>

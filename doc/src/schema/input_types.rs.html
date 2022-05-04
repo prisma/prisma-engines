@@ -548,9 +548,9 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputType</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InputType</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputType</span><span class="op">&gt;</span> {
-        <span class="macro">vec!</span>[<span class="self">self</span>]
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">InputType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r#type</span>: <span class="ident">InputType</span>) -&gt; <span class="self">Self</span> {
+        <span class="macro">vec!</span>[<span class="ident">r#type</span>]
     }
 }
 </code></pre></div>

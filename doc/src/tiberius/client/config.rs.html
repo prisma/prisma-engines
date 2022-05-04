@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.7.1/src/client/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.7.3/src/client/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -308,10 +308,53 @@
 <span id="303">303</span>
 <span id="304">304</span>
 <span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">ado_net</span>;
 <span class="kw">mod</span> <span class="ident">jdbc</span>;
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::path::PathBuf</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::AuthMethod</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::EncryptionLevel</span>;
@@ -338,8 +381,15 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">instance_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">application_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">trust_cert</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">trust</span>: <span class="ident">TrustConfig</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">auth</span>: <span class="ident">AuthMethod</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">TrustConfig</span> {
+    <span class="ident">CaCertificateLocation</span>(<span class="ident">PathBuf</span>),
+    <span class="ident">TrustAll</span>,
+    <span class="ident">Default</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span> {
@@ -351,7 +401,7 @@
             <span class="ident">instance_name</span>: <span class="prelude-val">None</span>,
             <span class="ident">application_name</span>: <span class="prelude-val">None</span>,
             <span class="ident">encryption</span>: <span class="ident">EncryptionLevel::Required</span>,
-            <span class="ident">trust_cert</span>: <span class="bool-val">false</span>,
+            <span class="ident">trust</span>: <span class="ident">TrustConfig::Default</span>,
             <span class="ident">auth</span>: <span class="ident">AuthMethod::None</span>,
         }
     }
@@ -415,11 +465,34 @@
     <span class="doccomment">/// as-is.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// On production setting, the certificate should be added to the local key</span>
-    <span class="doccomment">/// storage, using this setting is potentially dangerous.</span>
+    <span class="doccomment">/// storage (or use `trust_cert_ca` instead), using this setting is potentially dangerous.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// - Defaults to `false`.</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">/// Will panic in case `trust_cert_ca` was called before.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// - Defaults to `default`, meaning server certificate is validated against system-truststore.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trust_cert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">trust_cert</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">TrustConfig::CaCertificateLocation</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">trust</span> {
+            <span class="macro">panic!</span>(<span class="string">&quot;&#39;trust_cert&#39; and &#39;trust_cert_ca&#39; are mutual exclusive! Only use one.&quot;</span>)
+        }
+        <span class="self">self</span>.<span class="ident">trust</span> <span class="op">=</span> <span class="ident">TrustConfig::TrustAll</span>;
+    }
+
+    <span class="doccomment">/// If set, the server certificate will be validated against the given CA certificate in</span>
+    <span class="doccomment">/// in addition to the system-truststore.</span>
+    <span class="doccomment">/// Useful when using self-signed certificates on the server without having to disable the</span>
+    <span class="doccomment">/// trust-chain.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">/// Will panic in case `trust_cert` was called before.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// - Defaults to validating the server certificate is validated against system&#39;s certificate storage.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trust_cert_ca</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">TrustConfig::TrustAll</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">trust</span> {
+            <span class="macro">panic!</span>(<span class="string">&quot;&#39;trust_cert&#39; and &#39;trust_cert_ca&#39; are mutual exclusive! Only use one.&quot;</span>)
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="ident">trust</span> <span class="op">=</span> <span class="ident">TrustConfig::CaCertificateLocation</span>(<span class="ident">PathBuf::from</span>(<span class="ident">path</span>.<span class="ident">to_string</span>()))
+        }
     }
 
     <span class="doccomment">/// Sets the authentication method.</span>
@@ -466,7 +539,8 @@
     <span class="doccomment">/// |`uid`,`username`,`user`,`user id`|`&lt;string&gt;`|The SQL Server login account.|</span>
     <span class="doccomment">/// |`password`,`pwd`|`&lt;string&gt;`|The password for the SQL Server account logging on.|</span>
     <span class="doccomment">/// |`database`|`&lt;string&gt;`|The name of the database.|</span>
-    <span class="doccomment">/// |`TrustServerCertificate`|`true`,`false`,`yes`,`no`|Specifies whether the driver trusts the server certificate when connecting using TLS.|</span>
+    <span class="doccomment">/// |`TrustServerCertificate`|`true`,`false`,`yes`,`no`|Specifies whether the driver trusts the server certificate when connecting using TLS. Cannot be used toghether with `TrustServerCertificateCA`|</span>
+    <span class="doccomment">/// |`TrustServerCertificateCA`|`&lt;path&gt;`|Path to a `pem`, `crt` or `der` certificate file. Cannot be used together with `TrustServerCertificate`|</span>
     <span class="doccomment">/// |`encrypt`|`true`,`false`,`yes`,`no`,`DANGER_PLAINTEXT`|Specifies whether the driver uses TLS to encrypt communication.|</span>
     <span class="doccomment">/// |`Application Name`, `ApplicationName`|`&lt;string&gt;`|Sets the application name for the connection.|</span>
     <span class="doccomment">///</span>
@@ -518,6 +592,10 @@
             <span class="ident">builder</span>.<span class="ident">trust_cert</span>();
         }
 
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ca</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">trust_cert_ca</span>() {
+            <span class="ident">builder</span>.<span class="ident">trust_cert_ca</span>(<span class="ident">ca</span>);
+        }
+
         <span class="ident">builder</span>.<span class="ident">encryption</span>(<span class="ident">s</span>.<span class="ident">encrypt</span>()<span class="question-mark">?</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">builder</span>)
@@ -555,7 +633,7 @@
             .<span class="ident">get</span>(<span class="string">&quot;integratedsecurity&quot;</span>)
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">dict</span>().<span class="ident">get</span>(<span class="string">&quot;integrated security&quot;</span>))
         {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">windows</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;winauth&quot;</span>))]</span>
             <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="kw">if</span> <span class="ident">val</span>.<span class="ident">to_lowercase</span>() <span class="op">==</span> <span class="string">&quot;sspi&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::parse_bool</span>(<span class="ident">val</span>)<span class="question-mark">?</span> =&gt; <span class="kw">match</span> (<span class="ident">user</span>, <span class="ident">pw</span>)
             {
                 (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMethod::Integrated</span>),
@@ -589,6 +667,12 @@
             .<span class="ident">get</span>(<span class="string">&quot;trustservercertificate&quot;</span>)
             .<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::parse_bool</span>)
             .<span class="ident">unwrap_or</span>(<span class="prelude-val">Ok</span>(<span class="bool-val">false</span>))
+    }
+
+    <span class="kw">fn</span> <span class="ident">trust_cert_ca</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">dict</span>()
+            .<span class="ident">get</span>(<span class="string">&quot;trustservercertificateca&quot;</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ca</span><span class="op">|</span> <span class="ident">ca</span>.<span class="ident">to_string</span>())
     }
 
     <span class="kw">fn</span> <span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">EncryptionLevel</span><span class="op">&gt;</span> {

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-util-0.6.8/src/codec/framed_impl.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>framed_impl.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-util-0.7.1/src/codec/framed_impl.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>framed_impl.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -281,6 +281,36 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::decoder::Decoder</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::encoder::Encoder</span>;
 
@@ -290,12 +320,12 @@
 <span class="kw">use</span> <span class="ident">bytes::BytesMut</span>;
 <span class="kw">use</span> <span class="ident">futures_core::ready</span>;
 <span class="kw">use</span> <span class="ident">futures_sink::Sink</span>;
-<span class="kw">use</span> <span class="ident">log::trace</span>;
 <span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
 <span class="kw">use</span> <span class="ident">std::borrow</span>::{<span class="ident">Borrow</span>, <span class="ident">BorrowMut</span>};
 <span class="kw">use</span> <span class="ident">std::io</span>;
 <span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 <span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+<span class="kw">use</span> <span class="ident">tracing::trace</span>;
 
 <span class="macro">pin_project!</span> {
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -310,10 +340,12 @@
 <span class="kw">const</span> <span class="ident">INITIAL_CAPACITY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span> <span class="op">*</span> <span class="number">1024</span>;
 <span class="kw">const</span> <span class="ident">BACKPRESSURE_BOUNDARY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">INITIAL_CAPACITY</span>;
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ReadFrame</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">eof</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">is_readable</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">buffer</span>: <span class="ident">BytesMut</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">has_errored</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">WriteFrame</span> {
@@ -332,6 +364,7 @@
             <span class="ident">eof</span>: <span class="bool-val">false</span>,
             <span class="ident">is_readable</span>: <span class="bool-val">false</span>,
             <span class="ident">buffer</span>: <span class="ident">BytesMut::with_capacity</span>(<span class="ident">INITIAL_CAPACITY</span>),
+            <span class="ident">has_errored</span>: <span class="bool-val">false</span>,
         }
     }
 }
@@ -355,6 +388,7 @@
             <span class="ident">buffer</span>,
             <span class="ident">is_readable</span>: <span class="ident">size</span> <span class="op">&gt;</span> <span class="number">0</span>,
             <span class="ident">eof</span>: <span class="bool-val">false</span>,
+            <span class="ident">has_errored</span>: <span class="bool-val">false</span>,
         }
     }
 }
@@ -409,30 +443,42 @@
         <span class="comment">//</span>
         <span class="comment">// The initial state is `reading`.</span>
         <span class="comment">//</span>
-        <span class="comment">// | state   | eof   | is_readable |</span>
-        <span class="comment">// |---------|-------|-------------|</span>
-        <span class="comment">// | reading | false | false       |</span>
-        <span class="comment">// | framing | false | true        |</span>
-        <span class="comment">// | pausing | true  | true        |</span>
-        <span class="comment">// | paused  | true  | false       |</span>
-        <span class="comment">//</span>
-        <span class="comment">//                                 `decode_eof`</span>
-        <span class="comment">//                                 returns `Some`             read 0 bytes</span>
-        <span class="comment">//                                   │       │                 │      │</span>
-        <span class="comment">//                                   │       ▼                 │      ▼</span>
-        <span class="comment">//                                   ┌───────┐ `decode_eof`    ┌──────┐</span>
-        <span class="comment">//                 ┌──read 0 bytes──▶│pausing│─returns `None`─▶│paused│──┐</span>
-        <span class="comment">//                 │                 └───────┘                 └──────┘  │</span>
-        <span class="comment">// pending read┐   │                     ┌──────┐                  │  ▲  │</span>
-        <span class="comment">//      │      │   │                     │      │                  │  │  │</span>
-        <span class="comment">//      │      ▼   │                     │  `decode` returns `Some`│ pending read</span>
-        <span class="comment">//      │  ╔═══════╗                 ┌───────┐◀─┘                  │</span>
-        <span class="comment">//      └──║reading║─read n&gt;0 bytes─▶│framing│                     │</span>
-        <span class="comment">//         ╚═══════╝                 └───────┘◀──────read n&gt;0 bytes┘</span>
-        <span class="comment">//             ▲                         │</span>
-        <span class="comment">//             │                         │</span>
-        <span class="comment">//             └─`decode` returns `None`─┘</span>
+        <span class="comment">// | state   | eof   | is_readable | has_errored |</span>
+        <span class="comment">// |---------|-------|-------------|-------------|</span>
+        <span class="comment">// | reading | false | false       | false       |</span>
+        <span class="comment">// | framing | false | true        | false       |</span>
+        <span class="comment">// | pausing | true  | true        | false       |</span>
+        <span class="comment">// | paused  | true  | false       | false       |</span>
+        <span class="comment">// | errored | &lt;any&gt; | &lt;any&gt;       | true        |</span>
+        <span class="comment">//                                                       `decode_eof` returns Err</span>
+        <span class="comment">//                                          ┌────────────────────────────────────────────────────────┐</span>
+        <span class="comment">//                   `decode_eof` returns   │                                                        │</span>
+        <span class="comment">//                             `Ok(Some)`   │                                                        │</span>
+        <span class="comment">//                                 ┌─────┐  │     `decode_eof` returns               After returning │</span>
+        <span class="comment">//                Read 0 bytes     ├─────▼──┴┐    `Ok(None)`          ┌────────┐ ◄───┐ `None`    ┌───▼─────┐</span>
+        <span class="comment">//               ┌────────────────►│ Pausing ├───────────────────────►│ Paused ├─┐   └───────────┤ Errored │</span>
+        <span class="comment">//               │                 └─────────┘                        └─┬──▲───┘ │               └───▲───▲─┘</span>
+        <span class="comment">// Pending read  │                                                      │  │     │                   │   │</span>
+        <span class="comment">//     ┌──────┐  │            `decode` returns `Some`                   │  └─────┘                   │   │</span>
+        <span class="comment">//     │      │  │                   ┌──────┐                           │  Pending                   │   │</span>
+        <span class="comment">//     │ ┌────▼──┴─┐ Read n&gt;0 bytes ┌┴──────▼─┐     read n&gt;0 bytes      │  read                      │   │</span>
+        <span class="comment">//     └─┤ Reading ├───────────────►│ Framing │◄────────────────────────┘                            │   │</span>
+        <span class="comment">//       └──┬─▲────┘                └─────┬──┬┘                                                      │   │</span>
+        <span class="comment">//          │ │                           │  │                 `decode` returns Err                  │   │</span>
+        <span class="comment">//          │ └───decode` returns `None`──┘  └───────────────────────────────────────────────────────┘   │</span>
+        <span class="comment">//          │                             read returns Err                                               │</span>
+        <span class="comment">//          └────────────────────────────────────────────────────────────────────────────────────────────┘</span>
         <span class="kw">loop</span> {
+            <span class="comment">// Return `None` if we have encountered an error from the underlying decoder</span>
+            <span class="comment">// See: https://github.com/tokio-rs/tokio/issues/3976</span>
+            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">has_errored</span> {
+                <span class="comment">// preparing has_errored -&gt; paused</span>
+                <span class="macro">trace!</span>(<span class="string">&quot;Returning None and setting paused&quot;</span>);
+                <span class="ident">state</span>.<span class="ident">is_readable</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                <span class="ident">state</span>.<span class="ident">has_errored</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
+            }
+
             <span class="comment">// Repeatedly call `decode` or `decode_eof` while the buffer is &quot;readable&quot;,</span>
             <span class="comment">// i.e. it _might_ contain data consumable as a frame or closing frame.</span>
             <span class="comment">// Both signal that there is no such data by returning `None`.</span>
@@ -448,7 +494,11 @@
                 <span class="comment">// pausing or framing</span>
                 <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">eof</span> {
                     <span class="comment">// pausing</span>
-                    <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">pinned</span>.<span class="ident">codec</span>.<span class="ident">decode_eof</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>.<span class="ident">buffer</span>)<span class="question-mark">?</span>;
+                    <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">pinned</span>.<span class="ident">codec</span>.<span class="ident">decode_eof</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>.<span class="ident">buffer</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
+                        <span class="macro">trace!</span>(<span class="string">&quot;Got an error, going to errored state&quot;</span>);
+                        <span class="ident">state</span>.<span class="ident">has_errored</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                        <span class="ident">err</span>
+                    })<span class="question-mark">?</span>;
                     <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">is_none</span>() {
                         <span class="ident">state</span>.<span class="ident">is_readable</span> <span class="op">=</span> <span class="bool-val">false</span>; <span class="comment">// prepare pausing -&gt; paused</span>
                     }
@@ -459,7 +509,11 @@
                 <span class="comment">// framing</span>
                 <span class="macro">trace!</span>(<span class="string">&quot;attempting to decode a frame&quot;</span>);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">frame</span>) <span class="op">=</span> <span class="ident">pinned</span>.<span class="ident">codec</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>.<span class="ident">buffer</span>)<span class="question-mark">?</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">frame</span>) <span class="op">=</span> <span class="ident">pinned</span>.<span class="ident">codec</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>.<span class="ident">buffer</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">op</span><span class="op">|</span> {
+                    <span class="macro">trace!</span>(<span class="string">&quot;Got an error, going to errored state&quot;</span>);
+                    <span class="ident">state</span>.<span class="ident">has_errored</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    <span class="ident">op</span>
+                })<span class="question-mark">?</span> {
                     <span class="macro">trace!</span>(<span class="string">&quot;frame decoded from buffer&quot;</span>);
                     <span class="comment">// implicit framing -&gt; framing</span>
                     <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">frame</span>)));
@@ -473,7 +527,13 @@
             <span class="comment">// Make sure we&#39;ve got room for at least one byte to read to ensure</span>
             <span class="comment">// that we don&#39;t get a spurious 0 that looks like EOF.</span>
             <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">reserve</span>(<span class="number">1</span>);
-            <span class="kw">let</span> <span class="ident">bytect</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">poll_read_buf</span>(<span class="ident">pinned</span>.<span class="ident">inner</span>.<span class="ident">as_mut</span>(), <span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">state</span>.<span class="ident">buffer</span>)<span class="question-mark">?</span> {
+            <span class="kw">let</span> <span class="ident">bytect</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">poll_read_buf</span>(<span class="ident">pinned</span>.<span class="ident">inner</span>.<span class="ident">as_mut</span>(), <span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">state</span>.<span class="ident">buffer</span>).<span class="ident">map_err</span>(
+                <span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
+                    <span class="macro">trace!</span>(<span class="string">&quot;Got an error, going to errored state&quot;</span>);
+                    <span class="ident">state</span>.<span class="ident">has_errored</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    <span class="ident">err</span>
+                },
+            )<span class="question-mark">?</span> {
                 <span class="ident">Poll::Ready</span>(<span class="ident">ct</span>) =&gt; <span class="ident">ct</span>,
                 <span class="comment">// implicit reading -&gt; reading or implicit paused -&gt; paused</span>
                 <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
@@ -531,7 +591,7 @@
 
         <span class="kw">while</span> <span class="op">!</span><span class="ident">pinned</span>.<span class="ident">state</span>.<span class="ident">borrow_mut</span>().<span class="ident">buffer</span>.<span class="ident">is_empty</span>() {
             <span class="kw">let</span> <span class="ident">WriteFrame</span> { <span class="ident">buffer</span> } <span class="op">=</span> <span class="ident">pinned</span>.<span class="ident">state</span>.<span class="ident">borrow_mut</span>();
-            <span class="macro">trace!</span>(<span class="string">&quot;writing; remaining={}&quot;</span>, <span class="ident">buffer</span>.<span class="ident">len</span>());
+            <span class="macro">trace!</span>(<span class="ident">remaining</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">len</span>(), <span class="string">&quot;writing;&quot;</span>);
 
             <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">poll_write_buf</span>(<span class="ident">pinned</span>.<span class="ident">inner</span>.<span class="ident">as_mut</span>(), <span class="ident">cx</span>, <span class="ident">buffer</span>))<span class="question-mark">?</span>;
 

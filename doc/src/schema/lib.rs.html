@@ -52,6 +52,7 @@
 <span id="47">47</span>
 <span id="48">48</span>
 <span id="49">49</span>
+<span id="50">50</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">warn</span>(<span class="ident">warnings</span>)]</span>
 
 <span class="kw">mod</span> <span class="ident">enum_type</span>;
@@ -86,6 +87,7 @@
 <span class="doccomment">/// Since we have the invariant that the weak refs that are used throughout the query</span>
 <span class="doccomment">/// schema have to be always valid, we use this simple trait to keep the code clutter low.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoArc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
     <span class="kw">fn</span> <span class="ident">into_arc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 }
 

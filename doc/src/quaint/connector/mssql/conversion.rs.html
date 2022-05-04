@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/479e08a/src/connector/mssql/conversion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conversion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/a0722f2/src/connector/mssql/conversion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conversion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -109,59 +109,41 @@
 <span id="104">104</span>
 <span id="105">105</span>
 <span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast::Value</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">bigdecimal::BigDecimal</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">convert::TryFrom</span>};
-<span class="kw">use</span> <span class="ident">tiberius</span>::{<span class="ident">ColumnData</span>, <span class="ident">FromSql</span>, <span class="ident">IntoSql</span>, <span class="ident">ToSql</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">tiberius::ToSql</span>;
+<span class="kw">use</span> <span class="ident">tiberius</span>::{<span class="ident">ColumnData</span>, <span class="ident">FromSql</span>, <span class="ident">IntoSql</span>};
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">params</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">conv_params</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">ToSql</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">converted</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">params</span>.<span class="ident">len</span>());
-
-    <span class="kw">for</span> <span class="ident">param</span> <span class="kw">in</span> <span class="ident">params</span>.<span class="ident">iter</span>() {
-        <span class="ident">converted</span>.<span class="ident">push</span>(<span class="ident">param</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)
-    }
-
-    <span class="prelude-val">Ok</span>(<span class="ident">converted</span>)
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_sql</span>(<span class="self">self</span>) -&gt; <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Value::Integer</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_sql</span>(),
-            <span class="ident">Value::Float</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_sql</span>(),
-            <span class="ident">Value::Double</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_sql</span>(),
-            <span class="ident">Value::Text</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_sql</span>(),
-            <span class="ident">Value::Bytes</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_sql</span>(),
-            <span class="ident">Value::Enum</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_sql</span>(),
-            <span class="ident">Value::Boolean</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_sql</span>(),
+            <span class="ident">Value::Integer</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">into_sql</span>(),
+            <span class="ident">Value::Float</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">into_sql</span>(),
+            <span class="ident">Value::Double</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">into_sql</span>(),
+            <span class="ident">Value::Text</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">as_deref</span>().<span class="ident">into_sql</span>(),
+            <span class="ident">Value::Bytes</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">as_deref</span>().<span class="ident">into_sql</span>(),
+            <span class="ident">Value::Enum</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">as_deref</span>().<span class="ident">into_sql</span>(),
+            <span class="ident">Value::Boolean</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">into_sql</span>(),
             <span class="ident">Value::Char</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>)).<span class="ident">into_sql</span>(),
-            <span class="ident">Value::Xml</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_sql</span>(),
+            <span class="ident">Value::Xml</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">as_deref</span>().<span class="ident">into_sql</span>(),
             <span class="ident">Value::Array</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Arrays are not supported on SQL Server.&quot;</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
             <span class="ident">Value::Numeric</span>(<span class="ident">val</span>) =&gt; (<span class="kw-2">*</span><span class="ident">val</span>).<span class="ident">to_sql</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
             <span class="ident">Value::Json</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>).<span class="ident">unwrap</span>()).<span class="ident">into_sql</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-            <span class="ident">Value::Uuid</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_sql</span>(),
+            <span class="ident">Value::Uuid</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">into_sql</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            <span class="ident">Value::DateTime</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_sql</span>(),
+            <span class="ident">Value::DateTime</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">into_sql</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            <span class="ident">Value::Date</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_sql</span>(),
+            <span class="ident">Value::Date</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">into_sql</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            <span class="ident">Value::Time</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_sql</span>(),
+            <span class="ident">Value::Time</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">into_sql</span>(),
         }
     }
 }

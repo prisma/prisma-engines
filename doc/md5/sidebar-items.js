@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Md5","The MD5 hasher"]],"trait":[["Digest","The `Digest` trait specifies an interface common for digest functions."]]});
+initSidebarItems({"struct":[["Md5Core","Core MD5 hasher state."]],"trait":[["Digest","Convinience wrapper trait covering functionality of cryptographic hash functions with fixed output size."]],"type":[["Md5","MD5 hasher state."]]});

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-util-0.6.8/src/codec/framed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>framed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-util-0.7.1/src/codec/framed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>framed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -346,6 +346,36 @@
 <span id="341">341</span>
 <span id="342">342</span>
 <span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::decoder::Decoder</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::encoder::Encoder</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::framed_impl</span>::{<span class="ident">FramedImpl</span>, <span class="ident">RWFrames</span>, <span class="ident">ReadFrame</span>, <span class="ident">WriteFrame</span>};
@@ -454,6 +484,7 @@
                         <span class="ident">eof</span>: <span class="bool-val">false</span>,
                         <span class="ident">is_readable</span>: <span class="bool-val">false</span>,
                         <span class="ident">buffer</span>: <span class="ident">BytesMut::with_capacity</span>(<span class="ident">capacity</span>),
+                        <span class="ident">has_errored</span>: <span class="bool-val">false</span>,
                     },
                     <span class="ident">write</span>: <span class="ident">WriteFrame::default</span>(),
                 },
@@ -549,6 +580,35 @@
     <span class="doccomment">/// as it may corrupt the stream of frames otherwise being worked with.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">codec_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">U</span> {
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">codec</span>
+    }
+
+    <span class="doccomment">/// Maps the codec `U` to `C`, preserving the read and write buffers</span>
+    <span class="doccomment">/// wrapped by `Framed`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that care should be taken to not tamper with the underlying codec</span>
+    <span class="doccomment">/// as it may corrupt the stream of frames otherwise being worked with.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_codec</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">map</span>: <span class="ident">F</span>) -&gt; <span class="ident">Framed</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">U</span>) -&gt; <span class="ident">C</span>,
+    {
+        <span class="comment">// This could be potentially simplified once rust-lang/rust#86555 hits stable</span>
+        <span class="kw">let</span> <span class="ident">parts</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_parts</span>();
+        <span class="ident">Framed::from_parts</span>(<span class="ident">FramedParts</span> {
+            <span class="ident">io</span>: <span class="ident">parts</span>.<span class="ident">io</span>,
+            <span class="ident">codec</span>: <span class="ident">map</span>(<span class="ident">parts</span>.<span class="ident">codec</span>),
+            <span class="ident">read_buf</span>: <span class="ident">parts</span>.<span class="ident">read_buf</span>,
+            <span class="ident">write_buf</span>: <span class="ident">parts</span>.<span class="ident">write_buf</span>,
+            <span class="ident">_priv</span>: (),
+        })
+    }
+
+    <span class="doccomment">/// Returns a mutable reference to the underlying codec wrapped by</span>
+    <span class="doccomment">/// `Framed`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that care should be taken to not tamper with the underlying codec</span>
+    <span class="doccomment">/// as it may corrupt the stream of frames otherwise being worked with.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">codec_pin_mut</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">U</span> {
+        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">project</span>().<span class="ident">codec</span>
     }
 
     <span class="doccomment">/// Returns a reference to the read buffer.</span>

@@ -10,14 +10,14 @@
 functions and Message Authentication algorithms.</p>
 <p>Traits in this repository are organized into the following levels:</p>
 <ul>
-<li><strong>High-level convenience traits</strong>: <a href="trait.Digest.html" title="Digest"><code>Digest</code></a>, <a href="trait.DynDigest.html" title="DynDigest"><code>DynDigest</code></a>, [<code>Mac</code>].
+<li><strong>High-level convenience traits</strong>: <a href="trait.Digest.html" title="Digest"><code>Digest</code></a>, <a href="trait.DynDigest.html" title="DynDigest"><code>DynDigest</code></a>, <a href="trait.Mac.html" title="Mac"><code>Mac</code></a>.
 Wrappers around lower-level traits for most common use-cases. Users should
 usually prefer using these traits.</li>
 <li><strong>Mid-level traits</strong>: <a href="trait.Update.html" title="Update"><code>Update</code></a>, <a href="trait.FixedOutput.html" title="FixedOutput"><code>FixedOutput</code></a>, <a href="trait.FixedOutputReset.html" title="FixedOutputReset"><code>FixedOutputReset</code></a>,
 <a href="trait.ExtendableOutput.html" title="ExtendableOutput"><code>ExtendableOutput</code></a>, <a href="trait.ExtendableOutputReset.html" title="ExtendableOutputReset"><code>ExtendableOutputReset</code></a>, <a href="trait.XofReader.html" title="XofReader"><code>XofReader</code></a>,
-<a href="trait.VariableOutput.html" title="VariableOutput"><code>VariableOutput</code></a>, <a href="trait.Reset.html" title="Reset"><code>Reset</code></a>, [<code>KeyInit</code>], and [<code>InnerInit</code>]. These
+<a href="trait.VariableOutput.html" title="VariableOutput"><code>VariableOutput</code></a>, <a href="trait.Reset.html" title="Reset"><code>Reset</code></a>, <a href="trait.KeyInit.html" title="KeyInit"><code>KeyInit</code></a>, and <a href="trait.InnerInit.html" title="InnerInit"><code>InnerInit</code></a>. These
 traits atomically describe available functionality of an algorithm.</li>
-<li><strong>Marker traits</strong>: <a href="trait.HashMarker.html" title="HashMarker"><code>HashMarker</code></a>, [<code>MacMarker</code>]. Used to distinguish
+<li><strong>Marker traits</strong>: <a href="trait.HashMarker.html" title="HashMarker"><code>HashMarker</code></a>, <a href="trait.MacMarker.html" title="MacMarker"><code>MacMarker</code></a>. Used to distinguish
 different algorithm classes.</li>
 <li><strong>Low-level traits</strong> defined in the <a href="core_api/index.html" title="core_api"><code>core_api</code></a> module. These traits
 operate at a block-level and do not contain any built-in buffering.
@@ -33,8 +33,15 @@ by hash implementation crates.</p>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="consts/index.html" title="digest::consts mod">consts</a></div><div class="item-right docblock-short"><p>Type aliases for many constants.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="core_api/index.html" title="digest::core_api mod">core_api</a></div><div class="item-right docblock-short"><p>Low-level traits operating on blocks and wrappers around them.</p>
 </div></div></div><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.InvalidBufferSize.html" title="digest::InvalidBufferSize struct">InvalidBufferSize</a></div><div class="item-right docblock-short"><p>Buffer length is not equal to hash output size.</p>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.CtOutput.html" title="digest::CtOutput struct">CtOutput</a></div><div class="item-right docblock-short"><p>Fixed size output value which provides a safe <a href="https://doc.rust-lang.org/1.60.0/core/cmp/trait.Eq.html" title="Eq"><code>Eq</code></a> implementation that
+runs in constant time.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.InvalidBufferSize.html" title="digest::InvalidBufferSize struct">InvalidBufferSize</a></div><div class="item-right docblock-short"><p>Buffer length is not equal to hash output size.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.InvalidLength.html" title="digest::InvalidLength struct">InvalidLength</a></div><div class="item-right docblock-short"><p>The error type returned when key and/or IV used in the <a href="trait.KeyInit.html" title="KeyInit"><code>KeyInit</code></a>,
+<a href="../crypto_common/trait.KeyIvInit.html" title="KeyIvInit"><code>KeyIvInit</code></a>, and <a href="../crypto_common/trait.InnerIvInit.html" title="InnerIvInit"><code>InnerIvInit</code></a> slice-based methods had
+an invalid length.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.InvalidOutputSize.html" title="digest::InvalidOutputSize struct">InvalidOutputSize</a></div><div class="item-right docblock-short"><p>The error type used in variable hash traits.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.MacError.html" title="digest::MacError struct">MacError</a></div><div class="item-right docblock-short"><p>Error type for when the <a href="type.Output.html" title="Output"><code>Output</code></a> of a <a href="trait.Mac.html" title="Mac"><code>Mac</code></a>
+is not equal to the expected value.</p>
 </div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Digest.html" title="digest::Digest trait">Digest</a></div><div class="item-right docblock-short"><p>Convinience wrapper trait covering functionality of cryptographic hash
 functions with fixed output size.</p>
@@ -44,6 +51,10 @@ functions with fixed output size.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.FixedOutput.html" title="digest::FixedOutput trait">FixedOutput</a></div><div class="item-right docblock-short"><p>Trait for hash functions with fixed-size output.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.FixedOutputReset.html" title="digest::FixedOutputReset trait">FixedOutputReset</a></div><div class="item-right docblock-short"><p>Trait for hash functions with fixed-size output able to reset themselves.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.HashMarker.html" title="digest::HashMarker trait">HashMarker</a></div><div class="item-right docblock-short"><p>Marker trait for cryptographic hash functions.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.InnerInit.html" title="digest::InnerInit trait">InnerInit</a></div><div class="item-right docblock-short"><p>Types which can be initialized from another type (usually block ciphers).</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.KeyInit.html" title="digest::KeyInit trait">KeyInit</a></div><div class="item-right docblock-short"><p>Types which can be initialized from key.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Mac.html" title="digest::Mac trait">Mac</a></div><div class="item-right docblock-short"><p>Convinience wrapper trait covering functionality of Message Authentication algorithms.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.MacMarker.html" title="digest::MacMarker trait">MacMarker</a></div><div class="item-right docblock-short"><p>Marker trait for Message Authentication algorithms.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.OutputSizeUser.html" title="digest::OutputSizeUser trait">OutputSizeUser</a></div><div class="item-right docblock-short"><p>Types which return data with the given size.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Reset.html" title="digest::Reset trait">Reset</a></div><div class="item-right docblock-short"><p>Resettable types.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Update.html" title="digest::Update trait">Update</a></div><div class="item-right docblock-short"><p>Types which consume data with byte granularity.</p>
@@ -52,6 +63,7 @@ functions with fixed output size.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.XofReader.html" title="digest::XofReader trait">XofReader</a></div><div class="item-right docblock-short"><p>Trait for reader types which are used to extract extendable output
 from a XOF (extendable-output function) result.</p>
 </div></div></div><h2 id="types" class="small-section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Output.html" title="digest::Output type">Output</a></div><div class="item-right docblock-short"><p>Output array of <a href="trait.OutputSizeUser.html" title="OutputSizeUser"><code>OutputSizeUser</code></a> implementors.</p>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Key.html" title="digest::Key type">Key</a></div><div class="item-right docblock-short"><p>Key used by <a href="../crypto_common/trait.KeySizeUser.html" title="KeySizeUser"><code>KeySizeUser</code></a> implementors.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Output.html" title="digest::Output type">Output</a></div><div class="item-right docblock-short"><p>Output array of <a href="trait.OutputSizeUser.html" title="OutputSizeUser"><code>OutputSizeUser</code></a> implementors.</p>
 </div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="digest" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>
 </body></html>
