@@ -346,9 +346,10 @@
 <span id="341">341</span>
 <span id="342">342</span>
 <span id="343">343</span>
-<span id="344">344</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TestResult</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">indoc</span>::{<span class="ident">formatdoc</span>, <span class="ident">indoc</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">quaint::prelude::Queryable</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_macros::test_connector</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">BitFlags</span>, <span class="ident">Capabilities</span>, <span class="ident">Tags</span>};
 
@@ -360,10 +361,7 @@
     <span class="ident">IntrospectionResult</span>, <span class="ident">Version</span>,
 };
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorParams</span>, <span class="ident">MigrationConnector</span>};
-<span class="kw">use</span> <span class="ident">quaint</span>::{
-    <span class="ident">prelude</span>::{<span class="ident">Queryable</span>, <span class="ident">SqlFamily</span>},
-    <span class="ident">single::Quaint</span>,
-};
+<span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude::SqlFamily</span>, <span class="ident">single::Quaint</span>};
 <span class="kw">use</span> <span class="ident">sql_introspection_connector::SqlIntrospectionConnector</span>;
 <span class="kw">use</span> <span class="ident">sql_migration_connector::SqlMigrationConnector</span>;
 <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;

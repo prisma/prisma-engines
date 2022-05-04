@@ -297,6 +297,7 @@
 <span id="292">292</span>
 <span id="293">293</span>
 <span id="294">294</span>
+<span id="295">295</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL implementation of DestructiveChangeChecker is responsible for</span>
 <span class="doccomment">//! informing users about potentially destructive or impossible changes that</span>
 <span class="doccomment">//! their attempted migrations contain.</span>
@@ -481,7 +482,8 @@
                                 (<span class="ident">ColumnArity::Required</span>, <span class="ident">ColumnArity::Nullable</span>) =&gt; <span class="bool-val">true</span>,
                                 <span class="comment">// nothing changed</span>
                                 (<span class="ident">ColumnArity::Required</span>, <span class="ident">ColumnArity::Required</span>)
-                                <span class="op">|</span> (<span class="ident">ColumnArity::Nullable</span>, <span class="ident">ColumnArity::Nullable</span>) =&gt; <span class="bool-val">true</span>,
+                                <span class="op">|</span> (<span class="ident">ColumnArity::Nullable</span>, <span class="ident">ColumnArity::Nullable</span>)
+                                <span class="op">|</span> (<span class="ident">ColumnArity::List</span>, <span class="ident">ColumnArity::List</span>) =&gt; <span class="bool-val">true</span>,
                                 <span class="comment">// not supported on SQLite</span>
                                 (<span class="ident">ColumnArity::List</span>, <span class="kw">_</span>) <span class="op">|</span> (<span class="kw">_</span>, <span class="ident">ColumnArity::List</span>) =&gt; <span class="macro">unreachable!</span>(),
                             };

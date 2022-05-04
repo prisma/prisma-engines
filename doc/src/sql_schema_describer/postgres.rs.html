@@ -1610,6 +1610,13 @@
 <span id="1605">1605</span>
 <span id="1606">1606</span>
 <span id="1607">1607</span>
+<span id="1608">1608</span>
+<span id="1609">1609</span>
+<span id="1610">1610</span>
+<span id="1611">1611</span>
+<span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -2620,16 +2627,23 @@
                 ),
             });
 
-            <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;index_algo&quot;</span>).<span class="ident">as_str</span>() {
-                <span class="string">&quot;btree&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::BTree</span>,
-                <span class="string">&quot;hash&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::Hash</span>,
-                <span class="string">&quot;gist&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::Gist</span>,
-                <span class="string">&quot;gin&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::Gin</span>,
-                <span class="string">&quot;spgist&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::SpGist</span>,
-                <span class="string">&quot;brin&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::Brin</span>,
-                <span class="ident">other</span> =&gt; {
-                    <span class="macro">tracing::warn!</span>(<span class="string">&quot;Unknown index algorithm on {name}: {other}&quot;</span>);
-                    <span class="ident">SqlIndexAlgorithm::BTree</span>
+            <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroach</span>() {
+                <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;index_algo&quot;</span>).<span class="ident">as_str</span>() {
+                    <span class="string">&quot;inverted&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::Gin</span>,
+                    <span class="kw">_</span> =&gt; <span class="ident">SqlIndexAlgorithm::BTree</span>,
+                }
+            } <span class="kw">else</span> {
+                <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;index_algo&quot;</span>).<span class="ident">as_str</span>() {
+                    <span class="string">&quot;btree&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::BTree</span>,
+                    <span class="string">&quot;hash&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::Hash</span>,
+                    <span class="string">&quot;gist&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::Gist</span>,
+                    <span class="string">&quot;gin&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::Gin</span>,
+                    <span class="string">&quot;spgist&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::SpGist</span>,
+                    <span class="string">&quot;brin&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::Brin</span>,
+                    <span class="ident">other</span> =&gt; {
+                        <span class="macro">tracing::warn!</span>(<span class="string">&quot;Unknown index algorithm on {name}: {other}&quot;</span>);
+                        <span class="ident">SqlIndexAlgorithm::BTree</span>
+                    }
                 }
             };
 
