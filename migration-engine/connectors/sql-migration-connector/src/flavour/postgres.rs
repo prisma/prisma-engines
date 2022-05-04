@@ -591,6 +591,7 @@ where
 
         let mut circumstances = BitFlags::<Circumstances>::default();
         let provider_is_cockroachdb = flavour.is_cockroach;
+
         if provider_is_cockroachdb {
             circumstances |= Circumstances::IsCockroachDb;
         }
@@ -608,15 +609,32 @@ where
                         .await?;
 
                     let version = schema_exists_result.get(0).and_then(|row| row.at(1)).and_then(|v| v.to_string());
-                    if let Some(version) = version {
-                        if version.contains("CockroachDB") {
-                            circumstances |= Circumstances::IsCockroachDb;
-                            connection.raw_cmd(COCKROACHDB_PRELUDE).await?;
-                        } else if provider_is_cockroachdb {
-                            return Err(ConnectorError::from_msg("You are trying to connect to a postgresql database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.".to_owned()));
+
+                    let cockroach_preview_enabled = params
+                        .connector_params
+                        .preview_features
+                        .contains(PreviewFeature::Cockroachdb);
+
+                    match version {
+                        Some(version) => {
+                            let db_is_cockroach = version.contains("CockroachDB");
+
+                            if db_is_cockroach && !provider_is_cockroachdb && cockroach_preview_enabled {
+                                let msg = "You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.";
+
+                                return Err(ConnectorError::from_msg(msg.to_owned()));
+                            } else if !db_is_cockroach && provider_is_cockroachdb {
+                                let msg = "You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.";
+
+                                return Err(ConnectorError::from_msg(msg.to_owned()));
+                            } else if db_is_cockroach {
+                                circumstances |= Circumstances::IsCockroachDb;
+                                connection.raw_cmd(COCKROACHDB_PRELUDE).await?;
+                            }
                         }
-                    } else {
-                        tracing::warn!("Could not determine the version of the database.")
+                        None => {
+                            tracing::warn!("Could not determine the version of the database.")
+                        }
                     }
 
                     if let Some(true) = schema_exists_result
