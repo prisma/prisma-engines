@@ -1,3 +1,5 @@
+mod gin;
+
 use datamodel::parse_configuration;
 use introspection_connector::{CompositeTypeDepth, IntrospectionConnector, IntrospectionContext};
 use introspection_engine_tests::test_api::*;
