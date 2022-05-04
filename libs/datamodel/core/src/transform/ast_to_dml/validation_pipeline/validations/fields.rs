@@ -219,8 +219,10 @@ pub(super) fn validate_default_value(field: ScalarFieldWalker<'_>, ctx: &mut Con
 
     // Named defaults.
     if default_mapped_name.is_some() && !ctx.connector.supports_named_default_values() {
+        let msg = "You defined a database name for the default value of a field on the model. This is not supported by the provider.";
+
         ctx.push_error(DatamodelError::new_attribute_validation_error(
-            "You defined a database name for the default value of a field on the model. This is not supported by the provider.",
+            msg,
             "default",
             default_attribute.unwrap().span,
         ));

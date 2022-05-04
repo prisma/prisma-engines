@@ -23,6 +23,9 @@ pub struct ConnectorTestArgs {
     pub exclude: ExcludeConnectorTags,
 
     #[darling(default)]
+    pub exclude_features: ExcludeFeatures,
+
+    #[darling(default)]
     pub capabilities: RunOnlyForCapabilities,
 }
 
@@ -90,6 +93,17 @@ impl OnlyConnectorTags {
 }
 
 #[derive(Debug, Default)]
+pub struct ExcludeFeatures {
+    features: Vec<String>,
+}
+
+impl ExcludeFeatures {
+    pub fn features(&self) -> &[String] {
+        self.features.as_ref()
+    }
+}
+
+#[derive(Debug, Default)]
 pub struct ExcludeConnectorTags {
     tags: Vec<ConnectorTag>,
 }
@@ -101,6 +115,29 @@ impl ExcludeConnectorTags {
 
     pub fn tags(&self) -> &[ConnectorTag] {
         &self.tags
+    }
+}
+
+impl darling::FromMeta for ExcludeFeatures {
+    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+        let features = items
+            .iter()
+            .map(|i| match i {
+                syn::NestedMeta::Meta(m) => Err(darling::Error::unexpected_type(
+                    "Preview features can only be string literals.",
+                )
+                .with_span(&m.span())),
+                syn::NestedMeta::Lit(l) => match l {
+                    syn::Lit::Str(s) => Ok(s.value()),
+                    _ => Err(
+                        darling::Error::unexpected_type("Preview features can only be string literals.")
+                            .with_span(&l.span()),
+                    ),
+                },
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+
+        Ok(ExcludeFeatures { features })
     }
 }
 

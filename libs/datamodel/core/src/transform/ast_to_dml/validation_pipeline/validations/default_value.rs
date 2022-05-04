@@ -1,3 +1,4 @@
+use bigdecimal::BigDecimal;
 use datamodel_connector::ConnectorCapability;
 use parser_database::ast::Expression;
 
@@ -98,6 +99,18 @@ pub(super) fn validate_default_value(
             };
 
             let message = format!("Parse error: \"{value}\" is not a valid integer. ({details})");
+
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                &message, "default", *span,
+            ));
+        }
+        (ScalarType::Decimal, ast::Expression::StringValue(value, span)) => {
+            let details = match BigDecimal::from_str(value) {
+                Ok(_) => return,
+                Err(details) => details,
+            };
+
+            let message = format!("Parse error: \"{value}\" is not a valid decimal. ({details})");
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 &message, "default", *span,

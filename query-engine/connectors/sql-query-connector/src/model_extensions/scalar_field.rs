@@ -32,8 +32,8 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Json => Value::Json(None),
                 TypeIdentifier::DateTime => Value::DateTime(None),
                 TypeIdentifier::UUID => Value::Uuid(None),
-                TypeIdentifier::Int => Value::Integer(None),
-                TypeIdentifier::BigInt => Value::Integer(None),
+                TypeIdentifier::Int => Value::Int32(None),
+                TypeIdentifier::BigInt => Value::Int64(None),
                 TypeIdentifier::Bytes => Value::Bytes(None),
                 TypeIdentifier::Xml => Value::Xml(None),
                 TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
@@ -58,7 +58,7 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::Json(s) => Value::Json(serde_json::from_str(&s).unwrap()),
         PrismaValue::Bytes(b) => Value::Bytes(Some(b.into())),
         PrismaValue::Xml(s) => Value::Xml(Some(s.into())),
-        PrismaValue::Null => Value::Integer(None), // Can't tell which type the null is supposed to be.
+        PrismaValue::Null => Value::Int32(None), // Can't tell which type the null is supposed to be.
         PrismaValue::Object(_) => unimplemented!(),
     }
 }

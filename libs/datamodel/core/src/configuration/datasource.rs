@@ -41,6 +41,7 @@ impl std::fmt::Debug for Datasource {
 impl Datasource {
     pub fn capabilities(&self) -> ConnectorCapabilities {
         let capabilities = self.active_connector.capabilities().to_owned();
+
         ConnectorCapabilities::new(capabilities)
     }
 
