@@ -18,7 +18,7 @@ use crate::{
 };
 use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
 use parser_database::{
-    ast::{WithName, WithSpan},
+    ast::WithSpan,
     walkers::{PrimaryKeyWalker, TypedFieldWalker},
 };
 
@@ -86,7 +86,7 @@ pub(super) fn has_a_unique_default_constraint_name(
             .unwrap_or(field.ast_field().span);
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
-            &message, "default", span,
+            &message, "@default", span,
         ));
     }
 }
@@ -223,7 +223,7 @@ pub(super) fn validate_default_value(field: ScalarFieldWalker<'_>, ctx: &mut Con
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             msg,
-            "default",
+            "@default",
             default_attribute.unwrap().span,
         ));
     }
@@ -352,7 +352,7 @@ pub(crate) fn id_supports_clustering_setting(pk: PrimaryKeyWalker<'_>, ctx: &mut
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         "Defining clustering is not supported in the current connector.",
-        pk.ast_attribute().name(),
+        pk.attribute_name(),
         *pk.ast_attribute().span(),
     ));
 }
@@ -372,7 +372,7 @@ pub(crate) fn clustering_setting_preview_enabled(pk: PrimaryKeyWalker<'_>, ctx: 
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         "To specify clustering, please enable `extendedIndexes` preview feature.",
-        pk.ast_attribute().name(),
+        pk.attribute_name(),
         *pk.ast_attribute().span(),
     ))
 }
@@ -400,7 +400,7 @@ pub(crate) fn clustering_can_be_defined_only_once(pk: PrimaryKeyWalker<'_>, ctx:
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "A model can only hold one clustered index or id.",
-            pk.ast_attribute().name(),
+            pk.attribute_name(),
             *pk.ast_attribute().span(),
         ));
 

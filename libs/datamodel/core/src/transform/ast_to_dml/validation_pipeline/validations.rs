@@ -55,7 +55,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         if let Some(pk) = model.primary_key() {
             for field_attribute in pk.scalar_field_attributes() {
                 let span = pk.ast_attribute().span;
-                let attribute = ("id", span);
+                let attribute = (pk.attribute_name(), span);
                 fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
             }
 

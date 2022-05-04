@@ -57,7 +57,7 @@ pub(crate) fn defines_references_on_both_sides(
     let msg = "The `references` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations";
 
     for span in spans {
-        ctx.push_error(DatamodelError::new_attribute_validation_error(msg, "relation", span));
+        ctx.push_error(DatamodelError::new_attribute_validation_error(msg, "@relation", span));
     }
 }
 
@@ -93,7 +93,7 @@ pub(crate) fn defines_fields_on_both_sides(
     let msg = "The `fields` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations";
 
     for span in spans {
-        ctx.push_error(DatamodelError::new_attribute_validation_error(msg, "relation", span));
+        ctx.push_error(DatamodelError::new_attribute_validation_error(msg, "@relation", span));
     }
 }
 
@@ -126,7 +126,7 @@ pub(crate) fn references_id_from_both_sides(
     let msg = "The `references` argument must point to a singular `id` field";
 
     for span in spans {
-        ctx.push_error(DatamodelError::new_attribute_validation_error(msg, "relation", span));
+        ctx.push_error(DatamodelError::new_attribute_validation_error(msg, "@relation", span));
     }
 }
 
@@ -169,7 +169,9 @@ pub(crate) fn referencing_with_an_array_field_of_correct_type(
         let span = ast_field.span_for_attribute("relation").unwrap_or(ast_field.span);
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
-            error_msg, "relation", span,
+            error_msg,
+            "@relation",
+            span,
         ));
     }
 }
