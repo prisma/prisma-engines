@@ -126,8 +126,8 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_prisma_value</span>(<span class="ident">quaint_value</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">quaint_value</span> {
-        <span class="ident">Value::Integer</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">map</span>(<span class="ident">PrismaValue::Int</span>).<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
-
+        <span class="ident">Value::Int32</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>)).<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+        <span class="ident">Value::Int64</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">map</span>(<span class="ident">PrismaValue::Int</span>).<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
         <span class="ident">Value::Float</span>(<span class="prelude-val">Some</span>(<span class="ident">f</span>)) =&gt; <span class="kw">match</span> <span class="ident">f</span> {
             <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_nan</span>() =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConversionFailure</span> {

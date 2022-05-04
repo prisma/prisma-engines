@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/466e900/src/connector/sqlite/conversion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conversion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/c7dc33f/src/connector/sqlite/conversion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conversion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -282,6 +282,12 @@
 <span id="277">277</span>
 <span id="278">278</span>
 <span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast::Value</span>,
     <span class="ident">connector</span>::{
@@ -304,44 +310,49 @@
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">decl_type</span>() {
             <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;DECIMAL&quot;</span>) =&gt; <span class="bool-val">true</span>,
             <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;decimal&quot;</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="string">&quot;NUMERIC&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;REAL&quot;</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="string">&quot;numeric&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;real&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;NUMERIC&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;numeric&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;REAL&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;real&quot;</span>) =&gt; <span class="bool-val">true</span>,
             <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
     <span class="kw">fn</span> <span class="ident">is_float</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">decl_type</span>(), <span class="prelude-val">Some</span>(<span class="string">&quot;float&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;FLOAT&quot;</span>))
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">decl_type</span>(), <span class="prelude-val">Some</span>(<span class="string">&quot;FLOAT&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;float&quot;</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">is_double</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="self">self</span>.<span class="ident">decl_type</span>(),
-            <span class="prelude-val">Some</span>(<span class="string">&quot;double&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;DOUBLE&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;DOUBLE PRECISION&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;double precision&quot;</span>)
+            <span class="prelude-val">Some</span>(<span class="string">&quot;DOUBLE&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;double&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;DOUBLE PRECISION&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;double precision&quot;</span>)
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">is_integer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_int32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="self">self</span>.<span class="ident">decl_type</span>(),
-            <span class="prelude-val">Some</span>(<span class="string">&quot;INT&quot;</span>)
-                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;int&quot;</span>)
-                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;INTEGER&quot;</span>)
-                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;integer&quot;</span>)
-                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;SERIAL&quot;</span>)
-                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;serial&quot;</span>)
-                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;TINYINT&quot;</span>)
+            <span class="prelude-val">Some</span>(<span class="string">&quot;TINYINT&quot;</span>)
                 <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;tinyint&quot;</span>)
                 <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;SMALLINT&quot;</span>)
                 <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;smallint&quot;</span>)
                 <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;MEDIUMINT&quot;</span>)
                 <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;mediumint&quot;</span>)
-                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;BIGINT&quot;</span>)
+                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;INT&quot;</span>)
+                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;int&quot;</span>)
+                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;INTEGER&quot;</span>)
+                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;integer&quot;</span>)
+                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;SERIAL&quot;</span>)
+                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;serial&quot;</span>)
+                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;INT2&quot;</span>)
+                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;int2&quot;</span>)
+        )
+    }
+
+    <span class="kw">fn</span> <span class="ident">is_int64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(
+            <span class="self">self</span>.<span class="ident">decl_type</span>(),
+            <span class="prelude-val">Some</span>(<span class="string">&quot;BIGINT&quot;</span>)
                 <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;bigint&quot;</span>)
                 <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;UNSIGNED BIG INT&quot;</span>)
                 <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;unsigned big int&quot;</span>)
-                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;INT2&quot;</span>)
-                <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;int2&quot;</span>)
                 <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;INT8&quot;</span>)
                 <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;int8&quot;</span>)
         )
@@ -364,8 +375,8 @@
 
     <span class="kw">fn</span> <span class="ident">is_text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">decl_type</span>() {
-            <span class="prelude-val">Some</span>(<span class="string">&quot;TEXT&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;CLOB&quot;</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="string">&quot;text&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;clob&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;TEXT&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;text&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;CLOB&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;clob&quot;</span>) =&gt; <span class="bool-val">true</span>,
             <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;CHARACTER&quot;</span>) =&gt; <span class="bool-val">true</span>,
             <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;character&quot;</span>) =&gt; <span class="bool-val">true</span>,
             <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;VARCHAR&quot;</span>) =&gt; <span class="bool-val">true</span>,
@@ -408,7 +419,7 @@
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">column</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">columns</span>().<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
             <span class="kw">let</span> <span class="ident">pv</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_ref_unwrap</span>(<span class="ident">i</span>) {
                 <span class="ident">ValueRef::Null</span> =&gt; <span class="kw">match</span> <span class="ident">column</span> {
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_integer</span>() <span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_null</span>() =&gt; <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_int32</span>() <span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_int64</span>() <span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_null</span>() =&gt; <span class="ident">Value::Int64</span>(<span class="prelude-val">None</span>),
                     <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_text</span>() =&gt; <span class="ident">Value::Text</span>(<span class="prelude-val">None</span>),
                     <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_bytes</span>() =&gt; <span class="ident">Value::Bytes</span>(<span class="prelude-val">None</span>),
                     <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_float</span>() =&gt; <span class="ident">Value::Float</span>(<span class="prelude-val">None</span>),
@@ -427,7 +438,7 @@
 
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>());
                         }
-                        <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Int64</span>(<span class="prelude-val">None</span>),
                     },
                 },
                 <span class="ident">ValueRef::Integer</span>(<span class="ident">i</span>) =&gt; <span class="kw">match</span> <span class="ident">column</span> {
@@ -448,7 +459,7 @@
                         <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">chrono::Utc</span>.<span class="ident">timestamp_millis</span>(<span class="ident">i</span>);
                         <span class="ident">Value::datetime</span>(<span class="ident">dt</span>)
                     }
-                    <span class="kw">_</span> =&gt; <span class="ident">Value::integer</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="ident">Value::int64</span>(<span class="ident">i</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
                 <span class="ident">ValueRef::Real</span>(<span class="ident">f</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">is_real</span>() =&gt; {
@@ -506,7 +517,8 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span>, <span class="ident">RusqlError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Value::Integer</span>(<span class="ident">integer</span>) =&gt; <span class="ident">integer</span>.<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
+            <span class="ident">Value::Int32</span>(<span class="ident">integer</span>) =&gt; <span class="ident">integer</span>.<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
+            <span class="ident">Value::Int64</span>(<span class="ident">integer</span>) =&gt; <span class="ident">integer</span>.<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
             <span class="ident">Value::Float</span>(<span class="ident">float</span>) =&gt; <span class="ident">float</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span> <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
             <span class="ident">Value::Double</span>(<span class="ident">double</span>) =&gt; <span class="ident">double</span>.<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
             <span class="ident">Value::Text</span>(<span class="ident">cow</span>) =&gt; <span class="ident">cow</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">cow</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">cow</span>.<span class="ident">as_ref</span>())),

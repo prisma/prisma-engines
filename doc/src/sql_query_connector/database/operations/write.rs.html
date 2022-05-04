@@ -403,9 +403,16 @@
 <span id="398">398</span>
 <span id="399">399</span>
 <span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_trace::SqlTraceComment</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::SqlError</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_builder::write</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">QueryExt</span>};
 <span class="kw">use</span> <span class="ident">connector_interface</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
@@ -797,9 +804,14 @@
 
 <span class="doccomment">/// Execute a plain SQL query with the given parameters, returning the answer as</span>
 <span class="doccomment">/// a JSON `Value`.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">inputs</span>))]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>, <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">raw_json</span>(<span class="ident">inputs</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">sql_info</span>, <span class="ident">features</span>, <span class="ident">inputs</span>))]</span>
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(
+    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
+    <span class="ident">sql_info</span>: <span class="ident">SqlInfo</span>,
+    <span class="ident">features</span>: <span class="kw-2">&amp;</span>[<span class="ident">PreviewFeature</span>],
+    <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">raw_json</span>(<span class="ident">sql_info</span>, <span class="ident">features</span>, <span class="ident">inputs</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
 }

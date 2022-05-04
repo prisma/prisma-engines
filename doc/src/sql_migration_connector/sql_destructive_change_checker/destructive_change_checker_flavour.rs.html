@@ -134,7 +134,7 @@
             ))
         })<span class="question-mark">?</span>
         .<span class="ident">at</span>(<span class="number">0</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">as_i64</span>())
+        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">as_integer</span>())
         .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="ident">ConnectorError::from_msg</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;No count was returned when checking for existing rows in the `{}` table.&quot;</span>,
@@ -148,7 +148,7 @@
         .<span class="ident">first</span>()
         .<span class="ident">as_ref</span>()
         .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">at</span>(<span class="number">0</span>))
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">count</span><span class="op">|</span> <span class="ident">count</span>.<span class="ident">as_i64</span>())
+        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">count</span><span class="op">|</span> <span class="ident">count</span>.<span class="ident">as_integer</span>())
         .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;Unexpected result set shape when checking dropped columns.&quot;</span>.<span class="ident">into</span>()))
 }
 </code></pre></div>

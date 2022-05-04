@@ -122,7 +122,7 @@
 
     <span class="kw">fn</span> <span class="ident">get_expect_i64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">i64</span> {
         <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">name</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_i64</span>())
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_integer</span>())
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Getting {} from Resultrow {:?} as i64 failed&quot;</span>, <span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="self">self</span>))
             .<span class="ident">unwrap</span>()
     }
@@ -166,11 +166,11 @@
     }
 
     <span class="kw">fn</span> <span class="ident">get_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">name</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_i64</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u32</span>))
+        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">name</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_integer</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u32</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">get_i64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">name</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_i64</span>())
+        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">name</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_integer</span>())
     }
 }
 </code></pre></div>

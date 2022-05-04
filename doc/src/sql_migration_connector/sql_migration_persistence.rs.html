@@ -182,6 +182,8 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlMigrationConnector</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
     <span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">MigrationPersistence</span>, <span class="ident">MigrationRecord</span>, <span class="ident">PersistenceNotInitializedError</span>,
@@ -347,11 +349,13 @@
                     <span class="ident">started_at</span>: <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;started_at&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_datetime</span>()).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                         <span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;Failed to extract `started_at` from `_prisma_migrations` row.&quot;</span>.<span class="ident">into</span>())
                     })<span class="question-mark">?</span>,
-                    <span class="ident">applied_steps_count</span>: <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;applied_steps_count&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_i64</span>()).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                        <span class="ident">ConnectorError::from_msg</span>(
-                            <span class="string">&quot;Failed to extract `applied_steps_count` from `_prisma_migrations` row.&quot;</span>.<span class="ident">into</span>(),
-                        )
-                    })<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">u32</span>,
+                    <span class="ident">applied_steps_count</span>: <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;applied_steps_count&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_integer</span>()).<span class="ident">ok_or_else</span>(
+                        <span class="op">|</span><span class="op">|</span> {
+                            <span class="ident">ConnectorError::from_msg</span>(
+                                <span class="string">&quot;Failed to extract `applied_steps_count` from `_prisma_migrations` row.&quot;</span>.<span class="ident">into</span>(),
+                            )
+                        },
+                    )<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">u32</span>,
                 })
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;

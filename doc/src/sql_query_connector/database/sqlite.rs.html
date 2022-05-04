@@ -87,6 +87,20 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::connection::SqlConnection</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">FromSource</span>, <span class="ident">SqlError</span>};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
@@ -95,13 +109,14 @@
     <span class="ident">error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>},
     <span class="ident">Connection</span>, <span class="ident">Connector</span>,
 };
-<span class="kw">use</span> <span class="ident">datamodel::Datasource</span>;
+<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">Datasource</span>};
 <span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">connector::SqliteParams</span>, <span class="ident">error::ErrorKind</span> <span class="kw">as</span> <span class="ident">QuaintKind</span>, <span class="ident">pooled::Quaint</span>, <span class="ident">prelude::ConnectionInfo</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">time::Duration</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Sqlite</span> {
     <span class="ident">pool</span>: <span class="ident">Quaint</span>,
     <span class="ident">file_path</span>: <span class="ident">String</span>,
+    <span class="ident">features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Sqlite</span> {
@@ -112,11 +127,20 @@
     <span class="kw">fn</span> <span class="ident">connection_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ConnectionInfo</span> {
         <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">connection_info</span>()
     }
+
+    <span class="doccomment">/// Get SQLite&#39;s preview features.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">PreviewFeature</span>] {
+        <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">as_ref</span>()
+    }
 }
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">FromSource</span> <span class="kw">for</span> <span class="ident">Sqlite</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_source</span>(<span class="ident">_source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Sqlite</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_source</span>(
+        <span class="ident">_source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>,
+        <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">features</span>: <span class="kw-2">&amp;</span>[<span class="ident">PreviewFeature</span>],
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Sqlite</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">database_str</span> <span class="op">=</span> <span class="ident">url</span>;
 
         <span class="kw">let</span> <span class="ident">connection_info</span> <span class="op">=</span> <span class="ident">ConnectionInfo::from_url</span>(<span class="ident">database_str</span>)
@@ -142,7 +166,11 @@
 
         <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Sqlite</span> { <span class="ident">pool</span>, <span class="ident">file_path</span> })
+        <span class="prelude-val">Ok</span>(<span class="ident">Sqlite</span> {
+            <span class="ident">pool</span>,
+            <span class="ident">file_path</span>,
+            <span class="ident">features</span>: <span class="ident">features</span>.<span class="ident">to_owned</span>(),
+        })
     }
 }
 
@@ -160,7 +188,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_connection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Connection</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident"><span class="kw">super</span>::catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>().<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">check_out</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">SqlError::from</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">SqlConnection::new</span>(<span class="ident">conn</span>, <span class="self">self</span>.<span class="ident">connection_info</span>());
+            <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">SqlConnection::new</span>(<span class="ident">conn</span>, <span class="self">self</span>.<span class="ident">connection_info</span>(), <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">clone</span>());
 
             <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">conn</span>) <span class="kw">as</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Connection</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>)
         })

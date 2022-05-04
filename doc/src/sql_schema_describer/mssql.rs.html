@@ -1056,7 +1056,7 @@
 
         <span class="kw">let</span> <span class="ident">size</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="ident">rows</span>
             .<span class="ident">into_single</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;size&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_i64</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;size&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_integer</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>))
             .<span class="ident">unwrap_or</span>(<span class="number">0</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">size</span>

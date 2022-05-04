@@ -163,6 +163,7 @@
 <span id="158">158</span>
 <span id="159">159</span>
 <span id="160">160</span>
+<span id="161">161</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
 
 <span class="doccomment">/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.</span>
@@ -251,9 +252,10 @@
     <span class="ident">MongoDbQueryRaw</span>,
     <span class="ident">FullTextSearchWithoutIndex</span>,
     <span class="ident">FullTextSearchWithIndex</span>,
-    <span class="ident">AdvancedJsonNullability</span>, <span class="comment">// Database distinguishes between their null type and JSON null.</span>
-    <span class="ident">UndefinedType</span>,           <span class="comment">// Database distinguishes `null` and `undefined`</span>
-    <span class="ident">DecimalType</span>,             <span class="comment">// Connector supports Prisma Decimal type.</span>
+    <span class="ident">AdvancedJsonNullability</span>,    <span class="comment">// Connector distinguishes between their null type and JSON null.</span>
+    <span class="ident">UndefinedType</span>,              <span class="comment">// Connector distinguishes `null` and `undefined`</span>
+    <span class="ident">DecimalType</span>,                <span class="comment">// Connector supports Prisma Decimal type.</span>
+    <span class="ident">BackwardCompatibleQueryRaw</span> <span class="comment">// Temporary SQLite specific capability. Should be removed once https://github.com/prisma/prisma/issues/12784 is fixed</span>
 );
 
 <span class="doccomment">/// Contains all capabilities that the connector is able to serve.</span>

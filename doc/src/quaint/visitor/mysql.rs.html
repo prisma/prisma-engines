@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/466e900/src/visitor/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/c7dc33f/src/visitor/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -830,9 +830,6 @@
 <span id="825">825</span>
 <span id="826">826</span>
 <span id="827">827</span>
-<span id="828">828</span>
-<span id="829">829</span>
-<span id="830">830</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::<span class="kw-2">*</span>,
     <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>},
@@ -947,7 +944,8 @@
 
     <span class="kw">fn</span> <span class="ident">visit_raw_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">Value::Integer</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">i</span>)),
+            <span class="ident">Value::Int32</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">i</span>)),
+            <span class="ident">Value::Int64</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">i</span>)),
             <span class="ident">Value::Float</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
                 <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_nan</span>() =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
                 <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">==</span> <span class="ident">f32::INFINITY</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
@@ -1091,7 +1089,8 @@
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; OFFSET &quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">visit_parameterized</span>(<span class="ident">offset</span>)
             }
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">Value::Integer</span>(<span class="prelude-val">Some</span>(<span class="ident">offset</span>)))) <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(()),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">Value::Int32</span>(<span class="prelude-val">Some</span>(<span class="ident">offset</span>)))) <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(()),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">Value::Int64</span>(<span class="prelude-val">Some</span>(<span class="ident">offset</span>)))) <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(()),
             (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) =&gt; {
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; LIMIT &quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">visit_parameterized</span>(<span class="ident">Value::from</span>(<span class="number">9_223_372_036_854_775_807i64</span>))<span class="question-mark">?</span>;
@@ -1398,7 +1397,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_limit_and_offset_when_both_are_set</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">expected_values</span>(<span class="string">&quot;SELECT `users`.* FROM `users` LIMIT ? OFFSET ?&quot;</span>, <span class="macro">vec!</span>[<span class="number">10</span>, <span class="number">2</span>]);
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">expected_values</span>(<span class="string">&quot;SELECT `users`.* FROM `users` LIMIT ? OFFSET ?&quot;</span>, <span class="macro">vec!</span>[<span class="number">10_i64</span>, <span class="number">2_i64</span>]);
         <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;users&quot;</span>).<span class="ident">limit</span>(<span class="number">10</span>).<span class="ident">offset</span>(<span class="number">2</span>);
         <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">Mysql::build</span>(<span class="ident">query</span>).<span class="ident">unwrap</span>();
 
@@ -1422,7 +1421,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_limit_and_offset_when_only_limit_is_set</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">expected_values</span>(<span class="string">&quot;SELECT `users`.* FROM `users` LIMIT ?&quot;</span>, <span class="macro">vec!</span>[<span class="number">10</span>]);
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">expected_values</span>(<span class="string">&quot;SELECT `users`.* FROM `users` LIMIT ?&quot;</span>, <span class="macro">vec!</span>[<span class="number">10_i64</span>]);
         <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;users&quot;</span>).<span class="ident">limit</span>(<span class="number">10</span>);
         <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">Mysql::build</span>(<span class="ident">query</span>).<span class="ident">unwrap</span>();
 
@@ -1442,12 +1441,7 @@
 
         <span class="macro">assert_eq!</span>(<span class="ident">expected_sql</span>, <span class="ident">sql</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="macro">vec!</span>[
-                <span class="ident">Value::integer</span>(<span class="number">1</span>),
-                <span class="ident">Value::integer</span>(<span class="number">2</span>),
-                <span class="ident">Value::integer</span>(<span class="number">3</span>),
-                <span class="ident">Value::integer</span>(<span class="number">4</span>),
-            ],
+            <span class="macro">vec!</span>[<span class="ident">Value::int32</span>(<span class="number">1</span>), <span class="ident">Value::int32</span>(<span class="number">2</span>), <span class="ident">Value::int32</span>(<span class="number">3</span>), <span class="ident">Value::int32</span>(<span class="number">4</span>),],
             <span class="ident">params</span>
         );
     }

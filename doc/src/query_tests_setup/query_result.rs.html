@@ -84,6 +84,10 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">request_handlers</span>::{<span class="ident">GQLError</span>, <span class="ident">PrismaResponse</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryResult</span> {
@@ -151,6 +155,10 @@
             <span class="ident">PrismaResponse::Single</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">errors</span>().<span class="ident">collect</span>(),
             <span class="ident">PrismaResponse::Multi</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) =&gt; <span class="ident">m</span>.<span class="ident">errors</span>().<span class="ident">collect</span>(),
         }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string_pretty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
+        <span class="ident">serde_json::to_string_pretty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">response</span>).<span class="ident">unwrap</span>()
     }
 }
 
