@@ -7,6 +7,7 @@ use metrics_util::{
 };
 use parking_lot::RwLock;
 use std::collections::HashMap;
+use std::fmt;
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
 
@@ -30,20 +31,30 @@ use formatters::{metrics_to_json, Metric, MetricValue, Snapshot};
 
 // At the moment the histogram is only used for timings. So the bounds are hard coded here
 // The buckets are for ms
-const HISTOGRAM_BOUNDS: [f64; 9] = [10.0, 20.0, 50.0, 100.0, 200.0, 500.0, 1000.0, 2000.0, 5000.0];
+const HISTOGRAM_BOUNDS: [f64; 13] = [
+    0.0, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 100.0, 200.0, 500.0, 1000.0, 2000.0, 5000.0,
+];
+// We need a list of acceptable metrics we want to expose, we don't want to accidentally expose metrics
+// that a different library have or unintended information
+const ACCEPT_LIST: &'static [&'static str] = &[
+    "pool.active_connections",
+    "pool.idle_connections",
+    "pool.wait_count",
+    "pool.wait_duration",
+];
 
 struct Inner {
     descriptions: RwLock<HashMap<String, String>>,
     register: Registry<Key, GenerationalAtomicStorage>,
-    pub global_labels: IndexMap<String, String>,
+    accept_list: Vec<&'static str>,
 }
 
 impl Inner {
-    fn new() -> Self {
+    fn new(accept_list: Vec<&'static str>) -> Self {
         Self {
             descriptions: RwLock::new(HashMap::new()),
             register: Registry::new(GenerationalStorage::atomic()),
-            global_labels: IndexMap::default(),
+            accept_list,
         }
     }
 }
@@ -82,22 +93,29 @@ impl From<KeyLabels> for Key {
 }
 
 #[derive(Clone)]
-struct MetricRegistry {
+pub struct MetricRegistry {
     inner: Arc<Inner>,
+}
+
+impl fmt::Debug for MetricRegistry {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Metric Registry")
+    }
 }
 
 impl MetricRegistry {
     pub fn new() -> Self {
+        Self::new_with_accept_list(ACCEPT_LIST.to_vec())
+    }
+
+    // for internal and testing usage only
+    fn new_with_accept_list(accept_list: Vec<&'static str>) -> Self {
         MetricRegistry {
-            inner: Arc::new(Inner::new()),
+            inner: Arc::new(Inner::new(accept_list)),
         }
     }
 
-    // pub fn add_global_label(&mut self, key: String, value: String) {
-    //     self.inner.global_labels.insert(key, value);
-    // }
-
-    pub fn record(&self, metric: &MetricVisitor) {
+    fn record(&self, metric: &MetricVisitor) {
         match metric.metric_type {
             MetricType::Counter => self.handle_counter(metric),
             MetricType::Gauge => self.handle_gauge(metric),
@@ -137,7 +155,7 @@ impl MetricRegistry {
             });
     }
 
-    pub fn handle_histogram(&self, metric: &MetricVisitor) {
+    fn handle_histogram(&self, metric: &MetricVisitor) {
         self.inner
             .register
             .get_or_create_histogram(&metric.name, |c| match metric.action {
@@ -235,6 +253,15 @@ impl MetricRegistry {
         let metrics = self.get_snapshot();
         metrics_to_json(metrics)
     }
+
+    fn is_accepted_metric(&self, visitor: &MetricVisitor) -> bool {
+        let name = visitor.name.name();
+        if self.inner.accept_list.contains(&name) {
+            return true;
+        }
+
+        false
+    }
 }
 
 #[derive(Debug)]
@@ -287,7 +314,6 @@ impl Visit for MetricVisitor {
     }
 
     fn record_i64(&mut self, field: &Field, value: i64) {
-        println!("record i64 {} {}", field, value);
         match field.name() {
             "increment" => self.action = MetricAction::Increment(value as u64),
             "absolute" => self.action = MetricAction::Absolute(value as u64),
@@ -323,15 +349,17 @@ impl Visit for MetricVisitor {
 // A tracing layer for receiving metric trace events and storing them in the registry.
 impl<S: Subscriber> Layer<S> for MetricRegistry {
     fn on_event(&self, event: &tracing::Event<'_>, _ctx: tracing_subscriber::layer::Context<'_, S>) {
-        println!("event {:?}", event);
-
         if event.metadata().target() != METRIC_TARGET {
             return;
         }
+        println!("event {:?}", event);
 
         let mut visitor = MetricVisitor::new();
         event.record(&mut visitor);
-        self.record(&visitor);
+
+        if self.is_accepted_metric(&visitor) {
+            self.record(&visitor);
+        }
     }
 }
 
@@ -474,13 +502,26 @@ mod tests {
         Runtime::new().unwrap()
     });
 
+    const TESTING_ACCEPT_LIST: &'static [&'static str] = &[
+        "test_counter",
+        "another_counter",
+        "test_gauge",
+        "another_gauge",
+        "test_histogram",
+        "counter_1",
+        "counter_2",
+        "gauge_1",
+        "gauge_2",
+        "histogram_1",
+        "histogram_2",
+    ];
+
     #[test]
     fn test_counters() {
         RT.block_on(async {
-            let metrics = MetricRegistry::new();
+            let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
             let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
             async {
-                // describe_counter!("bytes_sent", Unit::Bytes, "total number of bytes sent");
                 let counter1 = register_counter!("test_counter");
                 counter1.increment(1);
                 increment_counter!("test_counter");
@@ -506,7 +547,7 @@ mod tests {
     #[test]
     fn test_gauges() {
         RT.block_on(async {
-            let metrics = MetricRegistry::new();
+            let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
             let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
             async {
                 let gauge1 = register_gauge!("test_gauge");
@@ -539,7 +580,7 @@ mod tests {
     #[test]
     fn test_no_panic_and_ignore_other_traces() {
         RT.block_on(async {
-            let metrics = MetricRegistry::new();
+            let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
             let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
             async {
                 trace!("a fake trace");
@@ -558,9 +599,26 @@ mod tests {
     }
 
     #[test]
+    fn test_ignore_non_accepted_metrics() {
+        RT.block_on(async {
+            let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
+            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
+            async {
+                increment_gauge!("not_accepted", 1.0);
+                increment_gauge!("test_gauge", 1.0);
+
+                assert_eq!(1.0, metrics.gauge_value("test_gauge").unwrap());
+                assert_eq!(None, metrics.gauge_value("not_accepted"));
+            }
+            .with_subscriber(dispatch)
+            .await;
+        });
+    }
+
+    #[test]
     fn test_histograms() {
         RT.block_on(async {
-            let metrics = MetricRegistry::new();
+            let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
             let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
             async {
                 let hist = register_histogram!("test_histogram");
@@ -596,7 +654,7 @@ mod tests {
     #[test]
     fn test_labels() {
         RT.block_on(async {
-            let metrics = MetricRegistry::new();
+            let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
             let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
             async {
                 let hist = register_histogram!("test_histogram", "label" => "one", "two" => "another");
@@ -610,7 +668,7 @@ mod tests {
     #[test]
     fn test_set_and_read_descriptions() {
         RT.block_on(async {
-            let metrics = MetricRegistry::new();
+            let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
             let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
             async {
                 describe_counter!("test_counter", "This is a counter");
@@ -619,6 +677,19 @@ mod tests {
                 let description = descriptions.get("test_counter").unwrap();
 
                 assert_eq!("This is a counter", description);
+
+                describe_gauge!("test_gauge", "This is a gauge");
+
+                let descriptions = metrics.get_descriptions();
+                let description = descriptions.get("test_gauge").unwrap();
+
+                assert_eq!("This is a gauge", description);
+
+                describe_histogram!("test_histogram", "This is a hist");
+
+                let descriptions = metrics.get_descriptions();
+                let description = descriptions.get("test_histogram").unwrap();
+                assert_eq!("This is a hist", description);
             }
             .with_subscriber(dispatch)
             .await;
@@ -628,7 +699,7 @@ mod tests {
     #[test]
     fn test_to_json() {
         RT.block_on(async {
-            let metrics = MetricRegistry::new();
+            let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
             let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
             async {
                 let empty = json!({
@@ -654,8 +725,6 @@ mod tests {
                 histogram!("histogram_2", 1000.0);
 
                 let json = metrics.to_json();
-                println!("J {}", json);
-
                 let expected = json!({
                     "counters": [{
                         "key": "counter_1",
@@ -692,36 +761,10 @@ mod tests {
                     }]
                 });
 
-                println!("E {}", expected);
-
-
                 assert_eq!(expected, json);
             }
             .with_subscriber(dispatch)
             .await;
         });
     }
-
-    // fn assert_obj_equal(expected: Value, json: Value) {
-    //     for (_, metrics) in expected.as_object().unwrap().iter() {
-    //         for metric_json in metrics.as_array().unwrap() {
-    //             let metric = metric_json.as_object().unwrap();
-    //             let key = metric.get("key").unwrap().as_str().unwrap();
-    //         }
-    //     }
-    // }
-
-    // fn get_metric(key: &str, json: Value) -> Value {
-    //     for (_, metrics) in expected.as_object().unwrap().iter() {
-    //         for metric_json in metrics.as_array().unwrap() {
-    //             let metric = metric_json.as_object().unwrap();
-    //             let found_key = metric.get("key").unwrap().as_str().unwrap();
-    //             if found_key == key {
-    //                 return found_key;
-    //             }
-    //         }
-    //     }
-
-    //     panic!(format!("count not find key {} in results", key));
-    // }
 }

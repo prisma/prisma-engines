@@ -4,8 +4,9 @@ use opentelemetry::{
     KeyValue,
 };
 use opentelemetry_otlp::WithExportConfig;
-use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
-use tracing_subscriber::{layer::SubscriberExt, registry::LookupSpan, EnvFilter, FmtSubscriber};
+use query_core::MetricRegistry;
+use tracing::{dispatcher::SetGlobalDefaultError, instrument::WithSubscriber, subscriber};
+use tracing_subscriber::{layer::SubscriberExt, registry::LookupSpan, EnvFilter, FmtSubscriber, Layer};
 
 use crate::LogFormat;
 
@@ -19,6 +20,7 @@ pub struct Logger<'a> {
     enable_telemetry: bool,
     log_queries: bool,
     telemetry_endpoint: Option<&'a str>,
+    metrics: Option<MetricRegistry>,
 }
 
 impl<'a> Logger<'a> {
@@ -30,6 +32,7 @@ impl<'a> Logger<'a> {
             enable_telemetry: false,
             log_queries: false,
             telemetry_endpoint: None,
+            metrics: None,
         }
     }
 
@@ -53,10 +56,22 @@ impl<'a> Logger<'a> {
         self.telemetry_endpoint = Some(endpoint);
     }
 
+    pub fn enable_metrics(&mut self, metrics: MetricRegistry) {
+        self.metrics = Some(metrics);
+    }
+
     /// Install logger as a global. Can be called only once per application
     /// instance. The returned guard value needs to stay in scope for the whole
     /// lifetime of the service.
     pub fn install(self) -> LoggerResult<()> {
+        // let base = tracing_subscriber::registry();
+
+        // // let base_with_metrics = if let Some(metrics) = self.metrics {
+        //     base.with(metrics)
+        // } else {
+        //     base
+        // };
+
         let mut filter = EnvFilter::from_default_env()
             .add_directive("tide=error".parse().unwrap())
             .add_directive("tonic=error".parse().unwrap())
@@ -71,14 +86,25 @@ impl<'a> Logger<'a> {
         match self.log_format {
             LogFormat::Text => {
                 if self.enable_telemetry {
+                    // Leaving this the old way since this will be removed with the new tracing work
                     let subscriber = FmtSubscriber::builder()
                         .with_env_filter(filter.add_directive("trace".parse().unwrap()))
                         .finish();
 
                     self.finalize(subscriber)
                 } else {
-                    let subscriber = FmtSubscriber::builder().with_env_filter(filter).finish();
-                    self.finalize(subscriber)
+                    let lay = tracing_subscriber::fmt::layer().with_filter(filter);
+
+                    let subscriber = tracing_subscriber::registry().with(lay);
+
+                    if let Some(metrics) = self.metrics {
+                        subscriber::set_global_default(subscriber.with(metrics))?;
+                        query_core::metrics::set_recorder();
+                    } else {
+                        subscriber::set_global_default(subscriber)?;
+                    };
+
+                    Ok(())
                 }
             }
             LogFormat::Json => {
@@ -118,7 +144,6 @@ impl<'a> Logger<'a> {
             Ok(())
         } else {
             subscriber::set_global_default(subscriber)?;
-
             Ok(())
         }
     }

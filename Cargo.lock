@@ -1993,15 +1993,6 @@ dependencies = [
 
 [[package]]
 name = "metrics"
-version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51b70227ece8711a1aa2f99655efd795d0cff297a5b9fe39645a93aacf6ad39d"
-dependencies = [
- "metrics-core",
-]
-
-[[package]]
-name = "metrics"
 version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2e52eb6380b6d2a10eb3434aec0885374490f5b82c8aaf5cd487a183c98be834"
@@ -2009,12 +2000,6 @@ dependencies = [
  "ahash",
  "metrics-macros",
 ]
-
-[[package]]
-name = "metrics-core"
-version = "0.5.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c064b3a1ff41f4bf6c91185c8a0caeccf8a8a27e9d0f92cc54cf3dbec812f48"
 
 [[package]]
 name = "metrics-exporter-prometheus"
@@ -2025,7 +2010,7 @@ dependencies = [
  "hyper",
  "indexmap",
  "ipnet",
- "metrics 0.18.1",
+ "metrics",
  "metrics-util",
  "parking_lot 0.11.2",
  "quanta",
@@ -2057,7 +2042,7 @@ dependencies = [
  "crossbeam-utils 0.8.6",
  "hashbrown",
  "indexmap",
- "metrics 0.18.1",
+ "metrics",
  "num_cpus",
  "ordered-float",
  "parking_lot 0.11.2",
@@ -2220,7 +2205,7 @@ dependencies = [
  "futures-timer",
  "futures-util",
  "log",
- "metrics 0.18.1",
+ "metrics",
  "thiserror",
  "tokio",
 ]
@@ -3298,7 +3283,7 @@ dependencies = [
  "hex",
  "libsqlite3-sys",
  "lru-cache",
- "metrics 0.12.1",
+ "metrics",
  "mobc",
  "mysql_async",
  "native-tls",
@@ -3372,7 +3357,7 @@ dependencies = [
  "indexmap",
  "itertools",
  "lazy_static",
- "metrics 0.18.1",
+ "metrics",
  "metrics-exporter-prometheus",
  "metrics-util",
  "mongodb-client",

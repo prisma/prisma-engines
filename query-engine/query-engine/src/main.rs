@@ -3,6 +3,7 @@
 #[macro_use]
 extern crate tracing;
 
+use query_core::MetricRegistry;
 use query_engine::cli::CliCommand;
 use query_engine::error::PrismaError;
 use query_engine::logger::Logger;
@@ -25,11 +26,13 @@ async fn main() -> Result<(), AnyError> {
     async fn main() -> Result<(), PrismaError> {
         let opts = PrismaOpt::from_args();
 
+        let metrics = MetricRegistry::new();
         let mut logger = Logger::new("query-engine-http");
         logger.log_format(opts.log_format());
         logger.log_queries(opts.log_queries());
         logger.enable_telemetry(opts.open_telemetry);
         logger.telemetry_endpoint(&opts.open_telemetry_endpoint);
+        logger.enable_metrics(metrics.clone());
 
         logger.install().unwrap();
 
@@ -37,7 +40,7 @@ async fn main() -> Result<(), AnyError> {
             Some(cmd) => cmd.execute().await?,
             None => {
                 set_panic_hook(opts.log_format());
-                server::listen(opts).await?;
+                server::listen(opts, metrics).await?;
             }
         }
 
