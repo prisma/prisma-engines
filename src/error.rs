@@ -248,6 +248,9 @@ pub enum ErrorKind {
 
     #[error("Cannot find a FULLTEXT index to use for the search")]
     MissingFullTextSearchIndex,
+
+    #[error("Column type '{}' could not be deserialized from the database.", column_type)]
+    UnsupportedColumnType { column_type: String },
 }
 
 impl ErrorKind {

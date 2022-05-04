@@ -368,3 +368,41 @@ async fn uuid_length_error(api: &mut dyn TestApi) -> crate::Result<()> {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgresql"))]
+async fn unsupported_column_type(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("point point, points point[]").await?;
+    api.conn()
+        .query_raw(
+            &format!(
+                r#"INSERT INTO {} ("point", "points") VALUES (Point(1,2), '{{"(1, 2)", "(2, 3)"}}')"#,
+                &table
+            ),
+            &[],
+        )
+        .await?;
+
+    // Scalar
+    let result = api
+        .conn()
+        .query(Select::from_table(&table).column("point").into())
+        .await;
+    let err = result.unwrap_err();
+    assert!(matches!(
+        err.kind(),
+        ErrorKind::UnsupportedColumnType { column_type } if column_type.as_str() == "point"
+    ));
+
+    // Scalar list
+    let result = api
+        .conn()
+        .query(Select::from_table(&table).column("points").into())
+        .await;
+    let err = result.unwrap_err();
+    assert!(matches!(
+        err.kind(),
+        ErrorKind::UnsupportedColumnType { column_type } if column_type.as_str() == "_point"
+    ));
+
+    Ok(())
+}

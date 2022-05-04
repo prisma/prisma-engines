@@ -14,7 +14,7 @@ use bytes::BytesMut;
 use chrono::{DateTime, NaiveDateTime, Utc};
 #[cfg(feature = "bigdecimal")]
 pub(crate) use decimal::DecimalWrapper;
-use postgres_types::{FromSql, ToSql};
+use postgres_types::{FromSql, ToSql, WrongType};
 use std::error::Error as StdError;
 use tokio_postgres::{
     types::{self, IsNull, Kind, Type as PostgresType},
@@ -437,6 +437,7 @@ impl GetRow for PostgresRow {
                     Kind::Enum(_) => match row.try_get(i)? {
                         Some(val) => {
                             let val: EnumString = val;
+
                             Value::enum_variant(val.value)
                         }
                         None => Value::Enum(None),
@@ -446,26 +447,51 @@ impl GetRow for PostgresRow {
                             Some(val) => {
                                 let val: Vec<EnumString> = val;
                                 let variants = val.into_iter().map(|x| Value::enum_variant(x.value));
-                                Value::array(variants)
+
+                                Ok(Value::array(variants))
                             }
-                            None => Value::Array(None),
+                            None => Ok(Value::Array(None)),
                         },
-                        _ => match row.try_get(i)? {
-                            Some(val) => {
+                        _ => match row.try_get(i) {
+                            Ok(Some(val)) => {
                                 let val: Vec<String> = val;
                                 let strings = val.into_iter().map(Value::text);
-                                Value::array(strings)
+
+                                Ok(Value::array(strings))
                             }
-                            None => Value::Array(None),
+                            Ok(None) => Ok(Value::Array(None)),
+                            Err(err) => {
+                                if err.source().map(|err| err.is::<WrongType>()).unwrap_or(false) {
+                                    let kind = ErrorKind::UnsupportedColumnType {
+                                        column_type: x.to_string(),
+                                    };
+
+                                    return Err(Error::builder(kind).build());
+                                } else {
+                                    Err(err)
+                                }
+                            }
                         },
-                    },
-                    _ => match row.try_get(i)? {
-                        Some(val) => {
+                    }?,
+                    _ => match row.try_get(i) {
+                        Ok(Some(val)) => {
                             let val: String = val;
-                            Value::text(val)
+
+                            Ok(Value::text(val))
                         }
-                        None => Value::Text(None),
-                    },
+                        Ok(None) => Ok(Value::Text(None)),
+                        Err(err) => {
+                            if err.source().map(|err| err.is::<WrongType>()).unwrap_or(false) {
+                                let kind = ErrorKind::UnsupportedColumnType {
+                                    column_type: x.to_string(),
+                                };
+
+                                return Err(Error::builder(kind).build());
+                            } else {
+                                Err(err)
+                            }
+                        }
+                    }?,
                 },
             };
 
