@@ -1,6 +1,8 @@
+mod validations;
+
 use datamodel_connector::{
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    parser_database::{self, ast, ValueValidator},
+    parser_database::{self, ast, walkers::ModelWalker, IndexAlgorithm, ValueValidator},
     Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
     NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
 };
@@ -214,7 +216,11 @@ impl Connector for CockroachDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _diagnostics: &mut Diagnostics) {}
+    fn validate_model(&self, model: ModelWalker<'_>, diagnostics: &mut Diagnostics) {
+        for index in model.indexes() {
+            validations::inverted_index_validations(index, diagnostics);
+        }
+    }
 
     fn validate_scalar_field_unknown_default_functions(
         &self,
@@ -238,6 +244,10 @@ impl Connector for CockroachDatamodelConnector {
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
         NATIVE_TYPE_CONSTRUCTORS
+    }
+
+    fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
+        BitFlags::empty() | IndexAlgorithm::BTree | IndexAlgorithm::Gin
     }
 
     fn parse_native_type(

@@ -1882,3 +1882,50 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres12), preview_features("extendedIndexes"))]
+async fn re_introspecting_custom_index_order(api: &TestApi) -> TestResult {
+    let schema_name = api.schema_name();
+    let create_table =
+        format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, a jsonb not null, b jsonb not null, c jsonb not null)",);
+    let create_idx_a = format!("CREATE INDEX \"aaaaaa\" ON \"{schema_name}\".\"A\" USING GIN (b);",);
+    let create_idx_b = format!("CREATE INDEX \"bbbbbb\" ON \"{schema_name}\".\"A\" USING GIN (a);",);
+    let create_idx_c = format!("CREATE INDEX \"cccccc\" ON \"{schema_name}\".\"A\" USING GIN (c);",);
+
+    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_idx_a).await?;
+    api.database().raw_cmd(&create_idx_b).await?;
+    api.database().raw_cmd(&create_idx_c).await?;
+
+    let dm = indoc! {r#"
+         model A {
+           id Int   @id
+           a  Json
+           b  Json
+
+           @@index([a], map: "bbbbbb", type: Gin)
+           @@index([b], map: "aaaaaa", type: Gin)
+         }
+    "#};
+
+    let input_dm = api.dm_with_sources(dm);
+    let input_dm = api.dm_with_generator_and_preview_flags(&input_dm);
+    let re_introspected = api.re_introspect_dml(&input_dm).await?;
+
+    let expected = expect![[r#"
+        model A {
+          id Int  @id @default(autoincrement())
+          a  Json
+          b  Json
+          c  Json
+
+          @@index([a], map: "bbbbbb", type: Gin)
+          @@index([b], map: "aaaaaa", type: Gin)
+          @@index([c], map: "cccccc", type: Gin)
+        }
+    "#]];
+
+    expected.assert_eq(&re_introspected);
+
+    Ok(())
+}

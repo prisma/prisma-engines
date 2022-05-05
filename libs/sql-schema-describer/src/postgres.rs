@@ -1008,16 +1008,23 @@ impl<'a> SqlSchemaDescriber<'a> {
                 ),
             });
 
-            let algorithm = match row.get_expect_string("index_algo").as_str() {
-                "btree" => SqlIndexAlgorithm::BTree,
-                "hash" => SqlIndexAlgorithm::Hash,
-                "gist" => SqlIndexAlgorithm::Gist,
-                "gin" => SqlIndexAlgorithm::Gin,
-                "spgist" => SqlIndexAlgorithm::SpGist,
-                "brin" => SqlIndexAlgorithm::Brin,
-                other => {
-                    tracing::warn!("Unknown index algorithm on {name}: {other}");
-                    SqlIndexAlgorithm::BTree
+            let algorithm = if self.is_cockroach() {
+                match row.get_expect_string("index_algo").as_str() {
+                    "inverted" => SqlIndexAlgorithm::Gin,
+                    _ => SqlIndexAlgorithm::BTree,
+                }
+            } else {
+                match row.get_expect_string("index_algo").as_str() {
+                    "btree" => SqlIndexAlgorithm::BTree,
+                    "hash" => SqlIndexAlgorithm::Hash,
+                    "gist" => SqlIndexAlgorithm::Gist,
+                    "gin" => SqlIndexAlgorithm::Gin,
+                    "spgist" => SqlIndexAlgorithm::SpGist,
+                    "brin" => SqlIndexAlgorithm::Brin,
+                    other => {
+                        tracing::warn!("Unknown index algorithm on {name}: {other}");
+                        SqlIndexAlgorithm::BTree
+                    }
                 }
             };
 
