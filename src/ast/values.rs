@@ -11,6 +11,7 @@ use std::{
     borrow::{Borrow, Cow},
     convert::TryFrom,
     fmt,
+    str::FromStr,
 };
 #[cfg(feature = "uuid")]
 use uuid::Uuid;
@@ -757,6 +758,71 @@ impl<'a> TryFrom<Value<'a>> for DateTime<Utc> {
         value
             .as_datetime()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a datetime")).build())
+    }
+}
+
+impl<'a> TryFrom<&Value<'a>> for Option<std::net::IpAddr> {
+    type Error = Error;
+
+    fn try_from(value: &Value<'a>) -> Result<Option<std::net::IpAddr>, Self::Error> {
+        match value {
+            val @ Value::Text(Some(_)) => {
+                let text = val.as_str().unwrap();
+
+                match std::net::IpAddr::from_str(text) {
+                    Ok(ip) => Ok(Some(ip)),
+                    Err(e) => Err(e.into()),
+                }
+            }
+            val @ Value::Bytes(Some(_)) => {
+                let text = val.as_str().unwrap();
+
+                match std::net::IpAddr::from_str(text) {
+                    Ok(ip) => Ok(Some(ip)),
+                    Err(e) => Err(e.into()),
+                }
+            }
+            v if v.is_null() => Ok(None),
+            v => {
+                let kind =
+                    ErrorKind::conversion(format!("Couldn't convert value of type `{:?}` to std::net::IpAddr.", v));
+
+                Err(Error::builder(kind).build())
+            }
+        }
+    }
+}
+
+#[cfg(feature = "uuid")]
+impl<'a> TryFrom<&Value<'a>> for Option<uuid::Uuid> {
+    type Error = Error;
+
+    fn try_from(value: &Value<'a>) -> Result<Option<uuid::Uuid>, Self::Error> {
+        match value {
+            Value::Uuid(uuid) => Ok(*uuid),
+            val @ Value::Text(Some(_)) => {
+                let text = val.as_str().unwrap();
+
+                match uuid::Uuid::from_str(text) {
+                    Ok(ip) => Ok(Some(ip)),
+                    Err(e) => Err(e.into()),
+                }
+            }
+            val @ Value::Bytes(Some(_)) => {
+                let text = val.as_str().unwrap();
+
+                match uuid::Uuid::from_str(text) {
+                    Ok(ip) => Ok(Some(ip)),
+                    Err(e) => Err(e.into()),
+                }
+            }
+            v if v.is_null() => Ok(None),
+            v => {
+                let kind = ErrorKind::conversion(format!("Couldn't convert value of type `{:?}` to uuid::Uuid.", v));
+
+                Err(Error::builder(kind).build())
+            }
+        }
     }
 }
 

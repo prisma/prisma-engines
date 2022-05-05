@@ -352,3 +352,19 @@ impl From<std::string::FromUtf8Error> for Error {
         Error::builder(ErrorKind::conversion("Couldn't convert data to UTF-8")).build()
     }
 }
+
+impl From<std::net::AddrParseError> for Error {
+    fn from(e: std::net::AddrParseError) -> Self {
+        Error::builder(ErrorKind::conversion(format!(
+            "Couldn't convert data to std::net::IpAddr: {}",
+            e
+        )))
+        .build()
+    }
+}
+
+impl From<uuid::Error> for Error {
+    fn from(e: uuid::Error) -> Self {
+        Error::builder(ErrorKind::UUIDError(format!("{}", e))).build()
+    }
+}

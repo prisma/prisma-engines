@@ -406,3 +406,16 @@ async fn unsupported_column_type(api: &mut dyn TestApi) -> crate::Result<()> {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgresql"))]
+async fn array_into_scalar_should_fail(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("string text").await?;
+    let insert = Insert::single_into(&table).value("string", Value::array(vec!["abc", "def"]));
+    let result = api.conn().insert(insert.into()).await;
+
+    let err = result.unwrap_err();
+
+    assert!(err.to_string().contains("Couldn't serialize value `Some([Text(Some(\"abc\")), Text(Some(\"def\"))])` into a `text`. Value is a list but `text` is not."));
+
+    Ok(())
+}
