@@ -50,11 +50,9 @@ fn binary_dbgenerated_defaults_should_work(api: TestApi) {
 
     let def_val = DefaultValue::db_generated("(uuid_to_bin(uuid()))");
 
-    api.assert_schema()
-        .assert_table("A", |table| {
-            table.assert_column("id", |col| col.assert_default(Some(def_val)))
-        })
-        .into_schema();
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("id", |col| col.assert_default(Some(def_val)))
+    });
 
     api.schema_push_w_datasource(schema).send().assert_no_steps();
 }
