@@ -114,6 +114,14 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 
 <span class="kw">mod</span> <span class="ident">commands</span>;
@@ -212,9 +220,17 @@
     <span class="macro">tracing::info!</span>(<span class="ident">git_hash</span> <span class="op">=</span> <span class="macro">env!</span>(<span class="string">&quot;GIT_HASH&quot;</span>), <span class="string">&quot;Starting migration engine RPC server&quot;</span>,);
 
     <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">datamodel_location</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">location</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">std::fs::File::open</span>(<span class="ident">location</span>).<span class="ident">expect</span>(<span class="string">&quot;error opening datamodel file&quot;</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">std::fs::File::open</span>(<span class="ident">location</span>) {
+            <span class="prelude-val">Ok</span>(<span class="ident">file</span>) =&gt; <span class="ident">file</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Error opening datamodel file in `{location}`: {e}&quot;</span>),
+        };
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="ident">file</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">file</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>) {
+            <span class="macro">panic!</span>(<span class="string">&quot;Error reading datamodel file `{location}`: {e}&quot;</span>);
+        };
+
         <span class="ident">datamodel</span>
     });
 
