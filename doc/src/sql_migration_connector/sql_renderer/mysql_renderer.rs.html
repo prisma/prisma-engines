@@ -563,7 +563,7 @@
                     <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">col</span>.<span class="ident">column_type_family</span>(), <span class="ident">ColumnTypeFamily::Json</span>)
                     <span class="comment">// We do not want to render binary defaults because</span>
                     <span class="comment">// they are not supported by MySQL.</span>
-                    <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">col</span>.<span class="ident">column_type_family</span>(), <span class="ident">ColumnTypeFamily::Binary</span>)
+                    <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">col</span>.<span class="ident">column_type_family</span>(), <span class="ident">ColumnTypeFamily::Binary</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">default</span>.<span class="ident">is_db_generated</span>())
                 })
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="ident">render_default</span>(<span class="ident">col</span>, <span class="ident">default</span>)),
             <span class="ident">auto_increment</span>: <span class="ident">col</span>.<span class="ident">is_autoincrement</span>(),
