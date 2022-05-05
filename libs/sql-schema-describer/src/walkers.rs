@@ -101,6 +101,10 @@ impl<'a> ColumnWalker<'a> {
     pub fn column_type(self) -> &'a ColumnType {
         &self.column().tpe
     }
+    /// The column comment.
+    pub fn comment(&self) -> Option<&'a String> {
+        self.column().comment.as_ref()
+    }
 
     /// The column native type.
     pub fn column_native_type<T>(&self) -> Option<T>

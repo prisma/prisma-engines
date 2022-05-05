@@ -224,12 +224,14 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 name: model_a_column.into(),
                 tpe: column_for_scalar_field(model_a_id, (0, 0), ctx).tpe,
                 default: None,
+                comment: None,
                 auto_increment: false,
             },
             sql::Column {
                 name: model_b_column.into(),
                 tpe: column_for_scalar_field(model_b_id, (0, 0), ctx).tpe,
                 default: None,
+                comment: None,
                 auto_increment: false,
             },
         ];
@@ -282,6 +284,7 @@ fn column_for_model_enum_scalar_field(
         name: field.database_name().to_owned(),
         tpe: ctx.flavour.enum_column_type(field, r#enum.database_name()),
         default,
+        comment: field.comment_value().map(|comment|comment.to_string()),
         auto_increment: false,
     }
 }
@@ -304,6 +307,7 @@ fn column_for_model_unsupported_scalar_field(field: ScalarFieldWalker<'_>, ctx: 
                 None
             }
         }),
+        comment: field.comment_value().map(|comment| comment.to_string()),
         auto_increment: false,
     }
 }
@@ -401,6 +405,7 @@ fn column_for_builtin_scalar_type(
         name: field.database_name().to_owned(),
         tpe,
         default,
+        comment: field.comment_value().map(|c| c.to_string()),
         auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
     }
 }

@@ -136,6 +136,7 @@ pub struct Column<'a> {
     pub column_name: Cow<'a, str>,
     pub not_null: bool,
     pub column_type: Cow<'a, str>,
+    pub comment: Option<Cow<'a, str>>,
     pub default: Option<Cow<'a, str>>,
     pub auto_increment: bool,
     pub primary_key: bool,
@@ -170,6 +171,11 @@ impl Display for Column<'_> {
         if let Some(references) = &self.references {
             f.write_str(" ")?;
             Display::fmt(references, f)?;
+        }
+
+        if let Some(comment) = &self.comment {
+            f.write_str(" COMMENT ")?;
+            f.write_str(comment.as_ref())?;
         }
 
         Ok(())
@@ -404,6 +410,7 @@ mod tests {
                     column_name: "id".into(),
                     not_null: false,
                     default: None,
+                    comment: None,
                     auto_increment: true,
                     primary_key: true,
                     references: None,
@@ -413,6 +420,7 @@ mod tests {
                     column_name: "test".into(),
                     not_null: true,
                     default: Some("(uuid_to_bin(uuid()))".into()),
+                    comment: Some(r#""test comment""#.into()),
                     auto_increment: false,
                     primary_key: false,
                     references: None,
@@ -428,7 +436,7 @@ mod tests {
             r#"
             CREATE TABLE `Cat` (
                 `id` INTEGER NULL AUTO_INCREMENT PRIMARY KEY,
-                `test` BINARY(16) NOT NULL DEFAULT (uuid_to_bin(uuid()))
+                `test` BINARY(16) NOT NULL DEFAULT (uuid_to_bin(uuid())) COMMENT "test comment"
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             "#,
         )

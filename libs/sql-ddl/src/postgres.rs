@@ -74,6 +74,7 @@ pub struct Column<'a> {
     pub name: Cow<'a, str>,
     pub r#type: Cow<'a, str>,
     pub default: Option<Cow<'a, str>>,
+    pub comment: Option<Cow<'a, str>>,
 }
 
 impl Display for Column<'_> {
@@ -85,6 +86,11 @@ impl Display for Column<'_> {
         if let Some(default) = &self.default {
             f.write_str(" DEFAULT ")?;
             f.write_str(default)?;
+        }
+
+        if let Some(comment) = &self.comment {
+            f.write_str(" is ")?;
+            f.write_str(comment)?;
         }
 
         Ok(())

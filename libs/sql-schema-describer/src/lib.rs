@@ -407,6 +407,8 @@ pub struct Column {
     pub name: String,
     /// Column type.
     pub tpe: ColumnType,
+    /// Column comment
+    pub comment: Option<String>,
     /// Column default.
     pub default: Option<DefaultValue>,
     /// Is the column auto-incrementing?
