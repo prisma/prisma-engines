@@ -579,8 +579,11 @@ where
                         let result_set = connection.query_raw("SELECT @@lower_case_table_names", &[]).await?;
 
                         if let Some(1) = result_set.into_single().ok().and_then(|row| {
-                            row.at(0)
-                                .and_then(|row| row.to_string().and_then(|s| s.parse().ok()).or_else(|| row.as_i64()))
+                            row.at(0).and_then(|row| {
+                                row.to_string()
+                                    .and_then(|s| s.parse().ok())
+                                    .or_else(|| row.as_integer())
+                            })
                         }) {
                             // https://dev.mysql.com/doc/refman/8.0/en/identifier-case-sensitivity.html
                             circumstances |= Circumstances::LowerCasesTableNames;

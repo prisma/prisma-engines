@@ -1,9 +1,10 @@
 use crate::{
-    column_metadata, error::*, model_extensions::*, sql_trace::SqlTraceComment, AliasedCondition, ColumnMetadata,
-    SqlRow, ToSqlRow,
+    column_metadata, error::*, model_extensions::*, sql_info::SqlInfo, sql_trace::SqlTraceComment,
+    value_ext::IntoTypedJsonExtension, AliasedCondition, ColumnMetadata, SqlRow, ToSqlRow,
 };
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
+use datamodel::{common::preview_features::PreviewFeature, datamodel_connector::ConnectorCapability};
 use futures::future::FutureExt;
 use itertools::Itertools;
 use opentelemetry::trace::TraceFlags;
@@ -69,9 +70,11 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Execute a singular SQL query in the database, returning an arbitrary
     /// JSON `Value` as a result.
-    #[tracing::instrument(skip(self, inputs))]
+    #[tracing::instrument(skip(self, sql_info, features, inputs))]
     async fn raw_json<'a>(
         &'a self,
+        sql_info: SqlInfo,
+        features: &[PreviewFeature],
         mut inputs: HashMap<String, PrismaValue>,
     ) -> std::result::Result<Value, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
@@ -91,8 +94,11 @@ pub trait QueryExt: Queryable + Send + Sync {
 
             for (idx, p_value) in row.into_iter().enumerate() {
                 let column_name = columns.get(idx).unwrap_or(&format!("f{}", idx)).clone();
+                // TODO: Remove backward_compatible checks for Prisma4
+                let backward_compatible = !features.contains(&PreviewFeature::ImprovedQueryRaw)
+                    || sql_info.has_capability(ConnectorCapability::BackwardCompatibleQueryRaw);
 
-                object.insert(column_name, Value::from(p_value));
+                object.insert(column_name, p_value.as_typed_json(backward_compatible));
             }
 
             result.push(Value::Object(object));

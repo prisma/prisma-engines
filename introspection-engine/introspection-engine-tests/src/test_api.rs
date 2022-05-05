@@ -1,5 +1,7 @@
 pub use super::TestResult;
 pub use expect_test::expect;
+pub use indoc::{formatdoc, indoc};
+pub use quaint::prelude::Queryable;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
@@ -11,10 +13,7 @@ use introspection_connector::{
     IntrospectionResult, Version,
 };
 use migration_connector::{ConnectorParams, MigrationConnector};
-use quaint::{
-    prelude::{Queryable, SqlFamily},
-    single::Quaint,
-};
+use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use std::fmt::Write;
