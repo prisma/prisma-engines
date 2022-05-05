@@ -198,7 +198,7 @@ fn syntax_errors_return_error_position(api: TestApi) {
                         ^
         HINT: try \h CREATE TABLE
 
-        DbError { severity: "ERROR", parsed_severity: None, code: SqlState(E42601), message: "at or near \"is_good_dog\": syntax error", detail: Some("source SQL:\nCREATE TABLE \"Dog\" (\n                id              SERIAL PRIMARY KEY,\n                name            TEXT NOT NULL\n                is_good_dog     BOOLEAN NOT NULL DEFAULT TRUE\n                ^"), hint: Some("try \\h CREATE TABLE"), position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("lexer.go"), line: Some(246), routine: Some("Error") }
+        DbError { severity: "ERROR", parsed_severity: None, code: SqlState(E42601), message: "at or near \"is_good_dog\": syntax error", detail: Some("source SQL:\nCREATE TABLE \"Dog\" (\n                id              SERIAL PRIMARY KEY,\n                name            TEXT NOT NULL\n                is_good_dog     BOOLEAN NOT NULL DEFAULT TRUE\n                ^"), hint: Some("try \\h CREATE TABLE"), position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("lexer.go"), line: Some(251), routine: Some("Error") }
 
            0: sql_migration_connector::apply_migration::apply_script
                    with [3mmigration_name[0m[2m=[0m"  0"
