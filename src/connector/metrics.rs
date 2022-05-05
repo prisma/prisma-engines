@@ -13,7 +13,6 @@ where
 {
     let start = Instant::now();
     let res = f().await;
-    let end = Instant::now();
 
     let result = match res {
         Ok(_) => "success",
@@ -29,7 +28,7 @@ where
         result,
     );
 
-    timing!(format!("{}.query.time", tag), start, end);
+    histogram!(format!("{}.query.time", tag), start.elapsed());
 
     res
 }
@@ -41,7 +40,6 @@ where
 {
     let start = Instant::now();
     let res = f.await;
-    let end = Instant::now();
 
     let result = match res {
         Ok(_) => "success",
@@ -56,7 +54,7 @@ where
         result,
     );
 
-    timing!("pool.check_out", start, end);
+    histogram!("pool.check_out", start.elapsed());
 
     res
 }
