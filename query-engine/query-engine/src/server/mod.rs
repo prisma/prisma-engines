@@ -42,6 +42,10 @@ impl State {
             enable_metrics,
         }
     }
+
+    pub fn get_metrics(&self) -> MetricRegistry {
+        self.cx.metrics.clone()
+    }
 }
 
 impl Clone for State {

@@ -1,23 +1,77 @@
+use query_core::MetricRegistry;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{
+    filter::Filtered,
     fmt::format::{DefaultFields, Format},
     layer::Layered,
     prelude::*,
-    EnvFilter, FmtSubscriber,
+    EnvFilter, FmtSubscriber, Registry,
 };
 
-type Sub = Layered<
-    ErrorLayer<FmtSubscriber<DefaultFields, Format, EnvFilter, PrintWriter>>,
-    FmtSubscriber<DefaultFields, Format, EnvFilter, PrintWriter>,
+// Pretty ugly. I'm not sure how to make this better
+type Sub2 = Layered<
+    ErrorLayer<
+        Layered<
+            MetricRegistry,
+            Layered<
+                Filtered<
+                    tracing_subscriber::fmt::Layer<
+                        Registry,
+                        DefaultFields,
+                        tracing_subscriber::fmt::format::Format,
+                        PrintWriter,
+                    >,
+                    EnvFilter,
+                    Registry,
+                >,
+                Registry,
+            >,
+        >,
+    >,
+    Layered<
+        MetricRegistry,
+        Layered<
+            Filtered<
+                tracing_subscriber::fmt::Layer<
+                    Registry,
+                    DefaultFields,
+                    tracing_subscriber::fmt::format::Format,
+                    PrintWriter,
+                >,
+                EnvFilter,
+                Registry,
+            >,
+            Registry,
+        >,
+    >,
+    Layered<
+        MetricRegistry,
+        Layered<
+            Filtered<
+                tracing_subscriber::fmt::Layer<
+                    Registry,
+                    DefaultFields,
+                    tracing_subscriber::fmt::format::Format,
+                    PrintWriter,
+                >,
+                EnvFilter,
+                Registry,
+            >,
+            Registry,
+        >,
+    >,
 >;
 
-pub fn test_tracing_subscriber(log_config: String) -> Sub {
+pub fn test_tracing_subscriber(log_config: String, metrics: MetricRegistry) -> Sub2 {
     let filter = EnvFilter::new(log_config);
 
-    FmtSubscriber::builder()
-        .with_env_filter(filter)
+    let fmt_layer = tracing_subscriber::fmt::layer()
         .with_writer(PrintWriter)
-        .finish()
+        .with_filter(filter);
+
+    tracing_subscriber::registry()
+        .with(fmt_layer)
+        .with(metrics)
         .with(ErrorLayer::default())
 }
 

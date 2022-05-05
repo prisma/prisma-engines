@@ -64,14 +64,6 @@ impl<'a> Logger<'a> {
     /// instance. The returned guard value needs to stay in scope for the whole
     /// lifetime of the service.
     pub fn install(self) -> LoggerResult<()> {
-        // let base = tracing_subscriber::registry();
-
-        // // let base_with_metrics = if let Some(metrics) = self.metrics {
-        //     base.with(metrics)
-        // } else {
-        //     base
-        // };
-
         let mut filter = EnvFilter::from_default_env()
             .add_directive("tide=error".parse().unwrap())
             .add_directive("tonic=error".parse().unwrap())
@@ -93,9 +85,9 @@ impl<'a> Logger<'a> {
 
                     self.finalize(subscriber)
                 } else {
-                    let lay = tracing_subscriber::fmt::layer().with_filter(filter);
+                    let fmt_layer = tracing_subscriber::fmt::layer().with_filter(filter);
 
-                    let subscriber = tracing_subscriber::registry().with(lay).with(self.metrics);
+                    let subscriber = tracing_subscriber::registry().with(fmt_layer).with(self.metrics);
                     subscriber::set_global_default(subscriber)?;
 
                     Ok(())
