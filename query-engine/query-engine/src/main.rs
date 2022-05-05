@@ -3,7 +3,7 @@
 #[macro_use]
 extern crate tracing;
 
-use query_core::MetricRegistry;
+use query_core::{metrics, MetricRegistry};
 use query_engine::cli::CliCommand;
 use query_engine::error::PrismaError;
 use query_engine::logger::Logger;
@@ -27,6 +27,9 @@ async fn main() -> Result<(), AnyError> {
         let opts = PrismaOpt::from_args();
 
         let metrics = MetricRegistry::new();
+        if opts.enable_metrics {
+            metrics::set_recorder();
+        }
         let mut logger = Logger::new("query-engine-http");
         logger.log_format(opts.log_format());
         logger.log_queries(opts.log_queries());

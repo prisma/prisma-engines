@@ -83,6 +83,10 @@ pub struct PrismaOpt {
     #[structopt(long = "debug", short = "d")]
     pub enable_debug_mode: bool,
 
+    /// Enables the GraphQL playground
+    #[structopt(long, short = "m")]
+    pub enable_metrics: bool,
+
     /// Enable query logging [env: LOG_QUERIES=y]
     #[structopt(long, short = "o")]
     pub log_queries: bool,

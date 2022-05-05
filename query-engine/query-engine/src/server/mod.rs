@@ -64,6 +64,8 @@ pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<St
         .preview_features()
         .contains(PreviewFeature::InteractiveTransactions);
 
+    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
+
     let datamodel = opts.datamodel()?;
     let cx = PrismaContext::builder(config, datamodel)
         .legacy(opts.legacy)
@@ -72,7 +74,13 @@ pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<St
         .build()
         .await?;
 
-    let state = State::new(cx, opts.enable_playground, opts.enable_debug_mode, enable_itx, true);
+    let state = State::new(
+        cx,
+        opts.enable_playground,
+        opts.enable_debug_mode,
+        enable_itx,
+        enable_metrics,
+    );
     Ok(state)
 }
 
@@ -229,7 +237,7 @@ fn playground_handler() -> Response<Body> {
         .unwrap()
 }
 
-async fn handle_metrics(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn handle_metrics(state: State, _req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let metrics = state.cx.metrics.to_json();
     let result_bytes = serde_json::to_vec(&metrics).unwrap();
 

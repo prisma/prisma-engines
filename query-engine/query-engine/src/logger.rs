@@ -5,7 +5,7 @@ use opentelemetry::{
 };
 use opentelemetry_otlp::WithExportConfig;
 use query_core::MetricRegistry;
-use tracing::{dispatcher::SetGlobalDefaultError, instrument::WithSubscriber, subscriber};
+use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
 use tracing_subscriber::{layer::SubscriberExt, registry::LookupSpan, EnvFilter, FmtSubscriber, Layer};
 
 use crate::LogFormat;
@@ -95,14 +95,8 @@ impl<'a> Logger<'a> {
                 } else {
                     let lay = tracing_subscriber::fmt::layer().with_filter(filter);
 
-                    let subscriber = tracing_subscriber::registry().with(lay);
-
-                    if let Some(metrics) = self.metrics {
-                        subscriber::set_global_default(subscriber.with(metrics))?;
-                        query_core::metrics::set_recorder();
-                    } else {
-                        subscriber::set_global_default(subscriber)?;
-                    };
+                    let subscriber = tracing_subscriber::registry().with(lay).with(self.metrics);
+                    subscriber::set_global_default(subscriber)?;
 
                     Ok(())
                 }
