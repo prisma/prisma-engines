@@ -36,6 +36,27 @@ fn datetime_defaults_work(api: TestApi) {
     });
 }
 
+#[test_connector(tags(Mysql8), exclude(Vitess))]
+fn binary_dbgenerated_defaults_should_work(api: TestApi) {
+    // https://github.com/prisma/prisma/issues/10715
+
+    let schema = r#"
+        model A {
+          id Bytes @id @default(dbgenerated("(uuid_to_bin(uuid()))")) @db.Binary(16)
+        }
+    "#;
+
+    api.schema_push_w_datasource(schema).send().assert_green();
+
+    let def_val = DefaultValue::db_generated("(uuid_to_bin(uuid()))");
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("id", |col| col.assert_default(Some(def_val)))
+    });
+
+    api.schema_push_w_datasource(schema).send().assert_no_steps();
+}
+
 #[test_connector(tags(Mysql), exclude(Mariadb))]
 fn datetime_dbgenerated_defaults(api: TestApi) {
     let dm = indoc::indoc! {r#"
