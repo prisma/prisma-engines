@@ -774,6 +774,15 @@ impl<'a> Reformatter<'a> {
                 comment(target, token.as_str())
             }
             Rule::WHITESPACE => {} // we are very opinionated about whitespace and hence ignore user input
+            // This is Prisma 1 thing, we should not render them. Example:
+            //
+            // ```no_run
+            // model Site {
+            //   name: String
+            //   htmlTitle: String
+            // }
+            // ```
+            Rule::LEGACY_COLON => {}
             Rule::CATCH_ALL | Rule::BLOCK_LEVEL_CATCH_ALL => {
                 target.write(token.as_str());
             }
