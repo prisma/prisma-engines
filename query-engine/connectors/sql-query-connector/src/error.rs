@@ -29,7 +29,7 @@ impl From<RawError> for SqlError {
             RawError::UnsupportedColumnType { column_type } => Self::RawError {
                 code: String::from("N/A"),
                 message: format!(
-                    r#"Failed to deserialize column of type '{}'. If you're using $queryRaw and this column is explicitely marked as `Unsupported` in your datamodel, try casting this column to any supported Prisma type such as `String`."#,
+                    r#"Failed to deserialize column of type '{}'. If you're using $queryRaw and this column is explicitly marked as `Unsupported` in your Prisma schema, try casting this column to any supported Prisma type such as `String`."#,
                     column_type
                 ),
             },

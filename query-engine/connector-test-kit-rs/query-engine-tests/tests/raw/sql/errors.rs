@@ -28,7 +28,7 @@ mod raw_errors {
             runner,
             fmt_query_raw(r#"SELECT * FROM "TestModel";"#, vec![]),
             2010,
-            "Failed to deserialize column of type 'point'. If you're using $queryRaw and this column is explicitly marked as `Unsupported` in your datamodel, try casting this column to any supported Prisma type such as `String`."
+            "Failed to deserialize column of type 'point'. If you're using $queryRaw and this column is explicitly marked as `Unsupported` in your Prisma schema, try casting this column to any supported Prisma type such as `String`."
         );
 
         Ok(())
