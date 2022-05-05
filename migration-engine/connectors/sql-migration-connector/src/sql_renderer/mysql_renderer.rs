@@ -33,7 +33,7 @@ impl MysqlFlavour {
                     && !matches!(col.column_type_family(), ColumnTypeFamily::Json)
                     // We do not want to render binary defaults because
                     // they are not supported by MySQL.
-                    && !matches!(col.column_type_family(), ColumnTypeFamily::Binary)
+                    && !matches!(col.column_type_family(), ColumnTypeFamily::Binary if !default.is_db_generated())
                 })
                 .map(|default| render_default(col, default)),
             auto_increment: col.is_autoincrement(),
