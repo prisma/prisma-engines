@@ -327,6 +327,19 @@
 <span id="322">322</span>
 <span id="323">323</span>
 <span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">error</span>::<span class="kw-2">*</span>, <span class="ident">Filter</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::prelude::DomainError</span>;
 <span class="kw">use</span> <span class="ident">quaint::error::ErrorKind</span> <span class="kw">as</span> <span class="ident">QuaintKind</span>;
@@ -344,6 +357,9 @@
         <span class="ident">code</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     },
+    <span class="ident">UnsupportedColumnType</span> {
+        <span class="ident">column_type</span>: <span class="ident">String</span>,
+    },
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RawError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlError</span> {
@@ -352,6 +368,13 @@
             <span class="ident">RawError::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> } =&gt; {
                 <span class="ident"><span class="self">Self</span>::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> }
             }
+            <span class="ident">RawError::UnsupportedColumnType</span> { <span class="ident">column_type</span> } =&gt; <span class="ident"><span class="self">Self</span>::RawError</span> {
+                <span class="ident">code</span>: <span class="ident">String::from</span>(<span class="string">&quot;N/A&quot;</span>),
+                <span class="ident">message</span>: <span class="macro">format!</span>(
+                    <span class="string">r#&quot;Failed to deserialize column of type &#39;{}&#39;. If you&#39;re using $queryRaw and this column is explicitly marked as `Unsupported` in your Prisma schema, try casting this column to any supported Prisma type such as `String`.&quot;#</span>,
+                    <span class="ident">column_type</span>
+                ),
+            },
             <span class="ident">RawError::ConnectionClosed</span> =&gt; <span class="ident"><span class="self">Self</span>::ConnectionClosed</span>,
             <span class="ident">RawError::Database</span> { <span class="ident">code</span>, <span class="ident">message</span> } =&gt; <span class="ident"><span class="self">Self</span>::RawError</span> {
                 <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">String::from</span>(<span class="string">&quot;N/A&quot;</span>)),
@@ -371,6 +394,9 @@
                 }
             }
             <span class="ident">quaint::error::ErrorKind::ConnectionClosed</span> =&gt; <span class="ident"><span class="self">Self</span>::ConnectionClosed</span>,
+            <span class="ident">quaint::error::ErrorKind::UnsupportedColumnType</span> { <span class="ident">column_type</span> } =&gt; <span class="ident"><span class="self">Self</span>::UnsupportedColumnType</span> {
+                <span class="ident">column_type</span>: <span class="ident">column_type</span>.<span class="ident">to_owned</span>(),
+            },
             <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Database</span> {
                 <span class="ident">code</span>: <span class="ident">e</span>.<span class="ident">original_code</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>),
                 <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">original_message</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>),
@@ -598,13 +624,13 @@
             <span class="ident">QuaintKind::ForeignKeyConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; <span class="ident"><span class="self">Self</span>::ForeignKeyConstraintViolation</span> {
                 <span class="ident">constraint</span>: <span class="ident">constraint</span>.<span class="ident">into</span>(),
             },
-
             <span class="ident">QuaintKind::MissingFullTextSearchIndex</span> =&gt; <span class="ident"><span class="self">Self</span>::MissingFullTextSearchIndex</span>,
             <span class="ident">e</span> @ <span class="ident">QuaintKind::ConnectionError</span>(<span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::ConnectionError</span>(<span class="ident">e</span>),
             <span class="ident">QuaintKind::ColumnReadFailure</span>(<span class="ident">e</span>) =&gt; <span class="ident"><span class="self">Self</span>::ColumnReadFailure</span>(<span class="ident">e</span>),
             <span class="ident">QuaintKind::ColumnNotFound</span> { <span class="ident">column</span> } =&gt; <span class="ident">SqlError::ColumnDoesNotExist</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">column</span>)),
             <span class="ident">QuaintKind::TableDoesNotExist</span> { <span class="ident">table</span> } =&gt; <span class="ident">SqlError::TableDoesNotExist</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">table</span>)),
             <span class="ident">QuaintKind::ConnectionClosed</span> =&gt; <span class="ident">SqlError::ConnectionClosed</span>,
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::UnsupportedColumnType</span> { .. } =&gt; <span class="ident">SqlError::ConversionError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
             <span class="ident">e</span> @ <span class="ident">QuaintKind::TransactionAlreadyClosed</span>(<span class="kw">_</span>) =&gt; <span class="ident">SqlError::TransactionAlreadyClosed</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>)),
             <span class="ident">e</span> @ <span class="ident">QuaintKind::IncorrectNumberOfParameters</span> { .. } =&gt; <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
             <span class="ident">e</span> @ <span class="ident">QuaintKind::ConversionError</span>(<span class="kw">_</span>) =&gt; <span class="ident">SqlError::ConversionError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
