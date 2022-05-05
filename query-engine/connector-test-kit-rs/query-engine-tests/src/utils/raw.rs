@@ -33,6 +33,7 @@ pub enum RawParam {
     Decimal(String),
     Array(Vec<RawParam>),
     Primitive(serde_json::Value),
+    Null,
 }
 
 impl RawParam {
@@ -96,6 +97,7 @@ impl From<RawParam> for serde_json::Value {
                 serde_json::Value::Array(json_values)
             }
             RawParam::Primitive(v) => v,
+            RawParam::Null => serde_json::Value::Null,
         }
     }
 }
