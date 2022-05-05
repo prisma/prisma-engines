@@ -1403,7 +1403,7 @@ fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "varchar" | "_varchar" => (String, Some(CockroachType::String(precision.character_maximum_length))),
         "bpchar" | "_bpchar" => (String, Some(CockroachType::Char(precision.character_maximum_length))),
         // https://www.cockroachlabs.com/docs/stable/string.html
-        "char" | "_char" if data_type == "\"char\"" => (String, Some(CockroachType::SingleChar)),
+        "char" | "_char" if data_type == "\"char\"" => (String, Some(CockroachType::CatalogSingleChar)),
         "char" | "_char" => (String, Some(CockroachType::Char(precision.character_maximum_length))),
         "date" | "_date" => (DateTime, Some(CockroachType::Date)),
         "bytea" | "_bytea" => (Binary, Some(CockroachType::Bytes)),

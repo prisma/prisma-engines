@@ -510,7 +510,7 @@ fn render_column_type_cockroachdb(col: &ColumnWalker<'_>) -> Cow<'static, str> {
 
         // https://www.cockroachlabs.com/docs/stable/string.html
         CockroachType::Char(length) => format!("CHAR{}", render_optional_args(length)).into(),
-        CockroachType::SingleChar => r#""char""#.into(),
+        CockroachType::CatalogSingleChar => r#""char""#.into(),
 
         CockroachType::Bytes => "BYTES".into(),
         CockroachType::Date => "DATE".into(),

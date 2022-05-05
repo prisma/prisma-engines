@@ -117,7 +117,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
         ("float8col", "Float", "Float8", "float8"),
         ("stringargs", "String", "String(200)", "text"),
         ("char", "String", "Char(200)", "bpchar"),
-        ("singlechar", "String", "SingleChar", "char"),
+        ("singlechar", "String", "CatalogSingleChar", "char"),
         ("stringnoarg", "String", "String", "text"),
         ("bytea", "Bytes", "Bytes", "bytea"),
         ("ts", "DateTime", "Timestamp(0)", "timestamp"),
