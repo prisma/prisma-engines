@@ -45,6 +45,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         models::has_a_unique_custom_primary_key_name_per_model(model, &names, ctx);
         models::uses_sort_or_length_on_primary_without_preview_flag(model, ctx);
         models::id_has_fields(model, ctx);
+        models::id_client_name_does_not_clash_with_field(model, ctx);
         models::primary_key_connector_specific(model, ctx);
         models::primary_key_length_prefix_supported(model, ctx);
         models::primary_key_sort_order_supported(model, ctx);
@@ -91,6 +92,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         for index in model.indexes() {
             indexes::has_fields(index, ctx);
             indexes::has_a_unique_constraint_name(index, &names, ctx);
+            indexes::unique_client_name_does_not_clash_with_field(index, ctx);
             indexes::unique_index_has_a_unique_custom_name_per_model(index, &names, ctx);
             indexes::uses_length_or_sort_without_preview_flag(index, ctx);
             indexes::field_length_prefix_supported(index, ctx);

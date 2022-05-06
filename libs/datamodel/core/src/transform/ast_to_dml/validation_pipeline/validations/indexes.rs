@@ -1,12 +1,12 @@
 use super::{constraint_namespace::ConstraintName, database_name::validate_db_name};
 use crate::{
-    ast::Span,
+    ast::{Span, WithSpan},
     common::preview_features::PreviewFeature,
     diagnostics::DatamodelError,
     transform::ast_to_dml::{db::walkers::IndexWalker, validation_pipeline::context::Context},
 };
 use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
-use schema_ast::ast::WithSpan;
+use itertools::Itertools;
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.
@@ -523,5 +523,33 @@ pub(crate) fn opclasses_are_not_allowed_with_other_than_normal_indices(index: In
         ));
 
         return;
+    }
+}
+
+pub(super) fn unique_client_name_does_not_clash_with_field(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+    if !index.is_unique() {
+        return;
+    }
+
+    // Only compound indexes clash.
+    if index.fields().len() <= 1 {
+        return;
+    }
+
+    let ast_attribute = if let Some(attr) = index.ast_attribute() {
+        attr
+    } else {
+        return;
+    };
+
+    let idx_client_name = index.fields().map(|f| f.name()).join("_");
+
+    if index.model().scalar_fields().any(|f| f.name() == idx_client_name) {
+        let attr_name = index.attribute_name();
+        ctx.push_error(DatamodelError::new_model_validation_error(
+            &format!("The field `{idx_client_name}` clashes with the `{attr_name}` name. Please resolve the conflict by providing a custom id name: `{attr_name}([...], name: \"custom_name\")`"),
+            index.model().name(),
+            ast_attribute.span,
+        ));
     }
 }

@@ -287,3 +287,22 @@ pub(super) fn id_has_fields(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
         id.ast_attribute().span,
     ))
 }
+
+pub(super) fn id_client_name_does_not_clash_with_field(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
+    let id = if let Some(id) = model.primary_key() { id } else { return };
+
+    // Only compound ids clash.
+    if id.fields().len() <= 1 {
+        return;
+    }
+
+    let id_client_name = id.fields().map(|f| f.name()).join("_");
+
+    if model.scalar_fields().any(|f| f.name() == id_client_name) {
+        ctx.push_error(DatamodelError::new_model_validation_error(
+            &format!("The field `{id_client_name}` clashes with the `@@id` attribute's name. Please resolve the conflict by providing a custom id name: `@@id([...], name: \"custom_name\")`"),
+            model.name(),
+            id.ast_attribute().span,
+        ));
+    }
+}
