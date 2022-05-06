@@ -24,7 +24,7 @@ impl NativeTypeErrorFactory {
     pub fn new_incompatible_native_type_with_index(self, message: &str, span: Span) -> DatamodelError {
         DatamodelError::new(
             format!(
-                "You cannot define an index on fields with Native type {} of {}.{message}",
+                "You cannot define an index on fields with native type `{}` of {}.{message}",
                 self.native_type, self.connector
             )
             .into(),
@@ -35,7 +35,7 @@ impl NativeTypeErrorFactory {
     pub fn new_incompatible_native_type_with_unique(self, message: &str, span: Span) -> DatamodelError {
         DatamodelError::new(
             format!(
-                "Native type {} cannot be unique in {}.{message}",
+                "Native type `{}` cannot be unique in {}.{message}",
                 self.native_type, self.connector
             )
             .into(),
@@ -46,7 +46,7 @@ impl NativeTypeErrorFactory {
     pub fn new_incompatible_native_type_with_id(self, message: &str, span: Span) -> DatamodelError {
         DatamodelError::new(
             format!(
-                "Native type {} of {} cannot be used on a field that is `@id` or `@@id`.{message}",
+                "Native type `{}` of {} cannot be used on a field that is `@id` or `@@id`.{message}",
                 self.native_type, self.connector
             )
             .into(),
@@ -57,7 +57,7 @@ impl NativeTypeErrorFactory {
     pub fn new_argument_m_out_of_range_error(self, message: &str, span: Span) -> DatamodelError {
         DatamodelError::new(
             format!(
-                "Argument M is out of range for Native type {} of {}: {message}",
+                "Argument M is out of range for native type `{}` of {}: {message}",
                 self.native_type, self.connector
             )
             .into(),

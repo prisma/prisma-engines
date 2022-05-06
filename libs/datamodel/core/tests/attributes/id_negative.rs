@@ -452,14 +452,13 @@ fn bytes_should_not_be_allowed_as_id_on_sql_server() {
     "#};
 
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+
     let expected = expect![[r#"
         [1;91merror[0m: [1mInvalid model: Using Bytes type is not allowed in the model's id.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m[1;91mmodel A {[0m
-        [1;94m11 | [0m    id Bytes @id
-        [1;94m12 | [0m}
+        [1;94m10 | [0mmodel A {
+        [1;94m11 | [0m    id Bytes @[1;91mid[0m
         [1;94m   | [0m
     "#]];
 

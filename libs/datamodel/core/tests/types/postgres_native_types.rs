@@ -20,9 +20,9 @@ fn xml_data_type_should_fail_on_index() {
         );
 
         let error_msg = if *attribute_name == "index" {
-            "You cannot define an index on fields with Native type Xml of Postgres."
+            "You cannot define an index on fields with native type `Xml` of Postgres."
         } else {
-            "Native type Xml cannot be unique in Postgres."
+            "Native type `Xml` cannot be unique in Postgres."
         };
 
         test_native_types_compatibility(&dml, error_msg, POSTGRES_SOURCE);
@@ -33,7 +33,7 @@ fn xml_data_type_should_fail_on_index() {
 fn should_fail_on_invalid_precision_for_decimal_type() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of Postgres: Precision must be positive with a maximum value of 1000.",
+            "Argument M is out of range for native type `{}` of Postgres: Precision must be positive with a maximum value of 1000.",
             type_name
         )
     }
@@ -46,7 +46,7 @@ fn should_fail_on_invalid_precision_for_decimal_type() {
 fn should_fail_on_invalid_precision_for_time_types() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of Postgres: M can range from 0 to 6.",
+            "Argument M is out of range for native type `{}` of Postgres: M can range from 0 to 6.",
             type_name
         )
     }
@@ -63,7 +63,7 @@ fn should_fail_on_invalid_precision_for_time_types() {
 fn should_fail_on_argument_out_of_range_for_bit_data_types() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of Postgres: M must be a positive integer.",
+            "Argument M is out of range for native type `{}` of Postgres: M must be a positive integer.",
             type_name
         )
     }
