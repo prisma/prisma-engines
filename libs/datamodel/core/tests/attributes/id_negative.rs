@@ -528,7 +528,7 @@ fn id_does_not_allow_sort_or_index_unless_extended_indexes_are_on() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@id": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0m
@@ -583,7 +583,7 @@ fn mysql_does_not_allow_compound_id_sort_argument() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@id": The sort argument is not supported in the primary key with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -632,7 +632,7 @@ fn postgresql_does_not_allow_compound_id_sort_argument() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@id": The sort argument is not supported in the primary key with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -727,7 +727,7 @@ fn sqlite_does_not_allow_compound_id_sort_argument() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@id": The sort argument is not supported in the primary key with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -776,7 +776,7 @@ fn postgresql_does_not_allow_compound_id_length_prefix() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@id": The length argument is not supported in the primary key with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -825,7 +825,7 @@ fn sqlserver_does_not_allow_compound_id_length_prefix() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@id": The length argument is not supported in the primary key with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -920,7 +920,7 @@ fn sqlite_does_not_allow_compound_id_length_prefix() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@id": The length argument is not supported in the primary key with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -1113,7 +1113,7 @@ fn empty_fields_must_error() {
     "#;
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The list of fields in an `@@id()` attribute cannot be empty. Please specify at least one field.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@id": The list of fields in an `@@id()` attribute cannot be empty. Please specify at least one field.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m          name        String @db.VarChar(255)
@@ -1213,7 +1213,7 @@ fn mongodb_no_unique_index_for_id_model_attribute() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The same field cannot be an id and unique on MongoDB.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The same field cannot be an id and unique on MongoDB.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m

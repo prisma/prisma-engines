@@ -89,7 +89,11 @@ pub(super) fn has_a_unique_primary_key_name(model: ModelWalker<'_>, names: &supe
             .span_for_argument("map")
             .unwrap_or_else(|| pk.ast_attribute().span);
 
-        ctx.push_error(DatamodelError::new_attribute_validation_error(&message, "id", span));
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            &message,
+            pk.attribute_name(),
+            span,
+        ));
     }
 }
 
@@ -120,7 +124,11 @@ pub(super) fn has_a_unique_custom_primary_key_name_per_model(
                 .span_for_argument("name")
                 .unwrap_or_else(|| pk.ast_attribute().span);
 
-            ctx.push_error(DatamodelError::new_attribute_validation_error(&message, "@id", span));
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                &message,
+                pk.attribute_name(),
+                span,
+            ));
         }
     }
 }
@@ -139,7 +147,11 @@ pub(crate) fn uses_sort_or_length_on_primary_without_preview_flag(model: ModelWa
             let message = "You must enable `extendedIndexes` preview feature to use sort or length parameters.";
             let span = pk.ast_attribute().span;
 
-            ctx.push_error(DatamodelError::new_attribute_validation_error(message, "id", span));
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                message,
+                pk.attribute_name(),
+                span,
+            ));
         }
     }
 }
@@ -162,7 +174,11 @@ pub(crate) fn primary_key_length_prefix_supported(model: ModelWalker<'_>, ctx: &
             let message = "The length argument is not supported in the primary key with the current connector";
             let span = pk.ast_attribute().span;
 
-            ctx.push_error(DatamodelError::new_attribute_validation_error(message, "id", span));
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                message,
+                pk.attribute_name(),
+                span,
+            ));
         }
     }
 }
@@ -185,7 +201,11 @@ pub(crate) fn primary_key_sort_order_supported(model: ModelWalker<'_>, ctx: &mut
             let message = "The sort argument is not supported in the primary key with the current connector";
             let span = pk.ast_attribute().span;
 
-            ctx.push_error(DatamodelError::new_attribute_validation_error(message, "id", span));
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                message,
+                pk.attribute_name(),
+                span,
+            ));
         }
     }
 }
@@ -217,7 +237,9 @@ pub(crate) fn only_one_fulltext_attribute_allowed(model: ModelWalker<'_>, ctx: &
             let message = "The current connector only allows one fulltext attribute per model";
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
-                message, "fulltext", span,
+                message,
+                "@@fulltext",
+                span,
             ));
         }
     }
@@ -261,7 +283,7 @@ pub(super) fn id_has_fields(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         "The list of fields in an `@@id()` attribute cannot be empty. Please specify at least one field.",
-        "id",
+        id.attribute_name(),
         id.ast_attribute().span,
     ))
 }

@@ -25,8 +25,7 @@ use std::{
 use visited_relation::*;
 
 const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automatically.";
-const RELATION_ATTRIBUTE_NAME: &str = "relation";
-const RELATION_ATTRIBUTE_NAME_WITH_AT: &str = "@relation";
+const RELATION_ATTRIBUTE_NAME: &str = "@relation";
 const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
 
 /// Depending on the database, a constraint name might need to be unique in a certain namespace.

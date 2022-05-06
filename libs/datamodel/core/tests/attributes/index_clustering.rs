@@ -159,7 +159,7 @@ fn clustered_index_allowed_only_in_sql_server() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": Defining clustering is not supported in the current connector.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": Defining clustering is not supported in the current connector.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -210,7 +210,7 @@ fn clustered_compound_unique_allowed_only_in_sql_server() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": Defining clustering is not supported in the current connector.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": Defining clustering is not supported in the current connector.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
@@ -259,7 +259,7 @@ fn non_clustered_compound_id_allowed_only_in_sql_server() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": Defining clustering is not supported in the current connector.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@id": Defining clustering is not supported in the current connector.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -285,7 +285,7 @@ fn clustered_index_allowed_only_with_preview_flag() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": To specify index clustering, please enable `extendedIndexes` preview feature.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": To specify index clustering, please enable `extendedIndexes` preview feature.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -336,7 +336,7 @@ fn clustered_compound_unique_allowed_only_with_preview_flag() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": To specify index clustering, please enable `extendedIndexes` preview feature.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": To specify index clustering, please enable `extendedIndexes` preview feature.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
@@ -385,7 +385,7 @@ fn nonclustered_compound_id_allowed_only_with_preview_flag() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": To specify clustering, please enable `extendedIndexes` preview feature.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@id": To specify clustering, please enable `extendedIndexes` preview feature.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -417,7 +417,7 @@ fn id_and_index_clustering_together_not_allowed() {
         [1;94m11 | [0mmodel A {
         [1;94m12 | [0m  id Int @[1;91mid[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@index": A model can only hold one clustered index or key.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": A model can only hold one clustered index or key.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m

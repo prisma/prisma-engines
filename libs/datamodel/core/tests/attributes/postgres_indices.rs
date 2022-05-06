@@ -161,7 +161,7 @@ fn disallows_compound_unique_length_prefix() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not supported in an index definition with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The length argument is not supported in an index definition with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b String
@@ -187,7 +187,7 @@ fn disallows_index_length_prefix() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is not supported in an index definition with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is not supported in an index definition with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -214,7 +214,7 @@ fn operator_classes_not_allowed_with_unique() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": Operator classes can only be defined to fields in an @@index attribute.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": Operator classes can only be defined to fields in an @@index attribute.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m

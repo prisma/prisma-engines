@@ -6,7 +6,7 @@ use crate::{
     transform::ast_to_dml::{db::walkers::IndexWalker, validation_pipeline::context::Context},
 };
 use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
-use schema_ast::ast::{WithName, WithSpan};
+use schema_ast::ast::WithSpan;
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.
@@ -68,7 +68,9 @@ pub(super) fn unique_index_has_a_unique_custom_name_per_model(
                 .unwrap_or_else(|| model.ast_model().span);
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
-                &message, "@unique", span,
+                &message,
+                index.attribute_name(),
+                span,
             ));
         }
     }
@@ -130,7 +132,9 @@ pub(crate) fn fulltext_index_preview_feature_enabled(index: IndexWalker<'_>, ctx
             .unwrap_or_else(|| index.model().ast_model().span);
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
-            message, "fulltext", span,
+            message,
+            index.attribute_name(),
+            span,
         ));
     }
 }
@@ -150,7 +154,9 @@ pub(crate) fn fulltext_index_supported(index: IndexWalker<'_>, ctx: &mut Context
             .unwrap_or_else(|| index.model().ast_model().span);
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
-            message, "fulltext", span,
+            message,
+            index.attribute_name(),
+            span,
         ));
     }
 }
@@ -169,7 +175,11 @@ pub(crate) fn index_algorithm_preview_feature(index: IndexWalker<'_>, ctx: &mut 
             .and_then(|i| i.span_for_argument("type"))
             .unwrap_or_else(Span::empty);
 
-        ctx.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            message,
+            index.attribute_name(),
+            span,
+        ));
     }
 }
 
@@ -292,7 +302,9 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(index: IndexWalke
                     .unwrap_or_else(|| index.model().ast_model().span);
 
                 ctx.push_error(DatamodelError::new_attribute_validation_error(
-                    message, "fulltext", span,
+                    message,
+                    index.attribute_name(),
+                    span,
                 ));
 
                 return;
@@ -323,7 +335,11 @@ pub(crate) fn hash_index_must_not_use_sort_param(index: IndexWalker<'_>, ctx: &m
             .map(|i| i.span)
             .unwrap_or_else(|| index.model().ast_model().span);
 
-        ctx.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            message,
+            index.attribute_name(),
+            span,
+        ));
     }
 }
 
@@ -352,7 +368,7 @@ pub(super) fn has_fields(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         "The list of fields in an index cannot be empty. Please specify at least one field.",
-        attr.name(),
+        index.attribute_name(),
         *attr.span(),
     ))
 }
@@ -374,7 +390,7 @@ pub(crate) fn supports_clustering_setting(index: IndexWalker<'_>, ctx: &mut Cont
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         "Defining clustering is not supported in the current connector.",
-        attr.name(),
+        index.attribute_name(),
         *attr.span(),
     ))
 }
@@ -400,7 +416,7 @@ pub(crate) fn clustering_setting_preview_enabled(index: IndexWalker<'_>, ctx: &m
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         "To specify index clustering, please enable `extendedIndexes` preview feature.",
-        attr.name(),
+        index.attribute_name(),
         *attr.span(),
     ))
 }
@@ -424,7 +440,7 @@ pub(crate) fn clustering_can_be_defined_only_once(index: IndexWalker<'_>, ctx: &
         if matches!(pk.clustered(), Some(true) | None) {
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 "A model can only hold one clustered index or key.",
-                attr.name(),
+                index.attribute_name(),
                 *attr.span(),
             ));
         }
@@ -441,7 +457,7 @@ pub(crate) fn clustering_can_be_defined_only_once(index: IndexWalker<'_>, ctx: &
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "A model can only hold one clustered index.",
-            attr.name(),
+            index.attribute_name(),
             *attr.span(),
         ));
 
@@ -470,7 +486,11 @@ pub(crate) fn index_algorithm_is_supported(index: IndexWalker<'_>, ctx: &mut Con
         .and_then(|i| i.span_for_argument("type"))
         .unwrap_or_else(Span::empty);
 
-    ctx.push_error(DatamodelError::new_attribute_validation_error(message, "index", span));
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        message,
+        index.attribute_name(),
+        span,
+    ));
 }
 
 /// You can use `ops` argument only with a normal index.
@@ -498,7 +518,7 @@ pub(crate) fn opclasses_are_not_allowed_with_other_than_normal_indices(index: In
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
-            attr.name(),
+            index.attribute_name(),
             attr.span,
         ));
 
