@@ -684,9 +684,6 @@
 <span id="679">679</span>
 <span id="680">680</span>
 <span id="681">681</span>
-<span id="682">682</span>
-<span id="683">683</span>
-<span id="684">684</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">shadow_db</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1298,20 +1295,17 @@ SET enable_experimental_alter_column_type_general = true;
 
                     <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">schema_exists_result</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">at</span>(<span class="number">1</span>)).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string</span>());
 
-                    <span class="kw">let</span> <span class="ident">cockroach_preview_enabled</span> <span class="op">=</span> <span class="ident">params</span>
-                        .<span class="ident">connector_params</span>
-                        .<span class="ident">preview_features</span>
-                        .<span class="ident">contains</span>(<span class="ident">PreviewFeature::Cockroachdb</span>);
-
                     <span class="kw">match</span> <span class="ident">version</span> {
                         <span class="prelude-val">Some</span>(<span class="ident">version</span>) =&gt; {
                             <span class="kw">let</span> <span class="ident">db_is_cockroach</span> <span class="op">=</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;CockroachDB&quot;</span>);
 
-                            <span class="kw">if</span> <span class="ident">db_is_cockroach</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">provider_is_cockroachdb</span> <span class="op">&amp;&amp;</span> <span class="ident">cockroach_preview_enabled</span> {
-                                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.&quot;</span>;
+                            <span class="comment">// We will want to validate this in the future: https://github.com/prisma/prisma/issues/13222</span>
+                            <span class="comment">// if db_is_cockroach &amp;&amp; !provider_is_cockroachdb  {</span>
+                            <span class="comment">//     let msg = &quot;You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.&quot;;</span>
 
-                                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="ident">msg</span>.<span class="ident">to_owned</span>()));
-                            } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">db_is_cockroach</span> <span class="op">&amp;&amp;</span> <span class="ident">provider_is_cockroachdb</span> {
+                            <span class="comment">//     return Err(ConnectorError::from_msg(msg.to_owned()));</span>
+
+                            <span class="kw">if</span> <span class="op">!</span><span class="ident">db_is_cockroach</span> <span class="op">&amp;&amp;</span> <span class="ident">provider_is_cockroachdb</span> {
                                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.&quot;</span>;
 
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="ident">msg</span>.<span class="ident">to_owned</span>()));
