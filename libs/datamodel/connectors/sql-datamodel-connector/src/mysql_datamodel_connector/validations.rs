@@ -31,10 +31,7 @@ pub(crate) fn field_types_can_be_used_in_an_index(
             continue;
         }
 
-        let span = index
-            .ast_attribute()
-            .map(|attr| attr.span)
-            .unwrap_or_else(|| Span::empty());
+        let span = index.ast_attribute().map(|attr| attr.span).unwrap_or_else(Span::empty);
 
         let error = if index.is_unique() {
             connector

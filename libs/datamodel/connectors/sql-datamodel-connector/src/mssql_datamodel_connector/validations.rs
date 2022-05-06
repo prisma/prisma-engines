@@ -22,10 +22,7 @@ pub(crate) fn index_uses_correct_field_types(
             continue;
         }
 
-        let span = index
-            .ast_attribute()
-            .map(|attr| attr.span)
-            .unwrap_or_else(|| Span::empty());
+        let span = index.ast_attribute().map(|attr| attr.span).unwrap_or_else(Span::empty);
 
         let error = connector.native_instance_error(&native_type);
 
