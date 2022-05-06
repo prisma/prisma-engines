@@ -4,9 +4,9 @@ mod tests {
     use datamodel::{
         ast::Span,
         dml::{
-            self, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition, IndexField,
-            Model, NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField, ReferentialAction, RelationField,
-            RelationInfo, ScalarField, ScalarType, ValueGenerator,
+            self, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexAlgorithm, IndexDefinition,
+            IndexField, Model, NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField, ReferentialAction,
+            RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
         },
         Datasource, StringFromEnvVar,
     };
@@ -16,8 +16,9 @@ mod tests {
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
     use sql_schema_describer::{
+        postgres::{PostgresSchemaExt, SqlIndexAlgorithm},
         Column, ColumnArity, ColumnType, ColumnTypeFamily, Enum, ForeignKey, ForeignKeyAction, Index, IndexColumn,
-        IndexType, PrimaryKey, PrimaryKeyColumn, SqlSchema, Table,
+        IndexId, IndexType, PrimaryKey, PrimaryKeyColumn, SqlSchema, Table, TableId,
     };
 
     fn postgres_context() -> IntrospectionContext {
@@ -394,7 +395,7 @@ mod tests {
                     fields: vec![IndexField::new_in_model("unique")],
                     tpe: dml::IndexType::Unique,
                     defined_on_field: true,
-                    algorithm: None,
+                    algorithm: Some(IndexAlgorithm::BTree),
                     clustered: None,
                 }],
                 primary_key: None,
@@ -427,6 +428,12 @@ mod tests {
             primary_key: None,
             foreign_keys: vec![],
         }];
+
+        let mut ext = PostgresSchemaExt::default();
+        ext.indexes.push((IndexId(TableId(0), 0), SqlIndexAlgorithm::BTree));
+
+        schema.set_connector_data(Box::new(ext));
+
         let introspection_result =
             calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
@@ -764,7 +771,7 @@ mod tests {
                     fields: vec![IndexField::new_in_model("name"), IndexField::new_in_model("lastname")],
                     tpe: datamodel::dml::IndexType::Unique,
                     defined_on_field: false,
-                    algorithm: None,
+                    algorithm: Some(IndexAlgorithm::BTree),
                     clustered: None,
                 }],
                 primary_key: Some(PrimaryKeyDefinition {
@@ -827,6 +834,12 @@ mod tests {
             }),
             foreign_keys: vec![],
         }];
+
+        let mut ext = PostgresSchemaExt::default();
+        ext.indexes.push((IndexId(TableId(0), 0), SqlIndexAlgorithm::BTree));
+
+        schema.set_connector_data(Box::new(ext));
+
         let introspection_result =
             calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 

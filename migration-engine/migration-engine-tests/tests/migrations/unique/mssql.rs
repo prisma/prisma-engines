@@ -1,15 +1,10 @@
 use indoc::formatdoc;
 use migration_engine_tests::test_api::*;
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn clustered_unique(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @unique(clustered: true)
@@ -25,15 +20,10 @@ fn clustered_unique(api: TestApi) {
     api.schema_push(&dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn non_clustered_unique(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @unique(clustered: false)
@@ -49,15 +39,10 @@ fn non_clustered_unique(api: TestApi) {
     api.schema_push(&dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn default_clustered_unique(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @unique
@@ -74,31 +59,6 @@ fn default_clustered_unique(api: TestApi) {
 }
 
 #[test_connector(tags(Mssql))]
-fn clustered_unique_no_preview(api: TestApi) {
-    let schema = api.schema_name();
-
-    let query = format!("CREATE TABLE [{schema}].[A] (id INT NOT NULL, CONSTRAINT A_id_key UNIQUE CLUSTERED (id))");
-
-    api.raw_cmd(&query);
-
-    let dm = formatdoc! {r#"
-        {}
-
-        model A {{
-          id Int @unique
-        }}
-    "#, api.datasource_block()};
-
-    api.schema_push(&dm).send().assert_green();
-
-    api.assert_schema().assert_table("A", |table| {
-        table.assert_index_on_columns(&["id"], |index| index.assert_non_clustered())
-    });
-
-    api.schema_push(&dm).send().assert_green().assert_no_steps();
-}
-
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
 fn non_clustered_to_clustered_unique(api: TestApi) {
     let schema = api.schema_name();
 
@@ -120,11 +80,6 @@ fn non_clustered_to_clustered_unique(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
 
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
-
         model A {{
           id Int @unique(clustered: true)
         }}
@@ -137,7 +92,7 @@ fn non_clustered_to_clustered_unique(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn clustered_to_non_clustered_unique(api: TestApi) {
     let schema = api.schema_name();
 
@@ -158,11 +113,6 @@ fn clustered_to_non_clustered_unique(api: TestApi) {
 
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @unique(clustered: false)

@@ -8,10 +8,7 @@ use crate::{
     version_checker::VersionChecker,
     Dedup, SqlError, SqlFamilyTrait,
 };
-use datamodel::{
-    common::preview_features::PreviewFeature,
-    dml::{self, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
-};
+use datamodel::dml::{self, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder};
 use sql_schema_describer::{SQLSortOrder, Table};
 use tracing::debug;
 
@@ -59,22 +56,11 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
         }
 
         for index in walker.indexes() {
-            // TODO: enable with preview flag, when dml index extensions are done.
-            if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes)
-                && index.columns().any(|c| c.length().is_some())
-            {
-                continue;
-            }
-
             model.add_index(calculate_index(index, ctx));
         }
 
         if let Some(pk) = &table.primary_key {
-            let clustered = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                primary_key_is_clustered(walker.table_id(), ctx)
-            } else {
-                None
-            };
+            let clustered = primary_key_is_clustered(walker.table_id(), ctx);
 
             model.primary_key = Some(PrimaryKeyDefinition {
                 name: None,
@@ -83,20 +69,15 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
                     .columns
                     .iter()
                     .map(|c| {
-                        let (sort_order, length) = if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                            (None, None)
-                        } else {
-                            let sort_order = c.sort_order.map(|sort| match sort {
-                                SQLSortOrder::Asc => SortOrder::Asc,
-                                SQLSortOrder::Desc => SortOrder::Desc,
-                            });
-                            (sort_order, c.length)
-                        };
+                        let sort_order = c.sort_order.map(|sort| match sort {
+                            SQLSortOrder::Asc => SortOrder::Asc,
+                            SQLSortOrder::Desc => SortOrder::Desc,
+                        });
 
                         PrimaryKeyField {
                             name: c.name().to_string(),
                             sort_order,
-                            length,
+                            length: c.length,
                         }
                     })
                     .collect(),

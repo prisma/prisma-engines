@@ -13,7 +13,7 @@ const TEXT_TYPES: &[&str] = &["Text", "LongText", "MediumText", "TinyText"];
 fn text_and_blob_data_types_should_fail_on_index() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "You cannot define an index on fields with native type `{}` of MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.",
+            "You cannot define an index on fields with native type `{}` of MySQL. Please use the `length` argument to the field in the index definition to allow this.",
             type_name
         )
     }
@@ -38,7 +38,7 @@ fn text_should_not_fail_on_length_prefixed_index() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mysql, &[]);
 
     assert!(parse_schema(&dml).is_ok());
 }
@@ -52,7 +52,7 @@ fn text_should_not_fail_on_length_prefixed_unique() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mysql, &[]);
 
     assert!(parse_schema(&dml).is_ok());
 }
@@ -65,7 +65,7 @@ fn text_should_not_fail_on_length_prefixed_pk() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mysql, &[]);
 
     assert!(parse_schema(&dml).is_ok());
 }
@@ -81,7 +81,7 @@ fn bytes_should_not_fail_on_length_prefixed_index() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mysql, &[]);
 
     assert!(parse_schema(&dml).is_ok());
 }
@@ -95,7 +95,7 @@ fn bytes_should_not_fail_on_length_prefixed_unique() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mysql, &[]);
 
     assert!(parse_schema(&dml).is_ok());
 }
@@ -108,7 +108,7 @@ fn bytes_should_not_fail_on_length_prefixed_pk() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mysql, &[]);
 
     assert!(parse_schema(&dml).is_ok());
 }
@@ -116,7 +116,7 @@ fn bytes_should_not_fail_on_length_prefixed_pk() {
 #[test]
 fn text_and_blob_data_types_can_not_be_unique() {
     fn error_msg(type_name: &str) -> String {
-        format!("Native type `{}` cannot be unique in MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.", type_name)
+        format!("Native type `{}` cannot be unique in MySQL. Please use the `length` argument to the field in the index definition to allow this.", type_name)
     }
 
     for tpe in BLOB_TYPES {
@@ -134,7 +134,7 @@ fn text_and_blob_data_types_can_not_be_unique() {
 fn text_and_blob_data_types_should_fail_on_id_attribute() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Native type `{}` of MySQL cannot be used on a field that is `@id` or `@@id`. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.",
+            "Native type `{}` of MySQL cannot be used on a field that is `@id` or `@@id`. Please use the `length` argument to the field in the index definition to allow this.",
             type_name
         )
     }

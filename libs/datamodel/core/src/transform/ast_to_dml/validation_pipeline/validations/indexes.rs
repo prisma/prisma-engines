@@ -7,6 +7,7 @@ use crate::{
 };
 use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
 use itertools::Itertools;
+use parser_database::IndexAlgorithm;
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.
@@ -76,26 +77,6 @@ pub(super) fn unique_index_has_a_unique_custom_name_per_model(
     }
 }
 
-/// sort and length are not yet allowed
-pub(crate) fn uses_length_or_sort_without_preview_flag(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        return;
-    }
-
-    if index
-        .scalar_field_attributes()
-        .any(|f| f.sort_order().is_some() || f.length().is_some())
-    {
-        let message = "You must enable `extendedIndexes` preview feature to use sort or length parameters.";
-
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
-            message,
-            index.attribute_name(),
-            index.ast_attribute().map(|i| i.span).unwrap_or_else(Span::empty),
-        ));
-    }
-}
-
 /// The database must support the index length prefix for it to be allowed in the data model.
 pub(crate) fn field_length_prefix_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
     if ctx
@@ -152,28 +133,6 @@ pub(crate) fn fulltext_index_supported(index: IndexWalker<'_>, ctx: &mut Context
             .ast_attribute()
             .map(|i| i.span)
             .unwrap_or_else(|| index.model().ast_model().span);
-
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
-            message,
-            index.attribute_name(),
-            span,
-        ));
-    }
-}
-
-/// Defining the `type` must be with `extendedIndexes` preview feature.
-pub(crate) fn index_algorithm_preview_feature(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        return;
-    }
-
-    if index.algorithm().is_some() {
-        let message = "You must enable `extendedIndexes` preview feature to be able to define the index type.";
-
-        let span = index
-            .ast_attribute()
-            .and_then(|i| i.span_for_argument("type"))
-            .unwrap_or_else(Span::empty);
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
@@ -315,11 +274,7 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(index: IndexWalke
 
 /// The ordering is only possible with `BTree` access method.
 pub(crate) fn hash_index_must_not_use_sort_param(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        return;
-    }
-
-    if !ctx.connector.has_capability(ConnectorCapability::UsingHashIndex) {
+    if !ctx.connector.supports_index_type(IndexAlgorithm::Hash) {
         return;
     }
 
@@ -395,32 +350,6 @@ pub(crate) fn supports_clustering_setting(index: IndexWalker<'_>, ctx: &mut Cont
     ))
 }
 
-pub(crate) fn clustering_setting_preview_enabled(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
-        return;
-    }
-
-    if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        return;
-    }
-
-    if index.clustered().is_none() {
-        return;
-    }
-
-    let attr = if let Some(attribute) = index.ast_attribute() {
-        attribute
-    } else {
-        return;
-    };
-
-    ctx.push_error(DatamodelError::new_attribute_validation_error(
-        "To specify index clustering, please enable `extendedIndexes` preview feature.",
-        index.attribute_name(),
-        *attr.span(),
-    ))
-}
-
 pub(crate) fn clustering_can_be_defined_only_once(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
     if !ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
         return;
@@ -467,10 +396,6 @@ pub(crate) fn clustering_can_be_defined_only_once(index: IndexWalker<'_>, ctx: &
 
 /// Is the index algorithm supported by the current connector.
 pub(crate) fn index_algorithm_is_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        return;
-    }
-
     let algo = match index.algorithm() {
         Some(algo) => algo,
         None => return,
@@ -495,10 +420,6 @@ pub(crate) fn index_algorithm_is_supported(index: IndexWalker<'_>, ctx: &mut Con
 
 /// You can use `ops` argument only with a normal index.
 pub(crate) fn opclasses_are_not_allowed_with_other_than_normal_indices(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        return;
-    }
-
     if index.is_normal() {
         return;
     }

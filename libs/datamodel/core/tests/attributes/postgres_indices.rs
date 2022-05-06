@@ -17,7 +17,7 @@ fn hash_index() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     schema.assert_has_model("A").assert_has_index(IndexDefinition {
@@ -42,7 +42,7 @@ fn hash_index_disallows_ops() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -68,7 +68,7 @@ fn btree_index_disallows_ops() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -91,7 +91,7 @@ fn unique_sort_order() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -105,7 +105,7 @@ fn compound_unique_sort_order() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -120,7 +120,7 @@ fn index_sort_order() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -132,7 +132,7 @@ fn disallows_unique_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -157,7 +157,7 @@ fn disallows_compound_unique_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -183,7 +183,7 @@ fn disallows_index_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -210,7 +210,7 @@ fn operator_classes_not_allowed_with_unique() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"

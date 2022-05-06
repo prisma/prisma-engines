@@ -1,32 +1,6 @@
 use crate::{common::*, with_header, Provider};
 
 #[test]
-fn without_preview_feature() {
-    let dml = indoc! {r#"
-        model A {
-          id Int                    @id
-          a  Unsupported("polygon")
-
-          @@index([a(ops: raw("poly_ops"))], type: SpGist)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": You must enable `extendedIndexes` preview feature to be able to define the index type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@index([a(ops: raw("poly_ops"))], [1;91mtype: SpGist[0m)
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn on_mysql() {
     let dml = indoc! {r#"
         model A {
@@ -37,7 +11,7 @@ fn on_mysql() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -63,7 +37,7 @@ fn with_raw_unsupported() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -91,7 +65,7 @@ fn with_unsupported_no_ops() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -119,7 +93,7 @@ fn only_single_column_allowed() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -147,7 +121,7 @@ fn no_ops_inet_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -174,7 +148,7 @@ fn inet_type_inet_ops() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -202,7 +176,7 @@ fn inet_ops_with_wrong_prisma_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -228,7 +202,7 @@ fn inet_ops_with_wrong_index_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -256,7 +230,7 @@ fn no_ops_char_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -283,7 +257,7 @@ fn no_ops_varchar_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -310,7 +284,7 @@ fn no_ops_text_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -337,7 +311,7 @@ fn text_type_text_ops() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -365,7 +339,7 @@ fn no_native_type_text_ops() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -393,7 +367,7 @@ fn text_ops_with_wrong_prisma_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -419,7 +393,7 @@ fn no_ops_weird_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -445,7 +419,7 @@ fn text_ops_with_wrong_index_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"

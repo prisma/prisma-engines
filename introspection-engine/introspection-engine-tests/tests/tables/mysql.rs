@@ -28,7 +28,7 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 async fn a_table_with_length_prefixed_primary_key(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -50,7 +50,7 @@ async fn a_table_with_length_prefixed_primary_key(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 async fn a_table_with_length_prefixed_unique(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -74,7 +74,7 @@ async fn a_table_with_length_prefixed_unique(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 async fn a_table_with_length_prefixed_compound_unique(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -102,7 +102,7 @@ async fn a_table_with_length_prefixed_compound_unique(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 async fn a_table_with_length_prefixed_index(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -131,7 +131,7 @@ async fn a_table_with_length_prefixed_index(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 async fn a_table_with_non_length_prefixed_index(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -162,7 +162,7 @@ async fn a_table_with_non_length_prefixed_index(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -191,7 +191,7 @@ async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (

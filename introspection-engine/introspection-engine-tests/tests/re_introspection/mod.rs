@@ -1882,7 +1882,7 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_connector(tags(Postgres12), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres12))]
 async fn re_introspecting_custom_index_order(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table =

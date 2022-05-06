@@ -4,8 +4,7 @@ use datamodel_connector::{
     Connector, Diagnostics, Span,
 };
 
-const LENGTH_GUIDE: &str =
-    " If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.";
+const LENGTH_GUIDE: &str = " Please use the `length` argument to the field in the index definition to allow this.";
 
 pub(crate) fn field_types_can_be_used_in_an_index(
     connector: &dyn Connector,

@@ -506,46 +506,6 @@ fn primary_key_and_foreign_key_names_cannot_clash() {
 }
 
 #[test]
-fn id_does_not_allow_sort_or_index_unless_extended_indexes_are_on() {
-    let dml = with_header(
-        r#"
-     model User {
-         firstName  String
-         middleName String
-         lastName   String
-
-         @@id([firstName, middleName(length: 1), lastName])
-     }
-
-     model Blog {
-         title  String @id(length:5)
-     }
-     "#,
-        Provider::Mysql,
-        &[],
-    );
-
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@id": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
-          [1;94m-->[0m  [4mschema.prisma:17[0m
-        [1;94m   | [0m
-        [1;94m16 | [0m
-        [1;94m17 | [0m         @@[1;91mid([firstName, middleName(length: 1), lastName])[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@id": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
-          [1;94m-->[0m  [4mschema.prisma:21[0m
-        [1;94m   | [0m
-        [1;94m20 | [0m     model Blog {
-        [1;94m21 | [0m         title  String @[1;91mid(length:5)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn mysql_does_not_allow_id_sort_argument() {
     let dml = indoc! {r#"
         model A {
@@ -553,7 +513,7 @@ fn mysql_does_not_allow_id_sort_argument() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -579,7 +539,7 @@ fn mysql_does_not_allow_compound_id_sort_argument() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -602,7 +562,7 @@ fn postgresql_does_not_allow_id_sort_argument() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -628,7 +588,7 @@ fn postgresql_does_not_allow_compound_id_sort_argument() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -651,7 +611,7 @@ fn sqlite_does_not_allow_id_sort_argument() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -674,34 +634,11 @@ fn mongodb_does_not_allow_id_sort_argument() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
-        [1;94m   | [0m
-        [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id String @[1;91mid(sort: Desc)[0m @map("_id") @test.ObjectId
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
-fn mongodb_does_not_allow_id_sort_argument_without_preview_flag() {
-    let dml = indoc! {r#"
-        model A {
-          id String @id(sort: Desc) @map("_id") @test.ObjectId
-        }
-    "#};
-
     let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
+        [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
@@ -723,7 +660,7 @@ fn sqlite_does_not_allow_compound_id_sort_argument() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Sqlite, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -746,7 +683,7 @@ fn postgresql_does_not_allow_id_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -772,7 +709,7 @@ fn postgresql_does_not_allow_compound_id_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -795,7 +732,7 @@ fn sqlserver_does_not_allow_id_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -821,7 +758,7 @@ fn sqlserver_does_not_allow_compound_id_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -844,7 +781,7 @@ fn sqlite_does_not_allow_id_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Sqlite, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -867,34 +804,11 @@ fn mongodb_does_not_allow_id_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
-        [1;94m   | [0m
-        [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id String @[1;91mid(length: 10)[0m @map("_id") @test.ObjectId
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
-fn mongodb_does_not_allow_id_length_prefix_without_preview_flag() {
-    let dml = indoc! {r#"
-        model A {
-          id String @id(length: 10) @map("_id") @test.ObjectId
-        }
-    "#};
-
     let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
+        [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
@@ -916,7 +830,7 @@ fn sqlite_does_not_allow_compound_id_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Sqlite, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -939,7 +853,7 @@ fn length_argument_does_not_work_with_decimal() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -962,7 +876,7 @@ fn length_argument_does_not_work_with_json() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -985,7 +899,7 @@ fn length_argument_does_not_work_with_datetime() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1008,7 +922,7 @@ fn length_argument_does_not_work_with_boolean() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1031,7 +945,7 @@ fn length_argument_does_not_work_with_float() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1054,7 +968,7 @@ fn length_argument_does_not_work_with_bigint() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1077,7 +991,7 @@ fn length_argument_does_not_work_with_int() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1097,7 +1011,7 @@ fn empty_fields_must_error() {
     let schema = r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex", "extendedIndexes"]
+          previewFeatures = ["fullTextIndex"]
         }
 
         datasource db {

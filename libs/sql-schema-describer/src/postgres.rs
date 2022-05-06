@@ -131,6 +131,7 @@ impl<'a> Default for &'a PostgresSchemaExt {
 }
 
 impl PostgresSchemaExt {
+    #[track_caller]
     pub fn index_algorithm(&self, index_id: IndexId) -> SqlIndexAlgorithm {
         match self.indexes.binary_search_by_key(&index_id, |(id, _)| *id) {
             Ok(i) => self.indexes[i].1,

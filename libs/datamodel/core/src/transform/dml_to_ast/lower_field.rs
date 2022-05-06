@@ -1,6 +1,6 @@
 use crate::{
     ast::{self, Attribute, Span},
-    common::{constraint_names::ConstraintNames, preview_features::PreviewFeature, RelationNames},
+    common::{constraint_names::ConstraintNames, RelationNames},
     dml::{self, Field, Ignorable, SortOrder},
     transform::dml_to_ast::LowerDmlToAst,
     Datasource,
@@ -96,28 +96,27 @@ impl<'a> LowerDmlToAst<'a> {
                         ));
                     }
                 }
-                if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                    if let Some(length) = pk.fields.first().unwrap().length {
-                        args.push(ast::Argument::new(
-                            "length",
-                            ast::Expression::NumericValue(length.to_string(), Span::empty()),
-                        ));
-                    }
 
-                    if let Some(SortOrder::Desc) = pk.fields.first().unwrap().sort_order {
-                        args.push(ast::Argument::new(
-                            "sort",
-                            ast::Expression::NumericValue("Desc".to_string(), Span::empty()),
-                        ));
-                    }
+                if let Some(length) = pk.fields.first().unwrap().length {
+                    args.push(ast::Argument::new(
+                        "length",
+                        ast::Expression::NumericValue(length.to_string(), Span::empty()),
+                    ));
+                }
 
-                    if matches!(pk.clustered, Some(false)) {
-                        args.push(ast::Argument::new(
-                            "clustered",
-                            ast::Expression::ConstantValue("false".to_string(), Span::empty()),
-                        ));
-                    }
-                };
+                if let Some(SortOrder::Desc) = pk.fields.first().unwrap().sort_order {
+                    args.push(ast::Argument::new(
+                        "sort",
+                        ast::Expression::NumericValue("Desc".to_string(), Span::empty()),
+                    ));
+                }
+
+                if matches!(pk.clustered, Some(false)) {
+                    args.push(ast::Argument::new(
+                        "clustered",
+                        ast::Expression::ConstantValue("false".to_string(), Span::empty()),
+                    ));
+                }
 
                 attributes.push(ast::Attribute::new("id", args));
             }
@@ -139,9 +138,7 @@ impl<'a> LowerDmlToAst<'a> {
 
                     i.is_unique() && i.defined_on_field && i.fields.len() == 1 && names_match
                 }) {
-                    if self.preview_features.contains(PreviewFeature::ExtendedIndexes)
-                        && matches!(idx.clustered, Some(true))
-                    {
+                    if matches!(idx.clustered, Some(true)) {
                         arguments.push(ast::Argument::new(
                             "clustered",
                             ast::Expression::ConstantValue("true".to_string(), Span::empty()),

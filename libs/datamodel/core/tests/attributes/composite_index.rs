@@ -202,7 +202,7 @@ fn composite_index_with_sort() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &["extendedIndexes"]));
+    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &[]));
 
     let mut field = IndexField::new_in_path(&[("a", None), ("field", Some("A"))]);
     field.sort_order = Some(SortOrder::Desc);

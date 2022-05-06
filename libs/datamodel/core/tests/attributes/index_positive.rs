@@ -251,7 +251,7 @@ fn mysql_allows_unique_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let schema = parse(&schema);
     let user_model = schema.assert_has_model("A");
     user_model.assert_has_index(IndexDefinition {
@@ -280,7 +280,7 @@ fn mysql_allows_compound_unique_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -295,7 +295,7 @@ fn mysql_allows_index_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -307,7 +307,7 @@ fn mysql_allows_unique_sort_order() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -319,7 +319,7 @@ fn sqlite_allows_unique_sort_order() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Sqlite, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -331,7 +331,7 @@ fn sqlserver_allows_unique_sort_order() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -345,7 +345,7 @@ fn mysql_allows_compound_unique_sort_order() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -359,7 +359,7 @@ fn sqlite_allows_compound_unique_sort_order() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Sqlite, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -373,7 +373,7 @@ fn sqlserver_allows_compound_unique_sort_order() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -388,7 +388,7 @@ fn mysql_allows_index_sort_order() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -403,7 +403,7 @@ fn sqlserver_allows_index_sort_order() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -494,7 +494,7 @@ fn duplicate_index_different_sort_order_mongodb() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
 
     parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
@@ -539,7 +539,7 @@ fn fulltext_index_sort_mongodb() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["fullTextIndex", "extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
 
     parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,

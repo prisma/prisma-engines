@@ -64,7 +64,6 @@ capabilities!(
     NamedDefaultValues,
     IndexColumnLengthPrefixing,
     PrimaryKeySortOrderDefinition,
-    UsingHashIndex,
     FullTextIndex,
     SortOrderInFullTextIndex,
     MultipleFullTextAttributesPerModel,

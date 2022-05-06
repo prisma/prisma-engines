@@ -73,10 +73,6 @@ impl MongoDbIntrospectionConnector {
             schema.remove_fulltext_indexes();
         }
 
-        if !preview_features.contains(PreviewFeature::ExtendedIndexes) {
-            schema.normalize_index_attributes();
-        }
-
         Ok(schema)
     }
 

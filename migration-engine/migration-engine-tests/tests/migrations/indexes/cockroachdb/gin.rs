@@ -22,7 +22,7 @@ fn gin_preview_disabled(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(CockroachDb), preview_features("extendedIndexes", "cockroachDb"))]
+#[test_connector(tags(CockroachDb), preview_features("cockroachDb"))]
 fn gin_array_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -44,7 +44,7 @@ fn gin_array_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(CockroachDb), preview_features("extendedIndexes", "cockroachDb"))]
+#[test_connector(tags(CockroachDb), preview_features("cockroachDb"))]
 fn gin_jsonb_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -66,7 +66,7 @@ fn gin_jsonb_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(CockroachDb), preview_features("extendedIndexes", "cockroachDb"))]
+#[test_connector(tags(CockroachDb), preview_features("cockroachDb"))]
 fn gin_raw_ops(api: TestApi) {
     let dm = r#"
         model A {

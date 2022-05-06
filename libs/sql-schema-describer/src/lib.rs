@@ -71,6 +71,7 @@ pub struct SqlSchema {
 
 impl SqlSchema {
     /// Extract connector-specific constructs. The type parameter must be the right one.
+    #[track_caller]
     pub fn downcast_connector_data<T: 'static>(&self) -> Option<&T> {
         self.connector_data.data.as_ref()?.downcast_ref()
     }

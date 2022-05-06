@@ -395,7 +395,7 @@ fn implicit_relations_indices_are_not_renamed_unnecessarily(api: TestApi) {
         .assert_migration_directories_count(1);
 }
 
-#[test_connector(tags(Mysql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql))]
 fn creating_index_on_long_varchar_without_length_fails(api: TestApi) {
     let plain_dm = r#"
      model User {
@@ -410,7 +410,7 @@ fn creating_index_on_long_varchar_without_length_fails(api: TestApi) {
     api.schema_push_w_datasource(plain_dm).send_unwrap_err();
 }
 
-#[test_connector(tags(Mysql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql))]
 fn mysql_should_diff_column_ordering_correctly_issue_10983(api: TestApi) {
     // https://github.com/prisma/prisma/issues/10983
 
@@ -436,7 +436,7 @@ fn mysql_should_diff_column_ordering_correctly_issue_10983(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(preview_features("extendedIndexes"))]
+#[test_connector]
 fn issue_repro_extended_indexes(api: TestApi) {
     // https://github.com/prisma/prisma/issues/11631
 
