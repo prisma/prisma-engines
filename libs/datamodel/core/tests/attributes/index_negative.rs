@@ -156,27 +156,17 @@ fn index_does_not_accept_missing_length_with_extended_indexes() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mNative type Text cannot be unique in MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;91merror[0m: [1mNative type `Text` cannot be unique in MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m11 | [0m
-        [1;94m12 | [0m     [1;91mmodel User {[0m
         [1;94m13 | [0m         id         Int    @id
-        [1;94m14 | [0m         firstName  String @unique @test.Text
-        [1;94m15 | [0m         
-        [1;94m16 | [0m         @@index([firstName])
-        [1;94m17 | [0m     }
+        [1;94m14 | [0m         firstName  String @[1;91munique[0m @test.Text
         [1;94m   | [0m
-        [1;91merror[0m: [1mYou cannot define an index on fields with Native type Text of MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `Text` of MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
-        [1;94m11 | [0m
-        [1;94m12 | [0m     [1;91mmodel User {[0m
-        [1;94m13 | [0m         id         Int    @id
-        [1;94m14 | [0m         firstName  String @unique @test.Text
         [1;94m15 | [0m         
-        [1;94m16 | [0m         @@index([firstName])
-        [1;94m17 | [0m     }
+        [1;94m16 | [0m         @@[1;91mindex([firstName])[0m
         [1;94m   | [0m
     "#]];
 
