@@ -1,7 +1,10 @@
+use std::time::Instant;
+
 use super::pipeline::QueryPipeline;
 use crate::{IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, ResponseData};
 use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
+use metrics::{histogram, increment_counter};
 use schema::QuerySchemaRef;
 use tracing_futures::WithSubscriber;
 
@@ -11,12 +14,18 @@ pub async fn execute_single_operation(
     operation: &Operation,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
+    let operation_timer = Instant::now();
     let interpreter = QueryInterpreter::new(conn);
     let (query_graph, serializer) = QueryGraphBuilder::new(query_schema.clone()).build(operation.clone())?;
 
-    QueryPipeline::new(query_graph, interpreter, serializer)
+    increment_counter!("query_total_operations");
+
+    let result = QueryPipeline::new(query_graph, interpreter, serializer)
         .execute(trace_id)
-        .await
+        .await;
+
+    histogram!("query_operation_total_elapsed_time_ms", operation_timer.elapsed());
+    result
 }
 
 pub async fn execute_many_operations(
@@ -33,11 +42,14 @@ pub async fn execute_many_operations(
     let mut results = Vec::with_capacity(queries.len());
 
     for (query_graph, serializer) in queries {
+        increment_counter!("query_total_operations");
+        let operation_timer = Instant::now();
         let interpreter = QueryInterpreter::new(conn);
         let result = QueryPipeline::new(query_graph, interpreter, serializer)
             .execute(trace_id.clone())
             .await?;
 
+        histogram!("query_operation_total_elapsed_time_ms", operation_timer.elapsed());
         results.push(Ok(result));
     }
 
@@ -69,6 +81,7 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
     for op in operations {
         match QueryGraphBuilder::new(query_schema.clone()).build(op.clone()) {
             Ok((graph, serializer)) => {
+                increment_counter!("query_total_operations");
                 let conn = connector.get_connection().await?;
 
                 futures.push(tokio::spawn(
@@ -99,7 +112,8 @@ async fn execute_self_contained(
     force_transactions: bool,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
-    if force_transactions || graph.needs_transaction() {
+    let operation_timer = Instant::now();
+    let result = if force_transactions || graph.needs_transaction() {
         let mut tx = conn.start_transaction().await?;
         let result = execute_on(tx.as_connection_like(), graph, serializer, trace_id).await;
 
@@ -112,7 +126,10 @@ async fn execute_self_contained(
         result
     } else {
         execute_on(conn.as_connection_like(), graph, serializer, trace_id).await
-    }
+    };
+
+    histogram!("query_operation_total_elapsed_time_ms", operation_timer.elapsed());
+    result
 }
 
 // Simplest execution on anything that's a ConnectionLike. Caller decides handling of connections and transactions.
@@ -122,6 +139,7 @@ async fn execute_on(
     serializer: IrSerializer,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
+    increment_counter!("query_total_operations");
     let interpreter = QueryInterpreter::new(conn);
     let result = QueryPipeline::new(graph, interpreter, serializer)
         .execute(trace_id)

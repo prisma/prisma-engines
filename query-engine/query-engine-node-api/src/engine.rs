@@ -1,10 +1,10 @@
 use crate::{error::ApiError, logger::Logger};
-use datamodel::{dml::Datamodel, ValidatedConfiguration};
+use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel, ValidatedConfiguration};
 use prisma_models::InternalDataModelBuilder;
 use query_core::{
     executor,
     schema::{QuerySchema, QuerySchemaRenderer},
-    schema_builder, QueryExecutor, TxId,
+    schema_builder, MetricRegistry, QueryExecutor, TxId,
 };
 use request_handlers::{GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde::{Deserialize, Serialize};
@@ -59,6 +59,7 @@ struct ConnectedEngine {
     executor: crate::Executor,
     config_dir: PathBuf,
     env: HashMap<String, String>,
+    metrics: Option<MetricRegistry>,
 }
 
 /// Returned from the `serverInfo` method in javascript.
@@ -68,6 +69,13 @@ struct ServerInfo {
     commit: String,
     version: String,
     primary_connector: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MetricOptions {
+    format: String,
+    global_labels: HashMap<String, String>,
 }
 
 impl ConnectedEngine {
@@ -172,6 +180,7 @@ impl QueryEngine {
             .subject;
 
         let datamodel = EngineDatamodel { ast, raw: datamodel };
+        let enable_metrics = config.subject.preview_features().contains(PreviewFeature::Metrics);
 
         let builder = EngineBuilder {
             datamodel,
@@ -184,7 +193,7 @@ impl QueryEngine {
 
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
-            logger: Logger::new(log_queries, log_level, log_callback),
+            logger: Logger::new(log_queries, log_level, log_callback, enable_metrics),
         })
     }
 
@@ -194,7 +203,7 @@ impl QueryEngine {
         let mut inner = self.inner.write().await;
         let builder = inner.as_builder()?;
 
-        let dispatcher = self.logger.dispatcher().await;
+        let dispatcher = self.logger.dispatcher();
 
         let engine = async move {
             // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
@@ -231,6 +240,7 @@ impl QueryEngine {
                 executor,
                 config_dir: builder.config_dir.clone(),
                 env: builder.env.clone(),
+                metrics: self.logger.metrics(),
             }) as crate::Result<ConnectedEngine>
         }
         .with_subscriber(dispatcher)
@@ -271,7 +281,7 @@ impl QueryEngine {
         let query = serde_json::from_str(&body)?;
         let trace: HashMap<String, String> = serde_json::from_str(&trace)?;
 
-        let dispatcher = self.logger.dispatcher().await;
+        let dispatcher = self.logger.dispatcher();
 
         async move {
             let trace_id = trace.get("traceparent").map(String::from);
@@ -291,7 +301,7 @@ impl QueryEngine {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
-        let dispatcher = self.logger.dispatcher().await;
+        let dispatcher = self.logger.dispatcher();
 
         async move {
             let input: TxInput = serde_json::from_str(&input)?;
@@ -314,7 +324,7 @@ impl QueryEngine {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
-        let dispatcher = self.logger.dispatcher().await;
+        let dispatcher = self.logger.dispatcher();
 
         async move {
             match engine.executor().commit_tx(TxId::from(tx_id)).await {
@@ -332,7 +342,7 @@ impl QueryEngine {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
-        let dispatcher = self.logger.dispatcher().await;
+        let dispatcher = self.logger.dispatcher();
 
         async move {
             match engine.executor().rollback_tx(TxId::from(tx_id)).await {
@@ -351,6 +361,28 @@ impl QueryEngine {
         let engine = inner.as_engine()?;
 
         Ok(GraphQLSchemaRenderer::render(engine.query_schema().clone()))
+    }
+
+    #[napi]
+    pub async fn metrics(&self, json_options: String) -> napi::Result<String> {
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
+        let options: MetricOptions = serde_json::from_str(&json_options)?;
+
+        if let Some(metrics) = &engine.metrics {
+            if options.format.as_str() == "json" {
+                let engine_metrics = metrics.to_json(options.global_labels);
+                let res = serde_json::to_string(&engine_metrics)?;
+                Ok(res)
+            } else {
+                Ok(metrics.to_prometheus(options.global_labels))
+            }
+        } else {
+            Err(
+                ApiError::Configuration("Metrics is not enabled. First set it in the preview features.".to_string())
+                    .into(),
+            )
+        }
     }
 }
 

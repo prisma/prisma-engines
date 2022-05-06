@@ -3,6 +3,7 @@ use datamodel::common::preview_features::PreviewFeature;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::{global, propagation::Extractor, Context};
+use query_core::MetricRegistry;
 use query_core::{schema::QuerySchemaRenderer, TxId};
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde_json::json;
@@ -21,17 +22,29 @@ pub struct State {
     enable_playground: bool,
     enable_debug_mode: bool,
     enable_itx: bool,
+    enable_metrics: bool,
 }
 
 impl State {
     /// Create a new instance of `State`.
-    fn new(cx: PrismaContext, enable_playground: bool, enable_debug_mode: bool, enable_itx: bool) -> Self {
+    fn new(
+        cx: PrismaContext,
+        enable_playground: bool,
+        enable_debug_mode: bool,
+        enable_itx: bool,
+        enable_metrics: bool,
+    ) -> Self {
         Self {
             cx: Arc::new(cx),
             enable_playground,
             enable_debug_mode,
             enable_itx,
+            enable_metrics,
         }
+    }
+
+    pub fn get_metrics(&self) -> MetricRegistry {
+        self.cx.metrics.clone()
     }
 }
 
@@ -42,11 +55,12 @@ impl Clone for State {
             enable_playground: self.enable_playground,
             enable_debug_mode: self.enable_debug_mode,
             enable_itx: self.enable_itx,
+            enable_metrics: self.enable_metrics,
         }
     }
 }
 
-pub async fn setup(opts: &PrismaOpt) -> PrismaResult<State> {
+pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<State> {
     let config = opts.configuration(false)?.subject;
     config.validate_that_one_datasource_is_provided()?;
 
@@ -54,20 +68,29 @@ pub async fn setup(opts: &PrismaOpt) -> PrismaResult<State> {
         .preview_features()
         .contains(PreviewFeature::InteractiveTransactions);
 
+    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
+
     let datamodel = opts.datamodel()?;
     let cx = PrismaContext::builder(config, datamodel)
         .legacy(opts.legacy)
+        .set_metrics(metrics)
         .enable_raw_queries(opts.enable_raw_queries)
         .build()
         .await?;
 
-    let state = State::new(cx, opts.enable_playground, opts.enable_debug_mode, enable_itx);
+    let state = State::new(
+        cx,
+        opts.enable_playground,
+        opts.enable_debug_mode,
+        enable_itx,
+        enable_metrics,
+    );
     Ok(state)
 }
 
 /// Starts up the graphql query engine server
-pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
-    let state = setup(&opts).await?;
+pub async fn listen(opts: PrismaOpt, metrics: MetricRegistry) -> PrismaResult<()> {
+    let state = setup(&opts, metrics).await?;
 
     let query_engine = make_service_fn(move |_| {
         let state = state.clone();
@@ -93,6 +116,10 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
 
     if req.method() == Method::POST && req.uri().path().contains("transaction") && state.enable_itx {
         return handle_transaction(state, req).await;
+    }
+
+    if req.method() == Method::GET && req.uri().path().contains("metrics") && state.enable_metrics {
+        return handle_metrics(state, req).await;
     }
 
     let mut res = match (req.method(), req.uri().path()) {
@@ -211,6 +238,32 @@ fn playground_handler() -> Response<Body> {
         .header(CONTENT_TYPE, "text/html")
         .body(Body::from(playground))
         .unwrap()
+}
+
+async fn handle_metrics(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    if let Some(query) = req.uri().query() {
+        if query.contains("format=json") {
+            let metrics = state.cx.metrics.to_json(Default::default());
+
+            let res = Response::builder()
+                .status(StatusCode::OK)
+                .header(CONTENT_TYPE, "application/json")
+                .body(Body::from(metrics.to_string()))
+                .unwrap();
+
+            return Ok(res);
+        }
+    }
+
+    let metrics = state.cx.metrics.to_prometheus(Default::default());
+
+    let res = Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/json")
+        .body(Body::from(metrics))
+        .unwrap();
+
+    Ok(res)
 }
 
 /// Sadly the routing doesn't make it obvious what the transaction routes are:

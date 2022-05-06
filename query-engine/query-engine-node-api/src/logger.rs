@@ -1,5 +1,6 @@
 use core::fmt;
 use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
+use query_core::MetricRegistry;
 use serde_json::Value;
 use std::collections::BTreeMap;
 use tracing::{
@@ -16,11 +17,17 @@ use tracing_subscriber::{
 
 pub(crate) struct Logger {
     dispatcher: Dispatch,
+    metrics: Option<MetricRegistry>,
 }
 
 impl Logger {
     /// Creates a new logger using a call layer
-    pub fn new(log_queries: bool, log_level: LevelFilter, log_callback: ThreadsafeFunction<String>) -> Self {
+    pub fn new(
+        log_queries: bool,
+        log_level: LevelFilter,
+        log_callback: ThreadsafeFunction<String>,
+        enable_metrics: bool,
+    ) -> Self {
         let is_sql_query = filter_fn(|meta| {
             meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
         });
@@ -33,18 +40,29 @@ impl Logger {
             is_sql_query.or(is_mongo_query).or(log_level).boxed()
         } else {
             // Filter based in the defined log level
-            log_level.boxed()
+            FilterExt::boxed(log_level)
         };
 
         let layer = CallbackLayer::new(log_callback).with_filter(filters);
 
+        let metrics = if enable_metrics {
+            Some(MetricRegistry::new())
+        } else {
+            None
+        };
+
         Self {
-            dispatcher: Dispatch::new(Registry::default().with(layer)),
+            dispatcher: Dispatch::new(Registry::default().with(layer).with(metrics.clone())),
+            metrics,
         }
     }
 
-    pub async fn dispatcher(&self) -> Dispatch {
+    pub fn dispatcher(&self) -> Dispatch {
         self.dispatcher.clone()
+    }
+
+    pub fn metrics(&self) -> Option<MetricRegistry> {
+        self.metrics.clone()
     }
 }
 

@@ -7,7 +7,6 @@ use crate::{
     root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
 };
-
 use connector_interface::*;
 use mongodb::{
     bson::{doc, Document},
@@ -58,7 +57,7 @@ pub async fn create_record<'conn>(
 
     logger::log_insert_one(coll.name(), &doc);
 
-    let insert_result = coll.insert_one_with_session(doc, None, session).await?;
+    let insert_result = metrics(|| coll.insert_one_with_session(doc, None, session)).await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
 
     Ok(SelectionResult::from((id_field, id_value)))
@@ -103,7 +102,9 @@ pub async fn create_records<'conn>(
 
     logger::log_insert_many(coll.name(), &docs, ordered);
 
-    match coll.insert_many_with_session(docs, options, session).await {
+    let insert = metrics(|| coll.insert_many_with_session(docs, options, session));
+
+    match insert.await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
         Err(err) if skip_duplicates => match err.kind.as_ref() {
             ErrorKind::BulkWrite(ref failure) => match failure.write_errors {
@@ -174,8 +175,7 @@ pub async fn update_records<'conn>(
 
     if !update_docs.is_empty() {
         logger::log_update_many_vec(coll.name(), &filter, &update_docs);
-        coll.update_many_with_session(filter, update_docs, None, session)
-            .await?;
+        metrics(|| coll.update_many_with_session(filter, update_docs, None, session)).await?;
     }
 
     let ids = ids
@@ -220,7 +220,7 @@ pub async fn delete_records<'conn>(
 
     let filter = doc! { id_field.db_name(): { "$in": ids } };
     logger::log_delete_many(coll.name(), &filter);
-    let delete_result = coll.delete_many_with_session(filter, None, session).await?;
+    let delete_result = metrics(|| coll.delete_many_with_session(filter, None, session)).await?;
 
     Ok(delete_result.deleted_count as usize)
 }
@@ -291,9 +291,7 @@ pub async fn m2m_connect<'conn>(
 
     logger::log_update_one(parent_coll.name(), &parent_filter, &parent_update);
     // First update the parent and add all child IDs to the m:n scalar field.
-    parent_coll
-        .update_one_with_session(parent_filter, parent_update, None, session)
-        .await?;
+    metrics(|| parent_coll.update_one_with_session(parent_filter, parent_update, None, session)).await?;
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
@@ -303,9 +301,7 @@ pub async fn m2m_connect<'conn>(
     // this needs work
     logger::log_update_many(child_coll.name(), &child_filter, &child_update);
 
-    child_coll
-        .update_many_with_session(child_filter, child_update, None, session)
-        .await?;
+    metrics(|| child_coll.update_many_with_session(child_filter, child_update, None, session)).await?;
 
     Ok(())
 }
@@ -347,9 +343,7 @@ pub async fn m2m_disconnect<'conn>(
 
     // First update the parent and remove all child IDs to the m:n scalar field.
     logger::log_update_one(parent_coll.name(), &parent_filter, &parent_update);
-    parent_coll
-        .update_one_with_session(parent_filter, parent_update, None, session)
-        .await?;
+    metrics(|| parent_coll.update_one_with_session(parent_filter, parent_update, None, session)).await?;
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
@@ -358,9 +352,7 @@ pub async fn m2m_disconnect<'conn>(
     let child_update = doc! { "$pull": { child_ids_scalar_field_name: parent_id } };
     logger::log_update_many(child_coll.name(), &child_filter, &child_update);
 
-    child_coll
-        .update_many_with_session(child_filter, child_update, None, session)
-        .await?;
+    metrics(|| child_coll.update_many_with_session(child_filter, child_update, None, session)).await?;
 
     Ok(())
 }
@@ -386,7 +378,7 @@ pub async fn query_raw<'conn>(
 
     let json_result = match mongo_command {
         MongoCommand::Raw { cmd } => {
-            let mut result = database.run_command_with_session(cmd, None, session).await?;
+            let mut result = metrics(|| database.run_command_with_session(cmd, None, session)).await?;
 
             // Removes unnecessary properties from raw response
             // See https://docs.mongodb.com/v5.0/reference/method/db.runCommand
