@@ -286,7 +286,7 @@
     <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">default_mapped_name</span>().<span class="ident">is_some</span>() {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="string">&quot;A `map` argument for the default value of a field on a composite type is not allowed. Consider removing it.&quot;</span>,
-            <span class="string">&quot;default&quot;</span>,
+            <span class="string">&quot;@default&quot;</span>,
             <span class="ident">default_attribute</span>.<span class="ident">unwrap</span>().<span class="ident">span</span>,
         ));
     }

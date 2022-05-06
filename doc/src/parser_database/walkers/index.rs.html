@@ -307,6 +307,10 @@
 <span id="302">302</span>
 <span id="303">303</span>
 <span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="ident">IndexAlgorithm</span>, <span class="ident">IndexAttribute</span>},
@@ -336,13 +340,17 @@
         <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
     }
 
-    <span class="doccomment">/// The attribute name: `&quot;unique&quot;` for `@@unique`, `&quot;fulltext&quot;` for `@@fultext` and `&quot;index&quot;`</span>
+    <span class="doccomment">/// The attribute name: `&quot;index&quot;` for `@@unique`, `&quot;fulltext&quot;` for `@@fultext` and `&quot;index&quot;`</span>
     <span class="doccomment">/// for `@index` and `@@index`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attribute_name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_unique</span>() {
-            <span class="string">&quot;unique&quot;</span>
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_unique</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_defined_on_field</span>() {
+            <span class="string">&quot;@unique&quot;</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_unique</span>() {
+            <span class="string">&quot;@@unique&quot;</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_fulltext</span>() {
+            <span class="string">&quot;@@fulltext&quot;</span>
         } <span class="kw">else</span> {
-            <span class="string">&quot;index&quot;</span>
+            <span class="string">&quot;@@index&quot;</span>
         }
     }
 

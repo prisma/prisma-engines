@@ -86,7 +86,7 @@
             <span class="comment">// Add an error for all autoincrement fields on the model.</span>
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
                 <span class="ident">msg</span>,
-                <span class="string">&quot;default&quot;</span>,
+                <span class="string">&quot;@default&quot;</span>,
                 <span class="ident">field</span>.<span class="ident">default_attribute</span>().<span class="ident">unwrap</span>().<span class="ident">span</span>,
             ));
         }
@@ -99,7 +99,7 @@
 
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="ident">msg</span>,
-            <span class="string">&quot;default&quot;</span>,
+            <span class="string">&quot;@default&quot;</span>,
             <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>,
         ))
     }
@@ -113,7 +113,7 @@
 
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
                 <span class="ident">msg</span>,
-                <span class="string">&quot;default&quot;</span>,
+                <span class="string">&quot;@default&quot;</span>,
                 <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
             ))
         }
@@ -123,7 +123,7 @@
 
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
                 <span class="ident">msg</span>,
-                <span class="string">&quot;default&quot;</span>,
+                <span class="string">&quot;@default&quot;</span>,
                 <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
             ))
         }

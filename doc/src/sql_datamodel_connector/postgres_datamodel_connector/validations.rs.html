@@ -435,6 +435,36 @@
 <span id="430">430</span>
 <span id="431">431</span>
 <span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">parser_database</span>::{<span class="ident">walkers::IndexWalker</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">OperatorClass</span>},
     <span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>,
@@ -520,7 +550,9 @@
                     <span class="macro">format!</span>(<span class="string">&quot;The given operator class `{opclass}` is not supported with the `{algo}` index type.&quot;</span>);
 
                 <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                    <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                    <span class="ident">attr</span>.<span class="ident">span</span>,
                 ));
 
                 <span class="kw">continue</span>;
@@ -537,14 +569,18 @@
                 );
 
                 <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                    <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                    <span class="ident">attr</span>.<span class="ident">span</span>,
                 ));
             }
             (<span class="prelude-val">Some</span>(<span class="ident">native_type</span>), <span class="prelude-val">None</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;The {algo} index field type `{native_type}` has no default operator class.&quot;</span>);
 
                 <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                    <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                    <span class="ident">attr</span>.<span class="ident">span</span>,
                 ));
             }
             (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">opclass</span>)) =&gt; {
@@ -554,7 +590,9 @@
                 );
 
                 <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                    <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                    <span class="ident">attr</span>.<span class="ident">span</span>,
                 ));
             }
             <span class="kw">_</span> =&gt; {
@@ -563,7 +601,9 @@
                     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;The {algo} index type does not support the type of the field `{name}`.&quot;</span>);
 
                     <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                        <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                        <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                        <span class="ident">attr</span>.<span class="ident">span</span>,
                     ));
                 }
             }
@@ -591,7 +631,9 @@
                     );
 
                         <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                            <span class="ident">attr</span>.<span class="ident">span</span>,
                         ));
                     }
                 }
@@ -614,7 +656,9 @@
                     );
 
                     <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                        <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                        <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                        <span class="ident">attr</span>.<span class="ident">span</span>,
                     ));
                 }
                 <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_instance</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">opclass</span>),
@@ -636,7 +680,9 @@
                         );
 
                         <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                            <span class="ident">attr</span>.<span class="ident">span</span>,
                         ));
                     }
                 }
@@ -687,7 +733,9 @@
                         );
 
                         <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                            <span class="ident">attr</span>.<span class="ident">span</span>,
                         ));
                     }
                 }
@@ -721,7 +769,9 @@
                         );
 
                         <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                            <span class="ident">attr</span>.<span class="ident">span</span>,
                         ));
                     }
                 }
@@ -742,7 +792,9 @@
                         );
 
                         <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                            <span class="ident">attr</span>.<span class="ident">span</span>,
                         ));
                     }
                 }
@@ -763,7 +815,9 @@
                         );
 
                         <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                            <span class="ident">attr</span>.<span class="ident">span</span>,
                         ));
                     }
                 }
@@ -789,7 +843,9 @@
                         );
 
                         <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                            <span class="ident">attr</span>.<span class="ident">span</span>,
                         ));
                     }
                 }
@@ -812,7 +868,9 @@
                         );
 
                         <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                            <span class="ident">attr</span>.<span class="ident">span</span>,
                         ));
                     }
                 }
@@ -833,7 +891,9 @@
                         );
 
                         <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="string">&quot;@index&quot;</span>, <span class="ident">attr</span>.<span class="ident">span</span>,
+                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                            <span class="ident">attr</span>.<span class="ident">span</span>,
                         ));
                     }
                 }

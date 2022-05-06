@@ -477,7 +477,7 @@
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast::FieldArity::List</span> <span class="op">|</span> <span class="ident">ast::FieldArity::Optional</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">arity</span> {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="string">&quot;Fields that are marked as id must be required.&quot;</span>,
-            <span class="string">&quot;id&quot;</span>,
+            <span class="string">&quot;@id&quot;</span>,
             <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">pk</span>.<span class="ident">source_attribute</span>].<span class="ident">span</span>,
         ))
     }

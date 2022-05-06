@@ -547,7 +547,6 @@
 <span id="542">542</span>
 <span id="543">543</span>
 <span id="544">544</span>
-<span id="545">545</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">many_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_one</span>;
@@ -575,8 +574,7 @@
 <span class="kw">use</span> <span class="ident">visited_relation</span>::<span class="kw-2">*</span>;
 
 <span class="kw">const</span> <span class="ident">PRISMA_FORMAT_HINT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;You can run `prisma format` to fix this automatically.&quot;</span>;
-<span class="kw">const</span> <span class="ident">RELATION_ATTRIBUTE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;relation&quot;</span>;
-<span class="kw">const</span> <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;@relation&quot;</span>;
+<span class="kw">const</span> <span class="ident">RELATION_ATTRIBUTE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;@relation&quot;</span>;
 <span class="kw">const</span> <span class="ident">STATE_ERROR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.&quot;</span>;
 
 <span class="doccomment">/// Depending on the database, a constraint name might need to be unique in a certain namespace.</span>

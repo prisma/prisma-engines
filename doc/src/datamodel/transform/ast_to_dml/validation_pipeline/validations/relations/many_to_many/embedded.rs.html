@@ -205,6 +205,8 @@
 <span id="200">200</span>
 <span id="201">201</span>
 <span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">diagnostics::DatamodelError</span>, <span class="ident">transform::ast_to_dml::validation_pipeline::context::Context</span>};
 <span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
 <span class="kw">use</span> <span class="ident">parser_database::walkers::TwoWayEmbeddedManyToManyRelationWalker</span>;
@@ -264,7 +266,7 @@
     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;The `references` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations&quot;</span>;
 
     <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">spans</span> {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">msg</span>, <span class="string">&quot;relation&quot;</span>, <span class="ident">span</span>));
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">msg</span>, <span class="string">&quot;@relation&quot;</span>, <span class="ident">span</span>));
     }
 }
 
@@ -300,7 +302,7 @@
     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;The `fields` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations&quot;</span>;
 
     <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">spans</span> {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">msg</span>, <span class="string">&quot;relation&quot;</span>, <span class="ident">span</span>));
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">msg</span>, <span class="string">&quot;@relation&quot;</span>, <span class="ident">span</span>));
     }
 }
 
@@ -333,7 +335,7 @@
     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;The `references` argument must point to a singular `id` field&quot;</span>;
 
     <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">spans</span> {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">msg</span>, <span class="string">&quot;relation&quot;</span>, <span class="ident">span</span>));
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">msg</span>, <span class="string">&quot;@relation&quot;</span>, <span class="ident">span</span>));
     }
 }
 
@@ -376,7 +378,9 @@
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">span_for_attribute</span>(<span class="string">&quot;relation&quot;</span>).<span class="ident">unwrap_or</span>(<span class="ident">ast_field</span>.<span class="ident">span</span>);
 
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="ident">error_msg</span>, <span class="string">&quot;relation&quot;</span>, <span class="ident">span</span>,
+            <span class="ident">error_msg</span>,
+            <span class="string">&quot;@relation&quot;</span>,
+            <span class="ident">span</span>,
         ));
     }
 }

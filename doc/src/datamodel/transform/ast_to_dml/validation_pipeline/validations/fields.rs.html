@@ -432,7 +432,7 @@
 };
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>};
 <span class="kw">use</span> <span class="ident">parser_database</span>::{
-    <span class="ident">ast</span>::{<span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
+    <span class="ident">ast::WithSpan</span>,
     <span class="ident">walkers</span>::{<span class="ident">PrimaryKeyWalker</span>, <span class="ident">TypedFieldWalker</span>},
 };
 
@@ -500,7 +500,7 @@
             .<span class="ident">unwrap_or</span>(<span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>);
 
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;default&quot;</span>, <span class="ident">span</span>,
+            <span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;@default&quot;</span>, <span class="ident">span</span>,
         ));
     }
 }
@@ -637,7 +637,7 @@
 
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="ident">msg</span>,
-            <span class="string">&quot;default&quot;</span>,
+            <span class="string">&quot;@default&quot;</span>,
             <span class="ident">default_attribute</span>.<span class="ident">unwrap</span>().<span class="ident">span</span>,
         ));
     }
@@ -766,7 +766,7 @@
 
     <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
         <span class="string">&quot;Defining clustering is not supported in the current connector.&quot;</span>,
-        <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">name</span>(),
+        <span class="ident">pk</span>.<span class="ident">attribute_name</span>(),
         <span class="kw-2">*</span><span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>(),
     ));
 }
@@ -786,7 +786,7 @@
 
     <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
         <span class="string">&quot;To specify clustering, please enable `extendedIndexes` preview feature.&quot;</span>,
-        <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">name</span>(),
+        <span class="ident">pk</span>.<span class="ident">attribute_name</span>(),
         <span class="kw-2">*</span><span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>(),
     ))
 }
@@ -814,7 +814,7 @@
 
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="string">&quot;A model can only hold one clustered index or id.&quot;</span>,
-            <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">name</span>(),
+            <span class="ident">pk</span>.<span class="ident">attribute_name</span>(),
             <span class="kw-2">*</span><span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>(),
         ));
 

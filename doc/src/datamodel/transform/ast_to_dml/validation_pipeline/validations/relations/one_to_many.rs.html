@@ -162,7 +162,7 @@
             <span class="string">&quot;The relation field `{}` on Model `{}` must specify the `fields` argument in the {} attribute. {}&quot;</span>,
             <span class="ident">forward</span>.<span class="ident">name</span>(),
             <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-            <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>,
+            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
             <span class="ident">PRISMA_FORMAT_HINT</span>
         );
 
@@ -180,7 +180,7 @@
                 <span class="string">&quot;The relation field `{}` on Model `{}` must specify the `references` argument in the {} attribute.&quot;</span>,
                 <span class="ident">forward</span>.<span class="ident">name</span>(),
                 <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-                <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>
+                <span class="ident">RELATION_ATTRIBUTE_NAME</span>
             ),
             <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
             <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
@@ -192,7 +192,7 @@
             <span class="string">&quot;The relation field `{}` on Model `{}` must not specify the `fields` or `references` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.&quot;</span>,
             <span class="ident">back</span>.<span class="ident">name</span>(),
             <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-            <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>,
+            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
             <span class="ident">forward</span>.<span class="ident">name</span>(),
             <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
         );
@@ -215,7 +215,7 @@
     <span class="kw">if</span> <span class="ident">back</span>.<span class="ident">explicit_on_delete</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">back</span>.<span class="ident">explicit_on_update</span>().<span class="ident">is_some</span>() {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`, or in case of a many to many relation, in an explicit join table.&quot;</span>,
-            <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>, <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+            <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME</span>, <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
         );
 
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(

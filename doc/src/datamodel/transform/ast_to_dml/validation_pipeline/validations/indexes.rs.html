@@ -510,6 +510,26 @@
 <span id="505">505</span>
 <span id="506">506</span>
 <span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">constraint_namespace::ConstraintName</span>, <span class="ident">database_name::validate_db_name</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast::Span</span>,
@@ -518,7 +538,7 @@
     <span class="ident">transform::ast_to_dml</span>::{<span class="ident">db::walkers::IndexWalker</span>, <span class="ident">validation_pipeline::context::Context</span>},
 };
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>};
-<span class="kw">use</span> <span class="ident">schema_ast::ast</span>::{<span class="ident">WithName</span>, <span class="ident">WithSpan</span>};
+<span class="kw">use</span> <span class="ident">schema_ast::ast::WithSpan</span>;
 
 <span class="doccomment">/// Different databases validate index and unique constraint names in a certain namespace.</span>
 <span class="doccomment">/// Validates index and unique constraint names against the database requirements.</span>
@@ -580,7 +600,9 @@
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>);
 
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                <span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;@unique&quot;</span>, <span class="ident">span</span>,
+                <span class="kw-2">&amp;</span><span class="ident">message</span>,
+                <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                <span class="ident">span</span>,
             ));
         }
     }
@@ -642,7 +664,9 @@
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">model</span>().<span class="ident">ast_model</span>().<span class="ident">span</span>);
 
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="ident">message</span>, <span class="string">&quot;fulltext&quot;</span>, <span class="ident">span</span>,
+            <span class="ident">message</span>,
+            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+            <span class="ident">span</span>,
         ));
     }
 }
@@ -662,7 +686,9 @@
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">model</span>().<span class="ident">ast_model</span>().<span class="ident">span</span>);
 
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="ident">message</span>, <span class="string">&quot;fulltext&quot;</span>, <span class="ident">span</span>,
+            <span class="ident">message</span>,
+            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+            <span class="ident">span</span>,
         ));
     }
 }
@@ -681,7 +707,11 @@
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">span_for_argument</span>(<span class="string">&quot;type&quot;</span>))
             .<span class="ident">unwrap_or_else</span>(<span class="ident">Span::empty</span>);
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="string">&quot;index&quot;</span>, <span class="ident">span</span>));
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+            <span class="ident">message</span>,
+            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+            <span class="ident">span</span>,
+        ));
     }
 }
 
@@ -804,7 +834,9 @@
                     .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">model</span>().<span class="ident">ast_model</span>().<span class="ident">span</span>);
 
                 <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                    <span class="ident">message</span>, <span class="string">&quot;fulltext&quot;</span>, <span class="ident">span</span>,
+                    <span class="ident">message</span>,
+                    <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+                    <span class="ident">span</span>,
                 ));
 
                 <span class="kw">return</span>;
@@ -835,7 +867,11 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">span</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">model</span>().<span class="ident">ast_model</span>().<span class="ident">span</span>);
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="string">&quot;index&quot;</span>, <span class="ident">span</span>));
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+            <span class="ident">message</span>,
+            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+            <span class="ident">span</span>,
+        ));
     }
 }
 
@@ -864,7 +900,7 @@
 
     <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
         <span class="string">&quot;The list of fields in an index cannot be empty. Please specify at least one field.&quot;</span>,
-        <span class="ident">attr</span>.<span class="ident">name</span>(),
+        <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
         <span class="kw-2">*</span><span class="ident">attr</span>.<span class="ident">span</span>(),
     ))
 }
@@ -886,7 +922,7 @@
 
     <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
         <span class="string">&quot;Defining clustering is not supported in the current connector.&quot;</span>,
-        <span class="ident">attr</span>.<span class="ident">name</span>(),
+        <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
         <span class="kw-2">*</span><span class="ident">attr</span>.<span class="ident">span</span>(),
     ))
 }
@@ -912,7 +948,7 @@
 
     <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
         <span class="string">&quot;To specify index clustering, please enable `extendedIndexes` preview feature.&quot;</span>,
-        <span class="ident">attr</span>.<span class="ident">name</span>(),
+        <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
         <span class="kw-2">*</span><span class="ident">attr</span>.<span class="ident">span</span>(),
     ))
 }
@@ -936,7 +972,7 @@
         <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">pk</span>.<span class="ident">clustered</span>(), <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">|</span> <span class="prelude-val">None</span>) {
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
                 <span class="string">&quot;A model can only hold one clustered index or key.&quot;</span>,
-                <span class="ident">attr</span>.<span class="ident">name</span>(),
+                <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
                 <span class="kw-2">*</span><span class="ident">attr</span>.<span class="ident">span</span>(),
             ));
         }
@@ -953,7 +989,7 @@
 
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="string">&quot;A model can only hold one clustered index.&quot;</span>,
-            <span class="ident">attr</span>.<span class="ident">name</span>(),
+            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
             <span class="kw-2">*</span><span class="ident">attr</span>.<span class="ident">span</span>(),
         ));
 
@@ -982,7 +1018,11 @@
         .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">span_for_argument</span>(<span class="string">&quot;type&quot;</span>))
         .<span class="ident">unwrap_or_else</span>(<span class="ident">Span::empty</span>);
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="string">&quot;index&quot;</span>, <span class="ident">span</span>));
+    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+        <span class="ident">message</span>,
+        <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
+        <span class="ident">span</span>,
+    ));
 }
 
 <span class="doccomment">/// You can use `ops` argument only with a normal index.</span>
@@ -1010,7 +1050,7 @@
 
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="ident">message</span>,
-            <span class="ident">attr</span>.<span class="ident">name</span>(),
+            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
             <span class="ident">attr</span>.<span class="ident">span</span>,
         ));
 
