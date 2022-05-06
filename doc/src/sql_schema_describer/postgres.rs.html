@@ -1617,6 +1617,13 @@
 <span id="1612">1612</span>
 <span id="1613">1613</span>
 <span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -1653,6 +1660,8 @@
     <span class="kw">pub</span> <span class="ident">cycle</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Cache size of the sequence</span>
     <span class="kw">pub</span> <span class="ident">cache_size</span>: <span class="ident">i64</span>,
+    <span class="doccomment">/// Whether the sequence is a cockroachdb virtual sequence</span>
+    <span class="kw">pub</span> <span class="ident">r#virtual</span>: <span class="ident">bool</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
@@ -2758,6 +2767,7 @@
             <span class="ident">increment_by</span>: <span class="ident">seq</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;increment_by&quot;</span>),
             <span class="ident">cycle</span>: <span class="ident">seq</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;cycle&quot;</span>),
             <span class="ident">cache_size</span>: <span class="ident">seq</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;cache_size&quot;</span>),
+            <span class="ident">r#virtual</span>: <span class="bool-val">false</span>,
         });
         <span class="ident">postgres_ext</span>.<span class="ident">sequences</span>.<span class="ident">extend</span>(<span class="ident">sequences</span>);
 
@@ -2805,97 +2815,100 @@
         <span class="ident">sequences</span>: <span class="kw-2">&amp;</span>[<span class="ident">Sequence</span>],
         <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">col</span>.<span class="ident">get</span>(<span class="string">&quot;column_default&quot;</span>) {
+        <span class="kw">let</span> <span class="ident">param_value</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get</span>(<span class="string">&quot;column_default&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">match</span> <span class="ident">param_value</span>.<span class="ident">to_string</span>() {
             <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">param_value</span>) =&gt; <span class="kw">match</span> <span class="ident">param_value</span>.<span class="ident">to_string</span>() {
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">starts_with</span>(<span class="string">&quot;NULL&quot;</span>) =&gt; <span class="prelude-val">None</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">default_string</span>) =&gt; {
-                    <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">tpe</span>.<span class="ident">family</span> {
-                        <span class="ident">ColumnTypeFamily::Int</span> <span class="op">|</span> <span class="ident">ColumnTypeFamily::BigInt</span> =&gt; {
-                            <span class="kw">let</span> <span class="ident">default_expr</span> <span class="op">=</span> <span class="ident">unsuffix_default_literal</span>(
-                                <span class="kw-2">&amp;</span><span class="ident">default_string</span>,
-                                <span class="kw-2">&amp;</span>[<span class="ident">data_type</span>, <span class="kw-2">&amp;</span><span class="ident">tpe</span>.<span class="ident">full_data_type</span>, <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;INT8&quot;</span>, <span class="string">&quot;INT4&quot;</span>],
-                            )
-                            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">default_string</span>.<span class="ident">as_str</span>().<span class="ident">into</span>());
-                            <span class="kw">let</span> <span class="ident">default_expr</span> <span class="op">=</span> <span class="ident">process_string_literal</span>(<span class="kw-2">&amp;</span><span class="ident">default_expr</span>);
+            <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">starts_with</span>(<span class="string">&quot;NULL&quot;</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">default_string</span>) =&gt; {
+                <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">tpe</span>.<span class="ident">family</span> {
+                    <span class="ident">ColumnTypeFamily::Int</span> <span class="op">|</span> <span class="ident">ColumnTypeFamily::BigInt</span> =&gt; {
+                        <span class="kw">let</span> <span class="ident">default_expr</span> <span class="op">=</span> <span class="ident">unsuffix_default_literal</span>(
+                            <span class="kw-2">&amp;</span><span class="ident">default_string</span>,
+                            <span class="kw-2">&amp;</span>[<span class="ident">data_type</span>, <span class="kw-2">&amp;</span><span class="ident">tpe</span>.<span class="ident">full_data_type</span>, <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;INT8&quot;</span>, <span class="string">&quot;INT4&quot;</span>],
+                        )
+                        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">default_string</span>.<span class="ident">as_str</span>().<span class="ident">into</span>());
+                        <span class="kw">let</span> <span class="ident">default_expr</span> <span class="op">=</span> <span class="ident">process_string_literal</span>(<span class="kw-2">&amp;</span><span class="ident">default_expr</span>);
 
-                            <span class="kw">match</span> <span class="ident">default_expr</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>().<span class="ident">ok</span>() {
-                                <span class="prelude-val">Some</span>(<span class="ident">int_value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="kw">if</span> <span class="ident">tpe</span>.<span class="ident">family</span>.<span class="ident">is_int</span>() {
-                                    <span class="ident">PrismaValue::Int</span>(<span class="ident">int_value</span>)
-                                } <span class="kw">else</span> {
-                                    <span class="ident">PrismaValue::BigInt</span>(<span class="ident">int_value</span>)
-                                }),
-                                <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">is_autoincrement</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>, <span class="ident">sequences</span>) {
-                                    <span class="prelude-val">Some</span>(<span class="ident">seq</span>) =&gt; <span class="ident">DefaultValue::sequence</span>(<span class="ident">seq</span>),
-                                    <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
-                                },
-                            }
-                        }
-                        <span class="ident">ColumnTypeFamily::Float</span> =&gt; <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_float</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
-                            <span class="prelude-val">Some</span>(<span class="ident">float_value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">float_value</span>),
-                            <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
-                        },
-                        <span class="ident">ColumnTypeFamily::Decimal</span> =&gt; <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_float</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
-                            <span class="prelude-val">Some</span>(<span class="ident">float_value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">float_value</span>),
-                            <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
-                        },
-                        <span class="ident">ColumnTypeFamily::Boolean</span> =&gt; <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_bool</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
-                            <span class="prelude-val">Some</span>(<span class="ident">bool_value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">bool_value</span>),
-                            <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
-                        },
-                        <span class="ident">ColumnTypeFamily::String</span> =&gt; <span class="kw">match</span> <span class="ident">fetch_dbgenerated</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
-                            <span class="prelude-val">Some</span>(<span class="ident">fun</span>) =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">fun</span>),
+                        <span class="kw">match</span> <span class="ident">default_expr</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>().<span class="ident">ok</span>() {
+                            <span class="prelude-val">Some</span>(<span class="ident">int_value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="kw">if</span> <span class="ident">tpe</span>.<span class="ident">family</span>.<span class="ident">is_int</span>() {
+                                <span class="ident">PrismaValue::Int</span>(<span class="ident">int_value</span>)
+                            } <span class="kw">else</span> {
+                                <span class="ident">PrismaValue::BigInt</span>(<span class="ident">int_value</span>)
+                            }),
                             <span class="prelude-val">None</span> =&gt; {
-                                <span class="kw">let</span> <span class="ident">literal</span> <span class="op">=</span> <span class="ident">unsuffix_default_literal</span>(
-                                    <span class="kw-2">&amp;</span><span class="ident">default_string</span>,
-                                    <span class="kw-2">&amp;</span>[<span class="ident">data_type</span>, <span class="kw-2">&amp;</span><span class="ident">tpe</span>.<span class="ident">full_data_type</span>, <span class="string">&quot;STRING&quot;</span>],
-                                );
-
-                                <span class="kw">match</span> <span class="ident">literal</span> {
-                                    <span class="prelude-val">Some</span>(<span class="ident">default_literal</span>) =&gt; <span class="ident">DefaultValue::value</span>(
-                                        <span class="ident">process_string_literal</span>(<span class="ident">default_literal</span>.<span class="ident">as_ref</span>()).<span class="ident">into_owned</span>(),
-                                    ),
-                                    <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">seq</span>) <span class="op">=</span> <span class="ident">is_sequence</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>, <span class="ident">sequences</span>) {
+                                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DefaultValue::sequence</span>(<span class="ident">seq</span>));
                                 }
-                            }
-                        },
-                        <span class="ident">ColumnTypeFamily::DateTime</span> =&gt; {
-                            <span class="kw">match</span> <span class="ident">default_string</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
-                                <span class="string">&quot;now()&quot;</span>
-                                <span class="op">|</span> <span class="string">&quot;now():::timestamp&quot;</span>
-                                <span class="op">|</span> <span class="string">&quot;now():::timestamptz&quot;</span>
-                                <span class="op">|</span> <span class="string">&quot;now():::date&quot;</span>
-                                <span class="op">|</span> <span class="string">&quot;current_timestamp&quot;</span>
-                                <span class="op">|</span> <span class="string">&quot;current_timestamp():::timestamp&quot;</span>
-                                <span class="op">|</span> <span class="string">&quot;current_timestamp():::timestamptz&quot;</span>
-                                <span class="op">|</span> <span class="string">&quot;current_timestamp():::date&quot;</span> =&gt; <span class="ident">DefaultValue::now</span>(),
-                                <span class="kw">_</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>), <span class="comment">//todo parse values</span>
+
+                                <span class="kw">if</span> <span class="ident">default_string</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;unique_rowid()&quot;</span>) {
+                                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DefaultValue::unique_rowid</span>());
+                                }
+
+                                <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>)
                             }
                         }
-                        <span class="ident">ColumnTypeFamily::Binary</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
-                        <span class="comment">// JSON/JSONB defaults come in the &#39;{}&#39;::jsonb form.</span>
-                        <span class="ident">ColumnTypeFamily::Json</span> =&gt; {
-                            <span class="ident">unsuffix_default_literal</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>, <span class="kw-2">&amp;</span>[<span class="ident">data_type</span>, <span class="kw-2">&amp;</span><span class="ident">tpe</span>.<span class="ident">full_data_type</span>])
-                                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="ident">DefaultValue::value</span>(<span class="ident">PrismaValue::Json</span>(<span class="ident">unquote_string</span>(<span class="kw-2">&amp;</span><span class="ident">default</span>))))
-                                .<span class="ident">unwrap_or_else</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>))
-                        }
-                        <span class="ident">ColumnTypeFamily::Uuid</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
-                        <span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">enum_name</span>) =&gt; {
-                            <span class="kw">let</span> <span class="ident">expected_suffixes</span>: <span class="kw-2">&amp;</span>[<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-                                <span class="ident">Cow::Borrowed</span>(<span class="ident">enum_name</span>),
-                                <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="ident">enum_name</span>)),
-                                <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="ident">schema</span>, <span class="ident">enum_name</span>)),
-                            ];
-                            <span class="kw">match</span> <span class="ident">unsuffix_default_literal</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>, <span class="ident">expected_suffixes</span>) {
-                                <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident"><span class="self">Self</span>::unquote_string</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>))),
+                    }
+                    <span class="ident">ColumnTypeFamily::Float</span> =&gt; <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_float</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
+                        <span class="prelude-val">Some</span>(<span class="ident">float_value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">float_value</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                    },
+                    <span class="ident">ColumnTypeFamily::Decimal</span> =&gt; <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_float</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
+                        <span class="prelude-val">Some</span>(<span class="ident">float_value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">float_value</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                    },
+                    <span class="ident">ColumnTypeFamily::Boolean</span> =&gt; <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_bool</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
+                        <span class="prelude-val">Some</span>(<span class="ident">bool_value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">bool_value</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                    },
+                    <span class="ident">ColumnTypeFamily::String</span> =&gt; <span class="kw">match</span> <span class="ident">fetch_dbgenerated</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
+                        <span class="prelude-val">Some</span>(<span class="ident">fun</span>) =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">fun</span>),
+                        <span class="prelude-val">None</span> =&gt; {
+                            <span class="kw">let</span> <span class="ident">literal</span> <span class="op">=</span>
+                                <span class="ident">unsuffix_default_literal</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>, <span class="kw-2">&amp;</span>[<span class="ident">data_type</span>, <span class="kw-2">&amp;</span><span class="ident">tpe</span>.<span class="ident">full_data_type</span>, <span class="string">&quot;STRING&quot;</span>]);
+
+                            <span class="kw">match</span> <span class="ident">literal</span> {
+                                <span class="prelude-val">Some</span>(<span class="ident">default_literal</span>) =&gt; {
+                                    <span class="ident">DefaultValue::value</span>(<span class="ident">process_string_literal</span>(<span class="ident">default_literal</span>.<span class="ident">as_ref</span>()).<span class="ident">into_owned</span>())
+                                }
                                 <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
                             }
                         }
-                        <span class="ident">ColumnTypeFamily::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
-                    })
-                }
-            },
+                    },
+                    <span class="ident">ColumnTypeFamily::DateTime</span> =&gt; {
+                        <span class="kw">match</span> <span class="ident">default_string</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
+                            <span class="string">&quot;now()&quot;</span>
+                            <span class="op">|</span> <span class="string">&quot;now():::timestamp&quot;</span>
+                            <span class="op">|</span> <span class="string">&quot;now():::timestamptz&quot;</span>
+                            <span class="op">|</span> <span class="string">&quot;now():::date&quot;</span>
+                            <span class="op">|</span> <span class="string">&quot;current_timestamp&quot;</span>
+                            <span class="op">|</span> <span class="string">&quot;current_timestamp():::timestamp&quot;</span>
+                            <span class="op">|</span> <span class="string">&quot;current_timestamp():::timestamptz&quot;</span>
+                            <span class="op">|</span> <span class="string">&quot;current_timestamp():::date&quot;</span> =&gt; <span class="ident">DefaultValue::now</span>(),
+                            <span class="kw">_</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>), <span class="comment">//todo parse values</span>
+                        }
+                    }
+                    <span class="ident">ColumnTypeFamily::Binary</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                    <span class="comment">// JSON/JSONB defaults come in the &#39;{}&#39;::jsonb form.</span>
+                    <span class="ident">ColumnTypeFamily::Json</span> =&gt; {
+                        <span class="ident">unsuffix_default_literal</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>, <span class="kw-2">&amp;</span>[<span class="ident">data_type</span>, <span class="kw-2">&amp;</span><span class="ident">tpe</span>.<span class="ident">full_data_type</span>])
+                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="ident">DefaultValue::value</span>(<span class="ident">PrismaValue::Json</span>(<span class="ident">unquote_string</span>(<span class="kw-2">&amp;</span><span class="ident">default</span>))))
+                            .<span class="ident">unwrap_or_else</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>))
+                    }
+                    <span class="ident">ColumnTypeFamily::Uuid</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                    <span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">enum_name</span>) =&gt; {
+                        <span class="kw">let</span> <span class="ident">expected_suffixes</span>: <span class="kw-2">&amp;</span>[<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+                            <span class="ident">Cow::Borrowed</span>(<span class="ident">enum_name</span>),
+                            <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="ident">enum_name</span>)),
+                            <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="ident">schema</span>, <span class="ident">enum_name</span>)),
+                        ];
+                        <span class="kw">match</span> <span class="ident">unsuffix_default_literal</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>, <span class="ident">expected_suffixes</span>) {
+                            <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident"><span class="self">Self</span>::unquote_string</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>))),
+                            <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                        }
+                    }
+                    <span class="ident">ColumnTypeFamily::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                })
+            }
         }
     }
 }
@@ -3075,8 +3088,9 @@
         .<span class="ident">expect</span>(<span class="string">&quot;compile autoincrement regex&quot;</span>)
 });
 
-<span class="doccomment">/// Returns the name of the sequence in the schema that the defaultvalue matches if it is drawn from one of them</span>
-<span class="kw">fn</span> <span class="ident">is_autoincrement</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">sequences</span>: <span class="kw-2">&amp;</span>[<span class="ident">Sequence</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="doccomment">/// Returns the name of the sequence in the schema that the defaultvalue matches if it is drawn</span>
+<span class="doccomment">/// from one of them</span>
+<span class="kw">fn</span> <span class="ident">is_sequence</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">sequences</span>: <span class="kw-2">&amp;</span>[<span class="ident">Sequence</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="ident">AUTOINCREMENT_REGEX</span>.<span class="ident">captures</span>(<span class="ident">value</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">captures</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">sequence_name</span> <span class="op">=</span> <span class="ident">captures</span>.<span class="ident">name</span>(<span class="string">&quot;sequence&quot;</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">captures</span>.<span class="ident">name</span>(<span class="string">&quot;sequence2&quot;</span>));
 
@@ -3213,22 +3227,22 @@
         ];
 
         <span class="kw">let</span> <span class="ident">first_autoincrement</span> <span class="op">=</span> <span class="string">r#&quot;nextval(&#39;first_sequence&#39;::regclass)&quot;#</span>;
-        <span class="macro">assert!</span>(<span class="ident">is_autoincrement</span>(<span class="ident">first_autoincrement</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">is_sequence</span>(<span class="ident">first_autoincrement</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="ident">is_some</span>());
 
         <span class="kw">let</span> <span class="ident">second_autoincrement</span> <span class="op">=</span> <span class="string">r#&quot;nextval(&#39;schema_name.second_sequence&#39;::regclass)&quot;#</span>;
-        <span class="macro">assert!</span>(<span class="ident">is_autoincrement</span>(<span class="ident">second_autoincrement</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">is_sequence</span>(<span class="ident">second_autoincrement</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="ident">is_some</span>());
 
         <span class="kw">let</span> <span class="ident">third_autoincrement</span> <span class="op">=</span> <span class="string">r#&quot;nextval(&#39;&quot;third_Sequence&quot;&#39;::regclass)&quot;#</span>;
-        <span class="macro">assert!</span>(<span class="ident">is_autoincrement</span>(<span class="ident">third_autoincrement</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">is_sequence</span>(<span class="ident">third_autoincrement</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="ident">is_some</span>());
 
         <span class="kw">let</span> <span class="ident">fourth_autoincrement</span> <span class="op">=</span> <span class="string">r#&quot;nextval(&#39;&quot;schema_Name&quot;.&quot;fourth_Sequence&quot;&#39;::regclass)&quot;#</span>;
-        <span class="macro">assert!</span>(<span class="ident">is_autoincrement</span>(<span class="ident">fourth_autoincrement</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">is_sequence</span>(<span class="ident">fourth_autoincrement</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="ident">is_some</span>());
 
         <span class="kw">let</span> <span class="ident">fifth_autoincrement</span> <span class="op">=</span> <span class="string">r#&quot;nextval((&#39;fifth_sequence&#39;::text)::regclass)&quot;#</span>;
-        <span class="macro">assert!</span>(<span class="ident">is_autoincrement</span>(<span class="ident">fifth_autoincrement</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">is_sequence</span>(<span class="ident">fifth_autoincrement</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="ident">is_some</span>());
 
         <span class="kw">let</span> <span class="ident">non_autoincrement</span> <span class="op">=</span> <span class="string">r#&quot;string_default_named_seq&quot;#</span>;
-        <span class="macro">assert!</span>(<span class="ident">is_autoincrement</span>(<span class="ident">non_autoincrement</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">is_sequence</span>(<span class="ident">non_autoincrement</span>, <span class="kw-2">&amp;</span><span class="ident">sequences</span>).<span class="ident">is_none</span>());
     }
 }
 </code></pre></div>

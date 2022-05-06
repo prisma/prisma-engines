@@ -655,7 +655,34 @@
 <span id="650">650</span>
 <span id="651">651</span>
 <span id="652">652</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Dedup</span>, <span class="ident">SqlError</span>, <span class="ident">SqlFamilyTrait</span>};
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>, <span class="ident">Dedup</span>, <span class="ident">SqlError</span>, <span class="ident">SqlFamilyTrait</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">common</span>::{<span class="ident">preview_features::PreviewFeature</span>, <span class="ident">RelationNames</span>},
     <span class="ident">dml</span>::{
@@ -664,11 +691,9 @@
         <span class="ident">SortOrder</span>, <span class="ident">ValueGenerator</span> <span class="kw">as</span> <span class="ident">VG</span>,
     },
 };
-<span class="kw">use</span> <span class="ident">introspection_connector::IntrospectionContext</span>;
 <span class="kw">use</span> <span class="ident">sql</span>::{<span class="ident">mssql::MssqlSchemaExt</span>, <span class="ident">postgres::PostgresSchemaExt</span>, <span class="ident">IndexFieldId</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">IndexType</span>, <span class="ident">SQLSortOrder</span>,
-    <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
+    <span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">IndexType</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing::debug</span>;
 
@@ -784,7 +809,7 @@
     <span class="ident">RelationField::new</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">FieldArity::List</span>, <span class="ident">FieldArity::List</span>, <span class="ident">relation_info</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_index</span>(<span class="ident">index</span>: <span class="ident">sql::walkers::IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">IndexDefinition</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_index</span>(<span class="ident">index</span>: <span class="ident">sql::walkers::IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">IndexDefinition</span> {
     <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">index_type</span>() {
         <span class="ident">IndexType::Unique</span> =&gt; <span class="ident">datamodel::dml::IndexType::Unique</span>,
         <span class="ident">IndexType::Normal</span> =&gt; <span class="ident">datamodel::dml::IndexType::Normal</span>,
@@ -847,7 +872,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Column</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">ScalarField</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Column</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">ScalarField</span> {
     <span class="macro">debug!</span>(<span class="string">&quot;Handling column {:?}&quot;</span>, <span class="ident">column</span>);
 
     <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="ident">calculate_scalar_field_type_with_native_types</span>(<span class="ident">column</span>, <span class="ident">ctx</span>);
@@ -860,7 +885,7 @@
         <span class="ident">ColumnArity::List</span> =&gt; <span class="ident">FieldArity::List</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">default_value</span> <span class="op">=</span> <span class="ident">calculate_default</span>(<span class="ident">table</span>, <span class="ident">column</span>, <span class="kw-2">&amp;</span><span class="ident">arity</span>);
+    <span class="kw">let</span> <span class="ident">default_value</span> <span class="op">=</span> <span class="ident">calculate_default</span>(<span class="ident">table</span>, <span class="ident">column</span>, <span class="kw-2">&amp;</span><span class="ident">arity</span>, <span class="ident">ctx</span>);
 
     <span class="ident">ScalarField</span> {
         <span class="ident">name</span>: <span class="ident">column</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
@@ -980,9 +1005,48 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_default</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Table</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Column</span>, <span class="ident">arity</span>: <span class="kw-2">&amp;</span><span class="ident">FieldArity</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DMLDef</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_default</span>(
+    <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Table</span>,
+    <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Column</span>,
+    <span class="ident">arity</span>: <span class="kw-2">&amp;</span><span class="ident">FieldArity</span>,
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DMLDef</span><span class="op">&gt;</span> {
     <span class="kw">match</span> (<span class="ident">column</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()), <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">tpe</span>.<span class="ident">family</span>) {
         (<span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">arity</span> <span class="op">==</span> <span class="ident">FieldArity::List</span> =&gt; <span class="prelude-val">None</span>,
+        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Sequence</span>(<span class="ident">name</span>)), <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">is_cockroach</span>() =&gt; {
+            <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
+
+            <span class="kw">let</span> <span class="ident">connector_data</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+            <span class="kw">let</span> <span class="ident">sequence_idx</span> <span class="op">=</span> <span class="ident">connector_data</span>
+                .<span class="ident">sequences</span>
+                .<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">name</span>)
+                .<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">sequence</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">connector_data</span>.<span class="ident">sequences</span>[<span class="ident">sequence_idx</span>];
+
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+
+            <span class="kw">if</span> <span class="ident">sequence</span>.<span class="ident">min_value</span> <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
+                <span class="ident">args</span>.<span class="ident">push</span>((<span class="prelude-val">Some</span>(<span class="string">&quot;minValue&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">PrismaValue::Int</span>(<span class="ident">sequence</span>.<span class="ident">min_value</span>)));
+            }
+
+            <span class="kw">if</span> <span class="ident">sequence</span>.<span class="ident">max_value</span> <span class="op">!</span><span class="op">=</span> <span class="ident">i64::MAX</span> {
+                <span class="ident">args</span>.<span class="ident">push</span>((<span class="prelude-val">Some</span>(<span class="string">&quot;maxValue&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">PrismaValue::Int</span>(<span class="ident">sequence</span>.<span class="ident">max_value</span>)));
+            }
+
+            <span class="kw">if</span> <span class="ident">sequence</span>.<span class="ident">cache_size</span> <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
+                <span class="ident">args</span>.<span class="ident">push</span>((<span class="prelude-val">Some</span>(<span class="string">&quot;cache&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">PrismaValue::Int</span>(<span class="ident">sequence</span>.<span class="ident">cache_size</span>)));
+            }
+
+            <span class="kw">if</span> <span class="ident">sequence</span>.<span class="ident">increment_by</span> <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
+                <span class="ident">args</span>.<span class="ident">push</span>((<span class="prelude-val">Some</span>(<span class="string">&quot;increment&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">PrismaValue::Int</span>(<span class="ident">sequence</span>.<span class="ident">increment_by</span>)));
+            }
+
+            <span class="kw">if</span> <span class="ident">sequence</span>.<span class="ident">start_value</span> <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
+                <span class="ident">args</span>.<span class="ident">push</span>((<span class="prelude-val">Some</span>(<span class="string">&quot;start&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">PrismaValue::Int</span>(<span class="ident">sequence</span>.<span class="ident">start_value</span>)));
+            }
+
+            <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_sequence</span>(<span class="ident">args</span>)))
+        }
         (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::Int</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">auto_increment</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>())),
         (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::BigInt</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">auto_increment</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>())),
         (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::Int</span>) <span class="kw">if</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>, <span class="ident">table</span>) =&gt; {
@@ -991,15 +1055,16 @@
         (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::BigInt</span>) <span class="kw">if</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>, <span class="ident">table</span>) =&gt; {
             <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>()))
         }
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>())),
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Now</span>), <span class="ident">ColumnTypeFamily::DateTime</span>) =&gt; {
+        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Sequence</span>(<span class="kw">_</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>())),
+        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Now</span>), <span class="ident">ColumnTypeFamily::DateTime</span>) =&gt; {
             <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_now</span>()), <span class="ident">column</span>))
         }
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="ident">default_string</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(
+        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::DbGenerated</span>(<span class="ident">default_string</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(
             <span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_dbgenerated</span>(<span class="ident">default_string</span>.<span class="ident">clone</span>())),
             <span class="ident">column</span>,
         )),
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">val</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(<span class="ident">DMLDef::new_single</span>(<span class="ident">val</span>.<span class="ident">clone</span>()), <span class="ident">column</span>)),
+        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Value</span>(<span class="ident">val</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(<span class="ident">DMLDef::new_single</span>(<span class="ident">val</span>.<span class="ident">clone</span>()), <span class="ident">column</span>)),
+        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::UniqueRowid</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>())),
         <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
@@ -1097,10 +1162,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field_type_with_native_types</span>(
-    <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Column</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>,
-) -&gt; <span class="ident">FieldType</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field_type_with_native_types</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Column</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">FieldType</span> {
     <span class="macro">debug!</span>(<span class="string">&quot;Calculating native field type for &#39;{}&#39;&quot;</span>, <span class="ident">column</span>.<span class="ident">name</span>);
     <span class="kw">let</span> <span class="ident">scalar_type</span> <span class="op">=</span> <span class="ident">calculate_scalar_field_type_for_native_type</span>(<span class="ident">column</span>);
 
@@ -1187,7 +1249,7 @@
         .<span class="ident">for_each</span>(<span class="ident">drop</span>);
 }
 
-<span class="kw">fn</span> <span class="ident">index_algorithm</span>(<span class="ident">index</span>: <span class="ident">sql::walkers::IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">index_algorithm</span>(<span class="ident">index</span>: <span class="ident">sql::walkers::IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_postgres</span>() {
         <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
@@ -1204,7 +1266,7 @@
     })
 }
 
-<span class="kw">fn</span> <span class="ident">index_is_clustered</span>(<span class="ident">index_id</span>: <span class="ident">sql::IndexId</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">index_is_clustered</span>(<span class="ident">index_id</span>: <span class="ident">sql::IndexId</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_mssql</span>() {
         <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
@@ -1214,25 +1276,17 @@
     <span class="prelude-val">Some</span>(<span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="ident">index_id</span>))
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_is_clustered</span>(
-    <span class="ident">table_id</span>: <span class="ident">sql::TableId</span>,
-    <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_is_clustered</span>(<span class="ident">table_id</span>: <span class="ident">sql::TableId</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_mssql</span>() {
         <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+    <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
 
     <span class="prelude-val">Some</span>(<span class="ident">ext</span>.<span class="ident">pk_is_clustered</span>(<span class="ident">table_id</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">get_opclass</span>(
-    <span class="ident">index_field_id</span>: <span class="ident">sql::IndexFieldId</span>,
-    <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OperatorClass</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">get_opclass</span>(<span class="ident">index_field_id</span>: <span class="ident">sql::IndexFieldId</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OperatorClass</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_postgres</span>() {
         <span class="kw">return</span> <span class="prelude-val">None</span>;
     }

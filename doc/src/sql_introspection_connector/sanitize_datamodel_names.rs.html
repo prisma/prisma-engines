@@ -252,7 +252,7 @@
 <span id="247">247</span>
 <span id="248">248</span>
 <span id="249">249</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlFamilyTrait</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>, <span class="ident">SqlFamilyTrait</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">dml</span>::{
         <span class="ident">Datamodel</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">IndexField</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">ValueGenerator</span>,
@@ -260,7 +260,6 @@
     },
     <span class="ident">is_reserved_type_name</span>,
 };
-<span class="kw">use</span> <span class="ident">introspection_connector::IntrospectionContext</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">quaint::prelude::SqlFamily</span>;
@@ -272,9 +271,9 @@
 <span class="kw">static</span> <span class="ident">RE_START</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Regex::new</span>(<span class="string">&quot;^[^a-zA-Z]+&quot;</span>).<span class="ident">unwrap</span>());
 <span class="kw">static</span> <span class="ident">RE</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Regex::new</span>(<span class="string">&quot;[^_a-zA-Z0-9]&quot;</span>).<span class="ident">unwrap</span>());
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sanitize_datamodel_names</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) {
-    <span class="kw">let</span> <span class="ident">enum_renames</span> <span class="op">=</span> <span class="ident">sanitize_models</span>(<span class="ident">datamodel</span>, <span class="ident">ctx</span>);
-    <span class="ident">sanitize_enums</span>(<span class="ident">datamodel</span>, <span class="kw-2">&amp;</span><span class="ident">enum_renames</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sanitize_datamodel_names</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) {
+    <span class="kw">let</span> <span class="ident">enum_renames</span> <span class="op">=</span> <span class="ident">sanitize_models</span>(<span class="ident">ctx</span>);
+    <span class="ident">sanitize_enums</span>(<span class="kw-2">&amp;</span><span class="ident">enum_renames</span>, <span class="ident">ctx</span>);
 }
 
 <span class="comment">// if after opionated renames we have duplicated names, e.g. a database with</span>
@@ -298,10 +297,11 @@
 }
 
 <span class="comment">// Todo: Sanitizing might need to be adjusted to also change the fields in the RelationInfo</span>
-<span class="kw">fn</span> <span class="ident">sanitize_models</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, (<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">sanitize_models</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, (<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enum_renames</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+    <span class="kw">let</span> <span class="ident">sql_family</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">sql_family</span>();
 
-    <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">datamodel</span>.<span class="ident">models_mut</span>() {
+    <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">datamodel</span>.<span class="ident">models_mut</span>() {
         <span class="ident">rename_reserved</span>(<span class="ident">model</span>);
         <span class="ident">sanitize_name</span>(<span class="ident">model</span>);
 
@@ -331,7 +331,7 @@
                         <span class="comment">// Enums in MySQL are defined on the column and do not have a separate name.</span>
                         <span class="comment">// Introspection generates an enum name for MySQL as `&lt;model_name&gt;_&lt;field_type&gt;`.</span>
                         <span class="comment">// If the sanitization changes the enum name, we need to make sure it&#39;s changed everywhere.</span>
-                        <span class="kw">let</span> (<span class="ident">sanitized_enum_name</span>, <span class="ident">db_name</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">SqlFamily::Mysql</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">sql_family</span>() {
+                        <span class="kw">let</span> (<span class="ident">sanitized_enum_name</span>, <span class="ident">db_name</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">SqlFamily::Mysql</span> <span class="op">=</span> <span class="ident">sql_family</span> {
                             <span class="kw">if</span> <span class="ident">model_db_name</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">sf</span>.<span class="ident">database_name</span>.<span class="ident">is_none</span>() {
                                 (<span class="ident">enum_name</span>.<span class="ident">to_owned</span>(), <span class="prelude-val">None</span>)
                             } <span class="kw">else</span> {
@@ -387,8 +387,8 @@
     <span class="ident">enum_renames</span>
 }
 
-<span class="kw">fn</span> <span class="ident">sanitize_enums</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>, <span class="ident">enum_renames</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, (<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span>) {
-    <span class="kw">for</span> <span class="ident">enm</span> <span class="kw">in</span> <span class="ident">datamodel</span>.<span class="ident">enums_mut</span>() {
+<span class="kw">fn</span> <span class="ident">sanitize_enums</span>(<span class="ident">enum_renames</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, (<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) {
+    <span class="kw">for</span> <span class="ident">enm</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">datamodel</span>.<span class="ident">enums_mut</span>() {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">sanitized_name</span>, <span class="ident">db_name</span>)) <span class="op">=</span> <span class="ident">enum_renames</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">enm</span>.<span class="ident">name</span>) {
             <span class="kw">if</span> <span class="ident">enm</span>.<span class="ident">database_name</span>().<span class="ident">is_none</span>() {
                 <span class="ident">enm</span>.<span class="ident">set_database_name</span>(<span class="ident">db_name</span>.<span class="ident">clone</span>());

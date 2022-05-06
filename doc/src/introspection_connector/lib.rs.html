@@ -127,27 +127,13 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">error</span>;
 
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">dml::Datamodel</span>, <span class="ident">Datasource</span>};
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="kw-2">*</span>;
+
+<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">dml::Datamodel</span>, <span class="ident">Datasource</span>};
+<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span>;
@@ -187,9 +173,9 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntrospectionResult</span> {
     <span class="doccomment">/// Datamodel</span>
     <span class="kw">pub</span> <span class="ident">data_model</span>: <span class="ident">Datamodel</span>,
-    <span class="doccomment">/// warnings</span>
+    <span class="doccomment">/// Introspection warnings</span>
     <span class="kw">pub</span> <span class="ident">warnings</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// version</span>
+    <span class="doccomment">/// Inferred Prisma version</span>
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">Version</span>,
 }
 
@@ -208,18 +194,6 @@
     <span class="kw">pub</span> <span class="ident">warnings</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>,
     <span class="doccomment">/// version</span>
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">Version</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">IntrospectionResultOutput</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(
-            <span class="ident">f</span>,
-            <span class="string">&quot;{{\&quot;datamodel\&quot;: \&quot;{}\&quot;, \&quot;warnings\&quot;: {}, \&quot;version\&quot;: \&quot;{}\&quot;}}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">datamodel</span>,
-            <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">warnings</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">version</span>).<span class="ident">unwrap</span>(),
-        )
-    }
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntrospectionContext</span> {

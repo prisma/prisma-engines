@@ -346,6 +346,11 @@
 <span id="341">341</span>
 <span id="342">342</span>
 <span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TestResult</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">indoc</span>::{<span class="ident">formatdoc</span>, <span class="ident">indoc</span>};
@@ -411,7 +416,6 @@
                 <span class="ident">q</span>.<span class="ident">raw_cmd</span>(
                     <span class="string">r#&quot;
                     SET default_int_size = 4;
-                    SET serial_normalization = &#39;sql_sequence&#39;;
                     &quot;#</span>,
                 )
                 .<span class="kw">await</span>
@@ -605,7 +609,7 @@
             <span class="self">self</span>.<span class="ident">args</span>
                 .<span class="ident">datasource_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection_string</span>, <span class="kw-2">&amp;</span>[(<span class="string">&quot;referentialIntegrity&quot;</span>, <span class="string">r#&quot;&quot;prisma&quot;&quot;#</span>)])
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">datasource_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection_string</span>, <span class="kw-2">&amp;</span>[])
+            <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">datasource_block</span>(<span class="string">r#&quot;env(TEST_DATABASE_URL)&quot;#</span>, <span class="kw-2">&amp;</span>[])
         }
     }
 
@@ -613,6 +617,12 @@
         <span class="ident">datamodel::parse_configuration</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}\n{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">datasource_block</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">generator_block</span>()))
             .<span class="ident">unwrap</span>()
             .<span class="ident">subject</span>
+    }
+
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">expect_datamodel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">expectation</span>: <span class="kw-2">&amp;</span><span class="ident">expect_test::Expect</span>) {
+        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">introspect</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="ident">expectation</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">found</span>);
     }
 
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>

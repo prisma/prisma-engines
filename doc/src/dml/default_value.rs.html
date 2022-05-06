@@ -355,6 +355,11 @@
 <span id="350">350</span>
 <span id="351">351</span>
 <span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::scalars::ScalarType</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -489,7 +494,7 @@
     <span class="comment">// intended for primary key values!</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_dbgenerated_func</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">DefaultKind::Expression</span>(<span class="kw-2">ref</span> <span class="ident">expr</span>) <span class="kw">if</span> <span class="ident">expr</span>.<span class="ident">is_dbgenerated</span>() =&gt; <span class="ident">expr</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">to_string</span>()),
+            <span class="ident">DefaultKind::Expression</span>(<span class="kw-2">ref</span> <span class="ident">expr</span>) <span class="kw">if</span> <span class="ident">expr</span>.<span class="ident">is_dbgenerated</span>() =&gt; <span class="ident">expr</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="number">1</span>.<span class="ident">to_string</span>()),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -498,12 +503,12 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ValueGenerator</span> {
     <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+    <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span>,
     <span class="ident">generator</span>: <span class="ident">ValueGeneratorFn</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ValueGenerator</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">generator</span> <span class="op">=</span> <span class="ident">ValueGeneratorFn::new</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">ValueGenerator</span> { <span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">generator</span> })
@@ -513,11 +518,15 @@
         <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;autoincrement&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec!</span>[]).<span class="ident">unwrap</span>()
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_sequence</span>(<span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;sequence&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">args</span>).<span class="ident">unwrap</span>()
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_dbgenerated</span>(<span class="ident">description</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="ident">description</span>.<span class="ident">trim_matches</span>(<span class="string">&#39;\0&#39;</span>).<span class="ident">is_empty</span>() {
             <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;dbgenerated&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">Vec::new</span>()).<span class="ident">unwrap</span>()
         } <span class="kw">else</span> {
-            <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;dbgenerated&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec!</span>[<span class="ident">PrismaValue::String</span>(<span class="ident">description</span>)]).<span class="ident">unwrap</span>()
+            <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;dbgenerated&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec!</span>[(<span class="prelude-val">None</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">description</span>))]).<span class="ident">unwrap</span>()
         }
     }
 
@@ -541,7 +550,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">args</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">PrismaValue</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">args</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">PrismaValue</span>)] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span>
     }
 
@@ -554,7 +563,7 @@
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_string</span>())
+        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="number">1</span>.<span class="ident">as_string</span>())
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;default_generators&quot;</span>)]</span>
@@ -579,7 +588,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_autoincrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;autoincrement&quot;</span>
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;autoincrement&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;sequence&quot;</span>
     }
 }
 
@@ -600,6 +609,7 @@
             <span class="string">&quot;uuid&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Uuid</span>),
             <span class="string">&quot;now&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Now</span>),
             <span class="string">&quot;autoincrement&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Autoincrement</span>),
+            <span class="string">&quot;sequence&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Autoincrement</span>),
             <span class="string">&quot;dbgenerated&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::DbGenerated</span>),
             <span class="string">&quot;auto&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Auto</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;The function {} is not a known function.&quot;</span>, <span class="ident">name</span>)),

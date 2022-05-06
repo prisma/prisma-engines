@@ -331,7 +331,7 @@
             <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="ident">e</span>)),
         };
 
-        <span class="ident">result</span>.<span class="ident">map_err</span>(<span class="ident">RpcError::from</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">result</span><span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// This function parses the provided schema and returns the contained Datamodel.</span>

@@ -733,6 +733,9 @@
 <span id="728">728</span>
 <span id="729">729</span>
 <span id="730">730</span>
+<span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">IndexField</span>, <span class="ident">PrimaryKeyField</span>},
@@ -1358,6 +1361,9 @@
         }
         <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;autoincrement&quot;</span> =&gt; {
             <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_autoincrement</span>())
+        }
+        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;sequence&quot;</span> =&gt; {
+            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_sequence</span>(<span class="ident">Vec::new</span>()))
         }
         <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;uuid&quot;</span> =&gt; {
             <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_uuid</span>())

@@ -396,6 +396,14 @@
 <span id="391">391</span>
 <span id="392">392</span>
 <span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::assertions</span>::{<span class="ident">MigrationsAssertions</span>, <span class="ident">ResultSetExt</span>, <span class="ident">SchemaAssertion</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_core::json_rpc::types</span>::{
@@ -671,6 +679,14 @@
     <span class="doccomment">/// Plan a `reset` command</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Reset</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">Reset::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expect_sql_for_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">expect_test::Expect</span>) {
+        <span class="comment">// let dir = tempfile::tempdir().unwrap();</span>
+        <span class="comment">// let schema_path = dir.path().join(&quot;schema.prisma&quot;);</span>
+        <span class="comment">// std::fs::write(&amp;schema_path, schema).unwrap();</span>
+        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector_diff</span>(<span class="ident">DiffTarget::Empty</span>, <span class="ident">DiffTarget::Datamodel</span>(<span class="ident">schema</span>));
+        <span class="ident">sql</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">found</span>);
     }
 
     <span class="doccomment">/// Plan a `schemaPush` command adding the datasource</span>

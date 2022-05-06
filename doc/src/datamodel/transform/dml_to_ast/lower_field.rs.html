@@ -340,6 +340,11 @@
 <span id="335">335</span>
 <span id="336">336</span>
 <span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">Attribute</span>, <span class="ident">Span</span>},
     <span class="ident">common</span>::{<span class="ident">constraint_names::ConstraintNames</span>, <span class="ident">preview_features::PreviewFeature</span>, <span class="ident">RelationNames</span>},
@@ -621,8 +626,13 @@
                 <span class="kw">let</span> <span class="ident">arguments</span> <span class="op">=</span> <span class="ident">e</span>
                     .<span class="ident">args</span>()
                     .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="ident">LowerDmlToAst</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="ident">::lower_prisma_value</span>)
-                    .<span class="ident">map</span>(<span class="ident">ast::Argument::new_unnamed</span>)
+                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">name</span>, <span class="ident">value</span>)<span class="op">|</span> {
+                        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">LowerDmlToAst</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="ident">::lower_prisma_value</span>(<span class="ident">value</span>);
+                        <span class="kw">match</span> <span class="ident">name</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">ast::Argument::new</span>(<span class="ident">name</span>, <span class="ident">value</span>),
+                            <span class="prelude-val">None</span> =&gt; <span class="ident">ast::Argument::new_unnamed</span>(<span class="ident">value</span>),
+                        }
+                    })
                     .<span class="ident">collect</span>();
                 <span class="ident">ast::Expression::Function</span>(
                     <span class="ident">e</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(),

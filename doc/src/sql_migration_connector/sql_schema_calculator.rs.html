@@ -443,6 +443,11 @@
 <span id="438">438</span>
 <span id="439">439</span>
 <span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">sql_schema_calculator_flavour</span>;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use</span> <span class="ident">sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour</span>;
@@ -791,7 +796,12 @@
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_now</span>() {
                 <span class="prelude-val">Some</span>(<span class="ident">sql::DefaultValue::now</span>())
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_autoincrement</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">sql::DefaultValue::sequence</span>(<span class="string">&quot;&quot;</span>))
+                <span class="ident">ctx</span>.<span class="ident">flavour</span>.<span class="ident">column_default_value_for_autoincrement</span>()
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_sequence</span>() {
+                <span class="prelude-val">Some</span>(<span class="ident">sql::DefaultValue::new</span>(<span class="ident">sql::DefaultKind::Sequence</span>(<span class="macro">format!</span>(
+                    <span class="string">&quot;prisma_sequence_{}_{}&quot;</span>,
+                    <span class="ident">idx</span>.<span class="number">0</span>, <span class="ident">idx</span>.<span class="number">1</span>
+                ))))
             } <span class="kw">else</span> {
                 <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">value</span>() {
                     <span class="ident">ast::Expression::NumericValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">scalar_type</span> {
