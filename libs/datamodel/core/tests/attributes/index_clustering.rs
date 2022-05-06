@@ -8,7 +8,7 @@ fn non_boolean_clustering() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -34,7 +34,7 @@ fn clustered_index_works_on_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     let schema = parse(&schema);
 
     schema.assert_has_model("A").assert_has_index(IndexDefinition {
@@ -57,7 +57,7 @@ fn clustered_unique_index_works_on_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     let schema = parse(&schema);
     let model = schema.assert_has_model("A");
 
@@ -84,7 +84,7 @@ fn clustered_compound_unique_index_works_on_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     let schema = parse(&schema);
     let model = schema.assert_has_model("A");
 
@@ -107,7 +107,7 @@ fn non_clustered_id_works_on_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     let schema = parse(&schema);
     let model = schema.assert_has_model("A");
 
@@ -131,7 +131,7 @@ fn non_clustered_compound_id_works_on_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     let schema = parse(&schema);
     let model = schema.assert_has_model("A");
 
@@ -155,7 +155,7 @@ fn clustered_index_allowed_only_in_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -179,7 +179,7 @@ fn clustered_unique_allowed_only_in_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -206,7 +206,7 @@ fn clustered_compound_unique_allowed_only_in_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -229,7 +229,7 @@ fn non_clustered_id_allowed_only_in_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -255,7 +255,7 @@ fn non_clustered_compound_id_allowed_only_in_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -264,132 +264,6 @@ fn non_clustered_compound_id_allowed_only_in_sql_server() {
         [1;94m   | [0m
         [1;94m14 | [0m
         [1;94m15 | [0m  @@[1;91mid([left, right], clustered: false)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error);
-}
-
-#[test]
-fn clustered_index_allowed_only_with_preview_flag() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id @map("_id")
-          a  Int
-
-          @@index([a], clustered: false)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::SqlServer, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": To specify index clustering, please enable `extendedIndexes` preview feature.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a], clustered: false)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error);
-}
-
-#[test]
-fn clustered_unique_allowed_only_with_preview_flag() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id @map("_id")
-          a  Int @unique(clustered: false)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::SqlServer, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": To specify index clustering, please enable `extendedIndexes` preview feature.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
-        [1;94m   | [0m
-        [1;94m12 | [0m  id Int @id @map("_id")
-        [1;94m13 | [0m  a  Int @[1;91munique(clustered: false)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error);
-}
-
-#[test]
-fn clustered_compound_unique_allowed_only_with_preview_flag() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id @map("_id")
-          a  Int
-          b  Int
-
-          @@unique([a, b], clustered: false)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::SqlServer, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@unique": To specify index clustering, please enable `extendedIndexes` preview feature.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
-        [1;94m   | [0m
-        [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91munique([a, b], clustered: false)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error);
-}
-
-#[test]
-fn nonclustered_id_allowed_only_with_preview_flag() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id(clustered: false)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::SqlServer, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": To specify clustering, please enable `extendedIndexes` preview feature.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
-        [1;94m   | [0m
-        [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Int @[1;91mid(clustered: false)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error);
-}
-
-#[test]
-fn nonclustered_compound_id_allowed_only_with_preview_flag() {
-    let dml = indoc! {r#"
-        model A {
-          a Int
-          b Int
-
-          @@id([a, b], clustered: false)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::SqlServer, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@id": To specify clustering, please enable `extendedIndexes` preview feature.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mid([a, b], clustered: false)[0m
         [1;94m   | [0m
     "#]];
 
@@ -407,7 +281,7 @@ fn id_and_index_clustering_together_not_allowed() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -437,7 +311,7 @@ fn id_and_unique_clustering_together_not_allowed() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -472,7 +346,7 @@ fn do_not_render_id_default_clustering() {
         }
     "#]];
 
-    let schema = with_header(input, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(input, Provider::SqlServer, &[]);
     let dml = datamodel::parse_datamodel(&schema).unwrap().subject;
     let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
@@ -493,7 +367,7 @@ fn render_id_non_default_clustering() {
         }
     "#]];
 
-    let schema = with_header(input, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(input, Provider::SqlServer, &[]);
     let (config, dml) = datamodel::parse_schema(&schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
@@ -520,7 +394,7 @@ fn do_not_render_compound_id_default_clustering() {
         }
     "#]];
 
-    let schema = with_header(input, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(input, Provider::SqlServer, &[]);
     let (config, dml) = datamodel::parse_schema(&schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
@@ -547,7 +421,7 @@ fn render_compound_id_default_clustering() {
         }
     "#]];
 
-    let schema = with_header(input, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(input, Provider::SqlServer, &[]);
     let (config, dml) = datamodel::parse_schema(&schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
@@ -574,7 +448,7 @@ fn do_not_render_index_default_clustering() {
         }
     "#]];
 
-    let schema = with_header(input, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(input, Provider::SqlServer, &[]);
     let (config, dml) = datamodel::parse_schema(&schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
@@ -601,7 +475,7 @@ fn render_index_non_default_clustering() {
         }
     "#]];
 
-    let schema = with_header(input, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(input, Provider::SqlServer, &[]);
     let (config, dml) = datamodel::parse_schema(&schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
@@ -624,7 +498,7 @@ fn do_not_render_unique_default_clustering() {
         }
     "#]];
 
-    let schema = with_header(input, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(input, Provider::SqlServer, &[]);
     let (config, dml) = datamodel::parse_schema(&schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
@@ -647,7 +521,7 @@ fn render_unique_non_default_clustering() {
         }
     "#]];
 
-    let schema = with_header(input, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(input, Provider::SqlServer, &[]);
     let (config, dml) = datamodel::parse_schema(&schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
@@ -676,7 +550,7 @@ fn do_not_render_compound_unique_default_clustering() {
         }
     "#]];
 
-    let schema = with_header(input, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(input, Provider::SqlServer, &[]);
     let (config, dml) = datamodel::parse_schema(&schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
@@ -705,7 +579,7 @@ fn render_compound_unique_non_default_clustering() {
         }
     "#]];
 
-    let schema = with_header(input, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(input, Provider::SqlServer, &[]);
     let (config, dml) = datamodel::parse_schema(&schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 

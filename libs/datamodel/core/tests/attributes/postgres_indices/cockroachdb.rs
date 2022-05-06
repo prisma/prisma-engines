@@ -11,7 +11,7 @@ fn array_field_default_ops() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Cockroach, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -38,7 +38,7 @@ fn no_ops_json_prisma_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Cockroach, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -65,7 +65,7 @@ fn with_raw_unsupported() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Cockroach, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -93,7 +93,7 @@ fn jsonb_column_as_the_last_in_index() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Cockroach, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
     let schema = parse(&schema);
 
     let b = IndexField::new_in_model("b");
@@ -122,7 +122,7 @@ fn jsonb_column_must_be_the_last_in_index() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Cockroach, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -148,7 +148,7 @@ fn custom_ops_not_supported() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Cockroach, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -174,7 +174,7 @@ fn raw_ops_not_supported() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Cockroach, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -200,7 +200,7 @@ fn wrong_field_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Cockroach, &["extendedIndexes", "cockroachDb"]);
+    let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"

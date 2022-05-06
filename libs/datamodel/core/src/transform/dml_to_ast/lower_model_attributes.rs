@@ -1,5 +1,4 @@
 use crate::ast::{Argument, Attribute};
-use crate::common::preview_features::PreviewFeature;
 use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::{
     ast::{self, Span},
@@ -7,7 +6,6 @@ use crate::{
 };
 use ::dml::datamodel::Datamodel;
 use ::dml::model::IndexAlgorithm;
-use itertools::Itertools;
 
 impl<'a> LowerDmlToAst<'a> {
     /// Internal: Lowers a model's attributes.
@@ -18,17 +16,10 @@ impl<'a> LowerDmlToAst<'a> {
 
         if let Some(pk) = &model.primary_key {
             if !pk.defined_on_field {
-                let mut args = if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                    vec![ast::Argument::new_unnamed(ast::Expression::Array(
-                        LowerDmlToAst::pk_field_array(&pk.fields),
-                        ast::Span::empty(),
-                    ))]
-                } else {
-                    vec![ast::Argument::new_unnamed(ast::Expression::Array(
-                        LowerDmlToAst::field_array(&pk.fields.clone().into_iter().map(|f| f.name).collect::<Vec<_>>()),
-                        ast::Span::empty(),
-                    ))]
-                };
+                let mut args = vec![ast::Argument::new_unnamed(ast::Expression::Array(
+                    LowerDmlToAst::pk_field_array(&pk.fields),
+                    ast::Span::empty(),
+                ))];
 
                 if pk.name.is_some() {
                     args.push(ast::Argument::new(
@@ -48,9 +39,7 @@ impl<'a> LowerDmlToAst<'a> {
                     }
                 }
 
-                if self.preview_features.contains(PreviewFeature::ExtendedIndexes)
-                    && matches!(pk.clustered, Some(false))
-                {
+                if matches!(pk.clustered, Some(false)) {
                     args.push(ast::Argument::new(
                         "clustered",
                         ast::Expression::ConstantValue("false".to_string(), Span::empty()),
@@ -74,9 +63,7 @@ impl<'a> LowerDmlToAst<'a> {
 
                 self.push_index_map_argument(datamodel, model, index_def, &mut args);
 
-                if self.preview_features.contains(PreviewFeature::ExtendedIndexes)
-                    && matches!(index_def.clustered, Some(true))
-                {
+                if matches!(index_def.clustered, Some(true)) {
                     args.push(ast::Argument::new(
                         "clustered",
                         ast::Expression::NumericValue("true".to_string(), Span::empty()),
@@ -105,9 +92,7 @@ impl<'a> LowerDmlToAst<'a> {
                     }
                 }
 
-                if self.preview_features.contains(PreviewFeature::ExtendedIndexes)
-                    && matches!(index_def.clustered, Some(true))
-                {
+                if matches!(index_def.clustered, Some(true)) {
                     args.push(ast::Argument::new(
                         "clustered",
                         ast::Expression::ConstantValue("true".to_string(), Span::empty()),
@@ -141,24 +126,10 @@ impl<'a> LowerDmlToAst<'a> {
     }
 
     fn fields_argument(&self, index_def: &IndexDefinition, always_render_sort_order: bool) -> Vec<Argument> {
-        if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-            vec![ast::Argument::new_unnamed(ast::Expression::Array(
-                LowerDmlToAst::index_field_array(&index_def.fields, always_render_sort_order),
-                ast::Span::empty(),
-            ))]
-        } else {
-            let fields = index_def
-                .fields
-                .clone()
-                .into_iter()
-                .map(|f| f.path.into_iter().map(|(field, _)| field).join("."))
-                .collect::<Vec<_>>();
-
-            vec![ast::Argument::new_unnamed(ast::Expression::Array(
-                LowerDmlToAst::field_array(&fields),
-                ast::Span::empty(),
-            ))]
-        }
+        vec![ast::Argument::new_unnamed(ast::Expression::Array(
+            LowerDmlToAst::index_field_array(&index_def.fields, always_render_sort_order),
+            ast::Span::empty(),
+        ))]
     }
 
     pub(crate) fn push_field_index_arguments(
@@ -177,20 +148,19 @@ impl<'a> LowerDmlToAst<'a> {
                     ast::Expression::StringValue(String::from(index_def.db_name.as_ref().unwrap()), Span::empty()),
                 ));
             }
-            if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                if let Some(length) = field.length {
-                    args.push(ast::Argument::new(
-                        "length",
-                        ast::Expression::NumericValue(length.to_string(), Span::empty()),
-                    ));
-                }
 
-                if field.sort_order == Some(SortOrder::Desc) {
-                    args.push(ast::Argument::new(
-                        "sort",
-                        ast::Expression::ConstantValue("Desc".to_string(), Span::empty()),
-                    ));
-                }
+            if let Some(length) = field.length {
+                args.push(ast::Argument::new(
+                    "length",
+                    ast::Expression::NumericValue(length.to_string(), Span::empty()),
+                ));
+            }
+
+            if field.sort_order == Some(SortOrder::Desc) {
+                args.push(ast::Argument::new(
+                    "sort",
+                    ast::Expression::ConstantValue("Desc".to_string(), Span::empty()),
+                ));
             }
         }
     }

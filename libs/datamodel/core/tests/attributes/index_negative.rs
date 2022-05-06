@@ -82,63 +82,6 @@ fn stringified_field_names_in_index_return_nice_error() {
 }
 
 #[test]
-fn index_does_not_accept_sort_or_length_without_extended_indexes() {
-    let dml = with_header(
-        r#"
-     model User {
-         id         Int    @id
-         firstName  String @unique(sort:Desc, length: 5)
-         middleName String @unique(sort:Desc)
-         lastName   String @unique(length: 5)
-         generation Int    @unique
-         
-         @@index([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
-         @@unique([firstName(sort: Desc), middleName(length: 6), lastName(sort: Desc, length: 6), generation])
-     }
-     "#,
-        Provider::Mysql,
-        &[],
-    );
-
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
-        [1;94m   | [0m
-        [1;94m13 | [0m         id         Int    @id
-        [1;94m14 | [0m         firstName  String @[1;91munique(sort:Desc, length: 5)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m         firstName  String @unique(sort:Desc, length: 5)
-        [1;94m15 | [0m         middleName String @[1;91munique(sort:Desc)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
-        [1;94m   | [0m
-        [1;94m15 | [0m         middleName String @unique(sort:Desc)
-        [1;94m16 | [0m         lastName   String @[1;91munique(length: 5)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@@index": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
-        [1;94m   | [0m
-        [1;94m18 | [0m         
-        [1;94m19 | [0m         @@[1;91mindex([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
-        [1;94m   | [0m
-        [1;94m19 | [0m         @@index([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
-        [1;94m20 | [0m         @@[1;91munique([firstName(sort: Desc), middleName(length: 6), lastName(sort: Desc, length: 6), generation])[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn index_does_not_accept_missing_length_with_extended_indexes() {
     let dml = with_header(
         r#"
@@ -150,19 +93,19 @@ fn index_does_not_accept_missing_length_with_extended_indexes() {
      }
      "#,
         Provider::Mysql,
-        &["extendedIndexes"],
+        &[],
     );
 
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mNative type `Text` cannot be unique in MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
+        [1;91merror[0m: [1mNative type `Text` cannot be unique in MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m         id         Int    @id
         [1;94m14 | [0m         firstName  String @[1;91munique[0m @test.Text
         [1;94m   | [0m
-        [1;91merror[0m: [1mYou cannot define an index on fields with native type `Text` of MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `Text` of MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m         
@@ -181,7 +124,7 @@ fn sqlserver_disallows_unique_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::SqlServer, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -206,7 +149,7 @@ fn sqlserver_disallows_compound_unique_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::SqlServer, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -232,7 +175,7 @@ fn sqlserver_disallows_index_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::SqlServer, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -255,7 +198,7 @@ fn sqlite_disallows_unique_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Sqlite, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -280,7 +223,7 @@ fn sqlite_disallows_compound_unique_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Sqlite, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -306,7 +249,7 @@ fn sqlite_disallows_index_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Sqlite, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -330,7 +273,7 @@ fn mongodb_disallows_unique_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -356,7 +299,7 @@ fn mongodb_disallows_compound_unique_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -382,7 +325,7 @@ fn mongodb_disallows_index_length_prefix() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -408,7 +351,7 @@ fn length_argument_does_not_work_with_decimal() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -434,7 +377,7 @@ fn length_argument_does_not_work_with_json() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -460,7 +403,7 @@ fn length_argument_does_not_work_with_datetime() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -486,7 +429,7 @@ fn length_argument_does_not_work_with_boolean() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -512,7 +455,7 @@ fn length_argument_does_not_work_with_float() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -538,7 +481,7 @@ fn length_argument_does_not_work_with_bigint() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -564,7 +507,7 @@ fn length_argument_does_not_work_with_int() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -590,7 +533,7 @@ fn hash_index_doesnt_allow_sorting() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -616,7 +559,7 @@ fn hash_index_doesnt_work_on_sqlserver() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -669,7 +612,7 @@ fn hash_index_doesnt_work_on_mysql() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -696,7 +639,7 @@ fn fulltext_index_length_attribute() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["fullTextIndex", "extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -722,7 +665,7 @@ fn hash_index_doesnt_work_on_sqlite() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Sqlite, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Sqlite, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -749,7 +692,7 @@ fn fulltext_index_sort_attribute() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["fullTextIndex", "extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -775,7 +718,7 @@ fn hash_index_doesnt_work_on_mongo() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -921,7 +864,7 @@ fn fulltext_index_fields_must_follow_each_other_in_mongo() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["fullTextIndex", "extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -941,7 +884,7 @@ fn index_without_fields_must_error() {
     let schema = r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex", "extendedIndexes"]
+          previewFeatures = ["fullTextIndex"]
         }
 
         datasource db {
@@ -1064,7 +1007,7 @@ fn duplicate_indices_on_the_same_fields_different_sort_same_name_are_not_allowed
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mongo, &[]);
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"

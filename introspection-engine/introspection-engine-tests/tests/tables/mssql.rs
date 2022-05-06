@@ -78,7 +78,7 @@ async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 async fn a_table_with_descending_primary_key(api: &TestApi) -> TestResult {
     let setup = formatdoc! {r#"
        CREATE TABLE [{}].[A] (
@@ -100,7 +100,7 @@ async fn a_table_with_descending_primary_key(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
     let setup = formatdoc! {r#"
        CREATE TABLE [{}].[A] (
@@ -125,7 +125,7 @@ async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 async fn a_table_with_descending_compound_unique(api: &TestApi) -> TestResult {
     let setup = formatdoc! {r#"
        CREATE TABLE [{}].[A] (
@@ -154,7 +154,7 @@ async fn a_table_with_descending_compound_unique(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
     let setup = formatdoc! {r#"
        CREATE TABLE [{schema_name}].[A] (

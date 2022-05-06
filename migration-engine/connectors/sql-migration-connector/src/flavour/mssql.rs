@@ -2,7 +2,6 @@ mod shadow_db;
 
 use crate::{flavour::normalize_sql_schema, SqlFlavour};
 use connection_string::JdbcString;
-use datamodel::common::preview_features::PreviewFeature;
 use indoc::formatdoc;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
@@ -11,7 +10,7 @@ use quaint::{
     connector::{Mssql as Connection, MssqlUrl},
     prelude::{Queryable, Table},
 };
-use sql_schema_describer::{mssql::MssqlSchemaExt, SqlSchema};
+use sql_schema_describer::SqlSchema;
 use std::{future, str::FromStr};
 use user_facing_errors::{
     introspection_engine::DatabaseSchemaInconsistent, migration_engine::ApplyMigrationError, KnownError,
@@ -105,17 +104,6 @@ impl SqlFlavour for MssqlFlavour {
                 })?;
 
             normalize_sql_schema(&mut schema, params.connector_params.preview_features);
-            let mssql_ext: &mut MssqlSchemaExt = schema.downcast_connector_data_mut();
-
-            // Remove this when the feature is GA
-            if !params
-                .connector_params
-                .preview_features
-                .contains(PreviewFeature::ExtendedIndexes)
-            {
-                mssql_ext.clustered_indexes.clear();
-                mssql_ext.nonclustered_primary_keys.clear();
-            }
 
             Ok(schema)
         })

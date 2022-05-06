@@ -215,43 +215,6 @@ fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<P
         }
     }
 
-    fn filter_extended_index_capabilities(schema: &mut SqlSchema) {
-        for (_, table) in schema.iter_tables_mut() {
-            if let Some(ref mut pk) = &mut table.primary_key {
-                for col in pk.columns.iter_mut() {
-                    col.length = None;
-                    col.sort_order = None;
-                }
-            }
-
-            let mut kept_indexes = Vec::new();
-
-            while let Some(mut index) = table.indices.pop() {
-                let mut remove_index = false;
-
-                for col in index.columns.iter_mut() {
-                    if col.length.is_some() {
-                        remove_index = true;
-                    }
-
-                    col.sort_order = None;
-                }
-
-                if !remove_index {
-                    kept_indexes.push(index);
-                }
-            }
-
-            kept_indexes.reverse();
-            table.indices = kept_indexes;
-        }
-    }
-
-    // Remove this when the feature is GA
-    if !preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        filter_extended_index_capabilities(sql_schema);
-    }
-
     // Remove this when the feature is GA
     if !preview_features.contains(PreviewFeature::FullTextIndex) {
         filter_fulltext_capabilities(sql_schema);

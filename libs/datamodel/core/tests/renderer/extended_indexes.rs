@@ -17,7 +17,7 @@ fn expanded_index_capability_rendering_works() {
     }
     "#,
         Provider::Mysql,
-        &["extendedIndexes"],
+        &[],
     );
 
     let expected = expect![[r#"
@@ -55,7 +55,7 @@ fn expanded_id_capability_rendering_works_for_mysql() {
       }
     "#,
         Provider::Mysql,
-        &["extendedIndexes"],
+        &[],
     );
 
     let expected = expect![[r#"
@@ -93,7 +93,7 @@ fn expanded_id_capability_rendering_works_for_sqlserver() {
       }
     "#,
         Provider::SqlServer,
-        &["extendedIndexes"],
+        &[],
     );
 
     let expected = expect![[r#"

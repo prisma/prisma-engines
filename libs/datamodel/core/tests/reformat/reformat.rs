@@ -1062,7 +1062,6 @@ fn reformatting_extended_indexes_works() {
         generator client {
           provider        = "prisma-client-js"
           binaryTargets   = ["darwin"]
-          previewFeatures = ["extendedIndexes"]
         }
         
         datasource db {
@@ -1094,9 +1093,8 @@ fn reformatting_extended_indexes_works() {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          binaryTargets   = ["darwin"]
-          previewFeatures = ["extendedIndexes"]
+          provider      = "prisma-client-js"
+          binaryTargets = ["darwin"]
         }
 
         datasource db {
@@ -1134,7 +1132,7 @@ fn reformatting_with_empty_indexes() {
     let schema = r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex", "extendedIndexes"]
+          previewFeatures = ["fullTextIndex"]
         }
 
         datasource db {
@@ -1156,7 +1154,7 @@ fn reformatting_with_empty_indexes() {
     let expected = expect![[r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex", "extendedIndexes"]
+          previewFeatures = ["fullTextIndex"]
         }
 
         datasource db {

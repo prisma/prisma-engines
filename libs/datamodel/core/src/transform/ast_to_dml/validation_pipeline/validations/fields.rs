@@ -6,7 +6,6 @@ use super::{
 };
 use crate::{
     ast,
-    common::preview_features::PreviewFeature,
     diagnostics::DatamodelError,
     transform::ast_to_dml::{
         db::{
@@ -357,35 +356,11 @@ pub(crate) fn id_supports_clustering_setting(pk: PrimaryKeyWalker<'_>, ctx: &mut
     ));
 }
 
-pub(crate) fn clustering_setting_preview_enabled(pk: PrimaryKeyWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
-        return;
-    }
-
-    if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        return;
-    }
-
-    if pk.clustered().is_none() {
-        return;
-    }
-
-    ctx.push_error(DatamodelError::new_attribute_validation_error(
-        "To specify clustering, please enable `extendedIndexes` preview feature.",
-        pk.attribute_name(),
-        *pk.ast_attribute().span(),
-    ))
-}
-
 /// Only one index or key can be clustered per table.
 ///
 /// Here we check the primary key. Another check in index validations.
 pub(crate) fn clustering_can_be_defined_only_once(pk: PrimaryKeyWalker<'_>, ctx: &mut Context<'_>) {
     if !ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
-        return;
-    }
-
-    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
     }
 

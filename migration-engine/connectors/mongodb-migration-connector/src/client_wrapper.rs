@@ -43,10 +43,6 @@ impl Client {
             schema.remove_fulltext_indexes();
         }
 
-        if !self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-            schema.normalize_index_attributes();
-        }
-
         Ok(schema)
     }
 
