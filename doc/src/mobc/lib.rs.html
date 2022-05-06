@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mobc-711820eed980cd14/75c68f1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mobc-711820eed980cd14/5a674b9/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -699,6 +699,33 @@
 <span id="694">694</span>
 <span id="695">695</span>
 <span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+<span id="712">712</span>
+<span id="713">713</span>
+<span id="714">714</span>
+<span id="715">715</span>
+<span id="716">716</span>
+<span id="717">717</span>
+<span id="718">718</span>
+<span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
+<span id="723">723</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A generic connection pool with async/await support.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Opening a new database connection every time one is needed is both</span>
@@ -765,8 +792,17 @@
 <span class="doccomment">//!        rx.recv().await.unwrap();</span>
 <span class="doccomment">//!    }</span>
 <span class="doccomment">//!}</span>
-<span class="doccomment">//!</span>
 <span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Metrics</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Mobc uses the metrics crate to expose the following metrics</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! 1. Active Connections - The number of connections in use.</span>
+<span class="doccomment">//! 1. Idle Connections - The number of connections that are not being used</span>
+<span class="doccomment">//! 1. Wait Count - the number of processes waiting for a connection</span>
+<span class="doccomment">//! 1. Wait Duration - A cumulative histogram of the wait time for a connection</span>
+<span class="doccomment">//!</span>
 
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
@@ -774,6 +810,7 @@
 <span class="kw">mod</span> <span class="ident">config</span>;
 
 <span class="kw">mod</span> <span class="ident">error</span>;
+<span class="kw">mod</span> <span class="ident">metrics_utils</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unstable</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">runtime</span>;
@@ -791,6 +828,7 @@
 <span class="kw">use</span> <span class="ident">futures_util::FutureExt</span>;
 <span class="kw">use</span> <span class="ident">futures_util::SinkExt</span>;
 <span class="kw">use</span> <span class="ident">futures_util::StreamExt</span>;
+<span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">decrement_gauge</span>, <span class="ident">gauge</span>, <span class="ident">histogram</span>, <span class="ident">increment_gauge</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">spawn::spawn</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::future::Future</span>;
@@ -800,6 +838,10 @@
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time</span>::{<span class="ident">delay_for</span>, <span class="ident">interval</span>};
 <span class="kw">use</span> <span class="ident">tokio::sync::Semaphore</span>;
+
+<span class="kw">use</span> <span class="ident">metrics_utils</span>::{<span class="ident">ACTIVE_CONNECTIONS</span>, <span class="ident">WAIT_COUNT</span>, <span class="ident">WAIT_DURATION</span>};
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::metrics_utils::IDLE_CONNECTIONS</span>;
 
 <span class="kw">const</span> <span class="ident">CONNECTION_REQUEST_QUEUE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10000</span>;
 
@@ -855,6 +897,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">internals</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+        <span class="macro">decrement_gauge!</span>(<span class="ident">ACTIVE_CONNECTIONS</span>, <span class="number">1.0</span>);
         <span class="ident">internals</span>.<span class="ident">num_open</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
     }
 
@@ -1053,6 +1096,9 @@
         } <span class="kw">else</span> {
             <span class="ident">config</span>.<span class="ident">max_open</span> <span class="kw">as</span> <span class="ident">usize</span>
         };
+
+        <span class="macro">gauge!</span>(<span class="ident">IDLE_CONNECTIONS</span>, <span class="ident">max_open</span> <span class="kw">as</span> <span class="ident">f64</span>);
+
         <span class="kw">let</span> (<span class="ident">share_config</span>, <span class="ident">internal_config</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">split</span>();
         <span class="kw">let</span> <span class="ident">internals</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">PoolInternals</span> {
             <span class="ident">config</span>: <span class="ident">internal_config</span>,
@@ -1119,6 +1165,9 @@
             <span class="ident">conn</span>: <span class="prelude-val">Some</span>(<span class="ident">c</span>),
         };
 
+        <span class="macro">increment_gauge!</span>(<span class="ident">ACTIVE_CONNECTIONS</span>, <span class="number">1.0</span>);
+        <span class="macro">decrement_gauge!</span>(<span class="ident">WAIT_COUNT</span>, <span class="number">1.0</span>);
+
         <span class="prelude-val">Ok</span>(<span class="ident">conn</span>)
     }
 
@@ -1158,6 +1207,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_or_create_conn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="ident">internals</span>.<span class="ident">wait_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="macro">increment_gauge!</span>(<span class="ident">WAIT_COUNT</span>, <span class="number">1.0</span>);
         <span class="kw">let</span> <span class="ident">wait_start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
 
         <span class="ident">drop</span>(<span class="ident">internals</span>);
@@ -1170,11 +1220,13 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="ident">internals</span>.<span class="ident">wait_duration</span> <span class="op">+</span><span class="op">=</span> <span class="ident">wait_start</span>.<span class="ident">elapsed</span>();
+        <span class="macro">histogram!</span>(<span class="ident">WAIT_DURATION</span>, <span class="ident">wait_start</span>.<span class="ident">elapsed</span>());
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">pop</span>();
 
         <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">is_some</span>() {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">unwrap</span>();
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">validate_conn</span>(<span class="kw-2">&amp;</span><span class="ident">internals</span>, <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>).<span class="kw">await</span> {
+                <span class="macro">decrement_gauge!</span>(<span class="ident">IDLE_CONNECTIONS</span>, <span class="number">1.0</span>);
                 <span class="ident">permit</span>.<span class="ident">forget</span>();
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">conn</span>);
             } <span class="kw">else</span> {
@@ -1185,6 +1237,7 @@
         <span class="kw">let</span> <span class="ident">create_r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">open_new_connection</span>(<span class="ident">internals</span>).<span class="kw">await</span>;
 
         <span class="kw">if</span> <span class="ident">create_r</span>.<span class="ident">is_ok</span>() {
+            <span class="macro">decrement_gauge!</span>(<span class="ident">IDLE_CONNECTIONS</span>, <span class="number">1.0</span>);
             <span class="ident">permit</span>.<span class="ident">forget</span>();
         }
 
@@ -1254,6 +1307,7 @@
         <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="ident">internals</span>);
     }
 
+    <span class="macro">increment_gauge!</span>(<span class="ident">IDLE_CONNECTIONS</span>, <span class="number">1.0</span>);
     <span class="ident">shared</span>.<span class="ident">semaphore</span>.<span class="ident">add_permits</span>(<span class="number">1</span>);
 }
 

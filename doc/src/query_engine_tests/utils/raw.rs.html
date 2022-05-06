@@ -110,6 +110,8 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">FixedOffset</span>};
 <span class="kw">use</span> <span class="ident">prisma_value::encode_bytes</span>;
 <span class="kw">use</span> <span class="ident">query_tests_setup</span>::{<span class="ident">TestError</span>, <span class="ident">TestResult</span>};
@@ -145,6 +147,7 @@
     <span class="ident">Decimal</span>(<span class="ident">String</span>),
     <span class="ident">Array</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RawParam</span><span class="op">&gt;</span>),
     <span class="ident">Primitive</span>(<span class="ident">serde_json::Value</span>),
+    <span class="ident">Null</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">RawParam</span> {
@@ -208,6 +211,7 @@
                 <span class="ident">serde_json::Value::Array</span>(<span class="ident">json_values</span>)
             }
             <span class="ident">RawParam::Primitive</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
+            <span class="ident">RawParam::Null</span> =&gt; <span class="ident">serde_json::Value::Null</span>,
         }
     }
 }
