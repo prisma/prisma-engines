@@ -326,10 +326,19 @@
 <span id="321">321</span>
 <span id="322">322</span>
 <span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">CompositeFieldRef</span>, <span class="ident">DomainError</span>, <span class="ident">Field</span>, <span class="ident">PrismaValueExtensions</span>, <span class="ident">RelationField</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">SelectionResult</span>,
+    <span class="ident">parent_container::ParentContainer</span>, <span class="ident">CompositeFieldRef</span>, <span class="ident">DomainError</span>, <span class="ident">Field</span>, <span class="ident">PrismaValueExtensions</span>, <span class="ident">RelationField</span>,
+    <span class="ident">ScalarFieldRef</span>, <span class="ident">SelectionResult</span>,
 };
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
@@ -496,6 +505,13 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">SelectedField::Composite</span>(<span class="kw-2">ref</span> <span class="ident">cs</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">cs</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">container</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">SelectedField::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">container</span>(),
+            <span class="ident">SelectedField::Composite</span>(<span class="ident">cs</span>) =&gt; <span class="ident">cs</span>.<span class="ident">field</span>.<span class="ident">container</span>(),
         }
     }
 

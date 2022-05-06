@@ -136,6 +136,9 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>};
 
@@ -239,7 +242,10 @@
                 <span class="macro">write!</span>(
                     <span class="ident">f</span>,
                     <span class="string">&quot;ProjectedDataDependency ({:?})&quot;</span>,
-                    <span class="ident">selection</span>.<span class="ident">prisma_names</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                    <span class="ident">selection</span>
+                        .<span class="ident">selections</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="ident">f</span>.<span class="ident">container</span>().<span class="ident">name</span>(), <span class="ident">f</span>.<span class="ident">prisma_name</span>()))
+                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                 )
             }
             <span class="ident"><span class="self">Self</span>::Then</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Then&quot;</span>),
