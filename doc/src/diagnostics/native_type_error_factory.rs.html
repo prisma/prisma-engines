@@ -107,7 +107,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_index</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
         <span class="ident">DatamodelError::new</span>(
             <span class="macro">format!</span>(
-                <span class="string">&quot;You cannot define an index on fields with Native type {} of {}.{message}&quot;</span>,
+                <span class="string">&quot;You cannot define an index on fields with native type `{}` of {}.{message}&quot;</span>,
                 <span class="self">self</span>.<span class="ident">native_type</span>, <span class="self">self</span>.<span class="ident">connector</span>
             )
             .<span class="ident">into</span>(),
@@ -118,7 +118,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_unique</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
         <span class="ident">DatamodelError::new</span>(
             <span class="macro">format!</span>(
-                <span class="string">&quot;Native type {} cannot be unique in {}.{message}&quot;</span>,
+                <span class="string">&quot;Native type `{}` cannot be unique in {}.{message}&quot;</span>,
                 <span class="self">self</span>.<span class="ident">native_type</span>, <span class="self">self</span>.<span class="ident">connector</span>
             )
             .<span class="ident">into</span>(),
@@ -129,7 +129,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_id</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
         <span class="ident">DatamodelError::new</span>(
             <span class="macro">format!</span>(
-                <span class="string">&quot;Native type {} of {} cannot be used on a field that is `@id` or `@@id`.{message}&quot;</span>,
+                <span class="string">&quot;Native type `{}` of {} cannot be used on a field that is `@id` or `@@id`.{message}&quot;</span>,
                 <span class="self">self</span>.<span class="ident">native_type</span>, <span class="self">self</span>.<span class="ident">connector</span>
             )
             .<span class="ident">into</span>(),
@@ -140,7 +140,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_argument_m_out_of_range_error</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
         <span class="ident">DatamodelError::new</span>(
             <span class="macro">format!</span>(
-                <span class="string">&quot;Argument M is out of range for Native type {} of {}: {message}&quot;</span>,
+                <span class="string">&quot;Argument M is out of range for native type `{}` of {}: {message}&quot;</span>,
                 <span class="self">self</span>.<span class="ident">native_type</span>, <span class="self">self</span>.<span class="ident">connector</span>
             )
             .<span class="ident">into</span>(),
