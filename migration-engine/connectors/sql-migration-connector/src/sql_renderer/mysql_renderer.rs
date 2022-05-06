@@ -520,6 +520,6 @@ fn render_default<'a>(column: &ColumnWalker<'a>, default: &'a DefaultValue) -> C
             Quoted::mysql_string(dt.to_rfc3339()).to_string().into()
         }
         DefaultKind::Value(val) => val.to_string().into(),
-        DefaultKind::Sequence(_) => Default::default(),
+        DefaultKind::Sequence(_) | DefaultKind::UniqueRowid => unreachable!(),
     }
 }

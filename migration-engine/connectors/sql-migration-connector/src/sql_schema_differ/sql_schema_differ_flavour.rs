@@ -82,6 +82,10 @@ pub(crate) trait SqlSchemaDifferFlavour {
     ) {
     }
 
+    fn sequence_changed(&self, previous: ColumnWalker<'_>, next: ColumnWalker<'_>) -> bool {
+        previous.is_autoincrement() != next.is_autoincrement()
+    }
+
     /// Whether the differ should produce CreateIndex steps for the indexes of
     /// new tables.
     fn should_create_indexes_from_created_tables(&self) -> bool {

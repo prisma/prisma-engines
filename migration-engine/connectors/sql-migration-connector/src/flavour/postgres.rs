@@ -16,7 +16,7 @@ use quaint::{
     prelude::ConnectionInfo,
 };
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
-use std::{collections::HashMap, future};
+use std::{collections::HashMap, future, time};
 use url::Url;
 use user_facing_errors::{
     common::{DatabaseAccessDenied, DatabaseDoesNotExist},
@@ -25,14 +25,13 @@ use user_facing_errors::{
     UserFacingError,
 };
 
-const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
+const ADVISORY_LOCK_TIMEOUT: time::Duration = time::Duration::from_secs(10);
 
-/// Connection settings applied to every new connection on CockroachDB
+/// Connection settings applied to every new connection on CockroachDB.
 ///
 /// https://www.cockroachlabs.com/docs/stable/experimental-features.html
 const COCKROACHDB_PRELUDE: &str = r#"
 SET enable_experimental_alter_column_type_general = true;
-SET serial_normalization = 'sql_sequence';
 "#;
 
 type State = super::State<Params, (BitFlags<Circumstances>, Connection)>;

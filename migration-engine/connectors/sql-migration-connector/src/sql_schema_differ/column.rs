@@ -23,9 +23,9 @@ pub(crate) fn all_changes(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour
         changes |= ColumnChange::Default;
     };
 
-    if cols.previous.is_autoincrement() != cols.next.is_autoincrement() {
+    if flavour.sequence_changed(cols.previous, cols.next) {
         changes |= ColumnChange::Sequence;
-    };
+    }
 
     ColumnChanges { type_change, changes }
 }
@@ -83,6 +83,9 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         (Some(DefaultKind::Sequence(_)), None) => true, // sequences are dropped separately
         (Some(DefaultKind::Sequence(_)), Some(DefaultKind::Value(_))) => false,
         (Some(DefaultKind::Sequence(_)), Some(DefaultKind::Now)) => false,
+
+        (Some(DefaultKind::UniqueRowid), Some(DefaultKind::UniqueRowid)) => true,
+        (Some(DefaultKind::UniqueRowid), _) | (_, Some(DefaultKind::UniqueRowid)) => false,
 
         (None, None) => true,
         (None, Some(DefaultKind::Value(_))) => false,

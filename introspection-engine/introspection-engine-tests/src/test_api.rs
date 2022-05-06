@@ -63,7 +63,6 @@ impl TestApi {
                 q.raw_cmd(
                     r#"
                     SET default_int_size = 4;
-                    SET serial_normalization = 'sql_sequence';
                     "#,
                 )
                 .await
@@ -257,7 +256,7 @@ impl TestApi {
             self.args
                 .datasource_block(&self.connection_string, &[("referentialIntegrity", r#""prisma""#)])
         } else {
-            self.args.datasource_block(&self.connection_string, &[])
+            self.args.datasource_block(r#"env(TEST_DATABASE_URL)"#, &[])
         }
     }
 
@@ -265,6 +264,12 @@ impl TestApi {
         datamodel::parse_configuration(&format!("{}\n{}", &self.datasource_block(), &self.generator_block()))
             .unwrap()
             .subject
+    }
+
+    #[track_caller]
+    pub async fn expect_datamodel(&self, expectation: &expect_test::Expect) {
+        let found = self.introspect().await.unwrap();
+        expectation.assert_eq(&found);
     }
 
     #[track_caller]

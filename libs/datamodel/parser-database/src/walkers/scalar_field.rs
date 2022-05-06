@@ -221,6 +221,11 @@ impl<'db> DefaultValueWalker<'db> {
         matches!(self.value(), ast::Expression::Function(name, _, _) if name == "now")
     }
 
+    /// Is this an `@default(sequence())`?
+    pub fn is_sequence(self) -> bool {
+        matches!(self.value(), ast::Expression::Function(name, _, _) if name == "sequence")
+    }
+
     /// Is this an `@default(uuid())`?
     pub fn is_uuid(self) -> bool {
         matches!(self.value(), ast::Expression::Function(name, _, _) if name == "uuid")

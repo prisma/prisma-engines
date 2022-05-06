@@ -1,3 +1,4 @@
+mod cockroachdb;
 mod sqlite;
 
 use barrel::types;
@@ -7,7 +8,7 @@ use introspection_engine_tests::test_api::*;
 use introspection_engine_tests::TestResult;
 use test_macros::test_connector;
 
-#[test_connector(exclude(Mysql, Mssql, Sqlite))]
+#[test_connector(exclude(Mysql, Mssql, Sqlite, CockroachDb))]
 async fn referential_actions(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -122,7 +123,7 @@ async fn referential_actions_mssql(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn default_referential_actions_with_restrict_postgres(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

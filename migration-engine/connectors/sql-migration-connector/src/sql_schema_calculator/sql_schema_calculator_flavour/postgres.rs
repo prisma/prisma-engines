@@ -7,6 +7,7 @@ use datamodel::{
 };
 use either::Either;
 use sql::postgres::PostgresSchemaExt;
+use sql_datamodel_connector::cockroach_datamodel_connector::SequenceFunction;
 use sql_schema_describer as sql;
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {
@@ -19,6 +20,14 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                 values: r#enum.values().map(|val| val.database_name().to_owned()).collect(),
             })
             .collect()
+    }
+
+    fn column_default_value_for_autoincrement(&self) -> Option<sql::DefaultValue> {
+        if self.is_cockroachdb() {
+            Some(sql::DefaultValue::unique_rowid())
+        } else {
+            Some(sql::DefaultValue::sequence(""))
+        }
     }
 
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
@@ -39,6 +48,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         for (table_idx, model) in db.walk_models().enumerate() {
             let table_id = sql::TableId(table_idx as u32);
 
+            // Add index algorithms and opclasses.
             for (index_index, index) in model.indexes().enumerate() {
                 let index_id = sql::IndexId(table_id, index_index as u32);
 
@@ -67,6 +77,59 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                         postgres_ext.opclasses.push((field_id, opclass));
                     }
                 }
+            }
+
+            // Add sequences for the fields with a default sequence in the model.
+            for (field_idx, field) in model.scalar_fields().enumerate() {
+                let field_default = if let Some(d) = field.default_value() {
+                    d
+                } else {
+                    continue;
+                };
+
+                if !field_default.is_sequence() {
+                    continue;
+                }
+
+                let mut sequence = sql::postgres::Sequence {
+                    name: format!("prisma_sequence_{}_{}", table_idx, field_idx),
+                    ..Default::default()
+                };
+                let sequence_fn = field_default.ast_attribute().arguments.arguments[0]
+                    .value
+                    .as_function()
+                    .unwrap()
+                    .1;
+                let sequence_details = SequenceFunction::build_unchecked(sequence_fn);
+                if let Some(start) = sequence_details.start {
+                    sequence.start_value = start;
+                }
+
+                if let Some(cache) = sequence_details.cache {
+                    sequence.cache_size = cache;
+                }
+
+                if let Some(max_value) = sequence_details.max_value {
+                    sequence.max_value = max_value;
+                }
+
+                if let Some(min_value) = sequence_details.min_value {
+                    sequence.min_value = min_value;
+                }
+
+                if let Some(increment) = sequence_details.increment {
+                    sequence.increment_by = increment;
+                }
+
+                if let Some(r#virtual) = sequence_details.r#virtual {
+                    sequence.r#virtual = r#virtual;
+                }
+
+                if let Some(no_cycle) = sequence_details.no_cycle {
+                    sequence.cycle = !no_cycle;
+                }
+
+                postgres_ext.sequences.push(sequence);
             }
         }
 

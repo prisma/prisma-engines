@@ -632,6 +632,8 @@ pub enum DefaultKind {
     Now,
     /// An expression generating a sequence.
     Sequence(String),
+    /// A unique row ID,
+    UniqueRowid,
     /// An unrecognized Default Value
     DbGenerated(String),
 }
@@ -676,6 +678,13 @@ impl DefaultValue {
         self.constraint_name.as_deref()
     }
 
+    pub fn as_sequence(&self) -> Option<&str> {
+        match &self.kind {
+            DefaultKind::Sequence(name) => Some(name),
+            _ => None,
+        }
+    }
+
     pub fn as_value(&self) -> Option<&PrismaValue> {
         match self.kind {
             DefaultKind::Value(ref v) => Some(v),
@@ -697,6 +706,10 @@ impl DefaultValue {
 
     pub fn is_db_generated(&self) -> bool {
         matches!(self.kind, DefaultKind::DbGenerated(_))
+    }
+
+    pub fn unique_rowid() -> Self {
+        Self::new(DefaultKind::UniqueRowid)
     }
 
     pub fn with_constraint_name(mut self, constraint_name: Option<String>) -> Self {

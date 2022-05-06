@@ -1,6 +1,9 @@
 use datamodel_connector::{
-    parser_database::{walkers::IndexWalker, IndexAlgorithm},
-    DatamodelError, Diagnostics,
+    parser_database::{
+        walkers::{IndexWalker, ModelWalker},
+        IndexAlgorithm,
+    },
+    DatamodelError, Diagnostics, ScalarType,
 };
 
 /// Validating the correct usage of GIN indices.
@@ -52,5 +55,20 @@ pub(super) fn inverted_index_validations(index: IndexWalker<'_>, errors: &mut Di
                 attr.span,
             ));
         }
+    }
+}
+
+pub(super) fn autoincrement_validations(model: ModelWalker<'_>, errors: &mut Diagnostics) {
+    let autoincrement_defaults_on_int = model
+        .scalar_fields()
+        .filter_map(|sf| sf.default_value().map(|d| (sf, d)))
+        .filter(|(sf, d)| d.is_autoincrement() && matches!(sf.scalar_type(), Some(ScalarType::Int)));
+
+    for (_scalar_field, default_value) in autoincrement_defaults_on_int {
+        errors.push_error(DatamodelError::new_attribute_validation_error(
+            "The `autoincrement()` default function is defined only on BigInt fields on CockroachDB. Use sequence() if you want an autoincrementing Int field.",
+            "default",
+            default_value.ast_attribute().span,
+        ));
     }
 }

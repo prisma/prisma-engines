@@ -689,12 +689,19 @@ impl<'a> PrimaryKeyAssertion<'a> {
         self
     }
 
+    #[track_caller]
     pub fn assert_has_autoincrement(self) -> Self {
         assert!(
             self.table
                 .columns
                 .iter()
-                .any(|column| self.pk.column_names().any(|name| name == column.name) && column.auto_increment),
+                .any(
+                    |column| self.pk.column_names().any(|name| name == column.name) && column.auto_increment
+                        || matches!(
+                            column.default.as_ref().map(|d| d.kind()),
+                            Some(DefaultKind::UniqueRowid)
+                        )
+                ),
             "Assertion failed: expected a sequence on the primary key, found none."
         );
 

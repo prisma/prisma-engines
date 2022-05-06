@@ -89,7 +89,7 @@ fn cockroach_specific_native_types_are_valid() {
     }
 
     model NativeTypesTest {
-        id          Int      @db.Int4 @id @default(autoincrement())
+        id          Int      @db.Int4 @id @default(sequence())
         bitcol      String   @db.Bit
         boolcol     Boolean  @db.Bool
         bytescol    Bytes    @db.Bytes
