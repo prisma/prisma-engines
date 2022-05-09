@@ -132,7 +132,7 @@ impl DefaultValue {
     // intended for primary key values!
     pub fn to_dbgenerated_func(&self) -> Option<String> {
         match self.kind {
-            DefaultKind::Expression(ref expr) if expr.is_dbgenerated() => expr.args.get(0).map(|val| val.to_string()),
+            DefaultKind::Expression(ref expr) if expr.is_dbgenerated() => expr.args.get(0).map(|val| val.1.to_string()),
             _ => None,
         }
     }
@@ -141,12 +141,12 @@ impl DefaultValue {
 #[derive(Clone)]
 pub struct ValueGenerator {
     name: String,
-    args: Vec<PrismaValue>,
+    args: Vec<(Option<String>, PrismaValue)>,
     generator: ValueGeneratorFn,
 }
 
 impl ValueGenerator {
-    pub fn new(name: String, args: Vec<PrismaValue>) -> Result<Self, String> {
+    pub fn new(name: String, args: Vec<(Option<String>, PrismaValue)>) -> Result<Self, String> {
         let generator = ValueGeneratorFn::new(name.as_ref())?;
 
         Ok(ValueGenerator { name, args, generator })
@@ -156,11 +156,15 @@ impl ValueGenerator {
         ValueGenerator::new("autoincrement".to_owned(), vec![]).unwrap()
     }
 
+    pub fn new_sequence(args: Vec<(Option<String>, PrismaValue)>) -> Self {
+        ValueGenerator::new("sequence".to_owned(), args).unwrap()
+    }
+
     pub fn new_dbgenerated(description: String) -> Self {
         if description.trim_matches('\0').is_empty() {
             ValueGenerator::new("dbgenerated".to_owned(), Vec::new()).unwrap()
         } else {
-            ValueGenerator::new("dbgenerated".to_owned(), vec![PrismaValue::String(description)]).unwrap()
+            ValueGenerator::new("dbgenerated".to_owned(), vec![(None, PrismaValue::String(description))]).unwrap()
         }
     }
 
@@ -184,7 +188,7 @@ impl ValueGenerator {
         &self.name
     }
 
-    pub fn args(&self) -> &[PrismaValue] {
+    pub fn args(&self) -> &[(Option<String>, PrismaValue)] {
         &self.args
     }
 
@@ -197,7 +201,7 @@ impl ValueGenerator {
             return None;
         }
 
-        self.args.get(0).and_then(|v| v.as_string())
+        self.args.get(0).and_then(|v| v.1.as_string())
     }
 
     #[cfg(feature = "default_generators")]
@@ -222,7 +226,7 @@ impl ValueGenerator {
     }
 
     pub fn is_autoincrement(&self) -> bool {
-        self.name == "autoincrement"
+        self.name == "autoincrement" || self.name == "sequence"
     }
 }
 
@@ -243,6 +247,7 @@ impl ValueGeneratorFn {
             "uuid" => Ok(Self::Uuid),
             "now" => Ok(Self::Now),
             "autoincrement" => Ok(Self::Autoincrement),
+            "sequence" => Ok(Self::Autoincrement),
             "dbgenerated" => Ok(Self::DbGenerated),
             "auto" => Ok(Self::Auto),
             _ => Err(format!("The function {} is not a known function.", name)),

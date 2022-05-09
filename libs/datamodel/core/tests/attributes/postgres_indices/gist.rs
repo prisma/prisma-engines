@@ -66,7 +66,7 @@ fn without_preview_feature() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": You must enable `extendedIndexes` preview feature to be able to define the index type.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": You must enable `extendedIndexes` preview feature to be able to define the index type.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -92,7 +92,7 @@ fn on_mysql() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given index type is not supported with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m

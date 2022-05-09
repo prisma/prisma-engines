@@ -1,3 +1,4 @@
+use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
@@ -223,6 +224,31 @@ async fn introspecting_json_defaults_on_cockroach(api: &TestApi) -> TestResult {
     "#]];
 
     expectation.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("json", types::json());
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+        model Blog {
+            id      Int @id @default(autoincrement())
+            json    Json @db.Json
+        }
+    "#};
+
+    let result = api.introspect().await?;
+
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }

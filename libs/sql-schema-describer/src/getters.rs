@@ -32,7 +32,7 @@ impl Getter for ResultRow {
 
     fn get_expect_i64(&self, name: &str) -> i64 {
         self.get(name)
-            .and_then(|x| x.as_i64())
+            .and_then(|x| x.as_integer())
             .ok_or_else(|| format!("Getting {} from Resultrow {:?} as i64 failed", name, &self))
             .unwrap()
     }
@@ -76,10 +76,10 @@ impl Getter for ResultRow {
     }
 
     fn get_u32(&self, name: &str) -> Option<u32> {
-        self.get(name).and_then(|x| x.as_i64().map(|x| x as u32))
+        self.get(name).and_then(|x| x.as_integer().map(|x| x as u32))
     }
 
     fn get_i64(&self, name: &str) -> Option<i64> {
-        self.get(name).and_then(|x| x.as_i64())
+        self.get(name).and_then(|x| x.as_integer())
     }
 }

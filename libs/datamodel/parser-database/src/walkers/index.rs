@@ -27,13 +27,17 @@ impl<'db> IndexWalker<'db> {
         self.index_attribute.mapped_name.map(|id| &self.db[id])
     }
 
-    /// The attribute name: `"unique"` for `@@unique`, `"fulltext"` for `@@fultext` and `"index"`
+    /// The attribute name: `"index"` for `@@unique`, `"fulltext"` for `@@fultext` and `"index"`
     /// for `@index` and `@@index`.
     pub fn attribute_name(self) -> &'static str {
-        if self.is_unique() {
-            "unique"
+        if self.is_unique() && self.is_defined_on_field() {
+            "@unique"
+        } else if self.is_unique() {
+            "@@unique"
+        } else if self.is_fulltext() {
+            "@@fulltext"
         } else {
-            "index"
+            "@@index"
         }
     }
 

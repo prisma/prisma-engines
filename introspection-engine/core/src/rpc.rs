@@ -137,7 +137,7 @@ impl RpcImpl {
             Err(e) => Err(Error::from(e)),
         };
 
-        result.map_err(RpcError::from)
+        Ok(result?)
     }
 
     /// This function parses the provided schema and returns the contained Datamodel.

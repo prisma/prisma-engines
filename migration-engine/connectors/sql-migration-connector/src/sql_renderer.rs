@@ -18,7 +18,7 @@ pub(crate) use common::IteratorJoin;
 
 use crate::{
     pair::Pair,
-    sql_migration::{AlterEnum, AlterTable, RedefineTable},
+    sql_migration::{AlterEnum, AlterTable, RedefineTable, SequenceChanges},
 };
 use common::Quoted;
 use sql_schema_describer::{
@@ -35,6 +35,10 @@ pub(crate) trait SqlRenderer {
 
     fn render_alter_primary_key(&self, _tables: Pair<TableWalker<'_>>) -> Vec<String> {
         unreachable!("unreachable render_alter_primary_key()")
+    }
+
+    fn render_alter_sequence(&self, _idx: Pair<u32>, _: SequenceChanges, _: Pair<&SqlSchema>) -> Vec<String> {
+        unreachable!("unreachable render_alter_sequence");
     }
 
     fn render_rename_index(&self, _indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {

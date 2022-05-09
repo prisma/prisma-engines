@@ -34,6 +34,15 @@ impl<'ast, 'db> PrimaryKeyWalker<'db> {
         self.attribute.source_field.is_some()
     }
 
+    /// If defined on a specific field, returns `@id`. Otherwise `@@id`.
+    pub fn attribute_name(self) -> &'static str {
+        if self.is_defined_on_field() {
+            "@id"
+        } else {
+            "@@id"
+        }
+    }
+
     /// If true, the index defines the storage and ordering of the row. Mostly
     /// matters on SQL Server where one can change the clustering.
     pub fn clustered(self) -> Option<bool> {

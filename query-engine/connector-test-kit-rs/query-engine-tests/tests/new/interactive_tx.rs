@@ -136,13 +136,13 @@ mod interactive_tx {
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
-          run_query!(&runner, fmt_execute_raw("INSERT INTO \"TestModel\"(id, field) VALUES ($1, $2)", vec![PrismaValue::Int(1), PrismaValue::String("Test".to_owned())])),
+          run_query!(&runner, fmt_execute_raw("INSERT INTO \"TestModel\"(id, field) VALUES ($1, $2)", vec![RawParam::from(1), RawParam::from("Test")])),
           @r###"{"data":{"executeRaw":1}}"###
         );
 
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw("SELECT * FROM \"TestModel\"", vec![])),
-          @r###"{"data":{"queryRaw":[{"id":1,"field":"Test"}]}}"###
+          @r###"{"data":{"queryRaw":[{"id":{"prisma__type":"int","prisma__value":1},"field":{"prisma__type":"string","prisma__value":"Test"}}]}}"###
         );
 
         let res = runner.commit_tx(tx_id.clone()).await?;
@@ -152,7 +152,7 @@ mod interactive_tx {
         // Data still there after commit.
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw("SELECT * FROM \"TestModel\"", vec![])),
-          @r###"{"data":{"queryRaw":[{"id":1,"field":"Test"}]}}"###
+          @r###"{"data":{"queryRaw":[{"id":{"prisma__type":"int","prisma__value":1},"field":{"prisma__type":"string","prisma__value":"Test"}}]}}"###
         );
 
         Ok(())

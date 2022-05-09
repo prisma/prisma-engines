@@ -3,9 +3,10 @@ use crate::{
     sql_renderer::IteratorJoin,
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
+use enumflags2::BitFlags;
 use sql_schema_describer::{
     walkers::{ColumnWalker, SqlSchemaExt},
-    ColumnId, SqlSchema, TableId,
+    ColumnId, EnumId, SqlSchema, TableId,
 };
 use std::{collections::BTreeSet, fmt::Write as _};
 
@@ -58,6 +59,7 @@ impl SqlMigration {
         for (idx, step) in self.steps.iter().enumerate() {
             let idx = idx as u32;
             match step {
+                SqlMigrationStep::AlterSequence(_, _) => (),
                 SqlMigrationStep::DropView(drop_view) => {
                     drift_items.insert((
                         DriftType::RemovedView,
@@ -72,13 +74,13 @@ impl SqlMigration {
                         idx,
                     ));
                 }
-                SqlMigrationStep::CreateEnum { .. } => {
+                SqlMigrationStep::CreateEnum(_) => {
                     drift_items.insert((DriftType::AddedEnum, "", idx));
                 }
                 SqlMigrationStep::AlterEnum(alter_enum) => {
                     drift_items.insert((
                         DriftType::ChangedEnum,
-                        self.schemas().enums(&alter_enum.index).previous().name(),
+                        self.schemas().enums(alter_enum.id).previous().name(),
                         idx,
                     ));
                 }
@@ -113,7 +115,7 @@ impl SqlMigration {
                 SqlMigrationStep::DropTable { .. } => {
                     drift_items.insert((DriftType::RemovedTable, "", idx));
                 }
-                SqlMigrationStep::DropEnum { .. } => {
+                SqlMigrationStep::DropEnum(_) => {
                     drift_items.insert((DriftType::RemovedEnum, "", idx));
                 }
                 SqlMigrationStep::CreateTable { .. } => {
@@ -202,11 +204,12 @@ impl SqlMigration {
             render_state = (*new_state, *item_name);
 
             match &self.steps[*step_idx as usize] {
+                SqlMigrationStep::AlterSequence(_, _) => {}
                 SqlMigrationStep::DropView(_) => {}
                 SqlMigrationStep::DropUserDefinedType(_) => {}
-                SqlMigrationStep::CreateEnum { enum_index } => {
+                SqlMigrationStep::CreateEnum(enum_id) => {
                     out.push_str("  - ");
-                    out.push_str(self.schemas().next().enum_walker_at(*enum_index).name());
+                    out.push_str(self.schemas().next().walk_enum(*enum_id).name());
                     out.push('\n');
                 }
                 SqlMigrationStep::AlterEnum(alter_enum) => {
@@ -322,9 +325,9 @@ impl SqlMigration {
                     out.push_str(self.schemas().previous().table_walker_at(*table_id).name());
                     out.push('\n');
                 }
-                SqlMigrationStep::DropEnum { enum_index } => {
+                SqlMigrationStep::DropEnum(enum_id) => {
                     out.push_str("  - ");
-                    out.push_str(self.schemas().previous().enum_walker_at(*enum_index).name());
+                    out.push_str(self.schemas().previous().walk_enum(*enum_id).name());
                     out.push('\n');
                 }
                 SqlMigrationStep::CreateTable { table_id } => {
@@ -402,7 +405,6 @@ fn render_column_changes(columns: Pair<ColumnWalker<'_>>, changes: &ColumnChange
     let readable_changes = changes
         .iter()
         .map(|change| match change {
-            ColumnChange::Renaming => "column was renamed".to_owned(),
             ColumnChange::Arity => format!(
                 "changed from {:?} to {:?}",
                 columns.previous().arity(),
@@ -414,7 +416,13 @@ fn render_column_changes(columns: Pair<ColumnWalker<'_>>, changes: &ColumnChange
                 columns.next().default().map(|d| d.kind())
             ),
             ColumnChange::TypeChanged => "type changed".to_owned(),
-            ColumnChange::Sequence => "sequence changed".to_owned(),
+            ColumnChange::Autoincrement => {
+                if columns.previous().is_autoincrement() {
+                    "column is no longer autoincrementing".to_owned()
+                } else {
+                    "column became autoincrementing".to_owned()
+                }
+            }
         })
         .join(", ");
 
@@ -429,11 +437,10 @@ fn render_column_changes(columns: Pair<ColumnWalker<'_>>, changes: &ColumnChange
 // you would intuitively expect.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum SqlMigrationStep {
+    AlterSequence(Pair<u32>, SequenceChanges),
     DropView(DropView),
     DropUserDefinedType(DropUserDefinedType),
-    CreateEnum {
-        enum_index: usize,
-    },
+    CreateEnum(sql_schema_describer::EnumId),
     AlterEnum(AlterEnum),
     DropForeignKey {
         table_id: TableId,
@@ -457,9 +464,7 @@ pub(crate) enum SqlMigrationStep {
     //   postgres.
     // - We must drop enums after we drop tables, or dropping the enum will
     //   fail on postgres because objects (=tables) still depend on them.
-    DropEnum {
-        enum_index: usize,
-    },
+    DropEnum(sql_schema_describer::EnumId),
     CreateTable {
         table_id: TableId,
     },
@@ -499,11 +504,12 @@ impl SqlMigrationStep {
             SqlMigrationStep::AddForeignKey { .. } => "AddForeignKey",
             SqlMigrationStep::AlterEnum(_) => "AlterEnum",
             SqlMigrationStep::AlterPrimaryKey(_) => "AlterPrimaryKey",
+            SqlMigrationStep::AlterSequence(_, _) => "AlterSequence",
             SqlMigrationStep::AlterTable(_) => "AlterTable",
-            SqlMigrationStep::CreateEnum { .. } => "CreateEnum",
+            SqlMigrationStep::CreateEnum(_) => "CreateEnum",
             SqlMigrationStep::CreateIndex { .. } => "CreateIndex",
             SqlMigrationStep::CreateTable { .. } => "CreateTable",
-            SqlMigrationStep::DropEnum { .. } => "DropEnum",
+            SqlMigrationStep::DropEnum(_) => "DropEnum",
             SqlMigrationStep::DropForeignKey { .. } => "DropForeignKey",
             SqlMigrationStep::DropIndex { .. } => "DropIndex",
             SqlMigrationStep::DropTable { .. } => "DropTable",
@@ -586,7 +592,7 @@ pub(crate) enum ColumnTypeChange {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct AlterEnum {
-    pub index: Pair<usize>,
+    pub id: Pair<EnumId>,
     pub created_variants: Vec<String>,
     pub dropped_variants: Vec<String>,
     /// This should be intepreted as ((prev_tblidx, prev_colidx),
@@ -611,4 +617,30 @@ pub(crate) struct RedefineTable {
     pub dropped_primary_key: bool,
     pub column_pairs: Vec<(Pair<ColumnId>, ColumnChanges, Option<ColumnTypeChange>)>,
     pub table_ids: Pair<TableId>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct SequenceChanges(pub(crate) BitFlags<SequenceChange>);
+
+impl PartialOrd for SequenceChanges {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.0.bits().cmp(&other.0.bits()))
+    }
+}
+
+impl Ord for SequenceChanges {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.0.bits().cmp(&other.0.bits())
+    }
+}
+
+#[enumflags2::bitflags]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(u8)]
+pub(crate) enum SequenceChange {
+    MinValue = 1,
+    MaxValue = 1 << 1,
+    Start = 1 << 2,
+    Cache = 1 << 3,
+    Increment = 1 << 4,
 }

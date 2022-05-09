@@ -624,6 +624,9 @@ fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarT
         ast::Expression::Function(funcname, _args, _) if funcname == "autoincrement" => {
             DefaultKind::Expression(ValueGenerator::new_autoincrement())
         }
+        ast::Expression::Function(funcname, _args, _) if funcname == "sequence" => {
+            DefaultKind::Expression(ValueGenerator::new_sequence(Vec::new()))
+        }
         ast::Expression::Function(funcname, _args, _) if funcname == "uuid" => {
             DefaultKind::Expression(ValueGenerator::new_uuid())
         }

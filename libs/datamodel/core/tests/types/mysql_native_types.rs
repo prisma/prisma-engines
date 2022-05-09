@@ -4,7 +4,6 @@ use crate::types::helper::{
 };
 use crate::{common::*, with_header, Provider};
 use datamodel::parse_schema;
-use datamodel::{ast, diagnostics::DatamodelError};
 use indoc::indoc;
 
 const BLOB_TYPES: &[&str] = &["Blob", "LongBlob", "MediumBlob", "TinyBlob"];
@@ -14,7 +13,7 @@ const TEXT_TYPES: &[&str] = &["Text", "LongText", "MediumText", "TinyText"];
 fn text_and_blob_data_types_should_fail_on_index() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "You cannot define an index on fields with Native type {} of MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.",
+            "You cannot define an index on fields with native type `{}` of MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.",
             type_name
         )
     }
@@ -117,7 +116,7 @@ fn bytes_should_not_fail_on_length_prefixed_pk() {
 #[test]
 fn text_and_blob_data_types_can_not_be_unique() {
     fn error_msg(type_name: &str) -> String {
-        format!("Native type {} cannot be unique in MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.", type_name)
+        format!("Native type `{}` cannot be unique in MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.", type_name)
     }
 
     for tpe in BLOB_TYPES {
@@ -135,7 +134,7 @@ fn text_and_blob_data_types_can_not_be_unique() {
 fn text_and_blob_data_types_should_fail_on_id_attribute() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Native type {} of MySQL cannot be used on a field that is `@id` or `@@id`. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.",
+            "Native type `{}` of MySQL cannot be used on a field that is `@id` or `@@id`. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.",
             type_name
         )
     }
@@ -179,7 +178,7 @@ fn test_block_attribute_support(native_type: &str, scalar_type: &str, attribute_
 fn should_fail_on_argument_out_of_range_for_bit_type() {
     for tpe in &["Bit(0)", "Bit(65)"] {
         let error_msg = format!(
-            "Argument M is out of range for Native type {} of MySQL: M can range from 1 to 64.",
+            "Argument M is out of range for native type `{}` of MySQL: M can range from 1 to 64.",
             &tpe
         );
         test_native_types_without_attributes(tpe, "Bytes", &error_msg, MYSQL_SOURCE);
@@ -189,14 +188,14 @@ fn should_fail_on_argument_out_of_range_for_bit_type() {
 #[test]
 fn should_only_allow_bit_one_for_booleans() {
     let expected_error =
-        "Argument M is out of range for Native type Bit(2) of MySQL: only Bit(1) can be used as Boolean.";
+        "Argument M is out of range for native type `Bit(2)` of MySQL: only Bit(1) can be used as Boolean.";
 
     test_native_types_without_attributes("Bit(2)", "Boolean", expected_error, MYSQL_SOURCE);
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_char_type() {
-    let error_msg = "Argument M is out of range for Native type Char(256) of MySQL: M can range from 0 to 255.";
+    let error_msg = "Argument M is out of range for native type `Char(256)` of MySQL: M can range from 0 to 255.";
 
     test_native_types_without_attributes("Char(256)", "String", error_msg, MYSQL_SOURCE);
 }
@@ -204,7 +203,7 @@ fn should_fail_on_argument_out_of_range_for_char_type() {
 #[test]
 fn should_fail_on_argument_out_of_range_for_varchar_type() {
     let error_msg =
-        "Argument M is out of range for Native type VarChar(655350) of MySQL: M can range from 0 to 65,535.";
+        "Argument M is out of range for native type `VarChar(655350)` of MySQL: M can range from 0 to 65,535.";
 
     test_native_types_without_attributes("VarChar(655350)", "String", error_msg, MYSQL_SOURCE);
 }
@@ -213,7 +212,7 @@ fn should_fail_on_argument_out_of_range_for_varchar_type() {
 fn should_fail_on_argument_out_of_range_for_decimal_type() {
     fn error_msg(type_name: &str, arg: &str, range: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of MySQL: {} can range from {}.",
+            "Argument M is out of range for native type `{}` of MySQL: {} can range from {}.",
             type_name, arg, range
         )
     }
@@ -252,6 +251,7 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
         }
         "#
     );
+
     let expectation = expect![[r#"
         [1;91merror[0m: [1mThe scale must not be larger than the precision for the Decimal(2,4) native type in MySQL.[0m
           [1;94m-->[0m  [4mschema.prisma:8[0m
@@ -260,6 +260,7 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
         [1;94m 8 | [0m    dec Decimal @[1;91mdb.Decimal(2, 4)[0m
         [1;94m   | [0m
     "#]];
+
     expect_error(dml, &expectation);
 }
 
@@ -272,16 +273,21 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
         }
 
         model Blog {
-            id     Int    @id
+            id     Int      @id
             bigInt DateTime @db.TinyInt
         }
     "#;
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    error.assert_is(DatamodelError::new(
-        "Native type TinyInt is not compatible with declared field type DateTime, expected field type Boolean or Int."
-            .into(),
-        ast::Span::new(172, 182),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type TinyInt is not compatible with declared field type DateTime, expected field type Boolean or Int.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m            id     Int      @id
+        [1;94m 9 | [0m            bigInt DateTime @[1;91mdb.TinyInt[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }

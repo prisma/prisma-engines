@@ -86,6 +86,46 @@ mod one2one_opt {
 
         Ok(())
     }
+
+    fn diff_id_name() -> String {
+        let schema = indoc! {
+            r#"model Parent {
+            #id(id, Int, @id)
+            uniq    Int? @unique
+            child   Child?
+          }
+          
+          model Child {
+            #id(childId, Int, @id)
+            childUniq       Int?
+            parent           Parent? @relation(fields: [childUniq], references: [uniq], onDelete: Cascade)
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    /// Deleting the parent deletes child as well.
+    /// Checks that it works even with different parent/child primary identifier names.
+    #[connector_test(schema(diff_id_name))]
+    async fn delete_parent_diff_id_name(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneParent(data: { id: 1, uniq: 1, child: { create: { childId: 1 } } }) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id } }"#),
+          @r###"{"data":{"deleteOneParent":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyChild { childUniq } }"#),
+          @r###"{"data":{"findManyChild":[]}}"###
+        );
+
+        Ok(())
+    }
 }
 
 #[test_suite(suite = "cascade_onD_1toM_req", schema(required))]

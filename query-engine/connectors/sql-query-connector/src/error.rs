@@ -15,6 +15,9 @@ pub enum RawError {
         code: Option<String>,
         message: Option<String>,
     },
+    UnsupportedColumnType {
+        column_type: String,
+    },
 }
 
 impl From<RawError> for SqlError {
@@ -23,6 +26,13 @@ impl From<RawError> for SqlError {
             RawError::IncorrectNumberOfParameters { expected, actual } => {
                 Self::IncorrectNumberOfParameters { expected, actual }
             }
+            RawError::UnsupportedColumnType { column_type } => Self::RawError {
+                code: String::from("N/A"),
+                message: format!(
+                    r#"Failed to deserialize column of type '{}'. If you're using $queryRaw and this column is explicitly marked as `Unsupported` in your Prisma schema, try casting this column to any supported Prisma type such as `String`."#,
+                    column_type
+                ),
+            },
             RawError::ConnectionClosed => Self::ConnectionClosed,
             RawError::Database { code, message } => Self::RawError {
                 code: code.unwrap_or_else(|| String::from("N/A")),
@@ -42,6 +52,9 @@ impl From<quaint::error::Error> for RawError {
                 }
             }
             quaint::error::ErrorKind::ConnectionClosed => Self::ConnectionClosed,
+            quaint::error::ErrorKind::UnsupportedColumnType { column_type } => Self::UnsupportedColumnType {
+                column_type: column_type.to_owned(),
+            },
             _ => Self::Database {
                 code: e.original_code().map(ToString::to_string),
                 message: e.original_message().map(ToString::to_string),
@@ -269,13 +282,13 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::ForeignKeyConstraintViolation { constraint } => Self::ForeignKeyConstraintViolation {
                 constraint: constraint.into(),
             },
-
             QuaintKind::MissingFullTextSearchIndex => Self::MissingFullTextSearchIndex,
             e @ QuaintKind::ConnectionError(_) => Self::ConnectionError(e),
             QuaintKind::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
             QuaintKind::ColumnNotFound { column } => SqlError::ColumnDoesNotExist(format!("{}", column)),
             QuaintKind::TableDoesNotExist { table } => SqlError::TableDoesNotExist(format!("{}", table)),
             QuaintKind::ConnectionClosed => SqlError::ConnectionClosed,
+            e @ QuaintKind::UnsupportedColumnType { .. } => SqlError::ConversionError(e.into()),
             e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{}", e)),
             e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ConversionError(_) => SqlError::ConversionError(e.into()),

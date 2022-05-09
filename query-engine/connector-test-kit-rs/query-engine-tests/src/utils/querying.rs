@@ -60,6 +60,15 @@ macro_rules! run_query {
 }
 
 #[macro_export]
+macro_rules! run_query_pretty {
+    ($runner:expr, $q:expr) => {{
+        let res = $runner.query($q).await?;
+        res.assert_success();
+        res.to_string_pretty()
+    }};
+}
+
+#[macro_export]
 macro_rules! run_query_json {
     ($runner:expr, $q:expr) => {
         serde_json::from_str::<serde_json::Value>($runner.query($q).await?.to_string().as_str()).unwrap()

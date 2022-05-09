@@ -90,7 +90,9 @@ impl<'db> Context<'db> {
 
     pub(crate) fn push_attribute_validation_error(&mut self, message: &str) {
         let attribute = self.current_attribute();
-        let err = DatamodelError::new_attribute_validation_error(message, attribute.name(), attribute.span);
+
+        let err =
+            DatamodelError::new_attribute_validation_error(message, &format!("@{}", attribute.name()), attribute.span);
         self.push_error(err);
     }
 
@@ -365,7 +367,7 @@ impl<'db> Context<'db> {
                 for arg in &args.empty_arguments {
                     self.push_error(DatamodelError::new_attribute_validation_error(
                         &format!("The `{}` argument is missing a value.", arg.name.name),
-                        attribute.name(),
+                        &format!("@{}", attribute.name()),
                         arg.name.span,
                     ));
                     is_reasonably_valid = false;
@@ -374,7 +376,7 @@ impl<'db> Context<'db> {
                 if let Some(span) = args.trailing_comma {
                     self.push_error(DatamodelError::new_attribute_validation_error(
                         "Trailing commas are not valid in attribute arguments, please remove the comma.",
-                        attribute.name(),
+                        &format!("@{}", attribute.name()),
                         span,
                     ))
                 }
