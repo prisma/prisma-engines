@@ -280,7 +280,11 @@ mod unchecked_update {
     }
 
     // "Unchecked updates" should "allow to write to autoincrement IDs directly"
-    #[connector_test(schema(schema_4), capabilities(AutoIncrement, WritableAutoincField))]
+    #[connector_test(
+        schema(schema_4),
+        capabilities(AutoIncrement, WritableAutoincField),
+        exclude(CockroachDb)
+    )]
     async fn allow_write_autoinc_ids(runner: Runner) -> TestResult<()> {
         run_query!(&runner, r#"mutation { createOneModelA { id } }"#);
 
@@ -290,6 +294,37 @@ mod unchecked_update {
               id
             }
           }"#),
+          @r###"{"data":{"updateOneModelA":{"id":111}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_4_cockroachdb() -> String {
+        let schema = indoc! {
+            r#"model ModelA {
+              #id(id, Int, @id, @default(sequence()))
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "Unchecked updates" should "allow to write to autoincrement IDs directly"
+    #[connector_test(schema(schema_4_cockroachdb), only(CockroachDb))]
+    async fn allow_write_autoinc_ids_cockroachdb(runner: Runner) -> TestResult<()> {
+        let res = run_query_json!(&runner, r#"mutation { createOneModelA { id } }"#);
+        let id = res["data"]["createOneModelA"]["id"].as_i64().unwrap();
+        let query = format!(
+            r#"mutation {{
+            updateOneModelA(where: {{ id: {id} }}, data: {{ id: 111 }}) {{
+              id
+            }}
+          }}"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, &query),
           @r###"{"data":{"updateOneModelA":{"id":111}}}"###
         );
 

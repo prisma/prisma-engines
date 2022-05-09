@@ -1,6 +1,8 @@
+mod validations;
+
 use datamodel_connector::{
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    parser_database::{self, ast, ValueValidator},
+    parser_database::{self, ast, walkers::ModelWalker, IndexAlgorithm, ValueValidator},
     Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
     NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
 };
@@ -21,7 +23,7 @@ const INT4_TYPE_NAME: &str = "Int4";
 const INT8_TYPE_NAME: &str = "Int8";
 const JSON_B_TYPE_NAME: &str = "JsonB";
 const OID_TYPE_NAME: &str = "Oid";
-const SINGLE_CHAR_TYPE_NAME: &str = "SingleChar";
+const CATALOG_SINGLE_CHAR_TYPE_NAME: &str = "CatalogSingleChar";
 const STRING_TYPE_NAME: &str = "String";
 const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
 const TIMESTAMP_TZ_TYPE_NAME: &str = "Timestamptz";
@@ -53,7 +55,7 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::without_args(INT8_TYPE_NAME, &[ScalarType::BigInt]),
     NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, &[ScalarType::Json]),
     NativeTypeConstructor::without_args(OID_TYPE_NAME, &[ScalarType::Int]),
-    NativeTypeConstructor::without_args(SINGLE_CHAR_TYPE_NAME, &[ScalarType::String]),
+    NativeTypeConstructor::without_args(CATALOG_SINGLE_CHAR_TYPE_NAME, &[ScalarType::String]),
     NativeTypeConstructor::without_args(UUID_TYPE_NAME, &[ScalarType::String]),
 ];
 
@@ -127,7 +129,7 @@ impl Connector for CockroachDatamodelConnector {
         match native_type {
             // String
             CockroachType::Char(_) => ScalarType::String,
-            CockroachType::SingleChar => ScalarType::String,
+            CockroachType::CatalogSingleChar => ScalarType::String,
             CockroachType::String(_) => ScalarType::String,
             CockroachType::Bit(_) => ScalarType::String,
             CockroachType::VarBit(_) => ScalarType::String,
@@ -214,7 +216,13 @@ impl Connector for CockroachDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _diagnostics: &mut Diagnostics) {}
+    fn validate_model(&self, model: ModelWalker<'_>, diagnostics: &mut Diagnostics) {
+        validations::autoincrement_validations(model, diagnostics);
+
+        for index in model.indexes() {
+            validations::inverted_index_validations(index, diagnostics);
+        }
+    }
 
     fn validate_scalar_field_unknown_default_functions(
         &self,
@@ -240,6 +248,10 @@ impl Connector for CockroachDatamodelConnector {
         NATIVE_TYPE_CONSTRUCTORS
     }
 
+    fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
+        BitFlags::empty() | IndexAlgorithm::BTree | IndexAlgorithm::Gin
+    }
+
     fn parse_native_type(
         &self,
         name: &str,
@@ -258,7 +270,7 @@ impl Connector for CockroachDatamodelConnector {
             INT2_TYPE_NAME => CockroachType::Int2,
             INT4_TYPE_NAME => CockroachType::Int4,
             INT8_TYPE_NAME => CockroachType::Int8,
-            SINGLE_CHAR_TYPE_NAME => CockroachType::SingleChar,
+            CATALOG_SINGLE_CHAR_TYPE_NAME => CockroachType::CatalogSingleChar,
             STRING_TYPE_NAME => CockroachType::String(parse_one_opt_u32(args, STRING_TYPE_NAME, span)?),
             TIMESTAMP_TYPE_NAME => CockroachType::Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME, span)?),
             TIMESTAMP_TZ_TYPE_NAME => {
@@ -291,7 +303,7 @@ impl Connector for CockroachDatamodelConnector {
             CockroachType::Float8 => (FLOAT8_TYPE_NAME, vec![]),
             CockroachType::String(x) => (STRING_TYPE_NAME, arg_vec_from_opt(x)),
             CockroachType::Char(x) => (CHAR_TYPE_NAME, arg_vec_from_opt(x)),
-            CockroachType::SingleChar => (SINGLE_CHAR_TYPE_NAME, Vec::new()),
+            CockroachType::CatalogSingleChar => (CATALOG_SINGLE_CHAR_TYPE_NAME, Vec::new()),
             CockroachType::Bytes => (BYTES_TYPE_NAME, vec![]),
             CockroachType::Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
             CockroachType::Timestamptz(x) => (TIMESTAMP_TZ_TYPE_NAME, arg_vec_from_opt(x)),
@@ -331,7 +343,6 @@ pub struct SequenceFunction {
     pub min_value: Option<i64>,
     pub max_value: Option<i64>,
     pub start: Option<i64>,
-    pub no_cycle: Option<bool>,
 }
 
 impl SequenceFunction {
@@ -350,10 +361,6 @@ impl SequenceFunction {
             ) {
                 (Some("virtual"), expr) => match expr.as_bool() {
                     Ok(b) => this.r#virtual = Some(b),
-                    Err(err) => diagnostics.push_error(err),
-                },
-                (Some("noCycle"), expr) => match expr.as_bool() {
-                    Ok(b) => this.no_cycle = Some(b),
                     Err(err) => diagnostics.push_error(err),
                 },
                 (Some("cache"), expr) => match expr.as_int() {

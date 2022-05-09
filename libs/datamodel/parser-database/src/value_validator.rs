@@ -306,7 +306,7 @@ impl<'a> ValueValidator<'a> {
 
                 Err(DatamodelError::new_attribute_validation_error(
                     &message,
-                    "relation",
+                    "@relation",
                     self.span(),
                 ))
             }

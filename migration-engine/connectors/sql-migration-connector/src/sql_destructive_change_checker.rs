@@ -182,7 +182,8 @@ impl SqlMigrationConnector {
                                 (ColumnArity::Required, ColumnArity::Nullable) => true,
                                 // nothing changed
                                 (ColumnArity::Required, ColumnArity::Required)
-                                | (ColumnArity::Nullable, ColumnArity::Nullable) => true,
+                                | (ColumnArity::Nullable, ColumnArity::Nullable)
+                                | (ColumnArity::List, ColumnArity::List) => true,
                                 // not supported on SQLite
                                 (ColumnArity::List, _) | (_, ColumnArity::List) => unreachable!(),
                             };
@@ -258,13 +259,13 @@ impl SqlMigrationConnector {
                     }
                 }
                 SqlMigrationStep::AlterEnum(AlterEnum {
-                    index,
+                    id,
                     created_variants: _,
                     dropped_variants,
                     previous_usages_as_default: _,
                 }) if !dropped_variants.is_empty() => plan.push_warning(
                     SqlMigrationWarningCheck::EnumValueRemoval {
-                        enm: schemas.next().enum_walker_at(*index.next()).name().to_owned(),
+                        enm: schemas.next().walk_enum(id.next).name().to_owned(),
                         values: dropped_variants.clone(),
                     },
                     step_index,

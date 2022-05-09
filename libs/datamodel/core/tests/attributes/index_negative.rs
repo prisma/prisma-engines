@@ -121,13 +121,13 @@ fn index_does_not_accept_sort_or_length_without_extended_indexes() {
         [1;94m15 | [0m         middleName String @unique(sort:Desc)
         [1;94m16 | [0m         lastName   String @[1;91munique(length: 5)[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@index": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
         [1;94m18 | [0m         
         [1;94m19 | [0m         @@[1;91mindex([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m         @@index([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation])
@@ -156,27 +156,17 @@ fn index_does_not_accept_missing_length_with_extended_indexes() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mNative type Text cannot be unique in MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;91merror[0m: [1mNative type `Text` cannot be unique in MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m11 | [0m
-        [1;94m12 | [0m     [1;91mmodel User {[0m
         [1;94m13 | [0m         id         Int    @id
-        [1;94m14 | [0m         firstName  String @unique @test.Text
-        [1;94m15 | [0m         
-        [1;94m16 | [0m         @@index([firstName])
-        [1;94m17 | [0m     }
+        [1;94m14 | [0m         firstName  String @[1;91munique[0m @test.Text
         [1;94m   | [0m
-        [1;91merror[0m: [1mYou cannot define an index on fields with Native type Text of MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `Text` of MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
-        [1;94m11 | [0m
-        [1;94m12 | [0m     [1;91mmodel User {[0m
-        [1;94m13 | [0m         id         Int    @id
-        [1;94m14 | [0m         firstName  String @unique @test.Text
         [1;94m15 | [0m         
-        [1;94m16 | [0m         @@index([firstName])
-        [1;94m17 | [0m     }
+        [1;94m16 | [0m         @@[1;91mindex([firstName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -220,7 +210,7 @@ fn sqlserver_disallows_compound_unique_length_prefix() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not supported in an index definition with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The length argument is not supported in an index definition with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b String
@@ -246,7 +236,7 @@ fn sqlserver_disallows_index_length_prefix() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is not supported in an index definition with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is not supported in an index definition with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -294,7 +284,7 @@ fn sqlite_disallows_compound_unique_length_prefix() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not supported in an index definition with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The length argument is not supported in an index definition with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b String
@@ -320,7 +310,7 @@ fn sqlite_disallows_index_length_prefix() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is not supported in an index definition with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is not supported in an index definition with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -370,7 +360,7 @@ fn mongodb_disallows_compound_unique_length_prefix() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not supported in an index definition with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The length argument is not supported in an index definition with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m  b String
@@ -396,7 +386,7 @@ fn mongodb_disallows_index_length_prefix() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is not supported in an index definition with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is not supported in an index definition with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -422,7 +412,7 @@ fn length_argument_does_not_work_with_decimal() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -448,7 +438,7 @@ fn length_argument_does_not_work_with_json() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -474,7 +464,7 @@ fn length_argument_does_not_work_with_datetime() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -500,7 +490,7 @@ fn length_argument_does_not_work_with_boolean() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -526,7 +516,7 @@ fn length_argument_does_not_work_with_float() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -552,7 +542,7 @@ fn length_argument_does_not_work_with_bigint() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -578,7 +568,7 @@ fn length_argument_does_not_work_with_int() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -604,7 +594,7 @@ fn hash_index_doesnt_allow_sorting() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": Hash type does not support sort option.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": Hash type does not support sort option.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -630,7 +620,7 @@ fn hash_index_doesnt_work_on_sqlserver() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given index type is not supported with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -657,7 +647,7 @@ fn fulltext_index_no_preview_feature() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@fulltext": You must enable `fullTextIndex` preview feature to be able to define a @@fulltext index.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@fulltext": You must enable `fullTextIndex` preview feature to be able to define a @@fulltext index.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
@@ -683,7 +673,7 @@ fn hash_index_doesnt_work_on_mysql() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given index type is not supported with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -710,7 +700,7 @@ fn fulltext_index_length_attribute() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The length argument is not supported in a @@fulltext attribute.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@fulltext": The length argument is not supported in a @@fulltext attribute.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
@@ -736,7 +726,7 @@ fn hash_index_doesnt_work_on_sqlite() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given index type is not supported with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -763,7 +753,7 @@ fn fulltext_index_sort_attribute() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The sort argument is not supported in a @@fulltext attribute in the current connector.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@fulltext": The sort argument is not supported in a @@fulltext attribute in the current connector.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
@@ -789,7 +779,7 @@ fn hash_index_doesnt_work_on_mongo() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given index type is not supported with the current connector[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -816,7 +806,7 @@ fn fulltext_index_postgres() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
@@ -843,7 +833,7 @@ fn fulltext_index_sql_server() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
@@ -870,7 +860,7 @@ fn fulltext_index_sqlite() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
@@ -900,13 +890,13 @@ fn only_one_fulltext_index_allowed_per_model_in_mongo() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@fulltext": The current connector only allows one fulltext attribute per model[0m
+        [1;91merror[0m: [1mError parsing attribute "@@fulltext": The current connector only allows one fulltext attribute per model[0m
           [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
         [1;94m17 | [0m
         [1;94m18 | [0m  @@[1;91mfulltext([a, b])[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@fulltext": The current connector only allows one fulltext attribute per model[0m
+        [1;91merror[0m: [1mError parsing attribute "@@fulltext": The current connector only allows one fulltext attribute per model[0m
           [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
         [1;94m18 | [0m  @@fulltext([a, b])
@@ -935,7 +925,7 @@ fn fulltext_index_fields_must_follow_each_other_in_mongo() {
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@fulltext": All index fields must be listed adjacently in the fields argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@fulltext": All index fields must be listed adjacently in the fields argument.[0m
           [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
         [1;94m17 | [0m
@@ -971,19 +961,19 @@ fn index_without_fields_must_error() {
     "#;
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The list of fields in an index cannot be empty. Please specify at least one field.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The list of fields in an index cannot be empty. Please specify at least one field.[0m
           [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
         [1;94m17 | [0m          @@fulltext(fields:[], map: "a")
         [1;94m18 | [0m          @@[1;91mindex(fields: [ ], map: "b")[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The list of fields in an index cannot be empty. Please specify at least one field.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The list of fields in an index cannot be empty. Please specify at least one field.[0m
           [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
         [1;94m18 | [0m          @@index(fields: [ ], map: "b")
         [1;94m19 | [0m          @@[1;91munique(fields: [])[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@fulltext": The list of fields in an index cannot be empty. Please specify at least one field.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@fulltext": The list of fields in an index cannot be empty. Please specify at least one field.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0m
@@ -1078,13 +1068,13 @@ fn duplicate_indices_on_the_same_fields_different_sort_same_name_are_not_allowed
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `A_data_idx` has to be unique in the following namespace: on model `A` for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `A_data_idx` has to be unique in the following namespace: on model `A` for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
         [1;94m15 | [0m  @@[1;91mindex([data(sort: Asc)])[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `A_data_idx` has to be unique in the following namespace: on model `A` for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `A_data_idx` has to be unique in the following namespace: on model `A` for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m  @@index([data(sort: Asc)])

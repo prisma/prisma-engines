@@ -290,7 +290,7 @@ fn validate_default_bool_value(
         "true" | "false" => accept(),
         _ => ctx.push_error(DatamodelError::new_attribute_validation_error(
             "A boolean literal must be `true` or `false`.",
-            "default",
+            "@default",
             span,
         )),
     }

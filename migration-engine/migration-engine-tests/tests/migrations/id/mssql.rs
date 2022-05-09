@@ -381,7 +381,7 @@ fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: TestAp
             .unwrap()
             .into_single()
             .unwrap()
-            .as_i64()
+            .as_integer()
             .unwrap();
 
         let insert = Insert::single_into(api.render_table_name("Post"))

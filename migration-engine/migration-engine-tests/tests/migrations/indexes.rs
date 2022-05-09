@@ -1,3 +1,4 @@
+mod cockroachdb;
 mod mssql;
 mod postgres;
 
@@ -480,7 +481,7 @@ fn new_index_with_same_name_as_index_from_dropped_table_works(api: TestApi) {
 fn column_type_migrations_should_not_implicitly_drop_indexes(api: TestApi) {
     let dm1 = r#"
         model Cat {
-            id Int @id @default(autoincrement())
+            id Int @id
             name String
 
             @@index([name])
@@ -510,7 +511,7 @@ fn column_type_migrations_should_not_implicitly_drop_indexes(api: TestApi) {
 fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestApi) {
     let dm1 = r#"
         model Cat {
-            id Int @id @default(autoincrement())
+            id Int @id
             name String
             age Int
 

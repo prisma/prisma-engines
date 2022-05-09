@@ -279,8 +279,13 @@ impl<'a> LowerDmlToAst<'a> {
                 let arguments = e
                     .args()
                     .iter()
-                    .map(LowerDmlToAst::<'a>::lower_prisma_value)
-                    .map(ast::Argument::new_unnamed)
+                    .map(|(name, value)| {
+                        let value = LowerDmlToAst::<'a>::lower_prisma_value(value);
+                        match name {
+                            Some(name) => ast::Argument::new(name, value),
+                            None => ast::Argument::new_unnamed(value),
+                        }
+                    })
                     .collect();
                 ast::Expression::Function(
                     e.name().to_string(),

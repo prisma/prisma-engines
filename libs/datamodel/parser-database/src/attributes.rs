@@ -409,7 +409,7 @@ fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes, 
         .map(|(field_id, _)| {
             DatamodelError::new_attribute_validation_error(
                 "Fields on an already ignored Model do not need an `@ignore` annotation.",
-                "ignore",
+                "@ignore",
                 *ctx.ast[model_id][field_id].span(),
             )
         })

@@ -1,15 +1,14 @@
+mod cockroachdb;
 mod mssql;
 mod mysql;
 mod sqlite;
 
 use barrel::types;
-use expect_test::expect;
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_json, test_api::*, TestResult};
 use serde_json::json;
-use test_macros::test_connector;
 
-#[test_connector(exclude(Mssql, Mysql))]
+#[test_connector(exclude(Mssql, Mysql, CockroachDb))]
 async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -197,54 +196,6 @@ async fn unsupported_type_keeps_its_usages(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(CockroachDb))]
-async fn unsupported_type_keeps_its_usages_cockroach(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Test", |t| {
-                t.add_column("id", types::primary());
-                // Geometry/Geography is the only type that is not supported by Prisma, but is also not
-                // indexable (only inverted-indexable).
-                t.add_column("broken", types::custom("geometry"));
-                t.add_column("broken2", types::custom("geography"));
-            });
-        })
-        .await?;
-
-    let expected = json!([{
-        "code": 3,
-        "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
-        "affected": [
-            {
-                "model": "Test",
-                "field": "broken",
-                "tpe": "geometry"
-            },
-            {
-                "model": "Test",
-                "field": "broken2",
-                "tpe": "geography"
-            },
-        ]
-    }]);
-
-    assert_eq_json!(expected, api.introspection_warnings().await?);
-
-    let dm = expect![[r#"
-        model Test {
-          id      Int                      @id @default(autoincrement())
-          broken  Unsupported("geometry")
-          broken2 Unsupported("geography")
-        }
-    "#]];
-
-    let result = api.introspect_dml().await?;
-
-    dm.assert_eq(&result);
-
-    Ok(())
-}
-
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> TestResult {
     api.barrel()
@@ -330,7 +281,7 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -414,7 +365,7 @@ async fn commenting_out_a_table_without_columns(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

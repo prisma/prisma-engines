@@ -16,7 +16,7 @@ use quaint::{
     prelude::ConnectionInfo,
 };
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
-use std::{collections::HashMap, future};
+use std::{collections::HashMap, future, time};
 use url::Url;
 use user_facing_errors::{
     common::{DatabaseAccessDenied, DatabaseDoesNotExist},
@@ -25,14 +25,13 @@ use user_facing_errors::{
     UserFacingError,
 };
 
-const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
+const ADVISORY_LOCK_TIMEOUT: time::Duration = time::Duration::from_secs(10);
 
-/// Connection settings applied to every new connection on CockroachDB
+/// Connection settings applied to every new connection on CockroachDB.
 ///
 /// https://www.cockroachlabs.com/docs/stable/experimental-features.html
 const COCKROACHDB_PRELUDE: &str = r#"
 SET enable_experimental_alter_column_type_general = true;
-SET serial_normalization = 'sql_sequence';
 "#;
 
 type State = super::State<Params, (BitFlags<Circumstances>, Connection)>;
@@ -591,6 +590,7 @@ where
 
         let mut circumstances = BitFlags::<Circumstances>::default();
         let provider_is_cockroachdb = flavour.is_cockroach;
+
         if provider_is_cockroachdb {
             circumstances |= Circumstances::IsCockroachDb;
         }
@@ -608,15 +608,29 @@ where
                         .await?;
 
                     let version = schema_exists_result.get(0).and_then(|row| row.at(1)).and_then(|v| v.to_string());
-                    if let Some(version) = version {
-                        if version.contains("CockroachDB") {
-                            circumstances |= Circumstances::IsCockroachDb;
-                            connection.raw_cmd(COCKROACHDB_PRELUDE).await?;
-                        } else if provider_is_cockroachdb {
-                            return Err(ConnectorError::from_msg("You are trying to connect to a postgresql database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.".to_owned()));
+
+                    match version {
+                        Some(version) => {
+                            let db_is_cockroach = version.contains("CockroachDB");
+
+                            // We will want to validate this in the future: https://github.com/prisma/prisma/issues/13222
+                            // if db_is_cockroach && !provider_is_cockroachdb  {
+                            //     let msg = "You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.";
+
+                            //     return Err(ConnectorError::from_msg(msg.to_owned()));
+
+                            if !db_is_cockroach && provider_is_cockroachdb {
+                                let msg = "You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.";
+
+                                return Err(ConnectorError::from_msg(msg.to_owned()));
+                            } else if db_is_cockroach {
+                                circumstances |= Circumstances::IsCockroachDb;
+                                connection.raw_cmd(COCKROACHDB_PRELUDE).await?;
+                            }
                         }
-                    } else {
-                        tracing::warn!("Could not determine the version of the database.")
+                        None => {
+                            tracing::warn!("Could not determine the version of the database.")
+                        }
                     }
 
                     if let Some(true) = schema_exists_result

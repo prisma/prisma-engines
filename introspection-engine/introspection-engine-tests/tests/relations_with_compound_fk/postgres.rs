@@ -3,7 +3,7 @@ use expect_test::expect;
 use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -51,7 +51,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -103,7 +103,7 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -149,7 +149,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

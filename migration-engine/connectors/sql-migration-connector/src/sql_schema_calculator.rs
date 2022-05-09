@@ -346,7 +346,12 @@ fn column_for_builtin_scalar_type(
             } else if v.is_now() {
                 Some(sql::DefaultValue::now())
             } else if v.is_autoincrement() {
-                Some(sql::DefaultValue::sequence(""))
+                ctx.flavour.column_default_value_for_autoincrement()
+            } else if v.is_sequence() {
+                Some(sql::DefaultValue::new(sql::DefaultKind::Sequence(format!(
+                    "prisma_sequence_{}_{}",
+                    idx.0, idx.1
+                ))))
             } else {
                 match v.value() {
                     ast::Expression::NumericValue(val, _) => match scalar_type {

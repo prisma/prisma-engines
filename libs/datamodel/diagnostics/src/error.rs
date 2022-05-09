@@ -43,7 +43,7 @@ enum DatamodelErrorKind {
   #[error("Argument \"{}\" is missing in generator block \"{}\".", argument_name, generator_name)]
   GeneratorArgumentNotFound { argument_name: String, generator_name: String, span: Span },
 
-  #[error("Error parsing attribute \"@{}\": {}", attribute_name, message)]
+  #[error("Error parsing attribute \"{}\": {}", attribute_name, message)]
   AttributeValidationError { message: String, attribute_name: String, span: Span },
 
   #[error("Attribute \"@{}\" is defined twice.", attribute_name)]

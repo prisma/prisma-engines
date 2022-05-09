@@ -112,7 +112,7 @@ impl<'a> RowAssertion<'a> {
     }
 
     pub fn assert_int_value(self, column_name: &str, expected_value: i64) -> Self {
-        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| (*col).as_i64());
+        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| (*col).as_integer());
 
         assert!(
             actual_value == Some(expected_value),

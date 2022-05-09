@@ -16,7 +16,6 @@ impl<'conn> QueryPipeline<'conn> {
         }
     }
 
-    #[tracing::instrument(skip(trace_id))]
     pub async fn execute(mut self, trace_id: Option<String>) -> crate::Result<ResponseData> {
         let serializer = self.serializer;
         let expr = Expressionista::translate(self.graph)?;

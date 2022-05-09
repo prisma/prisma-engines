@@ -43,7 +43,7 @@ fn default_sequence_is_valid_on_cockroachdb() {
         }
     "#;
 
-    assert_valid(&schema);
+    assert_valid(schema);
 }
 
 #[test]
@@ -94,7 +94,7 @@ fn default_sequence_with_one_argument_is_valid_on_cockroachdb() {
         }
     "#;
 
-    assert_valid(&schema);
+    assert_valid(schema);
 }
 
 #[test]
@@ -111,11 +111,11 @@ fn default_sequence_with_all_arguments_is_valid_on_cockroachdb() {
         }
 
         model Test {
-            id Int @id @default(sequence(virtual: true, cache: 10, increment: 3, minValue: 10, maxValue: 100, start: 12, noCycle: true))
+            id Int @id @default(sequence(virtual: true, cache: 10, increment: 3, minValue: 10, maxValue: 100, start: 12))
         }
     "#;
 
-    assert_valid(&schema);
+    assert_valid(schema);
 }
 
 #[test]
