@@ -1,16 +1,18 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
+    database_schema::SqlDatabaseSchema,
     flavour::PostgresFlavour,
     pair::Pair,
-    sql_migration::{AlterEnum, SqlMigrationStep},
+    sql_migration::{AlterEnum, SequenceChange, SequenceChanges, SqlMigrationStep},
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase},
 };
+use enumflags2::BitFlags;
 use native_types::{CockroachType, PostgresType};
 use once_cell::sync::Lazy;
 use regex::RegexSet;
 use sql_schema_describer::{
     postgres::PostgresSchemaExt,
-    walkers::{ColumnWalker, IndexWalker},
+    walkers::{ColumnWalker, IndexWalker, SqlSchemaExt},
 };
 
 /// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.
@@ -35,10 +37,34 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         true
     }
 
+    fn column_autoincrement_changed(&self, columns: Pair<ColumnWalker<'_>>) -> bool {
+        if self.is_cockroachdb() {
+            return false;
+        }
+
+        columns.previous.is_autoincrement() != columns.next.is_autoincrement()
+    }
+
+    fn column_type_change(&self, columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+        // Handle the enum cases first.
+        match columns.map(|col| col.column_type_family().as_enum()).into_tuple() {
+            (Some(previous_enum), Some(next_enum)) if previous_enum == next_enum => return None,
+            (Some(_), Some(_)) => return Some(ColumnTypeChange::NotCastable),
+            (None, Some(_)) | (Some(_), None) => return Some(ColumnTypeChange::NotCastable),
+            (None, None) => (),
+        };
+
+        if self.is_cockroachdb() {
+            cockroach_column_type_change(columns)
+        } else {
+            postgres_column_type_change(columns)
+        }
+    }
+
     fn push_enum_steps(&self, steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
         for enum_differ in db.enum_pairs() {
             let mut alter_enum = AlterEnum {
-                index: enum_differ.enums.as_ref().map(|e| e.enum_index()),
+                id: enum_differ.enums.as_ref().map(|e| e.enum_id()),
                 created_variants: enum_differ.created_values().map(String::from).collect(),
                 dropped_variants: enum_differ.dropped_values().map(String::from).collect(),
                 previous_usages_as_default: Vec::new(), // this gets filled in later
@@ -53,28 +79,83 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         }
 
         for enm in db.created_enums() {
-            steps.push(SqlMigrationStep::CreateEnum {
-                enum_index: enm.enum_index(),
-            })
+            steps.push(SqlMigrationStep::CreateEnum(enm.enum_id()))
         }
 
         for enm in db.dropped_enums() {
-            steps.push(SqlMigrationStep::DropEnum {
-                enum_index: enm.enum_index(),
-            })
+            steps.push(SqlMigrationStep::DropEnum(enm.enum_id()))
         }
     }
 
-    fn indexes_should_be_recreated_after_column_drop(&self) -> bool {
-        true
+    fn push_alter_sequence_steps(&self, steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
+        if !self.is_cockroachdb() {
+            return;
+        }
+
+        let schemas: Pair<(&SqlDatabaseSchema, &PostgresSchemaExt)> = db.schemas().map(|schema| {
+            (
+                schema,
+                schema.describer_schema.downcast_connector_data().unwrap_or_default(),
+            )
+        });
+
+        let sequence_pairs = db
+            .all_column_pairs()
+            .map(|cols| {
+                schemas.combine(cols).map(|((schema, ext), (table_id, column_id))| {
+                    (schema.table_walker_at(table_id).column_at(column_id), ext)
+                })
+            })
+            .filter_map(|cols| {
+                cols.map(|(col, ext)| {
+                    col.default()
+                        .and_then(|d| d.as_sequence())
+                        .and_then(|sequence_name| ext.get_sequence(sequence_name))
+                })
+                .transpose()
+            });
+
+        for pair in sequence_pairs {
+            let prev = pair.previous.1;
+            let next = pair.next.1;
+            let mut changes: BitFlags<SequenceChange> = BitFlags::default();
+
+            if prev.min_value != next.min_value {
+                changes |= SequenceChange::MinValue;
+            }
+
+            if prev.max_value != next.max_value {
+                changes |= SequenceChange::MaxValue;
+            }
+
+            if prev.start_value != next.start_value {
+                changes |= SequenceChange::Start;
+            }
+
+            if prev.cache_size != next.cache_size {
+                changes |= SequenceChange::Cache;
+            }
+
+            if prev.increment_by != next.increment_by {
+                changes |= SequenceChange::Increment;
+            }
+
+            if !changes.is_empty() {
+                steps.push(SqlMigrationStep::AlterSequence(
+                    pair.map(|p| p.0 as u32),
+                    SequenceChanges(changes),
+                ));
+            }
+        }
     }
 
     fn indexes_match(&self, a: IndexWalker<'_>, b: IndexWalker<'_>) -> bool {
         let columns_previous = a.columns();
         let columns_next = b.columns();
 
-        let pg_ext_previous: &PostgresSchemaExt = a.schema().downcast_connector_data();
-        let pg_ext_next: &PostgresSchemaExt = b.schema().downcast_connector_data();
+        let pg_ext_previous: &PostgresSchemaExt = a.schema().downcast_connector_data().unwrap_or_default();
+        let pg_ext_next: &PostgresSchemaExt = b.schema().downcast_connector_data().unwrap_or_default();
+
         let previous_algo = pg_ext_previous.index_algorithm(a.index_id());
         let next_algo = pg_ext_next.index_algorithm(b.index_id());
 
@@ -94,42 +175,15 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             })
     }
 
+    fn indexes_should_be_recreated_after_column_drop(&self) -> bool {
+        true
+    }
+
     fn index_should_be_renamed(&self, pair: &Pair<IndexWalker<'_>>) -> bool {
         // Implements correct comparison for truncated index names.
         let (previous_name, next_name) = pair.as_ref().map(|idx| idx.name()).into_tuple();
 
         previous_name != next_name
-    }
-
-    fn table_should_be_ignored(&self, table_name: &str) -> bool {
-        POSTGIS_TABLES_OR_VIEWS.is_match(table_name)
-    }
-
-    fn column_type_change(&self, columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
-        // Handle the enum cases first.
-        match columns.map(|col| col.column_type_family().as_enum()).as_tuple() {
-            (Some(previous_enum), Some(next_enum)) if previous_enum == next_enum => return None,
-            (Some(_), Some(_)) => return Some(ColumnTypeChange::NotCastable),
-            (None, Some(_)) | (Some(_), None) => return Some(ColumnTypeChange::NotCastable),
-            (None, None) => (),
-        };
-
-        if self.is_cockroachdb() {
-            cockroach_column_type_change(columns)
-        } else {
-            postgres_column_type_change(columns)
-        }
-    }
-
-    fn view_should_be_ignored(&self, view_name: &str) -> bool {
-        POSTGIS_TABLES_OR_VIEWS.is_match(view_name) || EXTENSION_VIEWS.is_match(view_name)
-    }
-
-    fn sequence_changed(&self, previous: ColumnWalker<'_>, next: ColumnWalker<'_>) -> bool {
-        let previous_has_sequence_default = previous.default().map(|d| d.is_sequence()).unwrap_or(false);
-        let next_has_sequence_default = next.default().map(|d| d.is_sequence()).unwrap_or(false);
-
-        previous_has_sequence_default != next_has_sequence_default
     }
 
     fn set_tables_to_redefine(&self, db: &mut DifferDatabase<'_>) {
@@ -150,6 +204,14 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             .map(|t| t.table_ids());
 
         db.tables_to_redefine = id_gets_dropped.collect();
+    }
+
+    fn table_should_be_ignored(&self, table_name: &str) -> bool {
+        POSTGIS_TABLES_OR_VIEWS.is_match(table_name)
+    }
+
+    fn view_should_be_ignored(&self, view_name: &str) -> bool {
+        POSTGIS_TABLES_OR_VIEWS.is_match(view_name) || EXTENSION_VIEWS.is_match(view_name)
     }
 }
 
@@ -187,8 +249,8 @@ fn cockroach_native_type_change_riskyness(
 ) -> Option<ColumnTypeChange> {
     let covered_by_index = columns
         .map(|col| col.is_part_of_secondary_index() || col.is_part_of_primary_key())
-        .as_tuple()
-        == (&true, &true);
+        .into_tuple()
+        == (true, true);
 
     match (previous, next) {
         (CockroachType::Int4, CockroachType::String(None)) if !covered_by_index => Some(ColumnTypeChange::SafeCast),
@@ -537,7 +599,7 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
 fn push_alter_enum_previous_usages_as_default(db: &DifferDatabase<'_>, alter_enum: &mut AlterEnum) {
     let mut previous_usages_as_default = Vec::new();
 
-    let enum_names = db.schemas().enums(&alter_enum.index).map(|enm| enm.name());
+    let enum_names = db.schemas().enums(alter_enum.id).map(|enm| enm.name());
 
     for table in db.dropped_tables() {
         for column in table

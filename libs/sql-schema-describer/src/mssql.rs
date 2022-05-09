@@ -71,6 +71,17 @@ pub struct MssqlSchemaExt {
     pub nonclustered_primary_keys: Vec<TableId>,
 }
 
+const DEFAULT_REF: &MssqlSchemaExt = &MssqlSchemaExt {
+    clustered_indexes: Vec::new(),
+    nonclustered_primary_keys: Vec::new(),
+};
+
+impl<'a> Default for &'a MssqlSchemaExt {
+    fn default() -> Self {
+        DEFAULT_REF
+    }
+}
+
 impl MssqlSchemaExt {
     pub fn pk_is_clustered(&self, table_id: TableId) -> bool {
         self.nonclustered_primary_keys.binary_search(&table_id).is_err()
@@ -134,7 +145,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
             procedures,
             user_defined_types,
             connector_data: crate::connector_data::ConnectorData {
-                data: Box::new(mssql_ext),
+                data: Some(Box::new(mssql_ext)),
             },
             ..Default::default()
         })

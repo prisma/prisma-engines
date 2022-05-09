@@ -730,7 +730,7 @@ impl<'a> PrimaryKeyAssertion<'a> {
     #[track_caller]
     pub fn assert_non_clustered(self) -> Self {
         if self.tags.contains(Tags::Mssql) {
-            let ext: &sql::mssql::MssqlSchemaExt = self.schema.downcast_connector_data();
+            let ext: &sql::mssql::MssqlSchemaExt = self.schema.downcast_connector_data().unwrap_or_default();
             assert!(!ext.pk_is_clustered(self.table_id))
         }
 
@@ -740,7 +740,7 @@ impl<'a> PrimaryKeyAssertion<'a> {
     #[track_caller]
     pub fn assert_clustered(self) -> Self {
         if self.tags.contains(Tags::Mssql) {
-            let ext: &sql::mssql::MssqlSchemaExt = self.schema.downcast_connector_data();
+            let ext: &sql::mssql::MssqlSchemaExt = self.schema.downcast_connector_data().unwrap_or_default();
             assert!(ext.pk_is_clustered(self.table_id))
         }
 
@@ -846,7 +846,7 @@ impl<'a> IndexAssertion<'a> {
     #[track_caller]
     pub fn assert_clustered(self) -> Self {
         if self.tags.contains(Tags::Mssql) {
-            let ext: &sql::mssql::MssqlSchemaExt = self.schema.downcast_connector_data();
+            let ext: &sql::mssql::MssqlSchemaExt = self.schema.downcast_connector_data().unwrap_or_default();
             assert!(ext.index_is_clustered(self.index_id))
         }
 
@@ -856,7 +856,7 @@ impl<'a> IndexAssertion<'a> {
     #[track_caller]
     pub fn assert_non_clustered(self) -> Self {
         if self.tags.contains(Tags::Mssql) {
-            let ext: &sql::mssql::MssqlSchemaExt = self.schema.downcast_connector_data();
+            let ext: &sql::mssql::MssqlSchemaExt = self.schema.downcast_connector_data().unwrap_or_default();
             assert!(!ext.index_is_clustered(self.index_id))
         }
 
@@ -870,7 +870,7 @@ impl<'a> IndexAssertion<'a> {
     }
 
     pub fn assert_algorithm(self, algo: SqlIndexAlgorithm) -> Self {
-        let postgres_ext: &PostgresSchemaExt = self.schema.downcast_connector_data();
+        let postgres_ext: &PostgresSchemaExt = self.schema.downcast_connector_data().unwrap_or_default();
         let algorithm = postgres_ext.index_algorithm(self.index_id);
         assert_eq!(algorithm, algo);
 
@@ -890,7 +890,7 @@ impl<'a> IndexAssertion<'a> {
             .unwrap();
 
         let operator_class = if self.tags.contains(Tags::Postgres) {
-            let ext: &PostgresSchemaExt = self.schema.downcast_connector_data();
+            let ext: &PostgresSchemaExt = self.schema.downcast_connector_data().unwrap_or_default();
 
             ext.get_opclass(IndexFieldId(self.index_id, col_idx as u32))
                 .map(|c| c.kind.clone())

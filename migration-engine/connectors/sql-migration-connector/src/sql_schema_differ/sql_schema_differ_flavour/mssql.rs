@@ -18,8 +18,8 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     }
 
     fn indexes_match(&self, a: IndexWalker<'_>, b: IndexWalker<'_>) -> bool {
-        let mssql_ext_previous: &MssqlSchemaExt = a.schema().downcast_connector_data();
-        let mssql_ext_next: &MssqlSchemaExt = b.schema().downcast_connector_data();
+        let mssql_ext_previous: &MssqlSchemaExt = a.schema().downcast_connector_data().unwrap_or_default();
+        let mssql_ext_next: &MssqlSchemaExt = b.schema().downcast_connector_data().unwrap_or_default();
 
         mssql_ext_previous.index_is_clustered(a.index_id()) == mssql_ext_next.index_is_clustered(b.index_id())
     }
@@ -70,8 +70,8 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     }
 
     fn primary_key_changed(&self, tables: Pair<sql_schema_describer::walkers::TableWalker<'_>>) -> bool {
-        let previous_ext: &MssqlSchemaExt = tables.previous().schema().downcast_connector_data();
-        let next_ext: &MssqlSchemaExt = tables.next().schema().downcast_connector_data();
+        let previous_ext: &MssqlSchemaExt = tables.previous().schema().downcast_connector_data().unwrap_or_default();
+        let next_ext: &MssqlSchemaExt = tables.next().schema().downcast_connector_data().unwrap_or_default();
 
         previous_ext.pk_is_clustered(tables.previous().table_id()) != next_ext.pk_is_clustered(tables.next().table_id())
     }

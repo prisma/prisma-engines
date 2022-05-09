@@ -71,17 +71,21 @@ pub struct SqlSchema {
 
 impl SqlSchema {
     /// Extract connector-specific constructs. The type parameter must be the right one.
-    pub fn downcast_connector_data<T: 'static>(&self) -> &T {
-        self.connector_data.data.downcast_ref().unwrap()
+    pub fn downcast_connector_data<T: 'static>(&self) -> Option<&T> {
+        self.connector_data.data.as_ref()?.downcast_ref()
     }
 
     /// Extract connector-specific constructs. The type parameter must be the right one.
-    pub fn downcast_connector_data_mut<T: 'static>(&mut self) -> &mut T {
-        self.connector_data.data.downcast_mut().unwrap()
+    pub fn downcast_connector_data_mut<T: Default + Send + Sync + 'static>(&mut self) -> &mut T {
+        if self.connector_data.data.is_none() {
+            self.connector_data.data = Some(Box::new(T::default()));
+        }
+
+        self.connector_data.data.as_mut().unwrap().downcast_mut().unwrap()
     }
 
     pub fn set_connector_data(&mut self, data: Box<dyn Any + Send + Sync>) {
-        self.connector_data.data = data;
+        self.connector_data.data = Some(data);
     }
 
     /// Get a table.
@@ -163,7 +167,7 @@ impl SqlSchema {
     pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
         (0..self.enums.len()).map(move |enum_index| EnumWalker {
             schema: self,
-            enum_index,
+            enum_id: EnumId(enum_index as u32),
         })
     }
 }

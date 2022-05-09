@@ -318,7 +318,7 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
     api.raw_cmd(sql);
 
     let schema = api.describe();
-    let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+    let ext: &PostgresSchemaExt = schema.downcast_connector_data().unwrap_or_default();
     let expected_ext = expect![[r#"
         PostgresSchemaExt {
             opclasses: [],
@@ -335,16 +335,6 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
                     virtual: false,
                 },
                 Sequence {
-                    name: "testnotcycling",
-                    start_value: 1,
-                    min_value: 1,
-                    max_value: 9223372036854775807,
-                    increment_by: 1,
-                    cycle: false,
-                    cache_size: 1,
-                    virtual: false,
-                },
-                Sequence {
                     name: "testmore",
                     start_value: 20,
                     min_value: 10,
@@ -352,6 +342,16 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
                     increment_by: 4,
                     cycle: false,
                     cache_size: 7,
+                    virtual: false,
+                },
+                Sequence {
+                    name: "testnotcycling",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 9223372036854775807,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 1,
                     virtual: false,
                 },
             ],

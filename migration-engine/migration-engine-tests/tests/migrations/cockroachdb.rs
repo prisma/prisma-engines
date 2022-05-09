@@ -1053,3 +1053,97 @@ fn autoincrement_is_idempotent(api: TestApi) {
     api.schema_push_w_datasource(dm1).send().assert_green();
     api.schema_push_w_datasource(dm1).send().assert_no_steps();
 }
+
+#[test_connector(tags(CockroachDb))]
+fn alter_sequence_to_default(api: TestApi) {
+    let schema1 = r#"
+        datasource db {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
+        }
+
+        model Test {
+            Id Int @id @default(sequence(minValue: 10, maxValue: 39, cache: 4, increment: 3, start: 12))
+        }
+    "#;
+
+    let schema2 = r#"
+        datasource db {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
+        }
+
+        model Test {
+            Id Int @id @default(sequence())
+        }
+    "#;
+
+    api.schema_push(schema1)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(schema1).send().assert_green().assert_no_steps();
+
+    api.schema_push(schema2)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(schema2).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(CockroachDb))]
+fn alter_sequence(api: TestApi) {
+    let schema1 = r#"
+        datasource db {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
+        }
+
+        model Test {
+            Id Int @id @default(sequence(minValue: 10, maxValue: 39, cache: 4, increment: 3, start: 12))
+        }
+    "#;
+
+    let schema2 = r#"
+        datasource db {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
+        }
+
+        model Test {
+            Id Int @id @default(sequence(minValue: 8, maxValue: 9009, cache: 12, increment: 33, start: 9))
+        }
+    "#;
+
+    api.schema_push(schema1)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(schema1).send().assert_green().assert_no_steps();
+
+    api.schema_push(schema2)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(schema2).send().assert_green().assert_no_steps();
+}

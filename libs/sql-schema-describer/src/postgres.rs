@@ -18,7 +18,7 @@ use tracing::trace;
 
 /// A PostgreSQL sequence.
 /// https://www.postgresql.org/docs/current/view-pg-sequences.html
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Sequence {
     /// Sequence name
     pub name: String,
@@ -36,6 +36,22 @@ pub struct Sequence {
     pub cache_size: i64,
     /// Whether the sequence is a cockroachdb virtual sequence
     pub r#virtual: bool,
+}
+
+// We impl default manually to align with database defaults.
+impl Default for Sequence {
+    fn default() -> Self {
+        Sequence {
+            name: String::default(),
+            start_value: 1,
+            min_value: 1,
+            max_value: i64::MAX,
+            increment_by: 1,
+            cycle: false,
+            cache_size: 1,
+            r#virtual: false,
+        }
+    }
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -102,6 +118,18 @@ pub struct PostgresSchemaExt {
     pub sequences: Vec<Sequence>,
 }
 
+const DEFAULT_REF: &PostgresSchemaExt = &PostgresSchemaExt {
+    opclasses: Vec::new(),
+    indexes: Vec::new(),
+    sequences: Vec::new(),
+};
+
+impl<'a> Default for &'a PostgresSchemaExt {
+    fn default() -> Self {
+        DEFAULT_REF
+    }
+}
+
 impl PostgresSchemaExt {
     pub fn index_algorithm(&self, index_id: IndexId) -> SqlIndexAlgorithm {
         match self.indexes.binary_search_by_key(&index_id, |(id, _)| *id) {
@@ -116,6 +144,13 @@ impl PostgresSchemaExt {
             .binary_search_by_key(&index_field_id, |(id, _)| *id)
             .ok()?;
         Some(&self.opclasses[idx].1)
+    }
+
+    pub fn get_sequence(&self, name: &str) -> Option<(usize, &Sequence)> {
+        self.sequences
+            .binary_search_by_key(&name, |s| &s.name)
+            .map(|idx| (idx, &self.sequences[idx]))
+            .ok()
     }
 }
 
@@ -466,7 +501,9 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
             tables,
             views,
             procedures,
-            connector_data: crate::connector_data::ConnectorData { data: Box::new(pg_ext) },
+            connector_data: crate::connector_data::ConnectorData {
+                data: Some(Box::new(pg_ext)),
+            },
             ..Default::default()
         })
     }
@@ -1116,6 +1153,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                   cache_size
               FROM pg_sequences
               WHERE schemaname = $1
+              ORDER BY sequence_name
             "#
         } else {
             r#"
@@ -1129,6 +1167,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                   0::INT8 AS cache_size
               FROM information_schema.sequences
               WHERE sequence_schema = $1
+              ORDER BY sequence_name
             "#
         };
 

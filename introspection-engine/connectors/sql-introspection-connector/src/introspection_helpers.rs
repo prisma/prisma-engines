@@ -332,7 +332,7 @@ pub(crate) fn calculate_default(
         (Some(sql::DefaultKind::Sequence(name)), _) if ctx.is_cockroach() => {
             use prisma_value::PrismaValue;
 
-            let connector_data: &PostgresSchemaExt = ctx.schema.downcast_connector_data();
+            let connector_data: &PostgresSchemaExt = ctx.schema.downcast_connector_data().unwrap_or_default();
             let sequence_idx = connector_data
                 .sequences
                 .binary_search_by_key(&name, |s| &s.name)
@@ -570,7 +570,7 @@ fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &mut Context) -> O
         return None;
     }
 
-    let data: &PostgresSchemaExt = index.schema().downcast_connector_data();
+    let data: &PostgresSchemaExt = index.schema().downcast_connector_data().unwrap_or_default();
 
     Some(match data.index_algorithm(index.index_id()) {
         sql::postgres::SqlIndexAlgorithm::BTree => IndexAlgorithm::BTree,
@@ -587,7 +587,7 @@ fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &mut Cont
         return None;
     }
 
-    let ext: &MssqlSchemaExt = schema.downcast_connector_data();
+    let ext: &MssqlSchemaExt = schema.downcast_connector_data().unwrap_or_default();
 
     Some(ext.index_is_clustered(index_id))
 }
@@ -597,7 +597,7 @@ pub(crate) fn primary_key_is_clustered(table_id: sql::TableId, ctx: &mut Context
         return None;
     }
 
-    let ext: &MssqlSchemaExt = ctx.schema.downcast_connector_data();
+    let ext: &MssqlSchemaExt = ctx.schema.downcast_connector_data().unwrap_or_default();
 
     Some(ext.pk_is_clustered(table_id))
 }
@@ -607,7 +607,7 @@ fn get_opclass(index_field_id: sql::IndexFieldId, schema: &SqlSchema, ctx: &mut 
         return None;
     }
 
-    let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+    let ext: &PostgresSchemaExt = schema.downcast_connector_data().unwrap_or_default();
 
     let opclass = match ext.get_opclass(index_field_id) {
         Some(opclass) => opclass,

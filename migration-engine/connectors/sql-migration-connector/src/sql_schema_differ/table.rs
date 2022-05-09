@@ -99,7 +99,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
     }
 
     pub(crate) fn primary_key_changed(&self) -> bool {
-        match self.tables.as_ref().map(|t| t.primary_key()).as_tuple() {
+        match self.tables.as_ref().map(|t| t.primary_key()).into_tuple() {
             (Some(previous_pk), Some(next_pk)) => {
                 if previous_pk.columns != next_pk.columns {
                     return true;
@@ -117,7 +117,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 
     /// The primary key present in `next` but not `previous`, if applicable.
     pub(crate) fn created_primary_key(&self) -> Option<&'schema PrimaryKey> {
-        match self.tables.as_ref().map(|t| t.primary_key()).as_tuple() {
+        match self.tables.as_ref().map(|t| t.primary_key()).into_tuple() {
             (None, Some(pk)) => Some(pk),
             _ => None,
         }
@@ -125,7 +125,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 
     /// The primary key present in `previous` but not `next`, if applicable.
     pub(crate) fn dropped_primary_key(&self) -> Option<&'schema PrimaryKey> {
-        match self.tables.as_ref().map(|t| t.primary_key()).as_tuple() {
+        match self.tables.as_ref().map(|t| t.primary_key()).into_tuple() {
             (Some(pk), None) => Some(pk),
             _ => None,
         }
