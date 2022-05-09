@@ -18,7 +18,7 @@ pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<
             // Add an error for all autoincrement fields on the model.
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 msg,
-                "default",
+                "@default",
                 field.default_attribute().unwrap().span,
             ));
         }
@@ -31,7 +31,7 @@ pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             msg,
-            "default",
+            "@default",
             model.ast_model().span,
         ))
     }
@@ -45,7 +45,7 @@ pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 msg,
-                "default",
+                "@default",
                 field.ast_field().span,
             ))
         }
@@ -55,7 +55,7 @@ pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 msg,
-                "default",
+                "@default",
                 field.ast_field().span,
             ))
         }

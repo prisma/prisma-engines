@@ -336,7 +336,7 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
         DefaultKind::Value(PrismaValue::Bytes(b)) => Quoted::sqlite_string(format_hex(b)).to_string().into(),
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
         DefaultKind::Value(PrismaValue::DateTime(val)) => Quoted::sqlite_string(val).to_string().into(),
-        DefaultKind::Value(val) => format!("{}", val).into(),
-        DefaultKind::Sequence(_) => "".into(),
+        DefaultKind::Value(val) => val.to_string().into(),
+        DefaultKind::Sequence(_) | DefaultKind::UniqueRowid => unreachable!(),
     }
 }

@@ -746,7 +746,7 @@ fn dmh_with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
     );
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn drift_can_be_detected_without_migrations_table(api: TestApi) {
     let directory = api.create_migrations_directory();
 

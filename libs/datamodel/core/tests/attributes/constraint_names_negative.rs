@@ -123,7 +123,7 @@ fn index_and_primary_cannot_have_same_name_on_sqlserver() {
         [1;94m 6 | [0mmodel User {
         [1;94m 7 | [0m  id         Int @id([1;91mmap: "MyName"[0m)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyName` has to be unique in the following namespace: on model `User` for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `MyName` has to be unique in the following namespace: on model `User` for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
@@ -151,13 +151,13 @@ fn index_and_unique_cannot_have_same_name_on_sqlserver() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyName` has to be unique in the following namespace: on model `User` for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `MyName` has to be unique in the following namespace: on model `User` for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
         [1;94m10 | [0m  @@index([test], [1;91mmap: "MyName"[0m)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `MyName` has to be unique in the following namespace: on model `User` for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The given constraint name `MyName` has to be unique in the following namespace: on model `User` for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m  @@index([test], map: "MyName")
@@ -190,13 +190,13 @@ fn multiple_indexes_with_same_name_are_not_supported_by_postgres() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
         [1;94m 8 | [0m
         [1;94m 9 | [0m  @@index([id], [1;91mname: "MyIndexName"[0m)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
@@ -230,13 +230,13 @@ fn unique_indexes_with_same_name_are_not_supported_by_postgres() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
         [1;94m10 | [0m  @@index([id], [1;91mmap: "MyIndexName"[0m)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0m
@@ -403,13 +403,13 @@ fn multiple_indexes_with_same_name_are_not_supported_by_sqlite() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
         [1;94m10 | [0m  @@index([id], [1;91mname: "MyIndexName"[0m)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0m

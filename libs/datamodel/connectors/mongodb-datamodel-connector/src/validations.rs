@@ -129,7 +129,7 @@ pub(crate) fn index_is_not_defined_multiple_times_to_same_fields(index: IndexWal
 
     errors.push_error(DatamodelError::new_attribute_validation_error(
         "Index already exists in the model.",
-        &format!("@{attr_name}"),
+        &format!("@@{attr_name}"),
         *attr.span(),
     ))
 }
@@ -158,7 +158,7 @@ pub(crate) fn unique_cannot_be_defined_to_id_field(index: IndexWalker<'_>, error
 
     errors.push_error(DatamodelError::new_attribute_validation_error(
         "The same field cannot be an id and unique on MongoDB.",
-        "unique",
+        index.attribute_name(),
         *attr.span(),
     ));
 }
@@ -175,7 +175,7 @@ pub(crate) fn field_name_uses_valid_characters(field: ScalarFieldWalker<'_>, err
     if name.starts_with('$') {
         errors.push_error(DatamodelError::new_attribute_validation_error(
             "The field name cannot start with a `$` character",
-            "map",
+            "@map",
             span,
         ));
     }
@@ -183,7 +183,7 @@ pub(crate) fn field_name_uses_valid_characters(field: ScalarFieldWalker<'_>, err
     if name.contains('.') {
         errors.push_error(DatamodelError::new_attribute_validation_error(
             "The field name cannot contain a `.` character",
-            "map",
+            "@map",
             span,
         ));
     }

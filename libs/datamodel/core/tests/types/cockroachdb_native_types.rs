@@ -4,7 +4,7 @@ use crate::{common::*, types::helper::test_native_types_without_attributes};
 fn should_fail_on_invalid_precision_for_decimal_type() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of CockroachDB: Precision must be positive with a maximum value of 1000.",
+            "Argument M is out of range for native type `{}` of CockroachDB: Precision must be positive with a maximum value of 1000.",
             type_name
         )
     }
@@ -17,7 +17,7 @@ fn should_fail_on_invalid_precision_for_decimal_type() {
 fn should_fail_on_invalid_precision_for_time_types() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of CockroachDB: M can range from 0 to 6.",
+            "Argument M is out of range for native type `{}` of CockroachDB: M can range from 0 to 6.",
             type_name
         )
     }
@@ -34,7 +34,7 @@ fn should_fail_on_invalid_precision_for_time_types() {
 fn should_fail_on_argument_out_of_range_for_bit_data_types() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of CockroachDB: M must be a positive integer.",
+            "Argument M is out of range for native type `{}` of CockroachDB: M must be a positive integer.",
             type_name
         )
     }
@@ -89,7 +89,7 @@ fn cockroach_specific_native_types_are_valid() {
     }
 
     model NativeTypesTest {
-        id          Int      @db.Int4 @id @default(autoincrement())
+        id          Int      @db.Int4 @id @default(sequence())
         bitcol      String   @db.Bit
         boolcol     Boolean  @db.Bool
         bytescol    Bytes    @db.Bytes
@@ -104,7 +104,7 @@ fn cockroach_specific_native_types_are_valid() {
         int8col     BigInt   @db.Int8
         jsonbcol    Json     @db.JsonB
         oidcol      Int      @db.Oid
-        scharcol    String   @db.SingleChar
+        scharcol    String   @db.CatalogSingleChar
         stringcol1  String   @db.String
         stringcol2  String   @db.String(40)
         timecol     DateTime @db.Time

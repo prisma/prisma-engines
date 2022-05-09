@@ -169,7 +169,12 @@ impl<'a> AlterTableConstructor<'a> {
     }
 
     fn add_primary_key(&mut self) {
-        let mssql_schema_ext: &MssqlSchemaExt = self.tables.next().schema().downcast_connector_data();
+        let mssql_schema_ext: &MssqlSchemaExt = self
+            .tables
+            .next()
+            .schema()
+            .downcast_connector_data()
+            .unwrap_or_default();
         let constraint_name = self
             .tables
             .next()

@@ -29,8 +29,10 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlDatabaseSchema>, flavour: &dyn S
     push_dropped_index_steps(&mut steps, &db);
     push_created_index_steps(&mut steps, &db);
     push_altered_table_steps(&mut steps, &db);
-    flavour.push_enum_steps(&mut steps, &db);
     push_redefined_table_steps(&mut steps, &db);
+
+    flavour.push_enum_steps(&mut steps, &db);
+    flavour.push_alter_sequence_steps(&mut steps, &db);
 
     steps.sort();
 
@@ -519,7 +521,7 @@ fn push_foreign_key_pair_changes(
         // many-to-many relation tables, but we used not to (we did not provide a constraint
         // names), and we do not want to cause new migrations on upgrade, we ignore the foreign
         // keys of implicit many-to-many relation tables for renamings.
-        if fk.map(|fk| is_prisma_implicit_m2m_fk(fk)).as_tuple() == (&true, &true) {
+        if fk.map(|fk| is_prisma_implicit_m2m_fk(fk)).into_tuple() == (true, true) {
             return;
         }
 

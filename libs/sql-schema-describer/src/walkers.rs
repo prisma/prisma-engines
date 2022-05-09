@@ -3,9 +3,9 @@
 #![deny(missing_docs)]
 
 use crate::{
-    Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
-    Index, IndexColumn, IndexFieldId, IndexId, IndexType, PrimaryKey, PrimaryKeyColumn, SQLSortOrder, SqlSchema, Table,
-    TableId, UserDefinedType, View,
+    ids::EnumId, Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey,
+    ForeignKeyAction, Index, IndexColumn, IndexFieldId, IndexId, IndexType, PrimaryKey, PrimaryKeyColumn, SQLSortOrder,
+    SqlSchema, Table, TableId, UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
 use std::fmt;
@@ -702,25 +702,23 @@ impl<'a> IndexWalker<'a> {
 #[derive(Clone, Copy)]
 pub struct EnumWalker<'a> {
     pub(crate) schema: &'a SqlSchema,
-    pub(crate) enum_index: usize,
+    pub(crate) enum_id: EnumId,
 }
 
 impl<'a> fmt::Debug for EnumWalker<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("EnumWalker")
-            .field("enum_index", &self.enum_index)
-            .finish()
+        f.debug_struct("EnumWalker").field("enum_id", &self.enum_id).finish()
     }
 }
 
 impl<'a> EnumWalker<'a> {
-    /// The index of the enum in the parent schema.
-    pub fn enum_index(&self) -> usize {
-        self.enum_index
+    /// The unique identifier of the enum in the parent schema.
+    pub fn enum_id(self) -> EnumId {
+        self.enum_id
     }
 
     fn get(&self) -> &'a Enum {
-        &self.schema.enums[self.enum_index]
+        &self.schema[self.enum_id]
     }
 
     /// The name of the enum. This is a made up name on MySQL.
@@ -736,9 +734,6 @@ impl<'a> EnumWalker<'a> {
 
 /// Extension methods for the traversal of a SqlSchema.
 pub trait SqlSchemaExt {
-    /// Find an enum by index.
-    fn enum_walker_at(&self, index: usize) -> EnumWalker<'_>;
-
     /// Find a table by name.
     fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>>;
 
@@ -750,16 +745,12 @@ pub trait SqlSchemaExt {
 
     /// Find a user-defined type by index.
     fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_>;
+
+    /// Walk an enum by ID.
+    fn walk_enum(&self, enum_id: EnumId) -> EnumWalker<'_>;
 }
 
 impl SqlSchemaExt for SqlSchema {
-    fn enum_walker_at(&self, index: usize) -> EnumWalker<'_> {
-        EnumWalker {
-            schema: self,
-            enum_index: index,
-        }
-    }
-
     fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
         Some(TableWalker {
             table_id: TableId(self.tables.iter().position(|table| table.name == name)? as u32),
@@ -783,5 +774,9 @@ impl SqlSchemaExt for SqlSchema {
             udt_index: index,
             schema: self,
         }
+    }
+
+    fn walk_enum(&self, enum_id: EnumId) -> EnumWalker<'_> {
+        EnumWalker { schema: self, enum_id }
     }
 }

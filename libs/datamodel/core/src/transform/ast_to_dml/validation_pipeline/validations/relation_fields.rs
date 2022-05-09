@@ -134,7 +134,7 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_>, ctx: &mut Co
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         &message,
-        "ignore",
+        "@ignore",
         field.ast_field().span,
     ));
 }
@@ -192,13 +192,15 @@ pub(super) fn map(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
     }
 
     if !ctx.connector.supports_named_foreign_keys() {
+        let span = field
+            .ast_field()
+            .span_for_attribute("relation")
+            .unwrap_or_else(ast::Span::empty);
+
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "Your provider does not support named foreign keys.",
-            "relation",
-            field
-                .ast_field()
-                .span_for_attribute("relation")
-                .unwrap_or_else(ast::Span::empty),
+            "@relation",
+            span,
         ));
         return;
     }

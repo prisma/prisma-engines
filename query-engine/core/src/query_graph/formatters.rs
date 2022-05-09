@@ -101,7 +101,10 @@ impl Display for QueryGraphDependency {
                 write!(
                     f,
                     "ProjectedDataDependency ({:?})",
-                    selection.prisma_names().collect::<Vec<_>>()
+                    selection
+                        .selections()
+                        .map(|f| format!("{}.{}", f.container().name(), f.prisma_name()))
+                        .collect::<Vec<_>>()
                 )
             }
             Self::Then => write!(f, "Then"),

@@ -295,7 +295,7 @@ mod many_count_rel {
               createdAt DateTime  @default(now())
               updatedAt DateTime  @updatedAt
             }
-            
+
             model Comment {
               #id(id, Int, @id)
               post      Post     @relation(fields: [postId], references: [id])
@@ -346,23 +346,23 @@ mod many_count_rel {
               votes           Vote[]
               UserToObjective UserToObjective[]
             }
-            
+
             model Objective {
               #id(id, Int, @default(autoincrement()), @id)
               name            String            @unique
               UserToObjective UserToObjective[] @relation(name: "UserObjectives")
             }
-            
+
             model UserToObjective {
               user        User      @relation(fields: [userId], references: [id])
               userId      Int
               objective   Objective @relation(name: "UserObjectives", fields: [objectiveId], references: [id], onDelete: NoAction, onUpdate: NoAction)
               objectiveId Int
               votes       Vote[]
-            
+
               @@id([userId, objectiveId])
             }
-            
+
             model Vote {
               createdAt     DateTime        @default(now())
               user          User            @relation(fields: [userId], references: [id])
@@ -370,7 +370,7 @@ mod many_count_rel {
               userObjective UserToObjective @relation(fields: [objectiveId, followerId], references: [userId, objectiveId], onDelete: NoAction, onUpdate: NoAction)
               objectiveId   Int
               followerId    Int
-            
+
               @@id([userId, objectiveId])
             }"#
         };
@@ -379,8 +379,83 @@ mod many_count_rel {
     }
 
     // Regression test for: https://github.com/prisma/prisma/issues/7299
-    #[connector_test(schema(schema_one2m_multi_fks), capabilities(CompoundIds))]
+    #[connector_test(schema(schema_one2m_multi_fks), capabilities(CompoundIds), exclude(CockroachDb))]
     async fn count_one2m_compound_ids(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            r#"mutation {
+                createOneUserToObjective(
+                  data: {
+                    user: { create: {} }
+                    objective: { create: { name: "Objective 1" } }
+                    votes: { create: [{ user: { create: {} } }, { user: { create: {} } }] }
+                  }
+                ) {
+                  userId
+                  _count {
+                    votes
+                  }
+                }
+              }
+            "#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query {
+            findManyUserToObjective {
+              _count {
+                votes
+              }
+            }
+          }"#),
+          @r###"{"data":{"findManyUserToObjective":[{"_count":{"votes":2}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_one2m_multi_fks_cockroachdb() -> String {
+        let schema = indoc! {
+            r#"model User {
+              #id(id, BigInt, @id, @default(autoincrement()))
+              votes           Vote[]
+              UserToObjective UserToObjective[]
+            }
+
+            model Objective {
+              #id(id, BigInt, @default(autoincrement()), @id)
+              name            String            @unique
+              UserToObjective UserToObjective[] @relation(name: "UserObjectives")
+            }
+
+            model UserToObjective {
+              user        User      @relation(fields: [userId], references: [id])
+              userId      BigInt
+              objective   Objective @relation(name: "UserObjectives", fields: [objectiveId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+              objectiveId BigInt
+              votes       Vote[]
+
+              @@id([userId, objectiveId])
+            }
+
+            model Vote {
+              createdAt     DateTime        @default(now())
+              user          User            @relation(fields: [userId], references: [id])
+              userId        BigInt
+              userObjective UserToObjective @relation(fields: [objectiveId, followerId], references: [userId, objectiveId], onDelete: NoAction, onUpdate: NoAction)
+              objectiveId   BigInt
+              followerId    BigInt
+
+              @@id([userId, objectiveId])
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for: https://github.com/prisma/prisma/issues/7299
+    #[connector_test(schema(schema_one2m_multi_fks_cockroachdb), only(CockroachDb))]
+    async fn count_one2m_compound_ids_cockroachdb(runner: Runner) -> TestResult<()> {
         run_query!(
             runner,
             r#"mutation {

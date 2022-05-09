@@ -1,7 +1,8 @@
 use std::fmt::Display;
 
 use crate::{
-    CompositeFieldRef, DomainError, Field, PrismaValueExtensions, RelationField, ScalarFieldRef, SelectionResult,
+    parent_container::ParentContainer, CompositeFieldRef, DomainError, Field, PrismaValueExtensions, RelationField,
+    ScalarFieldRef, SelectionResult,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
@@ -168,6 +169,13 @@ impl SelectedField {
         match self {
             SelectedField::Composite(ref cs) => Some(cs),
             _ => None,
+        }
+    }
+
+    pub fn container(&self) -> &ParentContainer {
+        match self {
+            SelectedField::Scalar(sf) => sf.container(),
+            SelectedField::Composite(cs) => cs.field.container(),
         }
     }
 
