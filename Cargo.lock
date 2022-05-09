@@ -3174,7 +3174,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/Weakky/quaint.git?branch=feat/pg-type-hints-v2-fork#d421236381cc52cc8f95b570fa7edc5df3ff3e1d"
+source = "git+https://github.com/prisma/quaint#0e609621a368bd4576129d7c84b1d2bdaf45ec98"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -4947,7 +4947,7 @@ version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f559b464de2e2bdabcac6a210d12e9b5a5973c251e102c44c585c71d51bd78e"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if 0.1.10",
  "rand 0.8.4",
  "static_assertions",
 ]
