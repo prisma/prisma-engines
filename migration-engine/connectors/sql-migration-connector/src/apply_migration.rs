@@ -121,15 +121,14 @@ fn render_raw_sql(
     schemas: Pair<&SqlSchema>,
 ) -> Vec<String> {
     match step {
+        SqlMigrationStep::AlterSequence(sequence_ids, changes) => {
+            renderer.render_alter_sequence(*sequence_ids, *changes, schemas)
+        }
         SqlMigrationStep::AlterPrimaryKey(table_id) => renderer.render_alter_primary_key(schemas.tables(table_id)),
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &schemas),
         SqlMigrationStep::RedefineTables(redefine_tables) => renderer.render_redefine_tables(redefine_tables, &schemas),
-        SqlMigrationStep::CreateEnum { enum_index } => {
-            renderer.render_create_enum(&schemas.next().enum_walker_at(*enum_index))
-        }
-        SqlMigrationStep::DropEnum { enum_index } => {
-            renderer.render_drop_enum(&schemas.previous().enum_walker_at(*enum_index))
-        }
+        SqlMigrationStep::CreateEnum(enum_id) => renderer.render_create_enum(&schemas.next().walk_enum(*enum_id)),
+        SqlMigrationStep::DropEnum(enum_id) => renderer.render_drop_enum(&schemas.previous().walk_enum(*enum_id)),
         SqlMigrationStep::CreateTable { table_id } => {
             let table = schemas.next().table_walker_at(*table_id);
 

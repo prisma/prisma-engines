@@ -43,7 +43,7 @@ fn default_sequence_is_valid_on_cockroachdb() {
         }
     "#;
 
-    assert_valid(&schema);
+    assert_valid(schema);
 }
 
 #[test]
@@ -94,7 +94,7 @@ fn default_sequence_with_one_argument_is_valid_on_cockroachdb() {
         }
     "#;
 
-    assert_valid(&schema);
+    assert_valid(schema);
 }
 
 #[test]
@@ -115,7 +115,7 @@ fn default_sequence_with_all_arguments_is_valid_on_cockroachdb() {
         }
     "#;
 
-    assert_valid(&schema);
+    assert_valid(schema);
 }
 
 #[test]

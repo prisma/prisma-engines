@@ -109,6 +109,12 @@ impl<'a> DifferDatabase<'a> {
         db
     }
 
+    pub(crate) fn all_column_pairs(&self) -> impl Iterator<Item = Pair<(TableId, ColumnId)>> + '_ {
+        self.columns
+            .iter()
+            .filter_map(|((tables, _), cols)| cols.transpose().map(|cols| tables.combine(cols)))
+    }
+
     pub(crate) fn column_pairs(&self, table: Pair<TableId>) -> impl Iterator<Item = Pair<ColumnId>> + '_ {
         self.range_columns(table).filter_map(|(_k, v)| v.transpose())
     }

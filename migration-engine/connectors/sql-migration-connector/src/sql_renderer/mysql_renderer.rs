@@ -477,10 +477,6 @@ impl MysqlAlterColumn {
             return MysqlAlterColumn::DropDefault;
         }
 
-        if changes.column_was_renamed() {
-            unreachable!("MySQL column renaming.")
-        }
-
         let defaults = (
             columns.previous().default().as_ref().map(|d| d.kind()),
             columns.next().default().as_ref().map(|d| d.kind()),

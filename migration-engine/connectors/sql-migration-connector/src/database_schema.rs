@@ -34,10 +34,6 @@ impl From<SqlDatabaseSchema> for DatabaseSchema {
 }
 
 impl SqlSchemaExt for SqlDatabaseSchema {
-    fn enum_walker_at(&self, index: usize) -> sql_schema_describer::walkers::EnumWalker<'_> {
-        self.describer_schema.enum_walker_at(index)
-    }
-
     fn table_walker<'a>(&'a self, name: &str) -> Option<sql_schema_describer::walkers::TableWalker<'a>> {
         self.describer_schema.table_walker(name)
     }
@@ -55,5 +51,9 @@ impl SqlSchemaExt for SqlDatabaseSchema {
 
     fn udt_walker_at(&self, index: usize) -> sql_schema_describer::walkers::UserDefinedTypeWalker<'_> {
         self.describer_schema.udt_walker_at(index)
+    }
+
+    fn walk_enum(&self, enum_id: sql_schema_describer::EnumId) -> sql_schema_describer::walkers::EnumWalker<'_> {
+        self.describer_schema.walk_enum(enum_id)
     }
 }

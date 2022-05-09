@@ -611,10 +611,10 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     virtual: false,
                 },
                 Sequence {
-                    name: "User_smallserial_col_seq",
+                    name: "User_primary_col_seq",
                     start_value: 1,
                     min_value: 1,
-                    max_value: 32767,
+                    max_value: 2147483647,
                     increment_by: 1,
                     cycle: false,
                     cache_size: 0,
@@ -631,10 +631,10 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     virtual: false,
                 },
                 Sequence {
-                    name: "User_primary_col_seq",
+                    name: "User_smallserial_col_seq",
                     start_value: 1,
                     min_value: 1,
-                    max_value: 2147483647,
+                    max_value: 32767,
                     increment_by: 1,
                     cycle: false,
                     cache_size: 0,
@@ -982,5 +982,5 @@ fn index_sort_order_composite_type_asc_desc_is_handled(api: TestApi) {
 }
 
 fn extract_ext(schema: &SqlSchema) -> &PostgresSchemaExt {
-    schema.downcast_connector_data()
+    schema.downcast_connector_data().unwrap_or_default()
 }

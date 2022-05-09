@@ -128,7 +128,7 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
-        let mssql_schema_ext: &MssqlSchemaExt = index.schema().downcast_connector_data();
+        let mssql_schema_ext: &MssqlSchemaExt = index.schema().downcast_connector_data().unwrap_or_default();
         let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
@@ -165,7 +165,7 @@ impl SqlRenderer for MssqlFlavour {
             .columns()
             .map(|column| self.render_column(&column))
             .join(",\n    ");
-        let mssql_schema_ext: &MssqlSchemaExt = table.schema().downcast_connector_data();
+        let mssql_schema_ext: &MssqlSchemaExt = table.schema().downcast_connector_data().unwrap_or_default();
 
         let primary_key = if let Some(pk) = table.primary_key() {
             let column_names = pk

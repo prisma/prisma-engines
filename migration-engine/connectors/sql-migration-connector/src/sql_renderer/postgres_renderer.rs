@@ -2,7 +2,7 @@ use super::{common::*, SqlRenderer};
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
-    sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
+    sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, SequenceChange, SequenceChanges, TableChange},
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
 use datamodel::dml::PrismaValue;
@@ -36,6 +36,50 @@ impl PostgresFlavour {
 }
 
 impl SqlRenderer for PostgresFlavour {
+    fn render_alter_sequence(
+        &self,
+        sequence_idx: Pair<u32>,
+        changes: SequenceChanges,
+        schemas: Pair<&SqlSchema>,
+    ) -> Vec<String> {
+        let exts: Pair<&PostgresSchemaExt> = schemas.map(|schema| schema.downcast_connector_data().unwrap_or_default());
+        let (prev_seq, next_seq) = exts
+            .combine(sequence_idx)
+            .map(|(ext, idx)| &ext.sequences[idx as usize])
+            .into_tuple();
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("ALTER SEQUENCE ");
+                stmt.push_display(&Quoted::postgres_ident(&prev_seq.name));
+
+                if changes.0.contains(SequenceChange::MinValue) {
+                    stmt.push_str(" MINVALUE ");
+                    stmt.push_display(&next_seq.min_value);
+                }
+
+                if changes.0.contains(SequenceChange::MaxValue) {
+                    stmt.push_str(" MAXVALUE ");
+                    stmt.push_display(&next_seq.max_value);
+                }
+
+                if changes.0.contains(SequenceChange::Increment) {
+                    stmt.push_str(" INCREMENT ");
+                    stmt.push_display(&next_seq.increment_by);
+                }
+
+                if changes.0.contains(SequenceChange::Start) {
+                    stmt.push_str(" START ");
+                    stmt.push_display(&next_seq.start_value);
+                }
+
+                if changes.0.contains(SequenceChange::Cache) {
+                    stmt.push_str(" CACHE ");
+                    stmt.push_display(&next_seq.cache_size);
+                }
+            })
+        })
+    }
+
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::postgres_ident(name)
     }
@@ -250,7 +294,7 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
-        let pg_ext: &PostgresSchemaExt = index.schema().downcast_connector_data();
+        let pg_ext: &PostgresSchemaExt = index.schema().downcast_connector_data().unwrap_or_default();
 
         ddl::CreateIndex {
             index_name: index.name().into(),
@@ -647,7 +691,7 @@ fn expand_alter_column(columns: &Pair<ColumnWalker<'_>>, column_changes: &Column
                 | (ColumnArity::List, ColumnArity::List) => (),
             },
             ColumnChange::TypeChanged => set_type = true,
-            ColumnChange::Sequence => {
+            ColumnChange::Autoincrement => {
                 if columns.previous().is_autoincrement() {
                     // The sequence should be dropped.
                     changes.push(PostgresAlterColumn::DropDefault)
@@ -656,7 +700,6 @@ fn expand_alter_column(columns: &Pair<ColumnWalker<'_>>, column_changes: &Column
                     changes.push(PostgresAlterColumn::AddSequence)
                 }
             }
-            ColumnChange::Renaming => unreachable!("column renaming"),
         }
     }
 
@@ -710,7 +753,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
             .map(|created_value| {
                 format!(
                     "ALTER TYPE {enum_name} ADD VALUE {value}",
-                    enum_name = Quoted::postgres_ident(schemas.enums(&alter_enum.index).previous().name()),
+                    enum_name = Quoted::postgres_ident(schemas.enums(alter_enum.id).previous().name()),
                     value = Quoted::postgres_string(created_value)
                 )
             })
@@ -733,7 +776,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
         return stmts;
     }
 
-    let enums = schemas.enums(&alter_enum.index);
+    let enums = schemas.enums(alter_enum.id);
 
     let mut stmts = Vec::with_capacity(10);
 
@@ -858,7 +901,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
 }
 
 fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>, renderer: &mut StepRenderer) {
-    let enums = schemas.enums(&alter_enum.index);
+    let enums = schemas.enums(alter_enum.id);
     let mut prefix = String::new();
     prefix.push_str("ALTER TYPE \"");
     prefix.push_str(enums.previous.name());
@@ -912,7 +955,7 @@ fn render_column_identity_str(flavour: &PostgresFlavour, column: &ColumnWalker<'
     }
 
     let sequence = if let Some(seq_name) = column.default().and_then(|d| d.as_sequence()) {
-        let connector_data: &PostgresSchemaExt = column.schema().downcast_connector_data();
+        let connector_data: &PostgresSchemaExt = column.schema().downcast_connector_data().unwrap_or_default();
         connector_data
             .sequences
             .iter()
