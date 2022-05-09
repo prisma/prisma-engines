@@ -950,11 +950,6 @@ fn sequences_without_options_can_be_created(api: TestApi) {
             url = env("TEST_DATABASE_URL")
         }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["cockroachdb"]
-        }
-
         model Test {
             Id Int @id @default(sequence())
         }

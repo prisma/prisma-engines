@@ -549,9 +549,4 @@ pub(crate) const COCKROACHDB_SOURCE: &str = r#"
         provider = "cockroachdb"
         url      = "postgresql://localhost:5432"
     }
-
-    generator js {
-        provider = "prisma-client-js"
-        previewFeatures = ["cockroachdb"]
-    }
 "#;
