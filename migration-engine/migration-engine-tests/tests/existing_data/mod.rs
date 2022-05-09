@@ -159,7 +159,7 @@ fn altering_a_column_with_non_null_values_should_warn(api: TestApi) {
     assert_eq!(api.dump_table("Test").len(), 2);
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 fn column_defaults_can_safely_be_changed(api: TestApi) {
     let combinations = &[
         ("Meow", Some(PrismaValue::String("Cats".to_string())), None),
@@ -323,7 +323,7 @@ fn changing_a_column_from_required_to_optional_should_work(api: TestApi) {
         assert_eq!(data.len(), 2);
         let ages: Vec<i64> = data
             .into_iter()
-            .map(|row| row.get("age").unwrap().as_i64().unwrap())
+            .map(|row| row.get("age").unwrap().as_integer().unwrap())
             .collect();
 
         assert_eq!(ages, &[12, 22]);
@@ -345,7 +345,7 @@ fn changing_a_column_from_optional_to_required_is_unexecutable(api: TestApi) {
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
         .values(("b", 22))
-        .values(("c", Value::Integer(None)));
+        .values(("c", Value::Int32(None)));
 
     api.query(insert.into());
 
@@ -374,7 +374,10 @@ fn changing_a_column_from_optional_to_required_is_unexecutable(api: TestApi) {
     {
         let data = api.dump_table("Test");
         assert_eq!(data.len(), 3);
-        let ages: Vec<Option<i64>> = data.into_iter().map(|row| row.get("age").unwrap().as_i64()).collect();
+        let ages: Vec<Option<i64>> = data
+            .into_iter()
+            .map(|row| row.get("age").unwrap().as_integer())
+            .collect();
 
         assert_eq!(ages, &[Some(12), Some(22), None]);
     }
@@ -754,7 +757,7 @@ fn enum_variants_can_be_dropped_without_data_loss(api: TestApi) {
 fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
     let dm1 = r#"
         model User {
-            id Int @id
+            id BigInt @id
             created_at DateTime
         }
     "#;
@@ -769,7 +772,7 @@ fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
 
     let dm2 = r#"
         model User {
-            id Int @id
+            id BigInt @id
             created_at DateTime @default(now())
         }
     "#;

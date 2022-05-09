@@ -13,6 +13,10 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
         Vec::new()
     }
 
+    fn column_default_value_for_autoincrement(&self) -> Option<sql::DefaultValue> {
+        None
+    }
+
     fn column_type_for_unsupported_type(&self, field: ScalarFieldWalker<'_>, description: String) -> sql::ColumnType {
         ColumnType {
             full_data_type: description.clone(),

@@ -96,9 +96,17 @@ async fn start_engine(datamodel_location: Option<&str>) {
     tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
 
     let datamodel = datamodel_location.map(|location| {
-        let mut file = std::fs::File::open(location).expect("error opening datamodel file");
+        let mut file = match std::fs::File::open(location) {
+            Ok(file) => file,
+            Err(e) => panic!("Error opening datamodel file in `{location}`: {e}"),
+        };
+
         let mut datamodel = String::new();
-        file.read_to_string(&mut datamodel).unwrap();
+
+        if let Err(e) = file.read_to_string(&mut datamodel) {
+            panic!("Error reading datamodel file `{location}`: {e}");
+        };
+
         datamodel
     });
 

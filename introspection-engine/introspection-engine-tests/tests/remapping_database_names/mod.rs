@@ -32,7 +32,7 @@ async fn should_not_remap_if_renaming_would_lead_to_duplicate_names(api: &TestAp
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn remapping_fields_with_invalid_characters(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -79,7 +79,7 @@ async fn remapping_fields_with_invalid_characters(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn remapping_tables_with_invalid_characters(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -114,7 +114,7 @@ async fn remapping_tables_with_invalid_characters(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql, Sqlite, Vitess))]
+#[test_connector(exclude(Mssql, Sqlite, Vitess, CockroachDb))]
 async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -166,7 +166,7 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql, Sqlite, Vitess))]
+#[test_connector(exclude(Mssql, Sqlite, Vitess, CockroachDb))]
 async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -218,7 +218,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
     Ok(())
 }
 
-#[test_connector(exclude(Sqlite, Mssql, Vitess))]
+#[test_connector(exclude(Sqlite, Mssql, Vitess, CockroachDb))]
 async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -281,7 +281,7 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb))]
 async fn remapping_enum_names(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -337,7 +337,7 @@ async fn remapping_enum_names(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb))]
 async fn remapping_enum_values(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -385,7 +385,7 @@ async fn remapping_enum_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb))]
 async fn remapping_enum_default_values(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -459,7 +459,7 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

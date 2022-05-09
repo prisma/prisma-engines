@@ -224,7 +224,7 @@ pub(super) fn validate_id_field_arities(
     if let ast::FieldArity::List | ast::FieldArity::Optional = ast_field.arity {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "Fields that are marked as id must be required.",
-            "id",
+            "@id",
             ctx.ast[pk.source_attribute].span,
         ))
     }

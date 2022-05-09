@@ -36,6 +36,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Controls whether we will generate `RenameForeignKey` steps for this flavour.
     fn can_rename_foreign_key(&self) -> bool;
 
+    /// This method must return whether a column became or ceased to be autoincrementing.
+    fn column_autoincrement_changed(&self, columns: Pair<ColumnWalker<'_>>) -> bool {
+        columns.previous.is_autoincrement() != columns.next.is_autoincrement()
+    }
+
     /// Return whether a column's type needs to be migrated, and how.
     fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         if differ.previous.column_type_family() != differ.next.column_type_family() {
@@ -47,6 +52,9 @@ pub(crate) trait SqlSchemaDifferFlavour {
 
     /// Push enum-related steps.
     fn push_enum_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
+
+    /// Push AlterSequence steps.
+    fn push_alter_sequence_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
 
     /// Connector-specific criterias deciding whether two indexes match.
     fn indexes_match(&self, _a: IndexWalker<'_>, _b: IndexWalker<'_>) -> bool {

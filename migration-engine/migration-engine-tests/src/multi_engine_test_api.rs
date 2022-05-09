@@ -171,13 +171,21 @@ impl TestApi {
         shadow_database_connection_string: Option<String>,
     ) -> EngineTestApi {
         let connection_info = ConnectionInfo::from_url(&connection_string).unwrap();
+
         let params = ConnectorParams {
             connection_string,
             preview_features: self.preview_features,
             shadow_database_connection_string,
         };
+
         let mut connector = match &connection_info {
-            ConnectionInfo::Postgres(_) => SqlMigrationConnector::new_postgres(),
+            ConnectionInfo::Postgres(_) => {
+                if self.args.provider() == "cockroachdb" {
+                    SqlMigrationConnector::new_cockroach()
+                } else {
+                    SqlMigrationConnector::new_postgres()
+                }
+            }
             ConnectionInfo::Mysql(_) => SqlMigrationConnector::new_mysql(),
             ConnectionInfo::Mssql(_) => SqlMigrationConnector::new_mssql(),
             ConnectionInfo::Sqlite { .. } => SqlMigrationConnector::new_sqlite(),

@@ -237,6 +237,51 @@ mod one2one_opt {
 
         Ok(())
     }
+
+    fn diff_id_name() -> String {
+        let schema = indoc! {
+            r#"model Parent {
+            #id(id, Int, @id)
+            uniq    Int? @unique
+            child   Child?
+          }
+          
+          model Child {
+            #id(childId, Int, @id)
+            childUniq       Int?
+            parent           Parent? @relation(fields: [childUniq], references: [uniq], onUpdate: Restrict)
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Updating the parent succeeds if no child is connected.
+    // Checks that it works even with different parent/child primary identifier names.
+    #[connector_test(schema(diff_id_name))]
+    async fn update_parent_diff_id_name(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneParent(data: { id: 1, uniq: 1 }) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneParent(
+              where: { id: 1 }
+              data: { uniq: 2 }
+            ) {
+              id
+              uniq
+              child { childId childUniq }
+            }
+          }
+          "#),
+          @r###"{"data":{"updateOneParent":{"id":1,"uniq":2,"child":null}}}"###
+        );
+
+        Ok(())
+    }
 }
 
 #[test_suite(suite = "restrict_onU_1toM_req", schema(required), exclude(SqlServer))]

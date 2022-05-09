@@ -1021,6 +1021,11 @@ impl ScalarType {
         }
     }
 
+    /// True if the type is bytes.
+    pub fn is_bytes(&self) -> bool {
+        matches!(self, ScalarType::Bytes)
+    }
+
     pub(crate) fn try_from_str(s: &str) -> Option<ScalarType> {
         match s {
             "Int" => Some(ScalarType::Int),

@@ -4,7 +4,7 @@ use std::{fs::File, io::Write};
 use test_macros::test_connector;
 use user_facing_errors::{migration_engine::ProviderSwitchedError, UserFacingError};
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn create_migration_with_new_provider_errors(api: TestApi) {
     let dm = r#"
     datasource db {
@@ -47,7 +47,7 @@ fn create_migration_with_new_provider_errors(api: TestApi) {
     assert!(err.message.contains("sqlite"), "{:?}", err);
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn migration_lock_with_different_comment_shapes_work(api: TestApi) {
     let dm = r#"
     datasource db {

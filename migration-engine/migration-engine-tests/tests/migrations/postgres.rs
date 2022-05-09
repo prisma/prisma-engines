@@ -490,11 +490,6 @@ fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: Te
             provider = "cockroachdb"
             url = env("TEST_DATABASE_URL")
         }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["cockroachdb"]
-        }
     "#;
 
     let engine = migration_core::migration_api(None, None).unwrap();
@@ -509,7 +504,7 @@ fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: Te
     .to_string();
 
     let expected_error = expect![[r#"
-        You are trying to connect to a postgresql database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.
+        You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.
     "#]];
     expected_error.assert_eq(&err);
 }

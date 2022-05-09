@@ -1408,3 +1408,22 @@ model Baz {
 
     expected.assert_eq(&reformat(schema));
 }
+
+#[test]
+fn removes_legacy_colon_from_fields() {
+    let input = indoc! {r#"
+        model Site {
+          name: String
+          htmlTitle: String
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model Site {
+          name      String
+          htmlTitle String
+        }
+    "#]];
+
+    expected.assert_eq(&reformat(input));
+}

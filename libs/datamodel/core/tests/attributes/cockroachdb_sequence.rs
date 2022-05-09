@@ -33,17 +33,12 @@ fn default_sequence_is_valid_on_cockroachdb() {
             url = env("TEST_DATABASE_URL")
         }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["cockroachdb"]
-        }
-
         model Test {
             id Int @id @default(sequence())
         }
     "#;
 
-    assert_valid(&schema);
+    assert_valid(schema);
 }
 
 #[test]
@@ -54,11 +49,6 @@ fn default_sequence_with_one_argument_of_the_wrong_type_on_cockroachdb() {
             url = env("TEST_DATABASE_URL")
         }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["cockroachdb"]
-        }
-
         model Test {
             id Int @id @default(sequence(cache: true))
         }
@@ -66,10 +56,10 @@ fn default_sequence_with_one_argument_of_the_wrong_type_on_cockroachdb() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mExpected a numeric value, but received literal value `true`.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m        model Test {
-        [1;94m13 | [0m            id Int @id @default(sequence(cache: [1;91mtrue[0m))
+        [1;94m 7 | [0m        model Test {
+        [1;94m 8 | [0m            id Int @id @default(sequence(cache: [1;91mtrue[0m))
         [1;94m   | [0m
     "#]];
 
@@ -84,17 +74,12 @@ fn default_sequence_with_one_argument_is_valid_on_cockroachdb() {
             url = env("TEST_DATABASE_URL")
         }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["cockroachdb"]
-        }
-
         model Test {
             id Int @id @default(sequence(start: 12))
         }
     "#;
 
-    assert_valid(&schema);
+    assert_valid(schema);
 }
 
 #[test]
@@ -105,17 +90,12 @@ fn default_sequence_with_all_arguments_is_valid_on_cockroachdb() {
             url = env("TEST_DATABASE_URL")
         }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["cockroachdb"]
-        }
-
         model Test {
-            id Int @id @default(sequence(virtual: true, cache: 10, increment: 3, minValue: 10, maxValue: 100, start: 12, noCycle: true))
+            id Int @id @default(sequence(virtual: true, cache: 10, increment: 3, minValue: 10, maxValue: 100, start: 12))
         }
     "#;
 
-    assert_valid(&schema);
+    assert_valid(schema);
 }
 
 #[test]
@@ -126,11 +106,6 @@ fn default_sequence_with_unknown_argument() {
             url = env("TEST_DATABASE_URL")
         }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["cockroachdb"]
-        }
-
         model Test {
             id Int @id @default(sequence(virtual: true, toppings: "cheese"))
         }
@@ -138,10 +113,10 @@ fn default_sequence_with_unknown_argument() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mUnexpected argument in `sequence()` function call[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m12 | [0m        model Test {
-        [1;94m13 | [0m            id Int @id @default(sequence(virtual: true, [1;91mtoppings: "cheese"[0m))
+        [1;94m 7 | [0m        model Test {
+        [1;94m 8 | [0m            id Int @id @default(sequence(virtual: true, [1;91mtoppings: "cheese"[0m))
         [1;94m   | [0m
     "#]];
 

@@ -9,21 +9,12 @@ services:
     networks:
       - databases
 
-  cockroach_22_1_0_alpha_1:
-    image: prismagraphql/cockroachdb-custom:22.1.0-alpha.1
+  cockroach_22_1_0:
+    image: prismagraphql/cockroachdb-custom:22.1.0
     restart: always
     command: start-single-node --insecure
     ports:
       - "26257:26257"
-    networks:
-      - databases
-
-  cockroach_22_1_0_beta_5:
-    image: prismagraphql/cockroachdb-custom:22.1.0-beta.5
-    restart: always
-    command: start-single-node --insecure
-    ports:
-      - "26259:26257"
     networks:
       - databases
 

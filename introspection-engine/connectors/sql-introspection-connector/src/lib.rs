@@ -204,3 +204,9 @@ impl SqlFamilyTrait for IntrospectionContext {
         }
     }
 }
+
+impl SqlFamilyTrait for calculate_datamodel::CalculateDatamodelContext<'_> {
+    fn sql_family(&self) -> SqlFamily {
+        self.sql_family
+    }
+}
