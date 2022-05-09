@@ -295,7 +295,11 @@ mod unchecked_create {
     }
 
     // "Unchecked creates" should "allow to write to autoincrement IDs directly"
-    #[connector_test(schema(schema_5), capabilities(AutoIncrement, WritableAutoincField))]
+    #[connector_test(
+        schema(schema_5),
+        capabilities(AutoIncrement, WritableAutoincField),
+        exclude(CockroachDb)
+    )]
     async fn allow_write_autoinc_ids(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -306,6 +310,33 @@ mod unchecked_create {
             }
           }"#),
           @r###"{"data":{"createOneModelA":{"id":111}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_5_cockroachdb() -> String {
+        let schema = indoc! {
+            r#"model ModelA {
+              #id(id, BigInt, @id, @default(autoincrement()))
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "Unchecked creates" should "allow to write to autoincrement IDs directly"
+    #[connector_test(schema(schema_5_cockroachdb), only(CockroachDb))]
+    async fn allow_write_autoinc_ids_cockroachdb(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            createOneModelA(data: {
+              id: "111"
+            }) {
+              id
+            }
+          }"#),
+          @r###"{"data":{"createOneModelA":{"id":"111"}}}"###
         );
 
         Ok(())

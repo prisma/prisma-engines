@@ -3,7 +3,7 @@ use indoc::indoc;
 use introspection_engine_tests::{test_api::*, TestResult};
 use test_macros::test_connector;
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn a_table_with_reserved_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -28,7 +28,7 @@ async fn a_table_with_reserved_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn reserved_names_case_sensitivity(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

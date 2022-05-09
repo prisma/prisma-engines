@@ -1,11 +1,10 @@
 mod error;
 
-use core::fmt;
-use datamodel::common::preview_features::PreviewFeature;
-use datamodel::{dml::Datamodel, Datasource};
-use enumflags2::BitFlags;
 pub use error::{ConnectorError, ErrorKind};
-use serde::*;
+
+use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel, Datasource};
+use enumflags2::BitFlags;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 pub type ConnectorResult<T> = Result<T, ConnectorError>;
@@ -45,9 +44,9 @@ pub enum Version {
 pub struct IntrospectionResult {
     /// Datamodel
     pub data_model: Datamodel,
-    /// warnings
+    /// Introspection warnings
     pub warnings: Vec<Warning>,
-    /// version
+    /// Inferred Prisma version
     pub version: Version,
 }
 
@@ -66,18 +65,6 @@ pub struct IntrospectionResultOutput {
     pub warnings: Vec<Warning>,
     /// version
     pub version: Version,
-}
-
-impl fmt::Display for IntrospectionResultOutput {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{{\"datamodel\": \"{}\", \"warnings\": {}, \"version\": \"{}\"}}",
-            self.datamodel,
-            serde_json::to_string(&self.warnings).unwrap(),
-            serde_json::to_string(&self.version).unwrap(),
-        )
-    }
 }
 
 pub struct IntrospectionContext {

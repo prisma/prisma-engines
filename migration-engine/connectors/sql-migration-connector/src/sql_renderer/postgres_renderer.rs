@@ -2,7 +2,7 @@ use super::{common::*, SqlRenderer};
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
-    sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
+    sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, SequenceChange, SequenceChanges, TableChange},
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
 use datamodel::dml::PrismaValue;
@@ -29,14 +29,57 @@ impl PostgresFlavour {
             .map(|default| format!(" DEFAULT {}", default))
             .unwrap_or_else(String::new);
 
-        format!(
-            "{}{} {}{}{}",
-            SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str
-        )
+        let identity_str = render_column_identity_str(self, column);
+
+        format!("{SQL_INDENTATION}{column_name} {tpe_str}{nullability_str}{default_str}{identity_str}",)
     }
 }
 
 impl SqlRenderer for PostgresFlavour {
+    fn render_alter_sequence(
+        &self,
+        sequence_idx: Pair<u32>,
+        changes: SequenceChanges,
+        schemas: Pair<&SqlSchema>,
+    ) -> Vec<String> {
+        let exts: Pair<&PostgresSchemaExt> = schemas.map(|schema| schema.downcast_connector_data().unwrap_or_default());
+        let (prev_seq, next_seq) = exts
+            .combine(sequence_idx)
+            .map(|(ext, idx)| &ext.sequences[idx as usize])
+            .into_tuple();
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("ALTER SEQUENCE ");
+                stmt.push_display(&Quoted::postgres_ident(&prev_seq.name));
+
+                if changes.0.contains(SequenceChange::MinValue) {
+                    stmt.push_str(" MINVALUE ");
+                    stmt.push_display(&next_seq.min_value);
+                }
+
+                if changes.0.contains(SequenceChange::MaxValue) {
+                    stmt.push_str(" MAXVALUE ");
+                    stmt.push_display(&next_seq.max_value);
+                }
+
+                if changes.0.contains(SequenceChange::Increment) {
+                    stmt.push_str(" INCREMENT ");
+                    stmt.push_display(&next_seq.increment_by);
+                }
+
+                if changes.0.contains(SequenceChange::Start) {
+                    stmt.push_str(" START ");
+                    stmt.push_display(&next_seq.start_value);
+                }
+
+                if changes.0.contains(SequenceChange::Cache) {
+                    stmt.push_str(" CACHE ");
+                    stmt.push_display(&next_seq.cache_size);
+                }
+            })
+        })
+    }
+
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::postgres_ident(name)
     }
@@ -251,7 +294,7 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
-        let pg_ext: &PostgresSchemaExt = index.schema().downcast_connector_data();
+        let pg_ext: &PostgresSchemaExt = index.schema().downcast_connector_data().unwrap_or_default();
 
         ddl::CreateIndex {
             index_name: index.name().into(),
@@ -489,18 +532,14 @@ fn render_column_type_postgres(col: &ColumnWalker<'_>) -> Cow<'static, str> {
 
 fn render_column_type_cockroachdb(col: &ColumnWalker<'_>) -> Cow<'static, str> {
     let t = col.column_type();
-    let is_autoincrement = col.is_autoincrement();
     let native_type = col
         .column_native_type()
         .expect("Missing native type in postgres_renderer::render_column_type()");
 
     let tpe: Cow<'_, str> = match native_type {
         CockroachType::Inet => "INET".into(),
-        CockroachType::Int2 if is_autoincrement => "SERIAL2".into(),
         CockroachType::Int2 => "INT2".into(),
-        CockroachType::Int4 if is_autoincrement => "SERIAL4".into(),
         CockroachType::Int4 => "INT4".into(),
-        CockroachType::Int8 if is_autoincrement => "SERIAL8".into(),
         CockroachType::Int8 => "INT8".into(),
         CockroachType::Oid => "OID".into(),
         CockroachType::Decimal(precision) => format!("DECIMAL{}", render_decimal_args(precision)).into(),
@@ -652,7 +691,7 @@ fn expand_alter_column(columns: &Pair<ColumnWalker<'_>>, column_changes: &Column
                 | (ColumnArity::List, ColumnArity::List) => (),
             },
             ColumnChange::TypeChanged => set_type = true,
-            ColumnChange::Sequence => {
+            ColumnChange::Autoincrement => {
                 if columns.previous().is_autoincrement() {
                     // The sequence should be dropped.
                     changes.push(PostgresAlterColumn::DropDefault)
@@ -661,7 +700,6 @@ fn expand_alter_column(columns: &Pair<ColumnWalker<'_>>, column_changes: &Column
                     changes.push(PostgresAlterColumn::AddSequence)
                 }
             }
-            ColumnChange::Renaming => unreachable!("column renaming"),
         }
     }
 
@@ -702,6 +740,7 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
             Cow::Owned(out)
         }
         DefaultKind::Value(val) => val.to_string().into(),
+        DefaultKind::UniqueRowid => "unique_rowid()".into(),
         DefaultKind::Sequence(_) => Default::default(),
     }
 }
@@ -714,7 +753,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
             .map(|created_value| {
                 format!(
                     "ALTER TYPE {enum_name} ADD VALUE {value}",
-                    enum_name = Quoted::postgres_ident(schemas.enums(&alter_enum.index).previous().name()),
+                    enum_name = Quoted::postgres_ident(schemas.enums(alter_enum.id).previous().name()),
                     value = Quoted::postgres_string(created_value)
                 )
             })
@@ -737,7 +776,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
         return stmts;
     }
 
-    let enums = schemas.enums(&alter_enum.index);
+    let enums = schemas.enums(alter_enum.id);
 
     let mut stmts = Vec::with_capacity(10);
 
@@ -862,7 +901,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
 }
 
 fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>, renderer: &mut StepRenderer) {
-    let enums = schemas.enums(&alter_enum.index);
+    let enums = schemas.enums(alter_enum.id);
     let mut prefix = String::new();
     prefix.push_str("ALTER TYPE \"");
     prefix.push_str(enums.previous.name());
@@ -907,5 +946,54 @@ fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema
             stmt.push_str(variant);
             stmt.push_str("'");
         });
+    }
+}
+
+fn render_column_identity_str(flavour: &PostgresFlavour, column: &ColumnWalker<'_>) -> String {
+    if !flavour.is_cockroachdb() {
+        return String::new();
+    }
+
+    let sequence = if let Some(seq_name) = column.default().and_then(|d| d.as_sequence()) {
+        let connector_data: &PostgresSchemaExt = column.schema().downcast_connector_data().unwrap_or_default();
+        connector_data
+            .sequences
+            .iter()
+            .find(|sequence| sequence.name == seq_name)
+            .unwrap()
+    } else {
+        return String::new();
+    };
+
+    let mut options = Vec::new();
+
+    if sequence.r#virtual {
+        options.push("VIRTUAL".to_owned());
+    }
+
+    if sequence.increment_by > 1 {
+        options.push(format!("INCREMENT {}", sequence.increment_by));
+    }
+
+    if sequence.cache_size > 1 {
+        options.push(format!("CACHE {}", sequence.cache_size))
+    }
+
+    if sequence.start_value > 1 {
+        options.push(format!("START {}", sequence.start_value))
+    }
+
+    if sequence.min_value > 1 {
+        options.push(format!("MINVALUE {}", sequence.min_value))
+    }
+
+    if sequence.max_value != 0 && sequence.max_value != i64::MAX {
+        options.push(format!("MAXVALUE {}", sequence.max_value))
+    }
+
+    if options.is_empty() {
+        String::from(" GENERATED BY DEFAULT AS IDENTITY")
+    } else {
+        format!(" GENERATED BY DEFAULT AS IDENTITY ({})", options.join(" "))
     }
 }

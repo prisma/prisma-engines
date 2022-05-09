@@ -21,7 +21,7 @@ async fn gin_preview_disabled(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model A {
-          id   Int   @id @default(autoincrement())
+          id   BigInt @id @default(autoincrement())
           data Int[]
 
           @@index([data])
@@ -55,7 +55,7 @@ async fn gin_unsupported_type(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model A {
-          id   Int                     @id @default(autoincrement())
+          id   BigInt                  @id @default(autoincrement())
           data Unsupported("geometry")
 
           @@index([data], type: Gin)
@@ -89,7 +89,7 @@ async fn array_ops(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model A {
-          id   Int   @id @default(autoincrement())
+          id   BigInt @id @default(autoincrement())
           data Int[]
 
           @@index([data], type: Gin)
@@ -123,7 +123,7 @@ async fn jsonb_ops(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model A {
-          id   Int  @id @default(autoincrement())
+          id   BigInt @id @default(autoincrement())
           data Json
 
           @@index([data], type: Gin)

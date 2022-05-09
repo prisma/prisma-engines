@@ -25,7 +25,7 @@ pub(super) fn validate_auto_param(default_value: Option<&ast::Expression>, ctx: 
             let message = "The current connector does not support the `auto()` function.";
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
-                message, "default", *span,
+                message, "@default", *span,
             ));
         }
         _ => (),
@@ -61,7 +61,7 @@ pub(super) fn validate_default_value(
             let message = format!("Parse error: \"{value}\" is not a valid JSON string. ({details})",);
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
-                &message, "default", *span,
+                &message, "@default", *span,
             ));
         }
         (ScalarType::Bytes, ast::Expression::StringValue(value, span)) => {
@@ -73,7 +73,7 @@ pub(super) fn validate_default_value(
             let message = format!("Parse error: \"{value}\" is not a valid base64 string. ({details})",);
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
-                &message, "default", *span,
+                &message, "@default", *span,
             ));
         }
         (ScalarType::DateTime, ast::Expression::StringValue(value, span)) => {
@@ -89,7 +89,7 @@ pub(super) fn validate_default_value(
             );
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
-                &message, "default", *span,
+                &message, "@default", *span,
             ));
         }
         (ScalarType::BigInt | ScalarType::Int, ast::Expression::NumericValue(value, span)) => {
@@ -101,7 +101,7 @@ pub(super) fn validate_default_value(
             let message = format!("Parse error: \"{value}\" is not a valid integer. ({details})");
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
-                &message, "default", *span,
+                &message, "@default", *span,
             ));
         }
         (ScalarType::Decimal, ast::Expression::StringValue(value, span)) => {

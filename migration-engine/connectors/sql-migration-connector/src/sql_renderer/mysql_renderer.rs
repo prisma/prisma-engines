@@ -477,10 +477,6 @@ impl MysqlAlterColumn {
             return MysqlAlterColumn::DropDefault;
         }
 
-        if changes.column_was_renamed() {
-            unreachable!("MySQL column renaming.")
-        }
-
         let defaults = (
             columns.previous().default().as_ref().map(|d| d.kind()),
             columns.next().default().as_ref().map(|d| d.kind()),
@@ -520,6 +516,6 @@ fn render_default<'a>(column: &ColumnWalker<'a>, default: &'a DefaultValue) -> C
             Quoted::mysql_string(dt.to_rfc3339()).to_string().into()
         }
         DefaultKind::Value(val) => val.to_string().into(),
-        DefaultKind::Sequence(_) => Default::default(),
+        DefaultKind::Sequence(_) | DefaultKind::UniqueRowid => unreachable!(),
     }
 }

@@ -1,25 +1,22 @@
-use crate::introspection_helpers::{
-    calculate_backrelation_field, calculate_index, calculate_many_to_many_field, calculate_relation_field,
-    calculate_scalar_field, is_new_migration_table, is_old_migration_table, is_prisma_1_point_0_join_table,
-    is_prisma_1_point_1_or_2_join_table, is_relay_table, primary_key_is_clustered,
+use crate::{
+    calculate_datamodel::CalculateDatamodelContext as Context,
+    introspection_helpers::{
+        calculate_backrelation_field, calculate_index, calculate_many_to_many_field, calculate_relation_field,
+        calculate_scalar_field, is_new_migration_table, is_old_migration_table, is_prisma_1_point_0_join_table,
+        is_prisma_1_point_1_or_2_join_table, is_relay_table, primary_key_is_clustered,
+    },
+    version_checker::VersionChecker,
+    Dedup, SqlError, SqlFamilyTrait,
 };
-use crate::version_checker::VersionChecker;
-
-use crate::{Dedup, SqlError, SqlFamilyTrait};
 use datamodel::{
     common::preview_features::PreviewFeature,
-    dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
+    dml::{self, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
 };
-use introspection_connector::IntrospectionContext;
-use sql_schema_describer::{SQLSortOrder, SqlSchema, Table};
+use sql_schema_describer::{SQLSortOrder, Table};
 use tracing::debug;
 
-pub fn introspect(
-    schema: &SqlSchema,
-    version_check: &mut VersionChecker,
-    data_model: &mut Datamodel,
-    ctx: &IntrospectionContext,
-) -> Result<(), SqlError> {
+pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) -> Result<(), SqlError> {
+    let schema = ctx.schema;
     // collect m2m table names
     let m2m_tables: Vec<String> = schema
         .tables
@@ -74,7 +71,7 @@ pub fn introspect(
 
         if let Some(pk) = &table.primary_key {
             let clustered = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                primary_key_is_clustered(walker.table_id(), schema, ctx)
+                primary_key_is_clustered(walker.table_id(), ctx)
             } else {
                 None
             };
@@ -111,25 +108,26 @@ pub fn introspect(
         version_check.always_has_created_at_updated_at(table, &model);
         version_check.has_p1_compatible_primary_key_column(table);
 
-        data_model.add_model(model);
+        ctx.datamodel.add_model(model);
     }
 
     for e in schema.enums.iter() {
         let values = e.values.iter().map(|v| dml::EnumValue::new(v)).collect();
-        data_model.add_enum(dml::Enum::new(&e.name, values));
+        ctx.datamodel.add_enum(dml::Enum::new(&e.name, values));
     }
 
     let mut fields_to_be_added = Vec::new();
 
     // add backrelation fields
-    for model in data_model.models() {
+    for model in ctx.datamodel.models() {
         for relation_field in model.relation_fields() {
             let relation_info = &relation_field.relation_info;
-            if data_model
+            if ctx
+                .datamodel
                 .find_related_field_for_info(relation_info, &relation_field.name)
                 .is_none()
             {
-                let other_model = data_model.find_model(&relation_info.to).unwrap();
+                let other_model = ctx.datamodel.find_model(&relation_info.to).unwrap();
                 let field = calculate_backrelation_field(schema, model, other_model, relation_field, relation_info)?;
 
                 fields_to_be_added.push((other_model.name.clone(), field));
@@ -143,11 +141,13 @@ pub fn introspect(
         .iter()
         .filter(|table| is_prisma_1_point_1_or_2_join_table(table) || is_prisma_1_point_0_join_table(table))
     {
-        calculate_fields_for_prisma_join_table(table, &mut fields_to_be_added, data_model)
+        calculate_fields_for_prisma_join_table(table, &mut fields_to_be_added, ctx)
     }
 
     for (model, field) in fields_to_be_added {
-        data_model.find_model_mut(&model).add_field(Field::RelationField(field));
+        ctx.datamodel
+            .find_model_mut(&model)
+            .add_field(Field::RelationField(field));
     }
 
     Ok(())
@@ -156,13 +156,13 @@ pub fn introspect(
 fn calculate_fields_for_prisma_join_table(
     join_table: &Table,
     fields_to_be_added: &mut Vec<(String, RelationField)>,
-    data_model: &mut Datamodel,
+    ctx: &mut Context,
 ) {
     if let (Some(fk_a), Some(fk_b)) = (join_table.foreign_keys.get(0), join_table.foreign_keys.get(1)) {
         let is_self_relation = fk_a.referenced_table == fk_b.referenced_table;
 
         for (fk, opposite_fk) in &[(fk_a, fk_b), (fk_b, fk_a)] {
-            let referenced_model = dml::find_model_by_db_name(data_model, &fk.referenced_table)
+            let referenced_model = dml::find_model_by_db_name(ctx.datamodel, &fk.referenced_table)
                 .expect("Could not find model referenced in relation table.");
 
             let relation_name = join_table.name[1..].to_string();

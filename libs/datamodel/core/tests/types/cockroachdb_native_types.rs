@@ -4,7 +4,7 @@ use crate::{common::*, types::helper::test_native_types_without_attributes};
 fn should_fail_on_invalid_precision_for_decimal_type() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of CockroachDB: Precision must be positive with a maximum value of 1000.",
+            "Argument M is out of range for native type `{}` of CockroachDB: Precision must be positive with a maximum value of 1000.",
             type_name
         )
     }
@@ -17,7 +17,7 @@ fn should_fail_on_invalid_precision_for_decimal_type() {
 fn should_fail_on_invalid_precision_for_time_types() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of CockroachDB: M can range from 0 to 6.",
+            "Argument M is out of range for native type `{}` of CockroachDB: M can range from 0 to 6.",
             type_name
         )
     }
@@ -34,7 +34,7 @@ fn should_fail_on_invalid_precision_for_time_types() {
 fn should_fail_on_argument_out_of_range_for_bit_data_types() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of CockroachDB: M must be a positive integer.",
+            "Argument M is out of range for native type `{}` of CockroachDB: M must be a positive integer.",
             type_name
         )
     }
@@ -53,11 +53,6 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
           url      = "postgresql://"
         }
 
-        generator js {
-            provider        = "prisma-client-js"
-            previewFeatures = ["Cockroachdb"]
-        }
-
         model Blog {
             id     Int   @id
             dec Decimal @db.Decimal(2, 4)
@@ -66,10 +61,10 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mThe scale must not be larger than the precision for the Decimal(2,4) native type in CockroachDB.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m            id     Int   @id
-        [1;94m14 | [0m            dec Decimal @[1;91mdb.Decimal(2, 4)[0m
+        [1;94m 8 | [0m            id     Int   @id
+        [1;94m 9 | [0m            dec Decimal @[1;91mdb.Decimal(2, 4)[0m
         [1;94m   | [0m
     "#]];
     expect_error(dml, &expectation);
@@ -83,13 +78,8 @@ fn cockroach_specific_native_types_are_valid() {
         url = env("TEST_DATABASE_URL")
     }
 
-    generator js {
-        provider = "prisma-client-js"
-        previewFeatures = ["cockroachdb"]
-    }
-
     model NativeTypesTest {
-        id          Int      @db.Int4 @id @default(autoincrement())
+        id          Int      @db.Int4 @id @default(sequence())
         bitcol      String   @db.Bit
         boolcol     Boolean  @db.Bool
         bytescol    Bytes    @db.Bytes

@@ -8,7 +8,7 @@ use expect_test::expect;
 use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
-#[test_connector(exclude(Sqlite, Mysql))]
+#[test_connector(exclude(Sqlite, Mysql, CockroachDb))]
 async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -63,7 +63,7 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(exclude(Mysql, Mssql))]
+#[test_connector(exclude(Mysql, Mssql, CockroachDb))]
 async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -109,7 +109,7 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
     Ok(())
 }
 
-#[test_connector(exclude(Sqlite, Mysql, Mssql))]
+#[test_connector(exclude(Sqlite, Mysql, Mssql, CockroachDb))]
 async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -146,7 +146,7 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> Tes
     Ok(())
 }
 
-#[test_connector(exclude(Mysql, Sqlite))]
+#[test_connector(exclude(Mysql, Sqlite, CockroachDb))]
 async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -184,7 +184,7 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mysql, Sqlite, Mssql))]
+#[test_connector(exclude(Mysql, Sqlite, Mssql, CockroachDb))]
 async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -222,7 +222,7 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mysql, Mssql))]
+#[test_connector(exclude(Mysql, Mssql, CockroachDb))]
 async fn repro_matt_references_on_wrong_side(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -266,7 +266,7 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mysql, Mssql))]
+#[test_connector(exclude(Mysql, Mssql, CockroachDb))]
 async fn a_compound_fk_pk_with_overlapping_primary_key(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -314,7 +314,7 @@ async fn a_compound_fk_pk_with_overlapping_primary_key(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_connector(exclude(Mysql, Sqlite))]
+#[test_connector(exclude(Mysql, Sqlite, CockroachDb))]
 async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

@@ -5,14 +5,13 @@ mod vitess;
 
 use barrel::types;
 use expect_test::expect;
-use indoc::formatdoc;
-use indoc::indoc;
+use indoc::{formatdoc, indoc};
 use introspection_engine_tests::{assert_eq_json, test_api::*};
 use quaint::prelude::Queryable;
 use serde_json::json;
 use test_macros::test_connector;
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn mapped_model_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -63,7 +62,7 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn manually_overwritten_mapped_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -115,7 +114,7 @@ async fn manually_overwritten_mapped_field_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql, Mysql))]
+#[test_connector(exclude(Mssql, Mysql, CockroachDb))]
 async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -180,7 +179,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn manually_mapped_model_and_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -245,7 +244,7 @@ async fn manually_mapped_model_and_field_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn mapped_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -330,7 +329,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb))]
 async fn mapped_enum_name(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -418,7 +417,7 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb))]
 async fn mapped_enum_value_name(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -503,7 +502,7 @@ async fn mapped_enum_value_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn manually_remapped_enum_value_name(api: &TestApi) -> TestResult {
     let sql = "CREATE Type color as ENUM (\'_black\', \'white\')";
     api.database().execute_raw(sql, &[]).await?;
@@ -566,7 +565,7 @@ async fn manually_remapped_enum_value_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn manually_re_mapped_enum_name(api: &TestApi) -> TestResult {
     let sql = "CREATE Type _color as ENUM (\'black\', \'white\')";
     api.database().execute_raw(sql, &[]).await?;
@@ -631,7 +630,7 @@ async fn manually_re_mapped_enum_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -716,7 +715,7 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mysql, Mssql))]
+#[test_connector(exclude(Mysql, Mssql, CockroachDb))]
 async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -780,7 +779,7 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn custom_virtual_relation_field_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -835,7 +834,7 @@ async fn custom_virtual_relation_field_names(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn custom_model_order(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1023,7 +1022,7 @@ async fn custom_enum_order(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql, Mysql, Sqlite))]
+#[test_connector(exclude(Mssql, Mysql, Sqlite, CockroachDb))]
 async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1192,14 +1191,14 @@ async fn virtual_cuid_default_cockroach(api: &TestApi) {
         }
 
         model Unrelated {
-            id               Int @id @default(autoincrement())
+            id               BigInt @id @default(autoincrement())
         }
     "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(&input_dm).await.unwrap());
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn comments_should_be_kept(api: &TestApi) -> TestResult {
     let sql = "CREATE Type a as ENUM (\'A\')".to_string();
     api.database().execute_raw(&sql, &[]).await?;
@@ -1267,7 +1266,7 @@ async fn comments_should_be_kept(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Mssql, CockroachDb))]
 async fn updated_at(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -1318,7 +1317,7 @@ async fn updated_at(api: &TestApi) {
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await.unwrap());
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, CockroachDb))]
 async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1510,7 +1509,7 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> T
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn custom_repro(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1571,7 +1570,7 @@ async fn custom_repro(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn re_introspecting_ignore(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1633,14 +1632,14 @@ async fn re_introspecting_ignore(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, CockroachDb))]
 async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestApi) -> TestResult {
-    //we do not have enough information to correctly assign which field should point to column A in the
-    //join table and which one to B
-    //upon table creation this is dependant on lexicographic order of the names of the fields, but we
-    //cannot be sure that users keep the order the same when renaming. worst case would be we accidentally
-    //switch the directions when reintrospecting.
-    //the generated names are also not helpful though, but at least they don't give a false sense of correctness -.-
+    // We do not have enough information to correctly assign which field should point to column A in the
+    // join table and which one to B
+    // Upon table creation this is dependant on lexicographic order of the names of the fields, but we
+    // cannot be sure that users keep the order the same when renaming. worst case would be we accidentally
+    // switch the directions when reintrospecting.
+    // The generated names are also not helpful though, but at least they don't give a false sense of correctness -.-
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -1682,7 +1681,7 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     Ok(())
 }
 
-#[test_connector(tags(Postgres, Mssql))]
+#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
 async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1743,7 +1742,7 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_connector(tags(Postgres, Mssql, Mysql, Sqlite))]
+#[test_connector(tags(Postgres, Mssql, Mysql, Sqlite), exclude(CockroachDb))]
 async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1801,7 +1800,7 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_connector(tags(Postgres, Mssql))]
+#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
 async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

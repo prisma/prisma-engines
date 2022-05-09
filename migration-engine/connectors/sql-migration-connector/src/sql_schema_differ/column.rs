@@ -7,10 +7,6 @@ pub(crate) fn all_changes(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour
     let mut changes = BitFlags::empty();
     let type_change = flavour.column_type_change(cols);
 
-    if cols.previous.name() != cols.next.name() {
-        changes |= ColumnChange::Renaming;
-    };
-
     if cols.previous.arity() != cols.next.arity() {
         changes |= ColumnChange::Arity
     };
@@ -23,9 +19,9 @@ pub(crate) fn all_changes(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour
         changes |= ColumnChange::Default;
     };
 
-    if cols.previous.is_autoincrement() != cols.next.is_autoincrement() {
-        changes |= ColumnChange::Sequence;
-    };
+    if flavour.column_autoincrement_changed(cols) {
+        changes |= ColumnChange::Autoincrement;
+    }
 
     ColumnChanges { type_change, changes }
 }
@@ -84,6 +80,9 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         (Some(DefaultKind::Sequence(_)), Some(DefaultKind::Value(_))) => false,
         (Some(DefaultKind::Sequence(_)), Some(DefaultKind::Now)) => false,
 
+        (Some(DefaultKind::UniqueRowid), Some(DefaultKind::UniqueRowid)) => true,
+        (Some(DefaultKind::UniqueRowid), _) | (_, Some(DefaultKind::UniqueRowid)) => false,
+
         (None, None) => true,
         (None, Some(DefaultKind::Value(_))) => false,
         (None, Some(DefaultKind::Now)) => false,
@@ -92,7 +91,6 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
             (prev.eq_ignore_ascii_case(next)) && names_match
         }
         (_, Some(DefaultKind::DbGenerated(_))) => false,
-        // Sequence migrations are handled separately.
         (_, Some(DefaultKind::Sequence(_))) => true,
     }
 }
@@ -108,11 +106,10 @@ fn json_defaults_match(previous: &str, next: &str) -> bool {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u8)]
 pub(crate) enum ColumnChange {
-    Renaming,
     Arity,
     Default,
     TypeChanged,
-    Sequence,
+    Autoincrement,
 }
 
 // This should be pub(crate), but SqlMigration is exported, so it has to be
@@ -141,7 +138,7 @@ impl ColumnChanges {
     }
 
     pub(crate) fn autoincrement_changed(&self) -> bool {
-        self.changes.contains(ColumnChange::Sequence)
+        self.changes.contains(ColumnChange::Autoincrement)
     }
 
     pub(crate) fn iter(&self) -> impl Iterator<Item = ColumnChange> + '_ {
@@ -166,10 +163,6 @@ impl ColumnChanges {
 
     pub(crate) fn only_type_changed(&self) -> bool {
         self.changes == ColumnChange::TypeChanged
-    }
-
-    pub(crate) fn column_was_renamed(&self) -> bool {
-        self.changes.contains(ColumnChange::Renaming)
     }
 }
 

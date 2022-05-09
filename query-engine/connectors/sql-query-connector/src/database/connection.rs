@@ -237,7 +237,7 @@ where
 
     async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
-            write::execute_raw(&self.inner, inputs).await
+            write::execute_raw(&self.inner, &self.features, inputs).await
         })
         .await
     }

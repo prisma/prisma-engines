@@ -12,7 +12,7 @@ fn gin_preview_disabled(api: TestApi) {
 
     let dm = r#"
         model A {
-          id   Int   @id @default(autoincrement())
+          id   Int   @id
           data Int[]
 
           @@index([data])
@@ -26,7 +26,7 @@ fn gin_preview_disabled(api: TestApi) {
 fn gin_array_ops(api: TestApi) {
     let dm = r#"
         model A {
-          id   Int   @id @default(autoincrement())
+          id   Int   @id
           data Int[]
 
           @@index([data], type: Gin)
@@ -48,7 +48,7 @@ fn gin_array_ops(api: TestApi) {
 fn gin_jsonb_ops(api: TestApi) {
     let dm = r#"
         model A {
-          id   Int  @id @default(autoincrement())
+          id   Int  @id
           data Json
 
           @@index([data], type: Gin)
@@ -70,7 +70,7 @@ fn gin_jsonb_ops(api: TestApi) {
 fn gin_raw_ops(api: TestApi) {
     let dm = r#"
         model A {
-          id   Int                      @id @default(autoincrement())
+          id   Int                      @id
           data Unsupported("geometry")?
 
           @@index([data], type: Gin)

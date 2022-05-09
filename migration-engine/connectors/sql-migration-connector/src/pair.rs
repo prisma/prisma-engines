@@ -1,7 +1,7 @@
 use crate::SqlDatabaseSchema;
 use sql_schema_describer::{
     walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker},
-    ColumnId, SqlSchema, TableId,
+    ColumnId, EnumId, SqlSchema, TableId,
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -20,10 +20,6 @@ impl<T> Pair<T> {
             previous: &self.previous,
             next: &self.next,
         }
-    }
-
-    pub(crate) fn as_tuple(&self) -> (&T, &T) {
-        (&self.previous, &self.next)
     }
 
     /// Map each element to an iterator, and zip the two iterators into an iterator over pairs.
@@ -64,6 +60,13 @@ impl<T> Pair<T> {
     pub(crate) fn next_mut(&mut self) -> &mut T {
         &mut self.next
     }
+
+    pub(crate) fn combine<U>(self, other: Pair<U>) -> Pair<(T, U)> {
+        Pair {
+            previous: (self.previous, other.previous),
+            next: (self.next, other.next),
+        }
+    }
 }
 
 impl<T> Pair<Option<T>> {
@@ -76,11 +79,8 @@ impl<T> Pair<Option<T>> {
 }
 
 impl<'a> Pair<&'a SqlDatabaseSchema> {
-    pub(crate) fn enums(&self, enum_indexes: &Pair<usize>) -> Pair<EnumWalker<'a>> {
-        Pair::new(
-            self.previous.enum_walker_at(enum_indexes.previous),
-            self.next.enum_walker_at(enum_indexes.next),
-        )
+    pub(crate) fn enums(&self, ids: Pair<EnumId>) -> Pair<EnumWalker<'a>> {
+        Pair::new(self.previous.walk_enum(ids.previous), self.next.walk_enum(ids.next))
     }
 
     pub(crate) fn tables(&self, table_ids: &Pair<TableId>) -> Pair<TableWalker<'a>> {
@@ -92,11 +92,8 @@ impl<'a> Pair<&'a SqlDatabaseSchema> {
 }
 
 impl<'a> Pair<&'a SqlSchema> {
-    pub(crate) fn enums(&self, enum_indexes: &Pair<usize>) -> Pair<EnumWalker<'a>> {
-        Pair::new(
-            self.previous.enum_walker_at(enum_indexes.previous),
-            self.next.enum_walker_at(enum_indexes.next),
-        )
+    pub(crate) fn enums(&self, ids: Pair<EnumId>) -> Pair<EnumWalker<'a>> {
+        Pair::new(self.previous.walk_enum(ids.previous), self.next.walk_enum(ids.next))
     }
 
     pub(crate) fn tables(&self, table_ids: &Pair<TableId>) -> Pair<TableWalker<'a>> {

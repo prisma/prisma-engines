@@ -159,7 +159,7 @@ fn altering_a_column_with_non_null_values_should_warn(api: TestApi) {
     assert_eq!(api.dump_table("Test").len(), 2);
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 fn column_defaults_can_safely_be_changed(api: TestApi) {
     let combinations = &[
         ("Meow", Some(PrismaValue::String("Cats".to_string())), None),
@@ -757,7 +757,7 @@ fn enum_variants_can_be_dropped_without_data_loss(api: TestApi) {
 fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
     let dm1 = r#"
         model User {
-            id Int @id
+            id BigInt @id
             created_at DateTime
         }
     "#;
@@ -772,7 +772,7 @@ fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
 
     let dm2 = r#"
         model User {
-            id Int @id
+            id BigInt @id
             created_at DateTime @default(now())
         }
     "#;
