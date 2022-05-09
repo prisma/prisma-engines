@@ -125,10 +125,6 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                     sequence.r#virtual = r#virtual;
                 }
 
-                if let Some(no_cycle) = sequence_details.no_cycle {
-                    sequence.cycle = !no_cycle;
-                }
-
                 postgres_ext.sequences.push(sequence);
             }
         }
