@@ -19,11 +19,6 @@ async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
     api.raw_cmd(sql).await;
 
     let expected = expect![[r#"
-        generator generated_test_preview_flags {
-          provider        = "prisma-client-js"
-          previewFeatures = ["cockroachdb"]
-        }
-
         generator client {
           provider = "prisma-client-js"
         }
@@ -90,11 +85,6 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
     api.raw_cmd(sql).await;
 
     let expected = expect![[r#"
-        generator generated_test_preview_flags {
-          provider        = "prisma-client-js"
-          previewFeatures = ["cockroachdb"]
-        }
-
         generator client {
           provider = "prisma-client-js"
         }
@@ -132,11 +122,6 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestR
         .await?;
 
     let expected = expect![[r#"
-        generator generated_test_preview_flags {
-          provider        = "prisma-client-js"
-          previewFeatures = ["cockroachdb"]
-        }
-
         generator client {
           provider = "prisma-client-js"
         }
@@ -217,11 +202,6 @@ async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> TestResult 
         .await?;
 
     let expected = expect![[r#"
-        generator generated_test_preview_flags {
-          provider        = "prisma-client-js"
-          previewFeatures = ["cockroachdb"]
-        }
-
         generator client {
           provider = "prisma-client-js"
         }
@@ -260,11 +240,6 @@ async fn default_values(api: &TestApi) -> TestResult {
     api.raw_cmd(sql).await;
 
     let expected = expect![[r#"
-        generator generated_test_preview_flags {
-          provider        = "prisma-client-js"
-          previewFeatures = ["cockroachdb"]
-        }
-
         generator client {
           provider = "prisma-client-js"
         }
@@ -308,11 +283,6 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
         .await?;
 
     let expected = expect![[r#"
-        generator generated_test_preview_flags {
-          provider        = "prisma-client-js"
-          previewFeatures = ["cockroachdb"]
-        }
-
         generator client {
           provider = "prisma-client-js"
         }

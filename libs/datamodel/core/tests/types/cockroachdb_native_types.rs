@@ -53,11 +53,6 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
           url      = "postgresql://"
         }
 
-        generator js {
-            provider        = "prisma-client-js"
-            previewFeatures = ["Cockroachdb"]
-        }
-
         model Blog {
             id     Int   @id
             dec Decimal @db.Decimal(2, 4)
@@ -66,10 +61,10 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mThe scale must not be larger than the precision for the Decimal(2,4) native type in CockroachDB.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
-        [1;94m13 | [0m            id     Int   @id
-        [1;94m14 | [0m            dec Decimal @[1;91mdb.Decimal(2, 4)[0m
+        [1;94m 8 | [0m            id     Int   @id
+        [1;94m 9 | [0m            dec Decimal @[1;91mdb.Decimal(2, 4)[0m
         [1;94m   | [0m
     "#]];
     expect_error(dml, &expectation);
@@ -81,11 +76,6 @@ fn cockroach_specific_native_types_are_valid() {
     datasource db {
         provider = "cockroachdb"
         url = env("TEST_DATABASE_URL")
-    }
-
-    generator js {
-        provider = "prisma-client-js"
-        previewFeatures = ["cockroachdb"]
     }
 
     model NativeTypesTest {

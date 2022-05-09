@@ -160,11 +160,6 @@ async fn a_table_with_enum_default_values(api: &TestApi) -> TestResult {
         .await?;
 
     let dm = expect![[r#"
-        generator generated_test_preview_flags {
-          provider        = "prisma-client-js"
-          previewFeatures = ["cockroachdb"]
-        }
-
         generator client {
           provider = "prisma-client-js"
         }
