@@ -8,7 +8,7 @@ pub fn fmt_query_raw(query: &str, params: Vec<RawParam>) -> String {
 
     format!(
         r#"mutation {{ queryRaw(query: "{}", parameters: "{}") }}"#,
-        query.replace('"', "\\\""),
+        query.replace('"', "\\\"").replace('\n', ""),
         params.replace('"', "\\\"")
     )
 }
@@ -19,7 +19,7 @@ pub fn fmt_execute_raw(query: &str, params: Vec<RawParam>) -> String {
 
     format!(
         r#"mutation {{ executeRaw(query: "{}", parameters: "{}") }}"#,
-        query.replace('"', "\\\""),
+        query.replace('"', "\\\"").replace('\n', ""),
         params.replace('"', "\\\"")
     )
 }
@@ -82,7 +82,7 @@ macro_rules! raw_value_from {
   };
 }
 
-raw_value_from!(String, &str, i32, i64, bool, f32, f64);
+raw_value_from!(String, &str, i64, bool, f64);
 
 impl From<RawParam> for serde_json::Value {
     fn from(val: RawParam) -> Self {
