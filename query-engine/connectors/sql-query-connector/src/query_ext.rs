@@ -81,9 +81,15 @@ pub trait QueryExt: Queryable + Send + Sync {
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
         let params = params.into_iter().map(convert_lossy).collect_vec();
-        let result_set = AssertUnwindSafe(self.query_raw(&query, &params))
-            .catch_unwind()
-            .await??;
+        let result_set = if features.contains(&PreviewFeature::ImprovedQueryRaw) {
+            AssertUnwindSafe(self.query_raw_typed(&query, &params))
+                .catch_unwind()
+                .await??
+        } else {
+            AssertUnwindSafe(self.query_raw(&query, &params))
+                .catch_unwind()
+                .await??
+        };
 
         // `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
         let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();
@@ -113,14 +119,21 @@ pub trait QueryExt: Queryable + Send + Sync {
     async fn raw_count<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
+        features: &[PreviewFeature],
     ) -> std::result::Result<usize, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
         let params = params.into_iter().map(convert_lossy).collect_vec();
-        let changes = AssertUnwindSafe(self.execute_raw(&query, &params))
-            .catch_unwind()
-            .await??;
+        let changes = if features.contains(&PreviewFeature::ImprovedQueryRaw) {
+            AssertUnwindSafe(self.execute_raw_typed(&query, &params))
+                .catch_unwind()
+                .await??
+        } else {
+            AssertUnwindSafe(self.execute_raw(&query, &params))
+                .catch_unwind()
+                .await??
+        };
 
         Ok(changes as usize)
     }

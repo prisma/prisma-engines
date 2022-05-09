@@ -43,7 +43,7 @@ mod raw_errors {
                 vec![RawParam::array(vec![1])],
             ),
             2010,
-            "error serializing parameter 0: Conversion failed: Couldn't serialize value `Some([Int64(Some(1))])` into a `int4`. Value is a list but `int4` is not."
+            r#"column "id" is of type integer but expression is of type bigint[]"#
         );
 
         Ok(())

@@ -385,8 +385,12 @@ pub async fn m2m_disconnect(
 /// Execute a plain SQL query with the given parameters, returning the number of
 /// affected rows.
 #[tracing::instrument(skip(conn, inputs))]
-pub async fn execute_raw(conn: &dyn QueryExt, inputs: HashMap<String, PrismaValue>) -> crate::Result<usize> {
-    let value = conn.raw_count(inputs).await?;
+pub async fn execute_raw(
+    conn: &dyn QueryExt,
+    features: &[PreviewFeature],
+    inputs: HashMap<String, PrismaValue>,
+) -> crate::Result<usize> {
+    let value = conn.raw_count(inputs, features).await?;
 
     Ok(value)
 }
