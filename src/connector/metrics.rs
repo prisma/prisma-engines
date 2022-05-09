@@ -29,6 +29,8 @@ where
     );
 
     histogram!(format!("{}.query.time", tag), start.elapsed());
+    histogram!("query_total_elapsed_time", start.elapsed());
+    increment_counter!("query_total_queries");
 
     res
 }

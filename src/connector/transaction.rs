@@ -2,6 +2,9 @@ use super::*;
 use crate::ast::*;
 use async_trait::async_trait;
 
+extern crate metrics as metrics;
+use metrics::{decrement_gauge, increment_gauge};
+
 /// A representation of an SQL database transaction. If not commited, a
 /// transaction will be rolled back by default when dropped.
 ///
@@ -19,12 +22,14 @@ impl<'a> Transaction<'a> {
         inner.raw_cmd(begin_stmt).await?;
         inner.server_reset_query(&this).await?;
 
+        increment_gauge!("query_active_transactions", 1.0);
         Ok(this)
     }
 
     /// Commit the changes to the database and consume the transaction.
     #[tracing::instrument(skip(self))]
     pub async fn commit(&self) -> crate::Result<()> {
+        decrement_gauge!("query_active_transactions", 1.0);
         self.inner.raw_cmd("COMMIT").await?;
 
         Ok(())
@@ -33,6 +38,7 @@ impl<'a> Transaction<'a> {
     /// Rolls back the changes to the database.
     #[tracing::instrument(skip(self))]
     pub async fn rollback(&self) -> crate::Result<()> {
+        decrement_gauge!("query_active_transactions", 1.0);
         self.inner.raw_cmd("ROLLBACK").await?;
 
         Ok(())
