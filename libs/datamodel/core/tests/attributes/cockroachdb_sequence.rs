@@ -111,7 +111,7 @@ fn default_sequence_with_all_arguments_is_valid_on_cockroachdb() {
         }
 
         model Test {
-            id Int @id @default(sequence(virtual: true, cache: 10, increment: 3, minValue: 10, maxValue: 100, start: 12, noCycle: true))
+            id Int @id @default(sequence(virtual: true, cache: 10, increment: 3, minValue: 10, maxValue: 100, start: 12))
         }
     "#;
 

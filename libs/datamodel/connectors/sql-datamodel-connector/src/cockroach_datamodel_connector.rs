@@ -343,7 +343,6 @@ pub struct SequenceFunction {
     pub min_value: Option<i64>,
     pub max_value: Option<i64>,
     pub start: Option<i64>,
-    pub no_cycle: Option<bool>,
 }
 
 impl SequenceFunction {
@@ -362,10 +361,6 @@ impl SequenceFunction {
             ) {
                 (Some("virtual"), expr) => match expr.as_bool() {
                     Ok(b) => this.r#virtual = Some(b),
-                    Err(err) => diagnostics.push_error(err),
-                },
-                (Some("noCycle"), expr) => match expr.as_bool() {
-                    Ok(b) => this.no_cycle = Some(b),
                     Err(err) => diagnostics.push_error(err),
                 },
                 (Some("cache"), expr) => match expr.as_int() {
