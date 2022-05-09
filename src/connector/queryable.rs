@@ -23,12 +23,29 @@ pub trait Queryable: Send + Sync {
     /// Execute a query given as SQL, interpolating the given parameters.
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet>;
 
+    /// Execute a query given as SQL, interpolating the given parameters.
+    ///
+    /// On Postgres, query parameters types will be inferred from the values
+    /// instead of letting Postgres infer them based on their usage in the SQL query.
+    ///
+    /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
+    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet>;
+
     /// Execute the given query, returning the number of affected rows.
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64>;
 
     /// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64>;
+
+    /// Execute a query given as SQL, interpolating the given parameters and
+    /// returning the number of affected rows.
+    ///
+    /// On Postgres, query parameters types will be inferred from the values
+    /// instead of letting Postgres infer them based on their usage in the SQL query.
+    ///
+    /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
+    async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64>;
 
     /// Run a command in the database, for queries that can't be run using
     /// prepared statements.

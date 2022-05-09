@@ -482,6 +482,11 @@ impl Queryable for Mysql {
     }
 
     #[tracing::instrument(skip(self, params))]
+    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
+        self.query_raw(sql, params).await
+    }
+
+    #[tracing::instrument(skip(self, params))]
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("mysql.execute_raw", sql, params, move || async move {
             self.prepared(sql, |stmt| async move {
@@ -493,6 +498,11 @@ impl Queryable for Mysql {
             .await
         })
         .await
+    }
+
+    #[tracing::instrument(skip(self, params))]
+    async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
+        self.execute_raw(sql, params).await
     }
 
     #[tracing::instrument(skip(self))]

@@ -29,6 +29,92 @@ pub fn conv_params<'a>(params: &'a [Value<'a>]) -> Vec<&'a (dyn types::ToSql + S
     params.iter().map(|x| x as &(dyn ToSql + Sync)).collect::<Vec<_>>()
 }
 
+/// Maps a list of query parameter values to a list of Postgres type.
+pub fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
+    params
+        .iter()
+        .map(|p| -> PostgresType {
+            // While we can infer the underlying type of a null, Prisma can't.
+            // Therefore, we let PG infer the underlying type.
+            if p.is_null() {
+                return PostgresType::UNKNOWN;
+            }
+
+            match p {
+                Value::Int32(_) => PostgresType::INT4,
+                Value::Int64(_) => PostgresType::INT8,
+                Value::Float(_) => PostgresType::FLOAT4,
+                Value::Double(_) => PostgresType::FLOAT8,
+                Value::Text(_) => PostgresType::TEXT,
+                // Enums are special types, we can't statically infer them, so we let PG infer it
+                Value::Enum(_) => PostgresType::UNKNOWN,
+                Value::Bytes(_) => PostgresType::BYTEA,
+                Value::Boolean(_) => PostgresType::BOOL,
+                Value::Char(_) => PostgresType::CHAR,
+                #[cfg(feature = "bigdecimal")]
+                Value::Numeric(_) => PostgresType::NUMERIC,
+                #[cfg(feature = "json")]
+                Value::Json(_) => PostgresType::JSONB,
+                Value::Xml(_) => PostgresType::XML,
+                #[cfg(feature = "uuid")]
+                Value::Uuid(_) => PostgresType::UUID,
+                #[cfg(feature = "chrono")]
+                Value::DateTime(_) => PostgresType::TIMESTAMPTZ,
+                #[cfg(feature = "chrono")]
+                Value::Date(_) => PostgresType::TIMESTAMP,
+                #[cfg(feature = "chrono")]
+                Value::Time(_) => PostgresType::TIME,
+                Value::Array(ref arr) => {
+                    let arr = arr.as_ref().unwrap();
+
+                    // If the array is empty, we can't infer the type so we let PG infer it
+                    if arr.is_empty() {
+                        return PostgresType::UNKNOWN;
+                    }
+
+                    let first = arr.first().unwrap();
+
+                    // If the array does not contain the same types of values, we let PG infer the type
+                    if arr
+                        .iter()
+                        .any(|val| std::mem::discriminant(first) != std::mem::discriminant(val))
+                    {
+                        return PostgresType::UNKNOWN;
+                    }
+
+                    match first {
+                        Value::Int32(_) => PostgresType::INT4_ARRAY,
+                        Value::Int64(_) => PostgresType::INT8_ARRAY,
+                        Value::Float(_) => PostgresType::FLOAT4_ARRAY,
+                        Value::Double(_) => PostgresType::FLOAT8_ARRAY,
+                        Value::Text(_) => PostgresType::TEXT_ARRAY,
+                        // Enums are special types, we can't statically infer them, so we let PG infer it
+                        Value::Enum(_) => PostgresType::UNKNOWN,
+                        Value::Bytes(_) => PostgresType::BYTEA_ARRAY,
+                        Value::Boolean(_) => PostgresType::BOOL_ARRAY,
+                        Value::Char(_) => PostgresType::CHAR_ARRAY,
+                        #[cfg(feature = "bigdecimal")]
+                        Value::Numeric(_) => PostgresType::NUMERIC_ARRAY,
+                        #[cfg(feature = "json")]
+                        Value::Json(_) => PostgresType::JSONB_ARRAY,
+                        Value::Xml(_) => PostgresType::XML_ARRAY,
+                        #[cfg(feature = "uuid")]
+                        Value::Uuid(_) => PostgresType::UUID_ARRAY,
+                        #[cfg(feature = "chrono")]
+                        Value::DateTime(_) => PostgresType::TIMESTAMPTZ_ARRAY,
+                        #[cfg(feature = "chrono")]
+                        Value::Date(_) => PostgresType::TIMESTAMP_ARRAY,
+                        #[cfg(feature = "chrono")]
+                        Value::Time(_) => PostgresType::TIME_ARRAY,
+                        // In the case of nested arrays, we let PG infer the type
+                        Value::Array(_) => PostgresType::UNKNOWN,
+                    }
+                }
+            }
+        })
+        .collect()
+}
+
 struct XmlString(pub String);
 
 impl<'a> FromSql<'a> for XmlString {

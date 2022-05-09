@@ -34,8 +34,16 @@ impl Queryable for PooledConnection {
         self.inner.query_raw(sql, params).await
     }
 
+    async fn query_raw_typed(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<connector::ResultSet> {
+        self.inner.query_raw_typed(sql, params).await
+    }
+
     async fn execute_raw(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<u64> {
         self.inner.execute_raw(sql, params).await
+    }
+
+    async fn execute_raw_typed(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<u64> {
+        self.inner.execute_raw_typed(sql, params).await
     }
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {

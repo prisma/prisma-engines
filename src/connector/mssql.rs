@@ -411,6 +411,11 @@ impl Queryable for Mssql {
     }
 
     #[tracing::instrument(skip(self, params))]
+    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
+        self.query_raw(sql, params).await
+    }
+
+    #[tracing::instrument(skip(self, params))]
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("mssql.execute_raw", sql, params, move || async move {
             let mut query = tiberius::Query::new(sql);
@@ -425,6 +430,11 @@ impl Queryable for Mssql {
             Ok(changes)
         })
         .await
+    }
+
+    #[tracing::instrument(skip(self, params))]
+    async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
+        self.execute_raw(sql, params).await
     }
 
     #[tracing::instrument(skip(self))]

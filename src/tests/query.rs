@@ -3081,3 +3081,134 @@ async fn generate_native_uuid(api: &mut dyn TestApi) -> crate::Result<()> {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgresql"))]
+async fn query_raw_typed_numeric(api: &mut dyn TestApi) -> crate::Result<()> {
+    let res = api
+        .conn()
+        .query_raw_typed(
+            r#"SELECT
+                    $1::float4     AS i4tof4,
+                    $2::float4     AS i8tof4,
+
+                    $3::float8     AS i4tof8,
+                    $4::float8     AS i8tof8,
+
+                    $5::int4       AS f4toi4,
+                    $6::int4       AS f8toi4,
+
+                    $7::int8       AS f4toi8,
+                    $8::int8       AS f8toi8,
+
+                    $9::int4       AS texttoi4,
+                    $10::int8      AS texttoi8,
+
+                    $11::float4    AS texttof4,
+                    $12::float8    AS texttof8
+                "#,
+            &[
+                Value::int32(42),     // $1
+                Value::int64(42),     // $2
+                Value::int32(42),     // $3
+                Value::int64(42),     // $4
+                Value::float(42.51),  // $5
+                Value::double(42.51), // $6
+                Value::float(42.51),  // $7
+                Value::double(42.51), // $8
+                Value::text("42"),    // $9
+                Value::text("42"),    // $10
+                Value::text("42.51"), // $11
+                Value::text("42.51"), // $12
+            ],
+        )
+        .await?
+        .into_single()?;
+
+    assert_eq!(Value::float(42.0), res["i4tof4"]);
+    assert_eq!(Value::float(42.0), res["i8tof4"]);
+
+    assert_eq!(Value::double(42.0), res["i4tof8"]);
+    assert_eq!(Value::double(42.0), res["i8tof8"]);
+
+    assert_eq!(Value::int32(43), res["f4toi4"]);
+    assert_eq!(Value::int32(43), res["f8toi4"]);
+
+    assert_eq!(Value::int64(43), res["f4toi8"]);
+    assert_eq!(Value::int64(43), res["f8toi8"]);
+
+    assert_eq!(Value::int32(42), res["texttoi4"]);
+    assert_eq!(Value::int64(42), res["texttoi8"]);
+
+    assert_eq!(Value::float(42.51), res["texttof4"]);
+    assert_eq!(Value::double(42.51), res["texttof8"]);
+
+    Ok(())
+}
+
+#[cfg(feature = "chrono")]
+#[test_each_connector(tags("postgresql"))]
+async fn query_raw_typed_date(api: &mut dyn TestApi) -> crate::Result<()> {
+    use chrono::DateTime;
+    use std::str::FromStr;
+
+    let res = api
+        .conn()
+        .query_raw_typed(
+            r#"SELECT
+                    ($1::timestamp - $2::interval)  AS texttointerval,
+                    $3 = DATE_PART('year', $4::date) AS is_year_2023;
+                "#,
+            &[
+                Value::text("2022-01-01 00:00:00"), // $1
+                Value::text("1 year"),              // $2
+                Value::int32(2022),                 // $3
+                Value::text("2022-01-01"),          // $4
+            ],
+        )
+        .await?
+        .into_single()?;
+
+    assert_eq!(
+        Value::from(DateTime::from_str("2021-01-01T00:00:00Z").unwrap()),
+        res["texttointerval"]
+    );
+    assert_eq!(Value::boolean(true), res["is_year_2023"]);
+
+    Ok(())
+}
+
+#[cfg(feature = "json")]
+#[test_each_connector(tags("postgresql"))]
+async fn query_raw_typed_json(api: &mut dyn TestApi) -> crate::Result<()> {
+    use serde_json::json;
+
+    let res = api
+        .conn()
+        .query_raw_typed(
+            r#"SELECT
+                    $1                               as json,
+                    $2::text                         as jsontotext,
+                    $3->'b'                          as json_operator,
+                    json_extract_path($4::json, 'b') as json_extract,
+                    jsonb_extract_path($5, 'b')      as jsonb_extract
+                   ;
+                "#,
+            &[
+                Value::json(json!({ "a":1, "b":2})), // $1
+                Value::json(json!({ "a":1, "b":2})), // $2
+                Value::json(json!({ "a":1, "b":2})), // $3
+                Value::json(json!({ "a":1, "b":2})), // $4
+                Value::json(json!({ "a":1, "b":2})), // $5
+            ],
+        )
+        .await?
+        .into_single()?;
+
+    assert_eq!(Value::json(json!({ "a":1, "b":2})), res["json"]);
+    assert_eq!(Value::text("{\"a\": 1, \"b\": 2}"), res["jsontotext"]);
+    assert_eq!(Value::json(json!(2)), res["json_operator"]);
+    assert_eq!(Value::json(json!(2)), res["json_extract"]);
+    assert_eq!(Value::json(json!(2)), res["jsonb_extract"]);
+
+    Ok(())
+}
