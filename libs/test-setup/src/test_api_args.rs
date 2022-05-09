@@ -117,7 +117,6 @@ pub struct TestApiArgs {
 }
 
 const EMPTY_PREVIEW_FEATURES: &[&str] = &[];
-const COCKROACH_PREVIEW_FEATURES: &[&str] = &["cockroachdb"];
 
 impl TestApiArgs {
     pub fn new(test_function_name: &'static str, preview_features: &'static [&'static str]) -> Self {
@@ -164,17 +163,11 @@ impl TestApiArgs {
     }
 
     pub fn datasource_block<'a>(&'a self, url: &'a str, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
-        let preview_features = if self.db.provider == "cockroachdb" {
-            COCKROACH_PREVIEW_FEATURES
-        } else {
-            EMPTY_PREVIEW_FEATURES
-        };
-
         DatasourceBlock {
             provider: self.db.provider,
             url,
             params,
-            preview_features,
+            preview_features: EMPTY_PREVIEW_FEATURES,
         }
     }
 

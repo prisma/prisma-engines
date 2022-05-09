@@ -102,7 +102,7 @@ jobs:
           - name: cockroach_21_2_0_patched
             url: "postgresql://prisma@localhost:26258"
             allow_failure: true
-          - name: cockroach_22_1_0_beta_5
+          - name: cockroach_22_1_0
             url: "postgresql://prisma@localhost:26257"
             allow_failure: false
           - name: cockroach_22_1_0_beta_5
