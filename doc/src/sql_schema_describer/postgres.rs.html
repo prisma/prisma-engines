@@ -1624,6 +1624,45 @@
 <span id="1619">1619</span>
 <span id="1620">1620</span>
 <span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
+<span id="1626">1626</span>
+<span id="1627">1627</span>
+<span id="1628">1628</span>
+<span id="1629">1629</span>
+<span id="1630">1630</span>
+<span id="1631">1631</span>
+<span id="1632">1632</span>
+<span id="1633">1633</span>
+<span id="1634">1634</span>
+<span id="1635">1635</span>
+<span id="1636">1636</span>
+<span id="1637">1637</span>
+<span id="1638">1638</span>
+<span id="1639">1639</span>
+<span id="1640">1640</span>
+<span id="1641">1641</span>
+<span id="1642">1642</span>
+<span id="1643">1643</span>
+<span id="1644">1644</span>
+<span id="1645">1645</span>
+<span id="1646">1646</span>
+<span id="1647">1647</span>
+<span id="1648">1648</span>
+<span id="1649">1649</span>
+<span id="1650">1650</span>
+<span id="1651">1651</span>
+<span id="1652">1652</span>
+<span id="1653">1653</span>
+<span id="1654">1654</span>
+<span id="1655">1655</span>
+<span id="1656">1656</span>
+<span id="1657">1657</span>
+<span id="1658">1658</span>
+<span id="1659">1659</span>
+<span id="1660">1660</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -1644,7 +1683,7 @@
 
 <span class="doccomment">/// A PostgreSQL sequence.</span>
 <span class="doccomment">/// https://www.postgresql.org/docs/current/view-pg-sequences.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Sequence</span> {
     <span class="doccomment">/// Sequence name</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
@@ -1662,6 +1701,22 @@
     <span class="kw">pub</span> <span class="ident">cache_size</span>: <span class="ident">i64</span>,
     <span class="doccomment">/// Whether the sequence is a cockroachdb virtual sequence</span>
     <span class="kw">pub</span> <span class="ident">r#virtual</span>: <span class="ident">bool</span>,
+}
+
+<span class="comment">// We impl default manually to align with database defaults.</span>
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Sequence</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident">Sequence</span> {
+            <span class="ident">name</span>: <span class="ident">String::default</span>(),
+            <span class="ident">start_value</span>: <span class="number">1</span>,
+            <span class="ident">min_value</span>: <span class="number">1</span>,
+            <span class="ident">max_value</span>: <span class="ident">i64::MAX</span>,
+            <span class="ident">increment_by</span>: <span class="number">1</span>,
+            <span class="ident">cycle</span>: <span class="bool-val">false</span>,
+            <span class="ident">cache_size</span>: <span class="number">1</span>,
+            <span class="ident">r#virtual</span>: <span class="bool-val">false</span>,
+        }
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
@@ -1728,6 +1783,18 @@
     <span class="kw">pub</span> <span class="ident">sequences</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Sequence</span><span class="op">&gt;</span>,
 }
 
+<span class="kw">const</span> <span class="ident">DEFAULT_REF</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> {
+    <span class="ident">opclasses</span>: <span class="ident">Vec::new</span>(),
+    <span class="ident">indexes</span>: <span class="ident">Vec::new</span>(),
+    <span class="ident">sequences</span>: <span class="ident">Vec::new</span>(),
+};
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PostgresSchemaExt</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident">DEFAULT_REF</span>
+    }
+}
+
 <span class="kw">impl</span> <span class="ident">PostgresSchemaExt</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index_id</span>: <span class="ident">IndexId</span>) -&gt; <span class="ident">SqlIndexAlgorithm</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">indexes</span>.<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">index_id</span>, <span class="op">|</span>(<span class="ident">id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">id</span>) {
@@ -1742,6 +1809,13 @@
             .<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">index_field_id</span>, <span class="op">|</span>(<span class="ident">id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">id</span>)
             .<span class="ident">ok</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">opclasses</span>[<span class="ident">idx</span>].<span class="number">1</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_sequence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">Sequence</span>)<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">sequences</span>
+            .<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">name</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> (<span class="ident">idx</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sequences</span>[<span class="ident">idx</span>]))
+            .<span class="ident">ok</span>()
     }
 }
 
@@ -2092,7 +2166,9 @@
             <span class="ident">tables</span>,
             <span class="ident">views</span>,
             <span class="ident">procedures</span>,
-            <span class="ident">connector_data</span>: <span class="ident"><span class="kw">crate</span>::connector_data::ConnectorData</span> { <span class="ident">data</span>: <span class="ident">Box::new</span>(<span class="ident">pg_ext</span>) },
+            <span class="ident">connector_data</span>: <span class="ident"><span class="kw">crate</span>::connector_data::ConnectorData</span> {
+                <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">pg_ext</span>)),
+            },
             ..<span class="ident">Default::default</span>()
         })
     }
@@ -2742,6 +2818,7 @@
                   cache_size
               FROM pg_sequences
               WHERE schemaname = $1
+              ORDER BY sequence_name
             &quot;#</span>
         } <span class="kw">else</span> {
             <span class="string">r#&quot;
@@ -2755,6 +2832,7 @@
                   0::INT8 AS cache_size
               FROM information_schema.sequences
               WHERE sequence_schema = $1
+              ORDER BY sequence_name
             &quot;#</span>
         };
 

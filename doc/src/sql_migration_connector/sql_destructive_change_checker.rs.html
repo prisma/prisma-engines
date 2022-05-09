@@ -559,13 +559,13 @@
                     }
                 }
                 <span class="ident">SqlMigrationStep::AlterEnum</span>(<span class="ident">AlterEnum</span> {
-                    <span class="ident">index</span>,
+                    <span class="ident">id</span>,
                     <span class="ident">created_variants</span>: <span class="kw">_</span>,
                     <span class="ident">dropped_variants</span>,
                     <span class="ident">previous_usages_as_default</span>: <span class="kw">_</span>,
                 }) <span class="kw">if</span> <span class="op">!</span><span class="ident">dropped_variants</span>.<span class="ident">is_empty</span>() =&gt; <span class="ident">plan</span>.<span class="ident">push_warning</span>(
                     <span class="ident">SqlMigrationWarningCheck::EnumValueRemoval</span> {
-                        <span class="ident">enm</span>: <span class="ident">schemas</span>.<span class="ident">next</span>().<span class="ident">enum_walker_at</span>(<span class="kw-2">*</span><span class="ident">index</span>.<span class="ident">next</span>()).<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                        <span class="ident">enm</span>: <span class="ident">schemas</span>.<span class="ident">next</span>().<span class="ident">walk_enum</span>(<span class="ident">id</span>.<span class="ident">next</span>).<span class="ident">name</span>().<span class="ident">to_owned</span>(),
                         <span class="ident">values</span>: <span class="ident">dropped_variants</span>.<span class="ident">clone</span>(),
                     },
                     <span class="ident">step_index</span>,

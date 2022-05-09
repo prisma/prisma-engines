@@ -98,10 +98,6 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SqlSchemaExt</span> <span class="kw">for</span> <span class="ident">SqlDatabaseSchema</span> {
-    <span class="kw">fn</span> <span class="ident">enum_walker_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">sql_schema_describer::walkers::EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">describer_schema</span>.<span class="ident">enum_walker_at</span>(<span class="ident">index</span>)
-    }
-
     <span class="kw">fn</span> <span class="ident">table_walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">sql_schema_describer::walkers::TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">describer_schema</span>.<span class="ident">table_walker</span>(<span class="ident">name</span>)
     }
@@ -119,6 +115,10 @@
 
     <span class="kw">fn</span> <span class="ident">udt_walker_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">sql_schema_describer::walkers::UserDefinedTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">describer_schema</span>.<span class="ident">udt_walker_at</span>(<span class="ident">index</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">walk_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">enum_id</span>: <span class="ident">sql_schema_describer::EnumId</span>) -&gt; <span class="ident">sql_schema_describer::walkers::EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">describer_schema</span>.<span class="ident">walk_enum</span>(<span class="ident">enum_id</span>)
     }
 }
 </code></pre></div>

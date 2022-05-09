@@ -563,6 +563,8 @@
 <span id="558">558</span>
 <span id="559">559</span>
 <span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">column</span>;
 <span class="kw">mod</span> <span class="ident">differ_database</span>;
 <span class="kw">mod</span> <span class="ident">enums</span>;
@@ -594,8 +596,10 @@
     <span class="ident">push_dropped_index_steps</span>(<span class="kw-2">&amp;mut</span> <span class="ident">steps</span>, <span class="kw-2">&amp;</span><span class="ident">db</span>);
     <span class="ident">push_created_index_steps</span>(<span class="kw-2">&amp;mut</span> <span class="ident">steps</span>, <span class="kw-2">&amp;</span><span class="ident">db</span>);
     <span class="ident">push_altered_table_steps</span>(<span class="kw-2">&amp;mut</span> <span class="ident">steps</span>, <span class="kw-2">&amp;</span><span class="ident">db</span>);
-    <span class="ident">flavour</span>.<span class="ident">push_enum_steps</span>(<span class="kw-2">&amp;mut</span> <span class="ident">steps</span>, <span class="kw-2">&amp;</span><span class="ident">db</span>);
     <span class="ident">push_redefined_table_steps</span>(<span class="kw-2">&amp;mut</span> <span class="ident">steps</span>, <span class="kw-2">&amp;</span><span class="ident">db</span>);
+
+    <span class="ident">flavour</span>.<span class="ident">push_enum_steps</span>(<span class="kw-2">&amp;mut</span> <span class="ident">steps</span>, <span class="kw-2">&amp;</span><span class="ident">db</span>);
+    <span class="ident">flavour</span>.<span class="ident">push_alter_sequence_steps</span>(<span class="kw-2">&amp;mut</span> <span class="ident">steps</span>, <span class="kw-2">&amp;</span><span class="ident">db</span>);
 
     <span class="ident">steps</span>.<span class="ident">sort</span>();
 
@@ -1084,7 +1088,7 @@
         <span class="comment">// many-to-many relation tables, but we used not to (we did not provide a constraint</span>
         <span class="comment">// names), and we do not want to cause new migrations on upgrade, we ignore the foreign</span>
         <span class="comment">// keys of implicit many-to-many relation tables for renamings.</span>
-        <span class="kw">if</span> <span class="ident">fk</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="ident">is_prisma_implicit_m2m_fk</span>(<span class="ident">fk</span>)).<span class="ident">as_tuple</span>() <span class="op">==</span> (<span class="kw-2">&amp;</span><span class="bool-val">true</span>, <span class="kw-2">&amp;</span><span class="bool-val">true</span>) {
+        <span class="kw">if</span> <span class="ident">fk</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="ident">is_prisma_implicit_m2m_fk</span>(<span class="ident">fk</span>)).<span class="ident">into_tuple</span>() <span class="op">==</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>) {
             <span class="kw">return</span>;
         }
 

@@ -294,7 +294,7 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">primary_key</span>()).<span class="ident">as_tuple</span>() {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">primary_key</span>()).<span class="ident">into_tuple</span>() {
             (<span class="prelude-val">Some</span>(<span class="ident">previous_pk</span>), <span class="prelude-val">Some</span>(<span class="ident">next_pk</span>)) =&gt; {
                 <span class="kw">if</span> <span class="ident">previous_pk</span>.<span class="ident">columns</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next_pk</span>.<span class="ident">columns</span> {
                     <span class="kw">return</span> <span class="bool-val">true</span>;
@@ -312,7 +312,7 @@
 
     <span class="doccomment">/// The primary key present in `next` but not `previous`, if applicable.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">created_primary_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;schema</span> <span class="ident">PrimaryKey</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">primary_key</span>()).<span class="ident">as_tuple</span>() {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">primary_key</span>()).<span class="ident">into_tuple</span>() {
             (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">pk</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">pk</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
@@ -320,7 +320,7 @@
 
     <span class="doccomment">/// The primary key present in `previous` but not `next`, if applicable.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">dropped_primary_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;schema</span> <span class="ident">PrimaryKey</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">primary_key</span>()).<span class="ident">as_tuple</span>() {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">primary_key</span>()).<span class="ident">into_tuple</span>() {
             (<span class="prelude-val">Some</span>(<span class="ident">pk</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">pk</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }

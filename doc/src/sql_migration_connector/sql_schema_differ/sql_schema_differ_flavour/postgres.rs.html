@@ -578,19 +578,83 @@
 <span id="573">573</span>
 <span id="574">574</span>
 <span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">database_schema::SqlDatabaseSchema</span>,
     <span class="ident">flavour::PostgresFlavour</span>,
     <span class="ident">pair::Pair</span>,
-    <span class="ident">sql_migration</span>::{<span class="ident">AlterEnum</span>, <span class="ident">SqlMigrationStep</span>},
+    <span class="ident">sql_migration</span>::{<span class="ident">AlterEnum</span>, <span class="ident">SequenceChange</span>, <span class="ident">SequenceChanges</span>, <span class="ident">SqlMigrationStep</span>},
     <span class="ident">sql_schema_differ</span>::{<span class="ident">column::ColumnTypeChange</span>, <span class="ident">differ_database::DifferDatabase</span>},
 };
+<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">CockroachType</span>, <span class="ident">PostgresType</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">regex::RegexSet</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
     <span class="ident">postgres::PostgresSchemaExt</span>,
-    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">IndexWalker</span>},
+    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">IndexWalker</span>, <span class="ident">SqlSchemaExt</span>},
 };
 
 <span class="doccomment">/// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.</span>
@@ -615,10 +679,34 @@
         <span class="bool-val">true</span>
     }
 
+    <span class="kw">fn</span> <span class="ident">column_autoincrement_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroachdb</span>() {
+            <span class="kw">return</span> <span class="bool-val">false</span>;
+        }
+
+        <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">is_autoincrement</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">is_autoincrement</span>()
+    }
+
+    <span class="kw">fn</span> <span class="ident">column_type_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
+        <span class="comment">// Handle the enum cases first.</span>
+        <span class="kw">match</span> <span class="ident">columns</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">column_type_family</span>().<span class="ident">as_enum</span>()).<span class="ident">into_tuple</span>() {
+            (<span class="prelude-val">Some</span>(<span class="ident">previous_enum</span>), <span class="prelude-val">Some</span>(<span class="ident">next_enum</span>)) <span class="kw">if</span> <span class="ident">previous_enum</span> <span class="op">==</span> <span class="ident">next_enum</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+            (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::NotCastable</span>),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::NotCastable</span>),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; (),
+        };
+
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroachdb</span>() {
+            <span class="ident">cockroach_column_type_change</span>(<span class="ident">columns</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">postgres_column_type_change</span>(<span class="ident">columns</span>)
+        }
+    }
+
     <span class="kw">fn</span> <span class="ident">push_enum_steps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">steps</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>, <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="kw">for</span> <span class="ident">enum_differ</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">enum_pairs</span>() {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">alter_enum</span> <span class="op">=</span> <span class="ident">AlterEnum</span> {
-                <span class="ident">index</span>: <span class="ident">enum_differ</span>.<span class="ident">enums</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">enum_index</span>()),
+                <span class="ident">id</span>: <span class="ident">enum_differ</span>.<span class="ident">enums</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">enum_id</span>()),
                 <span class="ident">created_variants</span>: <span class="ident">enum_differ</span>.<span class="ident">created_values</span>().<span class="ident">map</span>(<span class="ident">String::from</span>).<span class="ident">collect</span>(),
                 <span class="ident">dropped_variants</span>: <span class="ident">enum_differ</span>.<span class="ident">dropped_values</span>().<span class="ident">map</span>(<span class="ident">String::from</span>).<span class="ident">collect</span>(),
                 <span class="ident">previous_usages_as_default</span>: <span class="ident">Vec::new</span>(), <span class="comment">// this gets filled in later</span>
@@ -633,28 +721,83 @@
         }
 
         <span class="kw">for</span> <span class="ident">enm</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">created_enums</span>() {
-            <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::CreateEnum</span> {
-                <span class="ident">enum_index</span>: <span class="ident">enm</span>.<span class="ident">enum_index</span>(),
-            })
+            <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::CreateEnum</span>(<span class="ident">enm</span>.<span class="ident">enum_id</span>()))
         }
 
         <span class="kw">for</span> <span class="ident">enm</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">dropped_enums</span>() {
-            <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::DropEnum</span> {
-                <span class="ident">enum_index</span>: <span class="ident">enm</span>.<span class="ident">enum_index</span>(),
-            })
+            <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::DropEnum</span>(<span class="ident">enm</span>.<span class="ident">enum_id</span>()))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">indexes_should_be_recreated_after_column_drop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
+    <span class="kw">fn</span> <span class="ident">push_alter_sequence_steps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">steps</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>, <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_cockroachdb</span>() {
+            <span class="kw">return</span>;
+        }
+
+        <span class="kw">let</span> <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">SqlDatabaseSchema</span>, <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">schemas</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">schema</span><span class="op">|</span> {
+            (
+                <span class="ident">schema</span>,
+                <span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>(),
+            )
+        });
+
+        <span class="kw">let</span> <span class="ident">sequence_pairs</span> <span class="op">=</span> <span class="ident">db</span>
+            .<span class="ident">all_column_pairs</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">cols</span><span class="op">|</span> {
+                <span class="ident">schemas</span>.<span class="ident">combine</span>(<span class="ident">cols</span>).<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">schema</span>, <span class="ident">ext</span>), (<span class="ident">table_id</span>, <span class="ident">column_id</span>))<span class="op">|</span> {
+                    (<span class="ident">schema</span>.<span class="ident">table_walker_at</span>(<span class="ident">table_id</span>).<span class="ident">column_at</span>(<span class="ident">column_id</span>), <span class="ident">ext</span>)
+                })
+            })
+            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">cols</span><span class="op">|</span> {
+                <span class="ident">cols</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">col</span>, <span class="ident">ext</span>)<span class="op">|</span> {
+                    <span class="ident">col</span>.<span class="ident">default</span>()
+                        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_sequence</span>())
+                        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">sequence_name</span><span class="op">|</span> <span class="ident">ext</span>.<span class="ident">get_sequence</span>(<span class="ident">sequence_name</span>))
+                })
+                .<span class="ident">transpose</span>()
+            });
+
+        <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">sequence_pairs</span> {
+            <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">previous</span>.<span class="number">1</span>;
+            <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">next</span>.<span class="number">1</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">SequenceChange</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BitFlags::default</span>();
+
+            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">min_value</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">min_value</span> {
+                <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">SequenceChange::MinValue</span>;
+            }
+
+            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">max_value</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">max_value</span> {
+                <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">SequenceChange::MaxValue</span>;
+            }
+
+            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">start_value</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">start_value</span> {
+                <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">SequenceChange::Start</span>;
+            }
+
+            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">cache_size</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">cache_size</span> {
+                <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">SequenceChange::Cache</span>;
+            }
+
+            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">increment_by</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">increment_by</span> {
+                <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">SequenceChange::Increment</span>;
+            }
+
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">changes</span>.<span class="ident">is_empty</span>() {
+                <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::AlterSequence</span>(
+                    <span class="ident">pair</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u32</span>),
+                    <span class="ident">SequenceChanges</span>(<span class="ident">changes</span>),
+                ));
+            }
+        }
     }
 
     <span class="kw">fn</span> <span class="ident">indexes_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">columns_previous</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">columns</span>();
         <span class="kw">let</span> <span class="ident">columns_next</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">columns</span>();
 
-        <span class="kw">let</span> <span class="ident">pg_ext_previous</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">schema</span>().<span class="ident">downcast_connector_data</span>();
-        <span class="kw">let</span> <span class="ident">pg_ext_next</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">schema</span>().<span class="ident">downcast_connector_data</span>();
+        <span class="kw">let</span> <span class="ident">pg_ext_previous</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">schema</span>().<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
+        <span class="kw">let</span> <span class="ident">pg_ext_next</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">schema</span>().<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
+
         <span class="kw">let</span> <span class="ident">previous_algo</span> <span class="op">=</span> <span class="ident">pg_ext_previous</span>.<span class="ident">index_algorithm</span>(<span class="ident">a</span>.<span class="ident">index_id</span>());
         <span class="kw">let</span> <span class="ident">next_algo</span> <span class="op">=</span> <span class="ident">pg_ext_next</span>.<span class="ident">index_algorithm</span>(<span class="ident">b</span>.<span class="ident">index_id</span>());
 
@@ -674,42 +817,15 @@
             })
     }
 
+    <span class="kw">fn</span> <span class="ident">indexes_should_be_recreated_after_column_drop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="bool-val">true</span>
+    }
+
     <span class="kw">fn</span> <span class="ident">index_should_be_renamed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pair</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="comment">// Implements correct comparison for truncated index names.</span>
         <span class="kw">let</span> (<span class="ident">previous_name</span>, <span class="ident">next_name</span>) <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">name</span>()).<span class="ident">into_tuple</span>();
 
         <span class="ident">previous_name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next_name</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">table_should_be_ignored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">POSTGIS_TABLES_OR_VIEWS</span>.<span class="ident">is_match</span>(<span class="ident">table_name</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">column_type_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
-        <span class="comment">// Handle the enum cases first.</span>
-        <span class="kw">match</span> <span class="ident">columns</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">column_type_family</span>().<span class="ident">as_enum</span>()).<span class="ident">as_tuple</span>() {
-            (<span class="prelude-val">Some</span>(<span class="ident">previous_enum</span>), <span class="prelude-val">Some</span>(<span class="ident">next_enum</span>)) <span class="kw">if</span> <span class="ident">previous_enum</span> <span class="op">==</span> <span class="ident">next_enum</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-            (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::NotCastable</span>),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::NotCastable</span>),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; (),
-        };
-
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroachdb</span>() {
-            <span class="ident">cockroach_column_type_change</span>(<span class="ident">columns</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">postgres_column_type_change</span>(<span class="ident">columns</span>)
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">view_should_be_ignored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">view_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">POSTGIS_TABLES_OR_VIEWS</span>.<span class="ident">is_match</span>(<span class="ident">view_name</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">EXTENSION_VIEWS</span>.<span class="ident">is_match</span>(<span class="ident">view_name</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">sequence_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">previous</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">next</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">previous_has_sequence_default</span> <span class="op">=</span> <span class="ident">previous</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">is_sequence</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
-        <span class="kw">let</span> <span class="ident">next_has_sequence_default</span> <span class="op">=</span> <span class="ident">next</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">is_sequence</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
-
-        <span class="ident">previous_has_sequence_default</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next_has_sequence_default</span>
     }
 
     <span class="kw">fn</span> <span class="ident">set_tables_to_redefine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">db</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
@@ -730,6 +846,14 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">table_ids</span>());
 
         <span class="ident">db</span>.<span class="ident">tables_to_redefine</span> <span class="op">=</span> <span class="ident">id_gets_dropped</span>.<span class="ident">collect</span>();
+    }
+
+    <span class="kw">fn</span> <span class="ident">table_should_be_ignored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">POSTGIS_TABLES_OR_VIEWS</span>.<span class="ident">is_match</span>(<span class="ident">table_name</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">view_should_be_ignored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">view_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">POSTGIS_TABLES_OR_VIEWS</span>.<span class="ident">is_match</span>(<span class="ident">view_name</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">EXTENSION_VIEWS</span>.<span class="ident">is_match</span>(<span class="ident">view_name</span>)
     }
 }
 
@@ -767,8 +891,8 @@
 ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">covered_by_index</span> <span class="op">=</span> <span class="ident">columns</span>
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">is_part_of_secondary_index</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">is_part_of_primary_key</span>())
-        .<span class="ident">as_tuple</span>()
-        <span class="op">==</span> (<span class="kw-2">&amp;</span><span class="bool-val">true</span>, <span class="kw-2">&amp;</span><span class="bool-val">true</span>);
+        .<span class="ident">into_tuple</span>()
+        <span class="op">==</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>);
 
     <span class="kw">match</span> (<span class="ident">previous</span>, <span class="ident">next</span>) {
         (<span class="ident">CockroachType::Int4</span>, <span class="ident">CockroachType::String</span>(<span class="prelude-val">None</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">covered_by_index</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::SafeCast</span>),
@@ -1117,7 +1241,7 @@
 <span class="kw">fn</span> <span class="ident">push_alter_enum_previous_usages_as_default</span>(<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">alter_enum</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AlterEnum</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">previous_usages_as_default</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
-    <span class="kw">let</span> <span class="ident">enum_names</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">schemas</span>().<span class="ident">enums</span>(<span class="kw-2">&amp;</span><span class="ident">alter_enum</span>.<span class="ident">index</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">name</span>());
+    <span class="kw">let</span> <span class="ident">enum_names</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">schemas</span>().<span class="ident">enums</span>(<span class="ident">alter_enum</span>.<span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">name</span>());
 
     <span class="kw">for</span> <span class="ident">table</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">dropped_tables</span>() {
         <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">table</span>

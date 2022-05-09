@@ -224,6 +224,12 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">column</span>, <span class="ident">enums::EnumDiffer</span>, <span class="ident">table::TableDiffer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">flavour::SqlFlavour</span>, <span class="ident">pair::Pair</span>, <span class="ident">SqlDatabaseSchema</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
@@ -333,6 +339,12 @@
         <span class="ident">flavour</span>.<span class="ident">set_tables_to_redefine</span>(<span class="kw-2">&amp;mut</span> <span class="ident">db</span>);
 
         <span class="ident">db</span>
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">all_column_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span>(<span class="ident">TableId</span>, <span class="ident">ColumnId</span>)<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+        <span class="self">self</span>.<span class="ident">columns</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">filter_map</span>(<span class="op">|</span>((<span class="ident">tables</span>, <span class="kw">_</span>), <span class="ident">cols</span>)<span class="op">|</span> <span class="ident">cols</span>.<span class="ident">transpose</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">cols</span><span class="op">|</span> <span class="ident">tables</span>.<span class="ident">combine</span>(<span class="ident">cols</span>)))
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">column_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
