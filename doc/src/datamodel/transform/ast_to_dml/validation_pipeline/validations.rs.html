@@ -189,6 +189,8 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -236,6 +238,7 @@
         <span class="ident">models::has_a_unique_custom_primary_key_name_per_model</span>(<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
         <span class="ident">models::uses_sort_or_length_on_primary_without_preview_flag</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
         <span class="ident">models::id_has_fields</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+        <span class="ident">models::id_client_name_does_not_clash_with_field</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
         <span class="ident">models::primary_key_connector_specific</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
         <span class="ident">models::primary_key_length_prefix_supported</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
         <span class="ident">models::primary_key_sort_order_supported</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
@@ -282,6 +285,7 @@
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
             <span class="ident">indexes::has_fields</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
             <span class="ident">indexes::has_a_unique_constraint_name</span>(<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
+            <span class="ident">indexes::unique_client_name_does_not_clash_with_field</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
             <span class="ident">indexes::unique_index_has_a_unique_custom_name_per_model</span>(<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
             <span class="ident">indexes::uses_length_or_sort_without_preview_flag</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
             <span class="ident">indexes::field_length_prefix_supported</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
