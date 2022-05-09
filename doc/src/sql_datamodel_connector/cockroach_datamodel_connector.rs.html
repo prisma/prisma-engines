@@ -398,11 +398,6 @@
 <span id="393">393</span>
 <span id="394">394</span>
 <span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">validations</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
@@ -748,7 +743,6 @@
     <span class="kw">pub</span> <span class="ident">min_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">max_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">no_cycle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">SequenceFunction</span> {
@@ -767,10 +761,6 @@
             ) {
                 (<span class="prelude-val">Some</span>(<span class="string">&quot;virtual&quot;</span>), <span class="ident">expr</span>) =&gt; <span class="kw">match</span> <span class="ident">expr</span>.<span class="ident">as_bool</span>() {
                     <span class="prelude-val">Ok</span>(<span class="ident">b</span>) =&gt; <span class="ident">this</span>.<span class="ident">r#virtual</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">b</span>),
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>),
-                },
-                (<span class="prelude-val">Some</span>(<span class="string">&quot;noCycle&quot;</span>), <span class="ident">expr</span>) =&gt; <span class="kw">match</span> <span class="ident">expr</span>.<span class="ident">as_bool</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">b</span>) =&gt; <span class="ident">this</span>.<span class="ident">no_cycle</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">b</span>),
                     <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>),
                 },
                 (<span class="prelude-val">Some</span>(<span class="string">&quot;cache&quot;</span>), <span class="ident">expr</span>) =&gt; <span class="kw">match</span> <span class="ident">expr</span>.<span class="ident">as_int</span>() {
