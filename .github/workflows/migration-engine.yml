@@ -105,9 +105,6 @@ jobs:
           - name: cockroach_22_1_0
             url: "postgresql://prisma@localhost:26257"
             allow_failure: false
-          - name: cockroach_22_1_0_beta_5
-            url: "postgresql://prisma@localhost:26259"
-            allow_failure: false
           - name: sqlite
             url: sqlite
             allow_failure: false
