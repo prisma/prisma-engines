@@ -2139,7 +2139,7 @@ dependencies = [
 [[package]]
 name = "mobc"
 version = "0.7.3"
-source = "git+https://github.com/prisma/mobc?tag=1.0.1#5a674b9e514b6985760b5bf4c8c478697b470893"
+source = "git+https://github.com/prisma/mobc?tag=1.0.2#2d20f6da12a8bae6093b3749706725194130a586"
 dependencies = [
  "async-trait",
  "futures-channel",
@@ -3174,7 +3174,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#0e609621a368bd4576129d7c84b1d2bdaf45ec98"
+source = "git+https://github.com/prisma/quaint#231346a221ab6705913c7efb40a133c2fcc7e9b4"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -4947,7 +4947,7 @@ version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f559b464de2e2bdabcac6a210d12e9b5a5973c251e102c44c585c71d51bd78e"
 dependencies = [
- "cfg-if 0.1.10",
+ "cfg-if 1.0.0",
  "rand 0.8.4",
  "static_assertions",
 ]
