@@ -3070,6 +3070,19 @@ async fn generate_binary_uuid(api: &mut dyn TestApi) -> crate::Result<()> {
 }
 
 #[cfg(feature = "mysql")]
+#[test_each_connector(tags("mysql8"))]
+async fn generate_swapped_binary_uuid(api: &mut dyn TestApi) -> crate::Result<()> {
+    let select = Select::default().value(uuid_to_bin_swapped());
+    let res = api.conn().select(select).await?.into_single()?;
+    let val = res.into_single()?;
+
+    // If it is a byte type and has a value, it's a generated UUID.
+    assert!(matches!(val, Value::Bytes(x) if matches!(x, Some(_))));
+
+    Ok(())
+}
+
+#[cfg(feature = "mysql")]
 #[test_each_connector(tags("mysql"))]
 async fn generate_native_uuid(api: &mut dyn TestApi) -> crate::Result<()> {
     let select = Select::default().value(native_uuid());

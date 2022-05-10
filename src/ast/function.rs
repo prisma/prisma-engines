@@ -80,6 +80,8 @@ pub(crate) enum FunctionType<'a> {
     #[cfg(feature = "mysql")]
     UuidToBin,
     #[cfg(feature = "mysql")]
+    UuidToBinSwapped,
+    #[cfg(feature = "mysql")]
     Uuid,
 }
 
