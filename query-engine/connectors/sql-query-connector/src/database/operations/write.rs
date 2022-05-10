@@ -41,7 +41,7 @@ async fn generate_id(
 
             match func.as_str() {
                 "(uuid())" => (query.value(native_uuid().alias(alias)), true),
-                "(uuid_to_bin(uuid()))"|"(uuid_to_bin(uuid(),0))" => (query.value(uuid_to_bin().alias(alias)), true),
+                "(uuid_to_bin(uuid()))" | "(uuid_to_bin(uuid(),0))" => (query.value(uuid_to_bin().alias(alias)), true),
                 "(uuid_to_bin(uuid(),1))" => (query.value(uuid_to_bin_swapped().alias(alias)), true),
                 _ => (query, generated),
             }
