@@ -413,6 +413,7 @@
 <span id="408">408</span>
 <span id="409">409</span>
 <span id="410">410</span>
+<span id="411">411</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_trace::SqlTraceComment</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::SqlError</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_builder::write</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">QueryExt</span>};
 <span class="kw">use</span> <span class="ident">connector_interface</span>::<span class="kw-2">*</span>;
@@ -422,7 +423,7 @@
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">quaint</span>::{
     <span class="ident">error::ErrorKind</span>,
-    <span class="ident">prelude</span>::{<span class="ident">native_uuid</span>, <span class="ident">uuid_to_bin</span>, <span class="ident">Aliasable</span>, <span class="ident">Select</span>, <span class="ident">SqlFamily</span>},
+    <span class="ident">prelude</span>::{<span class="ident">native_uuid</span>, <span class="ident">uuid_to_bin</span>, <span class="ident">uuid_to_bin_swapped</span>, <span class="ident">Aliasable</span>, <span class="ident">Select</span>, <span class="ident">SqlFamily</span>},
 };
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
@@ -456,7 +457,8 @@
 
             <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">as_str</span>() {
                 <span class="string">&quot;(uuid())&quot;</span> =&gt; (<span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">native_uuid</span>().<span class="ident">alias</span>(<span class="ident">alias</span>)), <span class="bool-val">true</span>),
-                <span class="string">&quot;(uuid_to_bin(uuid()))&quot;</span> =&gt; (<span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">uuid_to_bin</span>().<span class="ident">alias</span>(<span class="ident">alias</span>)), <span class="bool-val">true</span>),
+                <span class="string">&quot;(uuid_to_bin(uuid()))&quot;</span> <span class="op">|</span> <span class="string">&quot;(uuid_to_bin(uuid(),0))&quot;</span> =&gt; (<span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">uuid_to_bin</span>().<span class="ident">alias</span>(<span class="ident">alias</span>)), <span class="bool-val">true</span>),
+                <span class="string">&quot;(uuid_to_bin(uuid(),1))&quot;</span> =&gt; (<span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">uuid_to_bin_swapped</span>().<span class="ident">alias</span>(<span class="ident">alias</span>)), <span class="bool-val">true</span>),
                 <span class="kw">_</span> =&gt; (<span class="ident">query</span>, <span class="ident">generated</span>),
             }
         });
