@@ -89,7 +89,7 @@ dev-postgres14: start-postgres14
 	cp $(CONFIG_PATH)/postgres14 $(CONFIG_FILE)
 
 start-cockroach_22_1_0:
-	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach_22_1_0
+	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach_22_1_0  && sudo apt update && sudo apt install wait-for-it -y && wait-for-it -h localhost -p 26257 && docker-compose exec -t cockroach_22_1_0 ./cockroach sql --insecure -e "SHOW PUBLIC CLUSTER SETTINGS;"
 
 dev-cockroach_22_1_0: start-cockroach_22_1_0
 	cp $(CONFIG_PATH)/cockroach_22_1_0 $(CONFIG_FILE)
