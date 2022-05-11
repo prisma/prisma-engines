@@ -61,7 +61,6 @@ pub fn nested_create(
 /// └─▶│  Connect   │   │  Connect   │◀─┘
 ///    └────────────┘   └────────────┘
 /// ```
-#[tracing::instrument]
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, create_nodes))]
 fn handle_many_to_many(
     graph: &mut QueryGraph,

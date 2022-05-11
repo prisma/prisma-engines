@@ -508,7 +508,6 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         })
     }
 
-    #[tracing::instrument]
     async fn version(&self, _schema: &str) -> crate::DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
@@ -541,7 +540,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         self.circumstances.contains(Circumstances::Cockroach)
     }
 
-    #[tracing::instrument]
     async fn get_databases(&self) -> DescriberResult<Vec<String>> {
         let sql = "select schema_name from information_schema.schemata;";
         let rows = self.conn.query_raw(sql, &[]).await?;
@@ -555,7 +553,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(names)
     }
 
-    #[tracing::instrument]
     async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
         if self.is_cockroach() {
             return Ok(Vec::new());
@@ -585,7 +582,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(procedures)
     }
 
-    #[tracing::instrument]
     async fn get_table_names(&self, schema: &str) -> DescriberResult<Vec<String>> {
         let sql = "
             SELECT table_name as table_name FROM information_schema.tables
@@ -604,7 +600,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(names)
     }
 
-    #[tracing::instrument]
     async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
         if self.circumstances.contains(Circumstances::Cockroach) {
             return Ok(0); // TODO
@@ -643,7 +638,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
     }
 
-    #[tracing::instrument]
     async fn get_views(&self, schema: &str) -> DescriberResult<Vec<View>> {
         let sql = indoc! {r#"
             SELECT viewname AS view_name, definition AS view_sql
@@ -1187,7 +1181,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(())
     }
 
-    #[tracing::instrument]
     async fn get_enums(&self, schema: &str) -> DescriberResult<Vec<Enum>> {
         let sql = "
             SELECT t.typname as name, e.enumlabel as value
