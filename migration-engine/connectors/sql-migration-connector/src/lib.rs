@@ -6,7 +6,6 @@
 #![allow(clippy::ptr_arg)] // remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
 mod apply_migration;
-mod connection_wrapper;
 mod database_schema;
 mod error;
 mod flavour;

@@ -7,25 +7,23 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use enumflags2::BitFlags;
 pub(crate) use mssql::MssqlFlavour;
 pub(crate) use mysql::MysqlFlavour;
 pub(crate) use postgres::PostgresFlavour;
 pub(crate) use sqlite::SqliteFlavour;
 
 use crate::{
-    connection_wrapper::Connection, sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
-    sql_renderer::SqlRenderer, sql_schema_calculator::SqlSchemaCalculatorFlavour,
-    sql_schema_differ::SqlSchemaDifferFlavour,
+    sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
+    sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
 };
 use datamodel::{common::preview_features::PreviewFeature, ValidatedSchema};
+use enumflags2::BitFlags;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
 };
-use quaint::prelude::Table;
+use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
-use user_facing_errors::migration_engine::ApplyMigrationError;
 
 /// P is the params, C is a connection.
 pub(crate) enum State<P, C> {
@@ -203,16 +201,6 @@ fn validate_connection_infos_do_not_match(previous: &str, next: &str) -> Connect
     }
 }
 
-async fn generic_apply_migration_script(migration_name: &str, script: &str, conn: &Connection) -> ConnectorResult<()> {
-    conn.raw_cmd(script).await.map_err(|sql_error| {
-        ConnectorError::user_facing(ApplyMigrationError {
-            migration_name: migration_name.to_owned(),
-            database_error_code: String::from(sql_error.error_code().unwrap_or("none")),
-            database_error: ConnectorError::from(sql_error).to_string(),
-        })
-    })
-}
-
 /// Remove all usage of non-enabled preview feature elements from the SqlSchema.
 fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<PreviewFeature>) {
     use sql_schema_describer::IndexType;
@@ -267,5 +255,18 @@ fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<P
     // Remove this when the feature is GA
     if !preview_features.contains(PreviewFeature::FullTextIndex) {
         filter_fulltext_capabilities(sql_schema);
+    }
+}
+
+fn quaint_error_to_connector_error(error: quaint::error::Error, connection_info: &ConnectionInfo) -> ConnectorError {
+    match user_facing_errors::quaint::render_quaint_error(error.kind(), connection_info) {
+        Some(user_facing_error) => user_facing_error.into(),
+        None => {
+            let msg = error
+                .original_message()
+                .map(String::from)
+                .unwrap_or_else(|| error.to_string());
+            ConnectorError::from_msg(msg)
+        }
     }
 }

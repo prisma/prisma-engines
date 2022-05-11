@@ -1,10 +1,6 @@
 mod shadow_db;
 
-use crate::{
-    connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
-    sql_renderer::IteratorJoin,
-    SqlFlavour,
-};
+use crate::{sql_renderer::IteratorJoin, SqlFlavour};
 use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use indoc::indoc;
@@ -12,8 +8,8 @@ use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
 };
 use quaint::{
-    connector::{tokio_postgres::error::ErrorPosition, PostgresUrl},
-    prelude::ConnectionInfo,
+    connector::{tokio_postgres::error::ErrorPosition, PostgreSql as Connection, PostgresUrl},
+    prelude::Queryable,
 };
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 use std::{collections::HashMap, future, time};
@@ -101,8 +97,8 @@ impl SqlFlavour for PostgresFlavour {
             // have any meaning, but it should not be used by any other tool.
             tokio::time::timeout(
                 ADVISORY_LOCK_TIMEOUT,
-                connection.raw_cmd("SELECT pg_advisory_lock(72707369)"),
-                )
+                raw_cmd("SELECT pg_advisory_lock(72707369)", connection, &params.url),
+            )
                 .await
                 .map_err(|_elapsed| {
                     ConnectorError::user_facing(user_facing_errors::common::DatabaseTimeout {
@@ -137,25 +133,23 @@ impl SqlFlavour for PostgresFlavour {
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         use sql_schema_describer::{postgres as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
         with_connection(self, |params, circumstances, conn| async move {
-            let connection_info = ConnectionInfo::Postgres(params.url.clone());
             let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
             if circumstances.contains(Circumstances::IsCockroachDb) {
                 describer_circumstances |= describer::Circumstances::Cockroach;
             }
 
-            let mut schema =
-                sql_schema_describer::postgres::SqlSchemaDescriber::new(conn.queryable(), describer_circumstances)
-                    .describe(params.url.schema())
-                    .await
-                    .map_err(|err| match err.into_kind() {
-                        DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, &connection_info),
-                        e @ DescriberErrorKind::CrossSchemaReference { .. } => {
-                            let err = DatabaseSchemaInconsistent {
-                                explanation: e.to_string(),
-                            };
-                            ConnectorError::user_facing(err)
-                        }
-                    })?;
+            let mut schema = sql_schema_describer::postgres::SqlSchemaDescriber::new(conn, describer_circumstances)
+                .describe(params.url.schema())
+                .await
+                .map_err(|err| match err.into_kind() {
+                    DescriberErrorKind::QuaintError(err) => quaint_err(&params.url)(err),
+                    e @ DescriberErrorKind::CrossSchemaReference { .. } => {
+                        let err = DatabaseSchemaInconsistent {
+                            explanation: e.to_string(),
+                        };
+                        ConnectorError::user_facing(err)
+                    }
+                })?;
 
             super::normalize_sql_schema(&mut schema, params.connector_params.preview_features);
 
@@ -179,9 +173,9 @@ impl SqlFlavour for PostgresFlavour {
 
     fn query<'a>(
         &'a mut self,
-        query: quaint::ast::Query<'a>,
+        q: quaint::ast::Query<'a>,
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
-        with_connection(self, move |_, _, conn| async move { Ok(conn.query(query).await?) })
+        with_connection(self, move |params, _, conn| query(q, conn, &params.url))
     }
 
     fn query_raw<'a>(
@@ -189,10 +183,9 @@ impl SqlFlavour for PostgresFlavour {
         sql: &'a str,
         params: &'a [quaint::Value<'a>],
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
-        with_connection(
-            self,
-            move |_, _, conn| async move { Ok(conn.query_raw(sql, params).await?) },
-        )
+        with_connection(self, move |conn_params, _, conn| {
+            query_raw(sql, params, conn, &conn_params.url)
+        })
     }
 
     fn run_query_script<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
@@ -205,10 +198,9 @@ impl SqlFlavour for PostgresFlavour {
         script: &'a str,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         with_connection(self, move |_params, _circumstances, connection| async move {
-            let (client, _url) = connection.unwrap_postgres();
-            let inner_client = client.client();
+            let client = connection.client();
 
-            match inner_client.simple_query(script).await {
+            match client.simple_query(script).await {
                 Ok(_) => Ok(()),
                 Err(err) => {
                     let (database_error_code, database_error): (Option<&str>, _) =
@@ -297,13 +289,13 @@ impl SqlFlavour for PostgresFlavour {
 
             strip_schema_param_from_url(&mut url);
 
-            let conn = create_postgres_admin_conn(url.clone()).await?;
+            let (mut conn, admin_url) = create_postgres_admin_conn(url.clone()).await?;
 
             let query = format!("CREATE DATABASE \"{}\"", db_name);
 
             let mut database_already_exists_error = None;
 
-            match conn.raw_cmd(&query).await {
+            match raw_cmd(&query, &mut conn, &admin_url).await {
                 Ok(_) => (),
                 Err(err) if err.is_user_facing_error::<user_facing_errors::common::DatabaseAlreadyExists>() => {
                     database_already_exists_error = Some(err)
@@ -311,20 +303,20 @@ impl SqlFlavour for PostgresFlavour {
                 Err(err) if err.is_user_facing_error::<user_facing_errors::query_engine::UniqueKeyViolation>() => {
                     database_already_exists_error = Some(err)
                 }
-                Err(err) => return Err(err.into()),
+                Err(err) => return Err(err),
             };
 
             // Now create the schema
-            url.set_path(&format!("/{}", db_name));
-
-            let conn = connect(&url.to_string()).await?;
+            let mut conn = Connection::new(params.url.clone())
+                .await
+                .map_err(quaint_err(&params.url))?;
 
             let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", schema_name);
 
-            conn.raw_cmd(&schema_sql).await?;
+            raw_cmd(&schema_sql, &mut conn, &params.url).await?;
 
             if let Some(err) = database_already_exists_error {
-                return Err(err.into());
+                return Err(err);
             }
 
             Ok(db_name.to_owned())
@@ -357,19 +349,16 @@ impl SqlFlavour for PostgresFlavour {
             assert!(!db_name.is_empty(), "Database name should not be empty.");
 
             strip_schema_param_from_url(&mut url);
-            let conn = create_postgres_admin_conn(url.clone()).await?;
+            let (mut admin_conn, admin_url) = create_postgres_admin_conn(url.clone()).await?;
 
-            conn.raw_cmd(&format!("DROP DATABASE \"{}\"", db_name)).await?;
+            raw_cmd(&format!("DROP DATABASE \"{}\"", db_name), &mut admin_conn, &admin_url).await?;
 
             Ok(())
         })
     }
 
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        with_connection(self, |_, _, connection| async move {
-            connection.raw_cmd("DROP TABLE _prisma_migrations").await?;
-            Ok(())
-        })
+        Box::pin(self.raw_cmd("DROP TABLE _prisma_migrations"))
     }
 
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -377,8 +366,8 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
-        with_connection(self, move |_params, _circumstances, conn| async move {
-            Ok(conn.raw_cmd(sql).await?)
+        with_connection(self, move |params, _circumstances, conn| async move {
+            raw_cmd(sql, conn, &params.url).await
         })
     }
 
@@ -386,10 +375,9 @@ impl SqlFlavour for PostgresFlavour {
         with_connection(self, move |params, _circumstances, conn| async move {
             let schema_name = params.url.schema();
 
-            conn.raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name))
-                .await?;
+            raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name), conn, &params.url).await?;
+            raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name), conn, &params.url).await?;
 
-            conn.raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name)).await?;
             Ok(())
         })
     }
@@ -399,7 +387,6 @@ impl SqlFlavour for PostgresFlavour {
             .connection_string
             .parse()
             .map_err(|err| ConnectorError::url_parse_error(err))?;
-        // ConnectorError::from(KnownError::new(InvalidConnectionString { details }))
         disable_postgres_statement_cache(&mut url)?;
         let connection_string = url.to_string();
         let url = PostgresUrl::new(url).map_err(|err| ConnectorError::url_parse_error(err))?;
@@ -458,8 +445,7 @@ impl SqlFlavour for PostgresFlavour {
 
                     {
                         let create_database = format!("CREATE DATABASE \"{}\"", shadow_database_name);
-                        main_connection
-                            .raw_cmd(&create_database)
+                        raw_cmd(&create_database, main_connection, &params.url)
                             .await
                             .map_err(ConnectorError::from)
                             .map_err(|err| err.into_shadow_db_creation_error())?;
@@ -471,12 +457,12 @@ impl SqlFlavour for PostgresFlavour {
                         .parse()
                         .map_err(ConnectorError::url_parse_error)?;
                     shadow_database_url.set_path(&format!("/{}", shadow_database_name));
-                    let params = ConnectorParams {
+                    let shadow_db_params = ConnectorParams {
                         connection_string: shadow_database_url.to_string(),
                         preview_features: params.connector_params.preview_features,
                         shadow_database_connection_string: None,
                     };
-                    shadow_database.set_params(params)?;
+                    shadow_database.set_params(shadow_db_params)?;
                     tracing::debug!("Connecting to shadow database `{}`", shadow_database_name);
                     shadow_database.ensure_connection_validity().await?;
 
@@ -486,7 +472,7 @@ impl SqlFlavour for PostgresFlavour {
                     let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await;
 
                     let drop_database = format!("DROP DATABASE IF EXISTS \"{}\"", shadow_database_name);
-                    main_connection.raw_cmd(&drop_database).await?;
+                    raw_cmd(&drop_database, main_connection, &params.url).await?;
 
                     ret
                 })
@@ -495,8 +481,8 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
-        with_connection(self, |_params, _circumstances, connection| async move {
-            Ok(connection.version().await?)
+        with_connection(self, |params, _circumstances, connection| async move {
+            connection.version().await.map_err(quaint_err(&params.url))
         })
     }
 }
@@ -511,7 +497,7 @@ fn strip_schema_param_from_url(url: &mut Url) {
 
 /// Try to connect as an admin to a postgres database. We try to pick a default database from which
 /// we can create another database.
-async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection> {
+async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Connection, PostgresUrl)> {
     // "postgres" is the default database on most postgres installations,
     // "template1" is guaranteed to exist, and "defaultdb" is the only working
     // option on DigitalOcean managed postgres databases.
@@ -521,7 +507,11 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection>
 
     for database_name in CANDIDATE_DEFAULT_DATABASES {
         url.set_path(&format!("/{}", database_name));
-        match connect(url.as_str()).await {
+        let postgres_url = PostgresUrl::new(url.clone()).unwrap();
+        match Connection::new(postgres_url.clone())
+            .await
+            .map_err(quaint_err(&postgres_url))
+        {
             // If the database does not exist, try the next one.
             Err(err) => match &err.error_code() {
                 Some(DatabaseDoesNotExist::ERROR_CODE) => (),
@@ -533,7 +523,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection>
             },
             // If the outcome is anything else, use this.
             other_outcome => {
-                conn = Some(other_outcome);
+                conn = Some(other_outcome.map(|conn| (conn, postgres_url)));
                 break;
             }
         }
@@ -597,13 +587,14 @@ where
 
         flavour.state
                 .try_connect(move |params| Box::pin(async move {
-                    let connection = connect(&params.connector_params.connection_string).await?;
+                    let mut connection = Connection::new(params.url.clone()).await.map_err(quaint_err(&params.url))?;
                     let schema_name = params.url.schema();
 
-                    let schema_exists_result = connection
-                        .query_raw(
+                    let schema_exists_result = query_raw(
                             "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1), version()",
                             &[schema_name.into()],
+                            &mut connection,
+                            &params.url,
                         )
                         .await?;
 
@@ -625,7 +616,7 @@ where
                                 return Err(ConnectorError::from_msg(msg.to_owned()));
                             } else if db_is_cockroach {
                                 circumstances |= Circumstances::IsCockroachDb;
-                                connection.raw_cmd(COCKROACHDB_PRELUDE).await?;
+                                raw_cmd(COCKROACHDB_PRELUDE, &mut connection, &params.url).await?;
                             }
                         }
                         None => {
@@ -645,14 +636,38 @@ where
                         schema_name = schema_name,
                     );
 
-                    connection
-                        .raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name))
-                        .await?;
+                    raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name), &mut connection, &params.url).await?;
 
                     Ok((circumstances, connection))
                 })).await?;
         with_connection::<O, F, C>(flavour, f).await
     })
+}
+
+async fn raw_cmd(sql: &str, conn: &mut Connection, url: &PostgresUrl) -> ConnectorResult<()> {
+    conn.raw_cmd(sql).await.map_err(quaint_err(url))
+}
+
+async fn query_raw(
+    sql: &str,
+    params: &[quaint::Value<'_>],
+    conn: &mut Connection,
+    url: &PostgresUrl,
+) -> ConnectorResult<quaint::prelude::ResultSet> {
+    conn.query_raw(sql, params).await.map_err(quaint_err(url))
+}
+
+async fn query(
+    q: quaint::ast::Query<'_>,
+    conn: &mut Connection,
+    url: &PostgresUrl,
+) -> ConnectorResult<quaint::prelude::ResultSet> {
+    conn.query(q).await.map_err(quaint_err(url))
+}
+
+fn quaint_err(url: &PostgresUrl) -> impl (Fn(quaint::error::Error) -> ConnectorError) + '_ {
+    use quaint::prelude::ConnectionInfo;
+    |err| super::quaint_error_to_connector_error(err, &ConnectionInfo::Postgres(url.clone()))
 }
 
 #[cfg(test)]
