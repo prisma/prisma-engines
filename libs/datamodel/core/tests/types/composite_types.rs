@@ -370,18 +370,6 @@ fn composite_types_are_parsed_without_error() {
                 Model {
                     name: "User",
                     fields: [
-                        CompositeField(
-                            CompositeField {
-                                name: "address",
-                                database_name: None,
-                                composite_type: "Address",
-                                arity: Optional,
-                                documentation: None,
-                                is_commented_out: false,
-                                is_ignored: false,
-                                default_value: None,
-                            },
-                        ),
                         ScalarField(
                             ScalarField {
                                 name: "id",
@@ -410,6 +398,18 @@ fn composite_types_are_parsed_without_error() {
                                 is_updated_at: false,
                                 is_commented_out: false,
                                 is_ignored: false,
+                            },
+                        ),
+                        CompositeField(
+                            CompositeField {
+                                name: "address",
+                                database_name: None,
+                                composite_type: "Address",
+                                arity: Optional,
+                                documentation: None,
+                                is_commented_out: false,
+                                is_ignored: false,
+                                default_value: None,
                             },
                         ),
                     ],

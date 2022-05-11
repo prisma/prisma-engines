@@ -424,6 +424,9 @@ impl<'a> LiftAstToDml<'a> {
             let field_id = scalar_field.field_id();
             let ast_field = &ast_model[field_id];
             let arity = self.lift_field_arity(&ast_field.arity);
+
+            field_ids_for_sorting.insert((&ast_model.name.name, &ast_field.name.name), field_id);
+
             let field_type = match &scalar_field.scalar_field_type() {
                 db::ScalarFieldType::CompositeType(ctid) => {
                     let mut field = dml::CompositeField::new();
@@ -452,7 +455,6 @@ impl<'a> LiftAstToDml<'a> {
                     .filter(|_| self.connector.supports_named_default_values()),
             });
 
-            field_ids_for_sorting.insert((&ast_model.name.name, &ast_field.name.name), field_id);
             model.add_field(dml::Field::ScalarField(field));
         }
 
