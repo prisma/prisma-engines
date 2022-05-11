@@ -684,13 +684,24 @@
 <span id="679">679</span>
 <span id="680">680</span>
 <span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">shadow_db</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">connection_wrapper</span>::{<span class="ident">connect</span>, <span class="ident">quaint_error_to_connector_error</span>, <span class="ident">Connection</span>},
-    <span class="ident">sql_renderer::IteratorJoin</span>,
-    <span class="ident">SqlFlavour</span>,
-};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">sql_renderer::IteratorJoin</span>, <span class="ident">SqlFlavour</span>};
 <span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
@@ -698,8 +709,8 @@
     <span class="ident">migrations_directory::MigrationDirectory</span>, <span class="ident">BoxFuture</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorParams</span>, <span class="ident">ConnectorResult</span>,
 };
 <span class="kw">use</span> <span class="ident">quaint</span>::{
-    <span class="ident">connector</span>::{<span class="ident">tokio_postgres::error::ErrorPosition</span>, <span class="ident">PostgresUrl</span>},
-    <span class="ident">prelude::ConnectionInfo</span>,
+    <span class="ident">connector</span>::{<span class="ident">tokio_postgres::error::ErrorPosition</span>, <span class="ident">PostgreSql</span> <span class="kw">as</span> <span class="ident">Connection</span>, <span class="ident">PostgresUrl</span>},
+    <span class="ident">prelude::Queryable</span>,
 };
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">postgres::PostgresSchemaExt</span>, <span class="ident">SqlSchema</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">future</span>, <span class="ident">time</span>};
@@ -787,8 +798,8 @@ SET enable_experimental_alter_column_type_general = true;
             <span class="comment">// have any meaning, but it should not be used by any other tool.</span>
             <span class="ident">tokio::time::timeout</span>(
                 <span class="ident">ADVISORY_LOCK_TIMEOUT</span>,
-                <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;SELECT pg_advisory_lock(72707369)&quot;</span>),
-                )
+                <span class="ident">raw_cmd</span>(<span class="string">&quot;SELECT pg_advisory_lock(72707369)&quot;</span>, <span class="ident">connection</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>),
+            )
                 .<span class="kw">await</span>
                 .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">_elapsed</span><span class="op">|</span> {
                     <span class="ident">ConnectorError::user_facing</span>(<span class="ident">user_facing_errors::common::DatabaseTimeout</span> {
@@ -823,25 +834,23 @@ SET enable_experimental_alter_column_type_general = true;
     <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">postgres</span> <span class="kw">as</span> <span class="ident">describer</span>, <span class="ident">DescriberErrorKind</span>, <span class="ident">SqlSchemaDescriberBackend</span>};
         <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">params</span>, <span class="ident">circumstances</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">connection_info</span> <span class="op">=</span> <span class="ident">ConnectionInfo::Postgres</span>(<span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">clone</span>());
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">describer_circumstances</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">describer::Circumstances</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
             <span class="kw">if</span> <span class="ident">circumstances</span>.<span class="ident">contains</span>(<span class="ident">Circumstances::IsCockroachDb</span>) {
                 <span class="ident">describer_circumstances</span> <span class="op">|</span><span class="op">=</span> <span class="ident">describer::Circumstances::Cockroach</span>;
             }
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span>
-                <span class="ident">sql_schema_describer::postgres::SqlSchemaDescriber::new</span>(<span class="ident">conn</span>.<span class="ident">queryable</span>(), <span class="ident">describer_circumstances</span>)
-                    .<span class="ident">describe</span>(<span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>())
-                    .<span class="kw">await</span>
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">into_kind</span>() {
-                        <span class="ident">DescriberErrorKind::QuaintError</span>(<span class="ident">err</span>) =&gt; <span class="ident">quaint_error_to_connector_error</span>(<span class="ident">err</span>, <span class="kw-2">&amp;</span><span class="ident">connection_info</span>),
-                        <span class="ident">e</span> @ <span class="ident">DescriberErrorKind::CrossSchemaReference</span> { .. } =&gt; {
-                            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">DatabaseSchemaInconsistent</span> {
-                                <span class="ident">explanation</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
-                            };
-                            <span class="ident">ConnectorError::user_facing</span>(<span class="ident">err</span>)
-                        }
-                    })<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">sql_schema_describer::postgres::SqlSchemaDescriber::new</span>(<span class="ident">conn</span>, <span class="ident">describer_circumstances</span>)
+                .<span class="ident">describe</span>(<span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>())
+                .<span class="kw">await</span>
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">into_kind</span>() {
+                    <span class="ident">DescriberErrorKind::QuaintError</span>(<span class="ident">err</span>) =&gt; <span class="ident">quaint_err</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>)(<span class="ident">err</span>),
+                    <span class="ident">e</span> @ <span class="ident">DescriberErrorKind::CrossSchemaReference</span> { .. } =&gt; {
+                        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">DatabaseSchemaInconsistent</span> {
+                            <span class="ident">explanation</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
+                        };
+                        <span class="ident">ConnectorError::user_facing</span>(<span class="ident">err</span>)
+                    }
+                })<span class="question-mark">?</span>;
 
             <span class="ident"><span class="kw">super</span>::normalize_sql_schema</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>);
 
@@ -865,9 +874,9 @@ SET enable_experimental_alter_column_type_general = true;
 
     <span class="kw">fn</span> <span class="ident">query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">query</span>: <span class="ident">quaint::ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">q</span>: <span class="ident">quaint::ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">quaint::prelude::ResultSet</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Ok</span>(<span class="ident">conn</span>.<span class="ident">query</span>(<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>) })
+        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>, <span class="kw">_</span>, <span class="ident">conn</span><span class="op">|</span> <span class="ident">query</span>(<span class="ident">q</span>, <span class="ident">conn</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">query_raw</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
@@ -875,10 +884,9 @@ SET enable_experimental_alter_column_type_general = true;
         <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">quaint::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>],
     ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">quaint::prelude::ResultSet</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(
-            <span class="self">self</span>,
-            <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Ok</span>(<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span><span class="question-mark">?</span>) },
-        )
+        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">conn_params</span>, <span class="kw">_</span>, <span class="ident">conn</span><span class="op">|</span> {
+            <span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>, <span class="ident">conn</span>, <span class="kw-2">&amp;</span><span class="ident">conn_params</span>.<span class="ident">url</span>)
+        })
     }
 
     <span class="kw">fn</span> <span class="ident">run_query_script</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -891,10 +899,9 @@ SET enable_experimental_alter_column_type_general = true;
         <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">_params</span>, <span class="ident">_circumstances</span>, <span class="ident">connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> (<span class="ident">client</span>, <span class="ident">_url</span>) <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">unwrap_postgres</span>();
-            <span class="kw">let</span> <span class="ident">inner_client</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">client</span>();
+            <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">client</span>();
 
-            <span class="kw">match</span> <span class="ident">inner_client</span>.<span class="ident">simple_query</span>(<span class="ident">script</span>).<span class="kw">await</span> {
+            <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">simple_query</span>(<span class="ident">script</span>).<span class="kw">await</span> {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
                 <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                     <span class="kw">let</span> (<span class="ident">database_error_code</span>, <span class="ident">database_error</span>): (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="kw">_</span>) <span class="op">=</span>
@@ -983,13 +990,13 @@ SET enable_experimental_alter_column_type_general = true;
 
             <span class="ident">strip_schema_param_from_url</span>(<span class="kw-2">&amp;mut</span> <span class="ident">url</span>);
 
-            <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">create_postgres_admin_conn</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">conn</span>, <span class="ident">admin_url</span>) <span class="op">=</span> <span class="ident">create_postgres_admin_conn</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE DATABASE \&quot;{}\&quot;&quot;</span>, <span class="ident">db_name</span>);
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">database_already_exists_error</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
-            <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="kw">await</span> {
+            <span class="kw">match</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>, <span class="kw-2">&amp;</span><span class="ident">admin_url</span>).<span class="kw">await</span> {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
                 <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::common::DatabaseAlreadyExists</span><span class="op">&gt;</span>() =&gt; {
                     <span class="ident">database_already_exists_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>)
@@ -997,20 +1004,20 @@ SET enable_experimental_alter_column_type_general = true;
                 <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::query_engine::UniqueKeyViolation</span><span class="op">&gt;</span>() =&gt; {
                     <span class="ident">database_already_exists_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>)
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
             };
 
             <span class="comment">// Now create the schema</span>
-            <span class="ident">url</span>.<span class="ident">set_path</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, <span class="ident">db_name</span>));
-
-            <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">to_string</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Connection::new</span>(<span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">clone</span>())
+                .<span class="kw">await</span>
+                .<span class="ident">map_err</span>(<span class="ident">quaint_err</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>))<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">schema_sql</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA IF NOT EXISTS \&quot;{}\&quot;;&quot;</span>, <span class="ident">schema_name</span>);
 
-            <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">schema_sql</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">schema_sql</span>, <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">database_already_exists_error</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>());
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
             }
 
             <span class="prelude-val">Ok</span>(<span class="ident">db_name</span>.<span class="ident">to_owned</span>())
@@ -1043,19 +1050,16 @@ SET enable_experimental_alter_column_type_general = true;
             <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">db_name</span>.<span class="ident">is_empty</span>(), <span class="string">&quot;Database name should not be empty.&quot;</span>);
 
             <span class="ident">strip_schema_param_from_url</span>(<span class="kw-2">&amp;mut</span> <span class="ident">url</span>);
-            <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">create_postgres_admin_conn</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">admin_conn</span>, <span class="ident">admin_url</span>) <span class="op">=</span> <span class="ident">create_postgres_admin_conn</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;DROP DATABASE \&quot;{}\&quot;&quot;</span>, <span class="ident">db_name</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;DROP DATABASE \&quot;{}\&quot;&quot;</span>, <span class="ident">db_name</span>), <span class="kw-2">&amp;mut</span> <span class="ident">admin_conn</span>, <span class="kw-2">&amp;</span><span class="ident">admin_url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(())
         })
     }
 
     <span class="kw">fn</span> <span class="ident">drop_migrations_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;DROP TABLE _prisma_migrations&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(())
-        })
+        <span class="ident">Box::pin</span>(<span class="self">self</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;DROP TABLE _prisma_migrations&quot;</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -1063,8 +1067,8 @@ SET enable_experimental_alter_column_type_general = true;
     }
 
     <span class="kw">fn</span> <span class="ident">raw_cmd</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">_params</span>, <span class="ident">_circumstances</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>, <span class="ident">_circumstances</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
+            <span class="ident">raw_cmd</span>(<span class="ident">sql</span>, <span class="ident">conn</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span>
         })
     }
 
@@ -1072,10 +1076,9 @@ SET enable_experimental_alter_column_type_general = true;
         <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>, <span class="ident">_circumstances</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">let</span> <span class="ident">schema_name</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>();
 
-            <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;DROP SCHEMA \&quot;{}\&quot; CASCADE&quot;</span>, <span class="ident">schema_name</span>))
-                .<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;DROP SCHEMA \&quot;{}\&quot; CASCADE&quot;</span>, <span class="ident">schema_name</span>), <span class="ident">conn</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA \&quot;{}\&quot;&quot;</span>, <span class="ident">schema_name</span>), <span class="ident">conn</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA \&quot;{}\&quot;&quot;</span>, <span class="ident">schema_name</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(())
         })
     }
@@ -1085,7 +1088,6 @@ SET enable_experimental_alter_column_type_general = true;
             .<span class="ident">connection_string</span>
             .<span class="ident">parse</span>()
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ConnectorError::url_parse_error</span>(<span class="ident">err</span>))<span class="question-mark">?</span>;
-        <span class="comment">// ConnectorError::from(KnownError::new(InvalidConnectionString { details }))</span>
         <span class="ident">disable_postgres_statement_cache</span>(<span class="kw-2">&amp;mut</span> <span class="ident">url</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">connection_string</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">to_string</span>();
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">PostgresUrl::new</span>(<span class="ident">url</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ConnectorError::url_parse_error</span>(<span class="ident">err</span>))<span class="question-mark">?</span>;
@@ -1144,8 +1146,7 @@ SET enable_experimental_alter_column_type_general = true;
 
                     {
                         <span class="kw">let</span> <span class="ident">create_database</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE DATABASE \&quot;{}\&quot;&quot;</span>, <span class="ident">shadow_database_name</span>);
-                        <span class="ident">main_connection</span>
-                            .<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">create_database</span>)
+                        <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">create_database</span>, <span class="ident">main_connection</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>)
                             .<span class="kw">await</span>
                             .<span class="ident">map_err</span>(<span class="ident">ConnectorError::from</span>)
                             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">into_shadow_db_creation_error</span>())<span class="question-mark">?</span>;
@@ -1157,12 +1158,12 @@ SET enable_experimental_alter_column_type_general = true;
                         .<span class="ident">parse</span>()
                         .<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
                     <span class="ident">shadow_database_url</span>.<span class="ident">set_path</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, <span class="ident">shadow_database_name</span>));
-                    <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
+                    <span class="kw">let</span> <span class="ident">shadow_db_params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
                         <span class="ident">connection_string</span>: <span class="ident">shadow_database_url</span>.<span class="ident">to_string</span>(),
                         <span class="ident">preview_features</span>: <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>,
                         <span class="ident">shadow_database_connection_string</span>: <span class="prelude-val">None</span>,
                     };
-                    <span class="ident">shadow_database</span>.<span class="ident">set_params</span>(<span class="ident">params</span>)<span class="question-mark">?</span>;
+                    <span class="ident">shadow_database</span>.<span class="ident">set_params</span>(<span class="ident">shadow_db_params</span>)<span class="question-mark">?</span>;
                     <span class="macro">tracing::debug!</span>(<span class="string">&quot;Connecting to shadow database `{}`&quot;</span>, <span class="ident">shadow_database_name</span>);
                     <span class="ident">shadow_database</span>.<span class="ident">ensure_connection_validity</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -1172,7 +1173,7 @@ SET enable_experimental_alter_column_type_general = true;
                     <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">shadow_db::sql_schema_from_migrations_history</span>(<span class="ident">migrations</span>, <span class="ident">shadow_database</span>).<span class="kw">await</span>;
 
                     <span class="kw">let</span> <span class="ident">drop_database</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;DROP DATABASE IF EXISTS \&quot;{}\&quot;&quot;</span>, <span class="ident">shadow_database_name</span>);
-                    <span class="ident">main_connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_database</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_database</span>, <span class="ident">main_connection</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
                     <span class="ident">ret</span>
                 })
@@ -1181,8 +1182,8 @@ SET enable_experimental_alter_column_type_general = true;
     }
 
     <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">_params</span>, <span class="ident">_circumstances</span>, <span class="ident">connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">connection</span>.<span class="ident">version</span>().<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">params</span>, <span class="ident">_circumstances</span>, <span class="ident">connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
+            <span class="ident">connection</span>.<span class="ident">version</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">quaint_err</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>))
         })
     }
 }
@@ -1197,7 +1198,7 @@ SET enable_experimental_alter_column_type_general = true;
 
 <span class="doccomment">/// Try to connect as an admin to a postgres database. We try to pick a default database from which</span>
 <span class="doccomment">/// we can create another database.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_postgres_admin_conn</span>(<span class="kw-2">mut</span> <span class="ident">url</span>: <span class="ident">Url</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_postgres_admin_conn</span>(<span class="kw-2">mut</span> <span class="ident">url</span>: <span class="ident">Url</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>(<span class="ident">Connection</span>, <span class="ident">PostgresUrl</span>)<span class="op">&gt;</span> {
     <span class="comment">// &quot;postgres&quot; is the default database on most postgres installations,</span>
     <span class="comment">// &quot;template1&quot; is guaranteed to exist, and &quot;defaultdb&quot; is the only working</span>
     <span class="comment">// option on DigitalOcean managed postgres databases.</span>
@@ -1207,7 +1208,11 @@ SET enable_experimental_alter_column_type_general = true;
 
     <span class="kw">for</span> <span class="ident">database_name</span> <span class="kw">in</span> <span class="ident">CANDIDATE_DEFAULT_DATABASES</span> {
         <span class="ident">url</span>.<span class="ident">set_path</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, <span class="ident">database_name</span>));
-        <span class="kw">match</span> <span class="ident">connect</span>(<span class="ident">url</span>.<span class="ident">as_str</span>()).<span class="kw">await</span> {
+        <span class="kw">let</span> <span class="ident">postgres_url</span> <span class="op">=</span> <span class="ident">PostgresUrl::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
+        <span class="kw">match</span> <span class="ident">Connection::new</span>(<span class="ident">postgres_url</span>.<span class="ident">clone</span>())
+            .<span class="kw">await</span>
+            .<span class="ident">map_err</span>(<span class="ident">quaint_err</span>(<span class="kw-2">&amp;</span><span class="ident">postgres_url</span>))
+        {
             <span class="comment">// If the database does not exist, try the next one.</span>
             <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">err</span>.<span class="ident">error_code</span>() {
                 <span class="prelude-val">Some</span>(<span class="ident">DatabaseDoesNotExist::ERROR_CODE</span>) =&gt; (),
@@ -1219,7 +1224,7 @@ SET enable_experimental_alter_column_type_general = true;
             },
             <span class="comment">// If the outcome is anything else, use this.</span>
             <span class="ident">other_outcome</span> =&gt; {
-                <span class="ident">conn</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">other_outcome</span>);
+                <span class="ident">conn</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">other_outcome</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">conn</span><span class="op">|</span> (<span class="ident">conn</span>, <span class="ident">postgres_url</span>)));
                 <span class="kw">break</span>;
             }
         }
@@ -1283,13 +1288,14 @@ SET enable_experimental_alter_column_type_general = true;
 
         <span class="ident">flavour</span>.<span class="ident">state</span>
                 .<span class="ident">try_connect</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">params</span><span class="op">|</span> <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">let</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">Connection::new</span>(<span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">quaint_err</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>))<span class="question-mark">?</span>;
                     <span class="kw">let</span> <span class="ident">schema_name</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>();
 
-                    <span class="kw">let</span> <span class="ident">schema_exists_result</span> <span class="op">=</span> <span class="ident">connection</span>
-                        .<span class="ident">query_raw</span>(
+                    <span class="kw">let</span> <span class="ident">schema_exists_result</span> <span class="op">=</span> <span class="ident">query_raw</span>(
                             <span class="string">&quot;SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1), version()&quot;</span>,
                             <span class="kw-2">&amp;</span>[<span class="ident">schema_name</span>.<span class="ident">into</span>()],
+                            <span class="kw-2">&amp;mut</span> <span class="ident">connection</span>,
+                            <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>,
                         )
                         .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -1311,7 +1317,7 @@ SET enable_experimental_alter_column_type_general = true;
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="ident">msg</span>.<span class="ident">to_owned</span>()));
                             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">db_is_cockroach</span> {
                                 <span class="ident">circumstances</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Circumstances::IsCockroachDb</span>;
-                                <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="ident">COCKROACHDB_PRELUDE</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                                <span class="ident">raw_cmd</span>(<span class="ident">COCKROACHDB_PRELUDE</span>, <span class="kw-2">&amp;mut</span> <span class="ident">connection</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                             }
                         }
                         <span class="prelude-val">None</span> =&gt; {
@@ -1331,14 +1337,38 @@ SET enable_experimental_alter_column_type_general = true;
                         <span class="ident">schema_name</span> <span class="op">=</span> <span class="ident">schema_name</span>,
                     );
 
-                    <span class="ident">connection</span>
-                        .<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA \&quot;{}\&quot;&quot;</span>, <span class="ident">schema_name</span>))
-                        .<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA \&quot;{}\&quot;&quot;</span>, <span class="ident">schema_name</span>), <span class="kw-2">&amp;mut</span> <span class="ident">connection</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
                     <span class="prelude-val">Ok</span>((<span class="ident">circumstances</span>, <span class="ident">connection</span>))
                 })).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="ident">with_connection</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">flavour</span>, <span class="ident">f</span>).<span class="kw">await</span>
     })
+}
+
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresUrl</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">quaint_err</span>(<span class="ident">url</span>))
+}
+
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(
+    <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+    <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">quaint::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
+    <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>,
+    <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresUrl</span>,
+) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">quaint::prelude::ResultSet</span><span class="op">&gt;</span> {
+    <span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">quaint_err</span>(<span class="ident">url</span>))
+}
+
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span>(
+    <span class="ident">q</span>: <span class="ident">quaint::ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>,
+    <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresUrl</span>,
+) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">quaint::prelude::ResultSet</span><span class="op">&gt;</span> {
+    <span class="ident">conn</span>.<span class="ident">query</span>(<span class="ident">q</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">quaint_err</span>(<span class="ident">url</span>))
+}
+
+<span class="kw">fn</span> <span class="ident">quaint_err</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresUrl</span>) -&gt; <span class="kw">impl</span> (<span class="ident">Fn</span>(<span class="ident">quaint::error::Error</span>) -&gt; <span class="ident">ConnectorError</span>) <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+    <span class="kw">use</span> <span class="ident">quaint::prelude::ConnectionInfo</span>;
+    <span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident"><span class="kw">super</span>::quaint_error_to_connector_error</span>(<span class="ident">err</span>, <span class="kw-2">&amp;</span><span class="ident">ConnectionInfo::Postgres</span>(<span class="ident">url</span>.<span class="ident">clone</span>()))
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
