@@ -9,9 +9,9 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
+use migration_connector::{BoxFuture, ConnectorResult};
 use sql_schema_describer::walkers::ColumnWalker;
 
-#[async_trait::async_trait]
 impl DestructiveChangeCheckerFlavour for MssqlFlavour {
     fn check_alter_column(
         &self,
@@ -111,27 +111,31 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
         }
     }
 
-    async fn count_rows_in_table(&mut self, table_name: &str) -> migration_connector::ConnectorResult<i64> {
-        let query = {
-            let schema_name = self.schema_name();
-            format!("SELECT COUNT(*) FROM [{}].[{}]", schema_name, table_name)
-        };
-        let result_set = self.query_raw(&query, &[]).await?;
-        super::extract_table_rows_count(table_name, result_set)
+    fn count_rows_in_table<'a>(&'a mut self, table_name: &'a str) -> BoxFuture<'a, ConnectorResult<i64>> {
+        Box::pin(async move {
+            let query = {
+                let schema_name = self.schema_name();
+                format!("SELECT COUNT(*) FROM [{}].[{}]", schema_name, table_name)
+            };
+            let result_set = self.query_raw(&query, &[]).await?;
+            super::extract_table_rows_count(table_name, result_set)
+        })
     }
 
-    async fn count_values_in_column(
-        &mut self,
-        (table, column): (&str, &str),
-    ) -> migration_connector::ConnectorResult<i64> {
-        let query = {
-            let schema_name = self.schema_name();
-            format!(
-                "SELECT COUNT(*) FROM [{}].[{}] WHERE [{}] IS NOT NULL",
-                schema_name, table, column
-            )
-        };
-        let result_set = self.query_raw(&query, &[]).await?;
-        super::extract_column_values_count(result_set)
+    fn count_values_in_column<'a>(
+        &'a mut self,
+        (table, column): (&'a str, &'a str),
+    ) -> BoxFuture<'a, ConnectorResult<i64>> {
+        Box::pin(async move {
+            let query = {
+                let schema_name = self.schema_name();
+                format!(
+                    "SELECT COUNT(*) FROM [{}].[{}] WHERE [{}] IS NOT NULL",
+                    schema_name, table, column
+                )
+            };
+            let result_set = self.query_raw(&query, &[]).await?;
+            super::extract_column_values_count(result_set)
+        })
     }
 }

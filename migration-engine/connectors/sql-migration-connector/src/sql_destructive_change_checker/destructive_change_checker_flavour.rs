@@ -5,11 +5,10 @@ mod sqlite;
 
 use super::DestructiveCheckPlan;
 use crate::{pair::Pair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges};
-use migration_connector::{ConnectorError, ConnectorResult};
+use migration_connector::{BoxFuture, ConnectorError, ConnectorResult};
 use sql_schema_describer::walkers::ColumnWalker;
 
 /// Flavour-specific destructive change checks and queries.
-#[async_trait::async_trait]
 pub(crate) trait DestructiveChangeCheckerFlavour {
     /// Check for potential destructive or unexecutable alter column steps.
     fn check_alter_column(
@@ -29,9 +28,12 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
         step_index: usize,
     );
 
-    async fn count_rows_in_table(&mut self, table_name: &str) -> ConnectorResult<i64>;
+    fn count_rows_in_table<'a>(&'a mut self, table_name: &'a str) -> BoxFuture<'a, ConnectorResult<i64>>;
 
-    async fn count_values_in_column(&mut self, table_and_column: (&str, &str)) -> ConnectorResult<i64>;
+    fn count_values_in_column<'a>(
+        &'a mut self,
+        table_and_column: (&'a str, &'a str),
+    ) -> BoxFuture<'a, ConnectorResult<i64>>;
 }
 
 /// Display a column type for warnings/errors.

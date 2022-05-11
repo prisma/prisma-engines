@@ -1,5 +1,4 @@
 [package]
-authors = ["Marcus Böhm <boehm@prisma.io>", "Julius de Bruijn <bruijn@prisma.io>"]
 edition = "2021"
 name = "migration-core"
 version = "0.1.0"
