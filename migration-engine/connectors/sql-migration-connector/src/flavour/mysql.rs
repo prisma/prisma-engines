@@ -1,7 +1,6 @@
 mod shadow_db;
 
 use crate::{
-    connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
     error::SystemDatabase,
     flavour::{normalize_sql_schema, SqlFlavour},
 };
@@ -12,9 +11,12 @@ use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
 };
 use once_cell::sync::Lazy;
-use quaint::connector::{
-    mysql_async::{self as my, prelude::Query},
-    MysqlUrl,
+use quaint::{
+    connector::{
+        mysql_async::{self as my, prelude::Query},
+        Mysql as Connection, MysqlUrl,
+    },
+    prelude::Queryable,
 };
 use regex::{Regex, RegexSet};
 use sql_schema_describer::SqlSchema;
@@ -88,7 +90,7 @@ impl SqlFlavour for MysqlFlavour {
 
             // https://dev.mysql.com/doc/refman/8.0/en/locking-functions.html
             let query = format!("SELECT GET_LOCK('prisma_migrate', {})", ADVISORY_LOCK_TIMEOUT.as_secs());
-            Ok(connection.raw_cmd(&query).await?)
+            raw_cmd(&query, connection, &params.url).await
         })
     }
 
@@ -103,14 +105,11 @@ impl SqlFlavour for MysqlFlavour {
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         use sql_schema_describer::{mysql as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
         with_connection(&mut self.state, |params, _circumstances, connection| async move {
-            let mut schema = describer::SqlSchemaDescriber::new(connection.queryable())
+            let mut schema = describer::SqlSchemaDescriber::new(connection)
                 .describe(params.url.dbname())
                 .await
                 .map_err(|err| match err.into_kind() {
-                    DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(
-                        err,
-                        &quaint::prelude::ConnectionInfo::Mysql(params.url.clone()),
-                    ),
+                    DescriberErrorKind::QuaintError(err) => quaint_err(&params.url)(err),
                     DescriberErrorKind::CrossSchemaReference { .. } => {
                         unreachable!("No schemas on MySQL")
                     }
@@ -122,16 +121,13 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     fn run_query_script<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
-        with_connection(&mut self.state, move |_params, circumstances, connection| async move {
+        with_connection(&mut self.state, move |params, circumstances, connection| async move {
             let convert_error = |error: my::Error| match convert_server_error(circumstances, &error) {
                 Some(e) => ConnectorError::from(e),
-                None => {
-                    quaint_error_to_connector_error(quaint::error::Error::from(error), connection.connection_info())
-                }
+                None => quaint_err(&params.url)(error.into()),
             };
 
-            let (client, _url) = connection.unwrap_mysql();
-            let mut conn = client.conn().lock().await;
+            let mut conn = connection.conn().lock().await;
 
             let mut result = sql.run(&mut *conn).await.map_err(convert_error)?;
 
@@ -182,8 +178,7 @@ impl SqlFlavour for MysqlFlavour {
                 })
             };
 
-            let (client, _url) = connection.unwrap_mysql();
-            let mut conn = client.conn().lock().await;
+            let mut conn = connection.conn().lock().await;
 
             let mut migration_idx = 0_usize;
 
@@ -253,7 +248,10 @@ impl SqlFlavour for MysqlFlavour {
                 Url::parse(&params.connector_params.connection_string).map_err(ConnectorError::url_parse_error)?;
             url.set_path("/mysql");
 
-            let conn = connect(&url.to_string()).await?;
+            let mysql_url = MysqlUrl::new(url).unwrap();
+            let mut conn = Connection::new(mysql_url.clone())
+                .await
+                .map_err(quaint_err(&params.url))?;
             let db_name = params.url.dbname();
 
             let query = format!(
@@ -261,7 +259,7 @@ impl SqlFlavour for MysqlFlavour {
                 db_name
             );
 
-            conn.raw_cmd(&query).await?;
+            raw_cmd(&query, &mut conn, &mysql_url).await?;
 
             Ok(db_name.to_owned())
         })
@@ -287,11 +285,12 @@ impl SqlFlavour for MysqlFlavour {
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async {
             let params = self.state.get_unwrapped_params();
-            let connection = connect(&params.connector_params.connection_string).await?;
-            let connection_info = connection.connection_info();
-            let db_name = connection_info.dbname().unwrap();
+            let mut connection = Connection::new(params.url.clone())
+                .await
+                .map_err(quaint_err(&params.url))?;
+            let db_name = params.url.dbname();
 
-            connection.raw_cmd(&format!("DROP DATABASE `{}`", db_name)).await?;
+            raw_cmd(&format!("DROP DATABASE `{}`", db_name), &mut connection, &params.url).await?;
 
             Ok(())
         })
@@ -307,12 +306,9 @@ impl SqlFlavour for MysqlFlavour {
 
     fn query<'a>(
         &'a mut self,
-        query: quaint::ast::Query<'a>,
+        q: quaint::ast::Query<'a>,
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
-        with_connection(
-            &mut self.state,
-            |_, _, conn| async move { Ok(conn.query(query).await?) },
-        )
+        with_connection(&mut self.state, |params, _, conn| query(q, conn, &params.url))
     }
 
     fn query_raw<'a>(
@@ -320,14 +316,14 @@ impl SqlFlavour for MysqlFlavour {
         sql: &'a str,
         params: &'a [quaint::Value<'a>],
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
-        with_connection(&mut self.state, move |_, _, conn| async move {
-            Ok(conn.query_raw(sql, params).await?)
+        with_connection(&mut self.state, move |conn_params, _, conn| {
+            query_raw(sql, params, conn, &conn_params.url)
         })
     }
 
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
-        with_connection(&mut self.state, move |_, _, conn| async move {
-            Ok(conn.raw_cmd(sql).await?)
+        with_connection(&mut self.state, move |params, _, conn| async move {
+            raw_cmd(sql, conn, &params.url).await
         })
     }
 
@@ -340,9 +336,9 @@ impl SqlFlavour for MysqlFlavour {
             }
 
             let db_name = params.url.dbname();
-            connection.raw_cmd(&format!("DROP DATABASE `{}`", db_name)).await?;
-            connection.raw_cmd(&format!("CREATE DATABASE `{}`", db_name)).await?;
-            connection.raw_cmd(&format!("USE `{}`", db_name)).await?;
+            raw_cmd(&format!("DROP DATABASE `{}`", db_name), connection, &params.url).await?;
+            raw_cmd(&format!("CREATE DATABASE `{}`", db_name), connection, &params.url).await?;
+            raw_cmd(&format!("USE `{}`", db_name), connection, &params.url).await?;
 
             Ok(())
         })
@@ -413,14 +409,14 @@ impl SqlFlavour for MysqlFlavour {
                     let shadow_database_name = crate::new_shadow_database_name();
 
                     let create_database = format!("CREATE DATABASE `{}`", shadow_database_name);
-                    conn.raw_cmd(&create_database)
+                    raw_cmd(&create_database, conn, &params.url)
                         .await
                         .map_err(ConnectorError::from)
                         .map_err(|err| err.into_shadow_db_creation_error())?;
 
                     let mut shadow_database_url = params.url.url().clone();
                     shadow_database_url.set_path(&format!("/{}", shadow_database_name));
-                    let params = ConnectorParams {
+                    let shadow_db_params = ConnectorParams {
                         connection_string: shadow_database_url.to_string(),
                         preview_features: params.connector_params.preview_features,
                         shadow_database_connection_string: None,
@@ -428,7 +424,7 @@ impl SqlFlavour for MysqlFlavour {
 
                     let host = shadow_database_url.host();
                     tracing::debug!("Connecting to shadow database at {:?}/{}", host, shadow_database_name);
-                    shadow_database.set_params(params)?;
+                    shadow_database.set_params(shadow_db_params)?;
 
                     // We go through the whole process without early return, then clean up
                     // the shadow database, and only then return the result. This avoids
@@ -436,7 +432,7 @@ impl SqlFlavour for MysqlFlavour {
                     let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await;
 
                     let drop_database = format!("DROP DATABASE IF EXISTS `{}`", shadow_database_name);
-                    conn.raw_cmd(&drop_database).await?;
+                    raw_cmd(&drop_database, conn, &params.url).await?;
 
                     ret
                 })
@@ -445,8 +441,8 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
-        with_connection(&mut self.state, |_, _, connection| async {
-            Ok(connection.version().await?)
+        with_connection(&mut self.state, |params, _, connection| async {
+            connection.version().await.map_err(quaint_err(&params.url))
         })
     }
 }
@@ -543,30 +539,28 @@ where
                 .try_connect(|params| {
                     Box::pin(async move {
                         let db_name = params.url.dbname();
-                        let connection = connect(&params.connector_params.connection_string).await?;
+                        let mut connection = Connection::new(params.url.clone())
+                            .await
+                            .map_err(quaint_err(&params.url))?;
 
                         if MYSQL_SYSTEM_DATABASES.is_match(db_name) {
                             return Err(SystemDatabase(db_name.to_owned()).into());
                         }
 
-                        let version = connection
-                            .query_raw("SELECT @@version", &[])
+                        let version = query_raw("SELECT @@version", &[], &mut connection, &params.url)
                             .await?
                             .into_iter()
                             .next()
                             .and_then(|r| r.into_iter().next())
                             .and_then(|val| val.into_string());
 
-                        let global_version = connection.version().await?;
                         let mut circumstances = BitFlags::<Circumstances>::default();
 
                         if let Some(version) = version {
                             if version.contains("vitess") || version.contains("Vitess") {
                                 circumstances |= Circumstances::IsVitess;
                             }
-                        }
 
-                        if let Some(version) = global_version {
                             if version.starts_with("5.6") {
                                 circumstances |= Circumstances::IsMysql56;
                             }
@@ -576,7 +570,8 @@ where
                             }
                         }
 
-                        let result_set = connection.query_raw("SELECT @@lower_case_table_names", &[]).await?;
+                        let result_set =
+                            query_raw("SELECT @@lower_case_table_names", &[], &mut connection, &params.url).await?;
 
                         if let Some(1) = result_set.into_single().ok().and_then(|row| {
                             row.at(0).and_then(|row| {
@@ -630,4 +625,30 @@ fn convert_server_error(circumstances: BitFlags<Circumstances>, error: &my::Erro
 /// This bit of logic was given to us by a PlanetScale engineer.
 fn is_planetscale(connection_string: &str) -> bool {
     connection_string.contains(".psdb.cloud")
+}
+
+async fn raw_cmd(sql: &str, conn: &mut Connection, url: &MysqlUrl) -> ConnectorResult<()> {
+    conn.raw_cmd(sql).await.map_err(quaint_err(url))
+}
+
+async fn query_raw(
+    sql: &str,
+    params: &[quaint::Value<'_>],
+    conn: &mut Connection,
+    url: &MysqlUrl,
+) -> ConnectorResult<quaint::prelude::ResultSet> {
+    conn.query_raw(sql, params).await.map_err(quaint_err(url))
+}
+
+async fn query(
+    q: quaint::ast::Query<'_>,
+    conn: &mut Connection,
+    url: &MysqlUrl,
+) -> ConnectorResult<quaint::prelude::ResultSet> {
+    conn.query(q).await.map_err(quaint_err(url))
+}
+
+fn quaint_err(url: &MysqlUrl) -> impl (Fn(quaint::error::Error) -> ConnectorError) + '_ {
+    use quaint::prelude::ConnectionInfo;
+    |err| super::quaint_error_to_connector_error(err, &ConnectionInfo::Mysql(url.clone()))
 }
