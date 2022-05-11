@@ -2,7 +2,6 @@ use core::fmt;
 use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use serde_json::Value;
 use std::collections::BTreeMap;
-use tokio::sync::RwLock;
 use tracing::{
     field::{Field, Visit},
     level_filters::LevelFilter,
@@ -16,7 +15,7 @@ use tracing_subscriber::{
 };
 
 pub(crate) struct Logger {
-    __dispatcher: RwLock<Dispatch>,
+    __dispatcher: Dispatch,
 }
 
 impl Logger {
@@ -40,13 +39,13 @@ impl Logger {
         let layer = CallbackLayer::new(log_callback).with_filter(filters);
 
         Self {
-            __dispatcher: RwLock::new(Dispatch::new(Registry::default().with(layer))),
+            __dispatcher: Dispatch::new(Registry::default().with(layer)),
         }
     }
 
     /// Returns a tracing dispatcher
     pub async fn dispatcher(&self) -> Dispatch {
-        self.__dispatcher.read().await.clone()
+        self.__dispatcher.clone()
     }
 }
 
