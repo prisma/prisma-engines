@@ -37,7 +37,7 @@ impl Logger {
             log_level.boxed()
         };
 
-        let layer = CallbackLayer::new(log_callback.clone()).with_filter(filters);
+        let layer = CallbackLayer::new(log_callback).with_filter(filters);
 
         Self {
             __dispatcher: RwLock::new(Dispatch::new(Registry::default().with(layer))),
