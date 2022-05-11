@@ -35,7 +35,10 @@ impl<'a> GraphQlHandler<'a> {
                 }
                 BatchDocument::Compact(compacted) => self.handle_compacted(compacted, tx_id, trace_id).await,
             },
-            Err(err) => PrismaResponse::Single(err.into()),
+            Err(err) => match err.as_known_error() {
+                Some(transformed) => PrismaResponse::Single(user_facing_errors::Error::new_known(transformed).into()),
+                None => PrismaResponse::Single(err.into()),
+            },
         }
     }
 
