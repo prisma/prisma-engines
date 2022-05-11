@@ -7,7 +7,6 @@ use prisma_models::{FieldSelection, ManyRecords, Record, RelationFieldRef, Selec
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
-#[tracing::instrument(skip(tx, query, parent_result, processor))]
 pub async fn m2m(
     tx: &mut dyn ConnectionLike,
     query: &RelatedRecordsQuery,
@@ -130,15 +129,6 @@ pub async fn m2m(
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
-#[tracing::instrument(skip(
-    tx,
-    parent_field,
-    parent_selections,
-    parent_result,
-    query_args,
-    selected_fields,
-    processor
-))]
 #[allow(clippy::too_many_arguments)]
 pub async fn one2m(
     tx: &mut dyn ConnectionLike,

@@ -375,7 +375,6 @@ pub async fn execute_raw<'conn>(
 }
 
 /// Execute a plain MongoDB query, returning the answer as a JSON `Value`.
-#[tracing::instrument(skip(database, session, model, inputs, query_type))]
 pub async fn query_raw<'conn>(
     database: &Database,
     session: &mut ClientSession,

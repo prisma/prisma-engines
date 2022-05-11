@@ -11,7 +11,6 @@ use std::convert::TryInto;
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
 /// e.g. that the query schema guarantees that required fields are present.
 /// Errors occur if conversions fail.
-#[tracing::instrument(skip(arguments, model))]
 pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> QueryGraphBuilderResult<QueryArguments> {
     let query_args = arguments.into_iter().fold(
         Ok(QueryArguments::new(model.clone())),

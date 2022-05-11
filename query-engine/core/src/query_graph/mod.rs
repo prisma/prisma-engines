@@ -215,7 +215,6 @@ impl QueryGraph {
         Ok(graph)
     }
 
-    #[tracing::instrument(skip(self))]
     pub fn finalize(&mut self) -> QueryGraphResult<()> {
         if !self.finalized {
             self.swap_marked()?;
@@ -518,7 +517,6 @@ impl QueryGraph {
     ///                                                                                                         └───┘
     /// ```
     /// [DTODO] put if flow exception illustration here.
-    #[tracing::instrument(skip(self))]
     fn swap_marked(&mut self) -> QueryGraphResult<()> {
         if !self.marked_node_pairs.is_empty() {
             trace!("[Graph][Swap] Before shape: {}", self);
@@ -615,7 +613,6 @@ impl QueryGraph {
     ///         sibling   │                                ─ ─ ─ ─ ─ ─ ┘
     ///      └ ─ ─ ─ ─ ─ ─
     /// ```
-    #[tracing::instrument(skip(self))]
     fn normalize_if_nodes(&mut self) -> QueryGraphResult<()> {
         for node_ix in self.graph.node_indices() {
             let node = NodeRef { node_ix };
@@ -658,7 +655,6 @@ impl QueryGraph {
     /// This ensures that children nodes of return nodes have the proper data dependencies at their disposal.
     /// In case the parent nodes of return nodes do not have a field selection that fullfils the new dependency,
     /// a reload node will be inserted in between the parent and the return node by the `insert_reloads` method.
-    #[tracing::instrument(skip(self))]
     fn ensure_return_nodes_have_parent_dependency(&mut self) -> QueryGraphResult<()> {
         let return_nodes: Vec<NodeRef> = self
             .graph
@@ -770,7 +766,6 @@ impl QueryGraph {
     ///
     /// The `Reload` node is always a "find many" query.
     /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
-    #[tracing::instrument(skip(self))]
     fn insert_reloads(&mut self) -> QueryGraphResult<()> {
         let reloads: Vec<(NodeRef, ModelRef, Vec<FieldSelection>)> = self
             .graph

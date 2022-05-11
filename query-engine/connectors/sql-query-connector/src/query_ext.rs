@@ -33,7 +33,6 @@ impl QueryExt for PooledConnection {}
 #[async_trait]
 pub trait QueryExt: Queryable + Send + Sync {
     /// Filter and map the resulting types with the given identifiers.
-    #[tracing::instrument(skip(self, q, idents))]
     async fn filter(
         &self,
         q: Query<'_>,
@@ -70,7 +69,6 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Execute a singular SQL query in the database, returning an arbitrary
     /// JSON `Value` as a result.
-    #[tracing::instrument(skip(self, sql_info, features, inputs))]
     async fn raw_json<'a>(
         &'a self,
         sql_info: SqlInfo,
@@ -115,7 +113,6 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Execute a singular SQL query in the database, returning the number of
     /// affected rows.
-    #[tracing::instrument(skip(self, inputs))]
     async fn raw_count<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
@@ -139,7 +136,6 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     /// Select one row from the database.
-    #[tracing::instrument(skip(self, q, meta))]
     async fn find(
         &self,
         q: Select<'_>,
@@ -155,7 +151,6 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Process the record filter and either return directly with precomputed values,
     /// or fetch IDs from the database.
-    #[tracing::instrument(skip(self, model, record_filter))]
     async fn filter_selectors(
         &self,
         model: &ModelRef,
@@ -170,7 +165,6 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     /// Read the all columns as a (primary) identifier.
-    #[tracing::instrument(skip(self, model, filter))]
     async fn filter_ids(
         &self,
         model: &ModelRef,
@@ -189,7 +183,6 @@ pub trait QueryExt: Queryable + Send + Sync {
         self.select_ids(select, model_id, trace_id).await
     }
 
-    #[tracing::instrument(skip(self, select, model_id))]
     async fn select_ids(
         &self,
         select: Select<'_>,

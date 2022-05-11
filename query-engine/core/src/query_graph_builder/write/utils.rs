@@ -86,7 +86,6 @@ fn get_selected_fields(model: &ModelRef, selection: FieldSelection) -> FieldSele
 /// - `parent_node` needs to return a blog ID during execution.
 /// - `parent_relation_field` is the field on the `Blog` model, e.g. `posts`.
 /// - `filter` narrows down posts, e.g. posts where their titles start with a given string.
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter))]
 pub fn insert_find_children_by_parent_node<T>(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
@@ -192,7 +191,6 @@ where
 /// the relation is also inlined on that models side, so we put that check into the if flow.
 ///
 /// Returns a `NodeRef` to the "Read Related" node in the graph illustrated above.
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field))]
 pub fn insert_existing_1to1_related_model_checks(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
@@ -308,7 +306,6 @@ pub fn insert_existing_1to1_related_model_checks(
 ///               │                                                         │                                        │
 ///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘
 /// ```
-#[tracing::instrument(skip(graph, model_to_delete, parent_node, child_node))]
 pub fn insert_emulated_on_delete(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -819,7 +816,6 @@ pub fn emulate_on_update_set_null(
 ///               │                                                         │                                        │
 ///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘
 /// ```
-#[tracing::instrument(skip(graph, model_to_update, parent_node, child_node))]
 pub fn insert_emulated_on_update_with_intermediary_node(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -868,7 +864,6 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     Ok(Some(join_node))
 }
 
-#[tracing::instrument(skip(graph, model_to_update, parent_node, child_node))]
 pub fn insert_emulated_on_update(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,

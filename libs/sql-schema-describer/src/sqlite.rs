@@ -137,7 +137,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(size.try_into().unwrap())
     }
 
-    async fn get_table(&self, schema: &str, name: &str) -> DescriberResult<Table> {
+    async fn get_table(&self, _schema: &str, name: &str) -> DescriberResult<Table> {
         let (columns, primary_key) = self.get_columns(name).await?;
         let foreign_keys = self.get_foreign_keys(name).await?;
         let indices = self.get_indices(name).await?;

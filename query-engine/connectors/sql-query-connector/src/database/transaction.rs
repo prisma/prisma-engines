@@ -40,7 +40,6 @@ impl<'tx> ConnectionLike for SqlConnectorTransaction<'tx> {}
 
 #[async_trait]
 impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
-    #[tracing::instrument(skip(self))]
     async fn commit(&mut self) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
             Ok(self.inner.commit().await.map_err(SqlError::from)?)
@@ -48,7 +47,6 @@ impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
         .await
     }
 
-    #[tracing::instrument(skip(self))]
     async fn rollback(&mut self) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
             let res = self.inner.rollback().await.map_err(SqlError::from);

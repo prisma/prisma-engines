@@ -9,7 +9,6 @@ use tracing::Span;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
-#[tracing::instrument(skip(model, args))]
 pub fn create_record(model: &ModelRef, mut args: WriteArgs, trace_id: Option<String>) -> Insert<'static> {
     let fields: Vec<_> = model
         .fields()
@@ -39,7 +38,6 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs, trace_id: Option<Str
 /// `INSERT` new records into the database based on the given write arguments,
 /// where each `WriteArg` in the Vec is one row.
 /// Requires `affected_fields` to be non-empty to produce valid SQL.
-#[tracing::instrument(skip(model, args, skip_duplicates))]
 #[allow(clippy::mutable_key_type)]
 pub fn create_records_nonempty(
     model: &ModelRef,
@@ -89,7 +87,6 @@ pub fn create_records_nonempty(
 }
 
 /// `INSERT` empty records statement.
-#[tracing::instrument(skip(model, skip_duplicates))]
 pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool, trace_id: Option<String>) -> Insert<'static> {
     let insert: Insert<'static> = Insert::single_into(model.as_table()).into();
     let insert = insert.append_trace(&Span::current()).add_trace_id(trace_id);
@@ -101,7 +98,6 @@ pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool, trace_id: O
     }
 }
 
-#[tracing::instrument(skip(model, ids, args))]
 pub fn update_many(
     model: &ModelRef,
     ids: &[&SelectionResult],
@@ -170,7 +166,6 @@ pub fn update_many(
     Ok(result)
 }
 
-#[tracing::instrument(skip(model, ids))]
 pub fn delete_many(model: &ModelRef, ids: &[&SelectionResult], trace_id: Option<String>) -> Vec<Query<'static>> {
     let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
 
@@ -182,7 +177,6 @@ pub fn delete_many(model: &ModelRef, ids: &[&SelectionResult], trace_id: Option<
     })
 }
 
-#[tracing::instrument(skip(field, parent_id, child_ids))]
 pub fn create_relation_table_records(
     field: &RelationFieldRef,
     parent_id: &SelectionResult,
@@ -207,7 +201,6 @@ pub fn create_relation_table_records(
     insert.build().on_conflict(OnConflict::DoNothing).into()
 }
 
-#[tracing::instrument(skip(parent_field, parent_id, child_ids))]
 pub fn delete_relation_table_records(
     parent_field: &RelationFieldRef,
     parent_id: &SelectionResult,

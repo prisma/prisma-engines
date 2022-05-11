@@ -25,7 +25,6 @@ use mongodb_connector::MongoDb;
 const DEFAULT_SQLITE_DB_NAME: &str = "main";
 
 /// Loads a query executor based on the parsed Prisma schema (datasource).
-#[tracing::instrument(name = "exec_loader", skip(source))]
 pub async fn load(
     source: &Datasource,
     features: &[PreviewFeature],

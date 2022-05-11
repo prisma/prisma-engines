@@ -66,7 +66,6 @@ pub async fn setup(opts: &PrismaOpt) -> PrismaResult<State> {
 }
 
 /// Starts up the graphql query engine server
-#[tracing::instrument(skip(opts))]
 pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
     let state = setup(&opts).await?;
 
