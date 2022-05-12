@@ -1,11 +1,9 @@
+use super::GraphQLProtocolAdapter;
+use crate::HandlerError;
 use graphql_parser as gql;
 use query_core::{BatchDocument, Operation, QueryDocument};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-
-use crate::HandlerError;
-
-use super::GraphQLProtocolAdapter;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
