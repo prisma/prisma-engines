@@ -547,25 +547,28 @@ where
                             return Err(SystemDatabase(db_name.to_owned()).into());
                         }
 
-                        let version = query_raw("SELECT @@version", &[], &mut connection, &params.url)
-                            .await?
-                            .into_iter()
-                            .next()
-                            .and_then(|r| r.into_iter().next())
-                            .and_then(|val| val.into_string());
+                        let versions =
+                            query_raw("SELECT @@version, @@GLOBAL.version", &[], &mut connection, &params.url)
+                                .await?
+                                .into_iter()
+                                .next()
+                                .and_then(|row| {
+                                    let mut columns = row.into_iter();
+                                    Some((columns.next()?.into_string()?, columns.next()?.into_string()?))
+                                });
 
                         let mut circumstances = BitFlags::<Circumstances>::default();
 
-                        if let Some(version) = version {
+                        if let Some((version, global_version)) = versions {
                             if version.contains("vitess") || version.contains("Vitess") {
                                 circumstances |= Circumstances::IsVitess;
                             }
 
-                            if version.starts_with("5.6") {
+                            if global_version.starts_with("5.6") {
                                 circumstances |= Circumstances::IsMysql56;
                             }
 
-                            if version.contains("MariaDB") {
+                            if global_version.contains("MariaDB") {
                                 circumstances |= Circumstances::IsMariadb;
                             }
                         }
