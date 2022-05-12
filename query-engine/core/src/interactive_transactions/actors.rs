@@ -87,7 +87,6 @@ impl ITXServer {
         let _ = op.respond_to.send(msg);
     }
 
-    #[tracing::instrument(skip(self, operation))]
     async fn execute_single(&mut self, operation: &Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
         let conn = self.cached_tx.as_open()?;
         execute_single_operation(
@@ -99,7 +98,6 @@ impl ITXServer {
         .await
     }
 
-    #[tracing::instrument(skip(self, operations))]
     async fn execute_batch(
         &mut self,
         operations: &[Operation],

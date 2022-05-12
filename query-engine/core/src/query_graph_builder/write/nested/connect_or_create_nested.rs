@@ -13,7 +13,6 @@ use std::{convert::TryInto, sync::Arc};
 ///
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_connect_or_create(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -89,7 +88,6 @@ pub fn nested_connect_or_create(
 ///                          │     Connect     │◀─┘
 ///                          └─────────────────┘
 /// ```
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn handle_many_to_many(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -147,7 +145,6 @@ fn handle_many_to_many(
 }
 
 /// Dispatcher for one-to-many relations.
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn handle_one_to_many(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -178,7 +175,6 @@ fn handle_one_to_many(
 }
 
 /// Dispatcher for one-to-one relations.
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn handle_one_to_one(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -250,7 +246,6 @@ fn handle_one_to_one(
 /// └─▶│  Update Child   │   │  Create Child   │◀─┘
 ///    └─────────────────┘   └─────────────────┘
 /// ```
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn one_to_many_inlined_child(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -392,7 +387,6 @@ fn one_to_many_inlined_child(
 ///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
 ///          Result
 ///    └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn one_to_many_inlined_parent(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -564,7 +558,6 @@ fn one_to_many_inlined_parent(
 ///
 /// Important note: We can't inject directly from the if node into the parent if the parent is a non-create, because we need to perform a check in between,
 /// and updating the record with the injection beforehand prevents that check. Instead, we need an additional update.
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter, create_data, child_model))]
 fn one_to_one_inlined_parent(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -784,7 +777,6 @@ fn one_to_one_inlined_parent(
 /// ```
 /// Note that two versions of this graph can be build: the create and non-create case,
 /// but they're never build at the same time (denoted by the dashed boxes).
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter, create_data, child_model))]
 fn one_to_one_inlined_child(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,

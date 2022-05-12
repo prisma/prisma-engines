@@ -12,7 +12,6 @@ use std::{convert::TryInto, sync::Arc};
 use write_args_parser::*;
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
-#[tracing::instrument(skip(graph, model, field))]
 pub fn create_record(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -59,7 +58,6 @@ pub fn create_record(
 }
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
-#[tracing::instrument(skip(graph, model, field))]
 pub fn create_many_records(
     graph: &mut QueryGraph,
     _connector_ctx: &ConnectorContext,
@@ -99,7 +97,6 @@ pub fn create_many_records(
     Ok(())
 }
 
-#[tracing::instrument(skip(graph, model, data_map))]
 pub fn create_record_node(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,

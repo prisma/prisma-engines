@@ -114,7 +114,6 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         })
     }
 
-    #[tracing::instrument]
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
         let mut tables = self.get_table_names(schema).await?;
         let table_ids = tables
@@ -151,7 +150,6 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         })
     }
 
-    #[tracing::instrument]
     async fn version(&self, _schema: &str) -> DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
@@ -164,7 +162,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Self { conn }
     }
 
-    #[tracing::instrument]
     async fn get_databases(&self) -> DescriberResult<Vec<String>> {
         let sql = "SELECT name FROM sys.schemas";
         let rows = self.conn.query_raw(sql, &[]).await?;
@@ -176,7 +173,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(names)
     }
 
-    #[tracing::instrument]
     async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
         let sql = r#"
             SELECT name, OBJECT_DEFINITION(object_id) AS definition
@@ -199,7 +195,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(procedures)
     }
 
-    #[tracing::instrument]
     async fn get_table_names(&self, schema: &str) -> DescriberResult<Vec<Table>> {
         let select = r#"
             SELECT t.name AS table_name
@@ -226,7 +221,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(names)
     }
 
-    #[tracing::instrument]
     async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
         let sql = indoc! {r#"
             SELECT
@@ -525,7 +519,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(())
     }
 
-    #[tracing::instrument]
     async fn get_views(&self, schema: &str) -> DescriberResult<Vec<View>> {
         let sql = indoc! {r#"
             SELECT name AS view_name, OBJECT_DEFINITION(object_id) AS view_sql

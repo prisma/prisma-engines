@@ -37,7 +37,6 @@ use std::{convert::TryInto, sync::Arc};
 /// └─▶│   Update   │
 ///    └────────────┘
 /// ```
-#[tracing::instrument(skip(graph, parent, parent_relation_field, value, child_model))]
 pub fn nested_update(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -109,7 +108,6 @@ pub fn nested_update(
     Ok(())
 }
 
-#[tracing::instrument(skip(graph, parent, parent_relation_field, value, child_model))]
 pub fn nested_update_many(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,

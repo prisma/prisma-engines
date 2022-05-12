@@ -92,7 +92,6 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
 }
 
 /// Execute the operation as a self-contained operation, if necessary wrapped in a transaction.
-#[tracing::instrument(skip(conn, graph, serializer, force_transactions))]
 async fn execute_self_contained(
     mut conn: Box<dyn Connection>,
     graph: QueryGraph,

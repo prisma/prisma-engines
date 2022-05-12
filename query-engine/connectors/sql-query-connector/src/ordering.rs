@@ -18,7 +18,6 @@ pub struct OrderByDefinition {
 }
 
 /// Builds all expressions for an `ORDER BY` clause based on the query arguments.
-#[tracing::instrument(skip(query_arguments, base_model))]
 pub fn build(
     query_arguments: &QueryArguments,
     base_model: &ModelRef, // The model the ordering will start from

@@ -12,7 +12,6 @@ use schema_builder::constants::args;
 use std::{convert::TryInto, sync::Arc};
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
-#[tracing::instrument(skip(graph, model, field))]
 pub fn update_record(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -84,7 +83,6 @@ pub fn update_record(
 }
 
 /// Creates an update many record query and adds it to the query graph.
-#[tracing::instrument(skip(graph, model, field))]
 pub fn update_many_records(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -135,7 +133,6 @@ pub fn update_many_records(
 }
 
 /// Creates an update record query node and adds it to the query graph.
-#[tracing::instrument(skip(graph, filter, model, data_map))]
 pub fn update_record_node<T: Clone>(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -169,7 +166,6 @@ where
 }
 
 /// Creates an update many record query node and adds it to the query graph.
-#[tracing::instrument(skip(graph, connector_ctx, filter, model, data_map))]
 pub fn update_many_record_node<T>(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,

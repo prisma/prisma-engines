@@ -15,7 +15,6 @@ use schema_builder::constants::aggregations::*;
 
 /// Resolves the given field as a aggregation query.
 #[allow(clippy::unnecessary_wraps)]
-#[tracing::instrument(skip(field, model))]
 fn resolve_query(
     field: FieldPair,
     model: &ModelRef,

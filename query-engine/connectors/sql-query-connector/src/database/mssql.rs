@@ -59,7 +59,6 @@ impl FromSource for Mssql {
 
 #[async_trait]
 impl Connector for Mssql {
-    #[tracing::instrument(skip(self))]
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;

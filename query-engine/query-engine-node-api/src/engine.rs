@@ -16,7 +16,7 @@ use std::{
     sync::Arc,
 };
 use tokio::sync::RwLock;
-use tracing::{instrument::WithSubscriber, warn, Level};
+use tracing::{instrument::WithSubscriber, Level};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 use tracing_subscriber::filter::LevelFilter;
 
@@ -96,19 +96,9 @@ struct ConstructorOptions {
     datasource_overrides: BTreeMap<String, String>,
     #[serde(default)]
     env: serde_json::Value,
-    #[serde(default)]
-    telemetry: TelemetryOptions,
     config_dir: PathBuf,
     #[serde(default)]
     ignore_env_var_errors: bool,
-}
-
-#[derive(Debug, Deserialize, Default)]
-#[serde(rename_all = "camelCase")]
-struct TelemetryOptions {
-    enabled: bool,
-    #[allow(unused)]
-    endpoint: Option<String>,
 }
 
 impl Inner {
@@ -153,7 +143,6 @@ impl QueryEngine {
             log_queries,
             datasource_overrides,
             env,
-            telemetry,
             config_dir,
             ignore_env_var_errors,
         } = env.from_js_value(options)?;
@@ -186,10 +175,6 @@ impl QueryEngine {
 
         let datamodel = EngineDatamodel { ast, raw: datamodel };
 
-        if telemetry.enabled {
-            warn!("Telemetry is not ready for usage yet");
-        };
-
         let builder = EngineBuilder {
             datamodel,
             config,
@@ -203,12 +188,6 @@ impl QueryEngine {
             inner: RwLock::new(Inner::Builder(builder)),
             logger: Logger::new(log_queries, log_level, log_callback),
         })
-    }
-
-    /// Starts capturing telemetry tracing data
-    #[napi]
-    pub async fn enable_tracing(&self, endpoint: Option<String>, name: Option<String>) -> napi::Result<()> {
-        self.logger.enable_telemetry(endpoint, name).await
     }
 
     /// Connect to the database, allow queries to be run.

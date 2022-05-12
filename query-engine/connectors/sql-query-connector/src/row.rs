@@ -18,7 +18,6 @@ pub struct SqlRow {
 }
 
 impl SqlRow {
-    #[tracing::instrument(skip(self, selections))]
     pub fn into_aggregation_results(self, selections: &[AggregationSelection]) -> Vec<AggregationResult> {
         let mut values = self.values;
         values.reverse();
@@ -89,7 +88,6 @@ pub trait ToSqlRow {
 }
 
 impl ToSqlRow for ResultRow {
-    #[tracing::instrument(skip(self, meta))]
     fn to_sql_row(self, meta: &[ColumnMetadata<'_>]) -> crate::Result<SqlRow> {
         let mut row = SqlRow::default();
         let row_width = meta.len();
@@ -124,7 +122,6 @@ impl ToSqlRow for ResultRow {
     }
 }
 
-#[tracing::instrument(skip(p_value, meta))]
 pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result<PrismaValue, SqlError> {
     let create_error = |value: &Value| {
         let message = match meta.name() {

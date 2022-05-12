@@ -99,7 +99,6 @@ impl<'a> GraphQlHandler<'a> {
         }
     }
 
-    #[tracing::instrument(skip(self, document))]
     async fn handle_compacted(
         &self,
         document: CompactedDocument,

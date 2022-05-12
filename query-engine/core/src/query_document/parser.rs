@@ -17,7 +17,6 @@ impl QueryDocumentParser {
     /// In contrast, nullable and optional types on an input object are separate concepts.
     /// The above is the reason we don't need to check nullability here, as it is done by the output
     /// validation in the serialization step.
-    #[tracing::instrument(skip(parent_path, selections, schema_object))]
     pub fn parse_object(
         parent_path: QueryPath,
         selections: &[Selection],
@@ -82,7 +81,6 @@ impl QueryDocumentParser {
     }
 
     /// Parses and validates selection arguments against a schema defined field.
-    #[tracing::instrument(skip(parent_path, schema_field, given_arguments))]
     pub fn parse_arguments(
         parent_path: QueryPath,
         schema_field: &OutputFieldRef,
@@ -141,7 +139,6 @@ impl QueryDocumentParser {
 
     /// Parses and validates a QueryValue against possible input types.
     /// Matching is done in order of definition on the input type. First matching type wins.
-    #[tracing::instrument(skip(parent_path, value, possible_input_types))]
     pub fn parse_input_value(
         parent_path: QueryPath,
         value: QueryValue,
@@ -218,7 +215,6 @@ impl QueryDocumentParser {
     }
 
     /// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
-    #[tracing::instrument(skip(parent_path, value))]
     pub fn parse_scalar(
         parent_path: &QueryPath,
         value: QueryValue,
@@ -263,7 +259,6 @@ impl QueryDocumentParser {
         }
     }
 
-    #[tracing::instrument(skip(path, s))]
     pub fn parse_datetime(path: &QueryPath, s: &str) -> QueryParserResult<DateTime<FixedOffset>> {
         DateTime::parse_from_rfc3339(s).map_err(|err| QueryParserError {
             path: path.clone(),
@@ -274,7 +269,6 @@ impl QueryDocumentParser {
         })
     }
 
-    #[tracing::instrument(skip(path, s))]
     pub fn parse_bytes(path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
         prisma_value::decode_bytes(&s)
             .map(PrismaValue::Bytes)
@@ -287,7 +281,6 @@ impl QueryDocumentParser {
             })
     }
 
-    #[tracing::instrument(skip(path, s))]
     pub fn parse_decimal(path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
         BigDecimal::from_str(&s)
             .map(PrismaValue::Float)
@@ -297,7 +290,6 @@ impl QueryDocumentParser {
             })
     }
 
-    #[tracing::instrument(skip(path, s))]
     pub fn parse_bigint(path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
         s.parse::<i64>().map(PrismaValue::BigInt).map_err(|_| QueryParserError {
             path: path.clone(),
@@ -306,7 +298,6 @@ impl QueryDocumentParser {
     }
 
     // [DTODO] This is likely incorrect or at least using the wrong abstractions.
-    #[tracing::instrument(skip(path, s))]
     pub fn parse_json_list(path: &QueryPath, s: &str) -> QueryParserResult<PrismaValue> {
         let json = Self::parse_json(path, s)?;
 
@@ -329,7 +320,6 @@ impl QueryDocumentParser {
         Ok(PrismaValue::List(prisma_values))
     }
 
-    #[tracing::instrument(skip(path, s))]
     pub fn parse_json(path: &QueryPath, s: &str) -> QueryParserResult<serde_json::Value> {
         serde_json::from_str(s).map_err(|err| QueryParserError {
             path: path.clone(),
@@ -337,7 +327,6 @@ impl QueryDocumentParser {
         })
     }
 
-    #[tracing::instrument(skip(path, s))]
     pub fn parse_uuid(path: &QueryPath, s: &str) -> QueryParserResult<Uuid> {
         Uuid::parse_str(s).map_err(|err| QueryParserError {
             path: path.clone(),
@@ -345,7 +334,6 @@ impl QueryDocumentParser {
         })
     }
 
-    #[tracing::instrument(skip(path, values, value_type))]
     pub fn parse_list(
         path: &QueryPath,
         values: Vec<QueryValue>,
@@ -357,7 +345,6 @@ impl QueryDocumentParser {
             .collect::<QueryParserResult<Vec<ParsedInputValue>>>()
     }
 
-    #[tracing::instrument(skip(path, val, typ))]
     pub fn parse_enum(path: &QueryPath, val: QueryValue, typ: &EnumTypeRef) -> QueryParserResult<ParsedInputValue> {
         let raw = match val {
             QueryValue::Enum(s) => s,
@@ -402,7 +389,6 @@ impl QueryDocumentParser {
     }
 
     /// Parses and validates an input object recursively.
-    #[tracing::instrument(skip(parent_path, object, schema_object))]
     pub fn parse_input_object(
         parent_path: QueryPath,
         object: IndexMap<String, QueryValue>,

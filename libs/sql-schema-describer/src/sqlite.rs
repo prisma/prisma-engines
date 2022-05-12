@@ -35,7 +35,6 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         })
     }
 
-    #[tracing::instrument]
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
         let table_names: Vec<String> = self.get_table_names(schema).await?;
 
@@ -75,7 +74,6 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         })
     }
 
-    #[tracing::instrument]
     async fn version(&self, _schema: &str) -> DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
@@ -89,7 +87,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         SqlSchemaDescriber { conn }
     }
 
-    #[tracing::instrument]
     async fn get_databases(&self) -> DescriberResult<Vec<String>> {
         let sql = "PRAGMA database_list;";
         let rows = self.conn.query_raw(sql, &[]).await?;
@@ -129,7 +126,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(names)
     }
 
-    #[tracing::instrument]
     async fn get_size(&self) -> DescriberResult<usize> {
         let sql = r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#;
         let result = self.conn.query_raw(sql, &[]).await?;
@@ -141,8 +137,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(size.try_into().unwrap())
     }
 
-    #[tracing::instrument]
-    async fn get_table(&self, schema: &str, name: &str) -> DescriberResult<Table> {
+    async fn get_table(&self, _schema: &str, name: &str) -> DescriberResult<Table> {
         let (columns, primary_key) = self.get_columns(name).await?;
         let foreign_keys = self.get_foreign_keys(name).await?;
         let indices = self.get_indices(name).await?;
@@ -156,7 +151,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         })
     }
 
-    #[tracing::instrument]
     async fn get_views(&self) -> DescriberResult<Vec<View>> {
         let sql = "SELECT name AS view_name, sql AS view_sql FROM sqlite_master WHERE type = 'view'";
         let result_set = self.conn.query_raw(sql, &[]).await?;
@@ -172,7 +166,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(views)
     }
 
-    #[tracing::instrument]
     async fn get_columns(&self, table: &str) -> DescriberResult<(Vec<Column>, Option<PrimaryKey>)> {
         let sql = format!(r#"PRAGMA table_info ("{}")"#, table);
         let result_set = self.conn.query_raw(&sql, &[]).await?;

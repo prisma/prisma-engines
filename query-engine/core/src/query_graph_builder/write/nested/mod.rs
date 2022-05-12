@@ -24,7 +24,6 @@ use set_nested::*;
 use update_nested::*;
 use upsert_nested::*;
 
-#[tracing::instrument(skip(graph, parent, parent_relation_field, data_map))]
 #[rustfmt::skip]
 pub fn connect_nested_query(
     graph: &mut QueryGraph,

@@ -52,7 +52,6 @@ use std::{convert::TryInto, sync::Arc};
 ///  │   Read Parent   │
 ///  └─────────────────┘
 /// ```
-#[tracing::instrument(skip(graph, model, field))]
 pub fn upsert_record(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,

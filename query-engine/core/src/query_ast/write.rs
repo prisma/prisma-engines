@@ -20,7 +20,6 @@ pub enum WriteQuery {
 
 impl WriteQuery {
     /// Takes a SelectionResult and writes its contents into the write arguments of the underlying query.
-    #[tracing::instrument(skip(self, result))]
     pub fn inject_result_into_args(&mut self, result: SelectionResult) {
         let model = self.model();
         let args = match self {
@@ -40,7 +39,6 @@ impl WriteQuery {
         args.update_datetimes(model);
     }
 
-    #[tracing::instrument(skip(self, field_selection))]
     pub fn returns(&self, field_selection: &FieldSelection) -> bool {
         let returns_id = &self.model().primary_identifier() == field_selection;
 
@@ -61,7 +59,6 @@ impl WriteQuery {
         }
     }
 
-    #[tracing::instrument(skip(self))]
     pub fn model(&self) -> ModelRef {
         match self {
             Self::CreateRecord(q) => Arc::clone(&q.model),
@@ -135,7 +132,6 @@ pub struct CreateManyRecords {
 }
 
 impl CreateManyRecords {
-    #[tracing::instrument(skip(self, result))]
     pub fn inject_result_into_all(&mut self, result: SelectionResult) {
         for (selected_field, value) in result {
             for args in self.args.iter_mut() {
