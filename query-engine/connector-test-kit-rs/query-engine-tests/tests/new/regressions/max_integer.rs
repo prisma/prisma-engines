@@ -5,7 +5,7 @@ mod max_integer {
     fn schema() -> String {
         let schema = indoc! {r#"
         model Test {
-            id  Int @id
+            #id(id, Int, @id)
             int Int
         }
         "#};
@@ -82,7 +82,7 @@ mod float_serialization_issues {
     fn schema() -> String {
         let schema = indoc! {r#"
         model Test {
-            id    Int   @id
+            #id(id, Int, @id)
             float Float
         }
         "#};
@@ -90,7 +90,7 @@ mod float_serialization_issues {
         schema.to_string()
     }
 
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn int_range_overlap_works(runner: Runner) -> TestResult<()> {
         runner
             .query("mutation { createOneTest(data: { id: 1, float: 1e20 }) { id float } }")
