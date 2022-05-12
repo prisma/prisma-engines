@@ -249,21 +249,21 @@ pub struct ProviderSwitchedError {
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3020",
-    message = "The automatic creation of shadow databases is disabled on Azure SQL. Please set up a shadow database using the `shadowDatabaseUrl` datasource attribute.\nRead the docs page for more details: [https://pris.ly/d/migrate-shadow](https://pris.ly/d/migrate-shadow)"
+    message = "The automatic creation of shadow databases is disabled on Azure SQL. Please set up a shadow database using the `shadowDatabaseUrl` datasource attribute.\nRead the docs page for more details: https://pris.ly/d/migrate-shadow"
 )]
 pub struct AzureMssqlShadowDb;
 
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3021",
-    message = "Foreign keys cannot be created on this database. Learn more how to handle this: [https://pris.ly/d/migrate-no-foreign-keys](https://pris.ly/d/migrate-no-foreign-keys)"
+    message = "Foreign keys cannot be created on this database. Learn more how to handle this: https://pris.ly/d/migrate-no-foreign-keys"
 )]
 pub struct ForeignKeyCreationNotAllowed;
 
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3022",
-    message = "Direct execution of DDL (Data Definition Language) SQL statements is disabled on this database. Please read more here about how to handle this: [https://pris.ly/d/migrate-no-direct-ddl](https://pris.ly/d/migrate-no-direct-ddl)"
+    message = "Direct execution of DDL (Data Definition Language) SQL statements is disabled on this database. Please read more here about how to handle this: https://pris.ly/d/migrate-no-direct-ddl"
 )]
 pub struct DirectDdlNotAllowed;
 
