@@ -15,7 +15,7 @@ use tracing_subscriber::{
 };
 
 pub(crate) struct Logger {
-    __dispatcher: Dispatch,
+    dispatcher: Dispatch,
 }
 
 impl Logger {
@@ -43,7 +43,6 @@ impl Logger {
         }
     }
 
-    /// Returns a tracing dispatcher
     pub async fn dispatcher(&self) -> Dispatch {
         self.__dispatcher.clone()
     }
