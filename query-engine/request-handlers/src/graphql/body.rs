@@ -57,7 +57,7 @@ impl GraphQlBody {
                 let gql_doc = match gql::parse_query(&body.query) {
                     Ok(doc) => doc,
                     Err(err) if err.to_string().contains("number too large to fit in target type") | err.to_string().contains("number too small to fit in target type") => {
-                        Err(HandlerError::ValueFitError(format!("Query parsing failure: A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you're trying to store large integers.")))?
+                        Err(HandlerError::ValueFitError("Query parsing failure: A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you're trying to store large integers.".to_owned()))?
                     }
                     err @ Err(_) => err?,
                 };
