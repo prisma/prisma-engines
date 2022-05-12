@@ -406,14 +406,6 @@
 <span id="401">401</span>
 <span id="402">402</span>
 <span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
-<span id="410">410</span>
-<span id="411">411</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_trace::SqlTraceComment</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::SqlError</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_builder::write</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">QueryExt</span>};
 <span class="kw">use</span> <span class="ident">connector_interface</span>::<span class="kw-2">*</span>;
@@ -477,7 +469,6 @@
 
 <span class="doccomment">/// Create a single record to the database defined in `conn`, resulting into a</span>
 <span class="doccomment">/// `RecordProjection` as an identifier pointing to the just-created record.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">args</span>))]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_record</span>(
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
     <span class="ident">sql_family</span>: <span class="kw-2">&amp;</span><span class="ident">SqlFamily</span>,
@@ -569,7 +560,6 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">sql_info</span>, <span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">skip_duplicates</span>))]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_records</span>(
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
     <span class="ident">sql_info</span>: <span class="ident">SqlInfo</span>,
@@ -718,7 +708,6 @@
 <span class="doccomment">/// Update multiple records in a database defined in `conn` and the records</span>
 <span class="doccomment">/// defined in `args`, resulting the identifiers that were modified in the</span>
 <span class="doccomment">/// operation.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>))]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_records</span>(
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
@@ -746,7 +735,6 @@
 }
 
 <span class="doccomment">/// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>))]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_records</span>(
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
@@ -770,7 +758,6 @@
 
 <span class="doccomment">/// Connect relations defined in `child_ids` to a parent defined in `parent_id`.</span>
 <span class="doccomment">/// The relation information is in the `RelationFieldRef`.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>))]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_connect</span>(
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
@@ -785,7 +772,6 @@
 
 <span class="doccomment">/// Disconnect relations defined in `child_ids` to a parent defined in `parent_id`.</span>
 <span class="doccomment">/// The relation information is in the `RelationFieldRef`.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>))]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_disconnect</span>(
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
@@ -801,7 +787,6 @@
 
 <span class="doccomment">/// Execute a plain SQL query with the given parameters, returning the number of</span>
 <span class="doccomment">/// affected rows.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">inputs</span>))]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
     <span class="ident">features</span>: <span class="kw-2">&amp;</span>[<span class="ident">PreviewFeature</span>],
@@ -814,7 +799,6 @@
 
 <span class="doccomment">/// Execute a plain SQL query with the given parameters, returning the answer as</span>
 <span class="doccomment">/// a JSON `Value`.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">sql_info</span>, <span class="ident">features</span>, <span class="ident">inputs</span>))]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
     <span class="ident">sql_info</span>: <span class="ident">SqlInfo</span>,

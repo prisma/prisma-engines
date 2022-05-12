@@ -187,7 +187,6 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
-<span id="185">185</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">GQLBatchResponse</span>, <span class="ident">GQLResponse</span>, <span class="ident">GraphQlBody</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::PrismaResponse</span>;
 <span class="kw">use</span> <span class="ident">futures::FutureExt</span>;
@@ -289,7 +288,6 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">document</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_compacted</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">document</span>: <span class="ident">CompactedDocument</span>,

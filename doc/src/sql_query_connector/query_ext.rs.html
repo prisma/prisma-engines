@@ -220,13 +220,6 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">column_metadata</span>, <span class="ident">error</span>::<span class="kw-2">*</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">sql_trace::SqlTraceComment</span>,
     <span class="ident">value_ext::IntoTypedJsonExtension</span>, <span class="ident">AliasedCondition</span>, <span class="ident">ColumnMetadata</span>, <span class="ident">SqlRow</span>, <span class="ident">ToSqlRow</span>,
@@ -262,7 +255,6 @@
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">QueryExt</span>: <span class="ident">Queryable</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
     <span class="doccomment">/// Filter and map the resulting types with the given identifiers.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">q</span>, <span class="ident">idents</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">filter</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
@@ -299,7 +291,6 @@
 
     <span class="doccomment">/// Execute a singular SQL query in the database, returning an arbitrary</span>
     <span class="doccomment">/// JSON `Value` as a result.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">sql_info</span>, <span class="ident">features</span>, <span class="ident">inputs</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_json</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="ident">sql_info</span>: <span class="ident">SqlInfo</span>,
@@ -344,7 +335,6 @@
 
     <span class="doccomment">/// Execute a singular SQL query in the database, returning the number of</span>
     <span class="doccomment">/// affected rows.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">inputs</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_count</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
@@ -368,7 +358,6 @@
     }
 
     <span class="doccomment">/// Select one row from the database.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">q</span>, <span class="ident">meta</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">find</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">q</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
@@ -384,7 +373,6 @@
 
     <span class="doccomment">/// Process the record filter and either return directly with precomputed values,</span>
     <span class="doccomment">/// or fetch IDs from the database.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">filter_selectors</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
@@ -399,7 +387,6 @@
     }
 
     <span class="doccomment">/// Read the all columns as a (primary) identifier.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">model</span>, <span class="ident">filter</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">filter_ids</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
@@ -418,7 +405,6 @@
         <span class="self">self</span>.<span class="ident">select_ids</span>(<span class="ident">select</span>, <span class="ident">model_id</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">select</span>, <span class="ident">model_id</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">select_ids</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">select</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,

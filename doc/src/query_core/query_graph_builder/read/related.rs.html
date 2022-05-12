@@ -38,12 +38,10 @@
 <span id="33">33</span>
 <span id="34">34</span>
 <span id="35">35</span>
-<span id="36">36</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">query_document::ParsedField</span>, <span class="ident">ReadQuery</span>, <span class="ident">RelatedRecordsQuery</span>};
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelRef</span>, <span class="ident">RelationFieldRef</span>};
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">field</span>, <span class="ident">parent</span>, <span class="ident">model</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_related</span>(
     <span class="ident">field</span>: <span class="ident">ParsedField</span>,
     <span class="ident">parent</span>: <span class="ident">RelationFieldRef</span>,

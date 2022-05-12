@@ -467,18 +467,6 @@
 <span id="462">462</span>
 <span id="463">463</span>
 <span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">expression</span>::<span class="kw-2">*</span>, <span class="ident">ComputationResult</span>, <span class="ident">DiffResult</span>, <span class="ident">Env</span>, <span class="ident">ExpressionResult</span>, <span class="ident">InterpretationResult</span>, <span class="ident">InterpreterError</span>,
 };
@@ -497,7 +485,6 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Expressionista</span> {
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translate</span>(<span class="kw-2">mut</span> <span class="ident">graph</span>: <span class="ident">QueryGraph</span>) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> {
         <span class="ident">graph</span>
             .<span class="ident">root_nodes</span>()
@@ -507,7 +494,6 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">Expression::Sequence</span> { <span class="ident">seq</span>: <span class="ident">res</span> })
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>))]</span>
     <span class="kw">fn</span> <span class="ident">build_expression</span>(
         <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
         <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
@@ -524,7 +510,6 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>))]</span>
     <span class="kw">fn</span> <span class="ident">build_query_expression</span>(
         <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
         <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
@@ -570,7 +555,6 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">child_pairs</span>))]</span>
     <span class="kw">fn</span> <span class="ident">process_children</span>(
         <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
         <span class="kw-2">mut</span> <span class="ident">child_pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span>,
@@ -616,7 +600,6 @@
         <span class="prelude-val">Ok</span>(<span class="ident">expressions</span>)
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>))]</span>
     <span class="kw">fn</span> <span class="ident">build_empty_expression</span>(
         <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
         <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
@@ -634,7 +617,6 @@
         <span class="ident"><span class="self">Self</span>::transform_node</span>(<span class="ident">graph</span>, <span class="ident">parent_edges</span>, <span class="ident">Node::Empty</span>, <span class="ident">into_expr</span>)
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>))]</span>
     <span class="kw">fn</span> <span class="ident">build_computation_expression</span>(
         <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
         <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
@@ -687,7 +669,6 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>))]</span>
     <span class="kw">fn</span> <span class="ident">build_flow_expression</span>(
         <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
         <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
@@ -702,7 +683,6 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>))]</span>
     <span class="kw">fn</span> <span class="ident">translate_if_node</span>(
         <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
         <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
@@ -769,7 +749,6 @@
         <span class="ident"><span class="self">Self</span>::transform_node</span>(<span class="ident">graph</span>, <span class="ident">parent_edges</span>, <span class="ident">node</span>, <span class="ident">into_expr</span>)
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>))]</span>
     <span class="kw">fn</span> <span class="ident">translate_return_node</span>(
         <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
         <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
@@ -812,7 +791,6 @@
 
     <span class="doccomment">/// Runs transformer functions (e.g. `ParentIdsFn`) via `Expression::Func` if necessary, or if none present,</span>
     <span class="doccomment">/// builds an expression directly. `into_expr` does the final expression building based on the node coming in.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_edges</span>, <span class="ident">node</span>, <span class="ident">into_expr</span>))]</span>
     <span class="kw">fn</span> <span class="ident">transform_node</span>(
         <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
         <span class="ident">parent_edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>,
@@ -871,7 +849,6 @@
     }
 
     <span class="doccomment">/// Collects all edge dependencies that perform a node transformation based on the parent.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_edges</span>))]</span>
     <span class="kw">fn</span> <span class="ident">collect_parent_transformers</span>(
         <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
         <span class="ident">parent_edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>,
@@ -892,7 +869,6 @@
             .<span class="ident">collect</span>()
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">result_subgraphs</span>))]</span>
     <span class="kw">fn</span> <span class="ident">fold_result_scopes</span>(
         <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
         <span class="ident">result_subgraphs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span>,

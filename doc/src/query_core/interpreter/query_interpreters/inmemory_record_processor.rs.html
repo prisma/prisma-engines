@@ -194,8 +194,6 @@
 <span id="189">189</span>
 <span id="190">190</span>
 <span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector::QueryArguments</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ManyRecords</span>, <span class="ident">Record</span>, <span class="ident">SelectionResult</span>};
@@ -218,7 +216,6 @@
 <span class="kw">impl</span> <span class="ident">InMemoryRecordProcessor</span> {
     <span class="doccomment">/// Creates a new processor from the given query args.</span>
     <span class="doccomment">/// The original args will be modified to prevent db level processing.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">args</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_query_args</span>(<span class="ident">args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryArguments</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">processor</span> <span class="op">=</span> <span class="self">Self</span> { <span class="ident">args</span>: <span class="ident">args</span>.<span class="ident">clone</span>() };
 
@@ -239,7 +236,6 @@
         <span class="self">self</span>.<span class="ident">take</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">records</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">records</span>: <span class="ident">ManyRecords</span>) -&gt; <span class="ident">ManyRecords</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">needs_reversed_order</span>() {
             <span class="ident">records</span>.<span class="ident">reverse</span>();

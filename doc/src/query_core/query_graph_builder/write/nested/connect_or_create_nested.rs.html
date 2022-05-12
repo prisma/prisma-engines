@@ -1014,14 +1014,6 @@
 <span id="1009">1009</span>
 <span id="1010">1010</span>
 <span id="1011">1011</span>
-<span id="1012">1012</span>
-<span id="1013">1013</span>
-<span id="1014">1014</span>
-<span id="1015">1015</span>
-<span id="1016">1016</span>
-<span id="1017">1017</span>
-<span id="1018">1018</span>
-<span id="1019">1019</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">query_ast</span>::<span class="kw-2">*</span>,
@@ -1037,7 +1029,6 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The resulting graph can take multiple forms, based on the relation type to the parent model.</span>
 <span class="doccomment">/// Information on the graph shapes can be found on the individual handlers.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">value</span>, <span class="ident">child_model</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested_connect_or_create</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
@@ -1113,7 +1104,6 @@
 <span class="doccomment">///                          │     Connect     │◀─┘</span>
 <span class="doccomment">///                          └─────────────────┘</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">values</span>, <span class="ident">child_model</span>))]</span>
 <span class="kw">fn</span> <span class="ident">handle_many_to_many</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
@@ -1171,7 +1161,6 @@
 }
 
 <span class="doccomment">/// Dispatcher for one-to-many relations.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">values</span>, <span class="ident">child_model</span>))]</span>
 <span class="kw">fn</span> <span class="ident">handle_one_to_many</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
@@ -1202,7 +1191,6 @@
 }
 
 <span class="doccomment">/// Dispatcher for one-to-one relations.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">values</span>, <span class="ident">child_model</span>))]</span>
 <span class="kw">fn</span> <span class="ident">handle_one_to_one</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
@@ -1274,7 +1262,6 @@
 <span class="doccomment">/// └─▶│  Update Child   │   │  Create Child   │◀─┘</span>
 <span class="doccomment">///    └─────────────────┘   └─────────────────┘</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">values</span>, <span class="ident">child_model</span>))]</span>
 <span class="kw">fn</span> <span class="ident">one_to_many_inlined_child</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
@@ -1416,7 +1403,6 @@
 <span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐</span>
 <span class="doccomment">///          Result</span>
 <span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">values</span>, <span class="ident">child_model</span>))]</span>
 <span class="kw">fn</span> <span class="ident">one_to_many_inlined_parent</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
@@ -1588,7 +1574,6 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Important note: We can&#39;t inject directly from the if node into the parent if the parent is a non-create, because we need to perform a check in between,</span>
 <span class="doccomment">/// and updating the record with the injection beforehand prevents that check. Instead, we need an additional update.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">filter</span>, <span class="ident">create_data</span>, <span class="ident">child_model</span>))]</span>
 <span class="kw">fn</span> <span class="ident">one_to_one_inlined_parent</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
@@ -1808,7 +1793,6 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// Note that two versions of this graph can be build: the create and non-create case,</span>
 <span class="doccomment">/// but they&#39;re never build at the same time (denoted by the dashed boxes).</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">filter</span>, <span class="ident">create_data</span>, <span class="ident">child_model</span>))]</span>
 <span class="kw">fn</span> <span class="ident">one_to_one_inlined_child</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,

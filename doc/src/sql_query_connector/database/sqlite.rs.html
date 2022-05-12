@@ -100,7 +100,6 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
-<span id="98">98</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::connection::SqlConnection</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">FromSource</span>, <span class="ident">SqlError</span>};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
@@ -184,7 +183,6 @@
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">Connector</span> <span class="kw">for</span> <span class="ident">Sqlite</span> {
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_connection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Connection</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident"><span class="kw">super</span>::catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>().<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">check_out</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">SqlError::from</span>)<span class="question-mark">?</span>;

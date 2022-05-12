@@ -58,7 +58,6 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
-<span id="56">56</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">connect_nested</span>;
 <span class="kw">mod</span> <span class="ident">connect_or_create_nested</span>;
 <span class="kw">mod</span> <span class="ident">create_nested</span>;
@@ -85,7 +84,6 @@
 <span class="kw">use</span> <span class="ident">update_nested</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">upsert_nested</span>::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent</span>, <span class="ident">parent_relation_field</span>, <span class="ident">data_map</span>))]</span>
 <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect_nested_query</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,

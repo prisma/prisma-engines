@@ -49,15 +49,12 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">query_ast</span>::<span class="kw-2">*</span>, <span class="ident">query_graph::QueryGraph</span>, <span class="ident">ParsedField</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::ModelRef</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">convert::TryInto</span>};
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">field</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>, <span class="ident">field</span>: <span class="ident">ParsedField</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">raw_query</span> <span class="op">=</span> <span class="ident">Query::Write</span>(<span class="ident">WriteQuery::ExecuteRaw</span>(<span class="ident">raw_query</span>(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="ident">field</span>)<span class="question-mark">?</span>));
 
@@ -65,7 +62,6 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">field</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>,

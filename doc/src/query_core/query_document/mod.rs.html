@@ -227,7 +227,6 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
-<span id="225">225</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Intermediate representation of the input document that is used by the query engine to build</span>
 <span class="doccomment">//! query ASTs and validate the incoming data.</span>
 <span class="doccomment">//!</span>
@@ -337,7 +336,6 @@
 
 <span class="doccomment">/// Here be the dragons. Ay caramba!</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CompactedDocument</span> {
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;find_one_optimization&quot;</span>, <span class="ident">skip</span>(<span class="ident">ops</span>))]</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ops</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="comment">// Unpack all read queries (an enum) into a collection of selections.</span>
         <span class="comment">// We already took care earlier that all operations here must be reads.</span>

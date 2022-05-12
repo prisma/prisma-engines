@@ -246,12 +246,6 @@
 <span id="241">241</span>
 <span id="242">242</span>
 <span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Migrations directory management.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This module is responsible for the management of the contents of the</span>
@@ -305,7 +299,6 @@
 }
 
 <span class="doccomment">/// Write the migration_lock file to the directory.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_migration_lock_file</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">directory_path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">migrations_directory_path</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file_path</span> <span class="op">=</span> <span class="ident">directory_path</span>.<span class="ident">join</span>(<span class="ident">MIGRATION_LOCK_FILENAME</span>);
@@ -328,7 +321,6 @@ provider = &quot;{}&quot;&quot;##</span>,
 }
 
 <span class="doccomment">/// Error if the provider in the schema does not match the one in the schema_lock.toml</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_on_changed_provider</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">match_provider_in_lock_file</span>(<span class="ident">migrations_directory_path</span>, <span class="ident">provider</span>) {
         <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(()),
@@ -341,7 +333,6 @@ provider = &quot;{}&quot;&quot;##</span>,
 }
 
 <span class="doccomment">/// Check whether provider matches. `None` means there was no migration_lock.toml file.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
 <span class="kw">fn</span> <span class="ident">match_provider_in_lock_file</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">read_provider_from_lock_file</span>(<span class="ident">migrations_directory_path</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">found_provider</span><span class="op">|</span> {
         <span class="kw">if</span> <span class="ident">found_provider</span> <span class="op">==</span> <span class="ident">provider</span> {
@@ -462,14 +453,12 @@ provider = &quot;{}&quot;&quot;##</span>,
     }
 
     <span class="doccomment">/// Check whether the checksum of the migration script matches the provided one.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">matches_checksum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">checksum_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">ReadMigrationScriptError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">filesystem_script</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_migration_script</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">checksum::script_matches_checksum</span>(<span class="kw-2">&amp;</span><span class="ident">filesystem_script</span>, <span class="ident">checksum_str</span>))
     }
 
     <span class="doccomment">/// Write the migration script to the directory.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_migration_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">extension</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">join</span>(<span class="ident">MIGRATION_SCRIPT_FILENAME</span>);
 
@@ -484,7 +473,6 @@ provider = &quot;{}&quot;&quot;##</span>,
     }
 
     <span class="doccomment">/// Read the migration script to a string.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_migration_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ReadMigrationScriptError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">join</span>(<span class="string">&quot;migration.sql&quot;</span>); <span class="comment">// todo why is it hardcoded here?</span>
         <span class="ident">std::fs::read_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">ioerr</span><span class="op">|</span> <span class="ident">ReadMigrationScriptError::new</span>(<span class="ident">ioerr</span>, <span class="kw-2">&amp;</span><span class="ident">path</span>))

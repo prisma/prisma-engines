@@ -193,7 +193,6 @@
 <span id="188">188</span>
 <span id="189">189</span>
 <span id="190">190</span>
-<span id="191">191</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">join_utils</span>::<span class="kw-2">*</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_arguments_ext::QueryArgumentsExt</span>};
 <span class="kw">use</span> <span class="ident">connector_interface::QueryArguments</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
@@ -214,7 +213,6 @@
 }
 
 <span class="doccomment">/// Builds all expressions for an `ORDER BY` clause based on the query arguments.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">query_arguments</span>, <span class="ident">base_model</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(
     <span class="ident">query_arguments</span>: <span class="kw-2">&amp;</span><span class="ident">QueryArguments</span>,
     <span class="ident">base_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="comment">// The model the ordering will start from</span>

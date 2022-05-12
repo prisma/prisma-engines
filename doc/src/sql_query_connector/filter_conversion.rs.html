@@ -766,7 +766,6 @@
 <span id="761">761</span>
 <span id="762">762</span>
 <span id="763">763</span>
-<span id="764">764</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model_extensions</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">connector_interface::filter</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
@@ -845,7 +844,6 @@
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">Filter</span> {
     <span class="doccomment">/// Conversion from a `Filter` to a query condition tree. Aliased when in a nested `SELECT`.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">alias</span>))]</span>
     <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Filter::And</span>(<span class="kw-2">mut</span> <span class="ident">filters</span>) =&gt; <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {

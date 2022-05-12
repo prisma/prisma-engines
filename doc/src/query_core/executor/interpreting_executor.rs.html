@@ -163,7 +163,6 @@
 <span id="158">158</span>
 <span id="159">159</span>
 <span id="160">160</span>
-<span id="161">161</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::execute_operation</span>::{<span class="ident">execute_many_operations</span>, <span class="ident">execute_many_self_contained</span>, <span class="ident">execute_single_self_contained</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">OpenTx</span>, <span class="ident">Operation</span>, <span class="ident">QueryExecutor</span>, <span class="ident">ResponseData</span>, <span class="ident">TransactionActorManager</span>, <span class="ident">TransactionError</span>, <span class="ident">TransactionManager</span>, <span class="ident">TxId</span>,
@@ -239,7 +238,6 @@
     <span class="doccomment">/// A failing operation does not fail the batch, instead, an error is returned alongside other responses.</span>
     <span class="doccomment">/// Note that individual operations executed in non-transactional mode can still be transactions in themselves</span>
     <span class="doccomment">/// if the query (e.g. a write op) requires it.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">operations</span>, <span class="ident">query_schema</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_all</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">tx_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span>,

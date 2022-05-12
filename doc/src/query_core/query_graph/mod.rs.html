@@ -855,11 +855,6 @@
 <span id="850">850</span>
 <span id="851">851</span>
 <span id="852">852</span>
-<span id="853">853</span>
-<span id="854">854</span>
-<span id="855">855</span>
-<span id="856">856</span>
-<span id="857">857</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">mod</span> <span class="ident">formatters</span>;
 <span class="kw">mod</span> <span class="ident">guard</span>;
@@ -1077,7 +1072,6 @@
         <span class="prelude-val">Ok</span>(<span class="ident">graph</span>)
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">finalized</span> {
             <span class="self">self</span>.<span class="ident">swap_marked</span>()<span class="question-mark">?</span>;
@@ -1380,7 +1374,6 @@
     <span class="doccomment">///                                                                                                         └───┘</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// [DTODO] put if flow exception illustration here.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">fn</span> <span class="ident">swap_marked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">marked_node_pairs</span>.<span class="ident">is_empty</span>() {
             <span class="macro">trace!</span>(<span class="string">&quot;[Graph][Swap] Before shape: {}&quot;</span>, <span class="self">self</span>);
@@ -1477,7 +1470,6 @@
     <span class="doccomment">///         sibling   │                                ─ ─ ─ ─ ─ ─ ┘</span>
     <span class="doccomment">///      └ ─ ─ ─ ─ ─ ─</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">fn</span> <span class="ident">normalize_if_nodes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">node_ix</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">node_indices</span>() {
             <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">NodeRef</span> { <span class="ident">node_ix</span> };
@@ -1520,7 +1512,6 @@
     <span class="doccomment">/// This ensures that children nodes of return nodes have the proper data dependencies at their disposal.</span>
     <span class="doccomment">/// In case the parent nodes of return nodes do not have a field selection that fullfils the new dependency,</span>
     <span class="doccomment">/// a reload node will be inserted in between the parent and the return node by the `insert_reloads` method.</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">fn</span> <span class="ident">ensure_return_nodes_have_parent_dependency</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">return_nodes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">graph</span>
@@ -1632,7 +1623,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The `Reload` node is always a &quot;find many&quot; query.</span>
     <span class="doccomment">/// Unwraps are safe because we&#39;re operating on the unprocessed state of the graph (`Expressionista` changes that).</span>
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">fn</span> <span class="ident">insert_reloads</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">reloads</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">NodeRef</span>, <span class="ident">ModelRef</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">graph</span>

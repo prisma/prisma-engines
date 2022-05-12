@@ -334,7 +334,6 @@
 <span id="329">329</span>
 <span id="330">330</span>
 <span id="331">331</span>
-<span id="332">332</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">composite</span>;
 <span class="kw">mod</span> <span class="ident">filter_fold</span>;
 <span class="kw">mod</span> <span class="ident">filter_grouping</span>;
@@ -358,7 +357,6 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">convert::TryInto</span>, <span class="ident">str::FromStr</span>};
 
 <span class="doccomment">/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">value_map</span>, <span class="ident">model</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_unique_filter</span>(<span class="ident">value_map</span>: <span class="ident">ParsedInputMap</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">value_map</span>
         .<span class="ident">into_iter</span>()

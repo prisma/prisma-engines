@@ -558,7 +558,6 @@
 <span id="553">553</span>
 <span id="554">554</span>
 <span id="555">555</span>
-<span id="556">556</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">join_utils::AliasedJoin</span>,
     <span class="ident">model_extensions</span>::{<span class="ident">AsColumn</span>, <span class="ident">AsColumns</span>, <span class="ident">AsTable</span>, <span class="ident">SelectionResultExt</span>},
@@ -679,7 +678,6 @@
 <span class="doccomment">///     OR `ModelA`.`modelB_id` IS NULL -- &gt;&gt;&gt; Additional check for the nullable foreign key</span>
 <span class="doccomment">///   )</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;build_cursor_condition&quot;</span>, <span class="ident">skip</span>(<span class="ident">query_arguments</span>, <span class="ident">model</span>, <span class="ident">order_by_defs</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(
     <span class="ident">query_arguments</span>: <span class="kw-2">&amp;</span><span class="ident">QueryArguments</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,

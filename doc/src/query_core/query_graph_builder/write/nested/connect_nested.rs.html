@@ -538,10 +538,6 @@
 <span id="533">533</span>
 <span id="534">534</span>
 <span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">query_ast</span>::<span class="kw-2">*</span>,
@@ -558,7 +554,6 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The resulting graph can take multiple forms, based on the relation type to the parent model.</span>
 <span class="doccomment">/// Information on the graph shapes can be found on the individual handlers.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">value</span>, <span class="ident">child_model</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested_connect</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">parent_node</span>: <span class="ident">NodeRef</span>,
@@ -618,7 +613,6 @@
 <span class="doccomment">/// └─▶│     Connect     │</span>
 <span class="doccomment">///    └─────────────────┘</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">filter</span>, <span class="ident">child_model</span>))]</span>
 <span class="kw">fn</span> <span class="ident">handle_many_to_many</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">parent_node</span>: <span class="ident">NodeRef</span>,
@@ -697,7 +691,6 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// We do not need to do relation requirement checks because the many side of the relation can&#39;t be required,</span>
 <span class="doccomment">/// and if the one side is required it&#39;s automatically satisfied because the record to connect has to exist.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">child_filter</span>, <span class="ident">child_model</span>))]</span>
 <span class="kw">fn</span> <span class="ident">handle_one_to_many</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">parent_node</span>: <span class="ident">NodeRef</span>,
@@ -882,7 +875,6 @@
 <span class="doccomment">/// ... because we just updated the relation.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is why we need to have an extra update at the end if it&#39;s inlined on the parent and a non-create.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">filter</span>, <span class="ident">child_model</span>))]</span>
 <span class="kw">fn</span> <span class="ident">handle_one_to_one</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">parent_node</span>: <span class="ident">NodeRef</span>,

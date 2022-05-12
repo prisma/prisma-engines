@@ -604,12 +604,6 @@
 <span id="599">599</span>
 <span id="600">600</span>
 <span id="601">601</span>
-<span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CoreError</span>, <span class="ident">QueryResult</span>, <span class="ident">RecordAggregations</span>, <span class="ident">RecordSelection</span>};
 <span class="kw">use</span> <span class="ident">bigdecimal::ToPrimitive</span>;
@@ -645,7 +639,6 @@
 <span class="doccomment">/// // todo more here</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns a map of pairs of (parent ID, response)</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">result</span>, <span class="ident">field</span>, <span class="ident">is_list</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_internal</span>(
     <span class="ident">result</span>: <span class="ident">QueryResult</span>,
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>,
@@ -671,7 +664,6 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">output_field</span>, <span class="ident">record_aggregations</span>))]</span>
 <span class="kw">fn</span> <span class="ident">serialize_aggregations</span>(
     <span class="ident">output_field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>,
     <span class="ident">record_aggregations</span>: <span class="ident">RecordAggregations</span>,
@@ -826,7 +818,6 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">record_selection</span>, <span class="ident">field</span>, <span class="ident">typ</span>, <span class="ident">is_list</span>))]</span>
 <span class="kw">fn</span> <span class="ident">serialize_record_selection</span>(
     <span class="ident">record_selection</span>: <span class="ident">RecordSelection</span>,
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>,
@@ -892,7 +883,6 @@
 <span class="doccomment">/// Serializes the given result into objects of given type.</span>
 <span class="doccomment">/// Doesn&#39;t validate the shape of the result set (&quot;unchecked&quot; result).</span>
 <span class="doccomment">/// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">result</span>, <span class="ident">typ</span>))]</span>
 <span class="kw">fn</span> <span class="ident">serialize_objects</span>(
     <span class="kw-2">mut</span> <span class="ident">result</span>: <span class="ident">RecordSelection</span>,
     <span class="ident">typ</span>: <span class="ident">ObjectTypeStrongRef</span>,
@@ -991,7 +981,6 @@
 }
 
 <span class="doccomment">/// Unwraps are safe due to query validation.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">record_id</span>, <span class="ident">items_with_parent</span>, <span class="ident">into</span>, <span class="ident">enclosing_type</span>))]</span>
 <span class="kw">fn</span> <span class="ident">write_nested_items</span>(
     <span class="ident">record_id</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
     <span class="ident">items_with_parent</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CheckedItemsWithParents</span><span class="op">&gt;</span>,
@@ -1025,7 +1014,6 @@
 }
 
 <span class="doccomment">/// Processes nested results into a more ergonomic structure of { &lt;nested field name&gt; -&gt; { parent ID -&gt; item (list, map, ...) } }.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">nested</span>, <span class="ident">enclosing_type</span>))]</span>
 <span class="kw">fn</span> <span class="ident">process_nested_results</span>(
     <span class="ident">nested</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span>,
     <span class="ident">enclosing_type</span>: <span class="kw-2">&amp;</span><span class="ident">ObjectTypeStrongRef</span>,

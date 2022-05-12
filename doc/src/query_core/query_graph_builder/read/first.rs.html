@@ -20,13 +20,11 @@
 <span id="15">15</span>
 <span id="16">16</span>
 <span id="17">17</span>
-<span id="18">18</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">prisma_models::ModelRef</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ParsedField</span>;
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">field</span>, <span class="ident">model</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_first</span>(<span class="ident">field</span>: <span class="ident">ParsedField</span>, <span class="ident">model</span>: <span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">ReadQuery</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">many_query</span> <span class="op">=</span> <span class="ident">many::find_many</span>(<span class="ident">field</span>, <span class="ident">model</span>)<span class="question-mark">?</span>;
 

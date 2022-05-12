@@ -1033,11 +1033,6 @@
 <span id="1028">1028</span>
 <span id="1029">1029</span>
 <span id="1030">1030</span>
-<span id="1031">1031</span>
-<span id="1032">1032</span>
-<span id="1033">1033</span>
-<span id="1034">1034</span>
-<span id="1035">1035</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">query_ast</span>::<span class="kw-2">*</span>,
     <span class="ident">query_graph</span>::{<span class="ident">Flow</span>, <span class="ident">Node</span>, <span class="ident">NodeRef</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphDependency</span>},
@@ -1126,7 +1121,6 @@
 <span class="doccomment">/// - `parent_node` needs to return a blog ID during execution.</span>
 <span class="doccomment">/// - `parent_relation_field` is the field on the `Blog` model, e.g. `posts`.</span>
 <span class="doccomment">/// - `filter` narrows down posts, e.g. posts where their titles start with a given string.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">filter</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_find_children_by_parent_node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
@@ -1232,7 +1226,6 @@
 <span class="doccomment">/// the relation is also inlined on that models side, so we put that check into the if flow.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns a `NodeRef` to the &quot;Read Related&quot; node in the graph illustrated above.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_existing_1to1_related_model_checks</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
@@ -1348,7 +1341,6 @@
 <span class="doccomment">///               │                                                         │                                        │</span>
 <span class="doccomment">///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">model_to_delete</span>, <span class="ident">parent_node</span>, <span class="ident">child_node</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_emulated_on_delete</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
@@ -1859,7 +1851,6 @@
 <span class="doccomment">///               │                                                         │                                        │</span>
 <span class="doccomment">///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">model_to_update</span>, <span class="ident">parent_node</span>, <span class="ident">child_node</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_emulated_on_update_with_intermediary_node</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
@@ -1908,7 +1899,6 @@
     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">join_node</span>))
 }
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">model_to_update</span>, <span class="ident">parent_node</span>, <span class="ident">child_node</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_emulated_on_update</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
