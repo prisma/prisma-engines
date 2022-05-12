@@ -41,4 +41,4 @@ opentelemetry = { version = "0.16" }
 tokio = { version = "1", features = ["sync"] }
 
 [build-dependencies]
-napi-build = "2"
+napi-build = "1"

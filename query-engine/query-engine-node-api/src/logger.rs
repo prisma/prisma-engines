@@ -39,12 +39,12 @@ impl Logger {
         let layer = CallbackLayer::new(log_callback).with_filter(filters);
 
         Self {
-            __dispatcher: Dispatch::new(Registry::default().with(layer)),
+            dispatcher: Dispatch::new(Registry::default().with(layer)),
         }
     }
 
     pub async fn dispatcher(&self) -> Dispatch {
-        self.__dispatcher.clone()
+        self.dispatcher.clone()
     }
 }
 
