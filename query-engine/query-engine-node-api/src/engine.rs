@@ -1,6 +1,5 @@
 use crate::{error::ApiError, logger::Logger};
 use datamodel::{dml::Datamodel, ValidatedConfiguration};
-use opentelemetry::global;
 use prisma_models::InternalDataModelBuilder;
 use query_core::{
     executor,
@@ -16,8 +15,7 @@ use std::{
     sync::Arc,
 };
 use tokio::sync::RwLock;
-use tracing::{instrument::WithSubscriber, Level};
-use tracing_opentelemetry::OpenTelemetrySpanExt;
+use tracing::instrument::WithSubscriber;
 use tracing_subscriber::filter::LevelFilter;
 
 use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsUnknown};
@@ -276,10 +274,6 @@ impl QueryEngine {
         let dispatcher = self.logger.dispatcher().await;
 
         async move {
-            let ctx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-            let current_span = tracing::span!(Level::TRACE, "query");
-            current_span.set_parent(ctx);
-
             let trace_id = trace.get("traceparent").map(String::from);
             let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
 
@@ -293,19 +287,14 @@ impl QueryEngine {
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[napi]
-    pub async fn start_transaction(&self, input: String, trace: HashMap<String, String>) -> napi::Result<String> {
+    pub async fn start_transaction(&self, input: String) -> napi::Result<String> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
         let dispatcher = self.logger.dispatcher().await;
 
         async move {
-            let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-            let span = tracing::span!(Level::TRACE, "query");
             let input: TxInput = serde_json::from_str(&input)?;
-
-            span.set_parent(cx);
-
             match engine
                 .executor()
                 .start_tx(engine.query_schema().clone(), input.max_wait, input.timeout)
@@ -319,20 +308,15 @@ impl QueryEngine {
         .await
     }
 
-    // /// If connected, attempts to commit a transaction with id `tx_id` in the core.
+    /// If connected, attempts to commit a transaction with id `tx_id` in the core.
     #[napi]
-    pub async fn commit_transaction(&self, tx_id: String, trace: HashMap<String, String>) -> napi::Result<String> {
+    pub async fn commit_transaction(&self, tx_id: String) -> napi::Result<String> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
         let dispatcher = self.logger.dispatcher().await;
 
         async move {
-            let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-            let span = tracing::span!(Level::TRACE, "query");
-
-            span.set_parent(cx);
-
             match engine.executor().commit_tx(TxId::from(tx_id)).await {
                 Ok(_) => Ok("{}".to_string()),
                 Err(err) => Ok(map_known_error(err)?),
@@ -342,20 +326,15 @@ impl QueryEngine {
         .await
     }
 
-    // /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
+    /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[napi]
-    pub async fn rollback_transaction(&self, tx_id: String, trace: HashMap<String, String>) -> napi::Result<String> {
+    pub async fn rollback_transaction(&self, tx_id: String) -> napi::Result<String> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
         let dispatcher = self.logger.dispatcher().await;
 
         async move {
-            let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-            let span = tracing::span!(Level::TRACE, "query");
-
-            span.set_parent(cx);
-
             match engine.executor().rollback_tx(TxId::from(tx_id)).await {
                 Ok(_) => Ok("{}".to_string()),
                 Err(err) => Ok(map_known_error(err)?),
