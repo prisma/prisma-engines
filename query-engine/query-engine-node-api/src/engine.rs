@@ -287,7 +287,7 @@ impl QueryEngine {
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[napi]
-    pub async fn start_transaction(&self, input: String, _trace: HashMap<String, String>) -> napi::Result<String> {
+    pub async fn start_transaction(&self, input: String) -> napi::Result<String> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
@@ -310,7 +310,7 @@ impl QueryEngine {
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
     #[napi]
-    pub async fn commit_transaction(&self, tx_id: String, _trace: HashMap<String, String>) -> napi::Result<String> {
+    pub async fn commit_transaction(&self, tx_id: String) -> napi::Result<String> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
@@ -328,7 +328,7 @@ impl QueryEngine {
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[napi]
-    pub async fn rollback_transaction(&self, tx_id: String, _trace: HashMap<String, String>) -> napi::Result<String> {
+    pub async fn rollback_transaction(&self, tx_id: String) -> napi::Result<String> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
