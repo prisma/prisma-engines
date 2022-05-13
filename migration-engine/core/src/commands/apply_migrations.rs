@@ -129,16 +129,19 @@ fn detect_failed_migrations(migrations_from_database: &[MigrationRecord]) -> Cor
     let mut details = String::new();
 
     for failed_migration in failed_migrations {
+        let logs = failed_migration
+            .logs
+            .as_deref()
+            .map(|s| s.trim())
+            .filter(|s| !s.is_empty())
+            .map(|s| format!(" with the following logs:\n{s}"))
+            .unwrap_or_default();
+
         writeln!(
             details,
-            "The `{name}` migration started at {started_at} failed with the following logs:\n{logs}",
+            "The `{name}` migration started at {started_at} failed{logs}",
             name = failed_migration.migration_name,
             started_at = failed_migration.started_at,
-            logs = if let Some(logs) = &failed_migration.logs {
-                format!("with the following logs:\n{}", logs)
-            } else {
-                String::new()
-            }
         )
         .unwrap();
     }
