@@ -64,6 +64,15 @@ impl<'a> Logger<'a> {
             .add_directive("hyper=error".parse().unwrap())
             .add_directive("tower=error".parse().unwrap());
 
+        if let Some(qe_log_level) = std::env::var("QE_LOG_LEVEL").ok() {
+            filter = filter
+                .add_directive(format!("query_engine={}", &qe_log_level).parse().unwrap())
+                .add_directive(format!("query_core={}", &qe_log_level).parse().unwrap())
+                .add_directive(format!("query_connector={}", &qe_log_level).parse().unwrap())
+                .add_directive(format!("sql_query_connector={}", &qe_log_level).parse().unwrap())
+                .add_directive(format!("mongodb_query_connector={}", &qe_log_level).parse().unwrap());
+        }
+
         if self.log_queries {
             filter = filter.add_directive("quaint[{is_query}]=trace".parse().unwrap());
         }

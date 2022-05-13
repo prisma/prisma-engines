@@ -295,11 +295,11 @@ impl Display for FieldSelection {
 impl Display for SelectedField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SelectedField::Scalar(sf) => write!(f, "{}", sf.name),
+            SelectedField::Scalar(sf) => write!(f, "{sf}"),
             SelectedField::Composite(cs) => write!(
                 f,
                 "{} {{ {} }}",
-                cs.field.name,
+                cs.field,
                 cs.selections
                     .iter()
                     .map(|selection| format!("{}", selection))
