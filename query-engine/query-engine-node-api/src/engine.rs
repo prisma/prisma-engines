@@ -15,7 +15,7 @@ use std::{
     sync::Arc,
 };
 use tokio::sync::RwLock;
-use tracing::{instrument::WithSubscriber};
+use tracing::instrument::WithSubscriber;
 use tracing_subscriber::filter::LevelFilter;
 
 use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsUnknown};
