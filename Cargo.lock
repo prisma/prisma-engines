@@ -1996,7 +1996,6 @@ dependencies = [
 name = "migration-connector"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "chrono",
  "datamodel",
  "enumflags2",
@@ -2056,7 +2055,6 @@ dependencies = [
 name = "migration-engine-tests"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "bigdecimal 0.2.2",
  "chrono",
  "connection-string",
@@ -2253,7 +2251,6 @@ dependencies = [
 name = "mongodb-migration-connector"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "datamodel",
  "dissimilar",
  "enumflags2",
@@ -3159,7 +3156,6 @@ dependencies = [
 name = "qe-setup"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "connection-string",
  "datamodel",
  "enumflags2",
@@ -4167,7 +4163,6 @@ dependencies = [
 name = "sql-migration-connector"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "chrono",
  "connection-string",
  "datamodel",

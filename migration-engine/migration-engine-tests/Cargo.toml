@@ -1,7 +1,6 @@
 [package]
 name = "migration-engine-tests"
 version = "0.1.0"
-authors = ["Tom Houlé <tom@tomhoule.com>"]
 edition = "2021"
 
 [dependencies]
@@ -15,7 +14,6 @@ test-macros = { path = "../../libs/test-macros" }
 test-setup = { path = "../../libs/test-setup" }
 prisma-value = { path = "../../libs/prisma-value" }
 
-async-trait = "0.1.0"
 bigdecimal = "0.2"
 chrono = "0.4.15"
 connection-string = "0.1.13"

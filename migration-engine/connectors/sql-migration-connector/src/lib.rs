@@ -134,7 +134,6 @@ impl SqlMigrationConnector {
     }
 }
 
-#[async_trait::async_trait]
 impl MigrationConnector for SqlMigrationConnector {
     fn set_host(&mut self, host: Arc<dyn migration_connector::ConnectorHost>) {
         self.host = host;
