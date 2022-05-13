@@ -351,7 +351,6 @@
 <span id="346">346</span>
 <span id="347">347</span>
 <span id="348">348</span>
-<span id="349">349</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
@@ -488,7 +487,6 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">MigrationConnector</span> <span class="kw">for</span> <span class="ident">SqlMigrationConnector</span> {
     <span class="kw">fn</span> <span class="ident">set_host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">host</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::ConnectorHost</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">host</span> <span class="op">=</span> <span class="ident">host</span>;
