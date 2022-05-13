@@ -1,4 +1,5 @@
 # Quaint
+
 [![crates.io](https://meritbadge.herokuapp.com/quaint)](https://crates.io/crates/quaint)
 [![docs.rs](https://docs.rs/quaint/badge.svg)](https://docs.rs/quaint)
 [![Cargo tests](https://github.com/prisma/quaint/actions/workflows/test.yml/badge.svg)](https://github.com/prisma/quaint/actions/workflows/test.yml)
@@ -31,6 +32,7 @@ Quaint is an abstraction over certain SQL databases. It provides:
 - `bigdecimal`: Numeric values can be read as `BigDecimal`.
 - `vendored-openssl`: Statically links against a vendored OpenSSL library on
   non-Windows or non-Apple platforms.
+- `fmt-sql`: Enables logging SQL queries _formatted_. The `FMT_SQL` env var must be present for the formatting to be enabled.
 
 ### Goals:
 
@@ -51,8 +53,8 @@ choice.
   PostgreSQL and SQL Server needs to be running for tests to succeed.
 
 Then:
-  
-``` sh
+
+```sh
 > cargo test
 ```
 
@@ -61,6 +63,8 @@ Then:
 The queries can be logged by setting the `LOG_QUERIES` environment variable to any
 value. They'll be logged at the `INFO` level and are visible when having a
 logger in scope.
+
+The `FMT_SQL` environment variable can be used to log _formatted_ SQL queries. Beware, the `fmt-sql` feature must be enabled too.
 
 ## Security
 

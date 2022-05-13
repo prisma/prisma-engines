@@ -490,7 +490,6 @@ pub(crate) struct PostgresUrlQueryParams {
 
 impl PostgreSql {
     /// Create a new connection to the database.
-    #[tracing::instrument(skip(url))]
     pub async fn new(url: PostgresUrl) -> crate::Result<Self> {
         let config = url.to_config();
 
@@ -552,7 +551,6 @@ impl PostgreSql {
         &self.client.0
     }
 
-    #[tracing::instrument(skip(self))]
     async fn fetch_cached(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<Statement> {
         let mut cache = self.statement_cache.lock().await;
         let capacity = cache.capacity();
@@ -632,7 +630,6 @@ impl Queryable for PostgreSql {
         self.execute_raw(sql.as_str(), &params[..]).await
     }
 
-    #[tracing::instrument(skip(self, params))]
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("postgres.query_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql, &[]).await?;
@@ -661,7 +658,6 @@ impl Queryable for PostgreSql {
         .await
     }
 
-    #[tracing::instrument(skip(self, params))]
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("postgres.query_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql, params).await?;
@@ -690,7 +686,6 @@ impl Queryable for PostgreSql {
         .await
     }
 
-    #[tracing::instrument(skip(self, params))]
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("postgres.execute_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql, &[]).await?;
@@ -713,7 +708,6 @@ impl Queryable for PostgreSql {
         .await
     }
 
-    #[tracing::instrument(skip(self, params))]
     async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("postgres.execute_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql, params).await?;
@@ -736,7 +730,6 @@ impl Queryable for PostgreSql {
         .await
     }
 
-    #[tracing::instrument(skip(self))]
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("postgres.raw_cmd", cmd, &[], move || async move {
             self.perform_io(self.client.0.simple_query(cmd)).await?;
@@ -745,7 +738,6 @@ impl Queryable for PostgreSql {
         .await
     }
 
-    #[tracing::instrument(skip(self))]
     async fn version(&self) -> crate::Result<Option<String>> {
         let query = r#"SELECT version()"#;
         let rows = self.query_raw(query, &[]).await?;
@@ -757,7 +749,6 @@ impl Queryable for PostgreSql {
         Ok(version_string)
     }
 
-    #[tracing::instrument(skip(self, tx))]
     async fn server_reset_query(&self, tx: &Transaction<'_>) -> crate::Result<()> {
         if self.pg_bouncer {
             tx.raw_cmd("DEALLOCATE ALL").await

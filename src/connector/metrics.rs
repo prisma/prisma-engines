@@ -19,14 +19,25 @@ where
         Err(_) => "error",
     };
 
-    tracing::trace!(
-        query,
-        item_type = "query",
-        is_query = true,
-        params = %Params(params),
-        duration_ms = start.elapsed().as_millis() as u64,
-        result,
-    );
+    #[cfg(feature = "fmt-sql")]
+    {
+        if std::env::var("FMT_SQL").is_ok() {
+            let query_fmt = sqlformat::format(
+                query,
+                &sqlformat::QueryParams::None,
+                sqlformat::FormatOptions::default(),
+            );
+
+            trace_query(&query_fmt, params, result, start);
+        } else {
+            trace_query(&query, params, result, start);
+        };
+    }
+
+    #[cfg(not(feature = "fmt-sql"))]
+    {
+        trace_query(query, params, result, start);
+    }
 
     histogram!(format!("{}.query.time", tag), start.elapsed());
     histogram!("query_total_elapsed_time", start.elapsed());
@@ -59,4 +70,15 @@ where
     histogram!("pool.check_out", start.elapsed());
 
     res
+}
+
+fn trace_query<'a>(query: &'a str, params: &'a [Value<'_>], result: &str, start: Instant) {
+    tracing::debug!(
+        query = %query,
+        params = %Params(params),
+        result,
+        item_type = "query",
+        is_query = true,
+        duration_ms = start.elapsed().as_millis() as u64,
+    );
 }
