@@ -799,18 +799,52 @@
 <span id="794">794</span>
 <span id="795">795</span>
 <span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Filter</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">compare::ScalarCompare</span>, <span class="ident">JsonFilterPath</span>, <span class="ident">JsonTargetType</span>};
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ModelProjection</span>, <span class="ident">PrismaListValue</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeSet</span>, <span class="ident">sync::Arc</span>};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScalarProjection</span> {
     <span class="doccomment">/// A single field projection.</span>
     <span class="ident">Single</span>(<span class="ident">ScalarFieldRef</span>),
 
     <span class="doccomment">/// A tuple projection, e.g. if (a, b) &lt;in&gt; ((1, 2), (1, 3), ...) is supposed to be queried.</span>
     <span class="ident">Compound</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>),
+}
+
+<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">ScalarProjection</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">sf</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;SingleProjection&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{sf}&quot;</span>)).<span class="ident">finish</span>(),
+            <span class="ident"><span class="self">Self</span>::Compound</span>(<span class="ident">sfs</span>) =&gt; {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dbg</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;CompoundProjection&quot;</span>);
+
+                <span class="kw">for</span> <span class="ident">sf</span> <span class="kw">in</span> <span class="ident">sfs</span> {
+                    <span class="ident">dbg</span>.<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{sf}&quot;</span>));
+                }
+
+                <span class="ident">dbg</span>.<span class="ident">finish</span>()
+            }
+        }
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">ScalarProjection</span> {

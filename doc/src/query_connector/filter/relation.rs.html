@@ -140,12 +140,22 @@
 <span id="135">135</span>
 <span id="136">136</span>
 <span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::compare::RelationCompare</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::RelationField</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationFilter</span> {
     <span class="doccomment">/// Starting field of the relation traversal.</span>
     <span class="kw">pub</span> <span class="ident">field</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span>,
@@ -157,6 +167,16 @@
     <span class="doccomment">/// E.g. if all related records or only some need</span>
     <span class="doccomment">/// to fulfill `nested_filter`.</span>
     <span class="kw">pub</span> <span class="ident">condition</span>: <span class="ident">RelationCondition</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">RelationFilter</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RelationFilter&quot;</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;field&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">field</span>))
+            .<span class="ident">field</span>(<span class="string">&quot;nested_filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">nested_filter</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;condition&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">condition</span>)
+            .<span class="ident">finish</span>()
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">RelationFilter</span> {

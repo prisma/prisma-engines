@@ -230,6 +230,22 @@
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
 
@@ -251,7 +267,7 @@
 <span class="doccomment">/// A query argument struct is always valid over a single model only, meaning that all</span>
 <span class="doccomment">/// data referenced in a single query argument instance is always refering to data of</span>
 <span class="doccomment">/// a single model (e.g. the cursor projection, distinct projection, orderby, ...).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryArguments</span> {
     <span class="kw">pub</span> <span class="ident">model</span>: <span class="ident">ModelRef</span>,
     <span class="kw">pub</span> <span class="ident">cursor</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
@@ -262,6 +278,22 @@
     <span class="kw">pub</span> <span class="ident">distinct</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">ignore_skip</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">ignore_take</span>: <span class="ident">bool</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">QueryArguments</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;QueryArguments&quot;</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;model&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>.<span class="ident">name</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;cursor&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cursor</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;take&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">take</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;skip&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">skip</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;order_by&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">order_by</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;distinct&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">distinct</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;ignore_skip&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ignore_skip</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;ignore_take&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ignore_take</span>)
+            .<span class="ident">finish</span>()
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">QueryArguments</span> {

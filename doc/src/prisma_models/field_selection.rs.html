@@ -631,11 +631,11 @@
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">SelectedField</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SelectedField::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">sf</span>.<span class="ident">name</span>),
+            <span class="ident">SelectedField::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{sf}&quot;</span>),
             <span class="ident">SelectedField::Composite</span>(<span class="ident">cs</span>) =&gt; <span class="macro">write!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;{} {{ {} }}&quot;</span>,
-                <span class="ident">cs</span>.<span class="ident">field</span>.<span class="ident">name</span>,
+                <span class="ident">cs</span>.<span class="ident">field</span>,
                 <span class="ident">cs</span>.<span class="ident">selections</span>
                     .<span class="ident">iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">selection</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">selection</span>))

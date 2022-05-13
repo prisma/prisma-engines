@@ -158,13 +158,43 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">DomainError</span>, <span class="ident">FieldSelection</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">SelectedField</span>};
+<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
 <span class="doccomment">/// Represents a set of results.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SelectionResult</span> {
     <span class="kw">pub</span> <span class="ident">pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">SelectedField</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">SelectionResult</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_list</span>()
+            .<span class="ident">entries</span>(
+                <span class="kw-2">&amp;</span><span class="self">self</span>
+                    .<span class="ident">pairs</span>
+                    .<span class="ident">iter</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> (<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">pair</span>.<span class="number">0</span>), <span class="ident">pair</span>.<span class="number">1</span>.<span class="ident">clone</span>()))
+                    .<span class="ident">collect_vec</span>(),
+            )
+            .<span class="ident">finish</span>()
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">SelectionResult</span> {

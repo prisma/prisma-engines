@@ -194,6 +194,15 @@
 <span id="189">189</span>
 <span id="190">190</span>
 <span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CompositeFieldRef</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">ScalarFieldRef</span>};
 <span class="kw">use</span> <span class="ident">std::string::ToString</span>;
 
@@ -299,10 +308,19 @@
 }
 
 <span class="doccomment">/// Describes a hop over to a relation or composite for an orderBy statement.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OrderByHop</span> {
     <span class="ident">Relation</span>(<span class="ident">RelationFieldRef</span>),
     <span class="ident">Composite</span>(<span class="ident">CompositeFieldRef</span>),
+}
+
+<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">OrderByHop</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident"><span class="self">Self</span>::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Relation&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{rf}&quot;</span>)).<span class="ident">finish</span>(),
+            <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Composite&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{cf}&quot;</span>)).<span class="ident">finish</span>(),
+        }
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">OrderByHop</span> {

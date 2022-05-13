@@ -127,11 +127,17 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">parent_container::ParentContainer</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">InternalEnum</span>};
 <span class="kw">use</span> <span class="ident">dml</span>::{<span class="ident">DefaultValue</span>, <span class="ident">FieldArity</span>, <span class="ident">NativeTypeInstance</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt::Debug</span>,
+    <span class="ident">fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Display</span>},
     <span class="ident">hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>},
     <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>},
 };
@@ -216,6 +222,12 @@
             .<span class="ident">field</span>(<span class="string">&quot;is_unique&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_unique</span>)
             .<span class="ident">field</span>(<span class="string">&quot;read_only&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">read_only</span>)
             .<span class="ident">finish</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ScalarField</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.<span class="ident">container</span>().<span class="ident">name</span>(), <span class="self">self</span>.<span class="ident">name</span>)
     }
 }
 
