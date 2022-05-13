@@ -19,7 +19,7 @@ pub struct SkipAndLimit {
 /// A query argument struct is always valid over a single model only, meaning that all
 /// data referenced in a single query argument instance is always refering to data of
 /// a single model (e.g. the cursor projection, distinct projection, orderby, ...).
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct QueryArguments {
     pub model: ModelRef,
     pub cursor: Option<SelectionResult>,
@@ -30,6 +30,22 @@ pub struct QueryArguments {
     pub distinct: Option<FieldSelection>,
     pub ignore_skip: bool,
     pub ignore_take: bool,
+}
+
+impl std::fmt::Debug for QueryArguments {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("QueryArguments")
+            .field("model", &self.model.name)
+            .field("cursor", &self.cursor)
+            .field("take", &self.take)
+            .field("skip", &self.skip)
+            .field("filter", &self.filter)
+            .field("order_by", &self.order_by)
+            .field("distinct", &self.distinct)
+            .field("ignore_skip", &self.ignore_skip)
+            .field("ignore_take", &self.ignore_take)
+            .finish()
+    }
 }
 
 impl QueryArguments {

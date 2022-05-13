@@ -3,13 +3,30 @@ use crate::{compare::ScalarCompare, JsonFilterPath, JsonTargetType};
 use prisma_models::{FieldSelection, ModelProjection, PrismaListValue, PrismaValue, ScalarFieldRef};
 use std::{collections::BTreeSet, sync::Arc};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub enum ScalarProjection {
     /// A single field projection.
     Single(ScalarFieldRef),
 
     /// A tuple projection, e.g. if (a, b) <in> ((1, 2), (1, 3), ...) is supposed to be queried.
     Compound(Vec<ScalarFieldRef>),
+}
+
+impl std::fmt::Debug for ScalarProjection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Single(sf) => f.debug_tuple("SingleProjection").field(&format!("{sf}")).finish(),
+            Self::Compound(sfs) => {
+                let mut dbg = f.debug_tuple("CompoundProjection");
+
+                for sf in sfs {
+                    dbg.field(&format!("{sf}"));
+                }
+
+                dbg.finish()
+            }
+        }
+    }
 }
 
 impl ScalarProjection {

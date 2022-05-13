@@ -2,7 +2,7 @@ use crate::prelude::*;
 use dml::{FieldArity, ReferentialAction, RelationInfo};
 use once_cell::sync::OnceCell;
 use std::{
-    fmt::Debug,
+    fmt::{Debug, Display},
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
 };
@@ -245,6 +245,12 @@ impl Debug for RelationField {
             .field("model", &"#ModelWeakRef#")
             .field("fields", &self.fields)
             .finish()
+    }
+}
+
+impl Display for RelationField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}", self.model().name, self.name)
     }
 }
 

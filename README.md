@@ -61,6 +61,8 @@ change any time. There is no guaranteed API stability.
 
 Notable environment flags:
 - `RUST_LOG_FORMAT=(devel|json)` sets the log format. By default outputs `json`.
+- `QE_LOG_LEVEL=(info|debug|trace)` sets the log level for the Query Engine. If you need Query Graph debugging logs, set it to "trace"
+- `FMT_SQL=1` enables logging _formatted_ SQL queries
 - `PRISMA_DML_PATH=[path_to_datamodel_file]` should point to the datamodel file
   location. This or `PRISMA_DML` is required for the Query Engine to run.
 - `PRISMA_DML=[base64_encoded_datamodel]` an alternative way to provide a
