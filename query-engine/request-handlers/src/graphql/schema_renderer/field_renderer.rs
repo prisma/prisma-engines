@@ -1,5 +1,4 @@
 use super::*;
-use itertools::Itertools;
 
 #[derive(Debug)]
 pub enum GqlFieldRenderer {
@@ -75,7 +74,7 @@ impl GqlFieldRenderer {
 fn pick_input_type(candidates: &[InputType]) -> &InputType {
     candidates
         .iter()
-        .fold1(|prev, next| match (prev, next) {
+        .reduce(|prev, next| match (prev, next) {
             (InputType::Scalar(ScalarType::Null), _) => next, // Null has the least precedence.
             (InputType::Scalar(_), InputType::List(_)) => next, // Lists have precedence over scalars.
             (InputType::Scalar(_), InputType::Object(_)) => next, // Objects have precedence over scalars.

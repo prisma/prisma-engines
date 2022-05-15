@@ -1,7 +1,6 @@
 use super::*;
 use crate::utils::quote_connector;
 use darling::FromMeta;
-use itertools::Itertools;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
@@ -26,7 +25,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     let handler = args.schema.unwrap().handler_path;
 
     // Renders the connectors as list to use in the code.
-    let connectors = connectors.into_iter().map(quote_connector).fold1(|aggr, next| {
+    let connectors = connectors.into_iter().map(quote_connector).reduce(|aggr, next| {
         quote! {
             #aggr, #next
         }
