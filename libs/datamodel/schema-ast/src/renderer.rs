@@ -9,11 +9,11 @@ pub use table::TableFormat;
 
 /// Get the sort order for an attribute, in the canonical sorting order.
 pub fn get_sort_index_of_attribute(is_field_attribute: bool, attribute_name: &str) -> usize {
-    // this must match the order defined for rendering in libs/datamodel/core/src/transform/attributes/mod.rs
+    // this must match the order defined for rendering in libs/datamodel/core/src/transform/dml_to_ast/lower_field.rs
     let correct_order: &[&str] = if is_field_attribute {
-        &["id", "unique", "default", "updatedAt", "map", "relation"]
+        &["id", "unique", "default", "updatedAt", "map", "relation", "ignore"]
     } else {
-        &["id", "unique", "index", "fulltext", "map"]
+        &["id", "unique", "index", "fulltext", "map", "ignore"]
     };
 
     correct_order
