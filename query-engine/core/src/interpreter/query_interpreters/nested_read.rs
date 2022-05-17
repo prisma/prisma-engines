@@ -80,10 +80,12 @@ pub async fn m2m(
     let mut id_map: HashMap<SelectionResult, Vec<SelectionResult>> = HashMap::new();
 
     for (parent_id, child_id) in ids {
-        match id_map.get_mut(&child_id) {
-            Some(v) => v.push(parent_id),
+        let coerced_child_id = child_id.clone().coerce_values()?;
+        let coerced_parent_id = parent_id.clone().coerce_values()?;
+        match id_map.get_mut(&coerced_child_id) {
+            Some(v) => v.push(coerced_parent_id),
             None => {
-                id_map.insert(child_id.coerce_values()?, vec![parent_id.coerce_values()?]);
+                id_map.insert(coerced_child_id, vec![coerced_parent_id]);
             }
         };
     }
