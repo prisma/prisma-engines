@@ -78,7 +78,6 @@ pub const GENERATOR: FeatureMap = FeatureMap::new()
         InteractiveTransactions,
         FullTextSearch,
         FullTextIndex,
-        DataProxy,
         ExtendedIndexes,
         Tracing,
         ImprovedQueryRaw,
@@ -103,6 +102,7 @@ pub const GENERATOR: FeatureMap = FeatureMap::new()
         OrderByRelation,
         ReferentialActions,
         NApi,
+        DataProxy,
     ]);
 
 #[derive(Debug)]
