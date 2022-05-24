@@ -1,5 +1,5 @@
 //! Query Engine test setup.
-
+#![allow(clippy::await_holding_lock)]
 mod mongodb;
 mod mssql;
 mod mysql;
@@ -138,13 +138,14 @@ async fn diff_and_apply(schema: &str) {
     .await
     .unwrap();
     let migrations = host.printed.lock().unwrap();
-    let migration = &migrations[0];
+    let migration = migrations[0].clone();
+    drop(migrations);
 
     api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Schema(SchemaContainer {
             schema: schema_file_path.to_string_lossy().into(),
         }),
-        script: migration.to_owned(),
+        script: migration,
     })
     .await
     .unwrap();
