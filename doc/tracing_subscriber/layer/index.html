@@ -342,7 +342,7 @@ different types. For example, the following <em>will not</em> work:</p>
 
 <span class="ident">tracing::subscriber::set_global_default</span>(<span class="ident">subscriber</span>)
     .<span class="ident">expect</span>(<span class="string">&quot;Unable to set global subscriber&quot;</span>);</code></pre></div>
-<p>However, a <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> wrapped in an <a href="https://doc.rust-lang.org/1.60.0/core/option/enum.Option.html" title="Option"><code>Option</code></a> <a href="trait.Layer.html#impl-Layer%3CS%3E-for-Option%3CL%3E">also implements the <code>Layer</code>
+<p>However, a <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> wrapped in an <a href="https://doc.rust-lang.org/1.61.0/core/option/enum.Option.html" title="Option"><code>Option</code></a> <a href="trait.Layer.html#impl-Layer%3CS%3E-for-Option%3CL%3E">also implements the <code>Layer</code>
 trait</a>. This allows individual layers to be enabled or disabled at
 runtime while always producing a <a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> of the same type. For
 example:</p>
@@ -382,5 +382,5 @@ wrapped <a href="https://docs.rs/tracing-core/latest/tracing_core/trait.Subscrib
 for an individual layer.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Layer.html" title="tracing_subscriber::layer::Layer trait">Layer</a></div><div class="item-right docblock-short"><p>A composable handler for <code>tracing</code> events.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.SubscriberExt.html" title="tracing_subscriber::layer::SubscriberExt trait">SubscriberExt</a></div><div class="item-right docblock-short"><p>Extension trait adding a <code>with(Layer)</code> combinator to <code>Subscriber</code>s.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
 </body></html>

@@ -9,7 +9,7 @@ data.</p>
 <p>All calls to <a href="trait.AsyncWrite.html#tymethod.poll_write"><code>poll_write</code></a> on the returned instance will return
 <code>Poll::Ready(Ok(buf.len()))</code> and the contents of the buffer will not be
 inspected.</p>
-<p>This is an asynchronous version of <a href="https://doc.rust-lang.org/1.60.0/std/io/util/fn.sink.html"><code>std::io::sink</code></a>.</p>
+<p>This is an asynchronous version of <a href="https://doc.rust-lang.org/1.61.0/std/io/util/fn.sink.html"><code>std::io::sink</code></a>.</p>
 <h2 id="examples"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="self">self</span>, <span class="ident">AsyncWriteExt</span>};
 
@@ -20,5 +20,5 @@ inspected.</p>
     <span class="macro">assert_eq!</span>(<span class="ident">num_bytes</span>, <span class="number">5</span>);
     <span class="prelude-val">Ok</span>(())
 }</code></pre></div>
-</div></details></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>
+</div></details></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
 </body></html>

@@ -32,7 +32,7 @@ for their field names rather than printing them.</p>
 <h2 id="using-valuable"><a href="#using-valuable">Using <code>valuable</code></a></h2>
 <p><code>tracing</code>’s <a href="../trait.Value.html" title="Value"><code>Value</code></a> trait is intentionally minimalist: it supports only a small
 number of Rust primitives as typed values, and only permits recording
-user-defined types with their <a href="https://doc.rust-lang.org/1.60.0/core/fmt/trait.Debug.html"><code>fmt::Debug</code></a> or <a href="https://doc.rust-lang.org/1.60.0/core/fmt/trait.Debug.html"><code>fmt::Display</code></a>
+user-defined types with their <a href="https://doc.rust-lang.org/1.61.0/core/fmt/trait.Debug.html"><code>fmt::Debug</code></a> or <a href="https://doc.rust-lang.org/1.61.0/core/fmt/trait.Debug.html"><code>fmt::Display</code></a>
 implementations. However, there are some cases where it may be useful to record
 nested values (such as arrays, <code>Vec</code>s, or <code>HashMap</code>s containing values), or
 user-defined <code>struct</code> and <code>enum</code> types without having to format them as
@@ -105,5 +105,5 @@ data.</p>
 recorded using its <code>Debug</code> implementation.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.display.html" title="tracing::field::display fn">display</a></div><div class="item-right docblock-short"><p>Wraps a type implementing <code>fmt::Display</code> as a <code>Value</code> that can be
 recorded using its <code>Display</code> implementation.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0 (7737e0b5c 2022-04-04)" ></div>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
 </body></html>
