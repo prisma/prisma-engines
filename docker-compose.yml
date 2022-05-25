@@ -143,7 +143,7 @@ services:
     tmpfs: /var/lib/mysql8
 
   mariadb-10-0:
-    image: mariadb:10
+    image: mariadb:10.7.3
     restart: always
     environment:
       MYSQL_USER: root
