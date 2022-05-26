@@ -523,10 +523,8 @@
 <span id="518">518</span>
 <span id="519">519</span>
 <span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::group_by_builder</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::root_queries::metrics</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cursor</span>::{<span class="ident">CursorBuilder</span>, <span class="ident">CursorData</span>},
     <span class="ident">filter</span>::{<span class="ident">convert_filter</span>, <span class="ident">FilterPrefix</span>},
@@ -578,9 +576,7 @@
         <span class="ident">with_session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">AggregateOptions::builder</span>().<span class="ident">allow_disk_use</span>(<span class="bool-val">true</span>).<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">on_collection</span>
-            .<span class="ident">aggregate_with_session</span>(<span class="self">self</span>.<span class="ident">stages</span>, <span class="ident">opts</span>, <span class="ident">with_session</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">on_collection</span>.<span class="ident">aggregate_with_session</span>(<span class="self">self</span>.<span class="ident">stages</span>, <span class="ident">opts</span>, <span class="ident">with_session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="ident">vacuum_cursor</span>(<span class="ident">cursor</span>, <span class="ident">with_session</span>).<span class="kw">await</span>
     }
@@ -597,9 +593,7 @@
         <span class="ident">on_collection</span>: <span class="ident">Collection</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
         <span class="ident">with_session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">on_collection</span>
-            .<span class="ident">find_with_session</span>(<span class="self">self</span>.<span class="ident">filter</span>, <span class="self">self</span>.<span class="ident">options</span>, <span class="ident">with_session</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">on_collection</span>.<span class="ident">find_with_session</span>(<span class="self">self</span>.<span class="ident">filter</span>, <span class="self">self</span>.<span class="ident">options</span>, <span class="ident">with_session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="ident">vacuum_cursor</span>(<span class="ident">cursor</span>, <span class="ident">with_session</span>).<span class="kw">await</span>
     }

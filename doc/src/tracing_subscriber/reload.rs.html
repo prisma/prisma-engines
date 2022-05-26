@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.9/src/reload.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reload.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/reload.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reload.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -242,6 +242,54 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Wrapper for a `Layer` to allow it to be dynamically reloaded.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This module provides a [`Layer` type] which wraps another type implementing</span>
@@ -252,6 +300,49 @@
 <span class="doccomment">//! should be dynamically reconfigured, such as when filtering directives may</span>
 <span class="doccomment">//! change at runtime. Note that this layer introduces a (relatively small)</span>
 <span class="doccomment">//! amount of overhead, and should thus only be used as needed.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Examples</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Reloading a [global filtering](crate::layer#global-filtering) layer:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//! # use tracing::info;</span>
+<span class="doccomment">//! use tracing_subscriber::{filter, fmt, reload, prelude::*};</span>
+<span class="doccomment">//! let filter = filter::LevelFilter::WARN;</span>
+<span class="doccomment">//! let (filter, reload_handle) = reload::Layer::new(filter);</span>
+<span class="doccomment">//! tracing_subscriber::registry()</span>
+<span class="doccomment">//!   .with(filter)</span>
+<span class="doccomment">//!   .with(fmt::Layer::default())</span>
+<span class="doccomment">//!   .init();</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # // specifying the Registry type is required</span>
+<span class="doccomment">//! # let _: &amp;reload::Handle&lt;filter::LevelFilter, tracing_subscriber::Registry&gt; = &amp;reload_handle;</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! info!(&quot;This will be ignored&quot;);</span>
+<span class="doccomment">//! reload_handle.modify(|filter| *filter = filter::LevelFilter::INFO);</span>
+<span class="doccomment">//! info!(&quot;This will be logged&quot;);</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Reloading a [`Filtered`](crate::filter::Filtered) layer:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//! # use tracing::info;</span>
+<span class="doccomment">//! use tracing_subscriber::{filter, fmt, reload, prelude::*};</span>
+<span class="doccomment">//! let filtered_layer = fmt::Layer::default().with_filter(filter::LevelFilter::WARN);</span>
+<span class="doccomment">//! let (filtered_layer, reload_handle) = reload::Layer::new(filtered_layer);</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # // specifying the Registry type is required</span>
+<span class="doccomment">//! # let _: &amp;reload::Handle&lt;filter::Filtered&lt;fmt::Layer&lt;tracing_subscriber::Registry&gt;,</span>
+<span class="doccomment">//! # filter::LevelFilter, tracing_subscriber::Registry&gt;,tracing_subscriber::Registry&gt;</span>
+<span class="doccomment">//! # = &amp;reload_handle;</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! tracing_subscriber::registry()</span>
+<span class="doccomment">//!   .with(filtered_layer)</span>
+<span class="doccomment">//!   .init();</span>
+<span class="doccomment">//! info!(&quot;This will be ignored&quot;);</span>
+<span class="doccomment">//! reload_handle.modify(|layer| *layer.filter_mut() = filter::LevelFilter::INFO);</span>
+<span class="doccomment">//! info!(&quot;This will be logged&quot;);</span>
+<span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [`Layer` type]: struct.Layer.html</span>
 <span class="doccomment">//! [`Layer` trait]: ../layer/trait.Layer.html</span>
@@ -280,7 +371,7 @@
     <span class="ident">_s</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">S</span>)<span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// Allows reloading the state of an associated `Layer`.</span>
+<span class="doccomment">/// Allows reloading the state of an associated [`Layer`](crate::layer::Layer).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> {
     <span class="ident">inner</span>: <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -394,6 +485,11 @@
     <span class="ident">S</span>: <span class="ident">Subscriber</span>,
 {
     <span class="doccomment">/// Replace the current layer with the provided `new_layer`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Warning:** The [`Filtered`](crate::filter::Filtered) type currently can&#39;t be changed</span>
+    <span class="doccomment">/// at runtime via the [`Handle::reload`] method.</span>
+    <span class="doccomment">/// Use the [`Handle::modify`] method to change the filter instead.</span>
+    <span class="doccomment">/// (see &lt;https://github.com/tokio-rs/tracing/issues/1629&gt;)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_layer</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">modify</span>(<span class="op">|</span><span class="ident">layer</span><span class="op">|</span> {
             <span class="kw-2">*</span><span class="ident">layer</span> <span class="op">=</span> <span class="ident">new_layer</span>.<span class="ident">into</span>();

@@ -222,6 +222,10 @@
 <span id="217">217</span>
 <span id="218">218</span>
 <span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::PrismaError</span>, <span class="ident">PrismaResult</span>};
 <span class="kw">use</span> <span class="ident">datamodel::dml::Datamodel</span>;
 <span class="kw">use</span> <span class="ident">datamodel::ValidatedConfiguration</span>;
@@ -315,6 +319,10 @@
     <span class="doccomment">/// Enables server debug features.</span>
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;debug&quot;</span>, <span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;d&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">enable_debug_mode</span>: <span class="ident">bool</span>,
+
+    <span class="doccomment">/// Enables the metrics endpoints</span>
+    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;m&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">enable_metrics</span>: <span class="ident">bool</span>,
 
     <span class="doccomment">/// Enable query logging [env: LOG_QUERIES=y]</span>
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;o&quot;</span>)]</span>

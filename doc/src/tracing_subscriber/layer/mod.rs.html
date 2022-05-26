@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.9/src/layer/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/layer/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1290,6 +1290,449 @@
 <span id="1283">1283</span>
 <span id="1284">1284</span>
 <span id="1285">1285</span>
+<span id="1286">1286</span>
+<span id="1287">1287</span>
+<span id="1288">1288</span>
+<span id="1289">1289</span>
+<span id="1290">1290</span>
+<span id="1291">1291</span>
+<span id="1292">1292</span>
+<span id="1293">1293</span>
+<span id="1294">1294</span>
+<span id="1295">1295</span>
+<span id="1296">1296</span>
+<span id="1297">1297</span>
+<span id="1298">1298</span>
+<span id="1299">1299</span>
+<span id="1300">1300</span>
+<span id="1301">1301</span>
+<span id="1302">1302</span>
+<span id="1303">1303</span>
+<span id="1304">1304</span>
+<span id="1305">1305</span>
+<span id="1306">1306</span>
+<span id="1307">1307</span>
+<span id="1308">1308</span>
+<span id="1309">1309</span>
+<span id="1310">1310</span>
+<span id="1311">1311</span>
+<span id="1312">1312</span>
+<span id="1313">1313</span>
+<span id="1314">1314</span>
+<span id="1315">1315</span>
+<span id="1316">1316</span>
+<span id="1317">1317</span>
+<span id="1318">1318</span>
+<span id="1319">1319</span>
+<span id="1320">1320</span>
+<span id="1321">1321</span>
+<span id="1322">1322</span>
+<span id="1323">1323</span>
+<span id="1324">1324</span>
+<span id="1325">1325</span>
+<span id="1326">1326</span>
+<span id="1327">1327</span>
+<span id="1328">1328</span>
+<span id="1329">1329</span>
+<span id="1330">1330</span>
+<span id="1331">1331</span>
+<span id="1332">1332</span>
+<span id="1333">1333</span>
+<span id="1334">1334</span>
+<span id="1335">1335</span>
+<span id="1336">1336</span>
+<span id="1337">1337</span>
+<span id="1338">1338</span>
+<span id="1339">1339</span>
+<span id="1340">1340</span>
+<span id="1341">1341</span>
+<span id="1342">1342</span>
+<span id="1343">1343</span>
+<span id="1344">1344</span>
+<span id="1345">1345</span>
+<span id="1346">1346</span>
+<span id="1347">1347</span>
+<span id="1348">1348</span>
+<span id="1349">1349</span>
+<span id="1350">1350</span>
+<span id="1351">1351</span>
+<span id="1352">1352</span>
+<span id="1353">1353</span>
+<span id="1354">1354</span>
+<span id="1355">1355</span>
+<span id="1356">1356</span>
+<span id="1357">1357</span>
+<span id="1358">1358</span>
+<span id="1359">1359</span>
+<span id="1360">1360</span>
+<span id="1361">1361</span>
+<span id="1362">1362</span>
+<span id="1363">1363</span>
+<span id="1364">1364</span>
+<span id="1365">1365</span>
+<span id="1366">1366</span>
+<span id="1367">1367</span>
+<span id="1368">1368</span>
+<span id="1369">1369</span>
+<span id="1370">1370</span>
+<span id="1371">1371</span>
+<span id="1372">1372</span>
+<span id="1373">1373</span>
+<span id="1374">1374</span>
+<span id="1375">1375</span>
+<span id="1376">1376</span>
+<span id="1377">1377</span>
+<span id="1378">1378</span>
+<span id="1379">1379</span>
+<span id="1380">1380</span>
+<span id="1381">1381</span>
+<span id="1382">1382</span>
+<span id="1383">1383</span>
+<span id="1384">1384</span>
+<span id="1385">1385</span>
+<span id="1386">1386</span>
+<span id="1387">1387</span>
+<span id="1388">1388</span>
+<span id="1389">1389</span>
+<span id="1390">1390</span>
+<span id="1391">1391</span>
+<span id="1392">1392</span>
+<span id="1393">1393</span>
+<span id="1394">1394</span>
+<span id="1395">1395</span>
+<span id="1396">1396</span>
+<span id="1397">1397</span>
+<span id="1398">1398</span>
+<span id="1399">1399</span>
+<span id="1400">1400</span>
+<span id="1401">1401</span>
+<span id="1402">1402</span>
+<span id="1403">1403</span>
+<span id="1404">1404</span>
+<span id="1405">1405</span>
+<span id="1406">1406</span>
+<span id="1407">1407</span>
+<span id="1408">1408</span>
+<span id="1409">1409</span>
+<span id="1410">1410</span>
+<span id="1411">1411</span>
+<span id="1412">1412</span>
+<span id="1413">1413</span>
+<span id="1414">1414</span>
+<span id="1415">1415</span>
+<span id="1416">1416</span>
+<span id="1417">1417</span>
+<span id="1418">1418</span>
+<span id="1419">1419</span>
+<span id="1420">1420</span>
+<span id="1421">1421</span>
+<span id="1422">1422</span>
+<span id="1423">1423</span>
+<span id="1424">1424</span>
+<span id="1425">1425</span>
+<span id="1426">1426</span>
+<span id="1427">1427</span>
+<span id="1428">1428</span>
+<span id="1429">1429</span>
+<span id="1430">1430</span>
+<span id="1431">1431</span>
+<span id="1432">1432</span>
+<span id="1433">1433</span>
+<span id="1434">1434</span>
+<span id="1435">1435</span>
+<span id="1436">1436</span>
+<span id="1437">1437</span>
+<span id="1438">1438</span>
+<span id="1439">1439</span>
+<span id="1440">1440</span>
+<span id="1441">1441</span>
+<span id="1442">1442</span>
+<span id="1443">1443</span>
+<span id="1444">1444</span>
+<span id="1445">1445</span>
+<span id="1446">1446</span>
+<span id="1447">1447</span>
+<span id="1448">1448</span>
+<span id="1449">1449</span>
+<span id="1450">1450</span>
+<span id="1451">1451</span>
+<span id="1452">1452</span>
+<span id="1453">1453</span>
+<span id="1454">1454</span>
+<span id="1455">1455</span>
+<span id="1456">1456</span>
+<span id="1457">1457</span>
+<span id="1458">1458</span>
+<span id="1459">1459</span>
+<span id="1460">1460</span>
+<span id="1461">1461</span>
+<span id="1462">1462</span>
+<span id="1463">1463</span>
+<span id="1464">1464</span>
+<span id="1465">1465</span>
+<span id="1466">1466</span>
+<span id="1467">1467</span>
+<span id="1468">1468</span>
+<span id="1469">1469</span>
+<span id="1470">1470</span>
+<span id="1471">1471</span>
+<span id="1472">1472</span>
+<span id="1473">1473</span>
+<span id="1474">1474</span>
+<span id="1475">1475</span>
+<span id="1476">1476</span>
+<span id="1477">1477</span>
+<span id="1478">1478</span>
+<span id="1479">1479</span>
+<span id="1480">1480</span>
+<span id="1481">1481</span>
+<span id="1482">1482</span>
+<span id="1483">1483</span>
+<span id="1484">1484</span>
+<span id="1485">1485</span>
+<span id="1486">1486</span>
+<span id="1487">1487</span>
+<span id="1488">1488</span>
+<span id="1489">1489</span>
+<span id="1490">1490</span>
+<span id="1491">1491</span>
+<span id="1492">1492</span>
+<span id="1493">1493</span>
+<span id="1494">1494</span>
+<span id="1495">1495</span>
+<span id="1496">1496</span>
+<span id="1497">1497</span>
+<span id="1498">1498</span>
+<span id="1499">1499</span>
+<span id="1500">1500</span>
+<span id="1501">1501</span>
+<span id="1502">1502</span>
+<span id="1503">1503</span>
+<span id="1504">1504</span>
+<span id="1505">1505</span>
+<span id="1506">1506</span>
+<span id="1507">1507</span>
+<span id="1508">1508</span>
+<span id="1509">1509</span>
+<span id="1510">1510</span>
+<span id="1511">1511</span>
+<span id="1512">1512</span>
+<span id="1513">1513</span>
+<span id="1514">1514</span>
+<span id="1515">1515</span>
+<span id="1516">1516</span>
+<span id="1517">1517</span>
+<span id="1518">1518</span>
+<span id="1519">1519</span>
+<span id="1520">1520</span>
+<span id="1521">1521</span>
+<span id="1522">1522</span>
+<span id="1523">1523</span>
+<span id="1524">1524</span>
+<span id="1525">1525</span>
+<span id="1526">1526</span>
+<span id="1527">1527</span>
+<span id="1528">1528</span>
+<span id="1529">1529</span>
+<span id="1530">1530</span>
+<span id="1531">1531</span>
+<span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
+<span id="1536">1536</span>
+<span id="1537">1537</span>
+<span id="1538">1538</span>
+<span id="1539">1539</span>
+<span id="1540">1540</span>
+<span id="1541">1541</span>
+<span id="1542">1542</span>
+<span id="1543">1543</span>
+<span id="1544">1544</span>
+<span id="1545">1545</span>
+<span id="1546">1546</span>
+<span id="1547">1547</span>
+<span id="1548">1548</span>
+<span id="1549">1549</span>
+<span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
+<span id="1608">1608</span>
+<span id="1609">1609</span>
+<span id="1610">1610</span>
+<span id="1611">1611</span>
+<span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
+<span id="1626">1626</span>
+<span id="1627">1627</span>
+<span id="1628">1628</span>
+<span id="1629">1629</span>
+<span id="1630">1630</span>
+<span id="1631">1631</span>
+<span id="1632">1632</span>
+<span id="1633">1633</span>
+<span id="1634">1634</span>
+<span id="1635">1635</span>
+<span id="1636">1636</span>
+<span id="1637">1637</span>
+<span id="1638">1638</span>
+<span id="1639">1639</span>
+<span id="1640">1640</span>
+<span id="1641">1641</span>
+<span id="1642">1642</span>
+<span id="1643">1643</span>
+<span id="1644">1644</span>
+<span id="1645">1645</span>
+<span id="1646">1646</span>
+<span id="1647">1647</span>
+<span id="1648">1648</span>
+<span id="1649">1649</span>
+<span id="1650">1650</span>
+<span id="1651">1651</span>
+<span id="1652">1652</span>
+<span id="1653">1653</span>
+<span id="1654">1654</span>
+<span id="1655">1655</span>
+<span id="1656">1656</span>
+<span id="1657">1657</span>
+<span id="1658">1658</span>
+<span id="1659">1659</span>
+<span id="1660">1660</span>
+<span id="1661">1661</span>
+<span id="1662">1662</span>
+<span id="1663">1663</span>
+<span id="1664">1664</span>
+<span id="1665">1665</span>
+<span id="1666">1666</span>
+<span id="1667">1667</span>
+<span id="1668">1668</span>
+<span id="1669">1669</span>
+<span id="1670">1670</span>
+<span id="1671">1671</span>
+<span id="1672">1672</span>
+<span id="1673">1673</span>
+<span id="1674">1674</span>
+<span id="1675">1675</span>
+<span id="1676">1676</span>
+<span id="1677">1677</span>
+<span id="1678">1678</span>
+<span id="1679">1679</span>
+<span id="1680">1680</span>
+<span id="1681">1681</span>
+<span id="1682">1682</span>
+<span id="1683">1683</span>
+<span id="1684">1684</span>
+<span id="1685">1685</span>
+<span id="1686">1686</span>
+<span id="1687">1687</span>
+<span id="1688">1688</span>
+<span id="1689">1689</span>
+<span id="1690">1690</span>
+<span id="1691">1691</span>
+<span id="1692">1692</span>
+<span id="1693">1693</span>
+<span id="1694">1694</span>
+<span id="1695">1695</span>
+<span id="1696">1696</span>
+<span id="1697">1697</span>
+<span id="1698">1698</span>
+<span id="1699">1699</span>
+<span id="1700">1700</span>
+<span id="1701">1701</span>
+<span id="1702">1702</span>
+<span id="1703">1703</span>
+<span id="1704">1704</span>
+<span id="1705">1705</span>
+<span id="1706">1706</span>
+<span id="1707">1707</span>
+<span id="1708">1708</span>
+<span id="1709">1709</span>
+<span id="1710">1710</span>
+<span id="1711">1711</span>
+<span id="1712">1712</span>
+<span id="1713">1713</span>
+<span id="1714">1714</span>
+<span id="1715">1715</span>
+<span id="1716">1716</span>
+<span id="1717">1717</span>
+<span id="1718">1718</span>
+<span id="1719">1719</span>
+<span id="1720">1720</span>
+<span id="1721">1721</span>
+<span id="1722">1722</span>
+<span id="1723">1723</span>
+<span id="1724">1724</span>
+<span id="1725">1725</span>
+<span id="1726">1726</span>
+<span id="1727">1727</span>
+<span id="1728">1728</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The [`Layer`] trait, a composable abstraction for building [`Subscriber`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The [`Subscriber`] trait in `tracing-core` represents the _complete_ set of</span>
@@ -1311,7 +1754,7 @@
 <span class="doccomment">//! [`Subscriber`] behavior; it can _observe_ events and spans, but does not</span>
 <span class="doccomment">//! assign IDs.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ## Composing Layers</span>
+<span class="doccomment">//! # Composing Layers</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Since a [`Layer`] does not implement a complete strategy for collecting</span>
 <span class="doccomment">//! traces, it must be composed with a `Subscriber` in order to be used. The</span>
@@ -1427,9 +1870,244 @@
 <span class="doccomment">//! [`Layer::with_subscriber`] as an implementation detail, as `with_subscriber`</span>
 <span class="doccomment">//! calls must be nested, leading to less clear code for the reader.</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! ## Runtime Configuration With `Layer`s</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! In some cases, a particular [`Layer`] may be enabled or disabled based on</span>
+<span class="doccomment">//! runtime configuration. This can introduce challenges, because the type of a</span>
+<span class="doccomment">//! layered [`Subscriber`] depends on which layers are added to it: if an `if`</span>
+<span class="doccomment">//! or `match` expression adds some [`Layer`] implementation in one branch,</span>
+<span class="doccomment">//! and other layers in another, the [`Subscriber`] values returned by those</span>
+<span class="doccomment">//! branches will have different types. For example, the following _will not_</span>
+<span class="doccomment">//! work:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```compile_fail</span>
+<span class="doccomment">//! # fn docs() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + &#39;static&gt;&gt; {</span>
+<span class="doccomment">//! # struct Config {</span>
+<span class="doccomment">//! #    is_prod: bool,</span>
+<span class="doccomment">//! #    path: &amp;&#39;static str,</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! # let cfg = Config { is_prod: false, path: &quot;debug.log&quot; };</span>
+<span class="doccomment">//! use std::fs::File;</span>
+<span class="doccomment">//! use tracing_subscriber::{Registry, prelude::*};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let stdout_log = tracing_subscriber::fmt::layer().pretty();</span>
+<span class="doccomment">//! let subscriber = Registry::default().with(stdout_log);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // The compile error will occur here because the if and else</span>
+<span class="doccomment">//! // branches have different (and therefore incompatible) types.</span>
+<span class="doccomment">//! let subscriber = if cfg.is_prod {</span>
+<span class="doccomment">//!     let file = File::create(cfg.path)?;</span>
+<span class="doccomment">//!     let layer = tracing_subscriber::fmt::layer()</span>
+<span class="doccomment">//!         .json()</span>
+<span class="doccomment">//!         .with_writer(Arc::new(file));</span>
+<span class="doccomment">//!     layer.with(subscriber)</span>
+<span class="doccomment">//! } else {</span>
+<span class="doccomment">//!     layer</span>
+<span class="doccomment">//! };</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! tracing::subscriber::set_global_default(subscriber)</span>
+<span class="doccomment">//!     .expect(&quot;Unable to set global subscriber&quot;);</span>
+<span class="doccomment">//! # Ok(()) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! However, a [`Layer`] wrapped in an [`Option`] [also implements the `Layer`</span>
+<span class="doccomment">//! trait][option-impl]. This allows individual layers to be enabled or disabled at</span>
+<span class="doccomment">//! runtime while always producing a [`Subscriber`] of the same type. For</span>
+<span class="doccomment">//! example:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! # fn docs() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + &#39;static&gt;&gt; {</span>
+<span class="doccomment">//! # struct Config {</span>
+<span class="doccomment">//! #    is_prod: bool,</span>
+<span class="doccomment">//! #    path: &amp;&#39;static str,</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! # let cfg = Config { is_prod: false, path: &quot;debug.log&quot; };</span>
+<span class="doccomment">//! use std::fs::File;</span>
+<span class="doccomment">//! use tracing_subscriber::{Registry, prelude::*};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let stdout_log = tracing_subscriber::fmt::layer().pretty();</span>
+<span class="doccomment">//! let subscriber = Registry::default().with(stdout_log);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // if `cfg.is_prod` is true, also log JSON-formatted logs to a file.</span>
+<span class="doccomment">//! let json_log = if cfg.is_prod {</span>
+<span class="doccomment">//!     let file = File::create(cfg.path)?;</span>
+<span class="doccomment">//!     let json_log = tracing_subscriber::fmt::layer()</span>
+<span class="doccomment">//!         .json()</span>
+<span class="doccomment">//!         .with_writer(file);</span>
+<span class="doccomment">//!     Some(json_log)</span>
+<span class="doccomment">//! } else {</span>
+<span class="doccomment">//!     None</span>
+<span class="doccomment">//! };</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // If `cfg.is_prod` is false, then `json` will be `None`, and this layer</span>
+<span class="doccomment">//! // will do nothing. However, the subscriber will still have the same type</span>
+<span class="doccomment">//! // regardless of whether the `Option`&#39;s value is `None` or `Some`.</span>
+<span class="doccomment">//! let subscriber = subscriber.with(json_log);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! tracing::subscriber::set_global_default(subscriber)</span>
+<span class="doccomment">//!    .expect(&quot;Unable to set global subscriber&quot;);</span>
+<span class="doccomment">//! # Ok(()) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! If a [`Layer`] may be one of several different types, note that [`Box&lt;dyn</span>
+<span class="doccomment">//! Layer&lt;S&gt; + Send + Sync&gt;` implements `Layer`][box-impl].</span>
+<span class="doccomment">//! This may be used to erase the type of a [`Layer`].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For example, a function that configures a [`Layer`] to log to one of</span>
+<span class="doccomment">//! several outputs might return a `Box&lt;dyn Layer&lt;S&gt; + Send + Sync + &#39;static&gt;`:</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use tracing_subscriber::{</span>
+<span class="doccomment">//!     Layer,</span>
+<span class="doccomment">//!     registry::LookupSpan,</span>
+<span class="doccomment">//!     prelude::*,</span>
+<span class="doccomment">//! };</span>
+<span class="doccomment">//! use std::{path::PathBuf, fs::File, io};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! /// Configures whether logs are emitted to a file, to stdout, or to stderr.</span>
+<span class="doccomment">//! pub enum LogConfig {</span>
+<span class="doccomment">//!     File(PathBuf),</span>
+<span class="doccomment">//!     Stdout,</span>
+<span class="doccomment">//!     Stderr,</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! impl LogConfig {</span>
+<span class="doccomment">//!     pub fn layer&lt;S&gt;(self) -&gt; Box&lt;dyn Layer&lt;S&gt; + Send + Sync + &#39;static&gt;</span>
+<span class="doccomment">//!     where</span>
+<span class="doccomment">//!         S: tracing_core::Subscriber,</span>
+<span class="doccomment">//!         for&lt;&#39;a&gt; S: LookupSpan&lt;&#39;a&gt;,</span>
+<span class="doccomment">//!     {</span>
+<span class="doccomment">//!         // Shared configuration regardless of where logs are output to.</span>
+<span class="doccomment">//!         let fmt = tracing_subscriber::fmt::layer()</span>
+<span class="doccomment">//!             .with_target(true)</span>
+<span class="doccomment">//!             .with_thread_names(true);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!         // Configure the writer based on the desired log target:</span>
+<span class="doccomment">//!         match self {</span>
+<span class="doccomment">//!             LogConfig::File(path) =&gt; {</span>
+<span class="doccomment">//!                 let file = File::create(path).expect(&quot;failed to create log file&quot;);</span>
+<span class="doccomment">//!                 Box::new(fmt.with_writer(file))</span>
+<span class="doccomment">//!             },</span>
+<span class="doccomment">//!             LogConfig::Stdout =&gt; Box::new(fmt.with_writer(io::stdout)),</span>
+<span class="doccomment">//!             LogConfig::Stderr =&gt; Box::new(fmt.with_writer(io::stderr)),</span>
+<span class="doccomment">//!         }</span>
+<span class="doccomment">//!     }</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let config = LogConfig::Stdout;</span>
+<span class="doccomment">//! tracing_subscriber::registry()</span>
+<span class="doccomment">//!     .with(config.layer())</span>
+<span class="doccomment">//!     .init();</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The [`Layer::boxed`] method is provided to make boxing a `Layer`</span>
+<span class="doccomment">//! more convenient, but [`Box::new`] may be used as well.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! When the number of `Layer`s varies at runtime, note that a</span>
+<span class="doccomment">//! [`Vec&lt;L&gt; where L: `Layer`` also implements `Layer`][vec-impl]. This</span>
+<span class="doccomment">//! can be used to add a variable number of `Layer`s to a `Subscriber`:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use tracing_subscriber::{Layer, prelude::*};</span>
+<span class="doccomment">//! struct MyLayer {</span>
+<span class="doccomment">//!     // ...</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! # impl MyLayer { fn new() -&gt; Self { Self {} }}</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! impl&lt;S: tracing_core::Subscriber&gt; Layer&lt;S&gt; for MyLayer {</span>
+<span class="doccomment">//!     // ...</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! /// Returns how many layers we need</span>
+<span class="doccomment">//! fn how_many_layers() -&gt; usize {</span>
+<span class="doccomment">//!     // ...</span>
+<span class="doccomment">//!     # 3</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Create a variable-length `Vec` of layers</span>
+<span class="doccomment">//! let mut layers = Vec::new();</span>
+<span class="doccomment">//! for _ in 0..how_many_layers() {</span>
+<span class="doccomment">//!     layers.push(MyLayer::new());</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! tracing_subscriber::registry()</span>
+<span class="doccomment">//!     .with(layers)</span>
+<span class="doccomment">//!     .init();</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! If a variable number of `Layer` is needed and those `Layer`s have</span>
+<span class="doccomment">//! different types, a `Vec` of [boxed `Layer` trait objects][box-impl] may</span>
+<span class="doccomment">//! be used. For example:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use tracing_subscriber::{filter::LevelFilter, Layer, prelude::*};</span>
+<span class="doccomment">//! use std::fs::File;</span>
+<span class="doccomment">//! # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+<span class="doccomment">//! struct Config {</span>
+<span class="doccomment">//!     enable_log_file: bool,</span>
+<span class="doccomment">//!     enable_stdout: bool,</span>
+<span class="doccomment">//!     enable_stderr: bool,</span>
+<span class="doccomment">//!     // ...</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! # impl Config {</span>
+<span class="doccomment">//! #    fn from_config_file()-&gt; Result&lt;Self, Box&lt;dyn std::error::Error&gt;&gt; {</span>
+<span class="doccomment">//! #         // don&#39;t enable the log file so that the example doesn&#39;t actually create it</span>
+<span class="doccomment">//! #         Ok(Self { enable_log_file: false, enable_stdout: true, enable_stderr: true })</span>
+<span class="doccomment">//! #    }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let cfg = Config::from_config_file()?;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Based on our dynamically loaded config file, create any number of layers:</span>
+<span class="doccomment">//! let mut layers = Vec::new();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! if cfg.enable_log_file {</span>
+<span class="doccomment">//!     let file = File::create(&quot;myapp.log&quot;)?;</span>
+<span class="doccomment">//!     let layer = tracing_subscriber::fmt::layer()</span>
+<span class="doccomment">//!         .with_thread_names(true)</span>
+<span class="doccomment">//!         .with_target(true)</span>
+<span class="doccomment">//!         .json()</span>
+<span class="doccomment">//!         .with_writer(file)</span>
+<span class="doccomment">//!         // Box the layer as a type-erased trait object, so that it can</span>
+<span class="doccomment">//!         // be pushed to the `Vec`.</span>
+<span class="doccomment">//!         .boxed();</span>
+<span class="doccomment">//!     layers.push(layer);</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! if cfg.enable_stdout {</span>
+<span class="doccomment">//!     let layer = tracing_subscriber::fmt::layer()</span>
+<span class="doccomment">//!         .pretty()</span>
+<span class="doccomment">//!         .with_filter(LevelFilter::INFO)</span>
+<span class="doccomment">//!         // Box the layer as a type-erased trait object, so that it can</span>
+<span class="doccomment">//!         // be pushed to the `Vec`.</span>
+<span class="doccomment">//!         .boxed();</span>
+<span class="doccomment">//!     layers.push(layer);</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! if cfg.enable_stdout {</span>
+<span class="doccomment">//!     let layer = tracing_subscriber::fmt::layer()</span>
+<span class="doccomment">//!         .with_target(false)</span>
+<span class="doccomment">//!         .with_filter(LevelFilter::WARN)</span>
+<span class="doccomment">//!         // Box the layer as a type-erased trait object, so that it can</span>
+<span class="doccomment">//!         // be pushed to the `Vec`.</span>
+<span class="doccomment">//!         .boxed();</span>
+<span class="doccomment">//!     layers.push(layer);</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! tracing_subscriber::registry()</span>
+<span class="doccomment">//!     .with(layers)</span>
+<span class="doccomment">//!     .init();</span>
+<span class="doccomment">//!# Ok(()) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Finally, if the number of layers _changes_ at runtime, a `Vec` of</span>
+<span class="doccomment">//! subscribers can be used alongside the [`reload`](crate::reload) module to</span>
+<span class="doccomment">//! add or remove subscribers dynamically at runtime.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [option-impl]: Layer#impl-Layer&lt;S&gt;-for-Option&lt;L&gt;</span>
+<span class="doccomment">//! [box-impl]: Layer#impl-Layer%3CS%3E-for-Box%3Cdyn%20Layer%3CS%3E%20+%20Send%20+%20Sync%3E</span>
 <span class="doccomment">//! [prelude]: crate::prelude</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ## Recording Traces</span>
+<span class="doccomment">//! # Recording Traces</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The [`Layer`] trait defines a set of methods for consuming notifications from</span>
 <span class="doccomment">//! tracing instrumentation, which are generally equivalent to the similarly</span>
@@ -1438,7 +2116,7 @@
 <span class="doccomment">//! information provided by the wrapped subscriber (such as [the current span])</span>
 <span class="doccomment">//! to the layer.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ## Filtering with `Layer`s</span>
+<span class="doccomment">//! # Filtering with `Layer`s</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! As well as strategies for handling trace events, the `Layer` trait may also</span>
 <span class="doccomment">//! be used to represent composable _filters_. This allows the determination of</span>
@@ -1450,7 +2128,7 @@
 <span class="doccomment">//! combined with _per-layer filters_ that control what spans and events are</span>
 <span class="doccomment">//! recorded by those layers.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ### Global Filtering</span>
+<span class="doccomment">//! ## Global Filtering</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! A `Layer` that implements a filtering strategy should override the</span>
 <span class="doccomment">//! [`register_callsite`] and/or [`enabled`] methods. It may also choose to implement</span>
@@ -1471,7 +2149,7 @@
 <span class="doccomment">//! [`Interest::never()`] from its [`register_callsite`] method, filter</span>
 <span class="doccomment">//! evaluation will short-circuit and the span or event will be disabled.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ### Per-Layer Filtering</span>
+<span class="doccomment">//! ## Per-Layer Filtering</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! **Note**: per-layer filtering APIs currently require the [`&quot;registry&quot;` crate</span>
 <span class="doccomment">//! feature flag][feat] to be enabled.</span>
@@ -1685,84 +2363,6 @@
 <span class="doccomment">//! # Ok(()) }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ## Runtime Configuration With Layers</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In some cases, a particular [`Layer`] may be enabled or disabled based on</span>
-<span class="doccomment">//! runtime configuration. This can introduce challenges, because the type of a</span>
-<span class="doccomment">//! layered [`Subscriber`] depends on which layers are added to it: if an `if`</span>
-<span class="doccomment">//! or `match` expression adds some [`Layer`]s in one branch and other layers</span>
-<span class="doccomment">//! in another, the [`Subscriber`] values returned by those branches will have</span>
-<span class="doccomment">//! different types. For example, the following _will not_ work:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```compile_fail</span>
-<span class="doccomment">//! # fn docs() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + &#39;static&gt;&gt; {</span>
-<span class="doccomment">//! # struct Config {</span>
-<span class="doccomment">//! #    is_prod: bool,</span>
-<span class="doccomment">//! #    path: &amp;&#39;static str,</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! # let cfg = Config { is_prod: false, path: &quot;debug.log&quot; };</span>
-<span class="doccomment">//! use std::{fs::File, sync::Arc};</span>
-<span class="doccomment">//! use tracing_subscriber::{Registry, prelude::*};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let stdout_log = tracing_subscriber::fmt::layer().pretty();</span>
-<span class="doccomment">//! let subscriber = Registry::default().with(stdout_log);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // The compile error will occur here because the if and else</span>
-<span class="doccomment">//! // branches have different (and therefore incompatible) types.</span>
-<span class="doccomment">//! let subscriber = if cfg.is_prod {</span>
-<span class="doccomment">//!     let file = File::create(cfg.path)?;</span>
-<span class="doccomment">//!     let layer = tracing_subscriber::fmt::layer()</span>
-<span class="doccomment">//!         .json()</span>
-<span class="doccomment">//!         .with_writer(Arc::new(file));</span>
-<span class="doccomment">//!     subscriber.with(layer)</span>
-<span class="doccomment">//! } else {</span>
-<span class="doccomment">//!     subscriber</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! tracing::subscriber::set_global_default(subscriber)</span>
-<span class="doccomment">//!     .expect(&quot;Unable to set global subscriber&quot;);</span>
-<span class="doccomment">//! # Ok(()) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! However, a [`Layer`] wrapped in an [`Option`] [also implements the `Layer`</span>
-<span class="doccomment">//! trait][option-impl]. This allows individual layers to be enabled or disabled at</span>
-<span class="doccomment">//! runtime while always producing a [`Subscriber`] of the same type. For</span>
-<span class="doccomment">//! example:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # fn docs() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + &#39;static&gt;&gt; {</span>
-<span class="doccomment">//! # struct Config {</span>
-<span class="doccomment">//! #    is_prod: bool,</span>
-<span class="doccomment">//! #    path: &amp;&#39;static str,</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! # let cfg = Config { is_prod: false, path: &quot;debug.log&quot; };</span>
-<span class="doccomment">//! use std::{fs::File, sync::Arc};</span>
-<span class="doccomment">//! use tracing_subscriber::{Registry, prelude::*};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let stdout_log = tracing_subscriber::fmt::layer().pretty();</span>
-<span class="doccomment">//! let subscriber = Registry::default().with(stdout_log);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // if `cfg.is_prod` is true, also log JSON-formatted logs to a file.</span>
-<span class="doccomment">//! let json_log = if cfg.is_prod {</span>
-<span class="doccomment">//!     let file = File::create(cfg.path)?;</span>
-<span class="doccomment">//!     let json_log = tracing_subscriber::fmt::layer()</span>
-<span class="doccomment">//!         .json()</span>
-<span class="doccomment">//!         .with_writer(Arc::new(file));</span>
-<span class="doccomment">//!     Some(json_log)</span>
-<span class="doccomment">//! } else {   </span>
-<span class="doccomment">//!     None</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // If `cfg.is_prod` is false, then `json` will be `None`, and this layer</span>
-<span class="doccomment">//! // will do nothing. However, the subscriber will still have the same type</span>
-<span class="doccomment">//! // regardless of whether the `Option`&#39;s value is `None` or `Some`.</span>
-<span class="doccomment">//! let subscriber = subscriber.with(json_log);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! tracing::subscriber::set_global_default(subscriber)</span>
-<span class="doccomment">//!    .expect(&quot;Unable to set global subscriber&quot;);</span>
-<span class="doccomment">//! # Ok(()) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
 <span class="doccomment">//! [`Subscriber`]: https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html</span>
 <span class="doccomment">//! [span IDs]: https://docs.rs/tracing-core/latest/tracing_core/span/struct.Id.html</span>
 <span class="doccomment">//! [the current span]: Context::current_span</span>
@@ -1772,7 +2372,6 @@
 <span class="doccomment">//! [`Layer::register_callsite`]: Layer::register_callsite</span>
 <span class="doccomment">//! [`Layer::enabled`]: Layer::enabled</span>
 <span class="doccomment">//! [`Interest::never()`]: https://docs.rs/tracing-core/latest/tracing_core/subscriber/struct.Interest.html#method.never</span>
-<span class="doccomment">//! [option-impl]: crate::layer::Layer#impl-Layer&lt;S&gt;-for-Option&lt;L&gt;</span>
 <span class="doccomment">//! [`Filtered`]: crate::filter::Filtered</span>
 <span class="doccomment">//! [`filter`]: crate::filter</span>
 <span class="doccomment">//! [`Targets`]: crate::filter::Targets</span>
@@ -2160,6 +2759,131 @@
         <span class="ident">filter::Filtered::new</span>(<span class="self">self</span>, <span class="ident">filter</span>)
     }
 
+    <span class="doccomment">/// Erases the type of this [`Layer`], returning a [`Box`]ed `dyn</span>
+    <span class="doccomment">/// Layer` trait object.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This can be used when a function returns a `Layer` which may be of</span>
+    <span class="doccomment">/// one of several types, or when a `Layer` subscriber has a very long type</span>
+    <span class="doccomment">/// signature.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The following example will *not* compile, because the value assigned to</span>
+    <span class="doccomment">/// `log_layer` may have one of several different types:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```compile_fail</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// use tracing_subscriber::{Layer, filter::LevelFilter, prelude::*};</span>
+    <span class="doccomment">/// use std::{path::PathBuf, fs::File, io};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// /// Configures whether logs are emitted to a file, to stdout, or to stderr.</span>
+    <span class="doccomment">/// pub enum LogConfig {</span>
+    <span class="doccomment">///     File(PathBuf),</span>
+    <span class="doccomment">///     Stdout,</span>
+    <span class="doccomment">///     Stderr,</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let config = // ...</span>
+    <span class="doccomment">///     # LogConfig::Stdout;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Depending on the config, construct a layer of one of several types.</span>
+    <span class="doccomment">/// let log_layer = match config {</span>
+    <span class="doccomment">///     // If logging to a file, use a maximally-verbose configuration.</span>
+    <span class="doccomment">///     LogConfig::File(path) =&gt; {</span>
+    <span class="doccomment">///         let file = File::create(path)?;</span>
+    <span class="doccomment">///         tracing_subscriber::fmt::layer()</span>
+    <span class="doccomment">///             .with_thread_ids(true)</span>
+    <span class="doccomment">///             .with_thread_names(true)</span>
+    <span class="doccomment">///             // Selecting the JSON logging format changes the layer&#39;s</span>
+    <span class="doccomment">///             // type.</span>
+    <span class="doccomment">///             .json()</span>
+    <span class="doccomment">///             .with_span_list(true)</span>
+    <span class="doccomment">///             // Setting the writer to use our log file changes the</span>
+    <span class="doccomment">///             // layer&#39;s type again.</span>
+    <span class="doccomment">///             .with_writer(file)</span>
+    <span class="doccomment">///     },</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     // If logging to stdout, use a pretty, human-readable configuration.</span>
+    <span class="doccomment">///     LogConfig::Stdout =&gt; tracing_subscriber::fmt::layer()</span>
+    <span class="doccomment">///         // Selecting the &quot;pretty&quot; logging format changes the</span>
+    <span class="doccomment">///         // layer&#39;s type!</span>
+    <span class="doccomment">///         .pretty()</span>
+    <span class="doccomment">///         .with_writer(io::stdout)</span>
+    <span class="doccomment">///         // Add a filter based on the RUST_LOG environment variable;</span>
+    <span class="doccomment">///         // this changes the type too!</span>
+    <span class="doccomment">///         .and_then(tracing_subscriber::EnvFilter::from_default_env()),</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     // If logging to stdout, only log errors and warnings.</span>
+    <span class="doccomment">///     LogConfig::Stderr =&gt; tracing_subscriber::fmt::layer()</span>
+    <span class="doccomment">///         // Changing the writer changes the layer&#39;s type</span>
+    <span class="doccomment">///         .with_writer(io::stderr)</span>
+    <span class="doccomment">///         // Only log the `WARN` and `ERROR` levels. Adding a filter</span>
+    <span class="doccomment">///         // changes the layer&#39;s type to `Filtered&lt;LevelFilter, ...&gt;`.</span>
+    <span class="doccomment">///         .with_filter(LevelFilter::WARN),</span>
+    <span class="doccomment">/// };</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// tracing_subscriber::registry()</span>
+    <span class="doccomment">///     .with(log_layer)</span>
+    <span class="doccomment">///     .init();</span>
+    <span class="doccomment">/// # Ok(()) }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// However, adding a call to `.boxed()` after each match arm erases the</span>
+    <span class="doccomment">/// layer&#39;s type, so this code *does* compile:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # use tracing_subscriber::{Layer, filter::LevelFilter, prelude::*};</span>
+    <span class="doccomment">/// # use std::{path::PathBuf, fs::File, io};</span>
+    <span class="doccomment">/// # pub enum LogConfig {</span>
+    <span class="doccomment">/// #    File(PathBuf),</span>
+    <span class="doccomment">/// #    Stdout,</span>
+    <span class="doccomment">/// #    Stderr,</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// # let config = LogConfig::Stdout;</span>
+    <span class="doccomment">/// let log_layer = match config {</span>
+    <span class="doccomment">///     LogConfig::File(path) =&gt; {</span>
+    <span class="doccomment">///         let file = File::create(path)?;</span>
+    <span class="doccomment">///         tracing_subscriber::fmt::layer()</span>
+    <span class="doccomment">///             .with_thread_ids(true)</span>
+    <span class="doccomment">///             .with_thread_names(true)</span>
+    <span class="doccomment">///             .json()</span>
+    <span class="doccomment">///             .with_span_list(true)</span>
+    <span class="doccomment">///             .with_writer(file)</span>
+    <span class="doccomment">///             // Erase the type by boxing the layer</span>
+    <span class="doccomment">///             .boxed()</span>
+    <span class="doccomment">///     },</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     LogConfig::Stdout =&gt; tracing_subscriber::fmt::layer()</span>
+    <span class="doccomment">///         .pretty()</span>
+    <span class="doccomment">///         .with_writer(io::stdout)</span>
+    <span class="doccomment">///         .and_then(tracing_subscriber::EnvFilter::from_default_env())</span>
+    <span class="doccomment">///         // Erase the type by boxing the layer</span>
+    <span class="doccomment">///         .boxed(),</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     LogConfig::Stderr =&gt; tracing_subscriber::fmt::layer()</span>
+    <span class="doccomment">///         .with_writer(io::stderr)</span>
+    <span class="doccomment">///         .with_filter(LevelFilter::WARN)</span>
+    <span class="doccomment">///         // Erase the type by boxing the layer</span>
+    <span class="doccomment">///         .boxed(),</span>
+    <span class="doccomment">/// };</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// tracing_subscriber::registry()</span>
+    <span class="doccomment">///     .with(log_layer)</span>
+    <span class="doccomment">///     .init();</span>
+    <span class="doccomment">/// # Ok(()) }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))))]</span>
+    <span class="kw">fn</span> <span class="ident">boxed</span>(<span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+        <span class="self">Self</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+    {
+        <span class="ident">Box::new</span>(<span class="self">self</span>)
+    }
+
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downcast_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*const</span> ()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() {
@@ -2172,6 +2896,7 @@
 
 <span class="macro">feature!</span> {
     <span class="attribute">#![<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+
     <span class="doccomment">/// A per-[`Layer`] filter that determines whether a span or event is enabled</span>
     <span class="doccomment">/// for an individual layer.</span>
     <span class="doccomment">///</span>
@@ -2346,6 +3071,51 @@
         <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
             <span class="prelude-val">None</span>
         }
+
+        <span class="doccomment">/// Notifies this filter that a new span was constructed with the given</span>
+        <span class="doccomment">/// `Attributes` and `Id`.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// By default, this method does nothing. `Filter` implementations that</span>
+        <span class="doccomment">/// need to be notified when new spans are created can override this</span>
+        <span class="doccomment">/// method.</span>
+        <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> (<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>);
+        }
+
+
+        <span class="doccomment">/// Notifies this filter that a span with the given `Id` recorded the given</span>
+        <span class="doccomment">/// `values`.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// By default, this method does nothing. `Filter` implementations that</span>
+        <span class="doccomment">/// need to be notified when new spans are created can override this</span>
+        <span class="doccomment">/// method.</span>
+        <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> (<span class="ident">id</span>, <span class="ident">values</span>, <span class="ident">ctx</span>);
+        }
+
+        <span class="doccomment">/// Notifies this filter that a span with the given ID was entered.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// By default, this method does nothing. `Filter` implementations that</span>
+        <span class="doccomment">/// need to be notified when a span is entered can override this method.</span>
+        <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> (<span class="ident">id</span>, <span class="ident">ctx</span>);
+        }
+
+        <span class="doccomment">/// Notifies this filter that a span with the given ID was exited.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// By default, this method does nothing. `Filter` implementations that</span>
+        <span class="doccomment">/// need to be notified when a span is exited can override this method.</span>
+        <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> (<span class="ident">id</span>, <span class="ident">ctx</span>);
+        }
+
+        <span class="doccomment">/// Notifies this filter that a span with the given ID has been closed.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// By default, this method does nothing. `Filter` implementations that</span>
+        <span class="doccomment">/// need to be notified when a span is closed can override this method.</span>
+        <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> (<span class="ident">id</span>, <span class="ident">ctx</span>);
+        }
     }
 }
 
@@ -2473,6 +3243,8 @@
 
 <span class="macro">feature!</span> {
     <span class="attribute">#![<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
+    <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
 
     <span class="macro">macro_rules!</span> <span class="ident">layer_impl_body</span> {
         () =&gt; {
@@ -2557,6 +3329,120 @@
         <span class="ident">S</span>: <span class="ident">Subscriber</span>,
     {
         <span class="macro">layer_impl_body!</span> {}
+    }
+
+
+
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+        <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+    {
+
+        <span class="kw">fn</span> <span class="ident">on_layer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">subscriber</span>: <span class="kw-2">&amp;mut</span> <span class="ident">S</span>) {
+            <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span> {
+                <span class="ident">l</span>.<span class="ident">on_layer</span>(<span class="ident">subscriber</span>);
+            }
+        }
+
+        <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
+            <span class="comment">// Return highest level of interest.</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interest</span> <span class="op">=</span> <span class="ident">Interest::never</span>();
+            <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span> {
+                <span class="kw">let</span> <span class="ident">new_interest</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">register_callsite</span>(<span class="ident">metadata</span>);
+                <span class="kw">if</span> (<span class="ident">interest</span>.<span class="ident">is_sometimes</span>() <span class="op">&amp;&amp;</span> <span class="ident">new_interest</span>.<span class="ident">is_always</span>())
+                    <span class="op">|</span><span class="op">|</span> (<span class="ident">interest</span>.<span class="ident">is_never</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">new_interest</span>.<span class="ident">is_never</span>())
+                {
+                    <span class="ident">interest</span> <span class="op">=</span> <span class="ident">new_interest</span>;
+                }
+            }
+
+            <span class="ident">interest</span>
+        }
+
+        <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+            <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>()))
+        }
+
+        <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+            <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span> {
+                <span class="ident">l</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
+            }
+        }
+
+        <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_level</span> <span class="op">=</span> <span class="ident">LevelFilter::ERROR</span>;
+            <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span> {
+                <span class="comment">// NOTE(eliza): this is slightly subtle: if *any* layer</span>
+                <span class="comment">// returns `None`, we have to return `None`, assuming there is</span>
+                <span class="comment">// no max level hint, since that particular layer cannot</span>
+                <span class="comment">// provide a hint.</span>
+                <span class="kw">let</span> <span class="ident">hint</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">max_level_hint</span>()<span class="question-mark">?</span>;
+                <span class="ident">max_level</span> <span class="op">=</span> <span class="ident">core::cmp::max</span>(<span class="ident">hint</span>, <span class="ident">max_level</span>);
+            }
+            <span class="prelude-val">Some</span>(<span class="ident">max_level</span>)
+        }
+
+        <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+            <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span> {
+                <span class="ident">l</span>.<span class="ident">on_record</span>(<span class="ident">span</span>, <span class="ident">values</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>())
+            }
+        }
+
+        <span class="kw">fn</span> <span class="ident">on_follows_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">follows</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+            <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span> {
+                <span class="ident">l</span>.<span class="ident">on_follows_from</span>(<span class="ident">span</span>, <span class="ident">follows</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
+            }
+        }
+
+        <span class="kw">fn</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+            <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span> {
+                <span class="ident">l</span>.<span class="ident">on_event</span>(<span class="ident">event</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
+            }
+        }
+
+        <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+            <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span> {
+                <span class="ident">l</span>.<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
+            }
+        }
+
+        <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+            <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span> {
+                <span class="ident">l</span>.<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
+            }
+        }
+
+        <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
+            <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span> {
+                <span class="ident">l</span>.<span class="ident">on_close</span>(<span class="ident">id</span>.<span class="ident">clone</span>(), <span class="ident">ctx</span>.<span class="ident">clone</span>());
+            }
+        }
+
+        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downcast_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*const</span> ()<span class="op">&gt;</span> {
+            <span class="comment">// If downcasting to `Self`, return a pointer to `self`.</span>
+            <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() {
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> ());
+            }
+
+            <span class="comment">// Someone is looking for per-layer filters. But, this `Vec`</span>
+            <span class="comment">// might contain layers with per-layer filters *and*</span>
+            <span class="comment">// layers without filters. It should only be treated as a</span>
+            <span class="comment">// per-layer-filtered layer if *all* its layers have</span>
+            <span class="comment">// per-layer filters.</span>
+            <span class="comment">// XXX(eliza): it&#39;s a bummer we have to do this linear search every</span>
+            <span class="comment">// time. It would be nice if this could be cached, but that would</span>
+            <span class="comment">// require replacing the `Vec` impl with an impl for a newtype...</span>
+            <span class="kw">if</span> <span class="ident">filter::is_plf_downcast_marker</span>(<span class="ident">id</span>) <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">downcast_raw</span>(<span class="ident">id</span>).<span class="ident">is_none</span>()) {
+                <span class="kw">return</span> <span class="prelude-val">None</span>;
+            }
+
+            <span class="comment">// Otherwise, return the first child of `self` that downcaasts to</span>
+            <span class="comment">// the selected type, if any.</span>
+            <span class="comment">// XXX(eliza): hope this is reasonable lol</span>
+            <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">downcast_raw</span>(<span class="ident">id</span>))
+        }
     }
 }
 

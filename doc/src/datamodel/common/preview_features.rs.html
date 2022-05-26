@@ -180,6 +180,8 @@
 <span id="175">175</span>
 <span id="176">176</span>
 <span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">PreviewFeature</span>::<span class="kw-2">*</span>;
@@ -246,7 +248,8 @@
     <span class="ident">ExtendedIndexes</span>,
     <span class="ident">Cockroachdb</span>,
     <span class="ident">Tracing</span>,
-    <span class="ident">ImprovedQueryRaw</span>
+    <span class="ident">ImprovedQueryRaw</span>,
+    <span class="ident">Metrics</span>
 );
 
 <span class="comment">// Mapping of which active, deprecated and hidden</span>
@@ -263,6 +266,7 @@
         <span class="ident">ExtendedIndexes</span>,
         <span class="ident">Tracing</span>,
         <span class="ident">ImprovedQueryRaw</span>,
+        <span class="ident">Metrics</span>,
     ])
     .<span class="ident">with_deprecated</span>(<span class="kw-2">&amp;</span>[
         <span class="ident">AtomicNumberOperations</span>,

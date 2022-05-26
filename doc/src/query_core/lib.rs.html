@@ -53,6 +53,8 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(
     <span class="ident">clippy::module_inception</span>,
     <span class="ident">clippy::wrong_self_convention</span>,
@@ -79,6 +81,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">executor</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">interactive_transactions</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">interpreter</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">metrics</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">query_ast</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">query_document</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">query_graph</span>;
@@ -86,6 +89,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">response_ir</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">result_ast</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::metrics</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">executor</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">interactive_transactions</span>::<span class="kw-2">*</span>;

@@ -136,14 +136,26 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">opentelemetry</span>::{
     <span class="ident">global</span>,
     <span class="ident">sdk</span>::{<span class="ident">propagation::TraceContextPropagator</span>, <span class="ident">trace::Config</span>, <span class="ident">Resource</span>},
     <span class="ident">KeyValue</span>,
 };
 <span class="kw">use</span> <span class="ident">opentelemetry_otlp::WithExportConfig</span>;
+<span class="kw">use</span> <span class="ident">query_core::MetricRegistry</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">dispatcher::SetGlobalDefaultError</span>, <span class="ident">subscriber</span>};
-<span class="kw">use</span> <span class="ident">tracing_subscriber</span>::{<span class="ident">layer::SubscriberExt</span>, <span class="ident">registry::LookupSpan</span>, <span class="ident">EnvFilter</span>, <span class="ident">FmtSubscriber</span>};
+<span class="kw">use</span> <span class="ident">tracing_subscriber</span>::{<span class="ident">layer::SubscriberExt</span>, <span class="ident">registry::LookupSpan</span>, <span class="ident">EnvFilter</span>, <span class="ident">FmtSubscriber</span>, <span class="ident">Layer</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::LogFormat</span>;
 
@@ -157,6 +169,7 @@
     <span class="ident">enable_telemetry</span>: <span class="ident">bool</span>,
     <span class="ident">log_queries</span>: <span class="ident">bool</span>,
     <span class="ident">telemetry_endpoint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="ident">metrics</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MetricRegistry</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Logger</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -168,6 +181,7 @@
             <span class="ident">enable_telemetry</span>: <span class="bool-val">false</span>,
             <span class="ident">log_queries</span>: <span class="bool-val">false</span>,
             <span class="ident">telemetry_endpoint</span>: <span class="prelude-val">None</span>,
+            <span class="ident">metrics</span>: <span class="prelude-val">None</span>,
         }
     }
 
@@ -189,6 +203,10 @@
     <span class="doccomment">/// Sets a custom telemetry endpoint (default: http://localhost:4317)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">telemetry_endpoint</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">endpoint</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
         <span class="self">self</span>.<span class="ident">telemetry_endpoint</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">endpoint</span>);
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_metrics</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">metrics</span>: <span class="ident">MetricRegistry</span>) {
+        <span class="self">self</span>.<span class="ident">metrics</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">metrics</span>);
     }
 
     <span class="doccomment">/// Install logger as a global. Can be called only once per application</span>
@@ -218,14 +236,19 @@
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">log_format</span> {
             <span class="ident">LogFormat::Text</span> =&gt; {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">enable_telemetry</span> {
+                    <span class="comment">// Leaving this the old way since this will be removed with the new tracing work</span>
                     <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">FmtSubscriber::builder</span>()
                         .<span class="ident">with_env_filter</span>(<span class="ident">filter</span>.<span class="ident">add_directive</span>(<span class="string">&quot;trace&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()))
                         .<span class="ident">finish</span>();
 
                     <span class="self">self</span>.<span class="ident">finalize</span>(<span class="ident">subscriber</span>)
                 } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">FmtSubscriber::builder</span>().<span class="ident">with_env_filter</span>(<span class="ident">filter</span>).<span class="ident">finish</span>();
-                    <span class="self">self</span>.<span class="ident">finalize</span>(<span class="ident">subscriber</span>)
+                    <span class="kw">let</span> <span class="ident">fmt_layer</span> <span class="op">=</span> <span class="ident">tracing_subscriber::fmt::layer</span>().<span class="ident">with_filter</span>(<span class="ident">filter</span>);
+
+                    <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">tracing_subscriber::registry</span>().<span class="ident">with</span>(<span class="ident">fmt_layer</span>).<span class="ident">with</span>(<span class="self">self</span>.<span class="ident">metrics</span>);
+                    <span class="ident">subscriber::set_global_default</span>(<span class="ident">subscriber</span>)<span class="question-mark">?</span>;
+
+                    <span class="prelude-val">Ok</span>(())
                 }
             }
             <span class="ident">LogFormat::Json</span> =&gt; {
@@ -264,7 +287,6 @@
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else</span> {
             <span class="ident">subscriber::set_global_default</span>(<span class="ident">subscriber</span>)<span class="question-mark">?</span>;
-
             <span class="prelude-val">Ok</span>(())
         }
     }

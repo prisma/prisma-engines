@@ -1,0 +1,127 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Performant cross-platform timing with goodies."><meta name="keywords" content="rust, rustlang, rust-lang, quanta"><title>quanta - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../quanta/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../quanta/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"><a href="#">Crate quanta</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.9.3</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div></section><div id="sidebar-vars" data-name="quanta" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../quanta/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">quanta</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/quanta/lib.rs.html#1-791">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Performant cross-platform timing with goodies.</p>
+<p><code>quanta</code> provides a simple and fast API for measuring the current time and the duration between
+events.  It does this by providing a thin layer on top of native OS timing functions, or, if
+available, using the Time Stamp Counter feature found on modern CPUs.</p>
+<h2 id="design"><a href="#design">Design</a></h2>
+<p>Internally, <code>quanta</code> maintains the concept of two potential clock sources: a reference clock and
+a source clock.</p>
+<p>The reference clock is provided by the OS, and always available.  It is equivalent to what is
+provided by the standard library in terms of the underlying system calls being made.  As it
+uses the native timing facilities provided by the operating system, we ultimately depend on the
+OS itself to give us a stable and correct value.</p>
+<p>The source clock is a potential clock source based on the Time Stamp Counter feature found on
+modern CPUs.  If the TSC feature is not present or is not reliable enough, <code>quanta</code> will
+transparently utilize the reference clock instead.</p>
+<p>Depending on the underlying processor(s) in the system, <code>quanta</code> will figure out the most
+accurate/efficient way to calibrate the source clock to the reference clock in order to provide
+measurements scaled to wall clock time.</p>
+<p>Details on TSC support, and calibration, are detailed below.</p>
+<h2 id="features"><a href="#features">Features</a></h2>
+<p>Beyond simply taking measurements of the current time, <code>quanta</code> provides features for more easily
+working with clocks, as well as being able to enhance performance further:</p>
+<ul>
+<li><code>Clock</code> can be mocked for testing</li>
+<li>globally accessible “recent” time with amortized overhead</li>
+</ul>
+<p>For any code that uses a <code>Clock</code>, a mocked version can be substituted.  This allows for
+application authors to control the time in tests, which allows simulating not only the normal
+passage of time but provides the ability to warp time forwards and backwards in order to test
+corner cases in logic, etc.  Creating a mocked clock can be acheived with <a href="struct.Clock.html#method.mock" title="Clock::mock"><code>Clock::mock</code></a>, and
+<a href="struct.Mock.html" title="Mock"><code>Mock</code></a> contains more details on mock usage.</p>
+<p><code>quanta</code> also provides a “recent” time feature, which allows a slightly-delayed version of time
+to be provided to callers, trading accuracy for speed of access.  An upkeep thread is spawned,
+which is responsible for taking measurements and updating the global recent time. Callers then
+can access the cached value by calling <code>Clock::recent</code>.  This interface can be 4-10x faster
+than directly calling <code>Clock::now</code>, even when TSC support is available.  As the upkeep thread
+is the only code updating the recent time, the accuracy of the value given to callers is
+limited by how often the upkeep thread updates the time, thus the trade off between accuracy
+and speed of access.</p>
+<h2 id="feature-flags"><a href="#feature-flags">Feature Flags</a></h2>
+<p><code>quanta</code> comes with feature flags that enable convenient conversions to time types in
+other popular crates, such as:</p>
+<ul>
+<li><code>prost</code> - provides an implementation into <a href="https://docs.rs/prost-types/0.7.0/prost_types/struct.Timestamp.html"><code>Timestamp</code></a> from
+<code>prost_types</code></li>
+</ul>
+<h2 id="platform-support"><a href="#platform-support">Platform Support</a></h2>
+<p>At a high level, <code>quanta</code> carries support for most major operating systems out of the box:</p>
+<ul>
+<li>Windows (<a href="https://msdn.microsoft.com/en-us/library/ms644904(v=VS.85).aspx">QueryPerformanceCounter</a>)</li>
+<li>macOS/OS X/iOS (<a href="https://developer.apple.com/documentation/kernel/1646199-mach_continuous_time">mach_continuous_time</a>)</li>
+<li>Linux/*BSD/Solaris (<a href="https://linux.die.net/man/3/clock_gettime">clock_gettime</a>)</li>
+</ul>
+<p>These platforms are supported in the “reference” clock sense, and support for using the Time
+Stamp Counter as a clocksource is more subtle, and explained below.</p>
+<h2 id="time-stamp-counter-support"><a href="#time-stamp-counter-support">Time Stamp Counter support</a></h2>
+<p>Accessing the TSC requires being on the x86_64 architecture, with access to SSE2. Additionally,
+the processor must support either constant or nonstop/invariant TSC.  This ensures that the TSC
+ticks at a constant rate which can be easily scaled.</p>
+<p>A caveat is that “constant” TSC doesn’t account for all possible power states (levels of power
+down or sleep that a CPU can enter to save power under light load, etc) and so a constant TSC
+can lead to drift in measurements over time, after they’ve been scaled to reference time.</p>
+<p>This is a limitation of the TSC mode, as well as the nature of <code>quanta</code> not being able to know,
+as the OS would, when a power state transition has happened, and thus compensate with a
+recalibration. Nonstop/invariant TSC does not have this limitation and is stable over long
+periods of time.</p>
+<p>Roughly speaking, the following list contains the beginning model/generation of processors
+where you should be able to expect having invariant TSC support:</p>
+<ul>
+<li>Intel Nehalem and newer for server-grade</li>
+<li>Intel Skylake and newer for desktop-grade</li>
+<li>VIA Centaur Nano and newer (circumstantial evidence here)</li>
+<li>AMD Phenom and newer</li>
+</ul>
+<p>Ultimately, <code>quanta</code> will query CPUID information to determine if the processor has the
+required features to use the TSC.</p>
+<h2 id="calibration"><a href="#calibration">Calibration</a></h2>
+<p>As the TSC doesn’t necessarily tick at reference scale – i.e. one tick isn’t always one
+nanosecond – we have to apply a scaling factor when converting from source to reference time
+scale.  We acquire this scaling factor by querying the processor or calibrating our source
+clock to the reference clock.</p>
+<p>In some cases, on newer processors, the frequency of the TSC can be queried directly, providing
+a fixed scaling factor with no further calibration necessary.  In other cases, <code>quanta</code> will
+have to run its own calibration before the clock is ready to be used: repeatedly taking
+measurements from both the reference and source clocks until a stable scaling factor has been
+established.</p>
+<p>This calibration is stored globally and reused.  However, the first <code>Clock</code> that is created in
+an application will block for a small period of time as it runs this calibration loop.  The
+time spent in the calibration loop is limited to 200ms overall.  In practice, <code>quanta</code> will
+reach a stable calibration quickly (usually 10-20ms, if not less) and so this deadline is
+unlikely to be reached.</p>
+<h2 id="caveats"><a href="#caveats">Caveats</a></h2>
+<p>Utilizing the TSC can be a tricky affair, and so here is a list of caveats that may or may not
+apply, and is in no way exhaustive:</p>
+<ul>
+<li>CPU hotplug behavior is undefined</li>
+<li>raw values may time warp</li>
+<li>measurements from the TSC may drift past or behind the comparable reference clock</li>
+</ul>
+<h2 id="wasm-support"><a href="#wasm-support">WASM support</a></h2>
+<p>This library can be built for WASM targets, but in this case the resolution
+and accuracy of measurements can be limited by the WASM environment. In
+particular, when running on the <code>wasm32-unknown-unknown</code> target in browsers,
+<code>quanta</code> will use <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/now">windows.performance.now</a> as a clock. This mean the
+accuracy is limited to milliseconds instead of the usual nanoseconds on
+other targets. When running within a WASI environment (target
+<code>wasm32-wasi</code>), the accuracy of the clock depends on the VM implementation.</p>
+</div></details><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Clock.html" title="quanta::Clock struct">Clock</a></div><div class="item-right docblock-short"><p>Unified clock for taking measurements.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Handle.html" title="quanta::Handle struct">Handle</a></div><div class="item-right docblock-short"><p>Handle to a running upkeep thread.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Instant.html" title="quanta::Instant struct">Instant</a></div><div class="item-right docblock-short"><p>A point-in-time wall-clock measurement.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Mock.html" title="quanta::Mock struct">Mock</a></div><div class="item-right docblock-short"><p>Controllable time source for use in tests.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Upkeep.html" title="quanta::Upkeep struct">Upkeep</a></div><div class="item-right docblock-short"><p>Ultra-low-overhead access to slightly-delayed time.</p>
+</div></div></div><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Error.html" title="quanta::Error enum">Error</a></div><div class="item-right docblock-short"><p>Errors thrown during the creation/spawning of the upkeep thread.</p>
+</div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IntoNanoseconds.html" title="quanta::IntoNanoseconds trait">IntoNanoseconds</a></div><div class="item-right docblock-short"><p>Type which can be converted into a nanosecond representation.</p>
+</div></div></div><h2 id="functions" class="small-section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.set_recent.html" title="quanta::set_recent fn">set_recent</a></div><div class="item-right docblock-short"><p>Sets the global recent time.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.with_clock.html" title="quanta::with_clock fn">with_clock</a></div><div class="item-right docblock-short"><p>Sets this clock as the default for the duration of a closure.</p>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="quanta" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</body></html>

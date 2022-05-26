@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["NibbleVec","A data-structure for storing a sequence of 4-bit values."]],"type":[["Nibblet","A `NibbleVec` backed by a `SmallVec` with 64 inline element slots. This will not allocate until more than 64 elements are added."]]});
