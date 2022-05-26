@@ -103,8 +103,11 @@ impl<'a> Logger<'a> {
                 }
             }
             LogFormat::Json => {
-                let subscriber = FmtSubscriber::builder().json().with_env_filter(filter).finish();
-                self.finalize(subscriber)
+                let fmt_layer = tracing_subscriber::fmt::layer().json().with_filter(filter);
+
+                let subscriber = tracing_subscriber::registry().with(fmt_layer).with(self.metrics);
+                subscriber::set_global_default(subscriber)?;
+                Ok(())
             }
         }
     }

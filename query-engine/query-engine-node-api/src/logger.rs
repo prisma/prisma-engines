@@ -46,6 +46,7 @@ impl Logger {
         let layer = CallbackLayer::new(log_callback).with_filter(filters);
 
         let metrics = if enable_metrics {
+            query_core::metrics::setup();
             Some(MetricRegistry::new())
         } else {
             None
