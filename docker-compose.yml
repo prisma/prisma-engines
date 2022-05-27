@@ -14,7 +14,15 @@ services:
     restart: always
     command: start-single-node --insecure
     ports:
-      - "26258:26257"
+      - "26257:26257"
+    networks:
+      - databases
+  test-db-cockroachdb:
+    image: prismagraphql/build:cockroach-custom
+    restart: always
+    command: start-single-node --insecure
+    ports:
+      - "26257:26257"
     networks:
       - databases
 

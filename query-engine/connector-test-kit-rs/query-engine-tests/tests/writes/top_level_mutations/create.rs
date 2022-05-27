@@ -217,6 +217,8 @@ mod create {
     // "A Create Mutation" should "create and return an item with enums passed as strings"
     #[connector_test]
     async fn return_enums_passed_as_strings(runner: Runner) -> TestResult<()> {
+        let res = runner.query(r#"mutation {createOneScalarModel(data: {id: "1", optEnum: "A"}){ optEnum }}"#).await;
+        println!("THE RESP {:?}", res.to_string_pretty());
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {createOneScalarModel(data: {id: "1", optEnum: "A"}){ optEnum }}"#),
           @r###"{"data":{"createOneScalarModel":{"optEnum":"A"}}}"###
