@@ -1,7 +1,6 @@
 use super::*;
 use crate::utils::quote_connector;
 use darling::FromMeta;
-use itertools::Itertools;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
@@ -26,7 +25,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     let handler = args.schema.unwrap().handler_path;
 
     // Renders the connectors as list to use in the code.
-    let connectors = connectors.into_iter().map(quote_connector).fold1(|aggr, next| {
+    let connectors = connectors.into_iter().map(quote_connector).reduce(|aggr, next| {
         quote! {
             #aggr, #next
         }
@@ -90,6 +89,8 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 let template = #handler();
                 let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template, #excluded_features);
                 let connector = config.test_connector_tag().unwrap();
+                let metrics = query_tests_setup::setup_metrics();
+                let metrics_for_subscriber = metrics.clone();
 
                 query_tests_setup::run_with_tokio(async move {
                     tracing::debug!("Used datamodel:\n {}", datamodel.yellow());
@@ -97,12 +98,12 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                     query_tests_setup::setup_project(&datamodel).await.unwrap();
 
                     let requires_teardown = connector.requires_teardown();
-                    let runner = Runner::load(config.runner(), datamodel.clone(), connector).await.unwrap();
+                    let runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics).await.unwrap();
 
                     #runner_fn_ident(runner).await.unwrap();
 
                     if requires_teardown { query_tests_setup::teardown_project(&datamodel).await.unwrap(); }
-                }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()))));
+                }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()), metrics_for_subscriber)));
             }
         }
 

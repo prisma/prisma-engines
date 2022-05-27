@@ -14,6 +14,7 @@ pub use datamodel_rendering::*;
 pub use error::*;
 pub use logging::*;
 pub use query_core;
+use query_core::MetricRegistry;
 pub use query_result::*;
 pub use runner::*;
 pub use schema_gen::*;
@@ -23,6 +24,7 @@ use colored::Colorize;
 use datamodel_connector::ConnectorCapability;
 use lazy_static::lazy_static;
 use std::future::Future;
+use std::sync::Once;
 use tokio::runtime::Builder;
 use tracing_futures::WithSubscriber;
 
@@ -50,6 +52,16 @@ pub fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
         .build()
         .unwrap()
         .block_on(fut)
+}
+
+static METRIC_RECORDER: Once = Once::new();
+
+pub fn setup_metrics() -> MetricRegistry {
+    let metrics = MetricRegistry::new();
+    METRIC_RECORDER.call_once(|| {
+        query_core::metrics::setup();
+    });
+    metrics
 }
 
 /// Taken from Reddit. Enables taking an async function pointer which takes references as param
@@ -98,13 +110,15 @@ pub fn run_relation_link_test<F>(
         let datamodel = render_test_datamodel(config, test_database, template, &[]);
         let connector = config.test_connector_tag().unwrap();
         let requires_teardown = connector.requires_teardown();
+        let metrics = setup_metrics();
+        let metrics_for_subscriber = metrics.clone();
 
         run_with_tokio(
             async move {
                 tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
                 setup_project(&datamodel).await.unwrap();
 
-                let runner = Runner::load(config.runner(), datamodel.clone(), connector)
+                let runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics)
                     .await
                     .unwrap();
 
@@ -116,6 +130,7 @@ pub fn run_relation_link_test<F>(
             }
             .with_subscriber(test_tracing_subscriber(
                 std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_string()),
+                metrics_for_subscriber,
             )),
         );
     }

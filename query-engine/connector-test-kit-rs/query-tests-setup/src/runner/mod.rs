@@ -5,7 +5,7 @@ mod node_api;
 pub use binary::*;
 pub use direct::*;
 pub use node_api::*;
-use query_core::TxId;
+use query_core::{MetricRegistry, TxId};
 
 use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestResult};
 use colored::*;
@@ -15,7 +15,7 @@ pub type TxResult = Result<(), user_facing_errors::Error>;
 #[async_trait::async_trait]
 pub trait RunnerInterface: Sized {
     /// Initializes the runner.
-    async fn load(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self>;
+    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self>;
 
     /// Queries the engine.
     async fn query(&self, query: String) -> TestResult<QueryResult>;
@@ -40,6 +40,8 @@ pub trait RunnerInterface: Sized {
 
     /// Clears ITX ID for queries.
     fn clear_active_tx(&mut self);
+
+    fn get_metrics(&self) -> MetricRegistry;
 }
 
 pub enum Runner {
@@ -54,11 +56,16 @@ pub enum Runner {
 }
 
 impl Runner {
-    pub async fn load(ident: &str, datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
+    pub async fn load(
+        ident: &str,
+        datamodel: String,
+        connector_tag: ConnectorTag,
+        metrics: MetricRegistry,
+    ) -> TestResult<Self> {
         match ident {
-            "direct" => Self::direct(datamodel, connector_tag).await,
+            "direct" => Self::direct(datamodel, connector_tag, metrics).await,
             "node-api" => Ok(Self::NodeApi(NodeApiRunner {})),
-            "binary" => Self::binary(datamodel, connector_tag).await,
+            "binary" => Self::binary(datamodel, connector_tag, metrics).await,
             unknown => Err(TestError::parse_error(format!("Unknown test runner '{}'", unknown))),
         }
     }
@@ -117,14 +124,14 @@ impl Runner {
         }
     }
 
-    async fn direct(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
-        let runner = DirectRunner::load(datamodel, connector_tag).await?;
+    async fn direct(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
+        let runner = DirectRunner::load(datamodel, connector_tag, metrics).await?;
 
         Ok(Self::Direct(runner))
     }
 
-    async fn binary(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
-        let runner = BinaryRunner::load(datamodel, connector_tag).await?;
+    async fn binary(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
+        let runner = BinaryRunner::load(datamodel, connector_tag, metrics).await?;
 
         Ok(Self::Binary(runner))
     }
@@ -158,6 +165,14 @@ impl Runner {
             Runner::Direct(r) => r.clear_active_tx(),
             Runner::NodeApi(_) => todo!(),
             Runner::Binary(r) => r.clear_active_tx(),
+        }
+    }
+
+    pub fn get_metrics(&self) -> MetricRegistry {
+        match self {
+            Runner::Direct(r) => r.get_metrics(),
+            Runner::NodeApi(_) => todo!(),
+            Runner::Binary(r) => r.get_metrics(),
         }
     }
 }

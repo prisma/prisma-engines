@@ -1,6 +1,6 @@
 use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
 use prisma_models::InternalDataModelBuilder;
-use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TxId};
+use query_core::{executor, schema::QuerySchemaRef, schema_builder, MetricRegistry, QueryExecutor, TxId};
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
 use std::{env, sync::Arc};
 
@@ -12,11 +12,12 @@ pub struct DirectRunner {
     query_schema: QuerySchemaRef,
     connector_tag: ConnectorTag,
     current_tx_id: Option<TxId>,
+    metrics: MetricRegistry,
 }
 
 #[async_trait::async_trait]
 impl RunnerInterface for DirectRunner {
-    async fn load(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
+    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
         let config = datamodel::parse_configuration(&datamodel).unwrap().subject;
         let data_source = config.datasources.first().expect("No valid data source found");
         let preview_features: Vec<_> = config.preview_features().iter().collect();
@@ -37,6 +38,7 @@ impl RunnerInterface for DirectRunner {
             query_schema,
             connector_tag,
             current_tx_id: None,
+            metrics,
         })
     }
 
@@ -95,5 +97,9 @@ impl RunnerInterface for DirectRunner {
 
     fn clear_active_tx(&mut self) {
         self.current_tx_id = None;
+    }
+
+    fn get_metrics(&self) -> MetricRegistry {
+        self.metrics.clone()
     }
 }
