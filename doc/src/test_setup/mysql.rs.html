@@ -122,6 +122,8 @@
 <span id="117">117</span>
 <span id="118">118</span>
 <span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">runtime::run_with_tokio</span>, <span class="ident">AnyError</span>, <span class="ident">Tags</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude::Queryable</span>, <span class="ident">single::Quaint</span>};
@@ -167,24 +169,26 @@
             <span class="prelude-val">Some</span>(<span class="ident">version</span>) =&gt; {
                 <span class="macro">eprintln!</span>(<span class="string">&quot;Version: {:?}&quot;</span>, <span class="ident">version</span>);
 
-                <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;5.6&quot;</span>) {
-                    <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Mysql56</span>
-                }
-
-                <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;5.7&quot;</span>) {
-                    <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Mysql57</span>
-                }
-
-                <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;8.&quot;</span>) {
-                    <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Mysql8</span>
-                }
+                <span class="comment">// order matters...</span>
 
                 <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;MariaDB&quot;</span>) {
                     <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Mariadb</span>
-                }
+                } <span class="kw">else</span> {
+                    <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;vitess&quot;</span>) {
+                        <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Vitess</span>;
+                    }
 
-                <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;vitess&quot;</span>) {
-                    <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Vitess</span>;
+                    <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;5.6&quot;</span>) {
+                        <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Mysql56</span>
+                    }
+
+                    <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;5.7&quot;</span>) {
+                        <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Mysql57</span>
+                    }
+
+                    <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;8.&quot;</span>) {
+                        <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Mysql8</span>
+                    }
                 }
 
                 <span class="macro">eprintln!</span>(<span class="string">&quot;Inferred tags: {:?}&quot;</span>, <span class="ident">tags</span>);
