@@ -396,7 +396,11 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
                         (None, OutputMeta::Composite(meta)) if meta.list => {
                             pairs.push((field.clone(), PrismaValue::List(Vec::new())))
                         }
-                        // Fill missing fields with nulls.
+                        // Coerce missing scalars with their default values
+                        (None, OutputMeta::Scalar(meta)) if meta.default.is_some() => {
+                            pairs.push((field.clone(), meta.default.clone().unwrap()))
+                        }
+                        // Fill missing fields without default values with nulls.
                         (None, _) => pairs.push((field.clone(), PrismaValue::Null)),
                     }
                 }
