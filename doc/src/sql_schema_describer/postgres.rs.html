@@ -1656,6 +1656,12 @@
 <span id="1651">1651</span>
 <span id="1652">1652</span>
 <span id="1653">1653</span>
+<span id="1654">1654</span>
+<span id="1655">1655</span>
+<span id="1656">1656</span>
+<span id="1657">1657</span>
+<span id="1658">1658</span>
+<span id="1659">1659</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -2688,7 +2694,13 @@
             <span class="kw">let</span> <span class="ident">is_unique</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;is_unique&quot;</span>);
             <span class="kw">let</span> <span class="ident">is_primary_key</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;is_primary_key&quot;</span>);
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
-            <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="ident">table_ids</span>[<span class="ident">table_name</span>.<span class="ident">as_str</span>()];
+            <span class="kw">let</span> <span class="ident">index_algo</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;index_algo&quot;</span>);
+
+            <span class="kw">let</span> <span class="ident">table_id</span>: <span class="ident">TableId</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="ident">table_name</span>.<span class="ident">as_str</span>()) {
+                <span class="kw-2">*</span><span class="ident">id</span>
+            } <span class="kw">else</span> {
+                <span class="kw">continue</span>; <span class="comment">// skip indexes on tables we do not know about (permissions, etc.)</span>
+            };
 
             <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;column_order&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">as_ref</span>() {
                 <span class="string">&quot;ASC&quot;</span> =&gt; <span class="ident">SQLSortOrder::Asc</span>,
@@ -2700,12 +2712,12 @@
             });
 
             <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroach</span>() {
-                <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;index_algo&quot;</span>).<span class="ident">as_str</span>() {
+                <span class="kw">match</span> <span class="ident">index_algo</span>.<span class="ident">as_str</span>() {
                     <span class="string">&quot;inverted&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::Gin</span>,
                     <span class="kw">_</span> =&gt; <span class="ident">SqlIndexAlgorithm::BTree</span>,
                 }
             } <span class="kw">else</span> {
-                <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;index_algo&quot;</span>).<span class="ident">as_str</span>() {
+                <span class="kw">match</span> <span class="ident">index_algo</span>.<span class="ident">as_str</span>() {
                     <span class="string">&quot;btree&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::BTree</span>,
                     <span class="string">&quot;hash&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::Hash</span>,
                     <span class="string">&quot;gist&quot;</span> =&gt; <span class="ident">SqlIndexAlgorithm::Gist</span>,
