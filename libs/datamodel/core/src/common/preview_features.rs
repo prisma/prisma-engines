@@ -81,7 +81,6 @@ pub const GENERATOR: FeatureMap = FeatureMap::new()
         DataProxy,
         ExtendedIndexes,
         Tracing,
-        ImprovedQueryRaw,
     ])
     .with_deprecated(&[
         AtomicNumberOperations,
@@ -103,6 +102,7 @@ pub const GENERATOR: FeatureMap = FeatureMap::new()
         OrderByRelation,
         ReferentialActions,
         NApi,
+        ImprovedQueryRaw,
     ]);
 
 #[derive(Debug)]
