@@ -419,20 +419,6 @@ fn renaming_a_datasource_works(api: TestApi) {
         .assert_no_steps();
 }
 
-#[test_connector]
-fn simple_type_aliases_in_migrations_must_work(api: TestApi) {
-    let dm1 = r#"
-        type CUID = String @id @default(cuid())
-
-        model User {
-            id CUID
-            age Float
-        }
-    "#;
-
-    api.schema_push_w_datasource(dm1).send().assert_green();
-}
-
 #[test_connector(exclude(CockroachDb))]
 fn created_at_does_not_get_arbitrarily_migrated(api: TestApi) {
     use quaint::ast::Insert;

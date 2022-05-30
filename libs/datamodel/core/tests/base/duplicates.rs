@@ -193,51 +193,6 @@ fn fail_on_model_enum_conflict() {
     expectation.assert_eq(&parse_and_render_error(dml));
 }
 #[test]
-fn fail_on_model_type_conflict() {
-    let dml = indoc! {r#"
-        type User = String
-
-        model User {
-          id Int @id
-        }
-    "#};
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mThe model "User" cannot be defined because a type with that name already exists.[0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
-        [1;94m   | [0m
-        [1;94m 2 | [0m
-        [1;94m 3 | [0mmodel [1;91mUser[0m {
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&parse_and_render_error(dml));
-}
-
-#[test]
-fn fail_on_enum_type_conflict() {
-    let dml = indoc! {r#"
-        type User = String
-
-        enum User {
-          Admin
-          Moderator
-        }
-    "#};
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mThe enum "User" cannot be defined because a type with that name already exists.[0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
-        [1;94m   | [0m
-        [1;94m 2 | [0m
-        [1;94m 3 | [0menum [1;91mUser[0m {
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&parse_and_render_error(dml));
-}
-
-#[test]
 fn fail_on_duplicate_model_field() {
     let dml = indoc! {r#"
         model User {
@@ -475,22 +430,6 @@ fn fail_on_reserved_name_for_model() {
         [1;94m   | [0m
         [1;94m   | [0m
         [1;94m 1 | [0mmodel [1;91mDateTime[0m {
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&parse_and_render_error(dml));
-}
-
-#[test]
-fn fail_on_reserved_name_for_custom_type() {
-    let dml = "type Int = String";
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1m"Int" is a reserved scalar type name and cannot be used.[0m
-          [1;94m-->[0m  [4mschema.prisma:1[0m
-        [1;94m   | [0m
-        [1;94m   | [0m
-        [1;94m 1 | [0mtype [1;91mInt[0m = String
         [1;94m   | [0m
     "#]];
 

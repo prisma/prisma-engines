@@ -130,11 +130,6 @@ impl ParserDatabase {
         }
     }
 
-    /// The fully resolved (non alias) scalar field type of an alias. .
-    pub fn alias_scalar_field_type(&self, alias_id: &ast::AliasId) -> &ScalarFieldType {
-        &self.types.type_aliases[alias_id]
-    }
-
     /// The parsed AST.
     pub fn ast(&self) -> &ast::SchemaAst {
         &self.ast

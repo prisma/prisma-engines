@@ -10,7 +10,7 @@ use crate::{
     transform::ast_to_dml::{
         db::{
             walkers::{CompleteInlineRelationWalker, InlineRelationWalker, ReferencingFields},
-            ParserDatabase, ScalarFieldType,
+            ScalarFieldType,
         },
         validation_pipeline::context::Context,
     },
@@ -502,7 +502,7 @@ pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_>,
     };
 
     for (referencing, referenced) in referencing_fields.zip(relation.referenced_fields()) {
-        if !field_types_match(referencing.scalar_field_type(), referenced.scalar_field_type(), ctx.db) {
+        if !field_types_match(referencing.scalar_field_type(), referenced.scalar_field_type()) {
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 &format!(
                     "The type of the field `{}` in the model `{}` is not matching the type of the referenced field `{}` in model `{}`.",
@@ -517,20 +517,12 @@ pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_>,
         }
     }
 
-    fn field_types_match(referencing: ScalarFieldType, referenced: ScalarFieldType, db: &ParserDatabase) -> bool {
+    fn field_types_match(referencing: ScalarFieldType, referenced: ScalarFieldType) -> bool {
         match (referencing, referenced) {
             (ScalarFieldType::CompositeType(a), ScalarFieldType::CompositeType(b)) if a == b => true,
             (ScalarFieldType::Enum(a), ScalarFieldType::Enum(b)) if a == b => true,
             (ScalarFieldType::BuiltInScalar(a), ScalarFieldType::BuiltInScalar(b)) if a == b => true,
             (ScalarFieldType::Unsupported(a), ScalarFieldType::Unsupported(b)) if a == b => true,
-            (ScalarFieldType::Alias(a), b) => {
-                let a_type = db.alias_scalar_field_type(&a);
-                field_types_match(*a_type, b, db)
-            }
-            (a, ScalarFieldType::Alias(b)) => {
-                let b_type = db.alias_scalar_field_type(&b);
-                field_types_match(a, *b_type, db)
-            }
             _ => false,
         }
     }

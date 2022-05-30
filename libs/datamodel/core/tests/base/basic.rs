@@ -1,5 +1,4 @@
 use crate::common::*;
-use diagnostics::{DatamodelWarning, Span};
 
 #[test]
 fn parse_basic_model() {
@@ -213,7 +212,7 @@ fn invalid_line_must_not_break() {
 }
 
 #[test]
-fn type_aliases_must_warn() {
+fn type_aliases_must_error() {
     let dml = indoc! {r#"
       type MyString = String @default("B")
 
@@ -223,10 +222,16 @@ fn type_aliases_must_warn() {
       }
     "#};
 
-    let parsed = datamodel::parse_datamodel(dml).unwrap();
-    let expected = DatamodelWarning::DeprecatedTypeAlias {
-        span: Span { start: 0, end: 36 },
-    };
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    assert_eq!(Some(expected).as_ref(), parsed.warnings.first());
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating: Invalid type definition. Please check the documentation in https://pris.ly/d/composite-types[0m
+          [1;94m-->[0m  [4mschema.prisma:1[0m
+        [1;94m   | [0m
+        [1;94m   | [0m
+        [1;94m 1 | [0m[1;91mtype MyString = String @default("B")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error);
 }

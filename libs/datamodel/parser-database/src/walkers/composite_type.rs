@@ -131,14 +131,9 @@ impl<'db> CompositeTypeFieldWalker<'db> {
 
     /// The type of the field in case it is a scalar type (not an enum, not a composite type).
     pub fn scalar_type(self) -> Option<ScalarType> {
-        let mut r#type = self.r#type();
-
-        loop {
-            match r#type {
-                ScalarFieldType::BuiltInScalar(scalar) => return Some(*scalar),
-                ScalarFieldType::Alias(alias_id) => r#type = &self.db.types.type_aliases[alias_id],
-                _ => return None,
-            }
+        match self.r#type() {
+            ScalarFieldType::BuiltInScalar(scalar) => Some(*scalar),
+            _ => None,
         }
     }
 

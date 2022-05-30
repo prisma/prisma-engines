@@ -1,6 +1,4 @@
-use crate::ast::{
-    traits::WithSpan, CompositeType, Enum, Field, GeneratorConfig, Identifier, Model, SourceConfig, Span,
-};
+use crate::ast::{traits::WithSpan, CompositeType, Enum, GeneratorConfig, Identifier, Model, SourceConfig, Span};
 
 /// Enum for distinguishing between top-level entries
 #[derive(Debug, Clone)]
@@ -15,8 +13,6 @@ pub enum Top {
     Source(SourceConfig),
     /// A generator block
     Generator(GeneratorConfig),
-    /// A type alias
-    Type(Field),
 }
 
 impl Top {
@@ -28,7 +24,6 @@ impl Top {
             Top::Model(_) => "model",
             Top::Source(_) => "source",
             Top::Generator(_) => "generator",
-            Top::Type(_) => "type",
         }
     }
 
@@ -40,7 +35,6 @@ impl Top {
             Top::Model(x) => &x.name,
             Top::Source(x) => &x.name,
             Top::Generator(x) => &x.name,
-            Top::Type(x) => &x.name,
         }
     }
 
@@ -81,14 +75,6 @@ impl Top {
         }
     }
 
-    /// Try to interpret the item as a type alias.
-    pub fn as_type_alias(&self) -> Option<&Field> {
-        match self {
-            Top::Type(r#type) => Some(r#type),
-            _ => None,
-        }
-    }
-
     /// Try to interpret the item as a datasource block.
     pub fn as_source(&self) -> Option<&SourceConfig> {
         match self {
@@ -106,7 +92,6 @@ impl WithSpan for Top {
             Top::Model(model) => model.span(),
             Top::Source(source) => source.span(),
             Top::Generator(gen) => gen.span(),
-            Top::Type(ty) => ty.span(),
         }
     }
 }

@@ -792,14 +792,6 @@ fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one
         // free floating comment
         /// free floating doc comment
 
-        // type alias comment
-        /// type alias doc comment
-        type MyString = String          @default("FooBar")
-
-
-        // free floating comment
-        /// free floating doc comment
-
         // generator comment
         /// generator doc comment
         generator js {
@@ -851,13 +843,6 @@ fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one
           ACTIVE
           DONE
         }
-
-        // free floating comment
-        /// free floating doc comment
-
-        // type alias comment
-        /// type alias doc comment
-        type                       MyString = String @default("FooBar")
 
         // free floating comment
         /// free floating doc comment

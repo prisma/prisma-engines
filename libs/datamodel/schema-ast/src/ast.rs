@@ -115,19 +115,6 @@ impl std::ops::Index<EnumId> for SchemaAst {
     }
 }
 
-/// An opaque identifier for a type alias in a schema AST. Use the
-/// `schema[alias_id]` syntax to resolve the id to an `ast::Field`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct AliasId(u32);
-
-impl std::ops::Index<AliasId> for SchemaAst {
-    type Output = Field;
-
-    fn index(&self, index: AliasId) -> &Self::Output {
-        self.tops[index.0 as usize].as_type_alias().unwrap()
-    }
-}
-
 /// An opaque identifier for a generator block in a schema AST.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GeneratorId(u32);
@@ -146,8 +133,6 @@ pub enum TopId {
     Model(ModelId),
     /// An enum declaration
     Enum(EnumId),
-    /// A type alias
-    Alias(AliasId),
     /// A generator block
     Generator(GeneratorId),
     /// A datasource block
@@ -186,7 +171,6 @@ impl std::ops::Index<TopId> for SchemaAst {
     fn index(&self, index: TopId) -> &Self::Output {
         let idx = match index {
             TopId::CompositeType(CompositeTypeId(idx)) => idx,
-            TopId::Alias(AliasId(idx)) => idx,
             TopId::Enum(EnumId(idx)) => idx,
             TopId::Model(ModelId(idx)) => idx,
             TopId::Generator(GeneratorId(idx)) => idx,
@@ -203,7 +187,6 @@ fn top_idx_to_top_id(top_idx: usize, top: &Top) -> TopId {
         Top::Model(_) => TopId::Model(ModelId(top_idx as u32)),
         Top::Source(_) => TopId::Source(SourceId(top_idx as u32)),
         Top::Generator(_) => TopId::Generator(GeneratorId(top_idx as u32)),
-        Top::Type(_) => TopId::Alias(AliasId(top_idx as u32)),
         Top::CompositeType(_) => TopId::CompositeType(CompositeTypeId(top_idx as u32)),
     }
 }

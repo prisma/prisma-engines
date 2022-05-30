@@ -10,7 +10,6 @@ use std::{
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     for (top_id, top) in ctx.ast.iter_tops() {
         match (top_id, top) {
-            (ast::TopId::Alias(alias_id), ast::Top::Type(type_alias)) => visit_type_alias(alias_id, type_alias, ctx),
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(model_id, model, ctx),
             (ast::TopId::Enum(_), ast::Top::Enum(enm)) => visit_enum(enm, ctx),
             (ast::TopId::CompositeType(ct_id), ast::Top::CompositeType(ct)) => visit_composite_type(ct_id, ct, ctx),
@@ -18,14 +17,11 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
             _ => unreachable!(),
         }
     }
-
-    detect_alias_cycles(ctx);
 }
 
 #[derive(Debug, Default)]
 pub(super) struct Types {
     pub(super) composite_type_fields: BTreeMap<(ast::CompositeTypeId, ast::FieldId), CompositeTypeField>,
-    pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
@@ -100,8 +96,6 @@ pub enum ScalarFieldType {
     Enum(ast::EnumId),
     /// A Prisma scalar type
     BuiltInScalar(ScalarType),
-    /// A type alias
-    Alias(ast::AliasId),
     /// An `Unsupported("...")` type
     Unsupported(UnsupportedType),
 }
@@ -558,82 +552,9 @@ fn visit_model<'db>(model_id: ast::ModelId, ast_model: &'db ast::Model, ctx: &mu
     }
 }
 
-/// Detect self-referencing type aliases, possibly indirectly. We loop
-/// through each type alias in the schema. If it references another type
-/// alias — which may in turn reference another type alias —, we check that
-/// it is not self-referencing. If a type alias ends up transitively
-/// referencing itself, we create an error diagnostic.
-fn detect_alias_cycles(ctx: &mut Context<'_>) {
-    // The IDs of the type aliases we traversed to get to the current type alias.
-    let mut path = Vec::new();
-    // We accumulate the errors here because we want to sort them at the end.
-    let mut errors: Vec<(ast::AliasId, DatamodelError)> = Vec::new();
-
-    for (alias_id, ty) in &ctx.types.type_aliases {
-        // Loop variable. This is the "tip" of the sequence of type aliases.
-        let mut current = (*alias_id, ty);
-        path.clear();
-
-        // Follow the chain of type aliases referencing other type aliases.
-        while let ScalarFieldType::Alias(next_alias_id) = current.1 {
-            path.push(current.0);
-            let next_alias = &ctx.ast[*next_alias_id];
-            // Detect a cycle where next type is also the root. In that
-            // case, we want to report an error.
-            if path.len() > 1 && &path[0] == next_alias_id {
-                errors.push((
-                    *alias_id,
-                    DatamodelError::new_validation_error(
-                        format!(
-                            "Recursive type definitions are not allowed. Recursive path was: {} -> {}.",
-                            path.iter()
-                                .map(|id| ctx.ast[*id].name.name.as_str())
-                                .collect::<Vec<_>>()
-                                .join(" -> "),
-                            &next_alias.name.name,
-                        ),
-                        next_alias.field_type.span(),
-                    ),
-                ));
-                break;
-            }
-
-            // We detect a cycle anywhere else in the chain of type aliases.
-            // In that case, the error will be reported somewhere else, and
-            // we can just move on from this alias.
-            if path.contains(next_alias_id) {
-                break;
-            }
-
-            match ctx.types.type_aliases.get(next_alias_id) {
-                Some(next_alias_type) => {
-                    current = (*next_alias_id, next_alias_type);
-                }
-                // A missing alias at this point means that there was an
-                // error resolving the type of the next alias. We stop
-                // validation here.
-                None => break,
-            }
-        }
-    }
-
-    errors.sort_by_key(|(id, _err)| *id);
-    for (_, error) in errors {
-        ctx.push_error(error);
-    }
-}
-
 fn visit_composite_type<'db>(ct_id: ast::CompositeTypeId, ct: &'db ast::CompositeType, ctx: &mut Context<'db>) {
     for (field_id, ast_field) in ct.iter_fields() {
         match field_type(ast_field, ctx) {
-            Ok(FieldType::Scalar(ScalarFieldType::Alias(_))) => {
-                ctx.push_error(DatamodelError::new_composite_type_validation_error(
-                    "Type aliases are not allowed on composite types. Consider using the resolved type instead."
-                        .to_string(),
-                    ct.name.name.clone(),
-                    ast_field.field_type.span(),
-                ))
-            }
             Ok(FieldType::Scalar(scalar_type)) => {
                 let field = CompositeTypeField {
                     r#type: scalar_type,
@@ -664,22 +585,6 @@ fn visit_enum<'db>(enm: &'db ast::Enum, ctx: &mut Context<'db>) {
     }
 }
 
-fn visit_type_alias<'db>(alias_id: ast::AliasId, alias: &'db ast::Field, ctx: &mut Context<'db>) {
-    match field_type(alias, ctx) {
-        Ok(FieldType::Scalar(scalar_field_type)) => {
-            ctx.types.type_aliases.insert(alias_id, scalar_field_type);
-        }
-        Ok(FieldType::Model(_)) => ctx.push_error(DatamodelError::new_validation_error(
-            "Only scalar types can be used for defining custom types.".to_owned(),
-            alias.field_type.span(),
-        )),
-        Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
-            supported,
-            alias.field_type.span(),
-        )),
-    };
-}
-
 /// Either a structured, supported type, or an Err(unsupported) if the type name
 /// does not match any we know of.
 fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<FieldType, &'db str> {
@@ -699,7 +604,6 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
     match ctx.names.tops.get(&supported_string_id).map(|id| (*id, &ctx.ast[*id])) {
         Some((ast::TopId::Model(model_id), ast::Top::Model(_))) => Ok(FieldType::Model(model_id)),
         Some((ast::TopId::Enum(enum_id), ast::Top::Enum(_))) => Ok(FieldType::Scalar(ScalarFieldType::Enum(enum_id))),
-        Some((ast::TopId::Alias(id), ast::Top::Type(_))) => Ok(FieldType::Scalar(ScalarFieldType::Alias(id))),
         Some((ast::TopId::CompositeType(ctid), ast::Top::CompositeType(_))) => {
             Ok(FieldType::Scalar(ScalarFieldType::CompositeType(ctid)))
         }
