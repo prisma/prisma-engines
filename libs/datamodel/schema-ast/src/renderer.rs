@@ -54,41 +54,23 @@ impl<'a> Renderer<'a> {
         let mut type_renderer: Option<TableFormat> = None;
 
         for (i, top) in datamodel.tops.iter().enumerate() {
-            match &top {
-                // TODO: This is super ugly. Goal is that type groups get formatted together.
-                ast::Top::Type(custom_type) => {
-                    if type_renderer.is_none() {
-                        if i != 0 {
-                            // We put an extra line break in between top level structs.
-                            self.end_line();
-                        }
-                        type_renderer = Some(TableFormat::new());
-                    }
-                    if let Some(renderer) = &mut type_renderer {
-                        Self::render_custom_type(renderer, custom_type);
-                    }
-                }
-                other => {
-                    if let Some(renderer) = &mut type_renderer {
-                        renderer.render(self);
-                        type_renderer = None;
-                    }
+            if let Some(renderer) = &mut type_renderer {
+                renderer.render(self);
+                type_renderer = None;
+            }
 
-                    if i != 0 {
-                        // We put an extra line break in between top level structs.
-                        self.end_line();
-                    }
+            if i != 0 {
+                // We put an extra line break in between top level structs.
+                self.end_line();
+            }
 
-                    match other {
-                        ast::Top::CompositeType(ct) => self.render_composite_type(ct),
-                        ast::Top::Model(model) => self.render_model(model),
-                        ast::Top::Enum(enm) => self.render_enum(enm),
-                        ast::Top::Source(source) => self.render_source_block(source),
-                        ast::Top::Generator(generator) => self.render_generator_block(generator),
-                        ast::Top::Type(_) => unreachable!(),
-                    }
-                }
-            };
+            match top {
+                ast::Top::CompositeType(ct) => self.render_composite_type(ct),
+                ast::Top::Model(model) => self.render_model(model),
+                ast::Top::Enum(enm) => self.render_enum(enm),
+                ast::Top::Source(source) => self.render_source_block(source),
+                ast::Top::Generator(generator) => self.render_generator_block(generator),
+            }
         }
 
         self.stream.write_char('\n').expect("Writer error.");
@@ -162,33 +144,6 @@ impl<'a> Renderer<'a> {
         self.indent_down();
         self.write("}");
         self.end_line();
-    }
-
-    fn render_custom_type(target: &mut TableFormat, field: &ast::Field) {
-        Self::render_documentation(
-            &mut target.interleave_writer(),
-            field.documentation.as_ref(),
-            field.is_commented_out(),
-        );
-
-        target.write("type ");
-        target.write(&field.name.name);
-        target.write(" = ");
-        Self::render_field_type(target, &field.field_type);
-
-        // Attributes
-        if !field.attributes.is_empty() {
-            let mut attributes_builder = StringBuilder::new();
-
-            let attributes = Self::sort_attributes(field.attributes.clone(), true);
-            for attribute in attributes {
-                Self::render_field_attribute(&mut attributes_builder, &attribute);
-            }
-
-            target.write(&attributes_builder.to_string());
-        }
-
-        target.end_line();
     }
 
     fn render_model(&mut self, model: &ast::Model) {

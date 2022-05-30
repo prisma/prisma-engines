@@ -248,12 +248,11 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
 }
 
 fn column_for_scalar_field(field: ScalarFieldWalker<'_>, idx: (usize, usize), ctx: &mut Context<'_>) -> sql::Column {
-    match field.resolved_scalar_field_type() {
+    match field.scalar_field_type() {
         ScalarFieldType::Enum(enum_id) => column_for_model_enum_scalar_field(field, enum_id, ctx),
         ScalarFieldType::CompositeType(_) => column_for_builtin_scalar_type(field, ScalarType::Json, idx, ctx),
         ScalarFieldType::BuiltInScalar(scalar_type) => column_for_builtin_scalar_type(field, scalar_type, idx, ctx),
         ScalarFieldType::Unsupported(_) => column_for_model_unsupported_scalar_field(field, ctx),
-        ScalarFieldType::Alias(_) => unreachable!(),
     }
 }
 

@@ -110,7 +110,6 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                 check_for_duplicate_properties(top, &generator.properties, &mut tmp_names, ctx);
                 &mut names.generators
             }
-            (_, ast::Top::Type(_)) => &mut names.tops,
             _ => unreachable!(),
         };
 

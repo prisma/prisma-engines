@@ -37,52 +37,39 @@ pub(super) fn visit_model_field_default(
         field_data.default = Some(default_value);
     };
 
-    // Resolve the default to a DefaultValue. We must loop in order to
-    // resolve type aliases.
-    let mut r#type = field_data.r#type;
-
-    loop {
-        match r#type {
-            ScalarFieldType::CompositeType(ctid) => {
-                validate_default_value_on_composite_type(ctid, ast_field, ctx);
-            }
-            ScalarFieldType::Enum(enum_id) => {
-                match value.value {
-                    ast::Expression::ConstantValue(enum_value, _) => {
-                        if ctx.ast[enum_id].values.iter().any(|v| v.name() == enum_value) {
-                            accept()
-                        } else {
-                            validate_invalid_default_enum_value(enum_value, ctx);
-                        }
+    match field_data.r#type {
+        ScalarFieldType::CompositeType(ctid) => {
+            validate_default_value_on_composite_type(ctid, ast_field, ctx);
+        }
+        ScalarFieldType::Enum(enum_id) => {
+            match value.value {
+                ast::Expression::ConstantValue(enum_value, _) => {
+                    if ctx.ast[enum_id].values.iter().any(|v| v.name() == enum_value) {
+                        accept()
+                    } else {
+                        validate_invalid_default_enum_value(enum_value, ctx);
                     }
-                    ast::Expression::Function(funcname, funcargs, _) if funcname == FN_DBGENERATED => {
-                        validate_dbgenerated_args(&funcargs.arguments, accept, ctx);
-                    }
-                    bad_value => validate_invalid_default_enum_expr(bad_value, ctx),
-                };
-            }
-            ScalarFieldType::BuiltInScalar(scalar_type) => validate_model_builtin_scalar_type_default(
-                scalar_type,
-                value.value,
-                mapped_name,
-                accept,
-                (model_id, field_id),
-                ctx,
-            ),
-            ScalarFieldType::Alias(alias_id) => {
-                r#type = ctx.types.type_aliases[&alias_id];
-                continue;
-            }
-            ScalarFieldType::Unsupported(_) => match value.value {
+                }
                 ast::Expression::Function(funcname, funcargs, _) if funcname == FN_DBGENERATED => {
                     validate_dbgenerated_args(&funcargs.arguments, accept, ctx);
                 }
-                _ => ctx
-                    .push_attribute_validation_error("Only @default(dbgenerated()) can be used for Unsupported types."),
-            },
+                bad_value => validate_invalid_default_enum_expr(bad_value, ctx),
+            };
         }
-
-        break;
+        ScalarFieldType::BuiltInScalar(scalar_type) => validate_model_builtin_scalar_type_default(
+            scalar_type,
+            value.value,
+            mapped_name,
+            accept,
+            (model_id, field_id),
+            ctx,
+        ),
+        ScalarFieldType::Unsupported(_) => match value.value {
+            ast::Expression::Function(funcname, funcargs, _) if funcname == FN_DBGENERATED => {
+                validate_dbgenerated_args(&funcargs.arguments, accept, ctx);
+            }
+            _ => ctx.push_attribute_validation_error("Only @default(dbgenerated()) can be used for Unsupported types."),
+        },
     }
 }
 
@@ -145,7 +132,6 @@ pub(super) fn visit_composite_field_default(
         ScalarFieldType::Unsupported(_) => {
             ctx.push_attribute_validation_error("Composite field of type `Unsupported` cannot have default values.")
         }
-        ScalarFieldType::Alias(_) => unreachable!(),
     }
 }
 

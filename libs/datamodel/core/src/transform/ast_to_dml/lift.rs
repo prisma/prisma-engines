@@ -508,11 +508,6 @@ impl<'a> LiftAstToDml<'a> {
             db::ScalarFieldType::Unsupported(_) => {
                 dml::FieldType::Unsupported(ast_field.field_type.as_unsupported().unwrap().0.to_owned())
             }
-            db::ScalarFieldType::Alias(top_id) => {
-                let alias = &self.db.ast()[*top_id];
-                let scalar_field_type = self.db.alias_scalar_field_type(top_id);
-                self.lift_scalar_field_type(alias, scalar_field_type, scalar_field)
-            }
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
                 let native_type = scalar_field.raw_native_type().map(|(_, name, args, _)| {
                     self.connector
@@ -565,9 +560,6 @@ impl<'a> LiftAstToDml<'a> {
                     .to_owned();
 
                 CompositeTypeFieldType::Unsupported(field)
-            }
-            db::ScalarFieldType::Alias(_) => {
-                unreachable!()
             }
         }
     }

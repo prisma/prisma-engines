@@ -186,7 +186,7 @@ fn visit_scalar_field_attributes<'db>(
     scalar_field_data: &mut ScalarField,
     ctx: &mut Context<'db>,
 ) {
-    ctx.visit_scalar_field_attributes(model_id, field_id, scalar_field_data.r#type);
+    ctx.visit_scalar_field_attributes(model_id, field_id);
 
     // @map
     if ctx.visit_optional_single_attr("map") {

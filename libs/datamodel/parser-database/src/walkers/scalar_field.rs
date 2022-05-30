@@ -144,14 +144,6 @@ impl<'db> ScalarFieldWalker<'db> {
         })
     }
 
-    /// The type of the field, with type aliases resolved.
-    pub fn resolved_scalar_field_type(self) -> ScalarFieldType {
-        match self.attributes().r#type {
-            ScalarFieldType::Alias(id) => *self.db.alias_scalar_field_type(&id),
-            other => other,
-        }
-    }
-
     /// The type of the field.
     pub fn scalar_field_type(self) -> ScalarFieldType {
         self.attributes().r#type
@@ -159,14 +151,9 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// The type of the field in case it is a scalar type (not an enum, not a composite type).
     pub fn scalar_type(self) -> Option<ScalarType> {
-        let mut tpe = &self.scalar_field.r#type;
-
-        loop {
-            match tpe {
-                ScalarFieldType::BuiltInScalar(scalar) => return Some(*scalar),
-                ScalarFieldType::Alias(alias_id) => tpe = &self.db.types.type_aliases[alias_id],
-                _ => return None,
-            }
+        match &self.scalar_field.r#type {
+            ScalarFieldType::BuiltInScalar(scalar) => Some(*scalar),
+            _ => None,
         }
     }
 }

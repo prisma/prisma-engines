@@ -74,26 +74,13 @@ impl<'a> Reformatter<'a> {
     }
 
     fn reformat_top(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
-        let mut types_table = TableFormat::new();
-        let mut types_mode = false;
         let mut seen_at_least_one_top_level_element = false;
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::WHITESPACE => {}
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {}
-                Rule::type_alias => {
-                    types_mode = true;
-                }
-                _ => {
-                    if types_mode {
-                        types_mode = false;
-                        // For all other ones, reset types_table.
-                        types_table.render(target);
-                        types_table = TableFormat::new();
-                        target.maybe_end_line();
-                    }
-                }
+                _ => {}
             };
 
             // new line handling outside of blocks:
@@ -109,11 +96,7 @@ impl<'a> Reformatter<'a> {
 
             match current.as_rule() {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    if types_mode {
-                        comment(&mut types_table.interleave_writer(), current.as_str());
-                    } else {
-                        comment(target, current.as_str());
-                    }
+                    comment(target, current.as_str());
                 }
                 Rule::model_declaration => {
                     let keyword = current
@@ -130,12 +113,6 @@ impl<'a> Reformatter<'a> {
                 }
                 Rule::enum_declaration => self.reformat_enum(target, &current),
                 Rule::config_block => self.reformat_config_block(target, &current),
-                Rule::type_alias => {
-                    if !types_mode {
-                        panic!("Renderer not in type mode.");
-                    }
-                    Self::reformat_type_alias(&mut types_table, &current);
-                }
                 Rule::comment_block => {
                     for comment_token in current.clone().into_inner() {
                         comment(target, comment_token.as_str());
@@ -465,35 +442,6 @@ impl<'a> Reformatter<'a> {
             Renderer::render_field_attribute(&mut column_writer, &missing_field_attribute.attribute);
             if missing_field_attributes.peek().is_some() {
                 column_writer.write(" "); // space between attributes
-            }
-        }
-
-        target.maybe_end_line();
-    }
-
-    fn reformat_type_alias(target: &mut TableFormat, token: &Token<'_>) {
-        let mut identifier = None;
-
-        for current in token.clone().into_inner() {
-            match current.as_rule() {
-                Rule::TYPE_KEYWORD => {}
-                Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
-                    identifier = Some(String::from(current.as_str()))
-                }
-                Rule::base_type => {
-                    target.write("type");
-                    target.write(&identifier.clone().expect("Unknown field identifier."));
-                    target.write("=");
-                    target.write(Self::get_identifier(current));
-                }
-                Rule::attribute => {
-                    Self::reformat_attribute(&mut target.column_locked_writer_for(4), &current, "@", vec![]);
-                }
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    comment(&mut target.interleave_writer(), current.as_str())
-                }
-                Rule::NEWLINE => {}
-                _ => Self::reformat_generic_token(target, &current),
             }
         }
 

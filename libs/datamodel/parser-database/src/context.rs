@@ -3,7 +3,7 @@ mod attributes;
 use self::attributes::AttributesValidationState;
 use crate::{
     ast, interner::StringInterner, names::Names, relations::Relations, types::Types, DatamodelError, Diagnostics,
-    ScalarFieldType, StringId, ValueValidator,
+    StringId, ValueValidator,
 };
 use schema_ast::ast::WithName;
 use std::collections::{HashMap, HashSet};
@@ -104,17 +104,8 @@ impl<'db> Context<'db> {
     ///
     /// Other than for this peculiarity, this method is identical to
     /// `visit_attributes()`.
-    pub(super) fn visit_scalar_field_attributes(
-        &mut self,
-        model_id: ast::ModelId,
-        field_id: ast::FieldId,
-        mut scalar_field_type: ScalarFieldType,
-    ) {
+    pub(super) fn visit_scalar_field_attributes(&mut self, model_id: ast::ModelId, field_id: ast::FieldId) {
         self.visit_attributes((model_id, field_id).into());
-        while let ScalarFieldType::Alias(alias_id) = scalar_field_type {
-            self.attributes.extend_attributes(alias_id.into(), self.ast);
-            scalar_field_type = self.types.type_aliases[&alias_id];
-        }
     }
 
     /// All attribute validation should go through `visit_attributes()`. It lets
