@@ -3424,6 +3424,7 @@ dependencies = [
  "connection-string",
  "datamodel",
  "datamodel-connector",
+ "futures",
  "napi",
  "napi-build",
  "napi-derive",
