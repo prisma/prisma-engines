@@ -327,7 +327,7 @@ mod delete_many_rels {
                 #m2m(childrenOpt, Child[], id, Int)
 
                 p            String     @unique
-                stepChildId  Int?
+                stepChildId  Int? @unique
                 stepChildOpt StepChild? @relation(fields: [stepChildId], references: [id])
             }
 

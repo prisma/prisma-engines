@@ -1,7 +1,7 @@
 use datamodel_connector::{
     parser_database::walkers::{IndexWalker, PrimaryKeyWalker},
     walker_ext_traits::ScalarFieldWalkerExt,
-    Connector, DatamodelError, Diagnostics, ScalarType, Span,
+    Connector, DatamodelError, Diagnostics, ScalarType,
 };
 use native_types::MsSqlType;
 
@@ -22,14 +22,12 @@ pub(crate) fn index_uses_correct_field_types(
             continue;
         }
 
-        let span = index.ast_attribute().map(|attr| attr.span).unwrap_or_else(Span::empty);
-
         let error = connector.native_instance_error(&native_type);
 
         if index.is_unique() {
-            errors.push_error(error.new_incompatible_native_type_with_unique("", span))
+            errors.push_error(error.new_incompatible_native_type_with_unique("", index.ast_attribute().span))
         } else {
-            errors.push_error(error.new_incompatible_native_type_with_index("", span))
+            errors.push_error(error.new_incompatible_native_type_with_index("", index.ast_attribute().span))
         };
 
         break;

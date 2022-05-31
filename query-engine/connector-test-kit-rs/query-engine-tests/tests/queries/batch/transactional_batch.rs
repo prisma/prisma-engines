@@ -10,7 +10,7 @@ mod transactional {
             r#"
                 model ModelA {
                     #id(id, Int, @id)
-                    b_id Int?
+                    b_id Int? @unique
                     b ModelB? @relation(fields: [b_id], references: [id])
                 }
 

@@ -215,7 +215,7 @@ mod unchecked_update {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
-              b_id Int?
+              b_id Int? @unique
               b    ModelB? @relation(fields: [b_id], references: [id])
               c    ModelC?
             }
@@ -227,7 +227,7 @@ mod unchecked_update {
 
             model ModelC {
               #id(id, Int, @id)
-              a_id Int
+              a_id Int @unique
               a    ModelA @relation(fields: [a_id], references: [id])
             }"#
         };

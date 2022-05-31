@@ -266,3 +266,43 @@ pub(crate) fn fields_and_references_on_wrong_side(relation: InlineRelationWalker
         ));
     }
 }
+
+/// A 1:1 relation is enforced with a unique constraint. The
+/// referencing side must use a unique constraint to enforce the
+/// relation.
+pub(crate) fn fields_must_be_a_unique_constraint(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
+    let forward = match relation.forward_relation_field() {
+        Some(field) => field,
+        None => return,
+    };
+
+    let model = relation.referencing_model();
+
+    let is_unique = model.unique_criterias().any(|c| {
+        let fields = match relation.referencing_fields() {
+            ReferencingFields::Concrete(fields) => fields,
+            _ => return true,
+        };
+
+        let lengths_match = c.fields().len() == fields.len();
+
+        let fields_match = c.fields().zip(fields).all(|(a, b)| match a.as_scalar_field() {
+            Some(a) => a == b,
+            None => false,
+        });
+
+        lengths_match && fields_match
+    });
+
+    if is_unique {
+        return;
+    }
+
+    let message = "A one-to-one relation must use unique fields on the defining side. Either add a unique constraint, or change the relation to one-to-many.";
+
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        message,
+        RELATION_ATTRIBUTE_NAME,
+        forward.ast_field().span,
+    ));
+}

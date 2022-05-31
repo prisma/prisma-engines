@@ -55,7 +55,7 @@ mod inline_relation {
 
           model ModelB {
             #id(id, String, @id)
-            a_u String?
+            a_u String? @unique
             a   ModelA? @relation(fields: [a_u], references: [u])
           }"#
         };
@@ -67,7 +67,7 @@ mod inline_relation {
         let schema = indoc! {
             r#"model ModelA {
           #id(id, String, @id)
-          b_u String?
+          b_u String? @unique
           b   ModelB? @relation(fields: [b_u], references: [u])
         }
 

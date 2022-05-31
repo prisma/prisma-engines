@@ -198,7 +198,7 @@ pub(crate) fn only_one_fulltext_attribute_allowed(model: ModelWalker<'_>, ctx: &
     let spans = model
         .indexes()
         .filter(|i| i.is_fulltext())
-        .map(|i| i.ast_attribute().map(|i| i.span).unwrap_or(model.ast_model().span))
+        .map(|i| i.ast_attribute().span)
         .collect::<Vec<_>>();
 
     if spans.len() > 1 {

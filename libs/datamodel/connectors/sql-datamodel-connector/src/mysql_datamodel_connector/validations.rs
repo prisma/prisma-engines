@@ -1,7 +1,7 @@
 use datamodel_connector::{
     parser_database::walkers::{IndexWalker, PrimaryKeyWalker},
     walker_ext_traits::ScalarFieldWalkerExt,
-    Connector, Diagnostics, Span,
+    Connector, Diagnostics,
 };
 
 const LENGTH_GUIDE: &str = " Please use the `length` argument to the field in the index definition to allow this.";
@@ -30,16 +30,14 @@ pub(crate) fn field_types_can_be_used_in_an_index(
             continue;
         }
 
-        let span = index.ast_attribute().map(|attr| attr.span).unwrap_or_else(Span::empty);
-
         let error = if index.is_unique() {
             connector
                 .native_instance_error(&native_type)
-                .new_incompatible_native_type_with_unique(LENGTH_GUIDE, span)
+                .new_incompatible_native_type_with_unique(LENGTH_GUIDE, index.ast_attribute().span)
         } else {
             connector
                 .native_instance_error(&native_type)
-                .new_incompatible_native_type_with_index(LENGTH_GUIDE, span)
+                .new_incompatible_native_type_with_index(LENGTH_GUIDE, index.ast_attribute().span)
         };
 
         errors.push_error(error);

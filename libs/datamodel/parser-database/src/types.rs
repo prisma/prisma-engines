@@ -220,8 +220,6 @@ pub(crate) struct ModelAttributes {
     pub(crate) is_ignored: bool,
     /// @@index and @(@)unique explicitely written to the schema AST.
     pub(super) ast_indexes: Vec<(ast::AttributeId, IndexAttribute)>,
-    /// @(@)unique added implicitely to the datamodel by us.
-    pub(super) implicit_indexes: Vec<IndexAttribute>,
     /// @@map
     pub(crate) mapped_name: Option<StringId>,
 }
@@ -362,15 +360,6 @@ impl IndexAttribute {
     pub(crate) fn is_normal(&self) -> bool {
         matches!(self.r#type, IndexType::Normal)
     }
-
-    pub(crate) fn fields_match(&self, other: &[ast::FieldId]) -> bool {
-        self.fields.len() == other.len()
-            && self
-                .fields
-                .iter()
-                .zip(other.iter())
-                .all(|(a, b)| a.path.field_in_index() == *b)
-    }
 }
 
 #[derive(Debug)]
@@ -381,17 +370,6 @@ pub(crate) struct IdAttribute {
     pub(super) name: Option<StringId>,
     pub(super) mapped_name: Option<StringId>,
     pub(super) clustered: Option<bool>,
-}
-
-impl IdAttribute {
-    pub(crate) fn fields_match(&self, other: &[ast::FieldId]) -> bool {
-        self.fields.len() == other.len()
-            && self
-                .fields
-                .iter()
-                .zip(other.iter())
-                .all(|(a, b)| a.path.field_in_index() == *b)
-    }
 }
 
 /// Defines a path to a field that is not directly in the model.

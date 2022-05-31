@@ -188,10 +188,9 @@ impl<'db> ModelWalker<'db> {
         from_pk.chain(from_indices)
     }
 
-    /// Iterate all the relation fields in the model in the order they were
-    /// defined. Note that these are only the fields that were actually written
-    /// in the schema.
-    pub(crate) fn explicit_indexes(self) -> impl Iterator<Item = IndexWalker<'db>> + 'db {
+    /// Iterate all the indexes in the model in the order they were
+    /// defined.
+    pub fn indexes(self) -> impl Iterator<Item = IndexWalker<'db>> + 'db {
         let model_id = self.model_id;
         let db = self.db;
 
@@ -200,27 +199,10 @@ impl<'db> ModelWalker<'db> {
             .iter()
             .map(move |(index, index_attribute)| IndexWalker {
                 model_id,
-                index: Some(*index),
+                index: *index,
                 db,
                 index_attribute,
             })
-    }
-
-    /// Iterate all the indexes in the model in the order they were
-    /// defined, followed by the implicit indexes.
-    pub fn indexes(self) -> impl Iterator<Item = IndexWalker<'db>> + 'db {
-        let implicit_indexes = self
-            .model_attributes
-            .implicit_indexes
-            .iter()
-            .map(move |index_attribute| IndexWalker {
-                model_id: self.model_id(),
-                index: None,
-                db: self.db,
-                index_attribute,
-            });
-
-        self.explicit_indexes().chain(implicit_indexes)
     }
 
     /// All (concrete) relation fields of the model.

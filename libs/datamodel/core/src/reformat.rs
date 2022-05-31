@@ -836,31 +836,8 @@ fn find_all_missing_attributes(db: &ParserDatabase) -> Vec<MissingFieldAttribute
             push_missing_relation_attribute(inline_relation, &mut missing_field_attributes);
         }
     }
-    push_missing_unique_attributes(db, &mut missing_field_attributes);
 
     missing_field_attributes
-}
-
-fn push_missing_unique_attributes(db: &ParserDatabase, attributes: &mut Vec<MissingFieldAttribute>) {
-    // Missing `@unique`s.
-    let missing_unique_indexes = db
-        .walk_models()
-        .flat_map(|model| model.indexes())
-        .filter(|idx| idx.ast_attribute().is_none());
-
-    for missing_unique in missing_unique_indexes {
-        if let Some(field) = missing_unique.source_field() {
-            attributes.push(MissingFieldAttribute {
-                model: missing_unique.model().name().to_owned(),
-                field: field.name().to_owned(),
-                attribute: ast::Attribute {
-                    name: ast::Identifier::new("unique"),
-                    arguments: ast::ArgumentsList::default(),
-                    span: Span::empty(),
-                },
-            })
-        }
-    }
 }
 
 fn push_missing_relation_attribute(

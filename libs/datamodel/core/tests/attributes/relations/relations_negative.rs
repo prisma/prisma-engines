@@ -949,3 +949,63 @@ fn cannot_use_references_with_many_to_many_relations() {
 
     expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
+
+#[test]
+fn should_fail_if_not_using_unique_constraint_with_singular_one_to_one() {
+    let dml = indoc! {r#"
+        model A {
+          id Int  @id
+          fk Int?
+          b  B?   @relation(fields: [fk], references: [id])
+        }
+
+        model B {
+          id Int @id
+          a  A?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": A one-to-one relation must use unique fields on the defining side. Either add a unique constraint, or change the relation to one-to-many.[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m  fk Int?
+        [1;94m 4 | [0m  [1;91mb  B?   @relation(fields: [fk], references: [id])[0m
+        [1;94m 5 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn should_fail_if_not_using_unique_constraint_with_compound_one_to_one() {
+    let dml = indoc! {r#"
+        model A {
+          id Int  @id
+          fk1 Int?
+          fk2 Int?
+          b   B?   @relation(fields: [fk1, fk2], references: [id1, id2])
+        }
+
+        model B {
+          id1 Int
+          id2 Int
+          a   A?
+
+          @@id([id1, id2])
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": A one-to-one relation must use unique fields on the defining side. Either add a unique constraint, or change the relation to one-to-many.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m  fk2 Int?
+        [1;94m 5 | [0m  [1;91mb   B?   @relation(fields: [fk1, fk2], references: [id1, id2])[0m
+        [1;94m 6 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}

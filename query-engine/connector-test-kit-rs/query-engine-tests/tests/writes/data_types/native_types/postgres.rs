@@ -314,7 +314,7 @@ mod postgres {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, String, @id, @test.Char(16))
-              b_id String? @test.Char(16)
+              b_id String? @unique @test.Char(16)
               b    ModelB? @relation(fields: [b_id], references: [id])
             }
 

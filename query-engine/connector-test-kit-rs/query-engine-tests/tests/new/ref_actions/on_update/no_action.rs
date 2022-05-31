@@ -13,7 +13,7 @@ mod one2one_req {
 
             model Child {
                 #id(id, Int, @id)
-                parent_uniq String
+                parent_uniq String @unique
                 parent      Parent @relation(fields: [parent_uniq], references: [uniq], onUpdate: NoAction)
             }"#
         };
@@ -125,7 +125,7 @@ mod one2one_opt {
 
             model Child {
                 #id(id, Int, @id)
-                parent_uniq String?
+                parent_uniq String? @unique
                 parent    Parent? @relation(fields: [parent_uniq], references: [uniq], onUpdate: NoAction)
             }"#
         };
