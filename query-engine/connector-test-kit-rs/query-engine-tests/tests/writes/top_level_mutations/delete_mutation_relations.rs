@@ -372,7 +372,7 @@ mod delete_mutation_relations {
                 #id(id, Int, @id)
 
                 s         String  @unique
-                parentId  Int?
+                parentId  Int? @unique
                 parentOpt Parent? @relation(fields: [parentId], references: [id])
                }"#
         };
@@ -387,7 +387,7 @@ mod delete_mutation_relations {
                 #m2m(childrenOpt, Child[], id, Int)
 
                 p            String     @unique
-                stepChildId  Int?
+                stepChildId  Int?       @unique
                 stepChildOpt StepChild? @relation(fields: [stepChildId], references: [id])
                }
 

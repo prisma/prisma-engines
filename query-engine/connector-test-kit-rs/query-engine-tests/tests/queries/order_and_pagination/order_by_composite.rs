@@ -445,7 +445,7 @@ mod mixed {
             r#"model TestModel {
               #id(id, Int, @id)
 
-              to_one_rel_id Int?
+              to_one_rel_id Int? @unique
               to_one_rel RelatedModel? @relation(name: "ToOne", fields: [to_one_rel_id], references: [id])
             }
 

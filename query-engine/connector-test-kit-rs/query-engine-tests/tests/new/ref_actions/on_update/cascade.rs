@@ -16,14 +16,14 @@ mod one2one_req {
               
               model Child {
                 #id(id, Int, @id)
-                parentUniq  Int
+                parentUniq  Int @unique
                 parent    Parent @relation(fields: [parentUniq], references: [uniq], onUpdate: Cascade)
                 child2 Child2?
               }
               
               model Child2 {
                 #id(id, Int, @id)
-                childUniq Int
+                childUniq Int @unique
                 child   Child @relation(fields: [childUniq], references: [parentUniq], onUpdate: Cascade)
               }
               "#
@@ -105,6 +105,8 @@ mod one2one_req {
               parent_uniq_1 String
               parent_uniq_2 String
               parent        Parent @relation(fields: [parent_uniq_1, parent_uniq_2], references: [uniq_1, uniq_2], onUpdate: Cascade)
+
+              @@unique([parent_uniq_1, parent_uniq_2])
             }"#
         };
 
@@ -151,14 +153,14 @@ mod one2one_opt {
               
               model Child {
                 #id(id, Int, @id)
-                parentUniq  Int?
+                parentUniq  Int? @unique
                 parent    Parent? @relation(fields: [parentUniq], references: [uniq], onUpdate: Cascade)
                 child2Opt Child2?
               }
               
               model Child2 {
                 #id(id, Int, @id)
-                childUniq Int?
+                childUniq Int? @unique
                 child   Child? @relation(fields: [childUniq], references: [parentUniq], onUpdate: Cascade)
               }
               "#
@@ -237,6 +239,8 @@ mod one2one_opt {
               parent_uniq_1 String?
               parent_uniq_2 String?
               parent        Parent? @relation(fields: [parent_uniq_1, parent_uniq_2], references: [uniq_1, uniq_2], onUpdate: Cascade)
+
+              @@unique([parent_uniq_1, parent_uniq_2])
             }"#
         };
 
@@ -277,7 +281,7 @@ mod one2one_opt {
             
             model Child {
               #id(childId, Int, @id)
-              childUniq       Int?
+              childUniq       Int? @unique
               parent           Parent? @relation(fields: [childUniq], references: [uniq], onUpdate: Cascade)
             }"#
         };

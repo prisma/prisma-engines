@@ -13,7 +13,7 @@ mod non_embed_updated_at {
               createdAt DateTime @default(now())
               updatedAt DateTime @updatedAt
 
-              bottomId  String?
+              bottomId  String?  @unique
               bottom    Bottom?  @relation(fields: [bottomId], references: [id])
             }
 

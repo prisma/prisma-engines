@@ -107,16 +107,11 @@ pub(super) fn id_must_be_defined(model: ModelWalker<'_>, errors: &mut Diagnostic
 
 /// We can define only one index with the same parameters.
 pub(crate) fn index_is_not_defined_multiple_times_to_same_fields(index: IndexWalker<'_>, errors: &mut Diagnostics) {
-    let attr = if let Some(attribute) = index.ast_attribute() {
-        attribute
-    } else {
-        return;
-    };
+    let attr = index.ast_attribute();
 
     let hits = index
         .model()
         .indexes()
-        .filter(|i| !i.is_implicit())
         .filter(|i| i.attribute_id() != index.attribute_id())
         .filter(|i| i.contains_exactly_the_fields(index.scalar_field_attributes()))
         .count();
@@ -136,12 +131,6 @@ pub(crate) fn index_is_not_defined_multiple_times_to_same_fields(index: IndexWal
 
 /// A field cannot have `@id` and `@unique` attributes at the same time.
 pub(crate) fn unique_cannot_be_defined_to_id_field(index: IndexWalker<'_>, errors: &mut Diagnostics) {
-    let attr = if let Some(attribute) = index.ast_attribute() {
-        attribute
-    } else {
-        return;
-    };
-
     if !index.is_unique() {
         return;
     }
@@ -159,7 +148,7 @@ pub(crate) fn unique_cannot_be_defined_to_id_field(index: IndexWalker<'_>, error
     errors.push_error(DatamodelError::new_attribute_validation_error(
         "The same field cannot be an id and unique on MongoDB.",
         index.attribute_name(),
-        *attr.span(),
+        *index.ast_attribute().span(),
     ));
 }
 

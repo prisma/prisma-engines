@@ -13,7 +13,7 @@ mod one2one_req {
 
             model Child {
                 #id(id, Int, @id)
-                parent_id Int    @default(2)
+                parent_id Int    @default(2) @unique
                 parent    Parent @relation(fields: [parent_id], references: [id], onDelete: SetDefault)
             }"#
         };
@@ -30,7 +30,7 @@ mod one2one_req {
 
             model Child {
                 #id(id, Int, @id)
-                parent_id Int
+                parent_id Int @unique
                 parent    Parent @relation(fields: [parent_id], references: [id], onDelete: SetDefault)
             }"#
         };
@@ -114,7 +114,7 @@ mod one2one_opt {
 
             model Child {
                 #id(id, Int, @id)
-                parent_id Int?    @default(2)
+                parent_id Int?    @default(2) @unique
                 parent    Parent? @relation(fields: [parent_id], references: [id], onDelete: SetDefault)
             }"#
         };
@@ -131,7 +131,7 @@ mod one2one_opt {
 
             model Child {
                 #id(id, Int, @id)
-                parent_id Int?
+                parent_id Int? @unique
                 parent    Parent? @relation(fields: [parent_id], references: [id], onDelete: SetDefault)
             }"#
         };

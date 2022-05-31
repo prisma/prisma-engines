@@ -16,7 +16,7 @@ mod rel_graphql {
            model Cat{
               #id(id, String, @id, @default(cuid()))
               catName String? @unique
-              ownerId String?
+              ownerId String? @unique
 
               owner   Owner?  @relation(fields: [ownerId], references: [id])
            }"#

@@ -394,7 +394,7 @@ mod sql_server {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, String, @id, @test.Char(16))
-              b_id String? @test.Char(16)
+              b_id String? @test.Char(16) @unique
               b    ModelB? @relation(fields: [b_id], references: [id])
             }
 
@@ -431,7 +431,7 @@ mod sql_server {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, String, @id, @test.NChar(16))
-              b_id String? @test.NChar(16)
+              b_id String? @test.NChar(16) @unique
               b    ModelB? @relation(fields: [b_id], references: [id])
             }
 

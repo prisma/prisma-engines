@@ -11,7 +11,7 @@ mod relation_fields;
 mod relations;
 
 use super::context::Context;
-use crate::{ast, transform::ast_to_dml::db::walkers::RefinedRelationWalker};
+use crate::transform::ast_to_dml::db::walkers::RefinedRelationWalker;
 use diagnostics::DatamodelError;
 use names::Names;
 
@@ -106,12 +106,9 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             indexes::opclasses_are_not_allowed_with_other_than_normal_indices(index, ctx);
 
             for field_attribute in index.scalar_field_attributes() {
-                let span = index
-                    .ast_attribute()
-                    .map(|attr| attr.span)
-                    .unwrap_or_else(ast::Span::empty);
-
+                let span = index.ast_attribute().span;
                 let attribute = (index.attribute_name(), span);
+
                 fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
             }
         }
@@ -150,6 +147,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
                     relations::one_to_one::fields_and_references_are_defined(relation, ctx);
                     relations::one_to_one::fields_and_references_defined_on_one_side_only(relation, ctx);
                     relations::one_to_one::referential_actions(relation, ctx);
+                    relations::one_to_one::fields_must_be_a_unique_constraint(relation, ctx);
 
                     // Run these validations last to prevent validation spam.
                     relations::one_to_one::fields_references_mixups(relation, ctx);

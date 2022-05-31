@@ -16,6 +16,8 @@ fn constraint_names() {
           b_a  String
           b_b  String
           B    B      @relation(fields: [b_a, b_b], references: [a, b], map: "CustomDBFK")
+
+          @@unique([b_a, b_b])
         }
 
         model B {

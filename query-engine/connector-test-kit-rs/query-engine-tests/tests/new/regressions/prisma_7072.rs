@@ -20,8 +20,10 @@ mod filter_in {
                 #id(id, String, @id)
                 name		String
                 fooId		String
-                version String
+                version     String
                 foo			Foo	@relation(fields: [fooId, version], references: [id, version])
+
+                @@unique([fooId, version])
             }
         "#};
 

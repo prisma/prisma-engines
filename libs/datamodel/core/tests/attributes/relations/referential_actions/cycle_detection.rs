@@ -13,7 +13,7 @@ fn cascading_on_delete_self_relations() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -23,7 +23,7 @@ fn cascading_on_delete_self_relations() {
         [1;94m   | [0m
         [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)[0m
-        [1;94m10 | [0m    aId    Int?
+        [1;94m10 | [0m    aId    Int? @unique
         [1;94m   | [0m
     "#]];
 
@@ -98,7 +98,7 @@ fn cycles_are_allowed_outside_of_emulation_and_sqlserver() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -124,7 +124,7 @@ fn emulated_cascading_on_delete_self_relations() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -134,7 +134,7 @@ fn emulated_cascading_on_delete_self_relations() {
         [1;94m   | [0m
         [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m15 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)[0m
-        [1;94m16 | [0m    aId    Int?
+        [1;94m16 | [0m    aId    Int? @unique
         [1;94m   | [0m
     "#]];
 
@@ -154,7 +154,7 @@ fn cascading_on_update_self_relations() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -164,7 +164,7 @@ fn cascading_on_update_self_relations() {
         [1;94m   | [0m
         [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)[0m
-        [1;94m10 | [0m    aId    Int?
+        [1;94m10 | [0m    aId    Int? @unique
         [1;94m   | [0m
     "#]];
 
@@ -190,7 +190,7 @@ fn emulated_cascading_on_update_self_relations() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -200,7 +200,7 @@ fn emulated_cascading_on_update_self_relations() {
         [1;94m   | [0m
         [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m15 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)[0m
-        [1;94m16 | [0m    aId    Int?
+        [1;94m16 | [0m    aId    Int? @unique
         [1;94m   | [0m
     "#]];
 
@@ -220,7 +220,7 @@ fn null_setting_on_delete_self_relations() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -230,7 +230,7 @@ fn null_setting_on_delete_self_relations() {
         [1;94m   | [0m
         [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)[0m
-        [1;94m10 | [0m    aId    Int?
+        [1;94m10 | [0m    aId    Int? @unique
         [1;94m   | [0m
     "#]];
 
@@ -256,7 +256,7 @@ fn emulated_null_setting_on_delete_self_relations() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -266,7 +266,7 @@ fn emulated_null_setting_on_delete_self_relations() {
         [1;94m   | [0m
         [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m15 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)[0m
-        [1;94m16 | [0m    aId    Int?
+        [1;94m16 | [0m    aId    Int? @unique
         [1;94m   | [0m
     "#]];
 
@@ -286,7 +286,7 @@ fn null_setting_on_update_self_relations() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -296,7 +296,7 @@ fn null_setting_on_update_self_relations() {
         [1;94m   | [0m
         [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)[0m
-        [1;94m10 | [0m    aId    Int?
+        [1;94m10 | [0m    aId    Int? @unique
         [1;94m   | [0m
     "#]];
 
@@ -322,7 +322,7 @@ fn emulated_null_setting_on_update_self_relations() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -332,7 +332,7 @@ fn emulated_null_setting_on_update_self_relations() {
         [1;94m   | [0m
         [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m15 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)[0m
-        [1;94m16 | [0m    aId    Int?
+        [1;94m16 | [0m    aId    Int? @unique
         [1;94m   | [0m
     "#]];
 
@@ -352,7 +352,7 @@ fn default_setting_on_delete_self_relations() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -362,7 +362,7 @@ fn default_setting_on_delete_self_relations() {
         [1;94m   | [0m
         [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)[0m
-        [1;94m10 | [0m    aId    Int?
+        [1;94m10 | [0m    aId    Int? @unique
         [1;94m   | [0m
     "#]];
 
@@ -388,7 +388,7 @@ fn emulated_default_setting_on_delete_self_relations() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -404,7 +404,7 @@ fn emulated_default_setting_on_delete_self_relations() {
         [1;94m   | [0m
         [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m15 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)[0m
-        [1;94m16 | [0m    aId    Int?
+        [1;94m16 | [0m    aId    Int? @unique
         [1;94m   | [0m
     "#]];
 
@@ -424,7 +424,7 @@ fn default_setting_on_update_self_relations() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -434,7 +434,7 @@ fn default_setting_on_update_self_relations() {
         [1;94m   | [0m
         [1;94m 8 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m 9 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)[0m
-        [1;94m10 | [0m    aId    Int?
+        [1;94m10 | [0m    aId    Int? @unique
         [1;94m   | [0m
     "#]];
 
@@ -460,7 +460,7 @@ fn emulated_default_setting_on_update_self_relations() {
             id     Int  @id @default(autoincrement())
             child  A?   @relation(name: "a_self_relation")
             parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)
-            aId    Int?
+            aId    Int? @unique
         }
     "#};
 
@@ -476,7 +476,7 @@ fn emulated_default_setting_on_update_self_relations() {
         [1;94m   | [0m
         [1;94m14 | [0m    child  A?   @relation(name: "a_self_relation")
         [1;94m15 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)[0m
-        [1;94m16 | [0m    aId    Int?
+        [1;94m16 | [0m    aId    Int? @unique
         [1;94m   | [0m
     "#]];
 

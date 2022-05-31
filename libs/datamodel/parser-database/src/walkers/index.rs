@@ -11,7 +11,7 @@ use super::CompositeTypeFieldWalker;
 #[derive(Copy, Clone)]
 pub struct IndexWalker<'db> {
     pub(crate) model_id: ast::ModelId,
-    pub(crate) index: Option<ast::AttributeId>,
+    pub(crate) index: ast::AttributeId,
     pub(crate) db: &'db ParserDatabase,
     pub(crate) index_attribute: &'db IndexAttribute,
 }
@@ -42,7 +42,7 @@ impl<'db> IndexWalker<'db> {
     }
 
     /// The id of the index, if explicitly defined.
-    pub fn attribute_id(self) -> Option<ast::AttributeId> {
+    pub fn attribute_id(self) -> ast::AttributeId {
         self.index
     }
 
@@ -67,8 +67,8 @@ impl<'db> IndexWalker<'db> {
     }
 
     /// The AST node of the index/unique attribute.
-    pub fn ast_attribute(self) -> Option<&'db ast::Attribute> {
-        self.index.map(|id| &self.db.ast[id])
+    pub fn ast_attribute(self) -> &'db ast::Attribute {
+        &self.db.ast[self.index]
     }
 
     pub(crate) fn attribute(self) -> &'db IndexAttribute {
@@ -144,11 +144,6 @@ impl<'db> IndexWalker<'db> {
     /// Is this an `@@index`?
     pub fn is_normal(self) -> bool {
         self.index_attribute.is_normal()
-    }
-
-    /// True if it's our implicit unique index.
-    pub fn is_implicit(self) -> bool {
-        self.index.is_none()
     }
 
     /// If true, the index defines the storage and ordering of the row. Mostly

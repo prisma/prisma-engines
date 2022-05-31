@@ -18,7 +18,7 @@ mod one_relation {
                 #id(id, String, @id, @default(cuid()))
                 title      String
                 popularity Int
-                blogId     String?
+                blogId     String? @unique
                 blog       Blog?    @relation(fields: [blogId], references: [id])
                 comment    Comment?
             }
@@ -27,7 +27,7 @@ mod one_relation {
                 #id(id, String, @id, @default(cuid()))
                 text   String
                 likes  Int
-                postId String?
+                postId String? @unique
                 post   Post?   @relation(fields: [postId], references: [id])
             }
             "#
@@ -204,7 +204,7 @@ mod one_relation {
                 #id(id, String, @id, @default(cuid()))
                 name   String  @unique
                 int    Int?
-                postId String?
+                postId String? @unique
                 post   Post?   @relation(fields: [postId], references: [id])
             }
             "#
