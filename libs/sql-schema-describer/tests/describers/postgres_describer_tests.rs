@@ -981,6 +981,36 @@ fn index_sort_order_composite_type_asc_desc_is_handled(api: TestApi) {
     assert_eq!(Some(SQLSortOrder::Desc), columns[1].sort_order());
 }
 
+#[test_connector(tags(Postgres))]
+fn array_column_defaults(api: TestApi) {
+    use prisma_value::PrismaValue;
+
+    let schema = r#"
+        CREATE TYPE "color" AS ENUM ('RED', 'GREEN', 'BLUE');
+
+        CREATE TABLE "defaults" (
+            text_empty TEXT[] NOT NULL DEFAULT '{}',
+            text TEXT[] NOT NULL DEFAULT '{ ''abc'' }',
+            colors COLOR[] NOT NULL DEFAULT '{ RED, GREEN }'
+        );
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+
+    let assert_default = |colname: &str, expected_default: Vec<PrismaValue>| {
+        let col = table.column(colname).unwrap();
+        let value = dbg!(col.default().unwrap()).as_value().unwrap();
+        assert_eq!(value, &PrismaValue::List(expected_default));
+    };
+
+    assert_default("text_empty", vec![]);
+    assert_default("text", vec!["abc".into()]);
+
+    todo!();
+}
+
 fn extract_ext(schema: &SqlSchema) -> &PostgresSchemaExt {
     schema.downcast_connector_data().unwrap_or_default()
 }

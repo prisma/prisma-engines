@@ -37,6 +37,10 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         return true;
     }
 
+    if cols.map(|c| c.arity().is_list()).into_tuple() == (true, true) {
+        return true; // TODO: diff scalar list defaults
+    }
+
     let prev = cols.previous().default();
     let next = cols.next().default();
 

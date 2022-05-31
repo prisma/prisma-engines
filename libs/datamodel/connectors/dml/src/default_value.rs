@@ -43,13 +43,20 @@ impl DefaultKind {
     pub fn is_uuid(&self) -> bool {
         matches!(self, DefaultKind::Expression(generator) if generator.name == "uuid")
     }
+
+    pub fn unwrap_single(self) -> PrismaValue {
+        match self {
+            DefaultKind::Single(_) => todo!(),
+            _ => panic!("called DefaultValue::unwrap_single() on wrong variant"),
+        }
+    }
 }
 
 impl DefaultValue {
     pub fn as_expression(&self) -> Option<&ValueGenerator> {
         match self.kind {
             DefaultKind::Expression(ref expr) => Some(expr),
-            DefaultKind::Single(_) => None,
+            _ => None,
         }
     }
 
