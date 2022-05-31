@@ -1,30 +1,75 @@
 use crate::common::*;
 
 #[test]
-fn must_error_if_default_value_for_list() {
+fn must_error_on_list_default_value_for_singular() {
     let dml = indoc! {r#"
         datasource db {
-          provider = "postgres"
-          url = "postgres://"
+          provider = "mongodb"
+          url = env("DATABASE_URL")
         }
 
-        type Composite {
-          rel String[] @default(["hello"])
+        type Model {
+          rel String @default(["hello"])
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": Cannot set a default value on list field.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": The default value of a non-list field cannot be a list.[0m
           [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 6 | [0mtype Composite {
-        [1;94m 7 | [0m  rel String[] @[1;91mdefault(["hello"])[0m
+        [1;94m 6 | [0mtype Model {
+        [1;94m 7 | [0m  rel String @[1;91mdefault(["hello"])[0m
         [1;94m   | [0m
     "#]];
+    expect_error(dml, &expectation);
+}
 
-    expectation.assert_eq(&error)
+#[test]
+fn must_error_on_singular_default_value_for_list() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          url = env("DATABASE_URL")
+        }
+
+        type Model {
+          rel String[] @default("hello")
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The default value of a list field must be a list.[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
+        [1;94m   | [0m
+        [1;94m 6 | [0mtype Model {
+        [1;94m 7 | [0m  rel String[] @[1;91mdefault("hello")[0m
+        [1;94m   | [0m
+    "#]];
+    expect_error(dml, &expectation);
+}
+
+#[test]
+fn must_error_on_bad_value_inside_list_default() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          url = env("DATABASE_URL")
+        }
+
+        type Model {
+          rel String[] @default(["hello", 101, "dalmatians"])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `101`.[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
+        [1;94m   | [0m
+        [1;94m 6 | [0mtype Model {
+        [1;94m 7 | [0m  rel String[] @[1;91mdefault(["hello", 101, "dalmatians"])[0m
+        [1;94m   | [0m
+    "#]];
+    expect_error(dml, &expectation);
 }
 
 #[test]
@@ -285,7 +330,7 @@ fn must_error_on_dbgenerated_default() {
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The function `dbgenerated()` is not supported on composite fields.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": Fields of composite types cannot have dbgenerated() defaults.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m        type User {
@@ -424,4 +469,29 @@ fn boolean_defaults_must_be_true_or_false() {
     "#]];
 
     expected.assert_eq(&error)
+}
+
+#[test]
+fn nested_scalar_list_defaults_are_disallowed() {
+    let schema = r#"
+        datasource db {
+            provider = "mongodb"
+            url = env("DBURL")
+        }
+
+        type Pizza {
+            toppings String[] @default(["reblochon cheese", ["potato", "with", "rosmarin"], "onions"])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `["potato","with","rosmarin"]`.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m        type Pizza {
+        [1;94m 8 | [0m            toppings String[] @[1;91mdefault(["reblochon cheese", ["potato", "with", "rosmarin"], "onions"])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expected);
 }

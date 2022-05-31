@@ -273,6 +273,17 @@ fn column_for_model_enum_scalar_field(
                 .with_constraint_name(ctx.flavour.default_constraint_name(def));
             Some(def)
         }
+        ast::Expression::Array(items, _) => {
+            let mut values = Vec::with_capacity(items.len());
+
+            for item in items {
+                values.push(PrismaValue::Enum(item.as_constant_value().unwrap().0.to_owned()));
+            }
+
+            let default_value = sql::DefaultValue::value(PrismaValue::List(values))
+                .with_constraint_name(ctx.flavour.default_constraint_name(def));
+            Some(default_value)
+        }
         other => unwrap_dbgenerated(other).map(|value| {
             sql::DefaultValue::db_generated(value).with_constraint_name(ctx.flavour.default_constraint_name(def))
         }),
@@ -353,47 +364,14 @@ fn column_for_builtin_scalar_type(
                 ))))
             } else {
                 match v.value() {
-                    ast::Expression::NumericValue(val, _) => match scalar_type {
-                        ScalarType::Int => Some(sql::DefaultValue::new(sql::DefaultKind::Value(PrismaValue::Int(
-                            val.parse().unwrap(),
-                        )))),
-                        ScalarType::BigInt => Some(sql::DefaultValue::new(sql::DefaultKind::Value(
-                            PrismaValue::BigInt(val.parse().unwrap()),
-                        ))),
-                        ScalarType::Float | ScalarType::Decimal => Some(sql::DefaultValue::new(
-                            sql::DefaultKind::Value(PrismaValue::Float(val.parse().unwrap())),
-                        )),
-                        other => unreachable!("{:?}", other),
-                    },
-                    ast::Expression::StringValue(val, _) => match scalar_type {
-                        ScalarType::String => Some(sql::DefaultValue::new(sql::DefaultKind::Value(
-                            PrismaValue::String(val.clone()),
-                        ))),
-                        ScalarType::DateTime => Some(sql::DefaultValue::new(sql::DefaultKind::Value(
-                            PrismaValue::DateTime(val.parse().unwrap()),
-                        ))),
-                        ScalarType::Json => Some(sql::DefaultValue::new(sql::DefaultKind::Value(PrismaValue::Json(
-                            val.parse().unwrap(),
-                        )))),
-                        ScalarType::Bytes => Some(sql::DefaultValue::new(sql::DefaultKind::Value(PrismaValue::Bytes(
-                            prisma_value::decode_bytes(val).unwrap(),
-                        )))),
-                        ScalarType::Decimal => Some(sql::DefaultValue::new(sql::DefaultKind::Value(
-                            PrismaValue::Float(val.parse().unwrap()),
-                        ))),
-                        other => unreachable!("{:?}", other),
-                    },
-
-                    // The only case where we have constant defaults in scalars is booleans.
-                    ast::Expression::ConstantValue(val, _) => Some(sql::DefaultValue::new(sql::DefaultKind::Value(
-                        PrismaValue::Boolean(val.parse().unwrap()),
-                    ))),
                     ast::Expression::Function(_, _, _) => {
                         // prisma-generated
                         ctx.schema.prisma_level_defaults.push((idx.0 as u32, idx.1 as u32));
                         return None;
                     }
-                    ast::Expression::Array(_, _) => unreachable!("Array defaults are not implemented"),
+                    constant => Some(sql::DefaultValue::new(sql::DefaultKind::Value(
+                        constant_expression_to_sql_default(constant, scalar_type),
+                    ))),
                 }
             }
         };
@@ -406,6 +384,41 @@ fn column_for_builtin_scalar_type(
         tpe,
         default,
         auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
+    }
+}
+
+fn constant_expression_to_sql_default(expr: &ast::Expression, scalar_type: ScalarType) -> PrismaValue {
+    match expr {
+        ast::Expression::NumericValue(val, _) => match scalar_type {
+            ScalarType::Int => PrismaValue::Int(val.parse().unwrap()),
+            ScalarType::BigInt => PrismaValue::BigInt(val.parse().unwrap()),
+            ScalarType::Float | ScalarType::Decimal => PrismaValue::Float(val.parse().unwrap()),
+            other => unreachable!("{:?}", other),
+        },
+        ast::Expression::StringValue(val, _) => match scalar_type {
+            ScalarType::String => PrismaValue::String(val.clone()),
+            ScalarType::DateTime => PrismaValue::DateTime(val.parse().unwrap()),
+            ScalarType::Json => PrismaValue::Json(val.parse().unwrap()),
+            ScalarType::Bytes => PrismaValue::Bytes(prisma_value::decode_bytes(val).unwrap()),
+            ScalarType::Decimal => PrismaValue::Float(val.parse().unwrap()),
+            other => unreachable!("{:?}", other),
+        },
+
+        ast::Expression::Array(items, _) => {
+            let mut values: Vec<PrismaValue> = Vec::with_capacity(items.len());
+
+            for item in items {
+                values.push(constant_expression_to_sql_default(item, scalar_type));
+            }
+
+            PrismaValue::List(values)
+        }
+
+        // The only case where we have constant defaults in scalars is booleans.
+        ast::Expression::ConstantValue(val, _) => PrismaValue::Boolean(val.parse().unwrap()),
+
+        // Handled before this function is called.
+        ast::Expression::Function(_, _, _) => unreachable!(),
     }
 }
 
@@ -433,7 +446,7 @@ fn convert_referential_action(action: ReferentialAction) -> sql::ForeignKeyActio
     }
 }
 
-/// Unwraps the value from dbgenerated() or dbgenerated("something")
+/// Unwraps the value from dbgenerated() or dbgenerated("something")
 fn unwrap_dbgenerated(expr: &ast::Expression) -> Option<String> {
     expr.as_function()
         .unwrap()

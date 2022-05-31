@@ -43,9 +43,6 @@ enum DatamodelErrorKind {
   #[error("Argument \"{}\" is missing in generator block \"{}\".", argument_name, generator_name)]
   GeneratorArgumentNotFound { argument_name: String, generator_name: String, span: Span },
 
-  #[error("Error parsing attribute \"{}\": {}", attribute_name, message)]
-  AttributeValidationError { message: String, attribute_name: String, span: Span },
-
   #[error("Attribute \"@{}\" is defined twice.", attribute_name)]
   DuplicateAttributeError { attribute_name: String, span: Span },
 
@@ -228,12 +225,8 @@ impl DatamodelError {
     }
 
     pub fn new_attribute_validation_error(message: &str, attribute_name: &str, span: Span) -> DatamodelError {
-        DatamodelErrorKind::AttributeValidationError {
-            message: String::from(message),
-            attribute_name: String::from(attribute_name),
-            span,
-        }
-        .into()
+        let msg = format!("Error parsing attribute \"{attribute_name}\": {message}");
+        Self::new(msg.into(), span)
     }
 
     pub fn new_duplicate_attribute_error(attribute_name: &str, span: Span) -> DatamodelError {
@@ -613,7 +606,6 @@ impl DatamodelError {
             DatamodelErrorKind::ArgumentCountMismatch { span, .. } => *span,
             DatamodelErrorKind::SourceArgumentNotFound { span, .. } => *span,
             DatamodelErrorKind::GeneratorArgumentNotFound { span, .. } => *span,
-            DatamodelErrorKind::AttributeValidationError { span, .. } => *span,
             DatamodelErrorKind::AttributeNotKnownError { span, .. } => *span,
             DatamodelErrorKind::ReservedScalarTypeError { span, .. } => *span,
             DatamodelErrorKind::DatasourceProviderNotKnownError { span, .. } => *span,

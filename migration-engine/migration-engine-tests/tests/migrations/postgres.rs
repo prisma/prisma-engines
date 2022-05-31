@@ -508,3 +508,40 @@ fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: Te
     "#]];
     expected_error.assert_eq(&err);
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn scalar_list_defaults_work(api: TestApi) {
+    let schema = r#"
+        datasource db {
+          provider = "postgresql"
+          url = "postgres://"
+        }
+
+        enum Color {
+            RED
+            GREEN
+            BLUE
+        }
+
+        model Model {
+            id Int @id
+            int_empty Int[] @default([])
+            int Int[] @default([0, 1, 1, 2, 3, 5, 8, 13, 21])
+            float Float[] @default([3.20, 4.20, 3.14, 0, 9.9999999, 1000.7])
+            string String[] @default(["Arrabiata", "Carbonara", "Al Ragù"])
+            boolean Boolean[] @default([false, true ,true, true])
+            dateTime DateTime[] @default(["2019-06-17T14:20:57Z", "2020-09-21T20:00:00+02:00"])
+            colors Color[] @default([GREEN, BLUE])
+            colors_empty Color[] @default([])
+            bytes    Bytes[] @default(["aGVsbG8gd29ybGQ="])
+            json     Json[]  @default(["{ \"a\": [\"b\"] }", "3"])
+            decimal  Decimal[]  @default(["121.10299000124800000001", "0.4", "1.1", "-68.0"])
+        }
+    "#;
+
+    api.schema_push(schema)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}

@@ -724,22 +724,56 @@ enum PostgresAlterColumn {
 }
 
 fn render_default(default: &DefaultValue) -> Cow<'_, str> {
+    fn render_constant_default(value: &PrismaValue) -> Cow<'_, str> {
+        match value {
+            PrismaValue::String(val) | PrismaValue::Enum(val) => format!("E'{}'", escape_string_literal(val)).into(),
+            PrismaValue::Json(json_value) => {
+                let mut out = String::with_capacity(json_value.len() + 2);
+                out.push('\'');
+                out.push_str(&escape_string_literal(json_value));
+                out.push('\'');
+                Cow::Owned(out)
+            }
+            PrismaValue::DateTime(val) => Quoted::postgres_string(val).to_string().into(),
+            PrismaValue::Bytes(b) => Quoted::postgres_string(format_hex(b)).to_string().into(),
+            PrismaValue::List(values) => {
+                let mut out = String::new();
+                let mut values = values.iter().peekable();
+
+                out.push_str("E'{");
+
+                while let Some(value) = values.next() {
+                    // Rules are different inside arrays literals.
+                    match value {
+                        PrismaValue::Enum(v) => out.push_str(v),
+                        PrismaValue::Json(v) => {
+                            let v = format!("\"{}\"", v.to_string().replace('"', r#"\\""#)); // fixme: this is a hack
+                            out.push_str(&v);
+                        }
+                        _ => out.push_str(&escape_string_literal(render_constant_default(value).as_ref())),
+                    }
+
+                    if values.peek().is_some() {
+                        out.push_str(", ");
+                    }
+                }
+
+                out.push_str("}'");
+
+                Cow::Owned(out)
+            }
+
+            other => other.to_string().into(),
+        }
+    }
+
     match default.kind() {
         DefaultKind::DbGenerated(val) => Cow::Borrowed(val.as_str()),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             format!("E'{}'", escape_string_literal(val)).into()
         }
-        DefaultKind::Value(PrismaValue::Bytes(b)) => Quoted::postgres_string(format_hex(b)).to_string().into(),
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
-        DefaultKind::Value(PrismaValue::DateTime(val)) => Quoted::postgres_string(val).to_string().into(),
-        DefaultKind::Value(PrismaValue::Json(json_value)) => {
-            let mut out = String::with_capacity(json_value.len() + 2);
-            out.push('\'');
-            out.push_str(&escape_string_literal(json_value));
-            out.push('\'');
-            Cow::Owned(out)
-        }
-        DefaultKind::Value(val) => val.to_string().into(),
+        DefaultKind::Value(value) => render_constant_default(value),
         DefaultKind::UniqueRowid => "unique_rowid()".into(),
         DefaultKind::Sequence(_) => Default::default(),
     }

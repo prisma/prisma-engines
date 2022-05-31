@@ -50,6 +50,15 @@ pub(super) fn validate_default_value(
         None => return,
     };
 
+    // For array expressions, validate each element in the array.
+    if let ast::Expression::Array(items, _) = expression {
+        for item in items {
+            validate_default_value(Some(item), Some(scalar_type), ctx);
+        }
+
+        return;
+    }
+
     // Scalar type specific validations.
     match (scalar_type, expression) {
         (ScalarType::Json, ast::Expression::StringValue(value, span)) => {

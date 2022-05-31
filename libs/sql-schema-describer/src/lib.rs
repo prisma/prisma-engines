@@ -723,7 +723,7 @@ impl DefaultValue {
     }
 }
 
-pub fn unquote_string(val: &str) -> String {
+fn unquote_string(val: &str) -> String {
     val.trim_start_matches('\'')
         .trim_end_matches('\'')
         .trim_start_matches('\\')
