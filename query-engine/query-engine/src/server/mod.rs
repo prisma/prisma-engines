@@ -277,7 +277,7 @@ async fn handle_metrics(state: State, req: Request<Body>) -> Result<Response<Bod
 
     let res = Response::builder()
         .status(StatusCode::OK)
-        .header(CONTENT_TYPE, "application/text")
+        .header(CONTENT_TYPE, "text/plain; version=0.0.4")
         .body(Body::from(metrics))
         .unwrap();
 
