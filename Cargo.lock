@@ -3253,7 +3253,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#a916d18f1b4fa49d8cdd013d8df9a453c818df3f"
+source = "git+https://github.com/prisma/quaint#8be4fab7f2f6213487b1d40f2d23a6de982a0cf6"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -5084,7 +5084,7 @@ version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f559b464de2e2bdabcac6a210d12e9b5a5973c251e102c44c585c71d51bd78e"
 dependencies = [
- "cfg-if 0.1.10",
+ "cfg-if 1.0.0",
  "rand 0.8.4",
  "static_assertions",
 ]
