@@ -1,7 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), only(MongoDb))]
 mod default_value {
     fn schema() -> String {
         let schema = indoc! {
