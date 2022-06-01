@@ -60,7 +60,7 @@ fn connector_for_connection_string(
         // seem to be used by some tests in prisma/prisma. They are not tested at all engine-side.
         //
         // Tracking issue: https://github.com/prisma/prisma/issues/11468
-        Some("file") | Some("sqlite") => {
+        Some("file") => {
             let params = ConnectorParams {
                 connection_string,
                 preview_features,

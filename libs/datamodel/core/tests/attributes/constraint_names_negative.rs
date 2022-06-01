@@ -15,7 +15,7 @@ const MYSQL: &str = r#"datasource mysql {
                                 }"#;
 const SQLITE: &str = r#"datasource sqlite {
                                   provider = "sqlite"
-                                  url = "sqlite://asdlj"
+                                  url = "file:asdlj"
                                 }"#;
 
 #[test]

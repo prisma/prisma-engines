@@ -92,7 +92,7 @@ impl Connector for SqliteDatamodelConnector {
             }
         };
 
-        if let Some(path) = set_root(url.trim_start_matches("file:").trim_start_matches("sqlite:")) {
+        if let Some(path) = set_root(url.trim_start_matches("file:")) {
             return Cow::Owned(format!("file:{}", path));
         };
 
@@ -100,7 +100,7 @@ impl Connector for SqliteDatamodelConnector {
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String> {
-        if !url.starts_with("file") && !url.starts_with("sqlite:") {
+        if !url.starts_with("file") {
             return Err("must start with the protocol `file:`.".to_string());
         }
 

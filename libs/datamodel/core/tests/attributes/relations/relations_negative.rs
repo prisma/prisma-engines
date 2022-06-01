@@ -785,7 +785,7 @@ fn mapping_foreign_keys_on_sqlite_should_error() {
     let dml = indoc! {r#"
         datasource test {
           provider = "sqlite"
-          url = "sqlite://..."
+          url = "file:."
         }
 
         model User {
