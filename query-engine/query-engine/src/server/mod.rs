@@ -119,7 +119,10 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
         return handle_transaction(state, req).await;
     }
 
-    if req.method() == Method::POST && req.uri().path().contains("metrics") && state.enable_metrics {
+    if [Method::POST, Method::GET].contains(req.method())
+        && req.uri().path().contains("metrics")
+        && state.enable_metrics
+    {
         return handle_metrics(state, req).await;
     }
 
