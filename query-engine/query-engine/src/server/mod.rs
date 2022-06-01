@@ -3,10 +3,11 @@ use datamodel::common::preview_features::PreviewFeature;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::{global, propagation::Extractor, Context};
-use query_core::MetricRegistry;
 use query_core::{schema::QuerySchemaRenderer, TxId};
+use query_core::{MetricFormat, MetricRegistry};
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde_json::json;
+use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Instant;
@@ -118,7 +119,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
         return handle_transaction(state, req).await;
     }
 
-    if req.method() == Method::GET && req.uri().path().contains("metrics") && state.enable_metrics {
+    if req.method() == Method::POST && req.uri().path().contains("metrics") && state.enable_metrics {
         return handle_metrics(state, req).await;
     }
 
@@ -241,25 +242,42 @@ fn playground_handler() -> Response<Body> {
 }
 
 async fn handle_metrics(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    if let Some(query) = req.uri().query() {
+    let format = if let Some(query) = req.uri().query() {
         if query.contains("format=json") {
-            let metrics = state.cx.metrics.to_json(Default::default());
-
-            let res = Response::builder()
-                .status(StatusCode::OK)
-                .header(CONTENT_TYPE, "application/json")
-                .body(Body::from(metrics.to_string()))
-                .unwrap();
-
-            return Ok(res);
+            MetricFormat::Json
+        } else {
+            MetricFormat::Prometheus
         }
+    } else {
+        MetricFormat::Prometheus
+    };
+
+    let body_start = req.into_body();
+    // block and buffer request until the request has completed
+    let full_body = hyper::body::to_bytes(body_start).await?;
+
+    let global_labels: HashMap<String, String> = match serde_json::from_slice(full_body.as_ref()) {
+        Ok(map) => map,
+        Err(_e) => HashMap::new(),
+    };
+
+    if format == MetricFormat::Json {
+        let metrics = state.cx.metrics.to_json(global_labels);
+
+        let res = Response::builder()
+            .status(StatusCode::OK)
+            .header(CONTENT_TYPE, "application/json")
+            .body(Body::from(metrics.to_string()))
+            .unwrap();
+
+        return Ok(res);
     }
 
-    let metrics = state.cx.metrics.to_prometheus(Default::default());
+    let metrics = state.cx.metrics.to_prometheus(global_labels);
 
     let res = Response::builder()
         .status(StatusCode::OK)
-        .header(CONTENT_TYPE, "application/json")
+        .header(CONTENT_TYPE, "text/plain; version=0.0.4")
         .body(Body::from(metrics))
         .unwrap();
 

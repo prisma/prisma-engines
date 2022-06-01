@@ -33,6 +33,8 @@ mod registry;
 use metrics::{absolute_counter, describe_counter, describe_gauge, describe_histogram, gauge};
 use recorder::*;
 pub use registry::MetricRegistry;
+use serde::Deserialize;
+use std::sync::Once;
 
 // At the moment the histogram is only used for timings. So the bounds are hard coded here
 // The buckets are for ms
@@ -44,12 +46,20 @@ const ACCEPT_LIST: &[&str] = &[
     "pool_idle_connections",
     "pool_wait_count",
     "pool_wait_duration_ms",
-    "query_total_elapsed_time+ms",
+    "query_total_elapsed_time_ms",
     "query_total_queries",
     "query_active_transactions",
     "query_total_operations",
     "query_operation_total_elapsed_time_ms",
 ];
+
+#[derive(PartialEq, Debug, Deserialize)]
+pub enum MetricFormat {
+    #[serde(alias = "json")]
+    Json,
+    #[serde(alias = "prometheus")]
+    Prometheus,
+}
 
 pub fn setup() {
     set_recorder();
@@ -95,9 +105,14 @@ fn describe_metrics() {
     absolute_counter!("query_total_queries", 0);
     absolute_counter!("query_total_operations", 0);
 }
+
+static METRIC_RECORDER: Once = Once::new();
+
 fn set_recorder() {
-    let recorder = MetricRecorder::default();
-    metrics::set_boxed_recorder(Box::new(recorder)).unwrap();
+    METRIC_RECORDER.call_once(|| {
+        let recorder = MetricRecorder::default();
+        metrics::set_boxed_recorder(Box::new(recorder)).unwrap();
+    });
 }
 
 #[cfg(test)]

@@ -5,7 +5,7 @@ use prisma_models::InternalDataModelBuilder;
 use query_core::{
     executor,
     schema::{QuerySchema, QuerySchemaRenderer},
-    schema_builder, MetricRegistry, QueryExecutor, TxId,
+    schema_builder, MetricFormat, MetricRegistry, QueryExecutor, TxId,
 };
 use request_handlers::{GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde::{Deserialize, Serialize};
@@ -78,8 +78,15 @@ struct ServerInfo {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct MetricOptions {
-    format: String,
+    format: MetricFormat,
+    #[serde(default)]
     global_labels: HashMap<String, String>,
+}
+
+impl MetricOptions {
+    fn is_json_format(&self) -> bool {
+        self.format == MetricFormat::Json
+    }
 }
 
 impl ConnectedEngine {
@@ -393,7 +400,7 @@ impl QueryEngine {
             let options: MetricOptions = serde_json::from_str(&json_options)?;
 
             if let Some(metrics) = &engine.metrics {
-                if options.format.as_str() == "json" {
+                if options.is_json_format() {
                     let engine_metrics = metrics.to_json(options.global_labels);
                     let res = serde_json::to_string(&engine_metrics)?;
                     Ok(res)
