@@ -460,6 +460,15 @@
 <span id="455">455</span>
 <span id="456">456</span>
 <span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">interner::StringId</span>,
@@ -857,7 +866,16 @@
         .<span class="ident">insert</span>((<span class="ident">evidence</span>.<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>, <span class="ident">evidence</span>.<span class="ident">model_id</span>, <span class="ident">relation_id</span>));
 }
 
-<span class="doccomment">/// Describes what happens when related nodes are deleted.</span>
+<span class="doccomment">/// An action describing the way referential integrity is managed in the system.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// An action is triggered when a relation constraint gets violated in a way</span>
+<span class="doccomment">/// that would make the the data inconsistent, e.g. deleting or updating a</span>
+<span class="doccomment">/// referencing record that leaves related records into a wrong state.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```ignore</span>
+<span class="doccomment">/// @relation(fields: [a], references: [b], onDelete: NoAction, onUpdate: Cascade)</span>
+<span class="doccomment">///                                                   ^^^^^^^^            ^^^^^^^</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
 <span class="attribute">#[<span class="ident">bitflags</span>]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>

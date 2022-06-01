@@ -123,21 +123,83 @@
 <span id="118">118</span>
 <span id="119">119</span>
 <span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">Attribute</span>, <span class="ident">Comment</span>, <span class="ident">Identifier</span>, <span class="ident">Span</span>, <span class="ident">WithAttributes</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>,
 };
 
+<span class="doccomment">/// A field definition in a model or a composite type.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Field</span> {
     <span class="doccomment">/// The field&#39;s type.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// name String</span>
+    <span class="doccomment">///      ^^^^^^</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">field_type</span>: <span class="ident">FieldType</span>,
     <span class="doccomment">/// The name of the field.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// name String</span>
+    <span class="doccomment">/// ^^^^</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Identifier</span>,
-    <span class="doccomment">/// The aritiy of the field.</span>
+    <span class="doccomment">/// The arity of the field.</span>
     <span class="kw">pub</span> <span class="ident">arity</span>: <span class="ident">FieldArity</span>,
     <span class="doccomment">/// The attributes of this field.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// name String @id @default(&quot;lol&quot;)</span>
+    <span class="doccomment">///             ^^^^^^^^^^^^^^^^^^^</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The comments for this field.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// /// Lorem ipsum</span>
+    <span class="doccomment">///     ^^^^^^^^^^^</span>
+    <span class="doccomment">/// name String @id @default(&quot;lol&quot;)</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The location of this field in the text representation.</span>
     <span class="kw">pub</span> <span class="ident">span</span>: <span class="ident">Span</span>,
@@ -200,10 +262,28 @@
     }
 }
 
+<span class="doccomment">/// An arity of a data model field.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FieldArity</span> {
+    <span class="doccomment">/// The field either must be in an insert statement, or the field must have</span>
+    <span class="doccomment">/// a default value for the insert to succeed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// name String</span>
+    <span class="doccomment">/// ```</span>
     <span class="ident">Required</span>,
+    <span class="doccomment">/// The field does not need to be in an insert statement for the write to</span>
+    <span class="doccomment">/// succeed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// name String?</span>
+    <span class="doccomment">/// ```</span>
     <span class="ident">Optional</span>,
+    <span class="doccomment">/// The field can have multiple values stored in the same column.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// name String[]</span>
+    <span class="doccomment">/// ```</span>
     <span class="ident">List</span>,
 }
 
