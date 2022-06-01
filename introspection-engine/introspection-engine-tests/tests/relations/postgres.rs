@@ -6,6 +6,43 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn kanjis(api: &TestApi) -> TestResult {
+    let migration = indoc! {r#"
+        CREATE TABLE "A"
+        (
+            id  int primary key,
+            b患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患 int not null
+        );
+
+        CREATE TABLE "B"
+        (
+            a者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者 int primary key
+        );
+
+        ALTER TABLE "A" ADD CONSTRAINT "患者ID" FOREIGN KEY (b患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患患) REFERENCES "B"(a者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者者) ON DELETE RESTRICT ON UPDATE CASCADE;
+    "#};
+
+    api.database().raw_cmd(migration).await?;
+
+    let expected = expect![[r#"
+        model A {
+          id                    Int @id
+          b____________________ Int @map("b患患患患患患患患患患患患患患患患患患患患")
+          B                     B   @relation(fields: [b____________________], references: [a____________________], map: "患者ID")
+        }
+
+        model B {
+          a____________________ Int @id @map("a者者者者者者者者者者者者者者者者者者者者")
+          A                     A[]
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 // Cockroach can return either order for multiple foreign keys. This is hard to deterministically
 // test, so disable for now. See: https://github.com/cockroachdb/cockroach/issues/71098.
 async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api: &TestApi) -> TestResult {
