@@ -59,9 +59,29 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">graphql_parser::query::ParseError</span>;
 <span class="kw">use</span> <span class="ident">query_core::CoreError</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+<span class="kw">use</span> <span class="ident">user_facing_errors::KnownError</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
@@ -80,6 +100,9 @@
         <span class="ident">feature_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
         <span class="ident">message</span>: <span class="ident">String</span>,
     },
+
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">_0</span>)]</span>
+    <span class="ident">ValueFitError</span>(<span class="ident">String</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">HandlerError</span> {
@@ -95,6 +118,21 @@
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">to_string</span>();
 
         <span class="ident"><span class="self">Self</span>::UnsupportedFeature</span> { <span class="ident">feature_name</span>, <span class="ident">message</span> }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value_fit</span>(<span class="ident">details</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::ValueFitError</span>(<span class="ident">details</span>.<span class="ident">to_string</span>())
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_known_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KnownError</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">HandlerError::ValueFitError</span>(<span class="ident">details</span>) =&gt; {
+                <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::ValueFitError</span> {
+                    <span class="ident">details</span>: <span class="ident">details</span>.<span class="ident">clone</span>(),
+                }))
+            }
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        }
     }
 }
 

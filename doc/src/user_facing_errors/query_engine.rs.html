@@ -329,6 +329,13 @@
 <span id="324">324</span>
 <span id="325">325</span>
 <span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">user_facing_error_macros</span>::<span class="kw-2">*</span>;
@@ -654,6 +661,13 @@
     <span class="kw">pub</span> <span class="ident">field</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">expected_type</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">found</span>: <span class="ident">String</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2033&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;{details}&quot;</span>)]</span>
+
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ValueFitError</span> {
+    <span class="kw">pub</span> <span class="ident">details</span>: <span class="ident">String</span>,
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="user_facing_errors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>

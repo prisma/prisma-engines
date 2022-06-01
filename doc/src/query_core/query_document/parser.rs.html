@@ -504,6 +504,10 @@
 <span id="499">499</span>
 <span id="500">500</span>
 <span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::schema</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">bigdecimal</span>::{<span class="ident">BigDecimal</span>, <span class="ident">ToPrimitive</span>};
@@ -749,8 +753,12 @@
             (<span class="ident">QueryValue::Int</span>(<span class="ident">i</span>), <span class="ident">ScalarType::BigInt</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)),
 
             (<span class="ident">QueryValue::Float</span>(<span class="ident">f</span>), <span class="ident">ScalarType::Float</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)),
-            (<span class="ident">QueryValue::Float</span>(<span class="ident">f</span>), <span class="ident">ScalarType::Int</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">f</span>.<span class="ident">to_i64</span>().<span class="ident">unwrap</span>())),
-            (<span class="ident">QueryValue::Float</span>(<span class="ident">d</span>), <span class="ident">ScalarType::Decimal</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">d</span>)),
+            (<span class="ident">QueryValue::Float</span>(<span class="ident">f</span>), <span class="ident">ScalarType::Decimal</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)),
+            (<span class="ident">QueryValue::Float</span>(<span class="ident">f</span>), <span class="ident">ScalarType::Int</span>) =&gt; <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">to_i64</span>() {
+                <span class="prelude-val">Some</span>(<span class="ident">converted</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">converted</span>)),
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError::new</span>(<span class="ident">parent_path</span>.<span class="ident">clone</span>(), <span class="ident">QueryParserErrorKind::ValueFitError</span>(
+                    <span class="macro">format!</span>(<span class="string">&quot;Unable to fit float value (or large JS integer serialized in exponent notation) &#39;{}&#39; into a 64 Bit signed integer for field &#39;{}&#39;. If you&#39;re trying to store large integers, consider using `BigInt`.&quot;</span>, <span class="ident">f</span>, <span class="ident">parent_path</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>())))),
+            },
 
             (<span class="ident">QueryValue::Boolean</span>(<span class="ident">b</span>), <span class="ident">ScalarType::Boolean</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)),
 

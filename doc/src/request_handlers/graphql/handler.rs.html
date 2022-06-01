@@ -187,6 +187,9 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">GQLBatchResponse</span>, <span class="ident">GQLResponse</span>, <span class="ident">GraphQlBody</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::PrismaResponse</span>;
 <span class="kw">use</span> <span class="ident">futures::FutureExt</span>;
@@ -224,7 +227,10 @@
                 }
                 <span class="ident">BatchDocument::Compact</span>(<span class="ident">compacted</span>) =&gt; <span class="self">self</span>.<span class="ident">handle_compacted</span>(<span class="ident">compacted</span>, <span class="ident">tx_id</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>,
             },
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">PrismaResponse::Single</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">as_known_error</span>() {
+                <span class="prelude-val">Some</span>(<span class="ident">transformed</span>) =&gt; <span class="ident">PrismaResponse::Single</span>(<span class="ident">user_facing_errors::Error::new_known</span>(<span class="ident">transformed</span>).<span class="ident">into</span>()),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">PrismaResponse::Single</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
+            },
         }
     }
 
