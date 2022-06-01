@@ -167,6 +167,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
                 implicit::supports_implicit_relations(relation, ctx);
                 implicit::validate_singular_id(relation, ctx);
                 implicit::validate_no_referential_actions(relation, ctx);
+                implicit::cannot_define_references_argument(relation, ctx);
             }
             RefinedRelationWalker::TwoWayEmbeddedManyToMany(relation) => {
                 use relations::many_to_many::embedded;

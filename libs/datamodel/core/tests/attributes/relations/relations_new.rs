@@ -761,85 +761,20 @@ fn must_error_for_required_one_to_one_self_relations() {
 }
 
 #[test]
-fn must_error_when_non_id_field_is_referenced_in_a_many_to_many() {
-    let dml = r#"
-    model Post {
-      id         Int        @id
-      slug       Int        @unique
-      categories Category[] @relation(references: [id])
-    }
-
-    model Category {
-      id    Int    @id @default(autoincrement())
-      posts Post[] @relation(references: [slug])
-    }
-    "#;
-
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: Implicit many-to-many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `Post`. But it is referencing the following fields that are not the id: slug[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
-        [1;94m   | [0m
-        [1;94m 9 | [0m      id    Int    @id @default(autoincrement())
-        [1;94m10 | [0m      [1;91mposts Post[] @relation(references: [slug])[0m
-        [1;94m11 | [0m    }
-        [1;94m   | [0m
-    "#]];
-
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
-}
-
-#[test]
-fn must_succeed_when_id_field_is_referenced_in_a_many_to_many() {
-    let dml = r#"
-    model Post {
-      id_post    Int @id        
-      slug       Int        @unique
-      categories Category[] @relation(references: [id_category])
-    }
-
-    model Category {
-      id_category    Int    @default(autoincrement()) @id
-      posts          Post[] @relation(references: [id_post])
-    }
-    "#;
-
-    assert!(datamodel::parse_datamodel(dml).is_ok());
-
-    let dml2 = r#"
-    model Post {
-      id_post         Int
-      slug            Int        @unique
-      categories      Category[] @relation(references: [id_category])
-
-      @@id([id_post])
-    }
-
-    model Category {
-      id_category     Int    @default(autoincrement())
-      posts           Post[] @relation(references: [id_post])
-
-      @@id([id_category])
-    }
-    "#;
-
-    assert!(datamodel::parse_datamodel(dml2).is_ok());
-}
-
-#[test]
 fn must_error_nicely_when_a_many_to_many_is_not_possible() {
     // many 2 many is not possible because Post does not have a singular id field
     let dml = r#"
     model Post {
       id         Int
       slug       Int        @unique
-      categories Category[] @relation(references: [id])
+      categories Category[] @relation("foo")
 
       @@id([id, slug])
     }
 
     model Category {
       id    Int    @id @default(autoincrement())
-      posts Post[] @relation(references: [slug])
+      posts Post[] @relation("foo")
     }"#;
 
     let expect = expect![[r#"
@@ -847,7 +782,7 @@ fn must_error_nicely_when_a_many_to_many_is_not_possible() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m      id    Int    @id @default(autoincrement())
-        [1;94m12 | [0m      [1;91mposts Post[] @relation(references: [slug])[0m
+        [1;94m12 | [0m      [1;91mposts Post[] @relation("foo")[0m
         [1;94m13 | [0m    }
         [1;94m   | [0m
     "#]];
