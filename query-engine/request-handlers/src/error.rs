@@ -1,6 +1,7 @@
 use graphql_parser::query::ParseError;
 use query_core::CoreError;
 use thiserror::Error;
+use user_facing_errors::KnownError;
 
 #[derive(Debug, Error)]
 #[allow(clippy::large_enum_variant)]
@@ -19,6 +20,9 @@ pub enum HandlerError {
         feature_name: &'static str,
         message: String,
     },
+
+    #[error("{}", _0)]
+    ValueFitError(String),
 }
 
 impl HandlerError {
@@ -34,6 +38,21 @@ impl HandlerError {
         let message = message.to_string();
 
         Self::UnsupportedFeature { feature_name, message }
+    }
+
+    pub fn value_fit(details: impl ToString) -> Self {
+        Self::ValueFitError(details.to_string())
+    }
+
+    pub fn as_known_error(&self) -> Option<KnownError> {
+        match self {
+            HandlerError::ValueFitError(details) => {
+                Some(KnownError::new(user_facing_errors::query_engine::ValueFitError {
+                    details: details.clone(),
+                }))
+            }
+            _ => None,
+        }
     }
 }
 
