@@ -147,6 +147,9 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">opentelemetry</span>::{
     <span class="ident">global</span>,
     <span class="ident">sdk</span>::{<span class="ident">propagation::TraceContextPropagator</span>, <span class="ident">trace::Config</span>, <span class="ident">Resource</span>},
@@ -252,8 +255,11 @@
                 }
             }
             <span class="ident">LogFormat::Json</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">FmtSubscriber::builder</span>().<span class="ident">json</span>().<span class="ident">with_env_filter</span>(<span class="ident">filter</span>).<span class="ident">finish</span>();
-                <span class="self">self</span>.<span class="ident">finalize</span>(<span class="ident">subscriber</span>)
+                <span class="kw">let</span> <span class="ident">fmt_layer</span> <span class="op">=</span> <span class="ident">tracing_subscriber::fmt::layer</span>().<span class="ident">json</span>().<span class="ident">with_filter</span>(<span class="ident">filter</span>);
+
+                <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">tracing_subscriber::registry</span>().<span class="ident">with</span>(<span class="ident">fmt_layer</span>).<span class="ident">with</span>(<span class="self">self</span>.<span class="ident">metrics</span>);
+                <span class="ident">subscriber::set_global_default</span>(<span class="ident">subscriber</span>)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(())
             }
         }
     }

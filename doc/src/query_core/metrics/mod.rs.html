@@ -516,6 +516,21 @@
 <span id="511">511</span>
 <span id="512">512</span>
 <span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Query Engine Metrics</span>
 <span class="doccomment">//! This crate is responsible for capturing and recording metrics in the Query Engine.</span>
 <span class="doccomment">//! Metrics is broken into two parts, `MetricsRecorder` and `MetricsRegistry`, and uses our tracing framework to communicate.</span>
@@ -551,6 +566,8 @@
 <span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">absolute_counter</span>, <span class="ident">describe_counter</span>, <span class="ident">describe_gauge</span>, <span class="ident">describe_histogram</span>, <span class="ident">gauge</span>};
 <span class="kw">use</span> <span class="ident">recorder</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">registry::MetricRegistry</span>;
+<span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Once</span>;
 
 <span class="comment">// At the moment the histogram is only used for timings. So the bounds are hard coded here</span>
 <span class="comment">// The buckets are for ms</span>
@@ -562,12 +579,20 @@
     <span class="string">&quot;pool_idle_connections&quot;</span>,
     <span class="string">&quot;pool_wait_count&quot;</span>,
     <span class="string">&quot;pool_wait_duration_ms&quot;</span>,
-    <span class="string">&quot;query_total_elapsed_time+ms&quot;</span>,
+    <span class="string">&quot;query_total_elapsed_time_ms&quot;</span>,
     <span class="string">&quot;query_total_queries&quot;</span>,
     <span class="string">&quot;query_active_transactions&quot;</span>,
     <span class="string">&quot;query_total_operations&quot;</span>,
     <span class="string">&quot;query_operation_total_elapsed_time_ms&quot;</span>,
 ];
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MetricFormat</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
+    <span class="ident">Json</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;prometheus&quot;</span>)]</span>
+    <span class="ident">Prometheus</span>,
+}
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup</span>() {
     <span class="ident">set_recorder</span>();
@@ -613,9 +638,14 @@
     <span class="macro">absolute_counter!</span>(<span class="string">&quot;query_total_queries&quot;</span>, <span class="number">0</span>);
     <span class="macro">absolute_counter!</span>(<span class="string">&quot;query_total_operations&quot;</span>, <span class="number">0</span>);
 }
+
+<span class="kw">static</span> <span class="ident">METRIC_RECORDER</span>: <span class="ident">Once</span> <span class="op">=</span> <span class="ident">Once::new</span>();
+
 <span class="kw">fn</span> <span class="ident">set_recorder</span>() {
-    <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">MetricRecorder::default</span>();
-    <span class="ident">metrics::set_boxed_recorder</span>(<span class="ident">Box::new</span>(<span class="ident">recorder</span>)).<span class="ident">unwrap</span>();
+    <span class="ident">METRIC_RECORDER</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">MetricRecorder::default</span>();
+        <span class="ident">metrics::set_boxed_recorder</span>(<span class="ident">Box::new</span>(<span class="ident">recorder</span>)).<span class="ident">unwrap</span>();
+    });
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>

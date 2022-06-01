@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["DebugValue","A point-in-time value for a metric exposing raw values."]],"struct":[["DebuggingRecorder","A simplistic recorder that can be installed and used for debugging or testing."],["Snapshot","A point-in-time snapshot of all metrics in [`DebuggingRecorder`]."],["Snapshotter","Captures point-in-time snapshots of [`DebuggingRecorder`]."]]});
