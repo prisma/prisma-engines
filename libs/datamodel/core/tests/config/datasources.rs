@@ -52,7 +52,7 @@ fn serialize_builtin_sources_to_dmmf() {
     let schema = indoc! {r#"
         datasource sqlite1 {
             provider = "sqlite"
-            url = "sqlite://file.db"
+            url = "file://file.db"
         }
     "#};
 
@@ -64,7 +64,7 @@ fn serialize_builtin_sources_to_dmmf() {
             "activeProvider": "sqlite",
             "url": {
               "fromEnvVar": null,
-              "value": "sqlite://file.db"
+              "value": "file://file.db"
             }
           }
         ]"#]];
