@@ -56,10 +56,6 @@ fn connector_for_connection_string(
             connector.set_params(params)?;
             Ok(Box::new(connector))
         }
-        // TODO: `sqlite:` connection strings may not work if we try to connect to them, but they
-        // seem to be used by some tests in prisma/prisma. They are not tested at all engine-side.
-        //
-        // Tracking issue: https://github.com/prisma/prisma/issues/11468
         Some("file") => {
             let params = ConnectorParams {
                 connection_string,
