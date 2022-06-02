@@ -193,7 +193,12 @@ fn must_error_if_wrong_protocol_is_used_for_mysql() {
         .unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `mysql://`.[0m
+        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `mysql://`.
+
+        To use a URL with protocal `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
+
+        More information about Data Proxy: https://pris.ly/d/data-proxy
+        [0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "mysql"
@@ -284,7 +289,12 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql() {
         .unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `postgresql://` or `postgres://`.[0m
+        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `postgresql://` or `postgres://`.
+
+        To use a URL with protocal `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
+
+        More information about Data Proxy: https://pris.ly/d/data-proxy
+        [0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "postgresql"
@@ -341,7 +351,12 @@ fn must_error_if_wrong_protocol_is_used_for_sqlite() {
         .unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `file:`.[0m
+        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `file:`.
+
+        To use a URL with protocal `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
+
+        More information about Data Proxy: https://pris.ly/d/data-proxy
+        [0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "sqlite"
