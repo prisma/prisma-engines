@@ -177,11 +177,11 @@ fn must_error_for_empty_urls_derived_load_env_vars() {
 }
 
 #[test]
-fn must_error_if_wrong_protocol_is_used_for_mysql() {
+fn must_error_if_prisma_protocol_is_used_for_mysql() {
     let dml = indoc! {r#"
         datasource myds {
           provider = "mysql"
-          url = "postgresql://"
+          url = "prisma://"
         }
     "#};
 
@@ -199,6 +199,34 @@ fn must_error_if_wrong_protocol_is_used_for_mysql() {
 
         More information about Data Proxy: https://pris.ly/d/data-proxy
         [0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "mysql"
+        [1;94m 3 | [0m  url = [1;91m"prisma://"[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn must_error_if_wrong_protocol_is_used_for_mysql() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "mysql"
+          url = "postgresql://"
+        }
+    "#};
+
+    let config = super::parse_config(dml).unwrap();
+
+    let error = config.subject.datasources[0]
+        .load_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `mysql://`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "mysql"
@@ -289,12 +317,7 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql() {
         .unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `postgresql://` or `postgres://`.
-
-        To use a URL with protocol `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
-
-        More information about Data Proxy: https://pris.ly/d/data-proxy
-        [0m
+        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `postgresql://` or `postgres://`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "postgresql"
@@ -351,12 +374,7 @@ fn must_error_if_wrong_protocol_is_used_for_sqlite() {
         .unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `file:`.
-
-        To use a URL with protocol `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
-
-        More information about Data Proxy: https://pris.ly/d/data-proxy
-        [0m
+        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `file:`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "sqlite"
