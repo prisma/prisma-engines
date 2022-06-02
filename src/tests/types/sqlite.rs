@@ -6,24 +6,20 @@ use crate::{ast::*, connector::Queryable};
 #[cfg(feature = "bigdecimal")]
 use std::str::FromStr;
 
+// TODO: This should return Int32
+// Blocked by: https://github.com/prisma/prisma/issues/12784, which we'll fix for Prisma4
 test_type!(integer(
     sqlite,
     "INTEGER",
-    Value::Int32(None),
-    Value::int32(i8::MIN),
-    Value::int32(i8::MAX),
-    Value::int32(i16::MIN),
-    Value::int32(i16::MAX),
-    Value::int32(i32::MIN),
-    Value::int32(i32::MAX),
-));
-
-test_type!(big_int(
-    sqlite,
-    "BIGINT",
     Value::Int64(None),
+    Value::int64(i8::MIN),
+    Value::int64(i8::MAX),
+    Value::int64(i16::MIN),
+    Value::int64(i16::MAX),
+    Value::int64(i32::MIN),
+    Value::int64(i32::MAX),
     Value::int64(i64::MIN),
-    Value::int64(i64::MAX),
+    Value::int64(i64::MAX)
 ));
 
 #[cfg(feature = "bigdecimal")]
@@ -161,25 +157,6 @@ async fn test_type_text_datetime_custom(api: &mut dyn TestApi) -> crate::Result<
     let expected = chrono::DateTime::from_utc(naive, chrono::Utc);
 
     assert_eq!(Some(&Value::datetime(expected)), res.at(0));
-
-    Ok(())
-}
-
-#[test_macros::test_each_connector(tags("sqlite"))]
-async fn test_get_int64_from_int32_field_fails(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_type_table("INT").await?;
-
-    api.conn()
-        .execute_raw(
-            &format!("INSERT INTO {} (value) VALUES (9223372036854775807)", &table),
-            &[],
-        )
-        .await?;
-
-    let select = Select::from_table(&table).column("value").order_by("id".descend());
-    let res = api.conn().select(select).await;
-
-    assert!(matches!(res, Err(_)));
 
     Ok(())
 }

@@ -286,7 +286,7 @@ mod tests {
         let result = conn.select(select.clone()).await.unwrap();
         let result = result.into_single().unwrap();
 
-        assert_eq!(result.get("id").unwrap(), &Value::int32(1));
+        assert_eq!(result.get("id").unwrap(), &Value::integer(1));
         assert_eq!(result.get("txt").unwrap(), &Value::text("henlo"));
 
         // Check that we do get a separate, new database.
