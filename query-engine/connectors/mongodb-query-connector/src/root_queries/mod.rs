@@ -9,9 +9,12 @@ mod update;
 use crate::{
     error::DecorateErrorWithFieldInformationExtension, output_meta::OutputMetaMapping, value::value_from_bson,
 };
+use futures::Future;
+use metrics::{histogram, increment_counter};
 use mongodb::bson::Bson;
 use mongodb::bson::Document;
 use prisma_models::*;
+use std::time::Instant;
 
 /// Transforms a document to a `Record`, fields ordered as defined in `fields`.
 fn document_to_record(mut doc: Document, fields: &[String], meta_mapping: &OutputMetaMapping) -> crate::Result<Record> {
@@ -37,4 +40,18 @@ fn pick_singular_id(model: &ModelRef) -> ScalarFieldRef {
         .into_iter()
         .next()
         .unwrap()
+}
+
+pub(crate) async fn metrics<'a, F, T, U>(f: F) -> mongodb::error::Result<T>
+where
+    F: FnOnce() -> U + 'a,
+    U: Future<Output = mongodb::error::Result<T>>,
+{
+    let start = Instant::now();
+    let res = f().await;
+
+    histogram!("query_total_elapsed_time_ms", start.elapsed());
+    increment_counter!("query_total_queries");
+
+    res
 }

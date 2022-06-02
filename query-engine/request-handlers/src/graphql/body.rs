@@ -1,9 +1,9 @@
+use super::GraphQLProtocolAdapter;
+use crate::HandlerError;
 use graphql_parser as gql;
 use query_core::{BatchDocument, Operation, QueryDocument};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-
-use super::GraphQLProtocolAdapter;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
@@ -54,7 +54,16 @@ impl GraphQlBody {
     pub(crate) fn into_doc(self) -> crate::Result<QueryDocument> {
         match self {
             GraphQlBody::Single(body) => {
-                let gql_doc = gql::parse_query(&body.query)?;
+                let gql_doc = match gql::parse_query(&body.query) {
+                    Ok(doc) => doc,
+                    Err(err)
+                        if err.to_string().contains("number too large to fit in target type")
+                            | err.to_string().contains("number too small to fit in target type") =>
+                    {
+                        return Err(HandlerError::ValueFitError("Query parsing failure: A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you're trying to store large integers.".to_owned()));
+                    }
+                    err @ Err(_) => err?,
+                };
                 let operation = GraphQLProtocolAdapter::convert(gql_doc, body.operation_name)?;
 
                 Ok(QueryDocument::Single(operation))

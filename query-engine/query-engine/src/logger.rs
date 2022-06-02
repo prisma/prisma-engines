@@ -4,8 +4,9 @@ use opentelemetry::{
     KeyValue,
 };
 use opentelemetry_otlp::WithExportConfig;
+use query_core::MetricRegistry;
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
-use tracing_subscriber::{layer::SubscriberExt, registry::LookupSpan, EnvFilter, FmtSubscriber};
+use tracing_subscriber::{layer::SubscriberExt, registry::LookupSpan, EnvFilter, FmtSubscriber, Layer};
 
 use crate::LogFormat;
 
@@ -19,6 +20,7 @@ pub struct Logger<'a> {
     enable_telemetry: bool,
     log_queries: bool,
     telemetry_endpoint: Option<&'a str>,
+    metrics: Option<MetricRegistry>,
 }
 
 impl<'a> Logger<'a> {
@@ -30,6 +32,7 @@ impl<'a> Logger<'a> {
             enable_telemetry: false,
             log_queries: false,
             telemetry_endpoint: None,
+            metrics: None,
         }
     }
 
@@ -51,6 +54,10 @@ impl<'a> Logger<'a> {
     /// Sets a custom telemetry endpoint (default: http://localhost:4317)
     pub fn telemetry_endpoint(&mut self, endpoint: &'a str) {
         self.telemetry_endpoint = Some(endpoint);
+    }
+
+    pub fn enable_metrics(&mut self, metrics: MetricRegistry) {
+        self.metrics = Some(metrics);
     }
 
     /// Install logger as a global. Can be called only once per application
@@ -80,19 +87,27 @@ impl<'a> Logger<'a> {
         match self.log_format {
             LogFormat::Text => {
                 if self.enable_telemetry {
+                    // Leaving this the old way since this will be removed with the new tracing work
                     let subscriber = FmtSubscriber::builder()
                         .with_env_filter(filter.add_directive("trace".parse().unwrap()))
                         .finish();
 
                     self.finalize(subscriber)
                 } else {
-                    let subscriber = FmtSubscriber::builder().with_env_filter(filter).finish();
-                    self.finalize(subscriber)
+                    let fmt_layer = tracing_subscriber::fmt::layer().with_filter(filter);
+
+                    let subscriber = tracing_subscriber::registry().with(fmt_layer).with(self.metrics);
+                    subscriber::set_global_default(subscriber)?;
+
+                    Ok(())
                 }
             }
             LogFormat::Json => {
-                let subscriber = FmtSubscriber::builder().json().with_env_filter(filter).finish();
-                self.finalize(subscriber)
+                let fmt_layer = tracing_subscriber::fmt::layer().json().with_filter(filter);
+
+                let subscriber = tracing_subscriber::registry().with(fmt_layer).with(self.metrics);
+                subscriber::set_global_default(subscriber)?;
+                Ok(())
             }
         }
     }
@@ -126,7 +141,6 @@ impl<'a> Logger<'a> {
             Ok(())
         } else {
             subscriber::set_global_default(subscriber)?;
-
             Ok(())
         }
     }

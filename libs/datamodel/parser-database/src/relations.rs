@@ -395,7 +395,16 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
         .insert((evidence.relation_field.referenced_model, evidence.model_id, relation_id));
 }
 
-/// Describes what happens when related nodes are deleted.
+/// An action describing the way referential integrity is managed in the system.
+///
+/// An action is triggered when a relation constraint gets violated in a way
+/// that would make the the data inconsistent, e.g. deleting or updating a
+/// referencing record that leaves related records into a wrong state.
+///
+/// ```ignore
+/// @relation(fields: [a], references: [b], onDelete: NoAction, onUpdate: Cascade)
+///                                                   ^^^^^^^^            ^^^^^^^
+/// ```
 #[repr(u8)]
 #[bitflags]
 #[derive(Debug, Copy, PartialEq, Clone)]

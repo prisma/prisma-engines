@@ -1,3 +1,4 @@
+mod max_integer;
 mod prisma_10098;
 mod prisma_12929;
 mod prisma_6173;

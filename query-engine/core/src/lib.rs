@@ -24,6 +24,7 @@ pub mod error;
 pub mod executor;
 pub mod interactive_transactions;
 pub mod interpreter;
+pub mod metrics;
 pub mod query_ast;
 pub mod query_document;
 pub mod query_graph;
@@ -31,6 +32,7 @@ pub mod query_graph_builder;
 pub mod response_ir;
 pub mod result_ast;
 
+pub use crate::metrics::*;
 pub use error::*;
 pub use executor::*;
 pub use interactive_transactions::*;

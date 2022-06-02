@@ -42,6 +42,10 @@ impl QueryPath {
         path.segments.push(segment);
         path
     }
+
+    pub fn last(&self) -> Option<&str> {
+        self.segments.last().map(|s| s.as_str())
+    }
 }
 
 impl fmt::Display for QueryPath {
@@ -60,6 +64,7 @@ pub enum QueryParserErrorKind {
     ValueParseError(String),
     ValueTypeMismatchError { have: QueryValue, want: InputType },
     InputUnionParseError { parsing_errors: Vec<QueryParserError> },
+    ValueFitError(String),
 }
 
 impl Display for QueryParserErrorKind {
@@ -83,6 +88,7 @@ impl Display for QueryParserErrorKind {
             Self::ValueTypeMismatchError { have, want } => {
                 write!(f, "Value types mismatch. Have: {:?}, want: {:?}", have, want)
             }
+            Self::ValueFitError(s) => write!(f, "{}", s),
         }
     }
 }

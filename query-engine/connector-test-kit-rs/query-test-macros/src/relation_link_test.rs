@@ -57,7 +57,7 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
 
     // Renders the connectors as list to use in the code.
     let connectors = args.connectors_to_test();
-    let connectors = connectors.into_iter().map(quote_connector).fold1(|aggr, next| {
+    let connectors = connectors.into_iter().map(quote_connector).reduce(|aggr, next| {
         quote! {
             #aggr, #next
         }

@@ -1,6 +1,6 @@
 use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
 use hyper::{Body, Method, Request, Response};
-use query_core::TxId;
+use query_core::{MetricRegistry, TxId};
 use query_engine::opt::PrismaOpt;
 use query_engine::server::{routes, setup, State};
 use request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, MultiQuery, PrismaResponse};
@@ -13,9 +13,9 @@ pub struct BinaryRunner {
 
 #[async_trait::async_trait]
 impl RunnerInterface for BinaryRunner {
-    async fn load(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
+    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
         let opts = PrismaOpt::from_list(&["binary", "--enable-raw-queries", "--datamodel", &datamodel]);
-        let state = setup(&opts).await.unwrap();
+        let state = setup(&opts, metrics).await.unwrap();
 
         Ok(BinaryRunner {
             state,
@@ -161,6 +161,10 @@ impl RunnerInterface for BinaryRunner {
 
     fn clear_active_tx(&mut self) {
         self.current_tx_id = None;
+    }
+
+    fn get_metrics(&self) -> MetricRegistry {
+        self.state.get_metrics()
     }
 }
 
