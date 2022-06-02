@@ -93,7 +93,7 @@ impl Datasource {
             let err_str = indoc::formatdoc! {"
                 {err_str}
 
-                To use a URL with protocal `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
+                To use a URL with protocol `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
 
                 More information about Data Proxy: https://pris.ly/d/data-proxy
             "};
