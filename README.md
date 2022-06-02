@@ -10,6 +10,7 @@ Client](https://www.prisma.io/client) and [Prisma
 Migrate](https://www.prisma.io/migrate).
 
 The engines and their respective binary crates are:
+
 - Query engine: `query-engine`
 - Migration engine: `migration-engine-cli`
 - Introspection engine: `introspection-engine`
@@ -23,15 +24,16 @@ published on the repo GitHub pages.
 ## Building Prisma Engines
 
 **Prerequisites:**
+
 - Installed the stable Rust toolchain, at least version 1.52.0. You can get the
   toolchain at [rustup](https://rustup.rs/) or the package manager of your
   choice.
 - Linux only: OpenSSL is required to be installed.
 - Installed [direnv](https://github.com/direnv/direnv), then `direnv allow` on
-  the repository root. 
-    - Make sure direnv is [hooked](https://direnv.net/docs/hook.html) into your shell
-    - Alternatively: Load the defined environment in `./.envrc` manually in your
-      shell.
+  the repository root.
+  - Make sure direnv is [hooked](https://direnv.net/docs/hook.html) into your shell
+  - Alternatively: Load the defined environment in `./.envrc` manually in your
+    shell.
 - **For m1 users**: Install [Protocol Buffers](https://grpc.io/docs/protoc-installation/)
 
 **How to build:**
@@ -44,12 +46,12 @@ Depending on how you invoked `cargo` in the previous step, you can find the
 compiled binaries inside the repository root in the `target/debug` (without
 `--release`) or `target/release` directories (with `--release`):
 
-| Prisma Component           | Path to Binary                                            |
-| -------------------------- | --------------------------------------------------------- |
-| Query Engine               | `./target/[debug\|release]/query-engine`                         |
-| Migration Engine           | `./target/[debug\|release]/migration-engine`               |
-| Introspection Engine       | `./target/[debug\|release]/introspection-engine`           |
-| Prisma Format              | `./target/[debug\|release]/prisma-fmt`                     |
+| Prisma Component     | Path to Binary                                   |
+| -------------------- | ------------------------------------------------ |
+| Query Engine         | `./target/[debug\|release]/query-engine`         |
+| Migration Engine     | `./target/[debug\|release]/migration-engine`     |
+| Introspection Engine | `./target/[debug\|release]/introspection-engine` |
+| Prisma Format        | `./target/[debug\|release]/prisma-fmt`           |
 
 ## Query Engine
 
@@ -60,6 +62,7 @@ If using it on production please be aware the api and the query language can
 change any time. There is no guaranteed API stability.
 
 Notable environment flags:
+
 - `RUST_LOG_FORMAT=(devel|json)` sets the log format. By default outputs `json`.
 - `QE_LOG_LEVEL=(info|debug|trace)` sets the log level for the Query Engine. If you need Query Graph debugging logs, set it to "trace"
 - `FMT_SQL=1` enables logging _formatted_ SQL queries
@@ -83,6 +86,7 @@ pre-building a binary and running it directly. If using `cargo`, replace
 whatever command that starts with `./query-engine` with `cargo run --bin query-engine --`.
 
 **Help**
+
 ```bash
 > ./target/release/query-engine --help
 query-engine d6f9915c25a2ae6eb793a3a18f87e576fb82e9da
@@ -124,28 +128,36 @@ SUBCOMMANDS:
 
 The prisma version hash is the latest git commit at the time the binary was built.
 
+## Metrics
+
+Running `make show-metrics` will start Prometheus and Grafana with a default metrics dashboard.
+Prometheus will scrape the `/metrics` endpoint to collect the engine's metrics
+
+Navigate to `http://localhost:3000` to view the Grafana dashboard.
+
 ## Testing
 
 There are two test suites for the engines: Unit tests and
 integration tests.
 
 - **Unit tests**: They test internal
-functionality of individual crates and components.
+  functionality of individual crates and components.
 
-  You can find them across the whole codebase, usually in `./tests` folders at the root of modules. 
+  You can find them across the whole codebase, usually in `./tests` folders at the root of modules.
 
 - **Integration tests**: They run GraphQL queries against isolated
-instances of the Query Engine and asserts that the responses are correct.
+  instances of the Query Engine and asserts that the responses are correct.
 
   You can find them at `./query-engine/connector-test-kit-rs`.
 
 ### Set up & run tests:
 
 **Prerequisites:**
+
 - Installed Rust toolchain.
 - Installed Docker and Docker-Compose.
 - Installed `direnv`, then `direnv allow` on the repository root.
-    - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
+  - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
 
 **Setup:**
 There are helper `make` commands to set up a test environment for a specific
@@ -159,13 +171,12 @@ tests:
 - `make dev-sqlite`: SQLite
 - `make dev-mongodb5`: MongoDB 5
 
-**On windows:*
+\*_On windows:_
 If not using WSL, `make` is not available and you should just see what your
 command does and do it manually. Basically this means editing the
 `.test_config` file and starting the needed Docker containers.
 
-To actually get the tests working, read the contents of `.envrc`. Then `Edit
-environment variables for your account` from Windows settings, and add at least
+To actually get the tests working, read the contents of `.envrc`. Then `Edit environment variables for your account` from Windows settings, and add at least
 the correct values for the following variables:
 
 - `WORKSPACE_ROOT` should point to the root directory of `prisma-engines` project.
@@ -182,13 +193,12 @@ Run `cargo test` in the repository root.
 
 ## Parallel rust-analyzer builds
 
-When rust-analzyer runs `cargo check` it will lock the build directory and stop any cargo commands from running until it has completed. This makes the build process feel a lot longer. It is possible to avoid this by setting a different build path for 
+When rust-analzyer runs `cargo check` it will lock the build directory and stop any cargo commands from running until it has completed. This makes the build process feel a lot longer. It is possible to avoid this by setting a different build path for
 rust-analyzer. To avoid this. Open VSCode settings and search for `Check on Save: Extra Args`. Look for the `Rust-analyzer › Check On Save: Extra Args` settings and add a new directory for rust-analyzer. Something like:
 
 ```
 --target-dir:/tmp/rust-analyzer-check
 ```
-
 
 ## Security
 

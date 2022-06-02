@@ -217,6 +217,9 @@ use-local-query-engine:
 	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/runtime/
 	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/query-engine-darwin
 
+show-metrics:
+	docker-compose -f docker-compose.yml up -d --remove-orphans grafana prometheus
+
 
 ## OpenTelemetry
 otel:
