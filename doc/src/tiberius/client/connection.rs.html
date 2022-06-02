@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.9.0/src/client/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.9.2/src/client/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -503,6 +503,31 @@
 <span id="498">498</span>
 <span id="499">499</span>
 <span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">tls::TlsPreloginWrapper</span>, <span class="ident">tls_stream::create_tls_stream</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -586,7 +611,16 @@
             <span class="ident">buf</span>: <span class="ident">BytesMut::new</span>(),
         };
 
-        <span class="kw">let</span> <span class="ident">prelogin</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">prelogin</span>(<span class="ident">config</span>.<span class="ident">encryption</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">fed_auth_required</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AuthMethod::AADToken</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">auth</span> {
+            <span class="bool-val">true</span>
+        } <span class="kw">else</span> {
+            <span class="bool-val">false</span>
+        };
+
+        <span class="kw">let</span> <span class="ident">prelogin</span> <span class="op">=</span> <span class="ident">connection</span>
+            .<span class="ident">prelogin</span>(<span class="ident">config</span>.<span class="ident">encryption</span>, <span class="ident">fed_auth_required</span>)
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
         <span class="kw">let</span> <span class="ident">encryption</span> <span class="op">=</span> <span class="ident">prelogin</span>.<span class="ident">negotiated_encryption</span>(<span class="ident">config</span>.<span class="ident">encryption</span>);
 
         <span class="kw">let</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">tls_handshake</span>(<span class="kw-2">&amp;</span><span class="ident">config</span>, <span class="ident">encryption</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -598,6 +632,7 @@
                 <span class="ident">config</span>.<span class="ident">database</span>,
                 <span class="ident">config</span>.<span class="ident">host</span>,
                 <span class="ident">config</span>.<span class="ident">application_name</span>,
+                <span class="ident">prelogin</span>,
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -724,14 +759,22 @@
     <span class="doccomment">/// encryption is needed. In this scenario, where PRELOGIN message is</span>
     <span class="doccomment">/// transporting the TLS handshake payload, the packet data is simply the</span>
     <span class="doccomment">/// raw bytes of the TLS handshake payload.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prelogin</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PreloginMessage</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prelogin</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>,
+        <span class="ident">fed_auth_required</span>: <span class="ident">bool</span>,
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PreloginMessage</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">PreloginMessage::new</span>();
         <span class="ident">msg</span>.<span class="ident">encryption</span> <span class="op">=</span> <span class="ident">encryption</span>;
+        <span class="ident">msg</span>.<span class="ident">fed_auth_required</span> <span class="op">=</span> <span class="ident">fed_auth_required</span>;
 
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::pre_login</span>(<span class="ident">id</span>), <span class="ident">msg</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">codec::collect_from</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="kw">let</span> <span class="ident">response</span>: <span class="ident">PreloginMessage</span> <span class="op">=</span> <span class="ident">codec::collect_from</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="comment">// threadid (should be empty when sent from server to client)</span>
+        <span class="macro">debug_assert_eq!</span>(<span class="ident">response</span>.<span class="ident">thread_id</span>, <span class="number">0</span>);
+        <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
     }
 
     <span class="doccomment">/// Defines the login record rules with SQL Server. Authentication with</span>
@@ -743,6 +786,7 @@
         <span class="ident">db</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">server_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">application_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">prelogin</span>: <span class="ident">PreloginMessage</span>,
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">login_message</span> <span class="op">=</span> <span class="ident">LoginMessage::new</span>();
 
@@ -865,6 +909,12 @@
                 <span class="ident">login_message</span>.<span class="ident">user_name</span>(<span class="ident">auth</span>.<span class="ident">user</span>());
                 <span class="ident">login_message</span>.<span class="ident">password</span>(<span class="ident">auth</span>.<span class="ident">password</span>());
 
+                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
+                <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::login</span>(<span class="ident">id</span>), <span class="ident">login_message</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">post_login_encryption</span>(<span class="ident">encryption</span>);
+            }
+            <span class="ident">AuthMethod::AADToken</span>(<span class="ident">token</span>) =&gt; {
+                <span class="ident">login_message</span>.<span class="ident">aad_token</span>(<span class="ident">token</span>, <span class="ident">prelogin</span>.<span class="ident">fed_auth_required</span>, <span class="ident">prelogin</span>.<span class="ident">nonce</span>);
                 <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
                 <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::login</span>(<span class="ident">id</span>), <span class="ident">login_message</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">post_login_encryption</span>(<span class="ident">encryption</span>);
