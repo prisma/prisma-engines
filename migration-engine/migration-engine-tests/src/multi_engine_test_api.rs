@@ -138,6 +138,11 @@ impl TestApi {
         self.tags().contains(Tags::Postgres)
     }
 
+    /// Returns true only when testing on postgres version 15.
+    pub fn is_postgres_15(&self) -> bool {
+        self.tags().contains(Tags::Postgres15)
+    }
+
     /// Returns true only when testing on cockroach.
     pub fn is_cockroach(&self) -> bool {
         self.tags().contains(Tags::CockroachDb)

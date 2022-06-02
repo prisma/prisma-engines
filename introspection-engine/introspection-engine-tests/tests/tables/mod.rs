@@ -450,7 +450,7 @@ async fn default_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres14))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres14, Postgres15))]
 async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
     let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
     api.database().execute_raw(&sequence, &[]).await?;

@@ -785,7 +785,7 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
     let schema = api.describe();
 
     let table = schema.table_bang("indexes_test");
-    let index = &table.indices[0];
+    let index = &table.indices.iter().find(|i| i.name == "my_idx").unwrap();
 
     assert_eq!(
         &index.columns,
@@ -804,7 +804,7 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
     );
     assert!(index.tpe.is_unique());
 
-    let index = &table.indices[1];
+    let index = &table.indices.iter().find(|i| i.name == "my_idx2").unwrap();
 
     assert!(!index.tpe.is_unique());
     assert_eq!(
