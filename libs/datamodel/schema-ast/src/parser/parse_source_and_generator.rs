@@ -19,13 +19,19 @@ pub(crate) fn parse_config_block(token: &Token<'_>, diagnostics: &mut Diagnostic
             Rule::key_value => properties.push(parse_key_value(&current)),
             Rule::comment_block => comment = parse_comment_block(&current),
             Rule::DATASOURCE_KEYWORD | Rule::GENERATOR_KEYWORD => kw = Some(current.as_str()),
-            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                format!(
+            Rule::BLOCK_LEVEL_CATCH_ALL => {
+                let mut msg = format!(
                     "This line is not a valid definition within a {}.",
                     kw.unwrap_or("configuration block")
-                ),
-                current.as_span().into(),
-            )),
+                );
+
+                if current.as_span().as_str().starts_with("url") {
+                    msg.push_str(r#" If the value is a windows-style path, `\` must be escaped as `\\`."#);
+                }
+
+                let err = DatamodelError::new_validation_error(msg, current.as_span().into());
+                diagnostics.push_error(err);
+            }
             _ => parsing_catch_all(&current, "source"),
         }
     }

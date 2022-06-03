@@ -117,6 +117,49 @@ fn datasource_should_not_allow_arbitrary_parameters() {
     expect.assert_eq(&datamodel::parse_schema(schema).map(drop).unwrap_err());
 }
 
+#[test]
+fn unescaped_windows_paths_give_a_good_error() {
+    let schema = indoc! {r#"
+        datasource ds {
+          provider = "sqlite"
+          url = "file:c:\Windows32\data.db"
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: This line is not a valid definition within a datasource. If the value is a windows-style path, `\` must be escaped as `\\`.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "sqlite"
+        [1;94m 3 | [0m  [1;91murl = "file:c:\Windows32\data.db"[0m
+        [1;94m 4 | [0m}
+        [1;94m   | [0m
+        [1;91merror[0m: [1mArgument "url" is missing in data source block "ds".[0m
+          [1;94m-->[0m  [4mschema.prisma:1[0m
+        [1;94m   | [0m
+        [1;94m   | [0m
+        [1;94m 1 | [0m[1;91mdatasource ds {[0m
+        [1;94m 2 | [0m  provider = "sqlite"
+        [1;94m 3 | [0m  url = "file:c:\Windows32\data.db"
+        [1;94m 4 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(schema).map(drop).unwrap_err());
+}
+
+#[test]
+fn escaped_windows_paths_should_work() {
+    let schema = indoc! {r#"
+        datasource ds {
+          provider = "sqlite"
+          url = "file:c:\\Windows32\\data.db"
+        }
+    "#};
+
+    assert!(datamodel::parse_schema(schema).is_ok());
+}
+
 fn render_schema_json(schema: &str) -> String {
     let config = parse_configuration(schema);
     datamodel::mcf::render_sources_to_json(&config.datasources)
