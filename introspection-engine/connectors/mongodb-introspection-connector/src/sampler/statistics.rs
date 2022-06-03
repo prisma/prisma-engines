@@ -105,7 +105,12 @@ impl<'a> Statistics<'a> {
     /// - if model is foo and field is bar, the type is FooBar
     /// - if a model already exists with the name, we'll use FooBar_
     fn composite_type_name(&self, model: &str, field: &str) -> Name {
-        let name = Name::Model(format!("{}_{}", model, field).to_case(Case::Pascal));
+        let combined: String = format!("{}_{}", model, field)
+            .chars()
+            .filter(|c| c.is_ascii())
+            .collect();
+
+        let name = Name::Model(combined.to_case(Case::Pascal));
 
         let name = if self.models.contains_key(&name) {
             format!("{}_", name)
