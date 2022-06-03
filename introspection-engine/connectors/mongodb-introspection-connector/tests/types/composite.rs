@@ -539,3 +539,34 @@ fn no_empty_type_warnings_when_depth_is_reached() {
     expected.assert_eq(res.datamodel());
     res.assert_no_warnings();
 }
+
+#[test]
+fn kanji() {
+    let res = introspect(|db| async move {
+        let docs = vec![
+            doc! { "name": "Musti", "推荐点RichText": { "singular": "Meowstrasse", "number": 123 }},
+            doc! { "name": "Naukio", "推荐点RichText": { "street": "Meowstrasse", "number": 123, "knock": true }},
+        ];
+
+        db.collection("TheCollectionName").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type TheCollectionNameRichText {
+          knock    Boolean?
+          number   Int
+          singular String?
+          street   String?
+        }
+
+        model TheCollectionName {
+          id       String                    @id @default(auto()) @map("_id") @db.ObjectId
+          name     String
+          RichText TheCollectionNameRichText @map("推荐点RichText")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
