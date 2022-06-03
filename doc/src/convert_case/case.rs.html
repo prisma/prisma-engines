@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/convert_case-0.4.0/src/case.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>case.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/convert_case-0.5.0/src/case.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>case.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -215,8 +215,196 @@
 <span id="210">210</span>
 <span id="211">211</span>
 <span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">use</span> <span class="ident">strum_macros::EnumIter</span>;
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pattern::Pattern</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Boundary</span>;
 
 <span class="doccomment">/// Defines the type of casing a string can be.</span>
 <span class="doccomment">///</span>
@@ -226,11 +414,25 @@
 <span class="doccomment">/// let super_mario_title: String = &quot;super_mario_64&quot;.to_case(Case::Title);</span>
 <span class="doccomment">/// assert_eq!(&quot;Super Mario 64&quot;, super_mario_title);</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// A case is the pair of a [pattern](enum.Pattern.html) and a delimeter (a string).  Given</span>
+<span class="doccomment">/// a list of words, a pattern describes how to mutate the words and a delimeter is how the mutated</span>
+<span class="doccomment">/// words are joined together.  These inherantly are the properties of what makes a &quot;multiword</span>
+<span class="doccomment">/// identifier case&quot;, or simply &quot;case&quot;.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This crate provides the ability to convert &quot;from&quot; a case.  This introduces a different feature</span>
+<span class="doccomment">/// of cases which are the [word boundaries](Boundary) that segment the identifier into words.  For example, a</span>
+<span class="doccomment">/// snake case identifier `my_var_name` can be split on underscores `_` to segment into words.  A</span>
+<span class="doccomment">/// camel case identifier `myVarName` is split where a lowercase letter is followed by an</span>
+<span class="doccomment">/// uppercase letter.  Each case is also associated with a list of boundaries that are used when</span>
+<span class="doccomment">/// converting &quot;from&quot; a particular case.</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">derive</span>(<span class="ident">EnumIter</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Case</span> {
-
     <span class="doccomment">/// Uppercase strings are delimited by spaces and all characters are uppercase.</span>
+    <span class="doccomment">/// * Boundaries: [Space](`Boundary::Space`)</span>
+    <span class="doccomment">/// * Pattern: [Uppercase](`Pattern::Uppercase`)</span>
+    <span class="doccomment">/// * Delimeter: Space</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
@@ -239,6 +441,9 @@
     <span class="ident">Upper</span>,
 
     <span class="doccomment">/// Lowercase strings are delimited by spaces and all characters are lowercase.</span>
+    <span class="doccomment">/// * Boundaries: [Space](`Boundary::Space`)</span>
+    <span class="doccomment">/// * Pattern: [Lowercase](`Pattern::Lowercase`)</span>
+    <span class="doccomment">/// * Delimeter: Space</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
@@ -249,6 +454,9 @@
     <span class="doccomment">/// Title case strings are delimited by spaces. Only the leading character of</span>
     <span class="doccomment">/// each word is uppercase.  No inferences are made about language, so words</span>
     <span class="doccomment">/// like &quot;as&quot;, &quot;to&quot;, and &quot;for&quot; will still be capitalized.</span>
+    <span class="doccomment">/// * Boundaries: [Space](`Boundary::Space`)</span>
+    <span class="doccomment">/// * Pattern: [Capital](`Pattern::Capital`)</span>
+    <span class="doccomment">/// * Delimeter: Space</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
@@ -258,6 +466,9 @@
 
     <span class="doccomment">/// Toggle case strings are delimited by spaces.  All characters are uppercase except</span>
     <span class="doccomment">/// for the leading character of each word, which is lowercase.</span>
+    <span class="doccomment">/// * Boundaries: [Space](`Boundary::Space`)</span>
+    <span class="doccomment">/// * Pattern: [Toggle](`Pattern::Toggle`)</span>
+    <span class="doccomment">/// * Delimeter: Space</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
@@ -267,6 +478,11 @@
 
     <span class="doccomment">/// Camel case strings are lowercase, but for every word _except the first_ the</span>
     <span class="doccomment">/// first letter is capitalized.</span>
+    <span class="doccomment">/// * Boundaries: [LowerUpper](Boundary::LowerUpper), [DigitUpper](Boundary::DigitUpper),</span>
+    <span class="doccomment">/// [UpperDigit](Boundary::UpperDigit), [DigitLower](Boundary::DigitLower),</span>
+    <span class="doccomment">/// [LowerDigit](Boundary::LowerDigit), [Acronym](Boundary::Acronym)</span>
+    <span class="doccomment">/// * Pattern: [Camel](`Pattern::Camel`)</span>
+    <span class="doccomment">/// * Delimeter: No delimeter</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
@@ -276,6 +492,11 @@
 
     <span class="doccomment">/// Pascal case strings are lowercase, but for every word the</span>
     <span class="doccomment">/// first letter is capitalized.</span>
+    <span class="doccomment">/// * Boundaries: [LowerUpper](Boundary::LowerUpper), [DigitUpper](Boundary::DigitUpper),</span>
+    <span class="doccomment">/// [UpperDigit](Boundary::UpperDigit), [DigitLower](Boundary::DigitLower),</span>
+    <span class="doccomment">/// [LowerDigit](Boundary::LowerDigit), [Acronym](Boundary::Acronym)</span>
+    <span class="doccomment">/// * Pattern: [Capital](`Pattern::Capital`)</span>
+    <span class="doccomment">/// * Delimeter: No delimeter</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
@@ -283,10 +504,13 @@
     <span class="doccomment">/// ```</span>
     <span class="ident">Pascal</span>,
 
-    <span class="doccomment">/// Upper camel case is an alternative name for Pascal case.</span>
+    <span class="doccomment">/// Upper camel case is an alternative name for [Pascal case](Case::Pascal).</span>
     <span class="ident">UpperCamel</span>,
 
     <span class="doccomment">/// Snake case strings are delimited by underscores `_` and are all lowercase.</span>
+    <span class="doccomment">/// * Boundaries: [Underscore](Boundary::Underscore)</span>
+    <span class="doccomment">/// * Pattern: [Lowercase](Pattern::Lowercase)</span>
+    <span class="doccomment">/// * Delimeter: Underscore `_`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
@@ -295,17 +519,23 @@
     <span class="ident">Snake</span>,
 
     <span class="doccomment">/// Upper snake case strings are delimited by underscores `_` and are all uppercase.</span>
+    <span class="doccomment">/// * Boundaries: [Underscore](Boundary::Underscore)</span>
+    <span class="doccomment">/// * Pattern: [Uppercase](Pattern::Uppercase)</span>
+    <span class="doccomment">/// * Delimeter: Underscore `_`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
     <span class="doccomment">/// assert_eq!(&quot;MY_VARIABLE_NAME&quot;, &quot;My variable NAME&quot;.to_case(Case::UpperSnake))</span>
     <span class="doccomment">/// ```</span>
     <span class="ident">UpperSnake</span>,
-    
-    <span class="doccomment">/// Screaming snake case is an alternative name for upper snake case.</span>
+
+    <span class="doccomment">/// Screaming snake case is an alternative name for [upper snake case](Case::UpperSnake).</span>
     <span class="ident">ScreamingSnake</span>,
 
     <span class="doccomment">/// Kebab case strings are delimited by hyphens `-` and are all lowercase.</span>
+    <span class="doccomment">/// * Boundaries: [Hyphen](Boundary::Hyphen)</span>
+    <span class="doccomment">/// * Pattern: [Lowercase](Pattern::Lowercase)</span>
+    <span class="doccomment">/// * Delimeter: Hyphen `-`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
@@ -314,6 +544,9 @@
     <span class="ident">Kebab</span>,
 
     <span class="doccomment">/// Cobol case strings are delimited by hyphens `-` and are all uppercase.</span>
+    <span class="doccomment">/// * Boundaries: [Hyphen](Boundary::Hyphen)</span>
+    <span class="doccomment">/// * Pattern: [Uppercase](Pattern::Uppercase)</span>
+    <span class="doccomment">/// * Delimeter: Hyphen `-`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
@@ -321,8 +554,14 @@
     <span class="doccomment">/// ```</span>
     <span class="ident">Cobol</span>,
 
+    <span class="doccomment">/// Upper kebab case is an alternative name for [Cobol case](Case::Cobol).</span>
+    <span class="ident">UpperKebab</span>,
+
     <span class="doccomment">/// Train case strings are delimited by hyphens `-`.  All characters are lowercase</span>
     <span class="doccomment">/// except for the leading character of each word.</span>
+    <span class="doccomment">/// * Boundaries: [Hyphen](Boundary::Hyphen)</span>
+    <span class="doccomment">/// * Pattern: [Capital](Pattern::Capital)</span>
+    <span class="doccomment">/// * Delimeter: Hyphen `-`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
@@ -330,8 +569,10 @@
     <span class="doccomment">/// ```</span>
     <span class="ident">Train</span>,
 
-    <span class="doccomment">/// Flat case strings are all lowercase, with no delimiter.  Converting to</span>
-    <span class="doccomment">/// this case is **lossy**.  That is, word boundaries are lost.</span>
+    <span class="doccomment">/// Flat case strings are all lowercase, with no delimiter. Note that word boundaries are lost.</span>
+    <span class="doccomment">/// * Boundaries: No boundaries</span>
+    <span class="doccomment">/// * Pattern: [Lowercase](Pattern::Lowercase)</span>
+    <span class="doccomment">/// * Delimeter: No delimeter</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
@@ -339,8 +580,10 @@
     <span class="doccomment">/// ```</span>
     <span class="ident">Flat</span>,
 
-    <span class="doccomment">/// Upper flat case strings are all uppercase, with no delimiter.  Converting to</span>
-    <span class="doccomment">/// this case is **lossy**.  That is, word boundaries are lost.</span>
+    <span class="doccomment">/// Upper flat case strings are all uppercase, with no delimiter. Note that word boundaries are lost.</span>
+    <span class="doccomment">/// * Boundaries: No boundaries</span>
+    <span class="doccomment">/// * Pattern: [Uppercase](Pattern::Uppercase)</span>
+    <span class="doccomment">/// * Delimeter: No delimeter</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
@@ -350,6 +593,10 @@
 
     <span class="doccomment">/// Alternating case strings are delimited by spaces.  Characters alternate between uppercase</span>
     <span class="doccomment">/// and lowercase.</span>
+    <span class="doccomment">/// * Boundaries: [Space](Boundary::Space)</span>
+    <span class="doccomment">/// * Pattern: [Alternating](Pattern::Alternating)</span>
+    <span class="doccomment">/// * Delimeter: Space</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
     <span class="doccomment">/// assert_eq!(&quot;mY vArIaBlE nAmE&quot;, &quot;My variable NAME&quot;.to_case(Case::Alternating));</span>
@@ -357,34 +604,124 @@
     <span class="ident">Alternating</span>,
 
     <span class="doccomment">/// Random case strings are delimited by spaces and characters are</span>
-    <span class="doccomment">/// randomly upper case or lower case.  This uses the `rand` crate </span>
+    <span class="doccomment">/// randomly upper case or lower case.  This uses the `rand` crate</span>
     <span class="doccomment">/// and is only available with the &quot;random&quot; feature.</span>
+    <span class="doccomment">/// * Boundaries: [Space](Boundary::Space)</span>
+    <span class="doccomment">/// * Pattern: [Random](Pattern::Random)</span>
+    <span class="doccomment">/// * Delimeter: Space</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
     <span class="doccomment">/// let new = &quot;My variable NAME&quot;.to_case(Case::Random);</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// `new` could be &quot;My vaRIAbLE nAme&quot; for example.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
+    <span class="doccomment">/// String `new` could be &quot;My vaRIAbLE nAme&quot; for example.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">doc</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>))]</span>
     <span class="ident">Random</span>,
 
     <span class="doccomment">/// Pseudo-random case strings are delimited by spaces and characters are randomly</span>
     <span class="doccomment">/// upper case or lower case, but there will never more than two consecutive lower</span>
     <span class="doccomment">/// case or upper case letters in a row.  This uses the `rand` crate and is</span>
     <span class="doccomment">/// only available with the &quot;random&quot; feature.</span>
+    <span class="doccomment">/// * Boundaries: [Space](Boundary::Space)</span>
+    <span class="doccomment">/// * Pattern: [PseudoRandom](Pattern::PseudoRandom)</span>
+    <span class="doccomment">/// * Delimeter: Space</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use convert_case::{Case, Casing};</span>
     <span class="doccomment">/// let new = &quot;My variable NAME&quot;.to_case(Case::Random);</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// `new` could be &quot;mY vArIAblE NamE&quot; for example.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
+    <span class="doccomment">/// String `new` could be &quot;mY vArIAblE NamE&quot; for example.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">doc</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>))]</span>
     <span class="ident">PseudoRandom</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Case</span> {
+    <span class="doccomment">/// Returns the delimiter used in the corresponding case.  The following</span>
+    <span class="doccomment">/// table outlines which cases use which delimeter.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// | Cases | Delimeter |</span>
+    <span class="doccomment">/// | --- | --- |</span>
+    <span class="doccomment">/// | Upper, Lower, Title, Toggle, Alternating, Random, PseudoRandom | Space |</span>
+    <span class="doccomment">/// | Snake, UpperSnake, ScreamingSnake | Underscore `_` |</span>
+    <span class="doccomment">/// | Kebab, Cobol, UpperKebab, Train | Hyphen `-` |</span>
+    <span class="doccomment">/// | UpperFlat, Flat, Camel, UpperCamel, Pascal | Empty string, no delimeter |</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">delim</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="kw">use</span> <span class="ident">Case</span>::<span class="kw-2">*</span>;
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">Upper</span> <span class="op">|</span> <span class="ident">Lower</span> <span class="op">|</span> <span class="ident">Title</span> <span class="op">|</span> <span class="ident">Toggle</span> <span class="op">|</span> <span class="ident">Alternating</span> =&gt; <span class="string">&quot; &quot;</span>,
+            <span class="ident">Snake</span> <span class="op">|</span> <span class="ident">UpperSnake</span> <span class="op">|</span> <span class="ident">ScreamingSnake</span> =&gt; <span class="string">&quot;_&quot;</span>,
+            <span class="ident">Kebab</span> <span class="op">|</span> <span class="ident">Cobol</span> <span class="op">|</span> <span class="ident">UpperKebab</span> <span class="op">|</span> <span class="ident">Train</span> =&gt; <span class="string">&quot;-&quot;</span>,
+
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
+            <span class="ident">Random</span> <span class="op">|</span> <span class="ident">PseudoRandom</span> =&gt; <span class="string">&quot; &quot;</span>,
+
+            <span class="ident">UpperFlat</span> <span class="op">|</span> <span class="ident">Flat</span> <span class="op">|</span> <span class="ident">Camel</span> <span class="op">|</span> <span class="ident">UpperCamel</span> <span class="op">|</span> <span class="ident">Pascal</span> =&gt; <span class="string">&quot;&quot;</span>,
+        }
+    }
+
+    <span class="doccomment">/// Returns the pattern used in the corresponding case.  The following</span>
+    <span class="doccomment">/// table outlines which cases use which pattern.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// | Cases | Pattern |</span>
+    <span class="doccomment">/// | --- | --- |</span>
+    <span class="doccomment">/// | Upper, UpperSnake, ScreamingSnake, UpperFlat, Cobol, UpperKebab | Uppercase |</span>
+    <span class="doccomment">/// | Lower, Snake, Kebab, Flat | Lowercase |</span>
+    <span class="doccomment">/// | Title, Pascal, UpperCamel, Train | Capital |</span>
+    <span class="doccomment">/// | Camel | Camel |</span>
+    <span class="doccomment">/// | Alternating | Alternating |</span>
+    <span class="doccomment">/// | Random | Random |</span>
+    <span class="doccomment">/// | PseudoRandom | PseudoRandom |</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">pattern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Pattern</span> {
+        <span class="kw">use</span> <span class="ident">Case</span>::<span class="kw-2">*</span>;
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">Upper</span> <span class="op">|</span> <span class="ident">UpperSnake</span> <span class="op">|</span> <span class="ident">ScreamingSnake</span> <span class="op">|</span> <span class="ident">UpperFlat</span> <span class="op">|</span> <span class="ident">Cobol</span> <span class="op">|</span> <span class="ident">UpperKebab</span> =&gt; {
+                <span class="ident">Pattern::Uppercase</span>
+            }
+            <span class="ident">Lower</span> <span class="op">|</span> <span class="ident">Snake</span> <span class="op">|</span> <span class="ident">Kebab</span> <span class="op">|</span> <span class="ident">Flat</span> =&gt; <span class="ident">Pattern::Lowercase</span>,
+            <span class="ident">Title</span> <span class="op">|</span> <span class="ident">Pascal</span> <span class="op">|</span> <span class="ident">UpperCamel</span> <span class="op">|</span> <span class="ident">Train</span> =&gt; <span class="ident">Pattern::Capital</span>,
+            <span class="ident">Camel</span> =&gt; <span class="ident">Pattern::Camel</span>,
+            <span class="ident">Toggle</span> =&gt; <span class="ident">Pattern::Toggle</span>,
+            <span class="ident">Alternating</span> =&gt; <span class="ident">Pattern::Alternating</span>,
+
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
+            <span class="ident">Random</span> =&gt; <span class="ident">Pattern::Random</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
+            <span class="ident">PseudoRandom</span> =&gt; <span class="ident">Pattern::PseudoRandom</span>,
+        }
+    }
+
+    <span class="doccomment">/// Returns the boundaries used in the corresponding case.  That is, where can word boundaries</span>
+    <span class="doccomment">/// be distinguished in a string of the given case.  The table outlines which cases use which</span>
+    <span class="doccomment">/// set of boundaries.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// | Cases | Boundaries |</span>
+    <span class="doccomment">/// | --- | --- |</span>
+    <span class="doccomment">/// | Upper, Lower, Title, Toggle, Alternating, Random, PseudoRandom | Space |</span>
+    <span class="doccomment">/// | Snake, UpperSnake, ScreamingSnake | Underscore `_` |</span>
+    <span class="doccomment">/// | Kebab, Cobol, UpperKebab, Train | Hyphen `-` |</span>
+    <span class="doccomment">/// | Camel, UpperCamel, Pascal | LowerUpper, LowerDigit, UpperDigit, DigitLower, DigitUpper, Acronym |</span>
+    <span class="doccomment">/// | UpperFlat, Flat | No boundaries |</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boundaries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Boundary</span><span class="op">&gt;</span> {
+        <span class="kw">use</span> <span class="ident">Boundary</span>::<span class="kw-2">*</span>;
+        <span class="kw">use</span> <span class="ident">Case</span>::<span class="kw-2">*</span>;
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">Upper</span> <span class="op">|</span> <span class="ident">Lower</span> <span class="op">|</span> <span class="ident">Title</span> <span class="op">|</span> <span class="ident">Toggle</span> <span class="op">|</span> <span class="ident">Alternating</span> =&gt; <span class="macro">vec!</span>[<span class="ident">Space</span>],
+            <span class="ident">Snake</span> <span class="op">|</span> <span class="ident">UpperSnake</span> <span class="op">|</span> <span class="ident">ScreamingSnake</span> =&gt; <span class="macro">vec!</span>[<span class="ident">Underscore</span>],
+            <span class="ident">Kebab</span> <span class="op">|</span> <span class="ident">Cobol</span> <span class="op">|</span> <span class="ident">UpperKebab</span> <span class="op">|</span> <span class="ident">Train</span> =&gt; <span class="macro">vec!</span>[<span class="ident">Hyphen</span>],
+
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
+            <span class="ident">Random</span> <span class="op">|</span> <span class="ident">PseudoRandom</span> =&gt; <span class="macro">vec!</span>[<span class="ident">Space</span>],
+
+            <span class="ident">UpperFlat</span> <span class="op">|</span> <span class="ident">Flat</span> =&gt; <span class="macro">vec!</span>[],
+            <span class="ident">Camel</span> <span class="op">|</span> <span class="ident">UpperCamel</span> <span class="op">|</span> <span class="ident">Pascal</span> =&gt; <span class="macro">vec!</span>[
+                <span class="ident">LowerUpper</span>, <span class="ident">Acronym</span>, <span class="ident">LowerDigit</span>, <span class="ident">UpperDigit</span>, <span class="ident">DigitLower</span>, <span class="ident">DigitUpper</span>,
+            ],
+        }
+    }
+
     <span class="comment">// Created to avoid using the EnumIter trait from strum in</span>
     <span class="comment">// final library.  A test confirms that all cases are listed here.</span>
-    <span class="doccomment">/// Returns a vector with all case enum variants.  This was</span>
-    <span class="doccomment">/// created for use in the `ccase` binary.</span>
+    <span class="doccomment">/// Returns a vector with all case enum variants in no particular order.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all_cases</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Case</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">Case</span>::<span class="kw-2">*</span>;
         <span class="macro">vec!</span>[
@@ -400,15 +737,48 @@
             <span class="ident">ScreamingSnake</span>,
             <span class="ident">Kebab</span>,
             <span class="ident">Cobol</span>,
+            <span class="ident">UpperKebab</span>,
             <span class="ident">Train</span>,
             <span class="ident">Flat</span>,
             <span class="ident">UpperFlat</span>,
             <span class="ident">Alternating</span>,
-
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
             <span class="ident">Random</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
             <span class="ident">PseudoRandom</span>,
+        ]
+    }
+
+    <span class="doccomment">/// Returns a vector with the two &quot;random&quot; feature cases `Random` and `PseudoRandom`.  Only</span>
+    <span class="doccomment">/// defined in the &quot;random&quot; feature.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">random_cases</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Case</span><span class="op">&gt;</span> {
+        <span class="kw">use</span> <span class="ident">Case</span>::<span class="kw-2">*</span>;
+        <span class="macro">vec!</span>[<span class="ident">Random</span>, <span class="ident">PseudoRandom</span>]
+    }
+
+    <span class="doccomment">/// Returns a vector with all the cases that do not depend on randomness.  This is all</span>
+    <span class="doccomment">/// the cases not in the &quot;random&quot; feature.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deterministic_cases</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Case</span><span class="op">&gt;</span> {
+        <span class="kw">use</span> <span class="ident">Case</span>::<span class="kw-2">*</span>;
+        <span class="macro">vec!</span>[
+            <span class="ident">Upper</span>,
+            <span class="ident">Lower</span>,
+            <span class="ident">Title</span>,
+            <span class="ident">Toggle</span>,
+            <span class="ident">Camel</span>,
+            <span class="ident">Pascal</span>,
+            <span class="ident">UpperCamel</span>,
+            <span class="ident">Snake</span>,
+            <span class="ident">UpperSnake</span>,
+            <span class="ident">ScreamingSnake</span>,
+            <span class="ident">Kebab</span>,
+            <span class="ident">Cobol</span>,
+            <span class="ident">UpperKebab</span>,
+            <span class="ident">Train</span>,
+            <span class="ident">Flat</span>,
+            <span class="ident">UpperFlat</span>,
+            <span class="ident">Alternating</span>,
         ]
     }
 }

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/convert_case-0.4.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/convert_case-0.5.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -340,21 +340,328 @@
 <span id="335">335</span>
 <span id="336">336</span>
 <span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Converts to and from various cases.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Command Line Utility `ccase`</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Since version &quot;0.3.0&quot; this crate is just a case conversion _library_.  The command line utility</span>
-<span class="doccomment">//! that uses the tools in this library has been moved to the `ccase` crate.  You can read about it</span>
-<span class="doccomment">//! at the [github repository](https://github.com/rutrum/convert-case/tree/master/ccase).</span>
+<span class="doccomment">//! This library was developed for the purposes of a command line utility for converting</span>
+<span class="doccomment">//! the case of strings and filenames.  You can check out </span>
+<span class="doccomment">//! [`ccase` on Github](https://github.com/rutrum/convert-case/tree/master/ccase).</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Rust Library</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Provides a [`Case`](enum.Case.html) enum which defines a variety of cases to convert into.</span>
-<span class="doccomment">//! A `Case` can be used with an item that implements the [`Casing`](trait.Casing.html) trait,</span>
-<span class="doccomment">//! which allows the item to be converted to a given case.</span>
+<span class="doccomment">//! Strings have implemented the [`Casing`](trait.Casing.html) trait, which adds methods for </span>
+<span class="doccomment">//! case conversion.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! You can convert a string or string slice into a case using the `to_case` method.</span>
+<span class="doccomment">//! You can convert strings into a case using the [`to_case`](Casing::to_case) method.</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! use convert_case::{Case, Casing};</span>
 <span class="doccomment">//!</span>
@@ -363,14 +670,16 @@
 <span class="doccomment">//! assert_eq!(&quot;Ronnie-James-Dio&quot;, &quot;RONNIE_JAMES_DIO&quot;.to_case(Case::Train));</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! By default, `to_case` will split along all word boundaries, that is</span>
+<span class="doccomment">//! By default, `to_case` will split along a set of default word boundaries, that is</span>
 <span class="doccomment">//! * space characters ` `,</span>
 <span class="doccomment">//! * underscores `_`,</span>
 <span class="doccomment">//! * hyphens `-`,</span>
-<span class="doccomment">//! * and changes in capitalization `aA`.</span>
+<span class="doccomment">//! * changes in capitalization from lowercase to uppercase `aA`,</span>
+<span class="doccomment">//! * adjacent digits and letters `a1`, `1a`, `A1`, `1A`,</span>
+<span class="doccomment">//! * and acroynms `AAa` (as in `HTTPRequest`).</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! For more accuracy, the `from_case` method splits based on the word boundaries</span>
-<span class="doccomment">//! of a particular case.  For example, splitting from snake case will only treat</span>
+<span class="doccomment">//! of a particular case.  For example, splitting from snake case will only use</span>
 <span class="doccomment">//! underscores as word boundaries.</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! use convert_case::{Case, Casing};</span>
@@ -385,8 +694,8 @@
 <span class="doccomment">//! );</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! By default (and when converting from camel case or similar cases) `convert_case`</span>
-<span class="doccomment">//! will detect acronyms.  It also ignores any leading, trailing, or deplicate delimeters.</span>
+<span class="doccomment">//! Case conversion can detect acronyms for camel-like strings.  It also ignores any leading, </span>
+<span class="doccomment">//! trailing, or duplicate delimiters.</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! use convert_case::{Case, Casing};</span>
 <span class="doccomment">//!</span>
@@ -397,8 +706,8 @@
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! It also works non-ascii characters.  However, no inferences on the language itself is made.</span>
-<span class="doccomment">//! For instance, the diagraph `ij` in dutch will not be capitalized, because it is represented</span>
-<span class="doccomment">//! as two distinct unicode characters.  However, `æ` would be capitalized.</span>
+<span class="doccomment">//! For instance, the digraph `ij` in Dutch will not be capitalized, because it is represented</span>
+<span class="doccomment">//! as two distinct Unicode characters.  However, `æ` would be capitalized.</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! use convert_case::{Case, Casing};</span>
 <span class="doccomment">//!</span>
@@ -408,17 +717,26 @@
 <span class="doccomment">//! let odysseus = &quot;ὈΔΥΣΣΕΎΣ&quot;;</span>
 <span class="doccomment">//! assert_eq!(&quot;ὀδυσσεύς&quot;, odysseus.to_case(Case::Lower));</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//! </span>
-<span class="doccomment">//! For the purposes of case conversion, characters followed by numerics and vice-versa are </span>
-<span class="doccomment">//! considered word boundaries.  In addition, any special ascii characters (besides `_` and `-`) </span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! By default, characters followed by digits and vice-versa are</span>
+<span class="doccomment">//! considered word boundaries.  In addition, any special ASCII characters (besides `_` and `-`)</span>
 <span class="doccomment">//! are ignored.</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! use convert_case::{Case, Casing};</span>
-<span class="doccomment">//! </span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! assert_eq!(&quot;e_5150&quot;, &quot;E5150&quot;.to_case(Case::Snake));</span>
 <span class="doccomment">//! assert_eq!(&quot;10,000_days&quot;, &quot;10,000Days&quot;.to_case(Case::Snake));</span>
 <span class="doccomment">//! assert_eq!(&quot;HELLO, WORLD!&quot;, &quot;Hello, world!&quot;.to_case(Case::Upper));</span>
 <span class="doccomment">//! assert_eq!(&quot;One\ntwo\nthree&quot;, &quot;ONE\nTWO\nTHREE&quot;.to_case(Case::Title));</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! You can also test what case a string is in.</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use convert_case::{Case, Casing};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! assert!( &quot;css-class-name&quot;.is_case(Case::Kebab));</span>
+<span class="doccomment">//! assert!(!&quot;css-class-name&quot;.is_case(Case::Snake));</span>
+<span class="doccomment">//! assert!(!&quot;UPPER_CASE_VAR&quot;.is_case(Case::Snake));</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Note on Accuracy</span>
@@ -436,83 +754,285 @@
 <span class="doccomment">//! assert_eq!(&quot;my_kebab_like_variable&quot;, &quot;myKebab-like-variable&quot;.to_case(Case::Snake));</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! # Boundary Specificity</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! It can be difficult to determine how to split a string into words.  That is why this case</span>
+<span class="doccomment">//! provides the [`from_case`](Casing::from_case) functionality, but sometimes that isn&#39;t enough</span>
+<span class="doccomment">//! to meet a specific use case.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Take an identifier has the word `2D`, such as `scale2D`.  No exclusive usage of `from_case` will</span>
+<span class="doccomment">//! be enough to solve the problem.  In this case we can further specify which boundaries to split</span>
+<span class="doccomment">//! the string on.  `convert_case` provides some patterns for achieving this specificity.</span>
+<span class="doccomment">//! We can specify what boundaries we want to split on using the [`Boundary` enum](Boundary).</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use convert_case::{Boundary, Case, Casing};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Not quite what we want</span>
+<span class="doccomment">//! assert_eq!(</span>
+<span class="doccomment">//!     &quot;scale_2_d&quot;,</span>
+<span class="doccomment">//!     &quot;scale2D&quot;</span>
+<span class="doccomment">//!         .from_case(Case::Camel)</span>
+<span class="doccomment">//!         .to_case(Case::Snake)</span>
+<span class="doccomment">//! );</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Remove boundary from Case::Camel</span>
+<span class="doccomment">//! assert_eq!(</span>
+<span class="doccomment">//!     &quot;scale_2d&quot;,</span>
+<span class="doccomment">//!     &quot;scale2D&quot;</span>
+<span class="doccomment">//!         .from_case(Case::Camel)</span>
+<span class="doccomment">//!         .without_boundaries(&amp;[Boundary::DigitUpper, Boundary::DigitLower])</span>
+<span class="doccomment">//!         .to_case(Case::Snake)</span>
+<span class="doccomment">//! );</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Write boundaries explicitly</span>
+<span class="doccomment">//! assert_eq!(</span>
+<span class="doccomment">//!     &quot;scale_2d&quot;,</span>
+<span class="doccomment">//!     &quot;scale2D&quot;</span>
+<span class="doccomment">//!         .with_boundaries(&amp;[Boundary::LowerDigit])</span>
+<span class="doccomment">//!         .to_case(Case::Snake)</span>
+<span class="doccomment">//! );</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The `Casing` trait provides initial methods, but any subsequent methods that do not resolve</span>
+<span class="doccomment">//! the conversion return a [`StateConverter`] struct.  It contains similar methods as `Casing`.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Custom Cases</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Because `Case` is an enum, you can&#39;t create your own variant for your use case.  However</span>
+<span class="doccomment">//! the parameters for case conversion have been encapsulated into the [`Converter`] struct</span>
+<span class="doccomment">//! which can be used for specific use cases.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Suppose you wanted to format a word like camel case, where the first word is lower case and the</span>
+<span class="doccomment">//! rest are capitalized.  But you want to include a delimeter like underscore.  This case isn&#39;t</span>
+<span class="doccomment">//! available as a `Case` variant, but you can create it by constructing the parameters of the</span>
+<span class="doccomment">//! `Converter`.</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use convert_case::{Case, Casing, Converter, Pattern};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let conv = Converter::new()</span>
+<span class="doccomment">//!     .set_pattern(Pattern::Camel)</span>
+<span class="doccomment">//!     .set_delim(&quot;_&quot;);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! assert_eq!(</span>
+<span class="doccomment">//!     &quot;my_Special_Case&quot;,</span>
+<span class="doccomment">//!     conv.convert(&quot;My Special Case&quot;)</span>
+<span class="doccomment">//! )</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! Just as with the `Casing` trait, you can also manually set the boundaries strings are split </span>
+<span class="doccomment">//! on.  You can use any of the [`Pattern`] variants available.  This even includes [`Pattern::Sentence`]</span>
+<span class="doccomment">//! which isn&#39;t used in any `Case` variant.  You can also set no pattern at all, which will</span>
+<span class="doccomment">//! maintain the casing of each letter in the input string.  You can also, of course, set any string as your</span>
+<span class="doccomment">//! delimeter.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For more details on how strings are converted, see the docs for [`Converter`].</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! # Random Feature</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! To ensure this library had zero dependencies, randomness was moved to the _random_ feature,</span>
-<span class="doccomment">//! which requires the `rand` crate. You can enable this feature by including the </span>
+<span class="doccomment">//! which requires the `rand` crate. You can enable this feature by including the</span>
 <span class="doccomment">//! following in your `Cargo.toml`.</span>
 <span class="doccomment">//! ```{toml}</span>
 <span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! convert_case = { version = &quot;^0.3, features = [&quot;random&quot;] }</span>
+<span class="doccomment">//! convert_case = { version = &quot;^0.3.0&quot;, features = [&quot;random&quot;] }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! This will add two additional cases: Random and PseudoRandom.  You can read about their</span>
 <span class="doccomment">//! construction in the [Case enum](enum.Case.html).</span>
 
 <span class="kw">mod</span> <span class="ident">case</span>;
-<span class="kw">mod</span> <span class="ident">words</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">case::Case</span>;
-<span class="kw">use</span> <span class="ident">words::Words</span>;
+<span class="kw">mod</span> <span class="ident">converter</span>;
+<span class="kw">mod</span> <span class="ident">pattern</span>;
+<span class="kw">mod</span> <span class="ident">segmentation</span>;
 
-<span class="doccomment">/// Describes items that can be converted into a case.</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">case::Case</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">converter::Converter</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pattern::Pattern</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">segmentation::Boundary</span>;
+
+<span class="doccomment">/// Describes items that can be converted into a case.  This trait is used</span>
+<span class="doccomment">/// in conjunction with the [`StateConverter`] struct which is returned from a couple</span>
+<span class="doccomment">/// methods on `Casing`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Implemented for string slices `&amp;str` and owned strings `String`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Casing</span> {
-    <span class="doccomment">/// References `self` and converts to the given case.</span>
+<span class="doccomment">/// Implemented for strings `&amp;str`, `String`, and `&amp;String`.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Casing</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+
+    <span class="doccomment">/// Convert the string into the given case.  It will reference `self` and create a new</span>
+    <span class="doccomment">/// `String` with the same pattern and delimeter as `case`.  It will split on boundaries</span>
+    <span class="doccomment">/// defined at [`Boundary::defaults()`].</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use convert_case::{Case, Casing};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     &quot;tetronimo-piece-border&quot;,</span>
+    <span class="doccomment">///     &quot;Tetronimo piece border&quot;.to_case(Case::Kebab)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">to_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="ident">String</span>;
 
-    <span class="doccomment">/// Creates a `FromCasing` struct, which saves information about</span>
-    <span class="doccomment">/// how to parse `self` before converting to a case.</span>
-    <span class="kw">fn</span> <span class="ident">from_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="ident">FromCasing</span>;
+    <span class="doccomment">/// Start the case conversion by storing the boundaries associated with the given case.</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use convert_case::{Case, Casing};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     &quot;2020-08-10_dannie_birthday&quot;,</span>
+    <span class="doccomment">///     &quot;2020-08-10 Dannie Birthday&quot;</span>
+    <span class="doccomment">///         .from_case(Case::Title)</span>
+    <span class="doccomment">///         .to_case(Case::Snake)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">fn</span> <span class="ident">from_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="ident">StateConverter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Creates a `StateConverter` struct initialized with the boundaries</span>
+    <span class="doccomment">/// provided.</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use convert_case::{Boundary, Case, Casing};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     &quot;e1_m1_hangar&quot;,</span>
+    <span class="doccomment">///     &quot;E1M1 Hangar&quot;</span>
+    <span class="doccomment">///         .with_boundaries(&amp;[Boundary::DigitUpper, Boundary::Space])</span>
+    <span class="doccomment">///         .to_case(Case::Snake)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">fn</span> <span class="ident">with_boundaries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Boundary</span>]) -&gt; <span class="ident">StateConverter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Determines if `self` is of the given case.  This is done simply by applying</span>
+    <span class="doccomment">/// the conversion and seeing if the result is the same.</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use convert_case::{Case, Casing};</span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// assert!( &quot;kebab-case-string&quot;.is_case(Case::Kebab));</span>
+    <span class="doccomment">/// assert!( &quot;Train-Case-String&quot;.is_case(Case::Train));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(!&quot;kebab-case-string&quot;.is_case(Case::Snake));</span>
+    <span class="doccomment">/// assert!(!&quot;kebab-case-string&quot;.is_case(Case::Train));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">fn</span> <span class="ident">is_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="ident">bool</span>;
 }
 
-<span class="kw">impl</span> <span class="ident">Casing</span> <span class="kw">for</span> <span class="ident">str</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Casing</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span>
+<span class="kw">where</span>
+    <span class="ident">String</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+{
     <span class="kw">fn</span> <span class="ident">to_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">Words::new</span>(<span class="self">self</span>).<span class="ident">into_case</span>(<span class="ident">case</span>)
+        <span class="ident">StateConverter::new</span>(<span class="self">self</span>).<span class="ident">to_case</span>(<span class="ident">case</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">from_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="ident">FromCasing</span> {
-        <span class="ident">FromCasing::new</span>(<span class="self">self</span>.<span class="ident">to_string</span>(), <span class="ident">case</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Casing</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="kw">fn</span> <span class="ident">to_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">Words::new</span>(<span class="self">self</span>).<span class="ident">into_case</span>(<span class="ident">case</span>)
+    <span class="kw">fn</span> <span class="ident">with_boundaries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Boundary</span>]) -&gt; <span class="ident">StateConverter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="ident">StateConverter::new</span>(<span class="self">self</span>).<span class="ident">with_boundaries</span>(<span class="ident">bs</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">from_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="ident">FromCasing</span> {
-        <span class="ident">FromCasing::new</span>(<span class="self">self</span>.<span class="ident">to_string</span>(), <span class="ident">case</span>)
+    <span class="kw">fn</span> <span class="ident">from_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="ident">StateConverter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="ident">StateConverter::new_from_case</span>(<span class="self">self</span>, <span class="ident">case</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">is_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_case</span>(<span class="ident">case</span>) <span class="op">==</span> <span class="self">self</span>
     }
 }
 
 <span class="doccomment">/// Holds information about parsing before converting into a case.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This struct is used when invoking the `from_case` method on</span>
-<span class="doccomment">/// `Casing`.  `FromCasing` also implements `Casing`.</span>
+<span class="doccomment">/// This struct is used when invoking the `from_case` and `with_boundaries` methods on</span>
+<span class="doccomment">/// `Casing`.  For a more fine grained approach to case conversion, consider using the [`Converter`]</span>
+<span class="doccomment">/// struct.</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use convert_case::{Case, Casing};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let title = &quot;ninety-nine_problems&quot;.from_case(Case::Snake).to_case(Case::Title);</span>
 <span class="doccomment">/// assert_eq!(&quot;Ninety-nine Problems&quot;, title);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FromCasing</span> {
-    <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="ident">case</span>: <span class="ident">Case</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StateConverter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>,
+    <span class="ident">conv</span>: <span class="ident">Converter</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">FromCasing</span> {
-    <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">name</span>, <span class="ident">case</span> }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Casing</span> <span class="kw">for</span> <span class="ident">FromCasing</span> {
-    <span class="kw">fn</span> <span class="ident">to_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">Words::from_casing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>, <span class="self">self</span>.<span class="ident">case</span>).<span class="ident">into_case</span>(<span class="ident">case</span>)
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">StateConverter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Only called by Casing function to_case()</span>
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">s</span>,
+            <span class="ident">conv</span>: <span class="ident">Converter::new</span>(),
+        }
     }
 
-    <span class="kw">fn</span> <span class="ident">from_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="self">self</span>.<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">case</span>)
+    <span class="doccomment">/// Only called by Casing function from_case()</span>
+    <span class="kw">fn</span> <span class="ident">new_from_case</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">s</span>,
+            <span class="ident">conv</span>: <span class="ident">Converter::new</span>().<span class="ident">from_case</span>(<span class="ident">case</span>),
+        }
+    }
+
+    <span class="doccomment">/// Uses the boundaries associated with `case` for word segmentation.  This</span>
+    <span class="doccomment">/// will overwrite any boundary information initialized before.  This method is</span>
+    <span class="doccomment">/// likely not useful, but provided anyway.</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use convert_case::{Case, Casing};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let name = &quot;Chuck Schuldiner&quot;</span>
+    <span class="doccomment">///     .from_case(Case::Snake) // from Casing trait</span>
+    <span class="doccomment">///     .from_case(Case::Title) // from StateConverter, overwrites previous</span>
+    <span class="doccomment">///     .to_case(Case::Kebab);</span>
+    <span class="doccomment">/// assert_eq!(&quot;chuck-schuldiner&quot;, name);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_case</span>(<span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">conv</span>: <span class="self">self</span>.<span class="ident">conv</span>.<span class="ident">from_case</span>(<span class="ident">case</span>),
+            ..<span class="self">self</span>
+        }
+    }
+
+    <span class="doccomment">/// Overwrites boundaries for word segmentation with those provided.  This will overwrite</span>
+    <span class="doccomment">/// any boundary information initialized before.  This method is likely not useful, but</span>
+    <span class="doccomment">/// provided anyway.</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use convert_case::{Boundary, Case, Casing};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let song = &quot;theHumbling river-puscifer&quot;</span>
+    <span class="doccomment">///     .from_case(Case::Kebab) // from Casing trait</span>
+    <span class="doccomment">///     .with_boundaries(&amp;[Boundary::Space, Boundary::LowerUpper]) // overwrites `from_case`</span>
+    <span class="doccomment">///     .to_case(Case::Pascal);</span>
+    <span class="doccomment">/// assert_eq!(&quot;TheHumblingRiver-puscifer&quot;, song);  // doesn&#39;t split on hyphen `-`</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_boundaries</span>(<span class="self">self</span>, <span class="ident">bs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Boundary</span>]) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">s</span>: <span class="self">self</span>.<span class="ident">s</span>,
+            <span class="ident">conv</span>: <span class="self">self</span>.<span class="ident">conv</span>.<span class="ident">set_boundaries</span>(<span class="ident">bs</span>),
+        }
+    }
+
+    <span class="doccomment">/// Removes any boundaries that were already initialized.  This is particularly useful when a</span>
+    <span class="doccomment">/// case like `Case::Camel` has a lot of associated word boundaries, but you want to exclude</span>
+    <span class="doccomment">/// some.</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use convert_case::{Boundary, Case, Casing};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     &quot;2d_transformation&quot;,</span>
+    <span class="doccomment">///     &quot;2dTransformation&quot;</span>
+    <span class="doccomment">///         .from_case(Case::Camel)</span>
+    <span class="doccomment">///         .without_boundaries(&amp;Boundary::digits())</span>
+    <span class="doccomment">///         .to_case(Case::Snake)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">without_boundaries</span>(<span class="self">self</span>, <span class="ident">bs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Boundary</span>]) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">s</span>: <span class="self">self</span>.<span class="ident">s</span>,
+            <span class="ident">conv</span>: <span class="self">self</span>.<span class="ident">conv</span>.<span class="ident">remove_boundaries</span>(<span class="ident">bs</span>),
+        }
+    }
+
+    <span class="doccomment">/// Consumes the `StateConverter` and returns the converted string.</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use convert_case::{Boundary, Case, Casing};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     &quot;ice-cream social&quot;,</span>
+    <span class="doccomment">///     &quot;Ice-Cream Social&quot;.from_case(Case::Title).to_case(Case::Lower)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_case</span>(<span class="self">self</span>, <span class="ident">case</span>: <span class="ident">Case</span>) -&gt; <span class="ident">String</span> {
+        <span class="self">self</span>.<span class="ident">conv</span>.<span class="ident">to_case</span>(<span class="ident">case</span>).<span class="ident">convert</span>(<span class="self">self</span>.<span class="ident">s</span>)
     }
 }
 
@@ -520,6 +1040,13 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">strum::IntoEnumIterator</span>;
+
+    <span class="kw">fn</span> <span class="ident">possible_cases</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Case</span><span class="op">&gt;</span> {
+        <span class="ident">Case::deterministic_cases</span>()
+            .<span class="ident">into_iter</span>()
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">case</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">from_case</span>(<span class="kw-2">*</span><span class="ident">case</span>).<span class="ident">to_case</span>(<span class="kw-2">*</span><span class="ident">case</span>) <span class="op">==</span> <span class="ident">s</span>)
+            .<span class="ident">collect</span>()
+    }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">lossless_against_lossless</span>() {
@@ -530,7 +1057,7 @@
             (<span class="ident">Case::Camel</span>, <span class="string">&quot;myVariable22Name&quot;</span>),
             (<span class="ident">Case::Pascal</span>, <span class="string">&quot;MyVariable22Name&quot;</span>),
             (<span class="ident">Case::Snake</span>, <span class="string">&quot;my_variable_22_name&quot;</span>),
-            (<span class="ident">Case::ScreamingSnake</span>, <span class="string">&quot;MY_VARIABLE_22_NAME&quot;</span>),
+            (<span class="ident">Case::UpperSnake</span>, <span class="string">&quot;MY_VARIABLE_22_NAME&quot;</span>),
             (<span class="ident">Case::Kebab</span>, <span class="string">&quot;my-variable-22-name&quot;</span>),
             (<span class="ident">Case::Cobol</span>, <span class="string">&quot;MY-VARIABLE-22-NAME&quot;</span>),
             (<span class="ident">Case::Toggle</span>, <span class="string">&quot;mY vARIABLE 22 nAME&quot;</span>),
@@ -563,10 +1090,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">multiline_strings</span>() {
-        <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;One\ntwo\nthree&quot;</span>,
-            <span class="string">&quot;one\ntwo\nthree&quot;</span>.<span class="ident">to_case</span>(<span class="ident">Case::Title</span>)
-        );
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;One\ntwo\nthree&quot;</span>, <span class="string">&quot;one\ntwo\nthree&quot;</span>.<span class="ident">to_case</span>(<span class="ident">Case::Title</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -675,6 +1199,96 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">alternating_ignore_symbols</span>() {
         <span class="macro">assert_eq!</span>(<span class="string">&quot;tHaT&#39;s&quot;</span>, <span class="string">&quot;that&#39;s&quot;</span>.<span class="ident">to_case</span>(<span class="ident">Case::Alternating</span>));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">string_is_snake</span>() {
+        <span class="macro">assert!</span>(<span class="string">&quot;im_snake_case&quot;</span>.<span class="ident">is_case</span>(<span class="ident">Case::Snake</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="string">&quot;im_NOTsnake_case&quot;</span>.<span class="ident">is_case</span>(<span class="ident">Case::Snake</span>));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">string_is_kebab</span>() {
+        <span class="macro">assert!</span>(<span class="string">&quot;im-kebab-case&quot;</span>.<span class="ident">is_case</span>(<span class="ident">Case::Kebab</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="string">&quot;im_not_kebab&quot;</span>.<span class="ident">is_case</span>(<span class="ident">Case::Kebab</span>));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">remove_boundaries</span>() {
+        <span class="macro">assert_eq!</span>(
+            <span class="string">&quot;m02_s05_binary_trees.pdf&quot;</span>,
+            <span class="string">&quot;M02S05BinaryTrees.pdf&quot;</span>
+                .<span class="ident">from_case</span>(<span class="ident">Case::Pascal</span>)
+                .<span class="ident">without_boundaries</span>(<span class="kw-2">&amp;</span>[<span class="ident">Boundary::UpperDigit</span>])
+                .<span class="ident">to_case</span>(<span class="ident">Case::Snake</span>)
+        );
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">with_boundaries</span>() {
+        <span class="macro">assert_eq!</span>(
+            <span class="string">&quot;my-dumb-file-name&quot;</span>,
+            <span class="string">&quot;my_dumbFileName&quot;</span>
+                .<span class="ident">with_boundaries</span>(<span class="kw-2">&amp;</span>[<span class="ident">Boundary::Underscore</span>, <span class="ident">Boundary::LowerUpper</span>])
+                .<span class="ident">to_case</span>(<span class="ident">Case::Kebab</span>)
+        );
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;random&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">random_case_boundaries</span>() {
+        <span class="kw">for</span> <span class="ident">random_case</span> <span class="kw">in</span> <span class="ident">Case::random_cases</span>() {
+            <span class="macro">assert_eq!</span>(
+                <span class="string">&quot;split_by_spaces&quot;</span>,
+                <span class="string">&quot;Split By Spaces&quot;</span>
+                    .<span class="ident">from_case</span>(<span class="ident">random_case</span>)
+                    .<span class="ident">to_case</span>(<span class="ident">Case::Snake</span>)
+            );
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">multiple_from_case</span>() {
+        <span class="macro">assert_eq!</span>(
+            <span class="string">&quot;longtime_nosee&quot;</span>,
+            <span class="string">&quot;LongTime NoSee&quot;</span>
+                .<span class="ident">from_case</span>(<span class="ident">Case::Camel</span>)
+                .<span class="ident">from_case</span>(<span class="ident">Case::Title</span>)
+                .<span class="ident">to_case</span>(<span class="ident">Case::Snake</span>),
+        )
+    }
+
+    <span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
+    <span class="kw">use</span> <span class="ident">std::iter::FromIterator</span>;
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">detect_many_cases</span>() {
+        <span class="kw">let</span> <span class="ident">lower_cases_vec</span> <span class="op">=</span> <span class="ident">possible_cases</span>(<span class="kw-2">&amp;</span><span class="string">&quot;asef&quot;</span>);
+        <span class="kw">let</span> <span class="ident">lower_cases_set</span> <span class="op">=</span> <span class="ident">HashSet::from_iter</span>(<span class="ident">lower_cases_vec</span>.<span class="ident">into_iter</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
+        <span class="ident">actual</span>.<span class="ident">insert</span>(<span class="ident">Case::Lower</span>);
+        <span class="ident">actual</span>.<span class="ident">insert</span>(<span class="ident">Case::Camel</span>);
+        <span class="ident">actual</span>.<span class="ident">insert</span>(<span class="ident">Case::Snake</span>);
+        <span class="ident">actual</span>.<span class="ident">insert</span>(<span class="ident">Case::Kebab</span>);
+        <span class="ident">actual</span>.<span class="ident">insert</span>(<span class="ident">Case::Flat</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">lower_cases_set</span>, <span class="ident">actual</span>);
+
+        <span class="kw">let</span> <span class="ident">lower_cases_vec</span> <span class="op">=</span> <span class="ident">possible_cases</span>(<span class="kw-2">&amp;</span><span class="string">&quot;asefCase&quot;</span>);
+        <span class="kw">let</span> <span class="ident">lower_cases_set</span> <span class="op">=</span> <span class="ident">HashSet::from_iter</span>(<span class="ident">lower_cases_vec</span>.<span class="ident">into_iter</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
+        <span class="ident">actual</span>.<span class="ident">insert</span>(<span class="ident">Case::Camel</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">lower_cases_set</span>, <span class="ident">actual</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">detect_each_case</span>() {
+        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">&quot;My String Identifier&quot;</span>.<span class="ident">to_string</span>();
+        <span class="kw">for</span> <span class="ident">case</span> <span class="kw">in</span> <span class="ident">Case::deterministic_cases</span>() {
+            <span class="kw">let</span> <span class="ident">new_s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">from_case</span>(<span class="ident">case</span>).<span class="ident">to_case</span>(<span class="ident">case</span>);
+            <span class="kw">let</span> <span class="ident">possible</span> <span class="op">=</span> <span class="ident">possible_cases</span>(<span class="kw-2">&amp;</span><span class="ident">new_s</span>);
+            <span class="macro">println!</span>(<span class="string">&quot;{} {:?} {:?}&quot;</span>, <span class="ident">new_s</span>, <span class="ident">case</span>, <span class="ident">possible</span>);
+            <span class="macro">assert!</span>(<span class="ident">possible</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">case</span>));
+        }
     }
 }
 </code></pre></div>
