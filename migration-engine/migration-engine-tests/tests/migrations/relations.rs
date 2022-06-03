@@ -572,9 +572,7 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
     }
 }
 
-// 5.6 and 5.7 doesn't let you `SET DEFAULT` without setting the default value
-// (even if nullable). Maria will silently just use `RESTRICT` instead.
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql, Vitess, CockroachDb))]
+#[test_connector(exclude(Mysql, Mssql, CockroachDb))]
 fn on_delete_set_default_should_work(api: TestApi) {
     let dm = r#"
         model A {

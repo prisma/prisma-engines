@@ -151,7 +151,7 @@ impl Connector for MySqlDatamodelConnector {
     fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        referential_integrity.allowed_referential_actions(Restrict | Cascade | SetNull | NoAction | SetDefault)
+        referential_integrity.allowed_referential_actions(Restrict | Cascade | SetNull | NoAction)
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {

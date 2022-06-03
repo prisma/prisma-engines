@@ -94,6 +94,70 @@ fn actions_on_mongo() {
 }
 
 #[test]
+fn on_delete_set_default_is_not_allowed_on_mysql() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url = "mysql://root:prisma@localhost:3306/mydb"
+        }
+
+        model A {
+          id Int @id
+          bs B[]
+        }
+
+        model B {
+          id Int @id
+          aId Int
+          a A @relation(fields: [aId], references: [id], onDelete: SetDefault)
+        }
+    "#};
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m  aId Int
+        [1;94m14 | [0m  a A @relation(fields: [aId], references: [id], [1;91monDelete: SetDefault[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn on_update_set_default_is_not_allowed_on_mysql() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url = "mysql://root:prisma@localhost:3306/mydb"
+        }
+
+        model A {
+          id Int @id
+          bs B[]
+        }
+
+        model B {
+          id Int @id
+          aId Int
+          a A @relation(fields: [aId], references: [id], onUpdate: SetDefault)
+        }
+    "#};
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m  aId Int
+        [1;94m14 | [0m  a A @relation(fields: [aId], references: [id], [1;91monUpdate: SetDefault[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
 fn on_delete_actions_should_work_on_prisma_referential_integrity() {
     let actions = &[Restrict, SetNull, Cascade, NoAction];
 
