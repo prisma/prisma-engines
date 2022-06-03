@@ -22,10 +22,10 @@ serde = { version = "1.0.90", features = ["derive"] }
 serde_json = { version = "1.0", features = ["preserve_order", "float_roundtrip"] }
 enumflags2 = "0.7"
 either = "1.6"
+indoc = "1"
 
 [dev-dependencies]
 expect-test = "1.1.0"
-indoc = "1"
 native-types = { path = "../../native-types" }
 pretty_assertions = "0.6.1"
 
