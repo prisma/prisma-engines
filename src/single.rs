@@ -35,7 +35,7 @@ impl Quaint {
     ///
     /// Connector type can be one of the following:
     ///
-    /// - `sqlite`/`file` opens an SQLite connection
+    /// - `file` opens an SQLite connection
     /// - `mysql` opens a MySQL connection
     /// - `postgres`/`postgresql` opens a PostgreSQL connection
     ///
@@ -131,7 +131,7 @@ impl Quaint {
     pub async fn new(url_str: &str) -> crate::Result<Self> {
         let inner = match url_str {
             #[cfg(feature = "sqlite")]
-            s if s.starts_with("file") || s.starts_with("sqlite") => {
+            s if s.starts_with("file") => {
                 let params = connector::SqliteParams::try_from(s)?;
                 let sqlite = connector::Sqlite::new(&params.file_path)?;
 

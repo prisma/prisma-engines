@@ -9,7 +9,7 @@
 //!
 //! Connector type can be one of the following:
 //!
-//! - `sqlite`/`file` opens an SQLite connection.
+//! - `file` opens an SQLite connection.
 //! - `mysql` opens a MySQL connection.
 //! - `postgres`/`postgresql` opens a PostgreSQL connection.
 //!
@@ -336,7 +336,7 @@ impl Quaint {
     pub fn builder(url_str: &str) -> crate::Result<Builder> {
         match url_str {
             #[cfg(feature = "sqlite")]
-            s if s.starts_with("file") || s.starts_with("sqlite") => {
+            s if s.starts_with("file") => {
                 let params = crate::connector::SqliteParams::try_from(s)?;
 
                 let manager = QuaintManager::Sqlite {

@@ -53,7 +53,7 @@ impl ConnectionInfo {
         // Non-URL database strings are interpreted as SQLite file paths.
         match url_str {
             #[cfg(feature = "sqlite")]
-            s if s.starts_with("file") || s.starts_with("sqlite") => {
+            s if s.starts_with("file") => {
                 if url_result.is_err() {
                     let params = SqliteParams::try_from(s)?;
 
@@ -268,7 +268,7 @@ impl SqlFamily {
     pub fn from_scheme(url_scheme: &str) -> Option<Self> {
         match url_scheme {
             #[cfg(feature = "sqlite")]
-            "sqlite" | "file" => Some(SqlFamily::Sqlite),
+            "file" => Some(SqlFamily::Sqlite),
             #[cfg(feature = "postgresql")]
             "postgres" | "postgresql" => Some(SqlFamily::Postgres),
             #[cfg(feature = "mysql")]
