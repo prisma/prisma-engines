@@ -238,43 +238,6 @@
 <span id="233">233</span>
 <span id="234">234</span>
 <span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),</span>
 <span class="doccomment">//! in order to avoid cluttering the connector with conditionals. This is a private implementation</span>
 <span class="doccomment">//! detail of the SQL connector.</span>
@@ -490,43 +453,6 @@
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">indices</span> {
             <span class="ident">index</span>.<span class="ident">tpe</span> <span class="op">=</span> <span class="ident">IndexType::Normal</span>;
         }
-    }
-
-    <span class="kw">fn</span> <span class="ident">filter_extended_index_capabilities</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>) {
-        <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">table</span>) <span class="kw">in</span> <span class="ident">schema</span>.<span class="ident">iter_tables_mut</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">pk</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">table</span>.<span class="ident">primary_key</span> {
-                <span class="kw">for</span> <span class="ident">col</span> <span class="kw">in</span> <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">iter_mut</span>() {
-                    <span class="ident">col</span>.<span class="ident">length</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                    <span class="ident">col</span>.<span class="ident">sort_order</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                }
-            }
-
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">kept_indexes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">index</span>) <span class="op">=</span> <span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">pop</span>() {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remove_index</span> <span class="op">=</span> <span class="bool-val">false</span>;
-
-                <span class="kw">for</span> <span class="ident">col</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">iter_mut</span>() {
-                    <span class="kw">if</span> <span class="ident">col</span>.<span class="ident">length</span>.<span class="ident">is_some</span>() {
-                        <span class="ident">remove_index</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    }
-
-                    <span class="ident">col</span>.<span class="ident">sort_order</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                }
-
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">remove_index</span> {
-                    <span class="ident">kept_indexes</span>.<span class="ident">push</span>(<span class="ident">index</span>);
-                }
-            }
-
-            <span class="ident">kept_indexes</span>.<span class="ident">reverse</span>();
-            <span class="ident">table</span>.<span class="ident">indices</span> <span class="op">=</span> <span class="ident">kept_indexes</span>;
-        }
-    }
-
-    <span class="comment">// Remove this when the feature is GA</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
-        <span class="ident">filter_extended_index_capabilities</span>(<span class="ident">sql_schema</span>);
     }
 
     <span class="comment">// Remove this when the feature is GA</span>

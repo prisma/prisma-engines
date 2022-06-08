@@ -686,22 +686,10 @@
 <span id="681">681</span>
 <span id="682">682</span>
 <span id="683">683</span>
-<span id="684">684</span>
-<span id="685">685</span>
-<span id="686">686</span>
-<span id="687">687</span>
-<span id="688">688</span>
-<span id="689">689</span>
-<span id="690">690</span>
-<span id="691">691</span>
-<span id="692">692</span>
-<span id="693">693</span>
-<span id="694">694</span>
-<span id="695">695</span>
-<span id="696">696</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">shadow_db</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">sql_renderer::IteratorJoin</span>, <span class="ident">SqlFlavour</span>};
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span> <span class="comment">// wtf, this one is unused on CI, not locally</span>
 <span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
@@ -712,7 +700,7 @@
     <span class="ident">connector</span>::{<span class="ident">tokio_postgres::error::ErrorPosition</span>, <span class="ident">PostgreSql</span> <span class="kw">as</span> <span class="ident">Connection</span>, <span class="ident">PostgresUrl</span>},
     <span class="ident">prelude::Queryable</span>,
 };
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">postgres::PostgresSchemaExt</span>, <span class="ident">SqlSchema</span>};
+<span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">future</span>, <span class="ident">time</span>};
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 <span class="kw">use</span> <span class="ident">user_facing_errors</span>::{
@@ -853,20 +841,6 @@ SET enable_experimental_alter_column_type_general = true;
                 })<span class="question-mark">?</span>;
 
             <span class="ident"><span class="kw">super</span>::normalize_sql_schema</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>);
-
-            <span class="kw">let</span> <span class="ident">pg_ext</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">downcast_connector_data_mut</span>();
-
-            <span class="comment">// Remove this when the feature is GA</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">params</span>
-                .<span class="ident">connector_params</span>
-                .<span class="ident">preview_features</span>
-                .<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>)
-            {
-                <span class="kw">for</span> <span class="ident">idx</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">pg_ext</span>.<span class="ident">indexes</span> {
-                    <span class="ident">idx</span>.<span class="number">1</span> <span class="op">=</span> <span class="ident">sql_schema_describer::postgres::SqlIndexAlgorithm::BTree</span>;
-                }
-                <span class="ident">pg_ext</span>.<span class="ident">opclasses</span>.<span class="ident">clear</span>();
-            }
 
             <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)
         })

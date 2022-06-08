@@ -70,10 +70,6 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>};
@@ -117,10 +113,6 @@
 
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) {
             <span class="ident">schema</span>.<span class="ident">remove_fulltext_indexes</span>();
-        }
-
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
-            <span class="ident">schema</span>.<span class="ident">normalize_index_attributes</span>();
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)

@@ -664,24 +664,6 @@
 <span id="659">659</span>
 <span id="660">660</span>
 <span id="661">661</span>
-<span id="662">662</span>
-<span id="663">663</span>
-<span id="664">664</span>
-<span id="665">665</span>
-<span id="666">666</span>
-<span id="667">667</span>
-<span id="668">668</span>
-<span id="669">669</span>
-<span id="670">670</span>
-<span id="671">671</span>
-<span id="672">672</span>
-<span id="673">673</span>
-<span id="674">674</span>
-<span id="675">675</span>
-<span id="676">676</span>
-<span id="677">677</span>
-<span id="678">678</span>
-<span id="679">679</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>, <span class="ident">Dedup</span>, <span class="ident">SqlError</span>, <span class="ident">SqlFamilyTrait</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">common</span>::{<span class="ident">preview_features::PreviewFeature</span>, <span class="ident">RelationNames</span>},
@@ -824,18 +806,6 @@
     <span class="comment">// keep them. This is a change in introspection behaviour, but due to re-introspection previous</span>
     <span class="comment">// datamodels and clients should keep working as before.</span>
 
-    <span class="kw">let</span> <span class="ident">using</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
-        <span class="ident">index_algorithm</span>(<span class="ident">index</span>, <span class="ident">ctx</span>)
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    };
-
-    <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
-        <span class="ident">index_is_clustered</span>(<span class="ident">index</span>.<span class="ident">index_id</span>(), <span class="ident">index</span>.<span class="ident">schema</span>(), <span class="ident">ctx</span>)
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    };
-
     <span class="ident">IndexDefinition</span> {
         <span class="ident">name</span>: <span class="prelude-val">None</span>,
         <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>()),
@@ -843,32 +813,26 @@
             .<span class="ident">columns</span>()
             .<span class="ident">enumerate</span>()
             .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">c</span>)<span class="op">|</span> {
-                <span class="kw">let</span> (<span class="ident">sort_order</span>, <span class="ident">length</span>, <span class="ident">operator_class</span>) <span class="op">=</span>
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
-                        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
-                    } <span class="kw">else</span> {
-                        <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sort</span> {
-                            <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
-                            <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
-                        });
+                <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sort</span> {
+                    <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
+                    <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
+                });
 
-                        <span class="kw">let</span> <span class="ident">index_field_id</span> <span class="op">=</span> <span class="ident">IndexFieldId</span>(<span class="ident">index</span>.<span class="ident">index_id</span>(), <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>);
-
-                        (<span class="ident">sort_order</span>, <span class="ident">c</span>.<span class="ident">length</span>(), <span class="ident">get_opclass</span>(<span class="ident">index_field_id</span>, <span class="ident">index</span>.<span class="ident">schema</span>(), <span class="ident">ctx</span>))
-                    };
+                <span class="kw">let</span> <span class="ident">index_field_id</span> <span class="op">=</span> <span class="ident">IndexFieldId</span>(<span class="ident">index</span>.<span class="ident">index_id</span>(), <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>);
+                <span class="kw">let</span> <span class="ident">operator_class</span> <span class="op">=</span> <span class="ident">get_opclass</span>(<span class="ident">index_field_id</span>, <span class="ident">index</span>.<span class="ident">schema</span>(), <span class="ident">ctx</span>);
 
                 <span class="ident">IndexField</span> {
                     <span class="ident">path</span>: <span class="macro">vec!</span>[(<span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(), <span class="prelude-val">None</span>)],
                     <span class="ident">sort_order</span>,
-                    <span class="ident">length</span>,
+                    <span class="ident">length</span>: <span class="ident">c</span>.<span class="ident">length</span>(),
                     <span class="ident">operator_class</span>,
                 }
             })
             .<span class="ident">collect</span>(),
         <span class="ident">tpe</span>,
         <span class="ident">defined_on_field</span>: <span class="ident">index</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span>,
-        <span class="ident">algorithm</span>: <span class="ident">using</span>,
-        <span class="ident">clustered</span>,
+        <span class="ident">algorithm</span>: <span class="ident">index_algorithm</span>(<span class="ident">index</span>, <span class="ident">ctx</span>),
+        <span class="ident">clustered</span>: <span class="ident">index_is_clustered</span>(<span class="ident">index</span>.<span class="ident">index_id</span>(), <span class="ident">index</span>.<span class="ident">schema</span>(), <span class="ident">ctx</span>),
     }
 }
 

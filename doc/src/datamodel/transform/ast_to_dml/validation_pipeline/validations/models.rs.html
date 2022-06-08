@@ -280,37 +280,6 @@
 <span id="275">275</span>
 <span id="276">276</span>
 <span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::database_name::validate_db_name</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::preview_features::PreviewFeature</span>,
@@ -446,35 +415,8 @@
     }
 }
 
-<span class="doccomment">/// uses sort or length on id without preview flag</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">uses_sort_or_length_on_primary_without_preview_flag</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
-        <span class="kw">return</span>;
-    }
-
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
-        <span class="kw">if</span> <span class="ident">pk</span>
-            .<span class="ident">scalar_field_attributes</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">sort_order</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">length</span>().<span class="ident">is_some</span>())
-        {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;You must enable `extendedIndexes` preview feature to use sort or length parameters.&quot;</span>;
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>;
-
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                <span class="ident">message</span>,
-                <span class="ident">pk</span>.<span class="ident">attribute_name</span>(),
-                <span class="ident">span</span>,
-            ));
-        }
-    }
-}
-
 <span class="doccomment">/// The database must support the primary key length prefix for it to be allowed in the data model.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_length_prefix_supported</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
-        <span class="kw">return</span>;
-    }
-
     <span class="kw">if</span> <span class="ident">ctx</span>
         .<span class="ident">connector</span>
         .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::IndexColumnLengthPrefixing</span>)
@@ -498,10 +440,6 @@
 
 <span class="doccomment">/// Not every database is allowing sort definition in the primary key.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_sort_order_supported</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
-        <span class="kw">return</span>;
-    }
-
     <span class="kw">if</span> <span class="ident">ctx</span>
         .<span class="ident">connector</span>
         .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::PrimaryKeySortOrderDefinition</span>)
