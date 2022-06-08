@@ -186,6 +186,7 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
+<span id="184">184</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -355,6 +356,7 @@
                 <span class="ident">implicit::supports_implicit_relations</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                 <span class="ident">implicit::validate_singular_id</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                 <span class="ident">implicit::validate_no_referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="ident">implicit::cannot_define_references_argument</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
             }
             <span class="ident">RefinedRelationWalker::TwoWayEmbeddedManyToMany</span>(<span class="ident">relation</span>) =&gt; {
                 <span class="kw">use</span> <span class="ident">relations::many_to_many::embedded</span>;
