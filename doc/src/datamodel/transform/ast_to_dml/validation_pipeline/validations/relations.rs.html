@@ -539,14 +539,6 @@
 <span id="534">534</span>
 <span id="535">535</span>
 <span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">many_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_one</span>;
@@ -559,7 +551,7 @@
     <span class="ident">transform::ast_to_dml</span>::{
         <span class="ident">db</span>::{
             <span class="ident">walkers</span>::{<span class="ident">CompleteInlineRelationWalker</span>, <span class="ident">InlineRelationWalker</span>, <span class="ident">ReferencingFields</span>},
-            <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>,
+            <span class="ident">ScalarFieldType</span>,
         },
         <span class="ident">validation_pipeline::context::Context</span>,
     },
@@ -1051,7 +1043,7 @@
     };
 
     <span class="kw">for</span> (<span class="ident">referencing</span>, <span class="ident">referenced</span>) <span class="kw">in</span> <span class="ident">referencing_fields</span>.<span class="ident">zip</span>(<span class="ident">relation</span>.<span class="ident">referenced_fields</span>()) {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">field_types_match</span>(<span class="ident">referencing</span>.<span class="ident">scalar_field_type</span>(), <span class="ident">referenced</span>.<span class="ident">scalar_field_type</span>(), <span class="ident">ctx</span>.<span class="ident">db</span>) {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">field_types_match</span>(<span class="ident">referencing</span>.<span class="ident">scalar_field_type</span>(), <span class="ident">referenced</span>.<span class="ident">scalar_field_type</span>()) {
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                     <span class="string">&quot;The type of the field `{}` in the model `{}` is not matching the type of the referenced field `{}` in model `{}`.&quot;</span>,
@@ -1066,20 +1058,12 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">field_types_match</span>(<span class="ident">referencing</span>: <span class="ident">ScalarFieldType</span>, <span class="ident">referenced</span>: <span class="ident">ScalarFieldType</span>, <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">field_types_match</span>(<span class="ident">referencing</span>: <span class="ident">ScalarFieldType</span>, <span class="ident">referenced</span>: <span class="ident">ScalarFieldType</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> (<span class="ident">referencing</span>, <span class="ident">referenced</span>) {
             (<span class="ident">ScalarFieldType::CompositeType</span>(<span class="ident">a</span>), <span class="ident">ScalarFieldType::CompositeType</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> =&gt; <span class="bool-val">true</span>,
             (<span class="ident">ScalarFieldType::Enum</span>(<span class="ident">a</span>), <span class="ident">ScalarFieldType::Enum</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> =&gt; <span class="bool-val">true</span>,
             (<span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">a</span>), <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> =&gt; <span class="bool-val">true</span>,
             (<span class="ident">ScalarFieldType::Unsupported</span>(<span class="ident">a</span>), <span class="ident">ScalarFieldType::Unsupported</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> =&gt; <span class="bool-val">true</span>,
-            (<span class="ident">ScalarFieldType::Alias</span>(<span class="ident">a</span>), <span class="ident">b</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">a_type</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">alias_scalar_field_type</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>);
-                <span class="ident">field_types_match</span>(<span class="kw-2">*</span><span class="ident">a_type</span>, <span class="ident">b</span>, <span class="ident">db</span>)
-            }
-            (<span class="ident">a</span>, <span class="ident">ScalarFieldType::Alias</span>(<span class="ident">b</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">b_type</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">alias_scalar_field_type</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>);
-                <span class="ident">field_types_match</span>(<span class="ident">a</span>, <span class="kw-2">*</span><span class="ident">b_type</span>, <span class="ident">db</span>)
-            }
             <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }

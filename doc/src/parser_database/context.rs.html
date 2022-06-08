@@ -438,21 +438,12 @@
 <span id="433">433</span>
 <span id="434">434</span>
 <span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">attributes</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::attributes::AttributesValidationState</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">interner::StringInterner</span>, <span class="ident">names::Names</span>, <span class="ident">relations::Relations</span>, <span class="ident">types::Types</span>, <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>,
-    <span class="ident">ScalarFieldType</span>, <span class="ident">StringId</span>, <span class="ident">ValueValidator</span>,
+    <span class="ident">StringId</span>, <span class="ident">ValueValidator</span>,
 };
 <span class="kw">use</span> <span class="ident">schema_ast::ast::WithName</span>;
 <span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
@@ -553,17 +544,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Other than for this peculiarity, this method is identical to</span>
     <span class="doccomment">/// `visit_attributes()`.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">visit_scalar_field_attributes</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-        <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
-        <span class="kw-2">mut</span> <span class="ident">scalar_field_type</span>: <span class="ident">ScalarFieldType</span>,
-    ) {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">visit_scalar_field_attributes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>) {
         <span class="self">self</span>.<span class="ident">visit_attributes</span>((<span class="ident">model_id</span>, <span class="ident">field_id</span>).<span class="ident">into</span>());
-        <span class="kw">while</span> <span class="kw">let</span> <span class="ident">ScalarFieldType::Alias</span>(<span class="ident">alias_id</span>) <span class="op">=</span> <span class="ident">scalar_field_type</span> {
-            <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">extend_attributes</span>(<span class="ident">alias_id</span>.<span class="ident">into</span>(), <span class="self">self</span>.<span class="ident">ast</span>);
-            <span class="ident">scalar_field_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">types</span>.<span class="ident">type_aliases</span>[<span class="kw-2">&amp;</span><span class="ident">alias_id</span>];
-        }
     }
 
     <span class="doccomment">/// All attribute validation should go through `visit_attributes()`. It lets</span>

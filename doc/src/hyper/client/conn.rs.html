@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.16/src/client/conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.19/src/client/conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1015,6 +1015,89 @@
 <span id="1010">1010</span>
 <span id="1011">1011</span>
 <span id="1012">1012</span>
+<span id="1013">1013</span>
+<span id="1014">1014</span>
+<span id="1015">1015</span>
+<span id="1016">1016</span>
+<span id="1017">1017</span>
+<span id="1018">1018</span>
+<span id="1019">1019</span>
+<span id="1020">1020</span>
+<span id="1021">1021</span>
+<span id="1022">1022</span>
+<span id="1023">1023</span>
+<span id="1024">1024</span>
+<span id="1025">1025</span>
+<span id="1026">1026</span>
+<span id="1027">1027</span>
+<span id="1028">1028</span>
+<span id="1029">1029</span>
+<span id="1030">1030</span>
+<span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
+<span id="1035">1035</span>
+<span id="1036">1036</span>
+<span id="1037">1037</span>
+<span id="1038">1038</span>
+<span id="1039">1039</span>
+<span id="1040">1040</span>
+<span id="1041">1041</span>
+<span id="1042">1042</span>
+<span id="1043">1043</span>
+<span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
+<span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
+<span id="1053">1053</span>
+<span id="1054">1054</span>
+<span id="1055">1055</span>
+<span id="1056">1056</span>
+<span id="1057">1057</span>
+<span id="1058">1058</span>
+<span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
+<span id="1062">1062</span>
+<span id="1063">1063</span>
+<span id="1064">1064</span>
+<span id="1065">1065</span>
+<span id="1066">1066</span>
+<span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Lower-level client connection API.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The types in this module are to provide a lower-level API based around a</span>
@@ -1173,6 +1256,8 @@
     <span class="ident">h1_writev</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
     <span class="ident">h1_title_case_headers</span>: <span class="ident">bool</span>,
     <span class="ident">h1_preserve_header_case</span>: <span class="ident">bool</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
+    <span class="ident">h1_preserve_header_order</span>: <span class="ident">bool</span>,
     <span class="ident">h1_read_buf_exact_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="ident">h1_max_buf_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
@@ -1504,6 +1589,23 @@
             <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">conn</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>().<span class="ident">into_parts</span>()))
         })
     }
+
+    <span class="doccomment">/// Returns whether the [extended CONNECT protocol][1] is enabled or not.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This setting is configured by the server peer by sending the</span>
+    <span class="doccomment">/// [`SETTINGS_ENABLE_CONNECT_PROTOCOL` parameter][2] in a `SETTINGS` frame.</span>
+    <span class="doccomment">/// This method returns the currently acknowledged value received from the</span>
+    <span class="doccomment">/// remote.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [1]: https://datatracker.ietf.org/doc/html/rfc8441#section-4</span>
+    <span class="doccomment">/// [2]: https://datatracker.ietf.org/doc/html/rfc8441#section-3</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_is_extended_connect_protocol_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>() {
+            <span class="ident">ProtoClient::H1</span> { .. } =&gt; <span class="bool-val">false</span>,
+            <span class="ident">ProtoClient::H2</span> { <span class="ident">h2</span> } =&gt; <span class="ident">h2</span>.<span class="ident">is_extended_connect_protocol_enabled</span>(),
+        }
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
@@ -1558,6 +1660,8 @@
             <span class="ident">h1_parser_config</span>: <span class="ident">Default::default</span>(),
             <span class="ident">h1_title_case_headers</span>: <span class="bool-val">false</span>,
             <span class="ident">h1_preserve_header_case</span>: <span class="bool-val">false</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
+            <span class="ident">h1_preserve_header_order</span>: <span class="bool-val">false</span>,
             <span class="ident">h1_max_buf_size</span>: <span class="prelude-val">None</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
             <span class="ident">h1_headers_raw</span>: <span class="bool-val">false</span>,
@@ -1615,6 +1719,49 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Set whether HTTP/1 connections will accept obsolete line folding for</span>
+    <span class="doccomment">/// header values.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Newline codepoints (`\r` and `\n`) will be transformed to spaces when</span>
+    <span class="doccomment">/// parsing.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// You probably don&#39;t need this, here is what [RFC 7230 Section 3.2.4.] has</span>
+    <span class="doccomment">/// to say about it:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &gt; A server that receives an obs-fold in a request message that is not</span>
+    <span class="doccomment">/// &gt; within a message/http container MUST either reject the message by</span>
+    <span class="doccomment">/// &gt; sending a 400 (Bad Request), preferably with a representation</span>
+    <span class="doccomment">/// &gt; explaining that obsolete line folding is unacceptable, or replace</span>
+    <span class="doccomment">/// &gt; each received obs-fold with one or more SP octets prior to</span>
+    <span class="doccomment">/// &gt; interpreting the field value or forwarding the message downstream.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &gt; A proxy or gateway that receives an obs-fold in a response message</span>
+    <span class="doccomment">/// &gt; that is not within a message/http container MUST either discard the</span>
+    <span class="doccomment">/// &gt; message and replace it with a 502 (Bad Gateway) response, preferably</span>
+    <span class="doccomment">/// &gt; with a representation explaining that unacceptable line folding was</span>
+    <span class="doccomment">/// &gt; received, or replace each received obs-fold with one or more SP</span>
+    <span class="doccomment">/// &gt; octets prior to interpreting the field value or forwarding the</span>
+    <span class="doccomment">/// &gt; message downstream.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &gt; A user agent that receives an obs-fold in a response message that is</span>
+    <span class="doccomment">/// &gt; not within a message/http container MUST replace each received</span>
+    <span class="doccomment">/// &gt; obs-fold with one or more SP octets prior to interpreting the field</span>
+    <span class="doccomment">/// &gt; value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this setting does not affect HTTP/2.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Default is false.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [RFC 7230 Section 3.2.4.]: https://tools.ietf.org/html/rfc7230#section-3.2.4</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_allow_obsolete_multiline_headers_in_responses</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">enabled</span>: <span class="ident">bool</span>,
+    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Builder</span> {
+        <span class="self">self</span>.<span class="ident">h1_parser_config</span>
+            .<span class="ident">allow_obsolete_multiline_headers_in_responses</span>(<span class="ident">enabled</span>);
+        <span class="self">self</span>
+    }
+
     <span class="doccomment">/// Set whether HTTP/1 connections should try to use vectored writes,</span>
     <span class="doccomment">/// or always flatten into a single buffer.</span>
     <span class="doccomment">///</span>
@@ -1658,6 +1805,21 @@
     <span class="doccomment">/// Default is false.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_preserve_header_case</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Builder</span> {
         <span class="self">self</span>.<span class="ident">h1_preserve_header_case</span> <span class="op">=</span> <span class="ident">enabled</span>;
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set whether to support preserving original header order.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Currently, this will record the order in which headers are received, and store this</span>
+    <span class="doccomment">/// ordering in a private extension on the `Response`. It will also look for and use</span>
+    <span class="doccomment">/// such an extension in any provided `Request`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this setting does not affect HTTP/2.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Default is false.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_preserve_header_order</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Builder</span> {
+        <span class="self">self</span>.<span class="ident">h1_preserve_header_order</span> <span class="op">=</span> <span class="ident">enabled</span>;
         <span class="self">self</span>
     }
 
@@ -1907,6 +2069,10 @@
                     }
                     <span class="kw">if</span> <span class="ident">opts</span>.<span class="ident">h1_preserve_header_case</span> {
                         <span class="ident">conn</span>.<span class="ident">set_preserve_header_case</span>();
+                    }
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
+                    <span class="kw">if</span> <span class="ident">opts</span>.<span class="ident">h1_preserve_header_order</span> {
+                        <span class="ident">conn</span>.<span class="ident">set_preserve_header_order</span>();
                     }
                     <span class="kw">if</span> <span class="ident">opts</span>.<span class="ident">h09_responses</span> {
                         <span class="ident">conn</span>.<span class="ident">set_h09_responses</span>();

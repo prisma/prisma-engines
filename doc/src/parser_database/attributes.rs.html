@@ -1295,7 +1295,7 @@
     <span class="ident">scalar_field_data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ScalarField</span>,
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
 ) {
-    <span class="ident">ctx</span>.<span class="ident">visit_scalar_field_attributes</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>, <span class="ident">scalar_field_data</span>.<span class="ident">r#type</span>);
+    <span class="ident">ctx</span>.<span class="ident">visit_scalar_field_attributes</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>);
 
     <span class="comment">// @map</span>
     <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;map&quot;</span>) {

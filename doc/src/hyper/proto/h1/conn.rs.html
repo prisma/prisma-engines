@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.16/src/proto/h1/conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.19/src/proto/h1/conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1422,14 +1422,6 @@
 <span id="1417">1417</span>
 <span id="1418">1418</span>
 <span id="1419">1419</span>
-<span id="1420">1420</span>
-<span id="1421">1421</span>
-<span id="1422">1422</span>
-<span id="1423">1423</span>
-<span id="1424">1424</span>
-<span id="1425">1425</span>
-<span id="1426">1426</span>
-<span id="1427">1427</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::io</span>;
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
@@ -1490,6 +1482,8 @@
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
                 <span class="ident">h1_header_read_timeout_running</span>: <span class="bool-val">false</span>,
                 <span class="ident">preserve_header_case</span>: <span class="bool-val">false</span>,
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
+                <span class="ident">preserve_header_order</span>: <span class="bool-val">false</span>,
                 <span class="ident">title_case_headers</span>: <span class="bool-val">false</span>,
                 <span class="ident">h09_responses</span>: <span class="bool-val">false</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
@@ -1543,6 +1537,11 @@
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">preserve_header_case</span> <span class="op">=</span> <span class="bool-val">true</span>;
     }
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_preserve_header_order</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">preserve_header_order</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    }
+
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_h09_responses</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h09_responses</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -1580,19 +1579,15 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">can_read_head</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
-            <span class="ident">Reading::Init</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">T::should_read_first</span>() {
-                    <span class="bool-val">true</span>
-                } <span class="kw">else</span> {
-                    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
-                        <span class="ident">Writing::Init</span> =&gt; <span class="bool-val">false</span>,
-                        <span class="kw">_</span> =&gt; <span class="bool-val">true</span>,
-                    }
-                }
-            }
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+        <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span>, <span class="ident">Reading::Init</span>) {
+            <span class="kw">return</span> <span class="bool-val">false</span>;
         }
+
+        <span class="kw">if</span> <span class="ident">T::should_read_first</span>() {
+            <span class="kw">return</span> <span class="bool-val">true</span>;
+        }
+
+        <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span>, <span class="ident">Writing::Init</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">can_read_body</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
@@ -1632,6 +1627,8 @@
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
                 <span class="ident">h1_header_read_timeout_running</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h1_header_read_timeout_running</span>,
                 <span class="ident">preserve_header_case</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">preserve_header_case</span>,
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
+                <span class="ident">preserve_header_order</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">preserve_header_order</span>,
                 <span class="ident">h09_responses</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h09_responses</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
                 <span class="ident">on_informational</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">on_informational</span>,
@@ -1790,10 +1787,10 @@
     }
 
     <span class="kw">fn</span> <span class="ident">is_mid_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span>) {
-            (<span class="kw-2">&amp;</span><span class="ident">Reading::Init</span>, <span class="kw-2">&amp;</span><span class="ident">Writing::Init</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">true</span>,
-        }
+        <span class="op">!</span><span class="macro">matches!</span>(
+            (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span>),
+            (<span class="kw-2">&amp;</span><span class="ident">Reading::Init</span>, <span class="kw-2">&amp;</span><span class="ident">Writing::Init</span>)
+        )
     }
 
     <span class="comment">// This will check to make sure the io object read is empty.</span>
@@ -1916,11 +1913,10 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">can_write_head</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">T::should_read_first</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Reading::Closed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
-            }
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">T::should_read_first</span>() <span class="op">&amp;&amp;</span> <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span>, <span class="ident">Reading::Closed</span>) {
+            <span class="kw">return</span> <span class="bool-val">false</span>;
         }
+
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
             <span class="ident">Writing::Init</span> =&gt; <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">can_headers_buf</span>(),
             <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
@@ -2064,14 +2060,14 @@
             <span class="ident">Writing::Body</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">buffer</span>(<span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="ident">chunk</span>));
 
-                <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_eof</span>() {
-                    <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_last</span>() {
-                        <span class="ident">Writing::Closed</span>
-                    } <span class="kw">else</span> {
-                        <span class="ident">Writing::KeepAlive</span>
-                    }
-                } <span class="kw">else</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">encoder</span>.<span class="ident">is_eof</span>() {
                     <span class="kw">return</span>;
+                }
+
+                <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_last</span>() {
+                    <span class="ident">Writing::Closed</span>
+                } <span class="kw">else</span> {
+                    <span class="ident">Writing::KeepAlive</span>
                 }
             }
             <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;write_body invalid state: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span>),
@@ -2103,34 +2099,31 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">end_body</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">can_write_body</span>());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(());
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
-            <span class="ident">Writing::Body</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>) =&gt; {
-                <span class="comment">// end of stream, that means we should try to eof</span>
-                <span class="kw">match</span> <span class="ident">encoder</span>.<span class="ident">end</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">end</span>) =&gt; {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">end</span>) <span class="op">=</span> <span class="ident">end</span> {
-                            <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">buffer</span>(<span class="ident">end</span>);
-                        }
-                        <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_last</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">encoder</span>.<span class="ident">is_close_delimited</span>() {
-                            <span class="ident">Writing::Closed</span>
-                        } <span class="kw">else</span> {
-                            <span class="ident">Writing::KeepAlive</span>
-                        }
-                    }
-                    <span class="prelude-val">Err</span>(<span class="ident">_not_eof</span>) =&gt; {
-                        <span class="ident">res</span> <span class="op">=</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_user_body</span>(
-                            <span class="ident"><span class="kw">crate</span>::Error::new_body_write_aborted</span>(),
-                        ));
-                        <span class="ident">Writing::Closed</span>
-                    }
-                }
-            }
+        <span class="kw">let</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
+            <span class="ident">Writing::Body</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">enc</span>) =&gt; <span class="ident">enc</span>,
             <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
         };
 
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">state</span>;
-        <span class="ident">res</span>
+        <span class="comment">// end of stream, that means we should try to eof</span>
+        <span class="kw">match</span> <span class="ident">encoder</span>.<span class="ident">end</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">end</span>) =&gt; {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">end</span>) <span class="op">=</span> <span class="ident">end</span> {
+                    <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">buffer</span>(<span class="ident">end</span>);
+                }
+
+                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_last</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">encoder</span>.<span class="ident">is_close_delimited</span>() {
+                    <span class="ident">Writing::Closed</span>
+                } <span class="kw">else</span> {
+                    <span class="ident">Writing::KeepAlive</span>
+                };
+
+                <span class="prelude-val">Ok</span>(())
+            }
+            <span class="prelude-val">Err</span>(<span class="ident">not_eof</span>) =&gt; {
+                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">Writing::Closed</span>;
+                <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_body_write_aborted</span>().<span class="ident">with</span>(<span class="ident">not_eof</span>))
+            }
+        }
     }
 
     <span class="comment">// When we get a parse error, depending on what side we are, we might be able</span>
@@ -2183,10 +2176,7 @@
 
         <span class="comment">// If still in Reading::Body, just give up</span>
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
-            <span class="ident">Reading::Init</span> <span class="op">|</span> <span class="ident">Reading::KeepAlive</span> =&gt; {
-                <span class="macro">trace!</span>(<span class="string">&quot;body drained&quot;</span>);
-                <span class="kw">return</span>;
-            }
+            <span class="ident">Reading::Init</span> <span class="op">|</span> <span class="ident">Reading::KeepAlive</span> =&gt; <span class="macro">trace!</span>(<span class="string">&quot;body drained&quot;</span>),
             <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">close_read</span>(),
         }
     }
@@ -2258,6 +2248,8 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
     <span class="ident">h1_header_read_timeout_running</span>: <span class="ident">bool</span>,
     <span class="ident">preserve_header_case</span>: <span class="ident">bool</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
+    <span class="ident">preserve_header_order</span>: <span class="ident">bool</span>,
     <span class="ident">title_case_headers</span>: <span class="ident">bool</span>,
     <span class="ident">h09_responses</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// If set, called with each 1xx informational response received for</span>
@@ -2435,43 +2427,35 @@
 
         <span class="self">self</span>.<span class="ident">method</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="self">self</span>.<span class="ident">keep_alive</span>.<span class="ident">idle</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_idle</span>() {
-            <span class="self">self</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">Reading::Init</span>;
-            <span class="self">self</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">Writing::Init</span>;
 
-            <span class="comment">// !T::should_read_first() means Client.</span>
-            <span class="comment">//</span>
-            <span class="comment">// If Client connection has just gone idle, the Dispatcher</span>
-            <span class="comment">// should try the poll loop one more time, so as to poll the</span>
-            <span class="comment">// pending requests stream.</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">T::should_read_first</span>() {
-                <span class="self">self</span>.<span class="ident">notify_read</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            }
-        } <span class="kw">else</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_idle</span>() {
             <span class="self">self</span>.<span class="ident">close</span>();
+            <span class="kw">return</span>;
+        }
+
+        <span class="self">self</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">Reading::Init</span>;
+        <span class="self">self</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">Writing::Init</span>;
+
+        <span class="comment">// !T::should_read_first() means Client.</span>
+        <span class="comment">//</span>
+        <span class="comment">// If Client connection has just gone idle, the Dispatcher</span>
+        <span class="comment">// should try the poll loop one more time, so as to poll the</span>
+        <span class="comment">// pending requests stream.</span>
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">T::should_read_first</span>() {
+            <span class="self">self</span>.<span class="ident">notify_read</span> <span class="op">=</span> <span class="bool-val">true</span>;
         }
     }
 
     <span class="kw">fn</span> <span class="ident">is_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">KA::Idle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">keep_alive</span>.<span class="ident">status</span>() {
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">keep_alive</span>.<span class="ident">status</span>(), <span class="ident">KA::Idle</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">is_read_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">reading</span> {
-            <span class="ident">Reading::Closed</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
-        }
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">reading</span>, <span class="ident">Reading::Closed</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">is_write_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">writing</span> {
-            <span class="ident">Writing::Closed</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
-        }
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">writing</span>, <span class="ident">Writing::Closed</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">prepare_upgrade</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::upgrade::OnUpgrade</span> {

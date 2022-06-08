@@ -133,14 +133,6 @@
 <span id="128">128</span>
 <span id="129">129</span>
 <span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Argument</span>, <span class="ident">ArgumentsList</span>, <span class="ident">Identifier</span>, <span class="ident">Span</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithSpan</span>};
 <span class="kw">use</span> <span class="ident">std::ops::Index</span>;
 
@@ -208,7 +200,6 @@
     <span class="ident">Enum</span>(<span class="ident"><span class="kw">super</span>::EnumId</span>),
     <span class="ident">EnumValue</span>(<span class="ident"><span class="kw">super</span>::EnumId</span>, <span class="ident">u32</span>),
     <span class="ident">CompositeTypeField</span>(<span class="ident"><span class="kw">super</span>::CompositeTypeId</span>, <span class="ident"><span class="kw">super</span>::FieldId</span>),
-    <span class="ident">TypeAlias</span>(<span class="ident"><span class="kw">super</span>::AliasId</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::ModelId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttributeContainer</span> {
@@ -226,12 +217,6 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::EnumId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttributeContainer</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident"><span class="kw">super</span>::EnumId</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Enum</span>(<span class="ident">v</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::AliasId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttributeContainer</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident"><span class="kw">super</span>::AliasId</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::TypeAlias</span>(<span class="ident">v</span>)
     }
 }
 
@@ -267,7 +252,6 @@
             <span class="ident">AttributeContainer::Enum</span>(<span class="ident">enum_id</span>) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">enum_id</span>].<span class="ident">attributes</span>,
             <span class="ident">AttributeContainer::EnumValue</span>(<span class="ident">enum_id</span>, <span class="ident">value_idx</span>) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">enum_id</span>].<span class="ident">values</span>[<span class="ident">value_idx</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">attributes</span>,
             <span class="ident">AttributeContainer::CompositeTypeField</span>(<span class="ident">ctid</span>, <span class="ident">field_id</span>) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">ctid</span>][<span class="ident">field_id</span>].<span class="ident">attributes</span>,
-            <span class="ident">AttributeContainer::TypeAlias</span>(<span class="ident">alias_id</span>) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">alias_id</span>].<span class="ident">attributes</span>,
         }
     }
 }

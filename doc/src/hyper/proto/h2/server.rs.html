@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.16/src/proto/h2/server.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>server.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.19/src/proto/h2/server.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>server.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -536,6 +536,21 @@
 <span id="531">531</span>
 <span id="532">532</span>
 <span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::marker::Unpin</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
@@ -553,6 +568,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::body::HttpBody</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::exec::ConnStreamExec</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">date</span>, <span class="ident">task</span>, <span class="ident">Future</span>, <span class="ident">Pin</span>, <span class="ident">Poll</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ext::Protocol</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::headers</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::h2::ping::Recorder</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::h2</span>::{<span class="ident">H2Upgraded</span>, <span class="ident">UpgradedSendStream</span>};
@@ -572,6 +588,8 @@
 <span class="kw">const</span> <span class="ident">DEFAULT_STREAM_WINDOW</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>; <span class="comment">// 1mb</span>
 <span class="kw">const</span> <span class="ident">DEFAULT_MAX_FRAME_SIZE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">16</span>; <span class="comment">// 16kb</span>
 <span class="kw">const</span> <span class="ident">DEFAULT_MAX_SEND_BUF_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">400</span>; <span class="comment">// 400kb</span>
+<span class="comment">// 16 MB &quot;sane default&quot; taken from golang http2</span>
+<span class="kw">const</span> <span class="ident">DEFAULT_SETTINGS_MAX_HEADER_LIST_SIZE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">16</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">20</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Config</span> {
@@ -579,12 +597,14 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">initial_conn_window_size</span>: <span class="ident">u32</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">initial_stream_window_size</span>: <span class="ident">u32</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_frame_size</span>: <span class="ident">u32</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">enable_connect_protocol</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_concurrent_streams</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">keep_alive_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">keep_alive_timeout</span>: <span class="ident">Duration</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_send_buffer_size</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_header_list_size</span>: <span class="ident">u32</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span> {
@@ -594,12 +614,14 @@
             <span class="ident">initial_conn_window_size</span>: <span class="ident">DEFAULT_CONN_WINDOW</span>,
             <span class="ident">initial_stream_window_size</span>: <span class="ident">DEFAULT_STREAM_WINDOW</span>,
             <span class="ident">max_frame_size</span>: <span class="ident">DEFAULT_MAX_FRAME_SIZE</span>,
+            <span class="ident">enable_connect_protocol</span>: <span class="bool-val">false</span>,
             <span class="ident">max_concurrent_streams</span>: <span class="prelude-val">None</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
             <span class="ident">keep_alive_interval</span>: <span class="prelude-val">None</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
             <span class="ident">keep_alive_timeout</span>: <span class="ident">Duration::from_secs</span>(<span class="number">20</span>),
             <span class="ident">max_send_buffer_size</span>: <span class="ident">DEFAULT_MAX_SEND_BUF_SIZE</span>,
+            <span class="ident">max_header_list_size</span>: <span class="ident">DEFAULT_SETTINGS_MAX_HEADER_LIST_SIZE</span>,
         }
     }
 }
@@ -651,9 +673,13 @@
             .<span class="ident">initial_window_size</span>(<span class="ident">config</span>.<span class="ident">initial_stream_window_size</span>)
             .<span class="ident">initial_connection_window_size</span>(<span class="ident">config</span>.<span class="ident">initial_conn_window_size</span>)
             .<span class="ident">max_frame_size</span>(<span class="ident">config</span>.<span class="ident">max_frame_size</span>)
+            .<span class="ident">max_header_list_size</span>(<span class="ident">config</span>.<span class="ident">max_header_list_size</span>)
             .<span class="ident">max_send_buffer_size</span>(<span class="ident">config</span>.<span class="ident">max_send_buffer_size</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">max_concurrent_streams</span> {
             <span class="ident">builder</span>.<span class="ident">max_concurrent_streams</span>(<span class="ident">max</span>);
+        }
+        <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">enable_connect_protocol</span> {
+            <span class="ident">builder</span>.<span class="ident">enable_connect_protocol</span>();
         }
         <span class="kw">let</span> <span class="ident">handshake</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">handshake</span>(<span class="ident">io</span>);
 
@@ -818,7 +844,7 @@
 
                         <span class="kw">let</span> <span class="ident">is_connect</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">method</span>() <span class="op">==</span> <span class="ident">Method::CONNECT</span>;
                         <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">parts</span>, <span class="ident">stream</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">into_parts</span>();
-                        <span class="kw">let</span> (<span class="ident">req</span>, <span class="ident">connect_parts</span>) <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">is_connect</span> {
+                        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">req</span>, <span class="ident">connect_parts</span>) <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">is_connect</span> {
                             (
                                 <span class="ident">Request::from_parts</span>(
                                     <span class="ident">parts</span>,
@@ -844,6 +870,10 @@
                                 }),
                             )
                         };
+
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">protocol</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">extensions_mut</span>().<span class="ident">remove</span>::<span class="op">&lt;</span><span class="ident">h2::ext::Protocol</span><span class="op">&gt;</span>() {
+                            <span class="ident">req</span>.<span class="ident">extensions_mut</span>().<span class="ident">insert</span>(<span class="ident">Protocol::from_inner</span>(<span class="ident">protocol</span>));
+                        }
 
                         <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">H2Stream::new</span>(<span class="ident">service</span>.<span class="ident">call</span>(<span class="ident">req</span>), <span class="ident">connect_parts</span>, <span class="ident">respond</span>);
                         <span class="ident">exec</span>.<span class="ident">execute_h2stream</span>(<span class="ident">fut</span>);

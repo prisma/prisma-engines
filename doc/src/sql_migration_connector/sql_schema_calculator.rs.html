@@ -447,7 +447,6 @@
 <span id="442">442</span>
 <span id="443">443</span>
 <span id="444">444</span>
-<span id="445">445</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">sql_schema_calculator_flavour</span>;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use</span> <span class="ident">sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour</span>;
@@ -698,12 +697,11 @@
 }
 
 <span class="kw">fn</span> <span class="ident">column_for_scalar_field</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">idx</span>: (<span class="ident">usize</span>, <span class="ident">usize</span>), <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">sql::Column</span> {
-    <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">resolved_scalar_field_type</span>() {
+    <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">scalar_field_type</span>() {
         <span class="ident">ScalarFieldType::Enum</span>(<span class="ident">enum_id</span>) =&gt; <span class="ident">column_for_model_enum_scalar_field</span>(<span class="ident">field</span>, <span class="ident">enum_id</span>, <span class="ident">ctx</span>),
         <span class="ident">ScalarFieldType::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="ident">column_for_builtin_scalar_type</span>(<span class="ident">field</span>, <span class="ident">ScalarType::Json</span>, <span class="ident">idx</span>, <span class="ident">ctx</span>),
         <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; <span class="ident">column_for_builtin_scalar_type</span>(<span class="ident">field</span>, <span class="ident">scalar_type</span>, <span class="ident">idx</span>, <span class="ident">ctx</span>),
         <span class="ident">ScalarFieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">column_for_model_unsupported_scalar_field</span>(<span class="ident">field</span>, <span class="ident">ctx</span>),
-        <span class="ident">ScalarFieldType::Alias</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 

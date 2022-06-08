@@ -18,7 +18,7 @@ such as sending the appropriate headers, methods, and status codes. You can
 then use <a href="fn.on.html" title="on"><code>on</code></a> to grab a <code>Future</code> which will resolve to the upgraded
 connection object, or an error if the upgrade fails.</p>
 <h2 id="client"><a href="#client">Client</a></h2>
-<p>Sending an HTTP ugprade from the <a href="../client/index.html"><code>client</code></a> involves setting
+<p>Sending an HTTP upgrade from the <a href="../client/index.html"><code>client</code></a> involves setting
 either the appropriate method, if wanting to <code>CONNECT</code>, or headers such as
 <code>Upgrade</code> and <code>Connection</code>, on the <code>http::Request</code>. Once receiving the
 <code>http::Response</code> back, you must check for the specific information that the

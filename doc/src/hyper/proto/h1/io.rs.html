@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.16/src/proto/h1/io.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.19/src/proto/h1/io.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -994,20 +994,31 @@
 <span id="989">989</span>
 <span id="990">990</span>
 <span id="991">991</span>
+<span id="992">992</span>
+<span id="993">993</span>
+<span id="994">994</span>
+<span id="995">995</span>
+<span id="996">996</span>
+<span id="997">997</span>
+<span id="998">998</span>
+<span id="999">999</span>
+<span id="1000">1000</span>
+<span id="1001">1001</span>
+<span id="1002">1002</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident">std::future::Future</span>;
 <span class="kw">use</span> <span class="ident">std::io</span>::{<span class="self">self</span>, <span class="ident">IoSlice</span>};
 <span class="kw">use</span> <span class="ident">std::marker::Unpin</span>;
 <span class="kw">use</span> <span class="ident">std::mem::MaybeUninit</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">tokio::time::Instant</span>;
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BufMut</span>, <span class="ident">Bytes</span>, <span class="ident">BytesMut</span>};
 <span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ReadBuf</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident">tokio::time::Instant</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Http1Transaction</span>, <span class="ident">ParseContext</span>, <span class="ident">ParsedMessage</span>};
@@ -1190,6 +1201,8 @@
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
                     <span class="ident">h1_header_read_timeout_running</span>: <span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_running</span>,
                     <span class="ident">preserve_header_case</span>: <span class="ident">parse_ctx</span>.<span class="ident">preserve_header_case</span>,
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
+                    <span class="ident">preserve_header_order</span>: <span class="ident">parse_ctx</span>.<span class="ident">preserve_header_order</span>,
                     <span class="ident">h09_responses</span>: <span class="ident">parse_ctx</span>.<span class="ident">h09_responses</span>,
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
                     <span class="ident">on_informational</span>: <span class="ident">parse_ctx</span>.<span class="ident">on_informational</span>,
@@ -1204,9 +1217,13 @@
                     {
                         <span class="kw-2">*</span><span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_running</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">h1_header_read_timeout_fut</span>) <span class="op">=</span> <span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_fut</span> {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">h1_header_read_timeout_fut</span>) <span class="op">=</span>
+                            <span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_fut</span>
+                        {
                             <span class="comment">// Reset the timer in order to avoid woken up when the timeout finishes</span>
-                            <span class="ident">h1_header_read_timeout_fut</span>.<span class="ident">as_mut</span>().<span class="ident">reset</span>(<span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">30</span> <span class="op">*</span> <span class="number">24</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>));
+                            <span class="ident">h1_header_read_timeout_fut</span>
+                                .<span class="ident">as_mut</span>()
+                                .<span class="ident">reset</span>(<span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">30</span> <span class="op">*</span> <span class="number">24</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>));
                         }
                     }
                     <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">msg</span>));
@@ -1220,12 +1237,14 @@
 
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
                     <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_running</span> {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">h1_header_read_timeout_fut</span>) <span class="op">=</span> <span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_fut</span> {
-                            <span class="kw">if</span> <span class="ident">Pin::new</span>( <span class="ident">h1_header_read_timeout_fut</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">is_ready</span>() {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">h1_header_read_timeout_fut</span>) <span class="op">=</span>
+                            <span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_fut</span>
+                        {
+                            <span class="kw">if</span> <span class="ident">Pin::new</span>(<span class="ident">h1_header_read_timeout_fut</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">is_ready</span>() {
                                 <span class="kw-2">*</span><span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_running</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
                                 <span class="macro">tracing::warn!</span>(<span class="string">&quot;read header from client timeout&quot;</span>);
-                                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_header_timeout</span>()))
+                                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_header_timeout</span>()));
                             }
                         }
                     }
@@ -1723,10 +1742,15 @@
                 <span class="ident">cached_headers</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-val">None</span>,
                 <span class="ident">req_method</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-val">None</span>,
                 <span class="ident">h1_parser_config</span>: <span class="ident">Default::default</span>(),
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
                 <span class="ident">h1_header_read_timeout</span>: <span class="prelude-val">None</span>,
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
                 <span class="ident">h1_header_read_timeout_fut</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-val">None</span>,
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
                 <span class="ident">h1_header_read_timeout_running</span>: <span class="kw-2">&amp;mut</span> <span class="bool-val">false</span>,
                 <span class="ident">preserve_header_case</span>: <span class="bool-val">false</span>,
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
+                <span class="ident">preserve_header_order</span>: <span class="bool-val">false</span>,
                 <span class="ident">h09_responses</span>: <span class="bool-val">false</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
                 <span class="ident">on_informational</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-val">None</span>,
@@ -1890,9 +1914,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_buf_flatten</span>() {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">pretty_env_logger::try_init</span>();
 
-        <span class="kw">let</span> <span class="ident">mock</span> <span class="op">=</span> <span class="ident">Mock::new</span>()
-            .<span class="ident">write</span>(<span class="string">b&quot;hello world, it&#39;s hyper!&quot;</span>)
-            .<span class="ident">build</span>();
+        <span class="kw">let</span> <span class="ident">mock</span> <span class="op">=</span> <span class="ident">Mock::new</span>().<span class="ident">write</span>(<span class="string">b&quot;hello world, it&#39;s hyper!&quot;</span>).<span class="ident">build</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffered</span> <span class="op">=</span> <span class="ident">Buffered</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">mock</span>);
         <span class="ident">buffered</span>.<span class="ident">write_buf</span>.<span class="ident">set_strategy</span>(<span class="ident">WriteStrategy::Flatten</span>);
