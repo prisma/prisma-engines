@@ -161,7 +161,7 @@ impl MysqlUrl {
         let mut max_connection_lifetime = None;
         let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
         let mut prefer_socket = None;
-        let mut statement_cache_size = 1000;
+        let mut statement_cache_size = 100;
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -565,6 +565,19 @@ mod tests {
         assert_eq!(true, url.query_params.use_ssl);
         assert_eq!(false, url.query_params.ssl_opts.skip_domain_validation());
         assert_eq!(false, url.query_params.ssl_opts.accept_invalid_certs());
+    }
+
+    #[test]
+    fn should_allow_changing_of_cache_size() {
+        let url = MysqlUrl::new(Url::parse("mysql:///root:root@localhost:3307/foo?statement_cache_size=420").unwrap())
+            .unwrap();
+        assert_eq!(420, url.cache().capacity());
+    }
+
+    #[test]
+    fn should_have_default_cache_size() {
+        let url = MysqlUrl::new(Url::parse("mysql:///root:root@localhost:3307/foo").unwrap()).unwrap();
+        assert_eq!(100, url.cache().capacity());
     }
 
     #[tokio::test]

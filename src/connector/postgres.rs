@@ -282,7 +282,7 @@ impl PostgresUrl {
         let mut connect_timeout = Some(Duration::from_secs(5));
         let mut pool_timeout = Some(Duration::from_secs(10));
         let mut pg_bouncer = false;
-        let mut statement_cache_size = 500;
+        let mut statement_cache_size = 100;
         let mut max_connection_lifetime = None;
         let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
         let mut options = None;
@@ -793,7 +793,7 @@ mod tests {
     #[test]
     fn should_have_default_cache_size() {
         let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
-        assert_eq!(500, url.cache().capacity());
+        assert_eq!(100, url.cache().capacity());
     }
 
     #[test]
