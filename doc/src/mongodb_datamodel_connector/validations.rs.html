@@ -182,17 +182,6 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">parser_database</span>::{
         <span class="ident">ast</span>::{<span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
@@ -302,16 +291,11 @@
 
 <span class="doccomment">/// We can define only one index with the same parameters.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">index_is_not_defined_multiple_times_to_same_fields</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
-    <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attribute</span>) <span class="op">=</span> <span class="ident">index</span>.<span class="ident">ast_attribute</span>() {
-        <span class="ident">attribute</span>
-    } <span class="kw">else</span> {
-        <span class="kw">return</span>;
-    };
+    <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">ast_attribute</span>();
 
     <span class="kw">let</span> <span class="ident">hits</span> <span class="op">=</span> <span class="ident">index</span>
         .<span class="ident">model</span>()
         .<span class="ident">indexes</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="op">!</span><span class="ident">i</span>.<span class="ident">is_implicit</span>())
         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">attribute_id</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">index</span>.<span class="ident">attribute_id</span>())
         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">contains_exactly_the_fields</span>(<span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>()))
         .<span class="ident">count</span>();
@@ -331,12 +315,6 @@
 
 <span class="doccomment">/// A field cannot have `@id` and `@unique` attributes at the same time.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unique_cannot_be_defined_to_id_field</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
-    <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attribute</span>) <span class="op">=</span> <span class="ident">index</span>.<span class="ident">ast_attribute</span>() {
-        <span class="ident">attribute</span>
-    } <span class="kw">else</span> {
-        <span class="kw">return</span>;
-    };
-
     <span class="kw">if</span> <span class="op">!</span><span class="ident">index</span>.<span class="ident">is_unique</span>() {
         <span class="kw">return</span>;
     }
@@ -354,7 +332,7 @@
     <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
         <span class="string">&quot;The same field cannot be an id and unique on MongoDB.&quot;</span>,
         <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-        <span class="kw-2">*</span><span class="ident">attr</span>.<span class="ident">span</span>(),
+        <span class="kw-2">*</span><span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>(),
     ));
 }
 

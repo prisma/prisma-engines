@@ -1053,29 +1053,6 @@
 <span id="1048">1048</span>
 <span id="1049">1049</span>
 <span id="1050">1050</span>
-<span id="1051">1051</span>
-<span id="1052">1052</span>
-<span id="1053">1053</span>
-<span id="1054">1054</span>
-<span id="1055">1055</span>
-<span id="1056">1056</span>
-<span id="1057">1057</span>
-<span id="1058">1058</span>
-<span id="1059">1059</span>
-<span id="1060">1060</span>
-<span id="1061">1061</span>
-<span id="1062">1062</span>
-<span id="1063">1063</span>
-<span id="1064">1064</span>
-<span id="1065">1065</span>
-<span id="1066">1066</span>
-<span id="1067">1067</span>
-<span id="1068">1068</span>
-<span id="1069">1069</span>
-<span id="1070">1070</span>
-<span id="1071">1071</span>
-<span id="1072">1072</span>
-<span id="1073">1073</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">helpers</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Diagnostics</span>, <span class="ident">ParserDatabase</span>};
@@ -1914,31 +1891,8 @@
             <span class="ident">push_missing_relation_attribute</span>(<span class="ident">inline_relation</span>, <span class="kw-2">&amp;mut</span> <span class="ident">missing_field_attributes</span>);
         }
     }
-    <span class="ident">push_missing_unique_attributes</span>(<span class="ident">db</span>, <span class="kw-2">&amp;mut</span> <span class="ident">missing_field_attributes</span>);
 
     <span class="ident">missing_field_attributes</span>
-}
-
-<span class="kw">fn</span> <span class="ident">push_missing_unique_attributes</span>(<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span>, <span class="ident">attributes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MissingFieldAttribute</span><span class="op">&gt;</span>) {
-    <span class="comment">// Missing `@unique`s.</span>
-    <span class="kw">let</span> <span class="ident">missing_unique_indexes</span> <span class="op">=</span> <span class="ident">db</span>
-        .<span class="ident">walk_models</span>()
-        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">indexes</span>())
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">ast_attribute</span>().<span class="ident">is_none</span>());
-
-    <span class="kw">for</span> <span class="ident">missing_unique</span> <span class="kw">in</span> <span class="ident">missing_unique_indexes</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>) <span class="op">=</span> <span class="ident">missing_unique</span>.<span class="ident">source_field</span>() {
-            <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">MissingFieldAttribute</span> {
-                <span class="ident">model</span>: <span class="ident">missing_unique</span>.<span class="ident">model</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                <span class="ident">attribute</span>: <span class="ident">ast::Attribute</span> {
-                    <span class="ident">name</span>: <span class="ident">ast::Identifier::new</span>(<span class="string">&quot;unique&quot;</span>),
-                    <span class="ident">arguments</span>: <span class="ident">ast::ArgumentsList::default</span>(),
-                    <span class="ident">span</span>: <span class="ident">Span::empty</span>(),
-                },
-            })
-        }
-    }
 }
 
 <span class="kw">fn</span> <span class="ident">push_missing_relation_attribute</span>(

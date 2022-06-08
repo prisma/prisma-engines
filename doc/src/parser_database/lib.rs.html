@@ -155,10 +155,6 @@
 <span id="150">150</span>
 <span id="151">151</span>
 <span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unsafe_code</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">missing_docs</span>)]</span>
 
 <span class="doccomment">//! See the docs on [ParserDatabase](./struct.ParserDatabase.html).</span>
@@ -190,7 +186,6 @@
 
 <span class="kw">mod</span> <span class="ident">attributes</span>;
 <span class="kw">mod</span> <span class="ident">context</span>;
-<span class="kw">mod</span> <span class="ident">indexes</span>;
 <span class="kw">mod</span> <span class="ident">interner</span>;
 <span class="kw">mod</span> <span class="ident">names</span>;
 <span class="kw">mod</span> <span class="ident">relations</span>;
@@ -278,9 +273,6 @@
 
         <span class="comment">// Fourth step: relation inference</span>
         <span class="ident">relations::infer_relations</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
-
-        <span class="comment">// Fifth step: infer implicit indices</span>
-        <span class="ident">indexes::infer_implicit_indexes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
 
         <span class="ident">ParserDatabase</span> {
             <span class="ident">ast</span>,

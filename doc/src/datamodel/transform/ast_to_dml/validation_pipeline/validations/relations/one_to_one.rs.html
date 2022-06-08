@@ -271,6 +271,46 @@
 <span id="266">266</span>
 <span id="267">267</span>
 <span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">diagnostics::DatamodelError</span>,
@@ -538,6 +578,46 @@
             <span class="ident">back</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
         ));
     }
+}
+
+<span class="doccomment">/// A 1:1 relation is enforced with a unique constraint. The</span>
+<span class="doccomment">/// referencing side must use a unique constraint to enforce the</span>
+<span class="doccomment">/// relation.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_must_be_a_unique_constraint</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">let</span> <span class="ident">forward</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    };
+
+    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_model</span>();
+
+    <span class="kw">let</span> <span class="ident">is_unique</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">unique_criterias</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">referencing_fields</span>() {
+            <span class="ident">ReferencingFields::Concrete</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>,
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="bool-val">true</span>,
+        };
+
+        <span class="kw">let</span> <span class="ident">lengths_match</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="ident">fields</span>.<span class="ident">len</span>();
+
+        <span class="kw">let</span> <span class="ident">fields_match</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">fields</span>().<span class="ident">zip</span>(<span class="ident">fields</span>).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">a</span>.<span class="ident">as_scalar_field</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">a</span>) =&gt; <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+        });
+
+        <span class="ident">lengths_match</span> <span class="op">&amp;&amp;</span> <span class="ident">fields_match</span>
+    });
+
+    <span class="kw">if</span> <span class="ident">is_unique</span> {
+        <span class="kw">return</span>;
+    }
+
+    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;A one-to-one relation must use unique fields on the defining side. Either add a unique constraint, or change the relation to one-to-many.&quot;</span>;
+
+    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+        <span class="ident">message</span>,
+        <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
+        <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+    ));
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../../" data-current-crate="datamodel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>

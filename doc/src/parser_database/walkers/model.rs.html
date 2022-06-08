@@ -278,24 +278,6 @@
 <span id="273">273</span>
 <span id="274">274</span>
 <span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">primary_key</span>;
 <span class="kw">mod</span> <span class="ident">unique_criteria</span>;
 
@@ -486,10 +468,9 @@
         <span class="ident">from_pk</span>.<span class="ident">chain</span>(<span class="ident">from_indices</span>)
     }
 
-    <span class="doccomment">/// Iterate all the relation fields in the model in the order they were</span>
-    <span class="doccomment">/// defined. Note that these are only the fields that were actually written</span>
-    <span class="doccomment">/// in the schema.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">explicit_indexes</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
+    <span class="doccomment">/// Iterate all the indexes in the model in the order they were</span>
+    <span class="doccomment">/// defined.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indexes</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
         <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model_id</span>;
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>;
 
@@ -498,27 +479,10 @@
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">index</span>, <span class="ident">index_attribute</span>)<span class="op">|</span> <span class="ident">IndexWalker</span> {
                 <span class="ident">model_id</span>,
-                <span class="ident">index</span>: <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">index</span>),
+                <span class="ident">index</span>: <span class="kw-2">*</span><span class="ident">index</span>,
                 <span class="ident">db</span>,
                 <span class="ident">index_attribute</span>,
             })
-    }
-
-    <span class="doccomment">/// Iterate all the indexes in the model in the order they were</span>
-    <span class="doccomment">/// defined, followed by the implicit indexes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indexes</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
-        <span class="kw">let</span> <span class="ident">implicit_indexes</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">model_attributes</span>
-            .<span class="ident">implicit_indexes</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">index_attribute</span><span class="op">|</span> <span class="ident">IndexWalker</span> {
-                <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>(),
-                <span class="ident">index</span>: <span class="prelude-val">None</span>,
-                <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-                <span class="ident">index_attribute</span>,
-            });
-
-        <span class="self">self</span>.<span class="ident">explicit_indexes</span>().<span class="ident">chain</span>(<span class="ident">implicit_indexes</span>)
     }
 
     <span class="doccomment">/// All (concrete) relation fields of the model.</span>

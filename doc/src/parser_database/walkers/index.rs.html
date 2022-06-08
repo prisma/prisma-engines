@@ -306,11 +306,6 @@
 <span id="301">301</span>
 <span id="302">302</span>
 <span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="ident">IndexAlgorithm</span>, <span class="ident">IndexAttribute</span>},
@@ -324,7 +319,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::AttributeId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index</span>: <span class="ident">ast::AttributeId</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index_attribute</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">IndexAttribute</span>,
 }
@@ -355,7 +350,7 @@
     }
 
     <span class="doccomment">/// The id of the index, if explicitly defined.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attribute_id</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::AttributeId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attribute_id</span>(<span class="self">self</span>) -&gt; <span class="ident">ast::AttributeId</span> {
         <span class="self">self</span>.<span class="ident">index</span>
     }
 
@@ -380,8 +375,8 @@
     }
 
     <span class="doccomment">/// The AST node of the index/unique attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_attribute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">id</span>])
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_attribute</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Attribute</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">index</span>]
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">attribute</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">IndexAttribute</span> {
@@ -457,11 +452,6 @@
     <span class="doccomment">/// Is this an `@@index`?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_normal</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">is_normal</span>()
-    }
-
-    <span class="doccomment">/// True if it&#39;s our implicit unique index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_implicit</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">is_none</span>()
     }
 
     <span class="doccomment">/// If true, the index defines the storage and ordering of the row. Mostly</span>

@@ -314,7 +314,7 @@
             to_one_com   CompositeA?  @map(&quot;to_one_composite&quot;)
             to_many_com  CompositeB[] @map(&quot;to_many_composite&quot;)
 
-            to_one_rel_id Int?
+            to_one_rel_id Int? @unique
             to_one_rel    RelatedModel? @relation(name: &quot;ToOne&quot;, fields: [to_one_rel_id], references: [id])
 
             #m2m(to_many_rel, RelatedModel[], id, Int, ToMany)
