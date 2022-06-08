@@ -6,6 +6,8 @@ let
   moldy-cargo = pkgs.writeShellScriptBin "moldy-cargo" ''
     mold -run cargo $@
   '';
+  lib = pkgs.lib;
+  stdenv = pkgs.stdenv;
 in
 mkShell {
   LIBCLANG_PATH="${pkgs.llvmPackages.libclang}/lib";
@@ -13,7 +15,6 @@ mkShell {
   PROTOC_INCLUDE="${pkgs.protobuf}/include";
 
   buildInputs = with pkgs; [
-    mold # much faster linker
     moldy-cargo
 
     gcc
@@ -25,5 +26,6 @@ mkShell {
     protobuf
 
     rust-bin.stable.latest.default
-  ];
+    
+  ] ++ lib.optionals stdenv.isLinux [ mold ] ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ];
 }
