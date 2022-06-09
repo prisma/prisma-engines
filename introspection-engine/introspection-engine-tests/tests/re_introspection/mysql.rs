@@ -227,3 +227,45 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
 
     Ok(())
 }
+
+#[test_connector(tags(Mysql))]
+async fn mysql_keeps_renamed_enum_defaults(api: &TestApi) -> TestResult {
+    let init = formatdoc! {r#"
+        CREATE TABLE `A` (
+          `id` int NOT NULL AUTO_INCREMENT,
+          `val` enum('0','1') NOT NULL DEFAULT '0',
+          PRIMARY KEY (`id`)
+        );
+    "#};
+
+    api.raw_cmd(&init).await;
+
+    let input = indoc! {r#"
+        model A {
+          id  Int   @id
+          val A_val @default(is_false)
+        }
+
+        enum A_val {
+          is_false @map("0")
+          is_true  @map("1")
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model A {
+          id  Int   @id @default(autoincrement())
+          val A_val @default(is_false)
+        }
+
+        enum A_val {
+          is_false @map("0")
+          is_true @map("1")
+        }
+    "#]];
+    let result = api.re_introspect_dml(input).await?;
+
+    expected.assert_eq(&result);
+
+    Ok(())
+}
