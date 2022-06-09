@@ -107,3 +107,55 @@ async fn pg_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn array_primary_key_single_column(api: &TestApi) -> TestResult {
+    let create_table = format!(
+        "CREATE TABLE \"{schema_name}\".\"A\" (id INT[] PRIMARY KEY)",
+        schema_name = api.schema_name()
+    );
+
+    api.database().raw_cmd(&create_table).await?;
+
+    let expected = expect![[r#"
+        model A {
+          id Int[] @id
+        }
+    "#]];
+
+    let result = api.introspect_dml().await?;
+    expected.assert_eq(&result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn array_primary_key_compound_column(api: &TestApi) -> TestResult {
+    let schema_name = api.schema_name();
+
+    let create_table = formatdoc!(
+        r#"
+        CREATE TABLE "{schema_name}"."A" (
+            id1 INT[],
+            id2 INT[],
+            CONSTRAINT "A_pkey" PRIMARY KEY (id1, id2)
+        )
+    "#
+    );
+
+    api.database().raw_cmd(&create_table).await?;
+
+    let expected = expect![[r#"
+        model A {
+          id1 Int[]
+          id2 Int[]
+
+          @@id([id1, id2])
+        }
+    "#]];
+
+    let result = api.introspect_dml().await?;
+    expected.assert_eq(&result);
+
+    Ok(())
+}

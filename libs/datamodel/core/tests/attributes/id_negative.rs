@@ -1137,3 +1137,52 @@ fn mongodb_no_unique_index_for_id_model_attribute() {
 
     expected.assert_eq(&error);
 }
+
+#[test]
+fn array_ids_should_not_work_on_cockroach() {
+    let dml = indoc! {r#"
+      model A {
+        id Int[] @id
+      }
+    "#};
+
+    let dml = with_header(dml, Provider::Cockroach, &[]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": IDs cannot contain array fields in the current connector.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id Int[] @[1;91mid[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn compound_ids_with_arrays_should_not_work_on_cockroach() {
+    let dml = indoc! {r#"
+      model A {
+        id1 Int[]
+        id2 Int[]
+
+        @@id([id1, id2])
+      }
+    "#};
+
+    let dml = with_header(dml, Provider::Cockroach, &[]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@@id": IDs cannot contain array fields in the current connector.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mid([id1, id2])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}

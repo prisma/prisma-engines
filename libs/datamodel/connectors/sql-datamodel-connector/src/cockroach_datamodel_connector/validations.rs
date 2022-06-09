@@ -1,10 +1,24 @@
 use datamodel_connector::{
     parser_database::{
-        walkers::{IndexWalker, ModelWalker},
+        walkers::{IndexWalker, ModelWalker, PrimaryKeyWalker},
         IndexAlgorithm,
     },
     DatamodelError, Diagnostics, ScalarType,
 };
+
+pub(super) fn id_columns_cannot_be_arrays(pk: PrimaryKeyWalker<'_>, errors: &mut Diagnostics) {
+    if pk.fields().all(|f| f.is_required()) {
+        return;
+    }
+
+    let msg = "IDs cannot contain array fields in the current connector.";
+
+    errors.push_error(DatamodelError::new_attribute_validation_error(
+        msg,
+        pk.attribute_name(),
+        pk.ast_attribute().span,
+    ));
+}
 
 /// Validating the correct usage of GIN indices.
 pub(super) fn inverted_index_validations(index: IndexWalker<'_>, errors: &mut Diagnostics) {

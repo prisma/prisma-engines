@@ -69,7 +69,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
 
     let ast_model = &ctx.ast[model_id];
 
-    // ID attribute fields must reference only required fields.
+    // ID attribute fields must reference only required or array fields.
     let fields_that_are_not_required: Vec<&str> = resolved_fields
         .iter()
         .filter_map(|field| {
@@ -79,19 +79,19 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
                 None => {
                     let field = &ctx.ast[model_id][field_id];
 
-                    if field.arity.is_required() {
-                        None
-                    } else {
+                    if field.arity.is_optional() {
                         Some(field.name())
+                    } else {
+                        None
                     }
                 }
                 Some(ctid) => {
                     let field = &ctx.ast[ctid][field_id];
 
-                    if field.arity.is_required() {
-                        None
-                    } else {
+                    if field.arity.is_optional() {
                         Some(field.name())
+                    } else {
+                        None
                     }
                 }
             }
@@ -221,7 +221,7 @@ pub(super) fn validate_id_field_arities(
         return;
     };
 
-    if let ast::FieldArity::List | ast::FieldArity::Optional = ast_field.arity {
+    if ast_field.arity.is_optional() {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "Fields that are marked as id must be required.",
             "@id",

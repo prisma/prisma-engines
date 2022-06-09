@@ -473,3 +473,28 @@ fn mongodb_compound_unique_can_have_id_as_part_of_it() {
     let schema = with_header(dml, Provider::Mongo, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
+
+#[test]
+fn array_ids_should_work_on_postgres() {
+    let dml = indoc! {r#"
+      model A {
+        id Int[] @id
+      }
+    "#};
+
+    parse(&with_header(dml, Provider::Postgres, &[]));
+}
+
+#[test]
+fn compound_ids_with_arrays_should_work_on_postgres() {
+    let dml = indoc! {r#"
+      model A {
+        id1 Int[]
+        id2 Int[]
+
+        @@id([id1, id2])
+      }
+    "#};
+
+    parse(&with_header(dml, Provider::Postgres, &[]));
+}

@@ -1,3 +1,4 @@
+use indoc::indoc;
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
 use quaint::Value;
@@ -507,4 +508,42 @@ fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: Te
         You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.
     "#]];
     expected_error.assert_eq(&err);
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn array_primary_key_single_column(api: TestApi) {
+    let dm = indoc! {r#"
+        model A {
+          id Int[] @id
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table
+            .assert_column("id", |col| col.assert_is_list().assert_type_is_int())
+            .assert_pk(|pk| pk.assert_columns(&["id"]))
+    });
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn array_primary_key_compound_column(api: TestApi) {
+    let dm = indoc! {r#"
+        model A {
+          id1 Int[]
+          id2 Int[]
+
+          @@id([id1, id2])
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table
+            .assert_column("id1", |col| col.assert_is_list().assert_type_is_int())
+            .assert_column("id2", |col| col.assert_is_list().assert_type_is_int())
+            .assert_pk(|pk| pk.assert_columns(&["id1", "id2"]))
+    });
 }
