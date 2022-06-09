@@ -28,6 +28,7 @@ pub fn enrich(
     merge_changed_relation_names(old_data_model, new_data_model);
     merge_changed_enum_names(old_data_model, new_data_model, warnings);
     merge_changed_enum_values(old_data_model, new_data_model, warnings);
+    merge_changed_enum_defaults(old_data_model, new_data_model);
     merge_mysql_enum_names(old_data_model, new_data_model, ctx);
     merge_prisma_level_defaults(old_data_model, new_data_model, warnings);
     merge_ignores(old_data_model, new_data_model, warnings);
@@ -49,6 +50,71 @@ pub fn enrich(
 
         re_order_putting_new_ones_last(enum_a_idx, enum_b_idx)
     });
+}
+
+/// If we have to map the enum values, this makes sure we handle them
+/// in the default attributes correctly.
+fn merge_changed_enum_defaults(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
+    let mut changes: Vec<(ModelAndField, String)> = Vec::new();
+
+    for old_model in old_data_model.models() {
+        let new_model = match new_data_model.models().find(|m| m.name == *old_model.name()) {
+            Some(m) => m,
+            None => continue,
+        };
+
+        // Mike
+        for old_field in old_model.scalar_fields() {
+            let new_field = match new_model.scalar_fields().find(|f| f.name == *old_field.name()) {
+                Some(f) => f,
+                None => continue,
+            };
+
+            let r#enum = match (&old_field.field_type, &new_field.field_type) {
+                (FieldType::Enum(left), FieldType::Enum(right)) if left == right => {
+                    new_data_model.enums().find(|e| e.name() == right).unwrap()
+                }
+                _ => continue,
+            };
+
+            match (
+                old_field.default_value.as_ref().and_then(|v| v.as_single()),
+                new_field.default_value.as_ref().and_then(|v| v.as_expression()),
+            ) {
+                // The right side is now considered as dbgenerated due
+                // to us not being able to generate a valid name to
+                // it.
+                //
+                // The user has renamed these already as the left side
+                // is a single value, so we'll map it to the now model
+                // accordingly.
+                (Some(_), Some(generator)) if generator.name() == "dbgenerated" => {
+                    let val = match generator.args().first().and_then(|(_, v)| v.as_string()) {
+                        Some(val) => val,
+                        None => continue,
+                    };
+
+                    if let Some(val) = r#enum.find_value_db_name(val) {
+                        changes.push((
+                            ModelAndField {
+                                model: new_model.name().to_string(),
+                                field: new_field.name().to_string(),
+                            },
+                            val.name.to_string(),
+                        ));
+                    }
+                }
+                _ => continue,
+            }
+        }
+    }
+
+    for change in changes.into_iter() {
+        let model = new_data_model.find_model_mut(&change.0.model);
+        let field = model.find_scalar_field_mut(&change.0.field);
+
+        field.set_default_value(DefaultValue::new_single(PrismaValue::Enum(change.1)));
+    }
 }
 
 fn keep_index_ordering(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
