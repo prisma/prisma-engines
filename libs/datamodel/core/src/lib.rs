@@ -74,7 +74,7 @@ use enumflags2::BitFlags;
 use parser_database::ParserDatabase;
 use transform::{
     ast_to_dml::{validate, DatasourceLoader, GeneratorLoader},
-    dml_to_ast::{self, GeneratorSerializer, LowerDmlToAst},
+    dml_to_ast::{self, lower, GeneratorSerializer, LowerParams},
 };
 
 #[derive(Debug)]
@@ -248,7 +248,11 @@ pub fn render_datamodel_to(
         .map(|c| c.preview_features())
         .unwrap_or_else(BitFlags::empty);
 
-    let lowered = LowerDmlToAst::new(datasource, preview_features).lower(datamodel);
+    let lowered = lower(LowerParams {
+        datasource,
+        _preview_features: preview_features,
+        datamodel,
+    });
 
     render_schema_ast_to(stream, &lowered, 2);
 }
@@ -260,7 +264,11 @@ pub fn render_datamodel_to_with_preview_flags(
     datasource: Option<&Datasource>,
     flags: BitFlags<PreviewFeature>,
 ) {
-    let lowered = LowerDmlToAst::new(datasource, flags).lower(datamodel);
+    let lowered = lower(LowerParams {
+        datasource,
+        _preview_features: flags,
+        datamodel,
+    });
     render_schema_ast_to(stream, &lowered, 2);
 }
 
@@ -282,7 +290,11 @@ fn render_datamodel_and_config_to(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) {
-    let mut lowered = LowerDmlToAst::new(config.datasources.first(), config.preview_features()).lower(datamodel);
+    let mut lowered = lower(LowerParams {
+        datasource: config.datasources.first(),
+        _preview_features: config.preview_features(),
+        datamodel,
+    });
 
     dml_to_ast::add_sources_to_ast(config, &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
