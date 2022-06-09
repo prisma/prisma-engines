@@ -646,6 +646,70 @@ pub trait Visitor<'a> {
         self.visit_expression(right)
     }
 
+    fn visit_like(&mut self, left: Expression<'a>, right: Cow<str>) -> Result {
+        self.visit_expression(left)?;
+
+        self.add_parameter(Value::text(format!(
+            "{}{}{}",
+            Self::C_WILDCARD,
+            right,
+            Self::C_WILDCARD
+        )));
+
+        self.write(" LIKE ")?;
+        self.parameter_substitution()
+    }
+
+    fn visit_not_like(&mut self, left: Expression<'a>, right: Cow<str>) -> Result {
+        self.visit_expression(left)?;
+
+        self.add_parameter(Value::text(format!(
+            "{}{}{}",
+            Self::C_WILDCARD,
+            right,
+            Self::C_WILDCARD
+        )));
+
+        self.write(" NOT LIKE ")?;
+        self.parameter_substitution()
+    }
+
+    fn visit_begins_with(&mut self, left: Expression<'a>, right: Cow<str>) -> Result {
+        self.visit_expression(left)?;
+
+        self.add_parameter(Value::text(format!("{}{}", right, Self::C_WILDCARD)));
+
+        self.write(" LIKE ")?;
+        self.parameter_substitution()
+    }
+
+    fn visit_not_begins_with(&mut self, left: Expression<'a>, right: Cow<str>) -> Result {
+        self.visit_expression(left)?;
+
+        self.add_parameter(Value::text(format!("{}{}", right, Self::C_WILDCARD)));
+
+        self.write(" NOT LIKE ")?;
+        self.parameter_substitution()
+    }
+
+    fn visit_ends_with(&mut self, left: Expression<'a>, right: Cow<str>) -> Result {
+        self.visit_expression(left)?;
+
+        self.add_parameter(Value::text(format!("{}{}", Self::C_WILDCARD, right,)));
+
+        self.write(" LIKE ")?;
+        self.parameter_substitution()
+    }
+
+    fn visit_not_ends_with(&mut self, left: Expression<'a>, right: Cow<str>) -> Result {
+        self.visit_expression(left)?;
+
+        self.add_parameter(Value::text(format!("{}{}", Self::C_WILDCARD, right,)));
+
+        self.write(" NOT LIKE ")?;
+        self.parameter_substitution()
+    }
+
     /// A comparison expression
     fn visit_compare(&mut self, compare: Compare<'a>) -> Result {
         match compare {
@@ -799,64 +863,12 @@ pub trait Visitor<'a> {
                     self.visit_expression(right)
                 }
             },
-            Compare::Like(left, right) => {
-                self.visit_expression(*left)?;
-
-                self.add_parameter(Value::text(format!(
-                    "{}{}{}",
-                    Self::C_WILDCARD,
-                    right,
-                    Self::C_WILDCARD
-                )));
-
-                self.write(" LIKE ")?;
-                self.parameter_substitution()
-            }
-            Compare::NotLike(left, right) => {
-                self.visit_expression(*left)?;
-
-                self.add_parameter(Value::text(format!(
-                    "{}{}{}",
-                    Self::C_WILDCARD,
-                    right,
-                    Self::C_WILDCARD
-                )));
-
-                self.write(" NOT LIKE ")?;
-                self.parameter_substitution()
-            }
-            Compare::BeginsWith(left, right) => {
-                self.visit_expression(*left)?;
-
-                self.add_parameter(Value::text(format!("{}{}", right, Self::C_WILDCARD)));
-
-                self.write(" LIKE ")?;
-                self.parameter_substitution()
-            }
-            Compare::NotBeginsWith(left, right) => {
-                self.visit_expression(*left)?;
-
-                self.add_parameter(Value::text(format!("{}{}", right, Self::C_WILDCARD)));
-
-                self.write(" NOT LIKE ")?;
-                self.parameter_substitution()
-            }
-            Compare::EndsInto(left, right) => {
-                self.visit_expression(*left)?;
-
-                self.add_parameter(Value::text(format!("{}{}", Self::C_WILDCARD, right,)));
-
-                self.write(" LIKE ")?;
-                self.parameter_substitution()
-            }
-            Compare::NotEndsInto(left, right) => {
-                self.visit_expression(*left)?;
-
-                self.add_parameter(Value::text(format!("{}{}", Self::C_WILDCARD, right,)));
-
-                self.write(" NOT LIKE ")?;
-                self.parameter_substitution()
-            }
+            Compare::Like(left, right) => self.visit_like(*left, right),
+            Compare::NotLike(left, right) => self.visit_not_like(*left, right),
+            Compare::BeginsWith(left, right) => self.visit_begins_with(*left, right),
+            Compare::NotBeginsWith(left, right) => self.visit_not_begins_with(*left, right),
+            Compare::EndsInto(left, right) => self.visit_ends_with(*left, right),
+            Compare::NotEndsInto(left, right) => self.visit_not_ends_with(*left, right),
             Compare::Null(column) => {
                 self.visit_expression(*column)?;
                 self.write(" IS NULL")

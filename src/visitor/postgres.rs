@@ -2,6 +2,7 @@ use crate::{
     ast::*,
     visitor::{self, Visitor},
 };
+use std::borrow::Cow;
 use std::fmt::{self, Write};
 
 /// A visitor to generate queries for the PostgreSQL database.
@@ -416,6 +417,102 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
         Ok(())
     }
+
+    fn visit_like(&mut self, left: Expression<'a>, right: Cow<str>) -> visitor::Result {
+        let need_cast = matches!(&left.kind, ExpressionKind::Column(_));
+        self.visit_expression(left)?;
+
+        // NOTE: Pg is strongly typed, LIKE comparisons are only between strings.
+        // to avoid problems with types without implicit casting we explicitly cast to text
+        if need_cast {
+            self.write("::text")?;
+        }
+
+        self.add_parameter(Value::text(format!(
+            "{}{}{}",
+            Self::C_WILDCARD,
+            right,
+            Self::C_WILDCARD
+        )));
+
+        self.write(" LIKE ")?;
+        self.parameter_substitution()
+    }
+
+    fn visit_not_like(&mut self, left: Expression<'a>, right: Cow<str>) -> visitor::Result {
+        let need_cast = matches!(&left.kind, ExpressionKind::Column(_));
+        self.visit_expression(left)?;
+
+        if need_cast {
+            self.write("::text")?;
+        }
+
+        self.add_parameter(Value::text(format!(
+            "{}{}{}",
+            Self::C_WILDCARD,
+            right,
+            Self::C_WILDCARD
+        )));
+
+        self.write(" NOT LIKE ")?;
+        self.parameter_substitution()
+    }
+
+    fn visit_begins_with(&mut self, left: Expression<'a>, right: Cow<str>) -> visitor::Result {
+        let need_cast = matches!(&left.kind, ExpressionKind::Column(_));
+        self.visit_expression(left)?;
+
+        if need_cast {
+            self.write("::text")?;
+        }
+
+        self.add_parameter(Value::text(format!("{}{}", right, Self::C_WILDCARD)));
+
+        self.write(" LIKE ")?;
+        self.parameter_substitution()
+    }
+
+    fn visit_not_begins_with(&mut self, left: Expression<'a>, right: Cow<str>) -> visitor::Result {
+        let need_cast = matches!(&left.kind, ExpressionKind::Column(_));
+        self.visit_expression(left)?;
+
+        if need_cast {
+            self.write("::text")?;
+        }
+
+        self.add_parameter(Value::text(format!("{}{}", right, Self::C_WILDCARD)));
+
+        self.write(" NOT LIKE ")?;
+        self.parameter_substitution()
+    }
+
+    fn visit_ends_with(&mut self, left: Expression<'a>, right: Cow<str>) -> visitor::Result {
+        let need_cast = matches!(&left.kind, ExpressionKind::Column(_));
+        self.visit_expression(left)?;
+
+        if need_cast {
+            self.write("::text")?;
+        }
+
+        self.add_parameter(Value::text(format!("{}{}", Self::C_WILDCARD, right,)));
+
+        self.write(" LIKE ")?;
+        self.parameter_substitution()
+    }
+
+    fn visit_not_ends_with(&mut self, left: Expression<'a>, right: Cow<str>) -> visitor::Result {
+        let need_cast = matches!(&left.kind, ExpressionKind::Column(_));
+        self.visit_expression(left)?;
+
+        if need_cast {
+            self.write("::text")?;
+        }
+
+        self.add_parameter(Value::text(format!("{}{}", Self::C_WILDCARD, right,)));
+
+        self.write(" NOT LIKE ")?;
+        self.parameter_substitution()
+    }
 }
 
 #[cfg(test)]
@@ -811,6 +908,90 @@ mod tests {
         let (sql, _) = Postgres::build(Select::from_table("foo").so_that("bar".compare_raw("ILIKE", "baz%"))).unwrap();
 
         assert_eq!(r#"SELECT "foo".* FROM "foo" WHERE "bar" ILIKE $1"#, sql);
+    }
+
+    #[test]
+    fn test_like_cast_to_string() {
+        let expected = expected_values(
+            r#"SELECT "test".* FROM "test" WHERE "jsonField"::text LIKE $1"#,
+            vec!["%foo%"],
+        );
+
+        let query = Select::from_table("test").so_that(Column::from("jsonField").like("foo"));
+        let (sql, params) = Postgres::build(query).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_not_like_cast_to_string() {
+        let expected = expected_values(
+            r#"SELECT "test".* FROM "test" WHERE "jsonField"::text NOT LIKE $1"#,
+            vec!["%foo%"],
+        );
+
+        let query = Select::from_table("test").so_that(Column::from("jsonField").not_like("foo"));
+        let (sql, params) = Postgres::build(query).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_begins_with_cast_to_string() {
+        let expected = expected_values(
+            r#"SELECT "test".* FROM "test" WHERE "jsonField"::text LIKE $1"#,
+            vec!["foo%"],
+        );
+
+        let query = Select::from_table("test").so_that(Column::from("jsonField").begins_with("foo"));
+        let (sql, params) = Postgres::build(query).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_not_begins_with_cast_to_string() {
+        let expected = expected_values(
+            r#"SELECT "test".* FROM "test" WHERE "jsonField"::text NOT LIKE $1"#,
+            vec!["foo%"],
+        );
+
+        let query = Select::from_table("test").so_that(Column::from("jsonField").not_begins_with("foo"));
+        let (sql, params) = Postgres::build(query).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_ends_with_cast_to_string() {
+        let expected = expected_values(
+            r#"SELECT "test".* FROM "test" WHERE "jsonField"::text LIKE $1"#,
+            vec!["%foo"],
+        );
+
+        let query = Select::from_table("test").so_that(Column::from("jsonField").ends_into("foo"));
+        let (sql, params) = Postgres::build(query).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_not_ends_with_cast_to_string() {
+        let expected = expected_values(
+            r#"SELECT "test".* FROM "test" WHERE "jsonField"::text NOT LIKE $1"#,
+            vec!["%foo"],
+        );
+
+        let query = Select::from_table("test").so_that(Column::from("jsonField").not_ends_into("foo"));
+        let (sql, params) = Postgres::build(query).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
     }
 
     #[test]
