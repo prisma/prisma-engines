@@ -206,6 +206,26 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         db.tables_to_redefine = id_gets_dropped.collect();
     }
 
+    fn string_matches_bytes(&self, string: &str, bytes: &[u8]) -> bool {
+        dbg!(string, bytes, string.len(), bytes.len());
+        if !string.starts_with("\\x") || string.len() - 2 != bytes.len() * 2 || !string.is_ascii() {
+            return false;
+        }
+
+        dbg!("here");
+
+        let string = &string[2..];
+
+        bytes.iter().enumerate().all(|(idx, byte)| {
+            let chars = &string[idx * 2..idx * 2 + 2];
+            if let Ok(byte_from_string) = u8::from_str_radix(chars, 16) {
+                byte_from_string == *byte
+            } else {
+                false
+            }
+        })
+    }
+
     fn table_should_be_ignored(&self, table_name: &str) -> bool {
         POSTGIS_TABLES_OR_VIEWS.is_match(table_name)
     }

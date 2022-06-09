@@ -528,7 +528,7 @@ fn scalar_list_defaults_work(api: TestApi) {
             int_empty Int[] @default([])
             int Int[] @default([0, 1, 1, 2, 3, 5, 8, 13, 21])
             float Float[] @default([3.20, 4.20, 3.14, 0, 9.9999999, 1000.7])
-            string String[] @default(["Arrabiata", "Carbonara", "Al Ragù"])
+            string String[] @default(["Arrabbiata", "Carbonara", "Al Ragù"])
             boolean Boolean[] @default([false, true ,true, true])
             dateTime DateTime[] @default(["2019-06-17T14:20:57Z", "2020-09-21T20:00:00+02:00"])
             colors Color[] @default([GREEN, BLUE])
@@ -544,4 +544,111 @@ fn scalar_list_defaults_work(api: TestApi) {
         .assert_green()
         .assert_has_executed_steps();
     api.schema_push(schema).send().assert_green().assert_no_steps();
+
+    let expected_sql = expect![[r#"
+        -- CreateEnum
+        CREATE TYPE "Color" AS ENUM ('RED', 'GREEN', 'BLUE');
+
+        -- CreateTable
+        CREATE TABLE "Model" (
+            "id" INTEGER NOT NULL,
+            "int_empty" INTEGER[] DEFAULT E'{}',
+            "int" INTEGER[] DEFAULT E'{0, 1, 1, 2, 3, 5, 8, 13, 21}',
+            "float" DOUBLE PRECISION[] DEFAULT E'{3.20, 4.20, 3.14, 0, 9.9999999, 1000.7}',
+            "string" TEXT[] DEFAULT E'{E\'Arrabbiata\', E\'Carbonara\', E\'Al Ragù\'}',
+            "boolean" BOOLEAN[] DEFAULT E'{false, true, true, true}',
+            "dateTime" TIMESTAMP(3)[] DEFAULT E'{\'2019-06-17 14:20:57 +00:00\', \'2020-09-21 20:00:00 +02:00\'}',
+            "colors" "Color"[] DEFAULT E'{GREEN, BLUE}',
+            "colors_empty" "Color"[] DEFAULT E'{}',
+            "bytes" BYTEA[] DEFAULT E'{\'68656c6c6f20776f726c64\'}',
+            "json" JSONB[] DEFAULT E'{"{ \\"a\\": [\\"b\\"] }", "3"}',
+            "decimal" DECIMAL(65,30)[] DEFAULT E'{121.10299000124800000001, 0.4, 1.1, -68.0}',
+
+            CONSTRAINT "Model_pkey" PRIMARY KEY ("id")
+        );
+    "#]];
+
+    api.expect_sql_for_schema(schema, &expected_sql);
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn scalar_list_default_diffing(api: TestApi) {
+    let schema_1 = r#"
+        datasource db {
+          provider = "postgresql"
+          url = env("DATABASE_URL")
+        }
+
+        enum Color {
+            RED
+            GREEN
+            BLUE
+        }
+
+        model Model {
+            id Int @id
+            int_empty Int[] @default([])
+            int Int[] @default([0, 1, 1, 2, 3, 5, 8, 13, 21])
+            float Float[] @default([3.20, 4.20, 3.14, 0, 9.9999999, 1000.7])
+            string String[] @default(["Arrabbiata", "Carbonara", "Al Ragù"])
+            boolean Boolean[] @default([false, true ,true, true])
+            dateTime DateTime[] @default(["2019-06-17T14:20:57Z", "2020-09-21T20:00:00+02:00"])
+            colors Color[] @default([GREEN, BLUE])
+            colors_empty Color[] @default([])
+            bytes    Bytes[] @default(["aGVsbG8gd29ybGQ="])
+            json     Json[]  @default(["{ \"a\": [\"b\"] }", "3"])
+            decimal  Decimal[]  @default(["121.10299000124800000001", "0.4", "1.1", "-68.0"])
+        }
+    "#;
+
+    let schema_2 = r#"
+        datasource db {
+          provider = "postgresql"
+          url = env("DATABASE_URL")
+        }
+
+        enum Color {
+            RED
+            GREEN
+            BLUE
+        }
+
+        model Model {
+            id Int @id
+            int_empty Int[] @default([])
+            int Int[] @default([0, 1, 1, 2, 3, 5, 8, 13, 21])
+            float Float[] @default([3.20, 4.20, 9.9999999, 1000.7])
+            string String[] @default(["Arrabbiata", "Quattro Formaggi","Al Ragù"])
+            boolean Boolean[] @default([true, true ,true, true])
+            dateTime DateTime[] @default(["2019-06-17T14:20:57Z", "2020-09-21T20:00:00+02:00"])
+            colors Color[] @default([BLUE, GREEN])
+            colors_empty Color[] @default([])
+            bytes    Bytes[] @default(["aGVsbG8gd29ybGQ=", "aGVsbG8gd37ybGQ="])
+            json     Json[]  @default(["{ \"a\": [\"b\"] }", "4"])
+            decimal  Decimal[]  @default(["0.4", "1.1", "-68.0"])
+        }
+    "#;
+
+    let migration = api.connector_diff(DiffTarget::Datamodel(schema_1), DiffTarget::Datamodel(schema_2));
+
+    let expected_migration = expect![[r#"
+        -- AlterTable
+        ALTER TABLE "Model" ALTER COLUMN "float" SET DEFAULT E'{3.20, 4.20, 9.9999999, 1000.7}',
+        ALTER COLUMN "string" SET DEFAULT E'{E\'Arrabbiata\', E\'Quattro Formaggi\', E\'Al Ragù\'}',
+        ALTER COLUMN "boolean" SET DEFAULT E'{true, true, true, true}',
+        ALTER COLUMN "colors" SET DEFAULT E'{BLUE, GREEN}',
+        ALTER COLUMN "bytes" SET DEFAULT E'{\'68656c6c6f20776f726c64\', \'68656c6c6f20777ef26c64\'}',
+        ALTER COLUMN "json" SET DEFAULT E'{"{ \\"a\\": [\\"b\\"] }", "4"}',
+        ALTER COLUMN "decimal" SET DEFAULT E'{0.4, 1.1, -68.0}';
+    "#]];
+
+    expected_migration.assert_eq(&migration);
+
+    api.schema_push(schema_1).send().assert_green();
+    api.schema_push(schema_1).send().assert_green().assert_no_steps();
+    api.schema_push(schema_2)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(schema_2).send().assert_green().assert_no_steps();
 }

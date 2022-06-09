@@ -680,7 +680,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let sql = format!(
             r#"
             SELECT
-               info.table_name,
+                info.table_name,
                 info.column_name,
                 format_type(att.atttypid, att.atttypmod) as formatted_type,
                 info.numeric_precision,
@@ -689,20 +689,22 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.datetime_precision,
                 info.data_type,
                 info.udt_name as full_data_type,
-                info.column_default,
+                -- info.column_default,
+                pg_get_expr(attdef.adbin, attdef.adrelid) AS column_default,
                 info.is_nullable,
                 info.is_identity,
                 info.data_type,
                 info.character_maximum_length
             FROM information_schema.columns info
-            JOIN pg_attribute att on att.attname = info.column_name
-            AND att.attrelid = (
-            	SELECT pg_class.oid
-            	FROM pg_class
-            	JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
-            	WHERE relname = info.table_name
-            	AND pg_namespace.nspname = $1
-            )
+            JOIN pg_attribute att ON att.attname = info.column_name
+                AND att.attrelid = (
+                    SELECT pg_class.oid
+                    FROM pg_class
+                    JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
+                    WHERE relname = info.table_name
+                    AND pg_namespace.nspname = $1
+                )
+            LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum
             WHERE table_schema = $1 {}
             ORDER BY ordinal_position;
         "#,
@@ -740,9 +742,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let default = col
                 .get("column_default")
                 .and_then(|raw_default_value| raw_default_value.to_string())
-                .and_then(|raw_default_value| {
-                    get_default_value(&raw_default_value, &data_type, &tpe, sequences, schema)
-                });
+                .and_then(|raw_default_value| get_default_value(&raw_default_value, &tpe));
 
             let auto_increment = is_identity
                 || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::Sequence(_)))

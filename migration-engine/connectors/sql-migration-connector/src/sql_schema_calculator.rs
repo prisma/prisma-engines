@@ -262,14 +262,17 @@ fn column_for_model_enum_scalar_field(
     ctx: &mut Context<'_>,
 ) -> sql::Column {
     let r#enum = ctx.datamodel.db.walk_enum(enum_id);
+    let value_for_name = |name: &str| -> PrismaValue {
+        match r#enum.values().find(|v| v.name() == name).map(|v| v.database_name()) {
+            // Some(v) if v.chars().all(|c| c.is_ascii_digit() || c == '-') => PrismaValue::BigInt(v.parse().unwrap()),
+            Some(v) => PrismaValue::Enum(v.to_owned()),
+            None => panic!("Expected enum field default to reference existing value."),
+        }
+    };
+
     let default = field.default_value().and_then(|def| match def.value() {
         ast::Expression::ConstantValue(value_name, _) => {
-            let value = r#enum
-                .values()
-                .find(|v| v.name() == value_name)
-                .expect("Expected enum field default to reference existing value.");
-
-            let def = sql::DefaultValue::value(PrismaValue::Enum(value.database_name().to_owned()))
+            let def = sql::DefaultValue::value(value_for_name(value_name))
                 .with_constraint_name(ctx.flavour.default_constraint_name(def));
             Some(def)
         }
@@ -277,7 +280,10 @@ fn column_for_model_enum_scalar_field(
             let mut values = Vec::with_capacity(items.len());
 
             for item in items {
-                values.push(PrismaValue::Enum(item.as_constant_value().unwrap().0.to_owned()));
+                let (value_name, _) = item
+                    .as_constant_value()
+                    .expect("Non-constant value inside enum list default.");
+                values.push(value_for_name(value_name));
             }
 
             let default_value = sql::DefaultValue::value(PrismaValue::List(values))

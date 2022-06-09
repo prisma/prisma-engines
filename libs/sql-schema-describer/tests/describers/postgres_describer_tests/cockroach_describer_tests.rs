@@ -1,4 +1,5 @@
 use crate::test_api::*;
+use prisma_value::PrismaValue;
 use sql_schema_describer::{postgres::PostgresSchemaExt, ColumnTypeFamily, IndexColumn, SQLSortOrder};
 
 #[test_connector(tags(CockroachDb))]
@@ -358,4 +359,20 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
         }
     "#]];
     expected_ext.assert_debug_eq(&ext);
+}
+
+#[test_connector(tags(CockroachDb))]
+fn int_expressions_in_defaults(api: TestApi) {
+    let schema = r#"
+        CREATE TABLE "defaults" (
+            mysum INT8 NOT NULL DEFAULT 5 + 32
+        );
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+    let col = table.column("mysum").unwrap();
+    let value = col.default().unwrap().as_value().unwrap();
+    assert!(matches!(value, PrismaValue::Int(37)));
 }

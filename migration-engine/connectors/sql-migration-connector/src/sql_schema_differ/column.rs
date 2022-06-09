@@ -37,10 +37,6 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         return true;
     }
 
-    if cols.map(|c| c.arity().is_list()).into_tuple() == (true, true) {
-        return true; // TODO: diff scalar list defaults
-    }
-
     let prev = cols.previous().default();
     let next = cols.next().default();
 
@@ -54,6 +50,10 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
     };
 
     match defaults {
+        (Some(DefaultKind::Value(PrismaValue::List(prev))), Some(DefaultKind::Value(PrismaValue::List(next)))) => {
+            list_defaults_match(prev, next, flavour)
+        }
+
         // Avoid naive string comparisons for JSON defaults.
         (
             Some(DefaultKind::Value(PrismaValue::Json(prev_json))),
@@ -104,6 +104,54 @@ fn json_defaults_match(previous: &str, next: &str) -> bool {
         .and_then(|previous| serde_json::from_str::<serde_json::Value>(next).map(|next| (previous, next)))
         .map(|(previous, next)| previous == next)
         .unwrap_or(true)
+}
+
+fn list_defaults_match(prev: &[PrismaValue], next: &[PrismaValue], flavour: &dyn SqlFlavour) -> bool {
+    if prev.len() != next.len() {
+        return false;
+    }
+
+    dbg!(prev, next);
+
+    prev.iter()
+        .zip(next.iter())
+        .all(|(prev_value, next_value)| match (prev_value, next_value) {
+            (PrismaValue::Int(int_val), PrismaValue::Enum(enum_val))
+            | (PrismaValue::BigInt(int_val), PrismaValue::Enum(enum_val))
+            | (PrismaValue::Enum(enum_val), PrismaValue::Int(int_val))
+            | (PrismaValue::Enum(enum_val), PrismaValue::BigInt(int_val)) => {
+                i64::from_str_radix(enum_val, 10).ok() == Some(*int_val)
+            }
+            (PrismaValue::Int(int_val), PrismaValue::Float(big_decimal))
+            | (PrismaValue::BigInt(int_val), PrismaValue::Float(big_decimal))
+            | (PrismaValue::Float(big_decimal), PrismaValue::Int(int_val))
+            | (PrismaValue::Float(big_decimal), PrismaValue::BigInt(int_val)) => {
+                big_decimal.is_integer() && big_decimal.to_string() == int_val.to_string()
+            }
+
+            (PrismaValue::String(lit_val), PrismaValue::Json(json_val))
+            | (PrismaValue::Json(json_val), PrismaValue::String(lit_val))
+            | (PrismaValue::Enum(lit_val), PrismaValue::Json(json_val))
+            | (PrismaValue::Json(json_val), PrismaValue::Enum(lit_val)) => json_defaults_match(lit_val, json_val),
+            (PrismaValue::Int(int_val), PrismaValue::Json(json_val))
+            | (PrismaValue::BigInt(int_val), PrismaValue::Json(json_val))
+            | (PrismaValue::Json(json_val), PrismaValue::Int(int_val))
+            | (PrismaValue::Json(json_val), PrismaValue::BigInt(int_val)) => json_val.parse().ok() == Some(*int_val),
+
+            (PrismaValue::Float(float_val), PrismaValue::Json(json_val))
+            | (PrismaValue::Json(json_val), PrismaValue::Float(float_val)) => {
+                float_val.to_string().as_str() == json_val
+            }
+
+            (PrismaValue::DateTime(_), _) | (_, PrismaValue::DateTime(_)) => true,
+
+            (PrismaValue::Enum(enum_val), PrismaValue::Bytes(bytes_val))
+            | (PrismaValue::Bytes(bytes_val), PrismaValue::Enum(enum_val)) => {
+                dbg!(flavour.string_matches_bytes(enum_val, bytes_val))
+            }
+
+            _ => prev_value == next_value,
+        })
 }
 
 #[enumflags2::bitflags]

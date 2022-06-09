@@ -7,8 +7,6 @@ use crate::{
 };
 use datamodel::dml::PrismaValue;
 use native_types::{CockroachType, PostgresType};
-use once_cell::sync::Lazy;
-use regex::Regex;
 use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
     postgres::{PostgresSchemaExt, SqlIndexAlgorithm},
@@ -24,7 +22,7 @@ impl PostgresFlavour {
         let nullability_str = render_nullability(column);
         let default_str = column
             .default()
-            .map(render_default)
+            .map(|d| render_default(d, &render_column_type(column, self)))
             .filter(|default| !default.is_empty())
             .map(|default| format!(" DEFAULT {}", default))
             .unwrap_or_else(String::new);
@@ -585,10 +583,31 @@ fn render_decimal_args(input: Option<(u32, u32)>) -> String {
     }
 }
 
+/// Escape an in-memory string so it becomes a valid string literal with default escaping, i.e.
+/// replacing `'` characters with `''`.
 fn escape_string_literal(s: &str) -> Cow<'_, str> {
-    static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'|\\"#).unwrap());
+    let mut char_indices = s.char_indices();
+    let first_idx = loop {
+        match char_indices.next() {
+            Some((idx, '\'')) => break idx,
+            Some(_) => (),
+            None => return Cow::Borrowed(s),
+        }
+    };
 
-    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "\\$0")
+    let mut out = String::with_capacity(s.len() + 1); // at least one more char
+    out.push_str(&s[0..first_idx]);
+
+    for c in s[first_idx..].chars() {
+        match c {
+            '\'' => {
+                out.push_str("''");
+            }
+            c => out.push(c),
+        }
+    }
+
+    Cow::Owned(out)
 }
 
 fn render_alter_column(
@@ -622,7 +641,7 @@ fn render_alter_column(
             PostgresAlterColumn::SetDefault(new_default) => clauses.push(format!(
                 "{} SET DEFAULT {}",
                 &alter_column_prefix,
-                render_default(&new_default)
+                render_default(&new_default, &render_column_type(columns.next(), flavour))
             )),
             PostgresAlterColumn::DropNotNull => clauses.push(format!("{} DROP NOT NULL", &alter_column_prefix)),
             PostgresAlterColumn::SetNotNull => clauses.push(format!("{} SET NOT NULL", &alter_column_prefix)),
@@ -723,10 +742,10 @@ enum PostgresAlterColumn {
     AddSequence,
 }
 
-fn render_default(default: &DefaultValue) -> Cow<'_, str> {
-    fn render_constant_default(value: &PrismaValue) -> Cow<'_, str> {
+fn render_default<'a>(default: &'a DefaultValue, full_data_type: &str) -> Cow<'a, str> {
+    fn render_constant_default<'a>(value: &'a PrismaValue, full_data_type: &str) -> Cow<'a, str> {
         match value {
-            PrismaValue::String(val) | PrismaValue::Enum(val) => format!("E'{}'", escape_string_literal(val)).into(),
+            PrismaValue::String(val) | PrismaValue::Enum(val) => format!("'{}'", escape_string_literal(val)).into(),
             PrismaValue::Json(json_value) => {
                 let mut out = String::with_capacity(json_value.len() + 2);
                 out.push('\'');
@@ -735,22 +754,24 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
                 Cow::Owned(out)
             }
             PrismaValue::DateTime(val) => Quoted::postgres_string(val).to_string().into(),
-            PrismaValue::Bytes(b) => Quoted::postgres_string(format_hex(b)).to_string().into(),
+            PrismaValue::Bytes(b) => {
+                // https://www.postgresql.org/docs/current/datatype-binary.html
+                let mut out = String::with_capacity(b.len() * 2 + 2);
+                out.push_str("'\\x");
+                format_hex(b, &mut out);
+                out.push('\'');
+                out.into()
+            }
             PrismaValue::List(values) => {
                 let mut out = String::new();
                 let mut values = values.iter().peekable();
 
-                out.push_str("E'{");
+                out.push_str("array[");
 
                 while let Some(value) = values.next() {
                     // Rules are different inside arrays literals.
                     match value {
-                        PrismaValue::Enum(v) => out.push_str(v),
-                        PrismaValue::Json(v) => {
-                            let v = format!("\"{}\"", v.to_string().replace('"', r#"\\""#)); // fixme: this is a hack
-                            out.push_str(&v);
-                        }
-                        _ => out.push_str(&escape_string_literal(render_constant_default(value).as_ref())),
+                        _ => out.push_str(&render_constant_default(value, full_data_type).as_ref()),
                     }
 
                     if values.peek().is_some() {
@@ -758,7 +779,8 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
                     }
                 }
 
-                out.push_str("}'");
+                out.push_str("]::");
+                out.push_str(full_data_type);
 
                 Cow::Owned(out)
             }
@@ -770,10 +792,10 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
         DefaultKind::DbGenerated(val) => Cow::Borrowed(val.as_str()),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
-            format!("E'{}'", escape_string_literal(val)).into()
+            format!("'{}'", escape_string_literal(val)).into()
         }
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
-        DefaultKind::Value(value) => render_constant_default(value),
+        DefaultKind::Value(value) => render_constant_default(value, full_data_type),
         DefaultKind::UniqueRowid => "unique_rowid()".into(),
         DefaultKind::Sequence(_) => Default::default(),
     }

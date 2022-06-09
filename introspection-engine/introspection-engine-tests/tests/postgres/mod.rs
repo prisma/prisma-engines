@@ -107,3 +107,30 @@ async fn pg_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres))]
+async fn scalar_list_defaults_work(api: &TestApi) -> TestResult {
+    let schema = r#"
+        CREATE TYPE "color" AS ENUM ('RED', 'GREEN', 'BLUE');
+
+        CREATE TABLE "defaults" (
+            id TEXT PRIMARY KEY,
+            text_empty TEXT[] NOT NULL DEFAULT '{}',
+            text TEXT[] NOT NULL DEFAULT '{ ''abc'' }',
+            text_c_escape TEXT[] NOT NULL DEFAULT E'{ \'abc\', \'def\' }',
+            colors COLOR[] NOT NULL DEFAULT '{ RED, GREEN }',
+            int_defaults INT4[] NOT NULL DEFAULT '{ 9, 12999, -4, 0, 1249849 }',
+            float_defaults DOUBLE PRECISION[] NOT NULL DEFAULT '{ 0, 9.12, 3.14, 0.1242, 124949.124949 }',
+            bool_defaults BOOLEAN[] NOT NULL DEFAULT '{ true, true, true, false }',
+            datetime_defaults TIMESTAMPTZ[] NOT NULL DEFAULT '{ ''2022-09-01T08:00Z'',''2021-09-01T08:00Z''}'
+        );
+    "#;
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[]];
+
+    api.expect_datamodel(&expectation).await;
+
+    Ok(())
+}

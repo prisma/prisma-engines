@@ -134,6 +134,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
         false
     }
 
+    /// Does the sql expression string match the provided byte array?
+    fn string_matches_bytes(&self, string: &str, bytes: &[u8]) -> bool {
+        string.as_bytes() == bytes
+    }
+
     fn table_names_match(&self, names: Pair<&str>) -> bool {
         names.previous() == names.next()
     }

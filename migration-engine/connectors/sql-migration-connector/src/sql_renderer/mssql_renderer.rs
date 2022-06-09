@@ -532,7 +532,12 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             Quoted::mssql_string(escape_string_literal(val)).to_string().into()
         }
-        DefaultKind::Value(PrismaValue::Bytes(b)) => format!("0x{}", format_hex(b)).into(),
+        DefaultKind::Value(PrismaValue::Bytes(b)) => {
+            let mut out = String::with_capacity(b.len() * 2 + 2);
+            out.push_str("0x");
+            format_hex(b, &mut out);
+            out.into()
+        }
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
         DefaultKind::Value(PrismaValue::DateTime(val)) => Quoted::mssql_string(val).to_string().into(),
         DefaultKind::Value(PrismaValue::Boolean(val)) => Cow::from(if *val { "1" } else { "0" }),
