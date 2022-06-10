@@ -1,240 +1,229 @@
+use super::*;
 use crate::{
     ast,
-    common::preview_features::PreviewFeature,
     dml::{self, IndexField, PrimaryKeyField, SortOrder},
     Datasource,
 };
-use enumflags2::BitFlags;
 use itertools::Itertools;
 
-pub struct LowerDmlToAst<'a> {
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct LowerParams<'a> {
     pub datasource: Option<&'a Datasource>,
-    pub preview_features: BitFlags<PreviewFeature>,
+    pub datamodel: &'a dml::Datamodel,
 }
 
-impl<'a> LowerDmlToAst<'a> {
-    /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(datasource: Option<&'a Datasource>, preview_features: BitFlags<PreviewFeature>) -> Self {
-        Self {
-            datasource,
-            preview_features,
+pub(crate) fn lower(params: LowerParams<'_>) -> ast::SchemaAst {
+    let datamodel = params.datamodel;
+    let mut tops: Vec<ast::Top> = Vec::new();
+
+    for r#type in datamodel.composite_types.iter() {
+        tops.push(ast::Top::CompositeType(lower_composite_type(r#type, params)));
+    }
+
+    for model in datamodel.models() {
+        if !model.is_generated {
+            tops.push(ast::Top::Model(lower_model(model, params)))
         }
     }
 
-    pub fn lower(&self, datamodel: &dml::Datamodel) -> ast::SchemaAst {
-        let mut tops: Vec<ast::Top> = Vec::new();
-
-        for r#type in datamodel.composite_types.iter() {
-            tops.push(ast::Top::CompositeType(self.lower_composite_type(r#type)));
-        }
-
-        for model in datamodel.models() {
-            if !model.is_generated {
-                tops.push(ast::Top::Model(self.lower_model(model, datamodel)))
-            }
-        }
-
-        for enm in datamodel.enums() {
-            tops.push(ast::Top::Enum(self.lower_enum(enm)))
-        }
-
-        ast::SchemaAst { tops }
+    for enm in datamodel.enums() {
+        tops.push(ast::Top::Enum(lower_enum(enm)))
     }
 
-    pub fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> ast::Model {
-        let mut fields: Vec<ast::Field> = Vec::new();
+    ast::SchemaAst { tops }
+}
 
-        for field in model.fields() {
-            fields.push(self.lower_field(model, field, datamodel))
-        }
+pub(super) fn lower_model(model: &dml::Model, params: LowerParams<'_>) -> ast::Model {
+    let mut fields: Vec<ast::Field> = Vec::new();
 
-        ast::Model {
-            name: ast::Identifier::new(&model.name),
-            fields,
-            attributes: self.lower_model_attributes(datamodel, model),
-            documentation: model.documentation.clone().map(|text| ast::Comment { text }),
-            span: ast::Span::empty(),
-            commented_out: model.is_commented_out,
-        }
+    for field in model.fields() {
+        fields.push(lower_field(model, field, params))
     }
 
-    fn lower_enum(&self, enm: &dml::Enum) -> ast::Enum {
-        ast::Enum {
-            name: ast::Identifier::new(&enm.name),
-            values: enm
-                .values()
-                .map(|v| ast::EnumValue {
-                    name: ast::Identifier::new(&v.name),
-                    attributes: self.lower_enum_value_attributes(v),
-                    documentation: v.documentation.clone().map(|text| ast::Comment { text }),
-                    span: ast::Span::empty(),
-                    commented_out: v.commented_out,
-                })
-                .collect(),
-            attributes: self.lower_enum_attributes(enm),
-            documentation: enm.documentation.clone().map(|text| ast::Comment { text }),
-            span: ast::Span::empty(),
-        }
+    ast::Model {
+        name: ast::Identifier::new(&model.name),
+        fields,
+        attributes: lower_model_attributes(model, params),
+        documentation: model.documentation.clone().map(|text| ast::Comment { text }),
+        span: ast::Span::empty(),
+        commented_out: model.is_commented_out,
     }
+}
 
-    pub fn lower_field(&self, model: &dml::Model, field: &dml::Field, datamodel: &dml::Datamodel) -> ast::Field {
-        let mut attributes = self.lower_field_attributes(model, field, datamodel);
-
-        let native_type = field.as_scalar_field().and_then(|sf| sf.field_type.as_native_type());
-
-        if let (Some((scalar_type, native_type)), Some(datasource)) = (native_type, self.datasource) {
-            self.lower_native_type_attribute(scalar_type, native_type, &mut attributes, datasource);
-        }
-
-        ast::Field {
-            name: ast::Identifier::new(field.name()),
-            arity: self.lower_field_arity(field.arity()),
-            attributes,
-            field_type: self.lower_type(&field.field_type()),
-            documentation: field.documentation().map(|text| ast::Comment { text: text.to_owned() }),
-            span: ast::Span::empty(),
-            is_commented_out: field.is_commented_out(),
-        }
-    }
-
-    pub(super) fn lower_composite_type(&self, r#type: &dml::CompositeType) -> ast::CompositeType {
-        let mut fields: Vec<ast::Field> = Vec::new();
-
-        for field in r#type.fields.iter() {
-            let mut attributes = field
-                .database_name
-                .as_ref()
-                .map(|db_name| {
-                    vec![ast::Attribute::new(
-                        "map",
-                        vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
-                            String::from(db_name),
-                            ast::Span::empty(),
-                        ))],
-                    )]
-                })
-                .unwrap_or_else(Vec::new);
-
-            let native_type = field.r#type.as_native_type();
-
-            if let (Some((scalar_type, native_type)), Some(datasource)) = (native_type, self.datasource) {
-                self.lower_native_type_attribute(scalar_type, native_type, &mut attributes, datasource);
-            }
-
-            fields.push(ast::Field {
-                field_type: self.lower_composite_field_type(&field.r#type),
-                name: ast::Identifier::new(&field.name),
-                arity: self.lower_field_arity(&field.arity),
-                attributes,
-                documentation: field
-                    .documentation
-                    .as_ref()
-                    .map(|text| ast::Comment { text: text.to_owned() }),
+fn lower_enum(enm: &dml::Enum) -> ast::Enum {
+    ast::Enum {
+        name: ast::Identifier::new(&enm.name),
+        values: enm
+            .values()
+            .map(|v| ast::EnumValue {
+                name: ast::Identifier::new(&v.name),
+                attributes: lower_enum_value_attributes(v),
+                documentation: v.documentation.clone().map(|text| ast::Comment { text }),
                 span: ast::Span::empty(),
-                is_commented_out: field.is_commented_out,
-            });
+                commented_out: v.commented_out,
+            })
+            .collect(),
+        attributes: lower_enum_attributes(enm),
+        documentation: enm.documentation.clone().map(|text| ast::Comment { text }),
+        span: ast::Span::empty(),
+    }
+}
+
+pub(super) fn lower_field(model: &dml::Model, field: &dml::Field, params: LowerParams<'_>) -> ast::Field {
+    let mut attributes = lower_field_attributes(model, field, params);
+
+    let native_type = field.as_scalar_field().and_then(|sf| sf.field_type.as_native_type());
+
+    if let (Some((scalar_type, native_type)), Some(datasource)) = (native_type, params.datasource) {
+        lower_native_type_attribute(scalar_type, native_type, &mut attributes, datasource);
+    }
+
+    ast::Field {
+        name: ast::Identifier::new(field.name()),
+        arity: lower_field_arity(field.arity()),
+        attributes,
+        field_type: lower_type(&field.field_type()),
+        documentation: field.documentation().map(|text| ast::Comment { text: text.to_owned() }),
+        span: ast::Span::empty(),
+        is_commented_out: field.is_commented_out(),
+    }
+}
+
+pub(super) fn lower_composite_type(r#type: &dml::CompositeType, params: LowerParams<'_>) -> ast::CompositeType {
+    let mut fields: Vec<ast::Field> = Vec::new();
+
+    for field in r#type.fields.iter() {
+        let mut attributes = field
+            .database_name
+            .as_ref()
+            .map(|db_name| {
+                vec![ast::Attribute::new(
+                    "map",
+                    vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
+                        String::from(db_name),
+                        ast::Span::empty(),
+                    ))],
+                )]
+            })
+            .unwrap_or_else(Vec::new);
+
+        let native_type = field.r#type.as_native_type();
+
+        if let (Some((scalar_type, native_type)), Some(datasource)) = (native_type, params.datasource) {
+            lower_native_type_attribute(scalar_type, native_type, &mut attributes, datasource);
         }
 
-        ast::CompositeType {
-            name: ast::Identifier::new(&r#type.name),
-            fields,
-            documentation: None,
+        fields.push(ast::Field {
+            field_type: lower_composite_field_type(&field.r#type),
+            name: ast::Identifier::new(&field.name),
+            arity: lower_field_arity(&field.arity),
+            attributes,
+            documentation: field
+                .documentation
+                .as_ref()
+                .map(|text| ast::Comment { text: text.to_owned() }),
             span: ast::Span::empty(),
-        }
+            is_commented_out: field.is_commented_out,
+        });
     }
 
-    pub fn field_array(fields: &[String]) -> Vec<ast::Expression> {
-        fields
-            .iter()
-            .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
-            .collect()
+    ast::CompositeType {
+        name: ast::Identifier::new(&r#type.name),
+        fields,
+        documentation: None,
+        span: ast::Span::empty(),
     }
+}
 
-    pub fn pk_field_array(fields: &[PrimaryKeyField]) -> Vec<ast::Expression> {
-        fields
-            .iter()
-            .map(|f| {
-                let mut args = vec![];
-                args.extend(f.length.map(|length| ast::Argument::new_numeric("length", length)));
+pub(super) fn field_array(fields: &[String]) -> Vec<ast::Expression> {
+    fields
+        .iter()
+        .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
+        .collect()
+}
 
-                args.extend(
-                    (f.sort_order == Some(SortOrder::Desc)).then(|| ast::Argument::new_constant("sort", "Desc")),
-                );
+pub fn pk_field_array(fields: &[PrimaryKeyField]) -> Vec<ast::Expression> {
+    fields
+        .iter()
+        .map(|f| {
+            let mut args = vec![];
+            args.extend(f.length.map(|length| ast::Argument::new_numeric("length", length)));
 
-                if args.is_empty() {
-                    ast::Expression::ConstantValue(f.name.clone(), ast::Span::empty())
-                } else {
-                    ast::Expression::Function(
-                        f.name.clone(),
-                        ast::ArgumentsList {
-                            arguments: args,
-                            ..Default::default()
-                        },
-                        ast::Span::empty(),
-                    )
-                }
-            })
-            .collect()
-    }
+            args.extend((f.sort_order == Some(SortOrder::Desc)).then(|| ast::Argument::new_constant("sort", "Desc")));
 
-    pub fn index_field_array(fields: &[IndexField], always_render_sort_order: bool) -> Vec<ast::Expression> {
-        fields
-            .iter()
-            .map(|f| {
-                let mut args = vec![];
+            if args.is_empty() {
+                ast::Expression::ConstantValue(f.name.clone(), ast::Span::empty())
+            } else {
+                ast::Expression::Function(
+                    f.name.clone(),
+                    ast::ArgumentsList {
+                        arguments: args,
+                        ..Default::default()
+                    },
+                    ast::Span::empty(),
+                )
+            }
+        })
+        .collect()
+}
 
-                args.extend(f.length.map(|length| ast::Argument::new_numeric("length", length)));
+pub fn index_field_array(fields: &[IndexField], always_render_sort_order: bool) -> Vec<ast::Expression> {
+    fields
+        .iter()
+        .map(|f| {
+            let mut args = vec![];
 
-                if always_render_sort_order {
-                    let ordering = f.sort_order.map(|ordering| match ordering {
-                        SortOrder::Asc => ast::Argument::new_constant("sort", "Asc"),
-                        SortOrder::Desc => ast::Argument::new_constant("sort", "Desc"),
-                    });
+            args.extend(f.length.map(|length| ast::Argument::new_numeric("length", length)));
 
-                    args.extend(ordering);
-                } else {
-                    let ordering = f
-                        .sort_order
-                        .filter(|s| *s == SortOrder::Desc)
-                        .map(|_| ast::Argument::new_constant("sort", "Desc"));
+            if always_render_sort_order {
+                let ordering = f.sort_order.map(|ordering| match ordering {
+                    SortOrder::Asc => ast::Argument::new_constant("sort", "Asc"),
+                    SortOrder::Desc => ast::Argument::new_constant("sort", "Desc"),
+                });
 
-                    args.extend(ordering);
-                }
+                args.extend(ordering);
+            } else {
+                let ordering = f
+                    .sort_order
+                    .filter(|s| *s == SortOrder::Desc)
+                    .map(|_| ast::Argument::new_constant("sort", "Desc"));
 
-                if let Some(opclass) = &f.operator_class {
-                    let expr = if opclass.is_raw() {
-                        let args = ast::ArgumentsList {
-                            arguments: vec![ast::Argument {
-                                name: None,
-                                value: ast::Expression::StringValue(opclass.to_string(), ast::Span::empty()),
-                                span: ast::Span::empty(),
-                            }],
-                            empty_arguments: Vec::new(),
-                            trailing_comma: None,
-                        };
-                        ast::Expression::Function("raw".to_string(), args, ast::Span::empty())
-                    } else {
-                        ast::Expression::ConstantValue(opclass.to_string(), ast::Span::empty())
+                args.extend(ordering);
+            }
+
+            if let Some(opclass) = &f.operator_class {
+                let expr = if opclass.is_raw() {
+                    let args = ast::ArgumentsList {
+                        arguments: vec![ast::Argument {
+                            name: None,
+                            value: ast::Expression::StringValue(opclass.to_string(), ast::Span::empty()),
+                            span: ast::Span::empty(),
+                        }],
+                        empty_arguments: Vec::new(),
+                        trailing_comma: None,
                     };
-
-                    args.push(ast::Argument::new("ops", expr));
-                }
-
-                let name = f.path.iter().map(|(name, _)| name).join(".");
-
-                if args.is_empty() {
-                    ast::Expression::ConstantValue(name, ast::Span::empty())
+                    ast::Expression::Function("raw".to_string(), args, ast::Span::empty())
                 } else {
-                    ast::Expression::Function(
-                        name,
-                        ast::ArgumentsList {
-                            arguments: args,
-                            ..Default::default()
-                        },
-                        ast::Span::empty(),
-                    )
-                }
-            })
-            .collect()
-    }
+                    ast::Expression::ConstantValue(opclass.to_string(), ast::Span::empty())
+                };
+
+                args.push(ast::Argument::new("ops", expr));
+            }
+
+            let name = f.path.iter().map(|(name, _)| name).join(".");
+
+            if args.is_empty() {
+                ast::Expression::ConstantValue(name, ast::Span::empty())
+            } else {
+                ast::Expression::Function(
+                    name,
+                    ast::ArgumentsList {
+                        arguments: args,
+                        ..Default::default()
+                    },
+                    ast::Span::empty(),
+                )
+            }
+        })
+        .collect()
 }

@@ -1,5 +1,4 @@
 use crate::common::*;
-use datamodel::render_datamodel_to_with_preview_flags;
 
 #[test]
 fn constraint_names() {
@@ -191,15 +190,9 @@ fn constraint_names() {
     "#]];
 
     let datamodel = parse(input);
-    let preview_features = parse_configuration(input).preview_features();
     let mut rendered = String::new();
 
-    render_datamodel_to_with_preview_flags(
-        &mut rendered,
-        &datamodel,
-        parse_configuration(input).datasources.first(),
-        preview_features,
-    );
+    datamodel::render_datamodel_to(&mut rendered, &datamodel, Some(&parse_configuration(input)));
 
     //todo can't be exactly the same since explicit default names will be suppressed when rerendering
     // the expected result after parsing and rendering is not exactly the same as the input.

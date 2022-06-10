@@ -1,16 +1,11 @@
-use crate::transform::dml_to_ast::LowerDmlToAst;
-use crate::{
-    ast::{self},
-    dml,
-};
+use super::*;
+use crate::{ast, dml};
 
-impl<'a> LowerDmlToAst<'a> {
-    /// Internal: Lowers an enum's attributes.
-    pub(crate) fn lower_enum_value_attributes(&self, enum_value: &dml::EnumValue) -> Vec<ast::Attribute> {
-        let mut attributes = vec![];
+/// Internal: Lowers an enum's attributes.
+pub(super) fn lower_enum_value_attributes(enum_value: &dml::EnumValue) -> Vec<ast::Attribute> {
+    let mut attributes = vec![];
 
-        <LowerDmlToAst<'a>>::push_model_index_map_arg(enum_value, &mut attributes);
+    push_model_index_map_arg(enum_value, &mut attributes);
 
-        attributes
-    }
+    attributes
 }

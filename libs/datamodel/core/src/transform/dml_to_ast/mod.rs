@@ -6,14 +6,19 @@ mod lower_enum_value_attributes;
 mod lower_field;
 mod lower_model_attributes;
 
-pub use datasource_serializer::add_sources_to_ast;
-use dml::datamodel::Datamodel;
-pub use generator_serializer::GeneratorSerializer;
-pub use lower::LowerDmlToAst;
+pub(crate) use datasource_serializer::add_sources_to_ast;
+pub(crate) use generator_serializer::GeneratorSerializer;
+pub(crate) use lower::{lower, LowerParams};
 
 use crate::{ast, configuration::StringFromEnvVar};
 use ::dml::{model::*, traits::*};
 use datamodel_connector::{constraint_names::ConstraintNames, Connector};
+use dml::datamodel::Datamodel;
+use lower::*;
+use lower_enum_attributes::*;
+use lower_enum_value_attributes::*;
+use lower_field::*;
+use lower_model_attributes::*;
 
 fn lower_string_from_env_var(arg_name: &str, string_from_env: &StringFromEnvVar) -> ast::ConfigBlockProperty {
     match string_from_env.as_env_var() {
