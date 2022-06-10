@@ -243,32 +243,8 @@ pub fn render_datamodel_to(
     configuration: Option<&Configuration>,
 ) {
     let datasource = configuration.and_then(|c| c.datasources.first());
+    let lowered = lower(LowerParams { datasource, datamodel });
 
-    let preview_features = configuration
-        .map(|c| c.preview_features())
-        .unwrap_or_else(BitFlags::empty);
-
-    let lowered = lower(LowerParams {
-        datasource,
-        _preview_features: preview_features,
-        datamodel,
-    });
-
-    render_schema_ast_to(stream, &lowered, 2);
-}
-
-/// Renders as a string into the stream.
-pub fn render_datamodel_to_with_preview_flags(
-    stream: &mut dyn std::fmt::Write,
-    datamodel: &dml::Datamodel,
-    datasource: Option<&Datasource>,
-    flags: BitFlags<PreviewFeature>,
-) {
-    let lowered = lower(LowerParams {
-        datasource,
-        _preview_features: flags,
-        datamodel,
-    });
     render_schema_ast_to(stream, &lowered, 2);
 }
 
@@ -292,7 +268,6 @@ fn render_datamodel_and_config_to(
 ) {
     let mut lowered = lower(LowerParams {
         datasource: config.datasources.first(),
-        _preview_features: config.preview_features(),
         datamodel,
     });
 

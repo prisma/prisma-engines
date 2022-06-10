@@ -1,17 +1,14 @@
 use super::*;
 use crate::{
     ast,
-    common::preview_features::PreviewFeature,
     dml::{self, IndexField, PrimaryKeyField, SortOrder},
     Datasource,
 };
-use enumflags2::BitFlags;
 use itertools::Itertools;
 
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct LowerParams<'a> {
     pub datasource: Option<&'a Datasource>,
-    pub _preview_features: BitFlags<PreviewFeature>,
     pub datamodel: &'a dml::Datamodel,
 }
 
