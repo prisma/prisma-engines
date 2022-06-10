@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-7.1.0/src/character/complete.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>complete.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-7.1.1/src/character/complete.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>complete.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../nom/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1212,6 +1212,24 @@
 <span id="1207">1207</span>
 <span id="1208">1208</span>
 <span id="1209">1209</span>
+<span id="1210">1210</span>
+<span id="1211">1211</span>
+<span id="1212">1212</span>
+<span id="1213">1213</span>
+<span id="1214">1214</span>
+<span id="1215">1215</span>
+<span id="1216">1216</span>
+<span id="1217">1217</span>
+<span id="1218">1218</span>
+<span id="1219">1219</span>
+<span id="1220">1220</span>
+<span id="1221">1221</span>
+<span id="1222">1222</span>
+<span id="1223">1223</span>
+<span id="1224">1224</span>
+<span id="1225">1225</span>
+<span id="1226">1226</span>
+<span id="1227">1227</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Character specific parsers and combinators, complete input version.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Functions recognizing specific characters.</span>
@@ -1628,6 +1646,24 @@
 <span class="doccomment">/// assert_eq!(parser(&quot;c1&quot;), Err(Err::Error(Error::new(&quot;c1&quot;, ErrorKind::Digit))));</span>
 <span class="doccomment">/// assert_eq!(parser(&quot;&quot;), Err(Err::Error(Error::new(&quot;&quot;, ErrorKind::Digit))));</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">/// </span>
+<span class="doccomment">/// ## Parsing an integer</span>
+<span class="doccomment">/// You can use `digit1` in combination with [`map_res`] to parse an integer:</span>
+<span class="doccomment">/// </span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # use nom::{Err, error::{Error, ErrorKind}, IResult, Needed};</span>
+<span class="doccomment">/// # use nom::combinator::map_res;</span>
+<span class="doccomment">/// # use nom::character::complete::digit1;</span>
+<span class="doccomment">/// fn parser(input: &amp;str) -&gt; IResult&lt;&amp;str, u32&gt; {</span>
+<span class="doccomment">///   map_res(digit1, str::parse)(input)</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// </span>
+<span class="doccomment">/// assert_eq!(parser(&quot;416&quot;), Ok((&quot;&quot;, 416)));</span>
+<span class="doccomment">/// assert_eq!(parser(&quot;12b&quot;), Ok((&quot;b&quot;, 12)));</span>
+<span class="doccomment">/// assert!(parser(&quot;b&quot;).is_err());</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// </span>
+<span class="doccomment">/// [`map_res`]: crate::combinator::map_res</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digit1</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="ident">T</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">T</span>: <span class="ident">InputTakeAtPosition</span>,

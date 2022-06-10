@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.1.0/src/client/options/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/client/options/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -2365,115 +2365,7 @@
 <span id="2360">2360</span>
 <span id="2361">2361</span>
 <span id="2362">2362</span>
-<span id="2363">2363</span>
-<span id="2364">2364</span>
-<span id="2365">2365</span>
-<span id="2366">2366</span>
-<span id="2367">2367</span>
-<span id="2368">2368</span>
-<span id="2369">2369</span>
-<span id="2370">2370</span>
-<span id="2371">2371</span>
-<span id="2372">2372</span>
-<span id="2373">2373</span>
-<span id="2374">2374</span>
-<span id="2375">2375</span>
-<span id="2376">2376</span>
-<span id="2377">2377</span>
-<span id="2378">2378</span>
-<span id="2379">2379</span>
-<span id="2380">2380</span>
-<span id="2381">2381</span>
-<span id="2382">2382</span>
-<span id="2383">2383</span>
-<span id="2384">2384</span>
-<span id="2385">2385</span>
-<span id="2386">2386</span>
-<span id="2387">2387</span>
-<span id="2388">2388</span>
-<span id="2389">2389</span>
-<span id="2390">2390</span>
-<span id="2391">2391</span>
-<span id="2392">2392</span>
-<span id="2393">2393</span>
-<span id="2394">2394</span>
-<span id="2395">2395</span>
-<span id="2396">2396</span>
-<span id="2397">2397</span>
-<span id="2398">2398</span>
-<span id="2399">2399</span>
-<span id="2400">2400</span>
-<span id="2401">2401</span>
-<span id="2402">2402</span>
-<span id="2403">2403</span>
-<span id="2404">2404</span>
-<span id="2405">2405</span>
-<span id="2406">2406</span>
-<span id="2407">2407</span>
-<span id="2408">2408</span>
-<span id="2409">2409</span>
-<span id="2410">2410</span>
-<span id="2411">2411</span>
-<span id="2412">2412</span>
-<span id="2413">2413</span>
-<span id="2414">2414</span>
-<span id="2415">2415</span>
-<span id="2416">2416</span>
-<span id="2417">2417</span>
-<span id="2418">2418</span>
-<span id="2419">2419</span>
-<span id="2420">2420</span>
-<span id="2421">2421</span>
-<span id="2422">2422</span>
-<span id="2423">2423</span>
-<span id="2424">2424</span>
-<span id="2425">2425</span>
-<span id="2426">2426</span>
-<span id="2427">2427</span>
-<span id="2428">2428</span>
-<span id="2429">2429</span>
-<span id="2430">2430</span>
-<span id="2431">2431</span>
-<span id="2432">2432</span>
-<span id="2433">2433</span>
-<span id="2434">2434</span>
-<span id="2435">2435</span>
-<span id="2436">2436</span>
-<span id="2437">2437</span>
-<span id="2438">2438</span>
-<span id="2439">2439</span>
-<span id="2440">2440</span>
-<span id="2441">2441</span>
-<span id="2442">2442</span>
-<span id="2443">2443</span>
-<span id="2444">2444</span>
-<span id="2445">2445</span>
-<span id="2446">2446</span>
-<span id="2447">2447</span>
-<span id="2448">2448</span>
-<span id="2449">2449</span>
-<span id="2450">2450</span>
-<span id="2451">2451</span>
-<span id="2452">2452</span>
-<span id="2453">2453</span>
-<span id="2454">2454</span>
-<span id="2455">2455</span>
-<span id="2456">2456</span>
-<span id="2457">2457</span>
-<span id="2458">2458</span>
-<span id="2459">2459</span>
-<span id="2460">2460</span>
-<span id="2461">2461</span>
-<span id="2462">2462</span>
-<span id="2463">2463</span>
-<span id="2464">2464</span>
-<span id="2465">2465</span>
-<span id="2466">2466</span>
-<span id="2467">2467</span>
-<span id="2468">2468</span>
-<span id="2469">2469</span>
-<span id="2470">2470</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)))]</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
 <span class="kw">mod</span> <span class="ident">test</span>;
 
 <span class="kw">mod</span> <span class="ident">resolver_config</span>;
@@ -2482,9 +2374,7 @@
     <span class="ident">collections::HashSet</span>,
     <span class="ident">convert::TryFrom</span>,
     <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>},
-    <span class="ident">fs::File</span>,
     <span class="ident">hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>},
-    <span class="ident">io</span>::{<span class="ident">BufReader</span>, <span class="ident">Seek</span>, <span class="ident">SeekFrom</span>},
     <span class="ident">path::PathBuf</span>,
     <span class="ident">str::FromStr</span>,
     <span class="ident">sync::Arc</span>,
@@ -2493,15 +2383,6 @@
 
 <span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
 <span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
-<span class="kw">use</span> <span class="ident">rustls</span>::{
-    <span class="ident">internal::pemfile</span>,
-    <span class="ident">Certificate</span>,
-    <span class="ident">RootCertStore</span>,
-    <span class="ident">ServerCertVerified</span>,
-    <span class="ident">ServerCertVerifier</span>,
-    <span class="ident">TLSError</span>,
-};
-<span class="kw">use</span> <span class="ident">rustls_pemfile</span>::{<span class="ident">read_one</span>, <span class="ident">Item</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{
     <span class="ident">de</span>::{<span class="ident">Error</span>, <span class="ident">Unexpected</span>},
     <span class="ident">Deserialize</span>,
@@ -2511,7 +2392,6 @@
 <span class="kw">use</span> <span class="ident">serde_with::skip_serializing_none</span>;
 <span class="kw">use</span> <span class="ident">strsim::jaro_winkler</span>;
 <span class="kw">use</span> <span class="ident">typed_builder::TypedBuilder</span>;
-<span class="kw">use</span> <span class="ident">webpki_roots::TLS_SERVER_ROOTS</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::srv::LookupHosts</span>;
@@ -2528,6 +2408,9 @@
     <span class="ident">selection_criteria</span>::{<span class="ident">ReadPreference</span>, <span class="ident">SelectionCriteria</span>, <span class="ident">TagSet</span>},
     <span class="ident">srv</span>::{<span class="ident">OriginalSrvInfo</span>, <span class="ident">SrvResolver</span>},
 };
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">resolver_config::ResolverConfig</span>;
 
@@ -2719,7 +2602,7 @@
         })
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_document</span>(<span class="self">self</span>) -&gt; <span class="ident">Document</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::Tcp</span> { <span class="ident">host</span>, <span class="ident">port</span> } =&gt; {
@@ -2797,8 +2680,8 @@
     }
 }
 
-<span class="doccomment">/// Options used to declare a versioned server API.  For more information, see the [Versioned API](</span>
-<span class="doccomment">/// https://docs.mongodb.com/v5.0/reference/versioned-api/) manual page.</span>
+<span class="doccomment">/// Options used to declare a stable server API.  For more information, see the [Stable API](</span>
+<span class="doccomment">/// https://docs.mongodb.com/v5.0/reference/stable-api/) manual page.</span>
 <span class="attribute">#[<span class="ident">serde_with::skip_serializing_none</span>]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">PartialEq</span>, <span class="ident">TypedBuilder</span>)]</span>
 <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
@@ -2894,8 +2777,7 @@
     <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">driver_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DriverInfo</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// The amount of time each monitoring thread should wait between sending an isMaster command</span>
-    <span class="doccomment">/// to its respective server.</span>
+    <span class="doccomment">/// The amount of time each monitoring thread should wait between performing server checks.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The default value is 10 seconds.</span>
     <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
@@ -2981,13 +2863,13 @@
     <span class="doccomment">/// The declared API version is applied to all commands run through the client, including those</span>
     <span class="doccomment">/// sent through any handle derived from the client.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Specifying versioned API options in the command document passed to `run_command` AND</span>
+    <span class="doccomment">/// Specifying stable API options in the command document passed to `run_command` AND</span>
     <span class="doccomment">/// declaring an API version on the client is not supported and is considered undefined</span>
     <span class="doccomment">/// behaviour. To run any command with a different API version or without declaring one, create</span>
     <span class="doccomment">/// a separate client that declares the appropriate API version.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// For more information, see the [Versioned API](</span>
-    <span class="doccomment">/// https://docs.mongodb.com/v5.0/reference/versioned-api/) manual page.</span>
+    <span class="doccomment">/// For more information, see the [Stable API](</span>
+    <span class="doccomment">/// https://docs.mongodb.com/v5.0/reference/stable-api/) manual page.</span>
     <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
 
@@ -3058,9 +2940,6 @@
 
     <span class="doccomment">/// Mock response for `SrvPollingMonitor::lookup_hosts`.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">mock_lookup_hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LookupHosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// Mock the `serviceId` response for a load-balanced hello.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">mock_service_id</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">fn</span> <span class="ident">default_hosts</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span> {
@@ -3263,99 +3142,17 @@
     <span class="doccomment">/// [`Client`](../struct.Client.html) will not attempt to verify its identity to the</span>
     <span class="doccomment">/// server.</span>
     <span class="kw">pub</span> <span class="ident">cert_key_file_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>,
-}
 
-<span class="kw">struct</span> <span class="ident">NoCertVerifier</span> {}
-
-<span class="kw">impl</span> <span class="ident">ServerCertVerifier</span> <span class="kw">for</span> <span class="ident">NoCertVerifier</span> {
-    <span class="kw">fn</span> <span class="ident">verify_server_cert</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">RootCertStore</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">Certificate</span>],
-        <span class="kw">_</span>: <span class="ident">webpki::DNSNameRef</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">ServerCertVerified</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">ServerCertVerified::assertion</span>())
-    }
+    <span class="doccomment">/// Whether or not the [`Client`](../struct.Client.html) should return an error if the hostname</span>
+    <span class="doccomment">/// is invalid.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default value is to error on invalid hostnames.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openssl-tls&quot;</span>, <span class="ident">docsrs</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openssl-tls&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="ident">allow_invalid_hostnames</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TlsOptions</span> {
-    <span class="doccomment">/// Converts `TlsOptions` into a rustls::ClientConfig.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_rustls_config</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">rustls::ClientConfig</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">rustls::ClientConfig::new</span>();
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">allow_invalid_certificates</span> {
-            <span class="ident">config</span>
-                .<span class="ident">dangerous</span>()
-                .<span class="ident">set_certificate_verifier</span>(<span class="ident">Arc::new</span>(<span class="ident">NoCertVerifier</span> {}));
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">RootCertStore::empty</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">ca_file_path</span> {
-            <span class="ident">store</span>
-                .<span class="ident">add_pem_file</span>(<span class="kw-2">&amp;mut</span> <span class="ident">BufReader::new</span>(<span class="ident">File::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>))
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ErrorKind::InvalidTlsConfig</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(
-                        <span class="string">&quot;Unable to parse PEM-encoded root certificate from {}&quot;</span>,
-                        <span class="ident">path</span>.<span class="ident">display</span>()
-                    ),
-                })<span class="question-mark">?</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">store</span>.<span class="ident">add_server_trust_anchors</span>(<span class="kw-2">&amp;</span><span class="ident">TLS_SERVER_ROOTS</span>);
-        }
-
-        <span class="ident">config</span>.<span class="ident">root_store</span> <span class="op">=</span> <span class="ident">store</span>;
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">cert_key_file_path</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">BufReader::new</span>(<span class="ident">File::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>);
-            <span class="kw">let</span> <span class="ident">certs</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pemfile::certs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">file</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">certs</span>) =&gt; <span class="ident">certs</span>,
-                <span class="prelude-val">Err</span>(()) =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidTlsConfig</span> {
-                        <span class="ident">message</span>: <span class="macro">format!</span>(
-                            <span class="string">&quot;Unable to parse PEM-encoded client certificate from {}&quot;</span>,
-                            <span class="ident">path</span>.<span class="ident">display</span>()
-                        ),
-                    }
-                    .<span class="ident">into</span>())
-                }
-            };
-
-            <span class="ident">file</span>.<span class="ident">seek</span>(<span class="ident">SeekFrom::Start</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">loop</span> {
-                <span class="kw">match</span> <span class="ident">read_one</span>(<span class="kw-2">&amp;mut</span> <span class="ident">file</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Item::PKCS8Key</span>(<span class="ident">bytes</span>))) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Item::RSAKey</span>(<span class="ident">bytes</span>))) =&gt; {
-                        <span class="kw">break</span> <span class="ident">rustls::PrivateKey</span>(<span class="ident">bytes</span>)
-                    }
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="kw">continue</span>,
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidTlsConfig</span> {
-                            <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;No PEM-encoded keys in {}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>()),
-                        }
-                        .<span class="ident">into</span>())
-                    }
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidTlsConfig</span> {
-                            <span class="ident">message</span>: <span class="macro">format!</span>(
-                                <span class="string">&quot;Unable to parse PEM-encoded item from {}&quot;</span>,
-                                <span class="ident">path</span>.<span class="ident">display</span>()
-                            ),
-                        }
-                        .<span class="ident">into</span>())
-                    }
-                }
-            };
-
-            <span class="ident">config</span>
-                .<span class="ident">set_single_client_cert</span>(<span class="ident">certs</span>, <span class="ident">key</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">ErrorKind::InvalidTlsConfig</span> {
-                    <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
-                })<span class="question-mark">?</span>;
-        }
-
-        <span class="prelude-val">Ok</span>(<span class="ident">config</span>)
-    }
-
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_for_client_options</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
         <span class="ident">tls_options</span>: <span class="kw-2">&amp;</span><span class="ident">TlsOptions</span>,
@@ -3516,17 +3313,17 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: if the `sync` feature is enabled, then this method will be replaced with [the sync</span>
     <span class="doccomment">/// version](#method.parse-1).</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::parse_uri</span>(<span class="ident">s</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// This method will be present if the `sync` feature is enabled. It&#39;s otherwise identical to</span>
     <span class="doccomment">/// [the async version](#method.parse)</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">docsrs</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>, <span class="ident">docsrs</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>))))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="kw">crate</span>::RUNTIME</span>.<span class="ident">block_on</span>(<span class="ident"><span class="self">Self</span>::parse_uri</span>(<span class="ident">s</span>.<span class="ident">as_ref</span>(), <span class="prelude-val">None</span>))
+        <span class="ident">runtime::block_on</span>(<span class="ident"><span class="self">Self</span>::parse_uri</span>(<span class="ident">s</span>.<span class="ident">as_ref</span>(), <span class="prelude-val">None</span>))
     }
 
     <span class="doccomment">/// Parses a MongoDB connection string into a `ClientOptions` struct.</span>
@@ -3543,7 +3340,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: if the `sync` feature is enabled, then this method will be replaced with [the sync</span>
     <span class="doccomment">/// version](#method.parse_with_resolver_config-1).</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">parse_with_resolver_config</span>(
         <span class="ident">uri</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">resolver_config</span>: <span class="ident">ResolverConfig</span>,
@@ -3553,10 +3350,10 @@
 
     <span class="doccomment">/// This method will be present if the `sync` feature is enabled. It&#39;s otherwise identical to</span>
     <span class="doccomment">/// [the async version](#method.parse_with_resolver_config)</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">docsrs</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>, <span class="ident">docsrs</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>))))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_with_resolver_config</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">resolver_config</span>: <span class="ident">ResolverConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="kw">crate</span>::RUNTIME</span>.<span class="ident">block_on</span>(<span class="ident"><span class="self">Self</span>::parse_uri</span>(<span class="ident">uri</span>, <span class="prelude-val">Some</span>(<span class="ident">resolver_config</span>)))
+        <span class="ident">runtime::block_on</span>(<span class="ident"><span class="self">Self</span>::parse_uri</span>(<span class="ident">uri</span>, <span class="prelude-val">Some</span>(<span class="ident">resolver_config</span>)))
     }
 
     <span class="doccomment">/// Populate this `ClientOptions` from the given URI, optionally using the resolver config for</span>
@@ -3617,15 +3414,6 @@
         }
 
         <span class="ident">options</span>.<span class="ident">validate</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">options</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_without_srv_resolution</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">ClientOptionsParser::parse</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">options</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">into</span>();
-        <span class="ident">options</span>.<span class="ident">validate</span>()<span class="question-mark">?</span>;
-
         <span class="prelude-val">Ok</span>(<span class="ident">options</span>)
     }
 
@@ -4493,7 +4281,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)))]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
@@ -4808,10 +4596,6 @@
             }
         );
     }
-
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>, <span class="ident">tokio::test</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>, <span class="ident">async_std::test</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_invalid_read_preference_mode</span>() {}
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>, <span class="ident">tokio::test</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>, <span class="ident">async_std::test</span>)]</span>

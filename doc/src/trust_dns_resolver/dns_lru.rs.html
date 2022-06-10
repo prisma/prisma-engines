@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.20.3/src/dns_lru.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dns_lru.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/dns_lru.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dns_lru.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -672,6 +672,7 @@
 <span id="667">667</span>
 <span id="668">668</span>
 <span id="669">669</span>
+<span id="670">670</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
@@ -791,8 +792,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TtlConfig</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_opts</span>(<span class="ident">opts</span>: <span class="kw-2">&amp;</span><span class="ident">config::ResolverOpts</span>) -&gt; <span class="ident">TtlConfig</span> {
-        <span class="ident">TtlConfig</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_opts</span>(<span class="ident">opts</span>: <span class="kw-2">&amp;</span><span class="ident">config::ResolverOpts</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
             <span class="ident">positive_min_ttl</span>: <span class="ident">opts</span>.<span class="ident">positive_min_ttl</span>,
             <span class="ident">negative_min_ttl</span>: <span class="ident">opts</span>.<span class="ident">negative_min_ttl</span>,
             <span class="ident">positive_max_ttl</span>: <span class="ident">opts</span>.<span class="ident">positive_max_ttl</span>,
@@ -819,6 +820,10 @@
             <span class="ident">negative_max_ttl</span>: <span class="ident">negative_max_ttl</span>
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Duration::from_secs</span>(<span class="ident">u64::from</span>(<span class="ident">MAX_TTL</span>))),
         }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">lock</span>().<span class="ident">clear</span>();
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">insert</span>(
@@ -909,8 +914,7 @@
             <span class="kw">let</span> <span class="ident">ttl_duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">u64::from</span>(<span class="ident">ttl</span>))
                 <span class="comment">// Clamp the TTL so that it&#39;s between the cache&#39;s configured</span>
                 <span class="comment">// minimum and maximum TTLs for negative responses.</span>
-                .<span class="ident">max</span>(<span class="self">self</span>.<span class="ident">negative_min_ttl</span>)
-                .<span class="ident">min</span>(<span class="self">self</span>.<span class="ident">negative_max_ttl</span>);
+                .<span class="ident">clamp</span>(<span class="self">self</span>.<span class="ident">negative_min_ttl</span>, <span class="self">self</span>.<span class="ident">negative_max_ttl</span>);
             <span class="kw">let</span> <span class="ident">valid_until</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">+</span> <span class="ident">ttl_duration</span>;
 
             {
@@ -926,11 +930,9 @@
             }
 
             <span class="ident"><span class="self">Self</span>::nx_error_with_ttl</span>(<span class="kw-2">&amp;mut</span> <span class="ident">error</span>, <span class="ident">ttl_duration</span>);
-
-            <span class="ident">error</span>
-        } <span class="kw">else</span> {
-            <span class="ident">error</span>
         }
+
+        <span class="ident">error</span>
     }
 
     <span class="doccomment">/// This needs to be mut b/c it&#39;s an LRU, meaning the ordering of elements will potentially change on retrieval...</span>
@@ -1009,7 +1011,7 @@
         <span class="comment">// configure the cache with a minimum TTL of 2 seconds.</span>
         <span class="kw">let</span> <span class="ident">ttls</span> <span class="op">=</span> <span class="ident">TtlConfig</span> {
             <span class="ident">positive_min_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">2</span>)),
-            ..<span class="ident">Default::default</span>()
+            ..<span class="ident">TtlConfig::default</span>()
         };
         <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">ttls</span>);
 
@@ -1041,13 +1043,13 @@
         <span class="comment">// configure the cache with a maximum TTL of 2 seconds.</span>
         <span class="kw">let</span> <span class="ident">ttls</span> <span class="op">=</span> <span class="ident">TtlConfig</span> {
             <span class="ident">negative_min_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">2</span>)),
-            ..<span class="ident">Default::default</span>()
+            ..<span class="ident">TtlConfig::default</span>()
         };
         <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">ttls</span>);
 
         <span class="comment">// neg response should have TTL of 1 seconds.</span>
         <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-            <span class="ident">query</span>: <span class="ident">name</span>.<span class="ident">clone</span>(),
+            <span class="ident">query</span>: <span class="ident">Box::new</span>(<span class="ident">name</span>.<span class="ident">clone</span>()),
             <span class="ident">soa</span>: <span class="prelude-val">None</span>,
             <span class="ident">negative_ttl</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
             <span class="ident">response_code</span>: <span class="ident">ResponseCode::NoError</span>,
@@ -1065,7 +1067,7 @@
 
         <span class="comment">// neg response should have TTL of 3 seconds.</span>
         <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-            <span class="ident">query</span>: <span class="ident">name</span>.<span class="ident">clone</span>(),
+            <span class="ident">query</span>: <span class="ident">Box::new</span>(<span class="ident">name</span>.<span class="ident">clone</span>()),
             <span class="ident">soa</span>: <span class="prelude-val">None</span>,
             <span class="ident">negative_ttl</span>: <span class="prelude-val">Some</span>(<span class="number">3</span>),
             <span class="ident">response_code</span>: <span class="ident">ResponseCode::NoError</span>,
@@ -1099,7 +1101,7 @@
         <span class="comment">// configure the cache with a maximum TTL of 60 seconds.</span>
         <span class="kw">let</span> <span class="ident">ttls</span> <span class="op">=</span> <span class="ident">TtlConfig</span> {
             <span class="ident">positive_max_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">60</span>)),
-            ..<span class="ident">Default::default</span>()
+            ..<span class="ident">TtlConfig::default</span>()
         };
         <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">ttls</span>);
 
@@ -1131,13 +1133,13 @@
         <span class="comment">// configure the cache with a maximum TTL of 60 seconds.</span>
         <span class="kw">let</span> <span class="ident">ttls</span> <span class="op">=</span> <span class="ident">TtlConfig</span> {
             <span class="ident">negative_max_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">60</span>)),
-            ..<span class="ident">Default::default</span>()
+            ..<span class="ident">TtlConfig::default</span>()
         };
         <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">ttls</span>);
 
         <span class="comment">// neg response should have TTL of 62 seconds.</span>
         <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-            <span class="ident">query</span>: <span class="ident">name</span>.<span class="ident">clone</span>(),
+            <span class="ident">query</span>: <span class="ident">Box::new</span>(<span class="ident">name</span>.<span class="ident">clone</span>()),
             <span class="ident">soa</span>: <span class="prelude-val">None</span>,
             <span class="ident">negative_ttl</span>: <span class="prelude-val">Some</span>(<span class="number">62</span>),
             <span class="ident">response_code</span>: <span class="ident">ResponseCode::NoError</span>,
@@ -1155,7 +1157,7 @@
 
         <span class="comment">// neg response should have TTL of 59 seconds.</span>
         <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-            <span class="ident">query</span>: <span class="ident">name</span>.<span class="ident">clone</span>(),
+            <span class="ident">query</span>: <span class="ident">Box::new</span>(<span class="ident">name</span>.<span class="ident">clone</span>()),
             <span class="ident">soa</span>: <span class="prelude-val">None</span>,
             <span class="ident">negative_ttl</span>: <span class="prelude-val">Some</span>(<span class="number">59</span>),
             <span class="ident">response_code</span>: <span class="ident">ResponseCode::NoError</span>,
@@ -1254,7 +1256,7 @@
         <span class="comment">// minimum TTL of 3 seconds.</span>
         <span class="kw">let</span> <span class="ident">ttls</span> <span class="op">=</span> <span class="ident">TtlConfig</span> {
             <span class="ident">positive_min_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">3</span>)),
-            ..<span class="ident">Default::default</span>()
+            ..<span class="ident">TtlConfig::default</span>()
         };
         <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">ttls</span>);
         <span class="ident">lru</span>.<span class="ident">insert</span>(<span class="ident">query</span>.<span class="ident">clone</span>(), <span class="ident">ips_ttl</span>, <span class="ident">now</span>);
@@ -1314,7 +1316,7 @@
         <span class="comment">// minimum TTL of 2 seconds.</span>
         <span class="kw">let</span> <span class="ident">ttls</span> <span class="op">=</span> <span class="ident">TtlConfig</span> {
             <span class="ident">positive_max_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">2</span>)),
-            ..<span class="ident">Default::default</span>()
+            ..<span class="ident">TtlConfig::default</span>()
         };
         <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">ttls</span>);
         <span class="ident">lru</span>.<span class="ident">insert</span>(<span class="ident">query</span>.<span class="ident">clone</span>(), <span class="ident">ips_ttl</span>, <span class="ident">now</span>);

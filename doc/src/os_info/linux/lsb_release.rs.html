@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.0.7/src/linux/lsb_release.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lsb_release.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.4.0/src/linux/lsb_release.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lsb_release.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -465,6 +465,25 @@
 <span id="460">460</span>
 <span id="461">461</span>
 <span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
 </pre><pre class="rust"><code><span class="comment">// spell-checker:ignore codename, noarch, rhel, ootpa, maipo</span>
 
 <span class="kw">use</span> <span class="ident">std::process::Command</span>;
@@ -488,9 +507,11 @@
         <span class="prelude-val">Some</span>(<span class="string">&quot;CentOS&quot;</span>) =&gt; <span class="ident">Type::CentOS</span>,
         <span class="prelude-val">Some</span>(<span class="string">&quot;Debian&quot;</span>) =&gt; <span class="ident">Type::Debian</span>,
         <span class="prelude-val">Some</span>(<span class="string">&quot;EndeavourOS&quot;</span>) =&gt; <span class="ident">Type::EndeavourOS</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Fedora&quot;</span>) =&gt; <span class="ident">Type::Fedora</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Fedora&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Fedora Linux&quot;</span>) =&gt; <span class="ident">Type::Fedora</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Gentoo&quot;</span>) =&gt; <span class="ident">Type::Gentoo</span>,
         <span class="prelude-val">Some</span>(<span class="string">&quot;Linuxmint&quot;</span>) =&gt; <span class="ident">Type::Mint</span>,
         <span class="prelude-val">Some</span>(<span class="string">&quot;ManjaroLinux&quot;</span>) =&gt; <span class="ident">Type::Manjaro</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Mariner&quot;</span>) =&gt; <span class="ident">Type::Mariner</span>,
         <span class="prelude-val">Some</span>(<span class="string">&quot;NixOS&quot;</span>) =&gt; <span class="ident">Type::NixOS</span>,
         <span class="prelude-val">Some</span>(<span class="string">&quot;openSUSE&quot;</span>) =&gt; <span class="ident">Type::openSUSE</span>,
         <span class="prelude-val">Some</span>(<span class="string">&quot;OracleServer&quot;</span>) =&gt; <span class="ident">Type::OracleLinux</span>,
@@ -729,6 +750,14 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">mariner</span>() {
+        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">mariner_file</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Mariner&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;2.0.20220210&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Mariner&quot;</span>.<span class="ident">to_string</span>()));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">endeavouros</span>() {
         <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">endeavouros_file</span>());
         <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;EndeavourOS&quot;</span>.<span class="ident">to_string</span>()));
@@ -915,6 +944,15 @@
         Description:    Manjaro Linux\n\
         Release:        19.0.2\n\
         Codename:       n/a\n\
+        &quot;</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">mariner_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="string">&quot;LSB Version:    n/a\n\
+        Distributor ID: Mariner\n\
+        Description:    CBL-Mariner 2.0.20220210\n\
+        Release:        2.0.20220210\n\
+        Codename:       Mariner\n\
         &quot;</span>
     }
 

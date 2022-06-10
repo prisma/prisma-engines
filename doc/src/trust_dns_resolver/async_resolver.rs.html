@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.20.3/src/async_resolver.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>async_resolver.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/async_resolver.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>async_resolver.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1261,6 +1261,85 @@
 <span id="1256">1256</span>
 <span id="1257">1257</span>
 <span id="1258">1258</span>
+<span id="1259">1259</span>
+<span id="1260">1260</span>
+<span id="1261">1261</span>
+<span id="1262">1262</span>
+<span id="1263">1263</span>
+<span id="1264">1264</span>
+<span id="1265">1265</span>
+<span id="1266">1266</span>
+<span id="1267">1267</span>
+<span id="1268">1268</span>
+<span id="1269">1269</span>
+<span id="1270">1270</span>
+<span id="1271">1271</span>
+<span id="1272">1272</span>
+<span id="1273">1273</span>
+<span id="1274">1274</span>
+<span id="1275">1275</span>
+<span id="1276">1276</span>
+<span id="1277">1277</span>
+<span id="1278">1278</span>
+<span id="1279">1279</span>
+<span id="1280">1280</span>
+<span id="1281">1281</span>
+<span id="1282">1282</span>
+<span id="1283">1283</span>
+<span id="1284">1284</span>
+<span id="1285">1285</span>
+<span id="1286">1286</span>
+<span id="1287">1287</span>
+<span id="1288">1288</span>
+<span id="1289">1289</span>
+<span id="1290">1290</span>
+<span id="1291">1291</span>
+<span id="1292">1292</span>
+<span id="1293">1293</span>
+<span id="1294">1294</span>
+<span id="1295">1295</span>
+<span id="1296">1296</span>
+<span id="1297">1297</span>
+<span id="1298">1298</span>
+<span id="1299">1299</span>
+<span id="1300">1300</span>
+<span id="1301">1301</span>
+<span id="1302">1302</span>
+<span id="1303">1303</span>
+<span id="1304">1304</span>
+<span id="1305">1305</span>
+<span id="1306">1306</span>
+<span id="1307">1307</span>
+<span id="1308">1308</span>
+<span id="1309">1309</span>
+<span id="1310">1310</span>
+<span id="1311">1311</span>
+<span id="1312">1312</span>
+<span id="1313">1313</span>
+<span id="1314">1314</span>
+<span id="1315">1315</span>
+<span id="1316">1316</span>
+<span id="1317">1317</span>
+<span id="1318">1318</span>
+<span id="1319">1319</span>
+<span id="1320">1320</span>
+<span id="1321">1321</span>
+<span id="1322">1322</span>
+<span id="1323">1323</span>
+<span id="1324">1324</span>
+<span id="1325">1325</span>
+<span id="1326">1326</span>
+<span id="1327">1327</span>
+<span id="1328">1328</span>
+<span id="1329">1329</span>
+<span id="1330">1330</span>
+<span id="1331">1331</span>
+<span id="1332">1332</span>
+<span id="1333">1333</span>
+<span id="1334">1334</span>
+<span id="1335">1335</span>
+<span id="1336">1336</span>
+<span id="1337">1337</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2015-2019 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
@@ -1277,6 +1356,7 @@
 <span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="self">self</span>, <span class="ident">future</span>};
 <span class="kw">use</span> <span class="ident">proto::error::ProtoResult</span>;
 <span class="kw">use</span> <span class="ident">proto::op::Query</span>;
+<span class="kw">use</span> <span class="ident">proto::rr::domain::usage::ONION</span>;
 <span class="kw">use</span> <span class="ident">proto::rr::domain::TryParseIp</span>;
 <span class="kw">use</span> <span class="ident">proto::rr</span>::{<span class="ident">IntoName</span>, <span class="ident">Name</span>, <span class="ident">Record</span>, <span class="ident">RecordType</span>};
 <span class="kw">use</span> <span class="ident">proto::xfer</span>::{<span class="ident">DnsRequestOptions</span>, <span class="ident">RetryDnsHandle</span>};
@@ -1333,6 +1413,7 @@
 
 <span class="doccomment">/// An AsyncResolver used with Tokio</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TokioAsyncResolver</span> <span class="op">=</span> <span class="ident">AsyncResolver</span><span class="op">&lt;</span><span class="ident">TokioConnection</span>, <span class="ident">TokioConnectionProvider</span><span class="op">&gt;</span>;
 
 <span class="macro">macro_rules!</span> <span class="ident">lookup_fn</span> {
@@ -1352,15 +1433,10 @@
                 }
             };
 
-            <span class="self">self</span>.<span class="ident">inner_lookup</span>(
-                <span class="ident">name</span>,
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>,
-                <span class="ident">DnsRequestOptions</span> {
-                    <span class="ident">use_edns</span>: <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">edns0</span>,
-                    ..<span class="ident">Default::default</span>()
-                },
-            )
-            .<span class="kw">await</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request_opts</span> <span class="op">=</span> <span class="ident">DnsRequestOptions::default</span>();
+            <span class="ident">request_opts</span>.<span class="ident">use_edns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">edns0</span>;
+
+            <span class="self">self</span>.<span class="ident">inner_lookup</span>(<span class="ident">name</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>, <span class="ident">request_opts</span>).<span class="kw">await</span>
         }
     };
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) =&gt; {
@@ -1378,6 +1454,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)))]</span>
 <span class="kw">impl</span> <span class="ident">TokioAsyncResolver</span> {
     <span class="doccomment">/// Construct a new Tokio based `AsyncResolver` with the provided configuration.</span>
     <span class="doccomment">///</span>
@@ -1401,6 +1478,10 @@
     <span class="doccomment">/// This will use `/etc/resolv.conf` on Unix OSes and the registry on Windows.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(
+        <span class="ident">docsrs</span>,
+        <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>, <span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))))
+    )]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokio_from_system_conf</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::from_system_conf</span>(<span class="ident">TokioHandle</span>)
     }
@@ -1409,7 +1490,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RuntimeProvider</span><span class="op">&gt;</span> <span class="ident">AsyncResolver</span><span class="op">&lt;</span><span class="ident">GenericConnection</span>, <span class="ident">GenericConnectionProvider</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Construct a new generic `AsyncResolver` with the provided configuration.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// see [crate::trust_dns_resolver::TokioAsyncResolver::tokio] instead.</span>
+    <span class="doccomment">/// see [TokioAsyncResolver::tokio(..)] instead.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
@@ -1427,7 +1508,7 @@
         <span class="ident">options</span>: <span class="ident">ResolverOpts</span>,
         <span class="ident">runtime</span>: <span class="ident">R::Handle</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
-        <span class="ident">AsyncResolver</span>::<span class="op">&lt;</span><span class="ident">GenericConnection</span>, <span class="ident">GenericConnectionProvider</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new_with_conn</span>(
+        <span class="ident"><span class="self">Self</span>::new_with_conn</span>(
             <span class="ident">config</span>,
             <span class="ident">options</span>,
             <span class="ident">GenericConnectionProvider</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">runtime</span>),
@@ -1436,13 +1517,22 @@
 
     <span class="doccomment">/// Constructs a new Resolver with the system configuration.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// see [crate::trust_dns_resolver::TokioAsyncResolver::tokio_from_system_conf] instead.</span>
+    <span class="doccomment">/// see [TokioAsyncResolver::tokio_from_system_conf(..)] instead.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will use `/etc/resolv.conf` on Unix OSes and the registry on Windows.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(
+        <span class="ident">docsrs</span>,
+        <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>, <span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))))
+    )]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_system_conf</span>(<span class="ident">runtime</span>: <span class="ident">R::Handle</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::from_system_conf_with_provider</span>(<span class="ident">GenericConnectionProvider</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">runtime</span>))
+    }
+
+    <span class="doccomment">/// Flushes/Removes all entries from the cache</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">clear_cache</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">client_cache</span>.<span class="ident">clear_cache</span>();
     }
 }
 
@@ -1461,7 +1551,7 @@
     <span class="doccomment">/// documentation for `AsyncResolver` for more information on how to use</span>
     <span class="doccomment">/// the background future.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_wraps</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_with_conn</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_conn</span>(
         <span class="ident">config</span>: <span class="ident">ResolverConfig</span>,
         <span class="ident">options</span>: <span class="ident">ResolverOpts</span>,
         <span class="ident">conn_provider</span>: <span class="ident">P</span>,
@@ -1494,7 +1584,7 @@
 
         <span class="macro">trace!</span>(<span class="string">&quot;handle passed back&quot;</span>);
         <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="ident">options</span>.<span class="ident">cache_size</span>, <span class="ident">dns_lru::TtlConfig::from_opts</span>(<span class="kw-2">&amp;</span><span class="ident">options</span>));
-        <span class="prelude-val">Ok</span>(<span class="ident">AsyncResolver</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">config</span>,
             <span class="ident">options</span>,
             <span class="ident">client_cache</span>: <span class="ident">CachingClient::with_cache</span>(<span class="ident">lru</span>, <span class="ident">either</span>, <span class="ident">options</span>.<span class="ident">preserve_intermediates</span>),
@@ -1507,7 +1597,11 @@
     <span class="doccomment">/// This will use `/etc/resolv.conf` on Unix OSes and the registry on Windows.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_system_conf_with_provider</span>(<span class="ident">conn_provider</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(
+        <span class="ident">docsrs</span>,
+        <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>, <span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))))
+    )]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_system_conf_with_provider</span>(<span class="ident">conn_provider</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">config</span>, <span class="ident">options</span>) <span class="op">=</span> <span class="ident"><span class="kw">super</span>::system_conf::read_system_conf</span>()<span class="question-mark">?</span>;
         <span class="ident"><span class="self">Self</span>::new_with_conn</span>(<span class="ident">config</span>, <span class="ident">options</span>, <span class="ident">conn_provider</span>)
     }
@@ -1552,7 +1646,17 @@
 
     <span class="kw">fn</span> <span class="ident">build_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> {
         <span class="comment">// if it&#39;s fully qualified, we can short circuit the lookup logic</span>
-        <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">is_fqdn</span>() {
+        <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">is_fqdn</span>()
+            <span class="op">|</span><span class="op">|</span> <span class="ident">ONION</span>.<span class="ident">zone_of</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>)
+                <span class="op">&amp;&amp;</span> <span class="ident">name</span>
+                    .<span class="ident">trim_to</span>(<span class="number">2</span>)
+                    .<span class="ident">iter</span>()
+                    .<span class="ident">next</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">56</span>) <span class="comment">// size of onion v3 address</span>
+                    .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        {
+            <span class="comment">// if already fully qualified, or if onion address, don&#39;t assume it might be a</span>
+            <span class="comment">// sub-domain</span>
             <span class="macro">vec!</span>[<span class="ident">name</span>]
         } <span class="kw">else</span> {
             <span class="comment">// Otherwise we have to build the search list</span>
@@ -1571,12 +1675,26 @@
 
             <span class="kw">for</span> <span class="ident">search</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">search</span>().<span class="ident">iter</span>().<span class="ident">rev</span>() {
                 <span class="kw">let</span> <span class="ident">name_search</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">clone</span>().<span class="ident">append_domain</span>(<span class="ident">search</span>);
-                <span class="ident"><span class="self">Self</span>::push_name</span>(<span class="ident">name_search</span>, <span class="kw-2">&amp;mut</span> <span class="ident">names</span>);
+
+                <span class="kw">match</span> <span class="ident">name_search</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">name_search</span>) =&gt; <span class="ident"><span class="self">Self</span>::push_name</span>(<span class="ident">name_search</span>, <span class="kw-2">&amp;mut</span> <span class="ident">names</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">debug!</span>(
+                        <span class="string">&quot;Not adding {} to {} for search due to error: {}&quot;</span>,
+                        <span class="ident">search</span>, <span class="ident">name</span>, <span class="ident">e</span>
+                    ),
+                }
             }
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">domain</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">domain</span>() {
                 <span class="kw">let</span> <span class="ident">name_search</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">clone</span>().<span class="ident">append_domain</span>(<span class="ident">domain</span>);
-                <span class="ident"><span class="self">Self</span>::push_name</span>(<span class="ident">name_search</span>, <span class="kw-2">&amp;mut</span> <span class="ident">names</span>);
+
+                <span class="kw">match</span> <span class="ident">name_search</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">name_search</span>) =&gt; <span class="ident"><span class="self">Self</span>::push_name</span>(<span class="ident">name_search</span>, <span class="kw-2">&amp;mut</span> <span class="ident">names</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">debug!</span>(
+                        <span class="string">&quot;Not adding {} to {} for search due to error: {}&quot;</span>,
+                        <span class="ident">domain</span>, <span class="ident">name</span>, <span class="ident">e</span>
+                    ),
+                }
             }
 
             <span class="comment">// this is the direct name lookup</span>
@@ -1655,7 +1773,7 @@
             <span class="self">self</span>.<span class="ident">client_cache</span>.<span class="ident">clone</span>(),
             <span class="ident">DnsRequestOptions::default</span>(),
             <span class="ident">hosts</span>,
-            <span class="ident">finally_ip_addr</span>.<span class="ident">map</span>(<span class="ident">Record::into_data</span>),
+            <span class="ident">finally_ip_addr</span>.<span class="ident">and_then</span>(<span class="ident">Record::into_data</span>),
         )
         .<span class="kw">await</span>
     }
@@ -1688,7 +1806,8 @@
 
 <span class="doccomment">/// Unit tests compatible with different runtime.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>)))]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>, <span class="ident">unreachable_pub</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">testing</span> {
     <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">net</span>::<span class="kw-2">*</span>, <span class="ident">str::FromStr</span>};
 
@@ -1815,6 +1934,7 @@
 
     <span class="doccomment">/// Test IP lookup from URLs with DNSSec validation.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sec_lookup_test</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Executor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>, <span class="ident">R</span>: <span class="ident">RuntimeProvider</span><span class="op">&gt;</span>(
         <span class="kw-2">mut</span> <span class="ident">exec</span>: <span class="ident">E</span>,
         <span class="ident">handle</span>: <span class="ident">R::Handle</span>,
@@ -1825,6 +1945,7 @@
             <span class="ident">ResolverConfig::default</span>(),
             <span class="ident">ResolverOpts</span> {
                 <span class="ident">validate</span>: <span class="bool-val">true</span>,
+                <span class="ident">try_tcp_on_error</span>: <span class="bool-val">true</span>,
                 ..<span class="ident">ResolverOpts::default</span>()
             },
             <span class="ident">handle</span>,
@@ -1854,6 +1975,7 @@
     <span class="doccomment">/// Test IP lookup from domains that exist but unsigned with DNSSec validation.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sec_lookup_fails_test</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Executor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>, <span class="ident">R</span>: <span class="ident">RuntimeProvider</span><span class="op">&gt;</span>(
         <span class="kw-2">mut</span> <span class="ident">exec</span>: <span class="ident">E</span>,
         <span class="ident">handle</span>: <span class="ident">R::Handle</span>,
@@ -1872,8 +1994,7 @@
         .<span class="ident">expect</span>(<span class="string">&quot;failed to create resolver&quot;</span>);
 
         <span class="comment">// needs to be a domain that exists, but is not signed (eventually this will be)</span>
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::from_str</span>(<span class="string">&quot;www.trust-dns.org.&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">exec</span>.<span class="ident">block_on</span>(<span class="ident">resolver</span>.<span class="ident">lookup_ip</span>(<span class="string">&quot;www.trust-dns.org.&quot;</span>));
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">exec</span>.<span class="ident">block_on</span>(<span class="ident">resolver</span>.<span class="ident">lookup_ip</span>(<span class="string">&quot;trust-dns.org.&quot;</span>));
 
         <span class="macro">assert!</span>(<span class="ident">response</span>.<span class="ident">is_err</span>());
         <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">unwrap_err</span>();
@@ -1881,6 +2002,7 @@
         <span class="kw">use</span> <span class="ident">proto::error</span>::{<span class="ident">ProtoError</span>, <span class="ident">ProtoErrorKind</span>};
 
         <span class="kw">let</span> <span class="ident">error_str</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">error</span>);
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::from_str</span>(<span class="string">&quot;trust-dns.org.&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">expected_str</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;{}&quot;</span>,
             <span class="ident">ResolveError::from</span>(<span class="ident">ProtoError::from</span>(<span class="ident">ProtoErrorKind::RrsigsNotPresent</span> {
@@ -1895,8 +2017,9 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
     <span class="doccomment">/// Test AsyncResolver created from system configuration with IP lookup.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">system_lookup_test</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Executor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>, <span class="ident">R</span>: <span class="ident">RuntimeProvider</span><span class="op">&gt;</span>(
         <span class="kw-2">mut</span> <span class="ident">exec</span>: <span class="ident">E</span>,
         <span class="ident">handle</span>: <span class="ident">R::Handle</span>,
@@ -1926,8 +2049,9 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
     <span class="doccomment">/// Test AsyncResolver created from system configuration with host lookups.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hosts_lookup_test</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Executor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>, <span class="ident">R</span>: <span class="ident">RuntimeProvider</span><span class="op">&gt;</span>(
         <span class="kw-2">mut</span> <span class="ident">exec</span>: <span class="ident">E</span>,
         <span class="ident">handle</span>: <span class="ident">R::Handle</span>,
@@ -2517,6 +2641,40 @@
         <span class="kw">let</span> <span class="ident">io_loop</span> <span class="op">=</span> <span class="ident">Runtime::new</span>().<span class="ident">expect</span>(<span class="string">&quot;failed to create tokio runtime io_loop&quot;</span>);
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">TokioHandle</span>;
         <span class="ident">search_ipv6_name_parse_fails_test</span>::<span class="op">&lt;</span><span class="ident">Runtime</span>, <span class="ident">TokioRuntime</span><span class="op">&gt;</span>(<span class="ident">io_loop</span>, <span class="ident">handle</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_build_names_onion</span>() {
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">TokioHandle</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ResolverConfig::default</span>();
+        <span class="ident">config</span>.<span class="ident">add_search</span>(<span class="ident">Name::from_ascii</span>(<span class="string">&quot;example.com.&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="kw">let</span> <span class="ident">resolver</span> <span class="op">=</span>
+            <span class="ident">AsyncResolver</span>::<span class="op">&lt;</span><span class="ident">GenericConnection</span>, <span class="ident">GenericConnectionProvider</span><span class="op">&lt;</span><span class="ident">TokioRuntime</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new</span>(
+                <span class="ident">config</span>,
+                <span class="ident">ResolverOpts::default</span>(),
+                <span class="ident">handle</span>,
+            )
+            .<span class="ident">expect</span>(<span class="string">&quot;failed to create resolver&quot;</span>);
+        <span class="kw">let</span> <span class="ident">tor_address</span> <span class="op">=</span> [
+            <span class="ident">Name::from_ascii</span>(<span class="string">&quot;2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion&quot;</span>)
+                .<span class="ident">unwrap</span>(),
+            <span class="ident">Name::from_ascii</span>(<span class="string">&quot;www.2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion&quot;</span>)
+                .<span class="ident">unwrap</span>(), <span class="comment">// subdomain are allowed too</span>
+        ];
+        <span class="kw">let</span> <span class="ident">not_tor_address</span> <span class="op">=</span> [
+            <span class="ident">Name::from_ascii</span>(<span class="string">&quot;onion&quot;</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">Name::from_ascii</span>(<span class="string">&quot;www.onion&quot;</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">Name::from_ascii</span>(<span class="string">&quot;2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.www.onion&quot;</span>)
+                .<span class="ident">unwrap</span>(), <span class="comment">// www before key</span>
+            <span class="ident">Name::from_ascii</span>(<span class="string">&quot;2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion.to&quot;</span>)
+                .<span class="ident">unwrap</span>(), <span class="comment">// Tor2web</span>
+        ];
+        <span class="kw">for</span> <span class="ident">name</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">tor_address</span> {
+            <span class="macro">assert_eq!</span>(<span class="ident">resolver</span>.<span class="ident">build_names</span>(<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">len</span>(), <span class="number">1</span>);
+        }
+        <span class="kw">for</span> <span class="ident">name</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">not_tor_address</span> {
+            <span class="macro">assert_eq!</span>(<span class="ident">resolver</span>.<span class="ident">build_names</span>(<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">len</span>(), <span class="number">2</span>);
+        }
     }
 }
 </code></pre></div>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.0.7/src/linux/file_release.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>file_release.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.4.0/src/linux/file_release.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>file_release.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -330,6 +330,39 @@
 <span id="325">325</span>
 <span id="326">326</span>
 <span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
 </pre><pre class="rust"><code><span class="comment">// spell-checker:ignore sles</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fs::File</span>, <span class="ident">io::Read</span>, <span class="ident">path::Path</span>};
@@ -394,7 +427,9 @@
         <span class="string">&quot;centos linux&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Type::CentOS</span>),
         <span class="string">&quot;centos stream&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Type::CentOS</span>),
         <span class="string">&quot;fedora&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Type::Fedora</span>),
+        <span class="string">&quot;fedora linux&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Type::Fedora</span>),
         <span class="string">&quot;linux mint&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Type::Mint</span>),
+        <span class="string">&quot;mariner&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Type::Mariner</span>),
         <span class="string">&quot;nixos&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Type::NixOS</span>),
         <span class="string">&quot;red hat enterprise linux&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Type::Redhat</span>),
         <span class="string">&quot;sles&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Type::SUSE</span>),
@@ -412,16 +447,18 @@
 
 <span class="doccomment">/// List of all supported distributions and the information on how to parse their version from the</span>
 <span class="doccomment">/// release file.</span>
-<span class="kw">const</span> <span class="ident">DISTRIBUTIONS</span>: [<span class="ident">ReleaseInfo</span>; <span class="number">5</span>] <span class="op">=</span> [
+<span class="kw">const</span> <span class="ident">DISTRIBUTIONS</span>: [<span class="ident">ReleaseInfo</span>; <span class="number">6</span>] <span class="op">=</span> [
     <span class="comment">// Due to shenanigans with Oracle Linux including an /etc/redhat-release file that states</span>
     <span class="comment">// that the OS is Red Hat Enterprise Linux, this /etc/os-release file MUST be checked</span>
     <span class="comment">// before this code checks /etc/redhat-release. If it does not get run first,</span>
     <span class="comment">// it will unintentionally report that the operating system is Red Hat Enterprise Linux</span>
     <span class="comment">// instead of Oracle Linux.</span>
     <span class="ident">ReleaseInfo</span> {
-        <span class="ident">os_type</span>: <span class="ident">Type::OracleLinux</span>,
-        <span class="ident">path</span>: <span class="string">&quot;/etc/os-release&quot;</span>,
-        <span class="ident">version_matcher</span>: <span class="ident">Matcher::KeyValue</span> { <span class="ident">key</span>: <span class="string">&quot;VERSION_ID&quot;</span> },
+        <span class="ident">os_type</span>: <span class="ident">Type::Mariner</span>,
+        <span class="ident">path</span>: <span class="string">&quot;/etc/mariner-release&quot;</span>,
+        <span class="ident">version_matcher</span>: <span class="ident">Matcher::PrefixedVersion</span> {
+            <span class="ident">prefix</span>: <span class="string">&quot;CBL-Mariner &quot;</span>,
+        },
     },
     <span class="ident">ReleaseInfo</span> {
         <span class="ident">os_type</span>: <span class="ident">Type::CentOS</span>,
@@ -434,14 +471,19 @@
         <span class="ident">version_matcher</span>: <span class="ident">Matcher::PrefixedVersion</span> { <span class="ident">prefix</span>: <span class="string">&quot;release&quot;</span> },
     },
     <span class="ident">ReleaseInfo</span> {
-        <span class="ident">os_type</span>: <span class="ident">Type::Redhat</span>,
-        <span class="ident">path</span>: <span class="string">&quot;/etc/redhat-release&quot;</span>,
-        <span class="ident">version_matcher</span>: <span class="ident">Matcher::PrefixedVersion</span> { <span class="ident">prefix</span>: <span class="string">&quot;release&quot;</span> },
-    },
-    <span class="ident">ReleaseInfo</span> {
         <span class="ident">os_type</span>: <span class="ident">Type::Alpine</span>,
         <span class="ident">path</span>: <span class="string">&quot;/etc/alpine-release&quot;</span>,
         <span class="ident">version_matcher</span>: <span class="ident">Matcher::AllTrimmed</span>,
+    },
+    <span class="ident">ReleaseInfo</span> {
+        <span class="ident">os_type</span>: <span class="ident">Type::OracleLinux</span>,
+        <span class="ident">path</span>: <span class="string">&quot;/etc/os-release&quot;</span>,
+        <span class="ident">version_matcher</span>: <span class="ident">Matcher::KeyValue</span> { <span class="ident">key</span>: <span class="string">&quot;VERSION_ID&quot;</span> },
+    },
+    <span class="ident">ReleaseInfo</span> {
+        <span class="ident">os_type</span>: <span class="ident">Type::Redhat</span>,
+        <span class="ident">path</span>: <span class="string">&quot;/etc/redhat-release&quot;</span>,
+        <span class="ident">version_matcher</span>: <span class="ident">Matcher::PrefixedVersion</span> { <span class="ident">prefix</span>: <span class="string">&quot;release&quot;</span> },
     },
 ];
 
@@ -452,7 +494,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">oracle_linux</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -464,7 +506,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">os_release_alpine_3_12</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-alpine-3-12&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -476,7 +518,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">os_release_amazon_1</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-amazon-1&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -488,7 +530,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">os_release_amazon_2</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-amazon-2&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -500,7 +542,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">os_release_centos</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-centos&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -512,7 +554,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">os_release_centos_stream</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-centos-stream&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -524,7 +566,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">os_release_fedora</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-fedora-32&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -535,8 +577,20 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">os_release_fedora_35</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
+        <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-fedora-35&quot;</span>;
+
+        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">os_type</span>(), <span class="ident">Type::Fedora</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">version</span>, <span class="ident">Version::Semantic</span>(<span class="number">35</span>, <span class="number">0</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">edition</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">os_release_nixos</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-nixos&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -551,7 +605,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">os_release_rhel</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-rhel&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -563,7 +617,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">os_release_suse_12</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-suse-12&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -575,7 +629,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">os_release_suse_15</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-suse-15&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -587,7 +641,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">os_release_ubuntu</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-ubuntu&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -599,7 +653,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">os_release_mint</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/os-release-mint&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -635,7 +689,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">redhat</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">3</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">5</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/redhat-release&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
@@ -647,12 +701,24 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">alpine</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">4</span>].<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">3</span>].<span class="ident">clone</span>()];
         <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/alpine-release&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">os_type</span>(), <span class="ident">Type::Alpine</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">version</span>, <span class="ident">Version::Custom</span>(<span class="string">&quot;A.B.C&quot;</span>.<span class="ident">to_owned</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">edition</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">mariner</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">distributions</span> <span class="op">=</span> [<span class="ident">DISTRIBUTIONS</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+        <span class="ident">distributions</span>[<span class="number">0</span>].<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;src/linux/tests/mariner-release&quot;</span>;
+
+        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">retrieve</span>(<span class="kw-2">&amp;</span><span class="ident">distributions</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">os_type</span>(), <span class="ident">Type::Mariner</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">version</span>, <span class="ident">Version::Semantic</span>(<span class="number">2</span>, <span class="number">0</span>, <span class="number">20220210</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">edition</span>, <span class="prelude-val">None</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">info</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
     }

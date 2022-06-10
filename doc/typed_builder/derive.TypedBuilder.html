@@ -4,7 +4,7 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../typed_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
         </a><div class="sidebar-elems"><h2 class="location"><a href="index.html">In typed_builder</a></h2><div id="sidebar-vars" data-name="TypedBuilder" data-ty="derive" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../typed_builder/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Derive Macro <a href="index.html">typed_builder</a>::<wbr><a class="derive" href="#">TypedBuilder</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/typed_builder/lib.rs.html#153-159">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><pre class="rust derive"><code>#[derive(TypedBuilder)]
+    <h1 class="fqn"><span class="in-band">Derive Macro <a href="index.html">typed_builder</a>::<wbr><a class="derive" href="#">TypedBuilder</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/typed_builder/lib.rs.html#156-162">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><pre class="rust derive"><code>#[derive(TypedBuilder)]
 {
     // Attributes available to this derive:
     #[builder]
@@ -24,7 +24,7 @@ you want to set a different default, use <code>#[builder(default=...)]</code>.</
     <span class="comment">// Mandatory Field:</span>
     <span class="ident">x</span>: <span class="ident">i32</span>,
 
-    <span class="comment">// #[default] without parameter - use the type&#39;s default</span>
+    <span class="comment">// #[builder(default)] without parameter - use the type&#39;s default</span>
     <span class="comment">// #[builder(setter(strip_option))] - wrap the setter argument with `Some(...)`</span>
     <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">strip_option</span>))]</span>
     <span class="ident">y</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
@@ -147,9 +147,13 @@ one cannot set the field to <code>None</code> with the setter - so the only way 
 is by using <code>#[builder(default)]</code> and not calling the field’s setter.</p>
 </li>
 <li>
+<p><code>strip_bool</code>: for <code>bool</code> fields only, this makes the setter receive no arguments and simply
+set the field’s value to <code>true</code>. When used, the <code>default</code> is automatically set to <code>false</code>.</p>
+</li>
+<li>
 <p><code>transform = |param1: Type1, param2: Type2 ...| expr</code>: this makes the setter accept
 <code>param1: Type1, param2: Type2 ...</code> instead of the field type itself. The parameters are
-transformed into the field type using the expression <code>expr</code>. The transormation is performed
+transformed into the field type using the expression <code>expr</code>. The transformation is performed
 when the setter is called.</p>
 </li>
 </ul>

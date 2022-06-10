@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.36/src/version.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>version.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.40/src/version.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>version.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -132,9 +132,6 @@
 <span id="127">127</span>
 <span id="128">128</span>
 <span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
 </pre><pre class="rust"><code><span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
 <span class="comment">// you may not use this file except in compliance with the License.</span>
 <span class="comment">// You may obtain a copy of the License at</span>
@@ -149,6 +146,7 @@
 <span class="comment">//</span>
 
 <span class="kw">use</span> <span class="ident">cfg_if::cfg_if</span>;
+<span class="kw">use</span> <span class="ident">openssl_macros::corresponds</span>;
 <span class="kw">use</span> <span class="ident">std::ffi::CStr</span>;
 
 <span class="macro">cfg_if!</span> {
@@ -178,24 +176,13 @@
 <span class="doccomment">/// `0x000906000 == 0.9.6 dev`</span>
 <span class="doccomment">/// `0x000906023 == 0.9.6b beta 3`</span>
 <span class="doccomment">/// `0x00090605f == 0.9.6e release`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Versions prior to 0.9.3 have identifiers &lt; 0x0930. Versions between 0.9.3 and 0.9.5 had a version identifier with this interpretation:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `MMNNFFRBB major minor fix final beta/patch`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// for example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `0x000904100 == 0.9.4 release`</span>
-<span class="doccomment">/// `0x000905000 == 0.9.5 dev`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Version 0.9.5a had an interim interpretation that is like the current one, except the patch level got the highest bit set, to keep continuity. The number was therefore 0x0090581f</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The return value of this function can be compared to the macro to make sure that the correct version of the library has been loaded, especially when using DLLs on Windows systems.</span>
+<span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OpenSSL_version_num</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">number</span>() -&gt; <span class="ident">i64</span> {
     <span class="kw">unsafe</span> { <span class="ident">OpenSSL_version_num</span>() <span class="kw">as</span> <span class="ident">i64</span> }
 }
 
 <span class="doccomment">/// The text variant of the version number and the release date. For example, &quot;OpenSSL 0.9.5a 1 Apr 2000&quot;.</span>
+<span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OpenSSL_version</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
     <span class="kw">unsafe</span> {
         <span class="ident">CStr::from_ptr</span>(<span class="ident">OpenSSL_version</span>(<span class="ident">OPENSSL_VERSION</span>))
@@ -206,6 +193,7 @@
 
 <span class="doccomment">/// The compiler flags set for the compilation process in the form &quot;compiler: ...&quot; if available or</span>
 <span class="doccomment">/// &quot;compiler: information not available&quot; otherwise.</span>
+<span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OpenSSL_version</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">c_flags</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
     <span class="kw">unsafe</span> {
         <span class="ident">CStr::from_ptr</span>(<span class="ident">OpenSSL_version</span>(<span class="ident">OPENSSL_CFLAGS</span>))
@@ -215,6 +203,7 @@
 }
 
 <span class="doccomment">/// The date of the build process in the form &quot;built on: ...&quot; if available or &quot;built on: date not available&quot; otherwise.</span>
+<span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OpenSSL_version</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">built_on</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
     <span class="kw">unsafe</span> {
         <span class="ident">CStr::from_ptr</span>(<span class="ident">OpenSSL_version</span>(<span class="ident">OPENSSL_BUILT_ON</span>))
@@ -224,6 +213,7 @@
 }
 
 <span class="doccomment">/// The &quot;Configure&quot; target of the library build in the form &quot;platform: ...&quot; if available or &quot;platform: information not available&quot; otherwise.</span>
+<span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OpenSSL_version</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">platform</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
     <span class="kw">unsafe</span> {
         <span class="ident">CStr::from_ptr</span>(<span class="ident">OpenSSL_version</span>(<span class="ident">OPENSSL_PLATFORM</span>))
@@ -233,6 +223,7 @@
 }
 
 <span class="doccomment">/// The &quot;OPENSSLDIR&quot; setting of the library build in the form &quot;OPENSSLDIR: &quot;...&quot;&quot; if available or &quot;OPENSSLDIR: N/A&quot; otherwise.</span>
+<span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OpenSSL_version</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dir</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
     <span class="kw">unsafe</span> {
         <span class="ident">CStr::from_ptr</span>(<span class="ident">OpenSSL_version</span>(<span class="ident">OPENSSL_DIR</span>))
@@ -264,7 +255,10 @@
     <span class="macro">assert!</span>(<span class="ident">number</span>() <span class="op">&gt;</span> <span class="number">0</span>);
     <span class="macro">assert!</span>(<span class="ident">version</span>().<span class="ident">starts_with</span>(<span class="ident">expected_name</span>()));
     <span class="macro">assert!</span>(<span class="ident">c_flags</span>().<span class="ident">starts_with</span>(<span class="string">&quot;compiler:&quot;</span>));
-    <span class="macro">assert!</span>(<span class="ident">built_on</span>().<span class="ident">starts_with</span>(<span class="string">&quot;built on:&quot;</span>));
+    <span class="comment">// some distributions patch out dates out of openssl so that the builds are reproducible</span>
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">built_on</span>().<span class="ident">is_empty</span>() {
+        <span class="macro">assert!</span>(<span class="ident">built_on</span>().<span class="ident">starts_with</span>(<span class="string">&quot;built on:&quot;</span>));
+    }
     <span class="macro">assert!</span>(<span class="ident">dir</span>().<span class="ident">starts_with</span>(<span class="string">&quot;OPENSSLDIR:&quot;</span>));
 }
 </code></pre></div>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.20.3/src/rr/domain/name.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>name.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/domain/name.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>name.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1890,6 +1890,51 @@
 <span id="1885">1885</span>
 <span id="1886">1886</span>
 <span id="1887">1887</span>
+<span id="1888">1888</span>
+<span id="1889">1889</span>
+<span id="1890">1890</span>
+<span id="1891">1891</span>
+<span id="1892">1892</span>
+<span id="1893">1893</span>
+<span id="1894">1894</span>
+<span id="1895">1895</span>
+<span id="1896">1896</span>
+<span id="1897">1897</span>
+<span id="1898">1898</span>
+<span id="1899">1899</span>
+<span id="1900">1900</span>
+<span id="1901">1901</span>
+<span id="1902">1902</span>
+<span id="1903">1903</span>
+<span id="1904">1904</span>
+<span id="1905">1905</span>
+<span id="1906">1906</span>
+<span id="1907">1907</span>
+<span id="1908">1908</span>
+<span id="1909">1909</span>
+<span id="1910">1910</span>
+<span id="1911">1911</span>
+<span id="1912">1912</span>
+<span id="1913">1913</span>
+<span id="1914">1914</span>
+<span id="1915">1915</span>
+<span id="1916">1916</span>
+<span id="1917">1917</span>
+<span id="1918">1918</span>
+<span id="1919">1919</span>
+<span id="1920">1920</span>
+<span id="1921">1921</span>
+<span id="1922">1922</span>
+<span id="1923">1923</span>
+<span id="1924">1924</span>
+<span id="1925">1925</span>
+<span id="1926">1926</span>
+<span id="1927">1927</span>
+<span id="1928">1928</span>
+<span id="1929">1929</span>
+<span id="1930">1930</span>
+<span id="1931">1931</span>
+<span id="1932">1932</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
@@ -1916,7 +1961,7 @@
 <span class="kw">use</span> <span class="ident">tinyvec::TinyVec</span>;
 
 <span class="doccomment">/// A domain name</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Name</span> {
     <span class="ident">is_fqdn</span>: <span class="ident">bool</span>,
     <span class="ident">label_data</span>: <span class="ident">TinyVec</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>,
@@ -1928,7 +1973,7 @@
 <span class="kw">impl</span> <span class="ident">Name</span> {
     <span class="doccomment">/// Create a new domain::Name, i.e. label</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Default::default</span>()
+        <span class="ident"><span class="self">Self</span>::default</span>()
     }
 
     <span class="doccomment">/// Returns the root label, i.e. no labels, can probably make this better in the future.</span>
@@ -1936,6 +1981,16 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
         <span class="ident">this</span>.<span class="ident">is_fqdn</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="ident">this</span>
+    }
+
+    <span class="doccomment">/// Extend the name with the offered label, and ensure maximum name length is not exceeded.</span>
+    <span class="kw">fn</span> <span class="ident">extend_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ProtoError</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">label_data</span>.<span class="ident">extend_from_slice</span>(<span class="ident">label</span>);
+        <span class="self">self</span>.<span class="ident">label_ends</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">label_data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>);
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">255</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;labels exceed maximum length of 255&quot;</span>.<span class="ident">into</span>());
+        };
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Returns true if there are no labels, i.e. it&#39;s empty.</span>
@@ -1991,9 +2046,8 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LabelIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">LabelIter</span> {
             <span class="ident">name</span>: <span class="self">self</span>,
-            <span class="ident">index</span>: <span class="number">0</span>,
-            <span class="ident">started</span>: <span class="bool-val">false</span>,
-            <span class="ident">finished</span>: <span class="bool-val">false</span>,
+            <span class="ident">start</span>: <span class="number">0</span>,
+            <span class="ident">end</span>: <span class="self">self</span>.<span class="ident">label_ends</span>.<span class="ident">len</span>(),
         }
     }
 
@@ -2010,12 +2064,7 @@
     <span class="doccomment">/// assert_eq!(name, Name::from_str(&quot;www.example.com&quot;).unwrap());</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_label</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">IntoLabel</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="ident">L</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">label_data</span>
-            .<span class="ident">extend_from_slice</span>(<span class="ident">label</span>.<span class="ident">into_label</span>()<span class="question-mark">?</span>.<span class="ident">as_bytes</span>());
-        <span class="self">self</span>.<span class="ident">label_ends</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">label_data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>);
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">255</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;labels exceed maximum length of 255&quot;</span>.<span class="ident">into</span>());
-        };
+        <span class="self">self</span>.<span class="ident">extend_name</span>(<span class="ident">label</span>.<span class="ident">into_label</span>()<span class="question-mark">?</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
@@ -2061,9 +2110,9 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;error converting some labels: {:?}&quot;</span>, <span class="ident">errors</span>).<span class="ident">into</span>());
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">Self</span> {
             <span class="ident">is_fqdn</span>: <span class="bool-val">true</span>,
-            ..<span class="ident">Default::default</span>()
+            ..<span class="ident"><span class="self">Self</span>::default</span>()
         };
         <span class="kw">for</span> <span class="ident">label</span> <span class="kw">in</span> <span class="ident">labels</span> {
             <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">append_label</span>(<span class="ident">label</span>)<span class="question-mark">?</span>;
@@ -2086,25 +2135,24 @@
     <span class="doccomment">/// let domain = Name::from_str(&quot;example.com&quot;).unwrap();</span>
     <span class="doccomment">/// assert!(!domain.is_fqdn());</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let name = local.clone().append_name(&amp;domain);</span>
+    <span class="doccomment">/// let name = local.clone().append_name(&amp;domain).unwrap();</span>
     <span class="doccomment">/// assert_eq!(name, Name::from_str(&quot;www.example.com&quot;).unwrap());</span>
     <span class="doccomment">/// assert!(!name.is_fqdn());</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // see also `Name::append_domain`</span>
     <span class="doccomment">/// let domain = Name::from_str(&quot;example.com.&quot;).unwrap();</span>
     <span class="doccomment">/// assert!(domain.is_fqdn());</span>
-    <span class="doccomment">/// let name = local.append_name(&amp;domain);</span>
+    <span class="doccomment">/// let name = local.append_name(&amp;domain).unwrap();</span>
     <span class="doccomment">/// assert_eq!(name, Name::from_str(&quot;www.example.com.&quot;).unwrap());</span>
     <span class="doccomment">/// assert!(name.is_fqdn());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">label</span> <span class="kw">in</span> <span class="ident">other</span>.<span class="ident">iter</span>() {
-            <span class="self">self</span>.<span class="ident">label_data</span>.<span class="ident">extend_from_slice</span>(<span class="ident">label</span>);
-            <span class="self">self</span>.<span class="ident">label_ends</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">label_data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>);
+            <span class="self">self</span>.<span class="ident">extend_name</span>(<span class="ident">label</span>)<span class="question-mark">?</span>;
         }
 
         <span class="self">self</span>.<span class="ident">is_fqdn</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">is_fqdn</span>;
-        <span class="self">self</span>
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Appends the `domain` to `self`, making the new `Name` an FQDN</span>
@@ -2120,14 +2168,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let local = Name::from_str(&quot;www&quot;).unwrap();</span>
     <span class="doccomment">/// let domain = Name::from_str(&quot;example.com&quot;).unwrap();</span>
-    <span class="doccomment">/// let name = local.append_domain(&amp;domain);</span>
+    <span class="doccomment">/// let name = local.append_domain(&amp;domain).unwrap();</span>
     <span class="doccomment">/// assert_eq!(name, Name::from_str(&quot;www.example.com&quot;).unwrap());</span>
     <span class="doccomment">/// assert!(name.is_fqdn())</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_domain</span>(<span class="self">self</span>, <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">append_name</span>(<span class="ident">domain</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_domain</span>(<span class="self">self</span>, <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">append_name</span>(<span class="ident">domain</span>)<span class="question-mark">?</span>;
         <span class="ident">this</span>.<span class="ident">set_fqdn</span>(<span class="bool-val">true</span>);
-        <span class="ident">this</span>
+        <span class="prelude-val">Ok</span>(<span class="ident">this</span>)
     }
 
     <span class="doccomment">/// Creates a new Name with all labels lowercased</span>
@@ -2150,7 +2198,7 @@
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">to_ascii_lowercase</span>())
             .<span class="ident">collect</span>();
-        <span class="ident">Name</span> {
+        <span class="self">Self</span> {
             <span class="ident">is_fqdn</span>: <span class="self">self</span>.<span class="ident">is_fqdn</span>,
             <span class="ident">label_data</span>: <span class="ident">new_label_data</span>,
             <span class="ident">label_ends</span>: <span class="self">self</span>.<span class="ident">label_ends</span>.<span class="ident">clone</span>(),
@@ -2170,7 +2218,7 @@
     <span class="doccomment">/// assert_eq!(Name::from_str(&quot;com.&quot;).unwrap().base_name(), Name::root());</span>
     <span class="doccomment">/// assert_eq!(Name::root().base_name(), Name::root());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">base_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Name</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">base_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">label_ends</span>.<span class="ident">len</span>();
         <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="self">self</span>.<span class="ident">trim_to</span>(<span class="ident">length</span> <span class="op">-</span> <span class="number">1</span>);
@@ -2192,11 +2240,11 @@
     <span class="doccomment">/// assert_eq!(example_com.trim_to(0), Name::root());</span>
     <span class="doccomment">/// assert_eq!(example_com.trim_to(3), Name::from_str(&quot;example.com.&quot;).unwrap());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trim_to</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">num_labels</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Name</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trim_to</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">num_labels</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="ident">num_labels</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">label_ends</span>.<span class="ident">len</span>() {
             <span class="self">self</span>.<span class="ident">clone</span>()
         } <span class="kw">else</span> {
-            <span class="ident">Name::from_labels</span>(<span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">skip</span>(<span class="self">self</span>.<span class="ident">label_ends</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">num_labels</span>)).<span class="ident">unwrap</span>()
+            <span class="ident"><span class="self">Self</span>::from_labels</span>(<span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">skip</span>(<span class="self">self</span>.<span class="ident">label_ends</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">num_labels</span>)).<span class="ident">unwrap</span>()
         }
     }
 
@@ -2405,7 +2453,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">from_encoded_str</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">LabelEnc</span><span class="op">&gt;</span>(<span class="ident">local</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">origin</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">label</span> <span class="op">=</span> <span class="ident">String::new</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseState::Label</span>;
@@ -2477,7 +2525,7 @@
         <span class="kw">if</span> <span class="ident">local</span>.<span class="ident">ends_with</span>(<span class="string">&#39;.&#39;</span>) {
             <span class="ident">name</span>.<span class="ident">set_fqdn</span>(<span class="bool-val">true</span>);
         } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">other</span>) <span class="op">=</span> <span class="ident">origin</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">name</span>.<span class="ident">append_domain</span>(<span class="ident">other</span>));
+            <span class="kw">return</span> <span class="ident">name</span>.<span class="ident">append_domain</span>(<span class="ident">other</span>);
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">name</span>)
@@ -2497,34 +2545,25 @@
         <span class="kw">let</span> <span class="ident">labels</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>();
 
         <span class="comment">// start index of each label</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">labels_written</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">label_ends</span>.<span class="ident">len</span>());
-
-        <span class="kw">if</span> <span class="ident">canonical</span> {
-            <span class="kw">for</span> <span class="ident">label</span> <span class="kw">in</span> <span class="ident">labels</span> {
-                <span class="ident">encoder</span>.<span class="ident">emit_character_data</span>(<span class="ident">label</span>)<span class="question-mark">?</span>;
-            }
-        } <span class="kw">else</span> {
-            <span class="comment">// we&#39;re going to write out each label, tracking the indexes of the start to each label</span>
-            <span class="comment">//   then we&#39;ll look to see if we can remove them and recapture the capacity in the buffer...</span>
-            <span class="kw">for</span> <span class="ident">label</span> <span class="kw">in</span> <span class="ident">labels</span> {
-                <span class="kw">if</span> <span class="ident">label</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">63</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoErrorKind::LabelBytesTooLong</span>(<span class="ident">label</span>.<span class="ident">len</span>()).<span class="ident">into</span>());
-                }
-
-                <span class="ident">labels_written</span>.<span class="ident">push</span>(<span class="ident">encoder</span>.<span class="ident">offset</span>());
-                <span class="ident">encoder</span>.<span class="ident">emit_character_data</span>(<span class="ident">label</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">labels_written</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">label_ends</span>.<span class="ident">len</span>());
+        <span class="comment">// we&#39;re going to write out each label, tracking the indexes of the start to each label</span>
+        <span class="comment">//   then we&#39;ll look to see if we can remove them and recapture the capacity in the buffer...</span>
+        <span class="kw">for</span> <span class="ident">label</span> <span class="kw">in</span> <span class="ident">labels</span> {
+            <span class="kw">if</span> <span class="ident">label</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">63</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoErrorKind::LabelBytesTooLong</span>(<span class="ident">label</span>.<span class="ident">len</span>()).<span class="ident">into</span>());
             }
 
-            <span class="comment">// we&#39;ve written all the labels to the buf, the current offset is the end</span>
-            <span class="kw">let</span> <span class="ident">last_index</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">offset</span>();
-
-            <span class="comment">// now search for other labels already stored matching from the beginning label, strip then to the end</span>
-            <span class="comment">//   if it&#39;s not found, then store this as a new label</span>
-            <span class="kw">for</span> <span class="ident">label_idx</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">labels_written</span> {
-                <span class="kw">let</span> <span class="ident">label_ptr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">get_label_pointer</span>(<span class="kw-2">*</span><span class="ident">label_idx</span>, <span class="ident">last_index</span>);
-
-                <span class="comment">// before we write the label, let&#39;s look for the current set of labels.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">loc</span>) <span class="op">=</span> <span class="ident">label_ptr</span> {
+            <span class="ident">labels_written</span>.<span class="ident">push</span>(<span class="ident">encoder</span>.<span class="ident">offset</span>());
+            <span class="ident">encoder</span>.<span class="ident">emit_character_data</span>(<span class="ident">label</span>)<span class="question-mark">?</span>;
+        }
+        <span class="kw">let</span> <span class="ident">last_index</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">offset</span>();
+        <span class="comment">// now search for other labels already stored matching from the beginning label, strip then to the end</span>
+        <span class="comment">//   if it&#39;s not found, then store this as a new label</span>
+        <span class="kw">for</span> <span class="ident">label_idx</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">labels_written</span> {
+            <span class="kw">match</span> <span class="ident">encoder</span>.<span class="ident">get_label_pointer</span>(<span class="kw-2">*</span><span class="ident">label_idx</span>, <span class="ident">last_index</span>) {
+                <span class="comment">// if writing canonical and already found, continue</span>
+                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">canonical</span> =&gt; <span class="kw">continue</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">loc</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">canonical</span> =&gt; {
                     <span class="comment">// reset back to the beginning of this label, and then write the pointer...</span>
                     <span class="ident">encoder</span>.<span class="ident">set_offset</span>(<span class="kw-2">*</span><span class="ident">label_idx</span>);
                     <span class="ident">encoder</span>.<span class="ident">trim</span>();
@@ -2535,7 +2574,8 @@
 
                     <span class="comment">// we found a pointer don&#39;t write more, break</span>
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
-                } <span class="kw">else</span> {
+                }
+                <span class="kw">_</span> =&gt; {
                     <span class="comment">// no existing label exists, store this new one.</span>
                     <span class="ident">encoder</span>.<span class="ident">store_label_pointer</span>(<span class="kw-2">*</span><span class="ident">label_idx</span>, <span class="ident">last_index</span>);
                 }
@@ -2764,21 +2804,31 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_wildcard</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">label_ends</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="ident">Name::root</span>();
+            <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::root</span>();
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">label_data</span> <span class="op">=</span> <span class="ident">TinyVec::new</span>();
         <span class="ident">label_data</span>.<span class="ident">push</span>(<span class="string">b&#39;*&#39;</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">label_ends</span> <span class="op">=</span> <span class="ident">TinyVec::new</span>();
         <span class="ident">label_ends</span>.<span class="ident">push</span>(<span class="number">1</span>);
+
+        <span class="comment">// this is not using the Name::extend_name function as it should always be shorter than the original name, so length check is unnecessary</span>
         <span class="kw">for</span> <span class="ident">label</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">skip</span>(<span class="number">1</span>) {
             <span class="ident">label_data</span>.<span class="ident">extend_from_slice</span>(<span class="ident">label</span>);
             <span class="ident">label_ends</span>.<span class="ident">push</span>(<span class="ident">label_data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>);
         }
-        <span class="ident">Name</span> {
+        <span class="self">Self</span> {
             <span class="ident">label_data</span>,
             <span class="ident">label_ends</span>,
             <span class="ident">is_fqdn</span>: <span class="self">self</span>.<span class="ident">is_fqdn</span>,
         }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Name(\&quot;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">write_labels</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">LabelEncUtf8</span><span class="op">&gt;</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\&quot;)&quot;</span>)
     }
 }
 
@@ -2815,33 +2865,29 @@
 <span class="doccomment">/// An iterator over labels in a name</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LabelIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Name</span>,
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-    <span class="ident">started</span>: <span class="ident">bool</span>,
-    <span class="ident">finished</span>: <span class="ident">bool</span>,
+    <span class="ident">start</span>: <span class="ident">usize</span>,
+    <span class="ident">end</span>: <span class="ident">usize</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">LabelIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>];
 
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">finished</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">end</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
-        <span class="self">self</span>.<span class="ident">started</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_ends</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">index</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">index</span> {
+
+        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_ends</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">start</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">start</span> {
             <span class="number">0</span> =&gt; <span class="number">0</span>,
-            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_ends</span>[<span class="self">self</span>.<span class="ident">index</span> <span class="op">-</span> <span class="number">1</span>],
+            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_ends</span>[<span class="self">self</span>.<span class="ident">start</span> <span class="op">-</span> <span class="number">1</span>],
         };
-        <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">index</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_ends</span>.<span class="ident">len</span>() {
-            <span class="self">self</span>.<span class="ident">finished</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        }
+        <span class="self">self</span>.<span class="ident">start</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_data</span>[<span class="ident">start</span> <span class="kw">as</span> <span class="ident">usize</span>..<span class="ident">end</span> <span class="kw">as</span> <span class="ident">usize</span>])
     }
 
     <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_ends</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">index</span>;
+        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">end</span>.<span class="ident">saturating_sub</span>(<span class="self">self</span>.<span class="ident">start</span>);
         (<span class="ident">len</span>, <span class="prelude-val">Some</span>(<span class="ident">len</span>))
     }
 }
@@ -2850,23 +2896,18 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">LabelIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">finished</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">start</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">started</span> {
-            <span class="self">self</span>.<span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_ends</span>.<span class="ident">len</span>().<span class="ident">checked_sub</span>(<span class="number">1</span>)<span class="question-mark">?</span>;
-        }
-        <span class="self">self</span>.<span class="ident">started</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_ends</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">index</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">index</span> {
+
+        <span class="self">self</span>.<span class="ident">end</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+
+        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_ends</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">end</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">end</span> {
             <span class="number">0</span> =&gt; <span class="number">0</span>,
-            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_ends</span>[<span class="self">self</span>.<span class="ident">index</span> <span class="op">-</span> <span class="number">1</span>],
+            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_ends</span>[<span class="self">self</span>.<span class="ident">end</span> <span class="op">-</span> <span class="number">1</span>],
         };
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">finished</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">index</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        }
+
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>.<span class="ident">label_data</span>[<span class="ident">start</span> <span class="kw">as</span> <span class="ident">usize</span>..<span class="ident">end</span> <span class="kw">as</span> <span class="ident">usize</span>])
     }
 }
@@ -2881,7 +2922,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Name</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="ident">IpAddr</span>) -&gt; <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="ident">IpAddr</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">addr</span> {
             <span class="ident">IpAddr::V4</span>(<span class="ident">ip</span>) =&gt; <span class="ident">ip</span>.<span class="ident">into</span>(),
             <span class="ident">IpAddr::V6</span>(<span class="ident">ip</span>) =&gt; <span class="ident">ip</span>.<span class="ident">into</span>(),
@@ -2890,7 +2931,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Ipv4Addr</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Name</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="ident">Ipv4Addr</span>) -&gt; <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="ident">Ipv4Addr</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">octets</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">octets</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">labels</span> <span class="op">=</span>
@@ -2918,7 +2959,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Ipv6Addr</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Name</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="ident">Ipv6Addr</span>) -&gt; <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="ident">Ipv6Addr</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">segments</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">segments</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">labels</span> <span class="op">=</span>
@@ -2960,7 +3001,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Name</span> {
+<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Name</span> {
     <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">cmp_with_f</span>::<span class="op">&lt;</span><span class="ident">CaseInsensitive</span><span class="op">&gt;</span>(<span class="ident">other</span>) <span class="op">==</span> <span class="ident">Ordering::Equal</span>
     }
@@ -2999,22 +3040,17 @@
     <span class="doccomment">///  this has a max of 255 octets, with each label being less than 63.</span>
     <span class="doccomment">///  all names will be stored lowercase internally.</span>
     <span class="doccomment">/// This will consume the portions of the `Vec` which it is reading...</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">label_data</span> <span class="op">=</span> <span class="ident">TinyVec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">label_ends</span> <span class="op">=</span> <span class="ident">TinyVec::new</span>();
-        <span class="ident">read_inner</span>(<span class="ident">decoder</span>, <span class="kw-2">&amp;mut</span> <span class="ident">label_data</span>, <span class="kw-2">&amp;mut</span> <span class="ident">label_ends</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">Name</span> {
-            <span class="ident">is_fqdn</span>: <span class="bool-val">true</span>,
-            <span class="ident">label_data</span>,
-            <span class="ident">label_ends</span>,
-        })
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::root</span>(); <span class="comment">// this is FQDN</span>
+
+        <span class="ident">read_inner</span>(<span class="ident">decoder</span>, <span class="kw-2">&amp;mut</span> <span class="ident">name</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">name</span>)
     }
 }
 
 <span class="kw">fn</span> <span class="ident">read_inner</span>(
     <span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">label_data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TinyVec</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>,
-    <span class="ident">label_ends</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TinyVec</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">24</span>]<span class="op">&gt;</span>,
+    <span class="ident">name</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Name</span>,
     <span class="ident">max_idx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">LabelParseState</span> <span class="op">=</span> <span class="ident">LabelParseState::LabelLengthOrPointer</span>;
@@ -3034,12 +3070,6 @@
                     <span class="ident">other</span>: <span class="ident">max_idx</span>,
                 });
             }
-        }
-
-        <span class="comment">// enforce max length of name</span>
-        <span class="kw">let</span> <span class="ident">cur_len</span> <span class="op">=</span> <span class="ident">label_data</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">label_ends</span>.<span class="ident">len</span>();
-        <span class="kw">if</span> <span class="ident">cur_len</span> <span class="op">&gt;</span> <span class="number">255</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DecodeError::DomainNameTooLong</span>(<span class="ident">cur_len</span>));
         }
 
         <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">state</span> {
@@ -3062,8 +3092,8 @@
                     .<span class="ident">verify_unwrap</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">63</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">DecodeError::LabelBytesTooLong</span>(<span class="ident">l</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
 
-                <span class="ident">label_data</span>.<span class="ident">extend_from_slice</span>(<span class="ident">label</span>);
-                <span class="ident">label_ends</span>.<span class="ident">push</span>(<span class="ident">label_data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>);
+                <span class="ident">name</span>.<span class="ident">extend_name</span>(<span class="ident">label</span>)
+                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">DecodeError::DomainNameTooLong</span>(<span class="ident">label</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
 
                 <span class="comment">// reset to collect more data</span>
                 <span class="ident">LabelParseState::LabelLengthOrPointer</span>
@@ -3107,7 +3137,7 @@
                     })<span class="question-mark">?</span>;
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pointer</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">clone</span>(<span class="ident">location</span>);
-                <span class="ident">read_inner</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pointer</span>, <span class="ident">label_data</span>, <span class="ident">label_ends</span>, <span class="prelude-val">Some</span>(<span class="ident">name_start</span>))<span class="question-mark">?</span>;
+                <span class="ident">read_inner</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pointer</span>, <span class="ident">name</span>, <span class="prelude-val">Some</span>(<span class="ident">name_start</span>))<span class="question-mark">?</span>;
 
                 <span class="comment">// Pointers always finish the name, break like Root.</span>
                 <span class="kw">break</span>;
@@ -3120,6 +3150,12 @@
         }
     }
 
+    <span class="comment">// TODO: should we consider checking this while the name is parsed?</span>
+    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">len</span>();
+    <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">255</span> {
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DecodeError::DomainNameTooLong</span>(<span class="ident">len</span>));
+    }
+
     <span class="prelude-val">Ok</span>(())
 }
 
@@ -3129,8 +3165,8 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Name</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Name</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
     }
 }
@@ -3187,9 +3223,9 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Name</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ProtoError</span>;
 
-    <span class="doccomment">/// Uses the Name::from_utf8 conversion on this string, see [`from_ascii`] for ascii only, or for preserving case</span>
+    <span class="doccomment">/// Uses the Name::from_utf8 conversion on this string, see [Name::from_ascii] for ascii only, or for preserving case</span>
     <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="ident">Name::from_str_relaxed</span>(<span class="ident">s</span>)
+        <span class="ident"><span class="self">Self</span>::from_str_relaxed</span>(<span class="ident">s</span>)
     }
 }
 
@@ -3208,6 +3244,13 @@
 
 <span class="kw">impl</span> <span class="ident">IntoName</span> <span class="kw">for</span> <span class="ident">String</span> {
     <span class="doccomment">/// Performs a utf8, IDNA or punycode, translation of the `String` into `Name`</span>
+    <span class="kw">fn</span> <span class="ident">into_name</span>(<span class="self">self</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> {
+        <span class="ident">Name::from_utf8</span>(<span class="self">self</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">IntoName</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">String</span> {
+    <span class="doccomment">/// Performs a utf8, IDNA or punycode, translation of the `&amp;String` into `Name`</span>
     <span class="kw">fn</span> <span class="ident">into_name</span>(<span class="self">self</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> {
         <span class="ident">Name::from_utf8</span>(<span class="self">self</span>)
     }
@@ -3234,7 +3277,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Name</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Name</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -3775,6 +3818,53 @@
                 <span class="ident">Ipv6Net::new</span>(<span class="string">&quot;2001:db8:85a3:8d3:1319:8a2e:370:7334&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>(), <span class="number">128</span>).<span class="ident">unwrap</span>()
             )
         );
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_name_too_long_with_append</span>() {
+        <span class="comment">// from https://github.com/bluejekyll/trust-dns/issues/1447</span>
+        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Name::from_ascii</span>(<span class="string">&quot;Llocainvannnnnnaxgtezqzqznnnnnn1na.nnntnninvannnnnnaxgtezqzqznnnnnn1na.nnntnnnnnnnaxgtezqzqznnnnnn1na.nnntnaaaaaaaaaaaaaaaaaaaaaaaaiK.iaaaaaaaaaaaaaaaaaaaaaaaaiKa.innnnnaxgtezqzqznnnnnn1na.nnntnaaaaaaaaaaaaaaaaaaaaaaaaiK.iaaaaaaaaaaaaaaaaaaaaaaaaiKa.in&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">sfx</span> <span class="op">=</span> <span class="ident">Name::from_ascii</span>(<span class="string">&quot;xxxxxxx.yyyyy.zzz&quot;</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">n</span>
+            .<span class="ident">append_domain</span>(<span class="kw-2">&amp;</span><span class="ident">sfx</span>)
+            .<span class="ident">err</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;should have errored, too long&quot;</span>);
+
+        <span class="kw">match</span> <span class="ident">error</span>.<span class="ident">kind</span>() {
+            <span class="ident">ProtoErrorKind::Message</span>(<span class="string">&quot;labels exceed maximum length of 255&quot;</span>) =&gt; (),
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected too long message&quot;</span>),
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_double_ended_iterator</span>() {
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::from_ascii</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">iter</span>();
+
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="string">b&quot;www&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">unwrap</span>(), <span class="string">b&quot;com&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="string">b&quot;example&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_size_hint</span>() {
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::from_ascii</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">iter</span>();
+
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">size_hint</span>().<span class="number">0</span>, <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="string">b&quot;www&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">size_hint</span>().<span class="number">0</span>, <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">unwrap</span>(), <span class="string">b&quot;com&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">size_hint</span>().<span class="number">0</span>, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="string">b&quot;example&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">size_hint</span>().<span class="number">0</span>, <span class="number">0</span>);
+        <span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">size_hint</span>().<span class="number">0</span>, <span class="number">0</span>);
+        <span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">size_hint</span>().<span class="number">0</span>, <span class="number">0</span>);
     }
 }
 </code></pre></div>

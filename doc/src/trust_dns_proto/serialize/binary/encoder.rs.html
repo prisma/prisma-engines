@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.20.3/src/serialize/binary/encoder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>encoder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/serialize/binary/encoder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>encoder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -623,6 +623,51 @@
 <span id="618">618</span>
 <span id="619">619</span>
 <span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
 </pre><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2015 Benjamin Fry &lt;benjaminfry@me.com&gt;
  *
@@ -810,7 +855,7 @@
         <span class="self">self</span>.<span class="ident">canonical_names</span>
     }
 
-    <span class="doccomment">/// Emit all names in canonical form, useful for https://tools.ietf.org/html/rfc3597</span>
+    <span class="doccomment">/// Emit all names in canonical form, useful for &lt;https://tools.ietf.org/html/rfc3597&gt;</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_canonical_names</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="self">Self</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
@@ -961,13 +1006,12 @@
                     <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 }
             })<span class="question-mark">?</span>;
-
-            <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">buffer</span>
                 .<span class="ident">enforced_write</span>(<span class="ident">data</span>.<span class="ident">len</span>(), <span class="op">|</span><span class="ident">buffer</span><span class="op">|</span> <span class="ident">buffer</span>.<span class="ident">extend_from_slice</span>(<span class="ident">data</span>))<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
         }
+
+        <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -1088,7 +1132,7 @@
 
 <span class="kw">impl</span> <span class="ident">EncodedSize</span> <span class="kw">for</span> <span class="ident">Header</span> {
     <span class="kw">fn</span> <span class="ident">size_of</span>() -&gt; <span class="ident">usize</span> {
-        <span class="ident">Header::len</span>()
+        <span class="ident"><span class="self">Self</span>::len</span>()
     }
 }
 
@@ -1132,9 +1176,14 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::op::Message</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary::BinDecoder</span>;
+    <span class="kw">use</span> <span class="kw">crate</span>::{
+        <span class="ident">op</span>::{<span class="ident">Message</span>, <span class="ident">Query</span>},
+        <span class="ident">rr</span>::{<span class="ident">rdata::SRV</span>, <span class="ident">RData</span>, <span class="ident">Record</span>, <span class="ident">RecordType</span>},
+    };
+    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">rr::Name</span>, <span class="ident">serialize::binary::BinDecoder</span>};
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_label_compression_regression</span>() {
@@ -1241,6 +1290,47 @@
             <span class="ident">ProtoErrorKind::MaxBufferSizeExceeded</span>(<span class="kw">_</span>) =&gt; (),
             <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(),
         }
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_target_compression</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">Message::new</span>();
+        <span class="ident">msg</span>.<span class="ident">add_query</span>(<span class="ident">Query::query</span>(
+            <span class="ident">Name::from_str</span>(<span class="string">&quot;www.google.com.&quot;</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">RecordType::A</span>,
+        ))
+        .<span class="ident">add_answer</span>(<span class="ident">Record::from_rdata</span>(
+            <span class="ident">Name::from_str</span>(<span class="string">&quot;www.google.com.&quot;</span>).<span class="ident">unwrap</span>(),
+            <span class="number">0</span>,
+            <span class="ident">RData::SRV</span>(<span class="ident">SRV::new</span>(
+                <span class="number">0</span>,
+                <span class="number">0</span>,
+                <span class="number">0</span>,
+                <span class="ident">Name::from_str</span>(<span class="string">&quot;www.compressme.com&quot;</span>).<span class="ident">unwrap</span>(),
+            )),
+        ))
+        .<span class="ident">add_additional</span>(<span class="ident">Record::from_rdata</span>(
+            <span class="ident">Name::from_str</span>(<span class="string">&quot;www.google.com.&quot;</span>).<span class="ident">unwrap</span>(),
+            <span class="number">0</span>,
+            <span class="ident">RData::SRV</span>(<span class="ident">SRV::new</span>(
+                <span class="number">0</span>,
+                <span class="number">0</span>,
+                <span class="number">0</span>,
+                <span class="ident">Name::from_str</span>(<span class="string">&quot;www.compressme.com&quot;</span>).<span class="ident">unwrap</span>(),
+            )),
+        ))
+        <span class="comment">// name here should use compressed label from target in previous records</span>
+        .<span class="ident">add_answer</span>(<span class="ident">Record::from_rdata</span>(
+            <span class="ident">Name::from_str</span>(<span class="string">&quot;www.compressme.com&quot;</span>).<span class="ident">unwrap</span>(),
+            <span class="number">0</span>,
+            <span class="ident">RData::CNAME</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.foo.com&quot;</span>).<span class="ident">unwrap</span>()),
+        ));
+
+        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">to_vec</span>().<span class="ident">unwrap</span>();
+        <span class="comment">// label is compressed pointing to target, would be 145 otherwise</span>
+        <span class="macro">assert_eq!</span>(<span class="ident">bytes</span>.<span class="ident">len</span>(), <span class="number">130</span>);
+        <span class="comment">// check re-serializing</span>
+        <span class="macro">assert!</span>(<span class="ident">Message::from_vec</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>).<span class="ident">is_ok</span>());
     }
 }
 </code></pre></div>

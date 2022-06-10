@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/runtime/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/runtime/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -721,6 +721,99 @@
 <span id="716">716</span>
 <span id="717">717</span>
 <span id="718">718</span>
+<span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
+<span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
+<span id="726">726</span>
+<span id="727">727</span>
+<span id="728">728</span>
+<span id="729">729</span>
+<span id="730">730</span>
+<span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::handle::Handle</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">blocking</span>, <span class="ident">driver</span>, <span class="ident">Callback</span>, <span class="ident">Runtime</span>, <span class="ident">Spawner</span>};
 
@@ -801,6 +894,12 @@
 
     <span class="doccomment">/// Customizable keep alive timeout for BlockingPool</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">keep_alive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// How many ticks before pulling a task from the global/remote queue?</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">global_queue_interval</span>: <span class="ident">u32</span>,
+
+    <span class="doccomment">/// How many ticks before yielding to the driver for timer and I/O events?</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">event_interval</span>: <span class="ident">u32</span>,
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">ThreadNameFn</span> <span class="op">=</span> <span class="ident">std::sync::Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() -&gt; <span class="ident">String</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
@@ -821,7 +920,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`LocalSet`]: crate::task::LocalSet</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_current_thread</span>() -&gt; <span class="ident">Builder</span> {
-        <span class="ident">Builder::new</span>(<span class="ident">Kind::CurrentThread</span>)
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">loom</span>)]</span>
+        <span class="kw">const</span> <span class="ident">EVENT_INTERVAL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">4</span>;
+        <span class="comment">// The number `61` is fairly arbitrary. I believe this value was copied from golang.</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">loom</span>))]</span>
+        <span class="kw">const</span> <span class="ident">EVENT_INTERVAL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">61</span>;
+
+        <span class="ident">Builder::new</span>(<span class="ident">Kind::CurrentThread</span>, <span class="number">31</span>, <span class="ident">EVENT_INTERVAL</span>)
     }
 
     <span class="doccomment">/// Returns a new builder with the multi thread scheduler selected.</span>
@@ -830,14 +935,15 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_multi_thread</span>() -&gt; <span class="ident">Builder</span> {
-        <span class="ident">Builder::new</span>(<span class="ident">Kind::MultiThread</span>)
+        <span class="comment">// The number `61` is fairly arbitrary. I believe this value was copied from golang.</span>
+        <span class="ident">Builder::new</span>(<span class="ident">Kind::MultiThread</span>, <span class="number">61</span>, <span class="number">61</span>)
     }
 
     <span class="doccomment">/// Returns a new runtime builder initialized with default configuration</span>
     <span class="doccomment">/// values.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Configuration methods can be chained on the return value.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">Kind</span>) -&gt; <span class="ident">Builder</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">Kind</span>, <span class="ident">global_queue_interval</span>: <span class="ident">u32</span>, <span class="ident">event_interval</span>: <span class="ident">u32</span>) -&gt; <span class="ident">Builder</span> {
         <span class="ident">Builder</span> {
             <span class="ident">kind</span>,
 
@@ -868,6 +974,11 @@
             <span class="ident">after_unpark</span>: <span class="prelude-val">None</span>,
 
             <span class="ident">keep_alive</span>: <span class="prelude-val">None</span>,
+
+            <span class="comment">// Defaults for these values depend on the scheduler kind, so we get them</span>
+            <span class="comment">// as parameters.</span>
+            <span class="ident">global_queue_interval</span>,
+            <span class="ident">event_interval</span>,
         }
     }
 
@@ -1009,7 +1120,6 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use tokio::runtime;</span>
     <span class="doccomment">/// # use std::sync::atomic::{AtomicUsize, Ordering};</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// # pub fn main() {</span>
     <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
     <span class="doccomment">///     .thread_name_fn(|| {</span>
@@ -1061,7 +1171,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// # pub fn main() {</span>
     <span class="doccomment">/// let runtime = runtime::Builder::new_multi_thread()</span>
     <span class="doccomment">///     .on_thread_start(|| {</span>
@@ -1087,7 +1196,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// # pub fn main() {</span>
     <span class="doccomment">/// let runtime = runtime::Builder::new_multi_thread()</span>
     <span class="doccomment">///     .on_thread_stop(|| {</span>
@@ -1196,7 +1304,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// # pub fn main() {</span>
     <span class="doccomment">/// let runtime = runtime::Builder::new_multi_thread()</span>
     <span class="doccomment">///     .on_thread_unpark(|| {</span>
@@ -1265,7 +1372,6 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use tokio::runtime;</span>
     <span class="doccomment">/// # use std::time::Duration;</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// # pub fn main() {</span>
     <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
     <span class="doccomment">///     .thread_keep_alive(Duration::from_millis(100))</span>
@@ -1277,33 +1383,104 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Sets the number of scheduler ticks after which the scheduler will poll the global</span>
+    <span class="doccomment">/// task queue.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A scheduler &quot;tick&quot; roughly corresponds to one `poll` invocation on a task.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// By default the global queue interval is:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * `31` for the current-thread scheduler.</span>
+    <span class="doccomment">/// * `61` for the multithreaded scheduler.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Schedulers have a local queue of already-claimed tasks, and a global queue of incoming</span>
+    <span class="doccomment">/// tasks. Setting the interval to a smaller value increases the fairness of the scheduler,</span>
+    <span class="doccomment">/// at the cost of more synchronization overhead. That can be beneficial for prioritizing</span>
+    <span class="doccomment">/// getting started on new work, especially if tasks frequently yield rather than complete</span>
+    <span class="doccomment">/// or await on further I/O. Conversely, a higher value prioritizes existing work, and</span>
+    <span class="doccomment">/// is a good choice when most tasks quickly complete polling.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use tokio::runtime;</span>
+    <span class="doccomment">/// # pub fn main() {</span>
+    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
+    <span class="doccomment">///     .global_queue_interval(31)</span>
+    <span class="doccomment">///     .build();</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">global_queue_interval</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">global_queue_interval</span> <span class="op">=</span> <span class="ident">val</span>;
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the number of scheduler ticks after which the scheduler will poll for</span>
+    <span class="doccomment">/// external events (timers, I/O, and so on).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A scheduler &quot;tick&quot; roughly corresponds to one `poll` invocation on a task.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// By default, the event interval is `61` for all scheduler types.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Setting the event interval determines the effective &quot;priority&quot; of delivering</span>
+    <span class="doccomment">/// these external events (which may wake up additional tasks), compared to</span>
+    <span class="doccomment">/// executing tasks that are currently ready to run. A smaller value is useful</span>
+    <span class="doccomment">/// when tasks frequently spend a long time in polling, or frequently yield,</span>
+    <span class="doccomment">/// which can result in overly long delays picking up I/O events. Conversely,</span>
+    <span class="doccomment">/// picking up new events requires extra synchronization and syscall overhead,</span>
+    <span class="doccomment">/// so if tasks generally complete their polling quickly, a higher event interval</span>
+    <span class="doccomment">/// will minimize that overhead while still keeping the scheduler responsive to</span>
+    <span class="doccomment">/// events.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use tokio::runtime;</span>
+    <span class="doccomment">/// # pub fn main() {</span>
+    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
+    <span class="doccomment">///     .event_interval(31)</span>
+    <span class="doccomment">///     .build();</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_interval</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">event_interval</span> <span class="op">=</span> <span class="ident">val</span>;
+        <span class="self">self</span>
+    }
+
     <span class="kw">fn</span> <span class="ident">build_basic_runtime</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">BasicScheduler</span>, <span class="ident">Kind</span>};
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">BasicScheduler</span>, <span class="ident">HandleInner</span>, <span class="ident">Kind</span>};
 
         <span class="kw">let</span> (<span class="ident">driver</span>, <span class="ident">resources</span>) <span class="op">=</span> <span class="ident">driver::Driver::new</span>(<span class="self">self</span>.<span class="ident">get_cfg</span>())<span class="question-mark">?</span>;
-
-        <span class="comment">// And now put a single-threaded scheduler on top of the timer. When</span>
-        <span class="comment">// there are no futures ready to do something, it&#39;ll let the timer or</span>
-        <span class="comment">// the reactor to generate some new stimuli for the futures to continue</span>
-        <span class="comment">// in their life.</span>
-        <span class="kw">let</span> <span class="ident">scheduler</span> <span class="op">=</span>
-            <span class="ident">BasicScheduler::new</span>(<span class="ident">driver</span>, <span class="self">self</span>.<span class="ident">before_park</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">after_unpark</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">Spawner::Basic</span>(<span class="ident">scheduler</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>());
 
         <span class="comment">// Blocking pool</span>
         <span class="kw">let</span> <span class="ident">blocking_pool</span> <span class="op">=</span> <span class="ident">blocking::create_blocking_pool</span>(<span class="self">self</span>, <span class="self">self</span>.<span class="ident">max_blocking_threads</span>);
         <span class="kw">let</span> <span class="ident">blocking_spawner</span> <span class="op">=</span> <span class="ident">blocking_pool</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>();
 
+        <span class="kw">let</span> <span class="ident">handle_inner</span> <span class="op">=</span> <span class="ident">HandleInner</span> {
+            <span class="ident">io_handle</span>: <span class="ident">resources</span>.<span class="ident">io_handle</span>,
+            <span class="ident">time_handle</span>: <span class="ident">resources</span>.<span class="ident">time_handle</span>,
+            <span class="ident">signal_handle</span>: <span class="ident">resources</span>.<span class="ident">signal_handle</span>,
+            <span class="ident">clock</span>: <span class="ident">resources</span>.<span class="ident">clock</span>,
+            <span class="ident">blocking_spawner</span>,
+        };
+
+        <span class="comment">// And now put a single-threaded scheduler on top of the timer. When</span>
+        <span class="comment">// there are no futures ready to do something, it&#39;ll let the timer or</span>
+        <span class="comment">// the reactor to generate some new stimuli for the futures to continue</span>
+        <span class="comment">// in their life.</span>
+        <span class="kw">let</span> <span class="ident">scheduler</span> <span class="op">=</span> <span class="ident">BasicScheduler::new</span>(
+            <span class="ident">driver</span>,
+            <span class="ident">handle_inner</span>,
+            <span class="self">self</span>.<span class="ident">before_park</span>.<span class="ident">clone</span>(),
+            <span class="self">self</span>.<span class="ident">after_unpark</span>.<span class="ident">clone</span>(),
+            <span class="self">self</span>.<span class="ident">global_queue_interval</span>,
+            <span class="self">self</span>.<span class="ident">event_interval</span>,
+        );
+        <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">Spawner::Basic</span>(<span class="ident">scheduler</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>());
+
         <span class="prelude-val">Ok</span>(<span class="ident">Runtime</span> {
             <span class="ident">kind</span>: <span class="ident">Kind::CurrentThread</span>(<span class="ident">scheduler</span>),
-            <span class="ident">handle</span>: <span class="ident">Handle</span> {
-                <span class="ident">spawner</span>,
-                <span class="ident">io_handle</span>: <span class="ident">resources</span>.<span class="ident">io_handle</span>,
-                <span class="ident">time_handle</span>: <span class="ident">resources</span>.<span class="ident">time_handle</span>,
-                <span class="ident">signal_handle</span>: <span class="ident">resources</span>.<span class="ident">signal_handle</span>,
-                <span class="ident">clock</span>: <span class="ident">resources</span>.<span class="ident">clock</span>,
-                <span class="ident">blocking_spawner</span>,
-            },
+            <span class="ident">handle</span>: <span class="ident">Handle</span> { <span class="ident">spawner</span> },
             <span class="ident">blocking_pool</span>,
         })
     }
@@ -1385,29 +1562,38 @@
     <span class="kw">impl</span> <span class="ident">Builder</span> {
         <span class="kw">fn</span> <span class="ident">build_threaded_runtime</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sys::num_cpus</span>;
-            <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">Kind</span>, <span class="ident">ThreadPool</span>};
-            <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::park::Parker</span>;
+            <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">HandleInner</span>, <span class="ident">Kind</span>, <span class="ident">ThreadPool</span>};
 
             <span class="kw">let</span> <span class="ident">core_threads</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">worker_threads</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">num_cpus</span>);
 
             <span class="kw">let</span> (<span class="ident">driver</span>, <span class="ident">resources</span>) <span class="op">=</span> <span class="ident">driver::Driver::new</span>(<span class="self">self</span>.<span class="ident">get_cfg</span>())<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> (<span class="ident">scheduler</span>, <span class="ident">launch</span>) <span class="op">=</span> <span class="ident">ThreadPool::new</span>(<span class="ident">core_threads</span>, <span class="ident">Parker::new</span>(<span class="ident">driver</span>), <span class="self">self</span>.<span class="ident">before_park</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">after_unpark</span>.<span class="ident">clone</span>());
-            <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">Spawner::ThreadPool</span>(<span class="ident">scheduler</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>());
-
             <span class="comment">// Create the blocking pool</span>
-            <span class="kw">let</span> <span class="ident">blocking_pool</span> <span class="op">=</span> <span class="ident">blocking::create_blocking_pool</span>(<span class="self">self</span>, <span class="self">self</span>.<span class="ident">max_blocking_threads</span> <span class="op">+</span> <span class="ident">core_threads</span>);
+            <span class="kw">let</span> <span class="ident">blocking_pool</span> <span class="op">=</span>
+                <span class="ident">blocking::create_blocking_pool</span>(<span class="self">self</span>, <span class="self">self</span>.<span class="ident">max_blocking_threads</span> <span class="op">+</span> <span class="ident">core_threads</span>);
             <span class="kw">let</span> <span class="ident">blocking_spawner</span> <span class="op">=</span> <span class="ident">blocking_pool</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>();
 
-            <span class="comment">// Create the runtime handle</span>
-            <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Handle</span> {
-                <span class="ident">spawner</span>,
+            <span class="kw">let</span> <span class="ident">handle_inner</span> <span class="op">=</span> <span class="ident">HandleInner</span> {
                 <span class="ident">io_handle</span>: <span class="ident">resources</span>.<span class="ident">io_handle</span>,
                 <span class="ident">time_handle</span>: <span class="ident">resources</span>.<span class="ident">time_handle</span>,
                 <span class="ident">signal_handle</span>: <span class="ident">resources</span>.<span class="ident">signal_handle</span>,
                 <span class="ident">clock</span>: <span class="ident">resources</span>.<span class="ident">clock</span>,
                 <span class="ident">blocking_spawner</span>,
             };
+
+            <span class="kw">let</span> (<span class="ident">scheduler</span>, <span class="ident">launch</span>) <span class="op">=</span> <span class="ident">ThreadPool::new</span>(
+                <span class="ident">core_threads</span>,
+                <span class="ident">driver</span>,
+                <span class="ident">handle_inner</span>,
+                <span class="self">self</span>.<span class="ident">before_park</span>.<span class="ident">clone</span>(),
+                <span class="self">self</span>.<span class="ident">after_unpark</span>.<span class="ident">clone</span>(),
+                <span class="self">self</span>.<span class="ident">global_queue_interval</span>,
+                <span class="self">self</span>.<span class="ident">event_interval</span>,
+            );
+            <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">Spawner::ThreadPool</span>(<span class="ident">scheduler</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>());
+
+            <span class="comment">// Create the runtime handle</span>
+            <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Handle</span> { <span class="ident">spawner</span> };
 
             <span class="comment">// Spawn the thread pool workers</span>
             <span class="kw">let</span> <span class="ident">_enter</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::runtime::context::enter</span>(<span class="ident">handle</span>.<span class="ident">clone</span>());

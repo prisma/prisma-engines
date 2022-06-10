@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/enumflags2-0.7.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/enumflags2-0.7.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../enumflags2/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -904,6 +904,125 @@
 <span id="899">899</span>
 <span id="900">900</span>
 <span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
+<span id="971">971</span>
+<span id="972">972</span>
+<span id="973">973</span>
+<span id="974">974</span>
+<span id="975">975</span>
+<span id="976">976</span>
+<span id="977">977</span>
+<span id="978">978</span>
+<span id="979">979</span>
+<span id="980">980</span>
+<span id="981">981</span>
+<span id="982">982</span>
+<span id="983">983</span>
+<span id="984">984</span>
+<span id="985">985</span>
+<span id="986">986</span>
+<span id="987">987</span>
+<span id="988">988</span>
+<span id="989">989</span>
+<span id="990">990</span>
+<span id="991">991</span>
+<span id="992">992</span>
+<span id="993">993</span>
+<span id="994">994</span>
+<span id="995">995</span>
+<span id="996">996</span>
+<span id="997">997</span>
+<span id="998">998</span>
+<span id="999">999</span>
+<span id="1000">1000</span>
+<span id="1001">1001</span>
+<span id="1002">1002</span>
+<span id="1003">1003</span>
+<span id="1004">1004</span>
+<span id="1005">1005</span>
+<span id="1006">1006</span>
+<span id="1007">1007</span>
+<span id="1008">1008</span>
+<span id="1009">1009</span>
+<span id="1010">1010</span>
+<span id="1011">1011</span>
+<span id="1012">1012</span>
+<span id="1013">1013</span>
+<span id="1014">1014</span>
+<span id="1015">1015</span>
+<span id="1016">1016</span>
+<span id="1017">1017</span>
+<span id="1018">1018</span>
+<span id="1019">1019</span>
+<span id="1020">1020</span>
 </pre><pre class="rust"><code><span class="doccomment">//! # Enum Flags</span>
 <span class="doccomment">//! `enumflags2` implements the classic bitflags datastructure. Annotate an enum</span>
 <span class="doccomment">//! with `#[bitflags]`, and `BitFlags&lt;YourEnum&gt;` will be able to hold arbitrary combinations</span>
@@ -930,12 +1049,11 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // The debug output lets you inspect both the numeric value and</span>
 <span class="doccomment">//! // the actual flags:</span>
+<span class="doccomment">//! assert_eq!(format!(&quot;{:?}&quot;, a_b), &quot;BitFlags&lt;Test&gt;(0b11, A | B)&quot;);</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! // BitFlags&lt;Test&gt;(0b11, [A, B])</span>
-<span class="doccomment">//! println!(&quot;{:?}&quot;, a_b);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // BitFlags&lt;Test&gt;(0b1, [A])</span>
-<span class="doccomment">//! println!(&quot;{:?}&quot;, a_b &amp; a_c);</span>
+<span class="doccomment">//! // But if you&#39;d rather see only one of those, that&#39;s available too:</span>
+<span class="doccomment">//! assert_eq!(format!(&quot;{}&quot;, a_b), &quot;A | B&quot;);</span>
+<span class="doccomment">//! assert_eq!(format!(&quot;{:04b}&quot;, a_b), &quot;0011&quot;);</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // Iterate over the flags like a normal set</span>
 <span class="doccomment">//! assert_eq!(a_b.iter().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[Test::A, Test::B]);</span>
@@ -997,7 +1115,7 @@
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">test</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)), <span class="ident">no_std</span>)]</span>
 
-<span class="kw">use</span> <span class="ident">core::iter::FromIterator</span>;
+<span class="kw">use</span> <span class="ident">core::iter</span>::{<span class="ident">FromIterator</span>, <span class="ident">FusedIterator</span>};
 <span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
 <span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">cmp</span>, <span class="ident">ops</span>};
 
@@ -1052,6 +1170,7 @@
     <span class="doccomment">/// assert_eq!(empty.contains(MyFlag::Two), false);</span>
     <span class="doccomment">/// assert_eq!(empty.contains(MyFlag::Three), false);</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">BitFlags::empty</span>()
     }
@@ -1080,6 +1199,7 @@
     <span class="doccomment">/// assert_eq!(empty.contains(MyFlag::Two), true);</span>
     <span class="doccomment">/// assert_eq!(empty.contains(MyFlag::Three), true);</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">all</span>() -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">BitFlags::all</span>()
     }
@@ -1092,7 +1212,12 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">_internal</span> {
     <span class="doccomment">/// A trait automatically implemented by `#[bitflags]` to make the enum</span>
     <span class="doccomment">/// a valid type parameter for `BitFlags&lt;T&gt;`.</span>
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RawBitFlags</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The values should reflect reality, like they do if the implementation</span>
+    <span class="doccomment">/// is generated by the procmacro.</span>
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">RawBitFlags</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
         <span class="doccomment">/// The underlying integer type.</span>
         <span class="kw">type</span> <span class="ident">Numeric</span>: <span class="ident">BitFlagNum</span>;
 
@@ -1106,9 +1231,6 @@
         <span class="doccomment">/// A value with all flag bits set.</span>
         <span class="kw">const</span> <span class="ident">ALL_BITS</span>: <span class="ident"><span class="self">Self</span>::Numeric</span>;
 
-        <span class="doccomment">/// A slice that contains each variant exactly one.</span>
-        <span class="kw">const</span> <span class="ident">FLAG_LIST</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="self">Self</span>];
-
         <span class="doccomment">/// The name of the type for debug formatting purposes.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This is typically `BitFlags&lt;EnumName&gt;`</span>
@@ -1120,13 +1242,14 @@
 
     <span class="kw">use</span> <span class="ident">::core::cmp::PartialOrd</span>;
     <span class="kw">use</span> <span class="ident">::core::fmt</span>;
-    <span class="kw">use</span> <span class="ident">::core::ops</span>::{<span class="ident">BitAnd</span>, <span class="ident">BitOr</span>, <span class="ident">BitXor</span>, <span class="ident">Not</span>};
+    <span class="kw">use</span> <span class="ident">::core::ops</span>::{<span class="ident">BitAnd</span>, <span class="ident">BitOr</span>, <span class="ident">BitXor</span>, <span class="ident">Not</span>, <span class="ident">Sub</span>};
 
     <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BitFlagNum</span>:
         <span class="ident">Default</span>
         <span class="op">+</span> <span class="ident">BitOr</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">BitAnd</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">BitXor</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
+        <span class="op">+</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">Not</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
         <span class="op">+</span> <span class="ident">fmt::Debug</span>
@@ -1134,10 +1257,29 @@
         <span class="op">+</span> <span class="ident">Copy</span>
         <span class="op">+</span> <span class="ident">Clone</span>
     {
+        <span class="kw">const</span> <span class="ident">ONE</span>: <span class="self">Self</span>;
+
+        <span class="kw">fn</span> <span class="ident">is_power_of_two</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+        <span class="kw">fn</span> <span class="ident">count_ones</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+        <span class="kw">fn</span> <span class="ident">wrapping_neg</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
     }
 
     <span class="macro">for_each_uint!</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">hide_docs</span> =&gt;
-        <span class="kw">impl</span> <span class="ident">BitFlagNum</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {}
+        <span class="kw">impl</span> <span class="ident">BitFlagNum</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
+            <span class="kw">const</span> <span class="ident">ONE</span>: <span class="self">Self</span> <span class="op">=</span> <span class="number">1</span>;
+
+            <span class="kw">fn</span> <span class="ident">is_power_of_two</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+                <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span><span class="ident">::is_power_of_two</span>(<span class="self">self</span>)
+            }
+
+            <span class="kw">fn</span> <span class="ident">count_ones</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span> {
+                <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span><span class="ident">::count_ones</span>(<span class="self">self</span>)
+            }
+
+            <span class="kw">fn</span> <span class="ident">wrapping_neg</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+                <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span><span class="ident">::wrapping_neg</span>(<span class="self">self</span>)
+            }
+        }
     }
 
     <span class="comment">// Re-export libcore so the macro doesn&#39;t inject &quot;extern crate&quot; downstream.</span>
@@ -1171,6 +1313,8 @@
         <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="op">!</span><span class="ident">x</span>).<span class="ident">trailing_zeros</span>()
     }
 }
+
+<span class="kw">use</span> <span class="ident">_internal::BitFlagNum</span>;
 
 <span class="comment">// Internal debug formatting implementations</span>
 <span class="kw">mod</span> <span class="ident">formatting</span>;
@@ -1253,8 +1397,8 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The types substituted for `T` and `N` must always match, creating a</span>
-<span class="doccomment">/// `BitFlags` value where that isn&#39;t the case is considered to be impossible</span>
-<span class="doccomment">/// without unsafe code.</span>
+<span class="doccomment">/// `BitFlags` value where that isn&#39;t the case is only possible with</span>
+<span class="doccomment">/// incorrect unsafe code.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">N</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">_internal::RawBitFlags</span><span class="op">&gt;</span><span class="ident">::Numeric</span><span class="op">&gt;</span> {
@@ -1286,6 +1430,8 @@
             $(
                 <span class="ident">n</span> <span class="op">|</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="kw">enum</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span> <span class="kw">as</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">enum</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::_internal::RawBitFlags</span><span class="op">&gt;</span><span class="ident">::Numeric</span>;
             )<span class="op">*</span>
+            <span class="comment">// SAFETY: The value has been created from numeric values of the underlying</span>
+            <span class="comment">// enum, so only valid bits are set.</span>
             <span class="kw">unsafe</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::BitFlags</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">enum</span><span class="op">&gt;</span><span class="macro-nonterminal">::from_bits_unchecked_c</span>(
                     <span class="ident">n</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::BitFlags::CONST_TOKEN</span>) }
         }
@@ -1293,7 +1439,7 @@
 }
 
 <span class="doccomment">/// The default value returned is one with all flags unset, i. e. [`empty`][Self::empty],</span>
-<span class="doccomment">/// unless customized.</span>
+<span class="doccomment">/// unless [customized](index.html#customizing-default).</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">BitFlag</span>,
@@ -1327,6 +1473,7 @@
 {
     <span class="doccomment">/// Returns a `BitFlags&lt;T&gt;` if the raw value provided does not contain</span>
     <span class="doccomment">/// any illegal flags.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bits</span>(<span class="ident">bits</span>: <span class="ident">T::Numeric</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromBitsError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_bits_truncate</span>(<span class="ident">bits</span>);
         <span class="kw">if</span> <span class="ident">flags</span>.<span class="ident">bits</span>() <span class="op">==</span> <span class="ident">bits</span> {
@@ -1341,8 +1488,11 @@
 
     <span class="doccomment">/// Create a `BitFlags&lt;T&gt;` from an underlying bitwise value. If any</span>
     <span class="doccomment">/// invalid bits are set, ignore them.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bits_truncate</span>(<span class="ident">bits</span>: <span class="ident">T::Numeric</span>) -&gt; <span class="self">Self</span> {
+        <span class="comment">// SAFETY: We&#39;re truncating out all the invalid bits, so the remaining</span>
+        <span class="comment">// ones must be valid.</span>
         <span class="kw">unsafe</span> { <span class="ident">BitFlags::from_bits_unchecked</span>(<span class="ident">bits</span> <span class="op">&amp;</span> <span class="ident">T::ALL_BITS</span>) }
     }
 
@@ -1354,8 +1504,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The argument must not have set bits at positions not corresponding to</span>
-    <span class="doccomment">/// any flag.</span>
+    <span class="doccomment">/// All bits set in `val` must correspond to a value of the enum.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_bits_unchecked</span>(<span class="ident">val</span>: <span class="ident">T::Numeric</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">BitFlags</span> {
@@ -1365,8 +1515,10 @@
     }
 
     <span class="doccomment">/// Turn a `T` into a `BitFlags&lt;T&gt;`. Also available as `flag.into()`.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_flag</span>(<span class="ident">flag</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
+        <span class="comment">// SAFETY: A value of the underlying enum is valid by definition.</span>
         <span class="kw">unsafe</span> { <span class="ident"><span class="self">Self</span>::from_bits_unchecked</span>(<span class="ident">flag</span>.<span class="ident">bits</span>()) }
     }
 
@@ -1455,6 +1607,26 @@
         <span class="self">self</span>.<span class="ident">val</span> <span class="op">==</span> <span class="ident">T::EMPTY</span>
     }
 
+    <span class="doccomment">/// Returns the number of flags set.</span>
+    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">val</span>.<span class="ident">count_ones</span>() <span class="kw">as</span> <span class="ident">usize</span>
+    }
+
+    <span class="doccomment">/// If exactly one flag is set, the flag is returned. Otherwise, returns `None`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// See also [`Itertools::exactly_one`](https://docs.rs/itertools/latest/itertools/trait.Itertools.html#method.exactly_one).</span>
+    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exactly_one</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">val</span>.<span class="ident">is_power_of_two</span>() {
+            <span class="comment">// SAFETY: By the invariant of the BitFlags type, all bits are valid</span>
+            <span class="comment">// in isolation for the underlying enum.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="ident">core::mem::transmute_copy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">val</span>) })
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
+    }
+
     <span class="doccomment">/// Returns the underlying bitwise value.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
@@ -1507,13 +1679,69 @@
     }
 
     <span class="doccomment">/// Returns an iterator that yields each set flag</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">T::FLAG_LIST</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">cloned</span>()
-            .<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">flag</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">flag</span>))
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="ident">Iter</span> {
+            <span class="ident">rest</span>: <span class="self">self</span>,
+        }
     }
 }
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BitFlag</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
+
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+        <span class="self">self</span>.<span class="ident">iter</span>()
+    }
+}
+
+<span class="doccomment">/// Iterator that yields each set flag.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BitFlag</span><span class="op">&gt;</span> {
+    <span class="ident">rest</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">BitFlag</span>,
+{
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
+
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">rest</span>.<span class="ident">is_empty</span>() {
+            <span class="prelude-val">None</span>
+        } <span class="kw">else</span> {
+            <span class="comment">// SAFETY: `flag` will be a single bit, because</span>
+            <span class="comment">// x &amp; -x = x &amp; (~x + 1), and the increment causes only one 0 -&gt; 1 transition.</span>
+            <span class="comment">// The invariant of `from_bits_unchecked` is satisfied, because bits &amp; x</span>
+            <span class="comment">// is a subset of bits, which we know are the valid bits.</span>
+            <span class="kw">unsafe</span> {
+                <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rest</span>.<span class="ident">bits</span>();
+                <span class="kw">let</span> <span class="ident">flag</span>: <span class="ident">T::Numeric</span> <span class="op">=</span> <span class="ident">bits</span> <span class="op">&amp;</span> <span class="ident">bits</span>.<span class="ident">wrapping_neg</span>();
+                <span class="kw">let</span> <span class="ident">flag</span>: <span class="ident">T</span> <span class="op">=</span> <span class="ident">core::mem::transmute_copy</span>(<span class="kw-2">&amp;</span><span class="ident">flag</span>);
+                <span class="self">self</span>.<span class="ident">rest</span> <span class="op">=</span> <span class="ident">BitFlags::from_bits_unchecked</span>(<span class="ident">bits</span> <span class="op">&amp;</span> (<span class="ident">bits</span> <span class="op">-</span> <span class="ident">BitFlagNum::ONE</span>));
+                <span class="prelude-val">Some</span>(<span class="ident">flag</span>)
+            }
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rest</span>.<span class="ident">len</span>();
+        (<span class="ident">l</span>, <span class="prelude-val">Some</span>(<span class="ident">l</span>))
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">BitFlag</span>,
+{
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">rest</span>.<span class="ident">len</span>()
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BitFlag</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
 
 <span class="macro">for_each_uint!</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">hide_docs</span> =&gt;
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span> {
@@ -1528,8 +1756,8 @@
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Safety</span>
         <span class="doccomment">///</span>
-        <span class="doccomment">/// The argument must not have set bits at positions not corresponding to</span>
-        <span class="doccomment">/// any flag.</span>
+        <span class="doccomment">/// All bits set in `val` must correspond to a value of the enum.</span>
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hide_docs</span>]</span>)<span class="question-mark">?</span>
         <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_bits_unchecked_c</span>(
@@ -1560,6 +1788,7 @@
         <span class="doccomment">///     BitFlags::&lt;MyFlag&gt;::from_bits_truncate_c(0b10101010, BitFlags::CONST_TOKEN);</span>
         <span class="doccomment">/// assert_eq!(FLAGS, MyFlag::Two);</span>
         <span class="doccomment">/// ```</span>
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hide_docs</span>]</span>)<span class="question-mark">?</span>
         <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_bits_truncate_c</span>(
@@ -1622,6 +1851,7 @@
         <span class="doccomment">/// const NEGATED: BitFlags&lt;MyFlag&gt; = FLAGS.not_c(BitFlags::CONST_TOKEN);</span>
         <span class="doccomment">/// assert_eq!(NEGATED, MyFlag::Three);</span>
         <span class="doccomment">/// ```</span>
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hide_docs</span>]</span>)<span class="question-mark">?</span>
         <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">not_c</span>(<span class="self">self</span>, <span class="ident">const_token</span>: <span class="ident">ConstToken</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
@@ -1675,6 +1905,8 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">B</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="comment">// SAFETY: The two operands are known to be composed of valid bits,</span>
+        <span class="comment">// and 0 | 0 = 0 in the columns of the invalid bits.</span>
         <span class="kw">unsafe</span> { <span class="ident">BitFlags::from_bits_unchecked</span>(<span class="self">self</span>.<span class="ident">bits</span>() <span class="op">|</span> <span class="ident">other</span>.<span class="ident">into</span>().<span class="ident">bits</span>()) }
     }
 }
@@ -1687,6 +1919,8 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">B</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="comment">// SAFETY: The two operands are known to be composed of valid bits,</span>
+        <span class="comment">// and 0 &amp; 0 = 0 in the columns of the invalid bits.</span>
         <span class="kw">unsafe</span> { <span class="ident">BitFlags::from_bits_unchecked</span>(<span class="self">self</span>.<span class="ident">bits</span>() <span class="op">&amp;</span> <span class="ident">other</span>.<span class="ident">into</span>().<span class="ident">bits</span>()) }
     }
 }
@@ -1699,6 +1933,8 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">bitxor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">B</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="comment">// SAFETY: The two operands are known to be composed of valid bits,</span>
+        <span class="comment">// and 0 ^ 0 = 0 in the columns of the invalid bits.</span>
         <span class="kw">unsafe</span> { <span class="ident">BitFlags::from_bits_unchecked</span>(<span class="self">self</span>.<span class="ident">bits</span>() <span class="op">^</span> <span class="ident">other</span>.<span class="ident">into</span>().<span class="ident">bits</span>()) }
     }
 }
@@ -1742,7 +1978,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">not</span>(<span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> { <span class="ident">BitFlags::from_bits_unchecked</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">bits</span>() <span class="op">&amp;</span> <span class="ident">T::ALL_BITS</span>) }
+        <span class="ident">BitFlags::from_bits_truncate</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">bits</span>())
     }
 }
 
@@ -1751,6 +1987,7 @@
     <span class="ident">T</span>: <span class="ident">BitFlag</span>,
     <span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">it</span>: <span class="ident">I</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span>,
@@ -1765,6 +2002,7 @@
     <span class="ident">T</span>: <span class="ident">BitFlag</span>,
     <span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">it</span>: <span class="ident">I</span>)
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span>,

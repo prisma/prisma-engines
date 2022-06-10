@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.20.3/src/udp/udp_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>udp_stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/udp/udp_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>udp_stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -313,6 +313,26 @@
 <span id="308">308</span>
 <span id="309">309</span>
 <span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2015-2018 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
@@ -333,7 +353,7 @@
 <span class="kw">use</span> <span class="ident">rand</span>;
 <span class="kw">use</span> <span class="ident">rand::distributions</span>::{<span class="ident">uniform::Uniform</span>, <span class="ident">Distribution</span>};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer</span>::{<span class="ident">BufStreamHandle</span>, <span class="ident">SerialMessage</span>, <span class="ident">StreamReceiver</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer</span>::{<span class="ident">BufDnsStreamHandle</span>, <span class="ident">SerialMessage</span>, <span class="ident">StreamReceiver</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Time</span>;
 
 <span class="doccomment">/// Trait for UdpSocket</span>
@@ -391,7 +411,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// * `name_server` - socket address for the remote server (used to determine IPv4 or IPv6)</span>
+    <span class="doccomment">/// * `remote_addr` - socket address for the remote connection (used to determine IPv4 or IPv6)</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Return</span>
     <span class="doccomment">///</span>
@@ -399,20 +419,21 @@
     <span class="doccomment">///  handle which can be used to send messages into the stream.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">name_server</span>: <span class="ident">SocketAddr</span>,
+        <span class="ident">remote_addr</span>: <span class="ident">SocketAddr</span>,
+        <span class="ident">bind_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>,
     ) -&gt; (
-        <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UdpStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span>,
-        <span class="ident">BufStreamHandle</span>,
+        <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span>,
+        <span class="ident">BufDnsStreamHandle</span>,
     ) {
-        <span class="kw">let</span> (<span class="ident">message_sender</span>, <span class="ident">outbound_messages</span>) <span class="op">=</span> <span class="ident">BufStreamHandle::create</span>();
+        <span class="kw">let</span> (<span class="ident">message_sender</span>, <span class="ident">outbound_messages</span>) <span class="op">=</span> <span class="ident">BufDnsStreamHandle::new</span>(<span class="ident">remote_addr</span>);
 
         <span class="comment">// TODO: allow the bind address to be specified...</span>
         <span class="comment">// constructs a future for getting the next randomly bound port to a UdpSocket</span>
-        <span class="kw">let</span> <span class="ident">next_socket</span> <span class="op">=</span> <span class="ident">NextRandomUdpSocket::new</span>(<span class="kw-2">&amp;</span><span class="ident">name_server</span>);
+        <span class="kw">let</span> <span class="ident">next_socket</span> <span class="op">=</span> <span class="ident">NextRandomUdpSocket::new</span>(<span class="kw-2">&amp;</span><span class="ident">remote_addr</span>, <span class="kw-2">&amp;</span><span class="ident">bind_addr</span>);
 
         <span class="comment">// This set of futures collapses the next udp socket into a stream which can be used for</span>
         <span class="comment">//  sending and receiving udp packets.</span>
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">next_socket</span>.<span class="ident">map_ok</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">socket</span><span class="op">|</span> <span class="ident">UdpStream</span> {
+        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">next_socket</span>.<span class="ident">map_ok</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">socket</span><span class="op">|</span> <span class="self">Self</span> {
             <span class="ident">socket</span>,
             <span class="ident">outbound_messages</span>,
         }));
@@ -428,14 +449,15 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `socket` - an already bound UDP socket</span>
+    <span class="doccomment">/// * `remote_addr` - remote side of this connection</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Return</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// a tuple of a Future Stream which will handle sending and receiving messsages, and a</span>
     <span class="doccomment">///  handle which can be used to send messages into the stream.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_bound</span>(<span class="ident">socket</span>: <span class="ident">S</span>) -&gt; (<span class="self">Self</span>, <span class="ident">BufStreamHandle</span>) {
-        <span class="kw">let</span> (<span class="ident">message_sender</span>, <span class="ident">outbound_messages</span>) <span class="op">=</span> <span class="ident">BufStreamHandle::create</span>();
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">UdpStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_bound</span>(<span class="ident">socket</span>: <span class="ident">S</span>, <span class="ident">remote_addr</span>: <span class="ident">SocketAddr</span>) -&gt; (<span class="self">Self</span>, <span class="ident">BufDnsStreamHandle</span>) {
+        <span class="kw">let</span> (<span class="ident">message_sender</span>, <span class="ident">outbound_messages</span>) <span class="op">=</span> <span class="ident">BufDnsStreamHandle::new</span>(<span class="ident">remote_addr</span>);
+        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">Self</span> {
             <span class="ident">socket</span>,
             <span class="ident">outbound_messages</span>,
         };
@@ -445,7 +467,7 @@
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_parts</span>(<span class="ident">socket</span>: <span class="ident">S</span>, <span class="ident">outbound_messages</span>: <span class="ident">StreamReceiver</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">UdpStream</span> {
+        <span class="self">Self</span> {
             <span class="ident">socket</span>,
             <span class="ident">outbound_messages</span>,
         }
@@ -497,64 +519,82 @@
 
 <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless polled&quot;</span>]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">NextRandomUdpSocket</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">bind_address</span>: <span class="ident">IpAddr</span>,
+    <span class="ident">bind_address</span>: <span class="ident">SocketAddr</span>,
     <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">UdpSocket</span><span class="op">&gt;</span> <span class="ident">NextRandomUdpSocket</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a future for randomly binding to a local socket address for client connections.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name_server</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>) -&gt; <span class="ident">NextRandomUdpSocket</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">zero_addr</span>: <span class="ident">IpAddr</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">name_server</span> {
-            <span class="ident">SocketAddr::V4</span>(..) =&gt; <span class="ident">IpAddr::V4</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)),
-            <span class="ident">SocketAddr::V6</span>(..) =&gt; <span class="ident">IpAddr::V6</span>(<span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)),
+    <span class="doccomment">/// Creates a future for randomly binding to a local socket address for client connections,</span>
+    <span class="doccomment">/// if no port is specified.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If a port is specified in the bind address it is used.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name_server</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>, <span class="ident">bind_addr</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">bind_address</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bind_addr</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">ba</span>) =&gt; <span class="kw-2">*</span><span class="ident">ba</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">name_server</span> {
+                <span class="ident">SocketAddr::V4</span>(..) =&gt; <span class="ident">SocketAddr::new</span>(<span class="ident">IpAddr::V4</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)), <span class="number">0</span>),
+                <span class="ident">SocketAddr::V6</span>(..) =&gt; {
+                    <span class="ident">SocketAddr::new</span>(<span class="ident">IpAddr::V6</span>(<span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)), <span class="number">0</span>)
+                }
+            },
         };
 
-        <span class="ident">NextRandomUdpSocket</span> {
-            <span class="ident">bind_address</span>: <span class="ident">zero_addr</span>,
+        <span class="self">Self</span> {
+            <span class="ident">bind_address</span>,
             <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bind</span>(<span class="ident">zero_addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
-        <span class="ident">S::bind</span>(<span class="ident">zero_addr</span>).<span class="kw">await</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bind</span>(<span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="ident">S::bind</span>(<span class="ident">addr</span>).<span class="kw">await</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">UdpSocket</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">NextRandomUdpSocket</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">io::Error</span><span class="op">&gt;</span>;
 
-    <span class="doccomment">/// polls until there is an available next random UDP port.</span>
+    <span class="doccomment">/// polls until there is an available next random UDP port,</span>
+    <span class="doccomment">/// if no port has been specified in bind_addr.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if there is no port available after 10 attempts, returns NotReady</span>
     <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">rand_port_range</span> <span class="op">=</span> <span class="ident">Uniform::new_inclusive</span>(<span class="number">1025_u16</span>, <span class="ident">u16::max_value</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rand</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">bind_address</span>.<span class="ident">port</span>() <span class="op">==</span> <span class="number">0</span> {
+            <span class="comment">// Per RFC 6056 Section 2.1:</span>
+            <span class="comment">//</span>
+            <span class="comment">//    The dynamic port range defined by IANA consists of the 49152-65535</span>
+            <span class="comment">//    range, and is meant for the selection of ephemeral ports.</span>
+            <span class="kw">let</span> <span class="ident">rand_port_range</span> <span class="op">=</span> <span class="ident">Uniform::new_inclusive</span>(<span class="number">49152_u16</span>, <span class="ident">u16::max_value</span>());
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rand</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();
 
-        <span class="kw">for</span> <span class="ident">attempt</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">10</span> {
-            <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident">rand_port_range</span>.<span class="ident">sample</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rand</span>); <span class="comment">// the range is [0 ... u16::max]</span>
-            <span class="kw">let</span> <span class="ident">zero_addr</span> <span class="op">=</span> <span class="ident">SocketAddr::new</span>(<span class="self">self</span>.<span class="ident">bind_address</span>, <span class="ident">port</span>);
+            <span class="kw">for</span> <span class="ident">attempt</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">10</span> {
+                <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident">rand_port_range</span>.<span class="ident">sample</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rand</span>);
+                <span class="kw">let</span> <span class="ident">bind_addr</span> <span class="op">=</span> <span class="ident">SocketAddr::new</span>(<span class="self">self</span>.<span class="ident">bind_address</span>.<span class="ident">ip</span>(), <span class="ident">port</span>);
 
-            <span class="comment">// TODO: allow TTL to be adjusted...</span>
-            <span class="comment">// TODO: this immediate poll might be wrong in some cases...</span>
-            <span class="kw">match</span> <span class="ident">Box::pin</span>(<span class="ident"><span class="self">Self</span>::bind</span>(<span class="ident">zero_addr</span>)).<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">socket</span>)) =&gt; {
-                    <span class="macro">debug!</span>(<span class="string">&quot;created socket successfully&quot;</span>);
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">socket</span>));
+                <span class="comment">// TODO: allow TTL to be adjusted...</span>
+                <span class="comment">// TODO: this immediate poll might be wrong in some cases...</span>
+                <span class="kw">match</span> <span class="ident">Box::pin</span>(<span class="ident"><span class="self">Self</span>::bind</span>(<span class="ident">bind_addr</span>)).<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>) {
+                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">socket</span>)) =&gt; {
+                        <span class="macro">debug!</span>(<span class="string">&quot;created socket successfully&quot;</span>);
+                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">socket</span>));
+                    }
+                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
+                        <span class="macro">debug!</span>(<span class="string">&quot;unable to bind port, attempt: {}: {}&quot;</span>, <span class="ident">attempt</span>, <span class="ident">err</span>)
+                    }
+                    <span class="ident">Poll::Pending</span> =&gt; <span class="macro">debug!</span>(<span class="string">&quot;unable to bind port, attempt: {}&quot;</span>, <span class="ident">attempt</span>),
                 }
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
-                    <span class="macro">debug!</span>(<span class="string">&quot;unable to bind port, attempt: {}: {}&quot;</span>, <span class="ident">attempt</span>, <span class="ident">err</span>)
-                }
-                <span class="ident">Poll::Pending</span> =&gt; <span class="macro">debug!</span>(<span class="string">&quot;unable to bind port, attempt: {}&quot;</span>, <span class="ident">attempt</span>),
             }
+
+            <span class="macro">debug!</span>(<span class="string">&quot;could not get next random port, delaying&quot;</span>);
+
+            <span class="comment">// TODO: because no interest is registered anywhere, we must awake.</span>
+            <span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">wake_by_ref</span>();
+
+            <span class="comment">// returning NotReady here, perhaps the next poll there will be some more socket available.</span>
+            <span class="ident">Poll::Pending</span>
+        } <span class="kw">else</span> {
+            <span class="comment">// Use port that was specified in bind address.</span>
+            <span class="ident">Box::pin</span>(<span class="ident"><span class="self">Self</span>::bind</span>(<span class="self">self</span>.<span class="ident">bind_address</span>)).<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>)
         }
-
-        <span class="macro">debug!</span>(<span class="string">&quot;could not get next random port, delaying&quot;</span>);
-
-        <span class="comment">// TODO: because no interest is registered anywhere, we must awake.</span>
-        <span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">wake_by_ref</span>();
-
-        <span class="comment">// returning NotReady here, perhaps the next poll there will be some more socket available.</span>
-        <span class="ident">Poll::Pending</span>
     }
 }
 
@@ -564,7 +604,7 @@
     <span class="kw">type</span> <span class="ident">Time</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::TokioTime</span>;
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bind</span>(<span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">tokio::net::UdpSocket::bind</span>(<span class="ident">addr</span>).<span class="kw">await</span>
+        <span class="ident"><span class="self">Self</span>::bind</span>(<span class="ident">addr</span>).<span class="kw">await</span>
     }
 
     <span class="kw">fn</span> <span class="ident">poll_recv_from</span>(
@@ -573,7 +613,7 @@
         <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
     ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">SocketAddr</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">tokio::io::ReadBuf::new</span>(<span class="ident">buf</span>);
-        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">tokio::net::UdpSocket::poll_recv_from</span>(<span class="self">self</span>, <span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident"><span class="self">Self</span>::poll_recv_from</span>(<span class="self">self</span>, <span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">filled</span>().<span class="ident">len</span>();
 
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>((<span class="ident">len</span>, <span class="ident">addr</span>)))
@@ -585,7 +625,7 @@
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">target</span>: <span class="ident">SocketAddr</span>,
     ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">tokio::net::UdpSocket::poll_send_to</span>(<span class="self">self</span>, <span class="ident">cx</span>, <span class="ident">buf</span>, <span class="ident">target</span>)
+        <span class="ident"><span class="self">Self</span>::poll_send_to</span>(<span class="self">self</span>, <span class="ident">cx</span>, <span class="ident">buf</span>, <span class="ident">target</span>)
     }
 }
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/time/instant.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>instant.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/time/instant.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>instant.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -226,14 +226,6 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::trivially_copy_pass_by_ref</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -303,13 +295,10 @@
         <span class="self">self</span>.<span class="ident">std</span>
     }
 
-    <span class="doccomment">/// Returns the amount of time elapsed from another instant to this one.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will panic if `earlier` is later than `self`.</span>
+    <span class="doccomment">/// Returns the amount of time elapsed from another instant to this one, or</span>
+    <span class="doccomment">/// zero duration if that instant is later than this one.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">duration_since</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">earlier</span>: <span class="ident">Instant</span>) -&gt; <span class="ident">Duration</span> {
-        <span class="self">self</span>.<span class="ident">std</span>.<span class="ident">duration_since</span>(<span class="ident">earlier</span>.<span class="ident">std</span>)
+        <span class="self">self</span>.<span class="ident">std</span>.<span class="ident">saturating_duration_since</span>(<span class="ident">earlier</span>.<span class="ident">std</span>)
     }
 
     <span class="doccomment">/// Returns the amount of time elapsed from another instant to this one, or</span>
@@ -354,13 +343,8 @@
         <span class="self">self</span>.<span class="ident">std</span>.<span class="ident">saturating_duration_since</span>(<span class="ident">earlier</span>.<span class="ident">std</span>)
     }
 
-    <span class="doccomment">/// Returns the amount of time elapsed since this instant was created.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function may panic if the current time is earlier than this</span>
-    <span class="doccomment">/// instant, which is something that can happen if an `Instant` is</span>
-    <span class="doccomment">/// produced synthetically.</span>
+    <span class="doccomment">/// Returns the amount of time elapsed since this instant was created,</span>
+    <span class="doccomment">/// or zero duration if that this instant is in the future.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -376,7 +360,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">elapsed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Duration</span> {
-        <span class="ident">Instant::now</span>() <span class="op">-</span> <span class="kw-2">*</span><span class="self">self</span>
+        <span class="ident">Instant::now</span>().<span class="ident">saturating_duration_since</span>(<span class="kw-2">*</span><span class="self">self</span>)
     }
 
     <span class="doccomment">/// Returns `Some(t)` where `t` is the time `self + duration` if `t` can be</span>
@@ -424,7 +408,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Duration</span>;
 
     <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Instant</span>) -&gt; <span class="ident">Duration</span> {
-        <span class="self">self</span>.<span class="ident">std</span> <span class="op">-</span> <span class="ident">rhs</span>.<span class="ident">std</span>
+        <span class="self">self</span>.<span class="ident">std</span>.<span class="ident">saturating_duration_since</span>(<span class="ident">rhs</span>.<span class="ident">std</span>)
     }
 }
 

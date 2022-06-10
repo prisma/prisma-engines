@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.20.3/src/tcp/tcp_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tcp_stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/tcp/tcp_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tcp_stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -464,6 +464,37 @@
 <span id="459">459</span>
 <span id="460">460</span>
 <span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
@@ -487,7 +518,8 @@
 <span class="kw">use</span> <span class="ident">log::debug</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer</span>::{<span class="ident">BufStreamHandle</span>, <span class="ident">SerialMessage</span>, <span class="ident">StreamReceiver</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer</span>::{<span class="ident">SerialMessage</span>, <span class="ident">StreamReceiver</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::BufDnsStreamHandle</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Time</span>;
 
 <span class="doccomment">/// Trait for TCP connection</span>
@@ -500,7 +532,13 @@
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Connect</span>: <span class="ident">DnsTcpStream</span> {
     <span class="doccomment">/// connect to tcp</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="ident"><span class="self">Self</span>::connect_with_bind</span>(<span class="ident">addr</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// connect to tcp with address to connect from</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_with_bind</span>(<span class="ident">addr</span>: <span class="ident">SocketAddr</span>, <span class="ident">bind_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>)
+        -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Current state while writing to the remote of the TCP connection</span>
@@ -565,8 +603,8 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(
         <span class="ident">name_server</span>: <span class="ident">SocketAddr</span>,
     ) -&gt; (
-        <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">BufStreamHandle</span>,
+        <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+        <span class="ident">BufDnsStreamHandle</span>,
     )
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">FromProtoError</span>,
@@ -585,30 +623,54 @@
         <span class="ident">name_server</span>: <span class="ident">SocketAddr</span>,
         <span class="ident">timeout</span>: <span class="ident">Duration</span>,
     ) -&gt; (
-        <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">BufStreamHandle</span>,
+        <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+        <span class="ident">BufDnsStreamHandle</span>,
     ) {
-        <span class="kw">let</span> (<span class="ident">message_sender</span>, <span class="ident">outbound_messages</span>) <span class="op">=</span> <span class="ident">BufStreamHandle::create</span>();
+        <span class="kw">let</span> (<span class="ident">message_sender</span>, <span class="ident">outbound_messages</span>) <span class="op">=</span> <span class="ident">BufDnsStreamHandle::new</span>(<span class="ident">name_server</span>);
+
         <span class="comment">// This set of futures collapses the next tcp socket into a stream which can be used for</span>
         <span class="comment">//  sending and receiving tcp packets.</span>
-        <span class="kw">let</span> <span class="ident">stream_fut</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::connect</span>(<span class="ident">name_server</span>, <span class="ident">timeout</span>, <span class="ident">outbound_messages</span>);
+        <span class="kw">let</span> <span class="ident">stream_fut</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::connect</span>(<span class="ident">name_server</span>, <span class="prelude-val">None</span>, <span class="ident">timeout</span>, <span class="ident">outbound_messages</span>);
+
+        (<span class="ident">stream_fut</span>, <span class="ident">message_sender</span>)
+    }
+
+    <span class="doccomment">/// Creates a new future of the eventually establish a IO stream connection or fail trying</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Arguments</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * `name_server` - the IP and Port of the DNS server to connect to</span>
+    <span class="doccomment">/// * `bind_addr` - the IP and port to connect from</span>
+    <span class="doccomment">/// * `timeout` - connection timeout</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_bind_addr_and_timeout</span>(
+        <span class="ident">name_server</span>: <span class="ident">SocketAddr</span>,
+        <span class="ident">bind_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>,
+        <span class="ident">timeout</span>: <span class="ident">Duration</span>,
+    ) -&gt; (
+        <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+        <span class="ident">BufDnsStreamHandle</span>,
+    ) {
+        <span class="kw">let</span> (<span class="ident">message_sender</span>, <span class="ident">outbound_messages</span>) <span class="op">=</span> <span class="ident">BufDnsStreamHandle::new</span>(<span class="ident">name_server</span>);
+        <span class="kw">let</span> <span class="ident">stream_fut</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::connect</span>(<span class="ident">name_server</span>, <span class="ident">bind_addr</span>, <span class="ident">timeout</span>, <span class="ident">outbound_messages</span>);
 
         (<span class="ident">stream_fut</span>, <span class="ident">message_sender</span>)
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(
         <span class="ident">name_server</span>: <span class="ident">SocketAddr</span>,
+        <span class="ident">bind_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>,
         <span class="ident">timeout</span>: <span class="ident">Duration</span>,
         <span class="ident">outbound_messages</span>: <span class="ident">StreamReceiver</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tcp</span> <span class="op">=</span> <span class="ident">S::connect</span>(<span class="ident">name_server</span>);
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">tcp</span> <span class="op">=</span> <span class="ident">S::connect_with_bind</span>(<span class="ident">name_server</span>, <span class="ident">bind_addr</span>);
         <span class="ident">S::Time::timeout</span>(<span class="ident">timeout</span>, <span class="ident">tcp</span>)
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">tcp_stream</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">io::Error</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">|</span> {
                 <span class="ident">tcp_stream</span>
                     .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">tcp_stream</span><span class="op">|</span> <span class="ident">tcp_stream</span>)
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">tcp_stream</span><span class="op">|</span> {
                         <span class="macro">debug!</span>(<span class="string">&quot;TCP connection established to: {}&quot;</span>, <span class="ident">name_server</span>);
-                        <span class="ident">TcpStream</span> {
+                        <span class="self">Self</span> {
                             <span class="ident">socket</span>: <span class="ident">tcp_stream</span>,
                             <span class="ident">outbound_messages</span>,
                             <span class="ident">send_state</span>: <span class="prelude-val">None</span>,
@@ -654,8 +716,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `stream` - the established IO stream for communication</span>
     <span class="doccomment">/// * `peer_addr` - sources address of the stream</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_stream</span>(<span class="ident">stream</span>: <span class="ident">S</span>, <span class="ident">peer_addr</span>: <span class="ident">SocketAddr</span>) -&gt; (<span class="self">Self</span>, <span class="ident">BufStreamHandle</span>) {
-        <span class="kw">let</span> (<span class="ident">message_sender</span>, <span class="ident">outbound_messages</span>) <span class="op">=</span> <span class="ident">BufStreamHandle::create</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_stream</span>(<span class="ident">stream</span>: <span class="ident">S</span>, <span class="ident">peer_addr</span>: <span class="ident">SocketAddr</span>) -&gt; (<span class="self">Self</span>, <span class="ident">BufDnsStreamHandle</span>) {
+        <span class="kw">let</span> (<span class="ident">message_sender</span>, <span class="ident">outbound_messages</span>) <span class="op">=</span> <span class="ident">BufDnsStreamHandle::new</span>(<span class="ident">peer_addr</span>);
         <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_stream_with_receiver</span>(<span class="ident">stream</span>, <span class="ident">peer_addr</span>, <span class="ident">outbound_messages</span>);
         (<span class="ident">stream</span>, <span class="ident">message_sender</span>)
     }
@@ -666,7 +728,7 @@
         <span class="ident">peer_addr</span>: <span class="ident">SocketAddr</span>,
         <span class="ident">outbound_messages</span>: <span class="ident">StreamReceiver</span>,
     ) -&gt; <span class="self">Self</span> {
-        <span class="ident">TcpStream</span> {
+        <span class="self">Self</span> {
             <span class="ident">socket</span>,
             <span class="ident">outbound_messages</span>,
             <span class="ident">send_state</span>: <span class="prelude-val">None</span>,

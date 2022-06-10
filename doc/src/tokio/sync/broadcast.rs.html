@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/sync/broadcast.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>broadcast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/sync/broadcast.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>broadcast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1081,6 +1081,106 @@
 <span id="1076">1076</span>
 <span id="1077">1077</span>
 <span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+<span id="1106">1106</span>
+<span id="1107">1107</span>
+<span id="1108">1108</span>
+<span id="1109">1109</span>
+<span id="1110">1110</span>
+<span id="1111">1111</span>
+<span id="1112">1112</span>
+<span id="1113">1113</span>
+<span id="1114">1114</span>
+<span id="1115">1115</span>
+<span id="1116">1116</span>
+<span id="1117">1117</span>
+<span id="1118">1118</span>
+<span id="1119">1119</span>
+<span id="1120">1120</span>
+<span id="1121">1121</span>
+<span id="1122">1122</span>
+<span id="1123">1123</span>
+<span id="1124">1124</span>
+<span id="1125">1125</span>
+<span id="1126">1126</span>
+<span id="1127">1127</span>
+<span id="1128">1128</span>
+<span id="1129">1129</span>
+<span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
+<span id="1152">1152</span>
+<span id="1153">1153</span>
+<span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
+<span id="1159">1159</span>
+<span id="1160">1160</span>
+<span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
+<span id="1172">1172</span>
+<span id="1173">1173</span>
+<span id="1174">1174</span>
+<span id="1175">1175</span>
+<span id="1176">1176</span>
+<span id="1177">1177</span>
+<span id="1178">1178</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A multi-producer, multi-consumer broadcast queue. Each sent value is seen by</span>
 <span class="doccomment">//! all consumers.</span>
 <span class="doccomment">//!</span>
@@ -1313,7 +1413,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`recv`]: crate::sync::broadcast::Receiver::recv</span>
     <span class="doccomment">/// [`Receiver`]: crate::sync::broadcast::Receiver</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
     <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RecvError</span> {
         <span class="doccomment">/// There are no more active senders implying no further messages will ever</span>
         <span class="doccomment">/// be sent.</span>
@@ -1341,7 +1441,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`try_recv`]: crate::sync::broadcast::Receiver::try_recv</span>
     <span class="doccomment">/// [`Receiver`]: crate::sync::broadcast::Receiver</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
     <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TryRecvError</span> {
         <span class="doccomment">/// The channel is currently empty. There are still active</span>
         <span class="doccomment">/// [`Sender`] handles, so data may yet become available.</span>
@@ -1508,6 +1608,11 @@
 <span class="doccomment">///     tx.send(20).unwrap();</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Panics</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This will panic if `capacity` is equal to `0` or larger</span>
+<span class="doccomment">/// than `usize::MAX / 2`.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
     <span class="macro">assert!</span>(<span class="ident">capacity</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;capacity is empty&quot;</span>);
     <span class="macro">assert!</span>(<span class="ident">capacity</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">usize::MAX</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>, <span class="string">&quot;requested capacity too large&quot;</span>);
@@ -1725,6 +1830,7 @@
     }
 }
 
+<span class="doccomment">/// Create a new `Receiver` which reads starting from the tail.</span>
 <span class="kw">fn</span> <span class="ident">new_receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">shared</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="ident">shared</span>.<span class="ident">tail</span>.<span class="ident">lock</span>();
 
@@ -1774,6 +1880,73 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Returns the number of messages that were sent into the channel and that</span>
+    <span class="doccomment">/// this [`Receiver`] has yet to receive.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the returned value from `len` is larger than the next largest power of 2</span>
+    <span class="doccomment">/// of the capacity of the channel any call to [`recv`] will return an</span>
+    <span class="doccomment">/// `Err(RecvError::Lagged)` and any call to [`try_recv`] will return an</span>
+    <span class="doccomment">/// `Err(TryRecvError::Lagged)`, e.g. if the capacity of the channel is 10,</span>
+    <span class="doccomment">/// [`recv`] will start to return `Err(RecvError::Lagged)` once `len` returns</span>
+    <span class="doccomment">/// values larger than 16.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Receiver`]: crate::sync::broadcast::Receiver</span>
+    <span class="doccomment">/// [`recv`]: crate::sync::broadcast::Receiver::recv</span>
+    <span class="doccomment">/// [`try_recv`]: crate::sync::broadcast::Receiver::try_recv</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use tokio::sync::broadcast;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// #[tokio::main]</span>
+    <span class="doccomment">/// async fn main() {</span>
+    <span class="doccomment">///     let (tx, mut rx1) = broadcast::channel(16);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     tx.send(10).unwrap();</span>
+    <span class="doccomment">///     tx.send(20).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     assert_eq!(rx1.len(), 2);</span>
+    <span class="doccomment">///     assert_eq!(rx1.recv().await.unwrap(), 10);</span>
+    <span class="doccomment">///     assert_eq!(rx1.len(), 1);</span>
+    <span class="doccomment">///     assert_eq!(rx1.recv().await.unwrap(), 20);     </span>
+    <span class="doccomment">///     assert_eq!(rx1.len(), 0);</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
+        <span class="kw">let</span> <span class="ident">next_send_pos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">tail</span>.<span class="ident">lock</span>().<span class="ident">pos</span>;
+        (<span class="ident">next_send_pos</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">next</span>) <span class="kw">as</span> <span class="ident">usize</span>
+    }
+
+    <span class="doccomment">/// Returns true if there aren&#39;t any messages in the channel that the [`Receiver`]</span>
+    <span class="doccomment">/// has yet to receive.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Receiver]: create::sync::broadcast::Receiver</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use tokio::sync::broadcast;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// #[tokio::main]</span>
+    <span class="doccomment">/// async fn main() {</span>
+    <span class="doccomment">///     let (tx, mut rx1) = broadcast::channel(16);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     assert!(rx1.is_empty());</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     tx.send(10).unwrap();</span>
+    <span class="doccomment">///     tx.send(20).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     assert!(!rx1.is_empty());</span>
+    <span class="doccomment">///     assert_eq!(rx1.recv().await.unwrap(), 10);</span>
+    <span class="doccomment">///     assert_eq!(rx1.recv().await.unwrap(), 20);     </span>
+    <span class="doccomment">///     assert!(rx1.is_empty());</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
+    }
+
     <span class="doccomment">/// Locks the next value if there is one.</span>
     <span class="kw">fn</span> <span class="ident">recv_ref</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
@@ -1892,6 +2065,33 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Re-subscribes to the channel starting from the current tail element.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This [`Receiver`] handle will receive a clone of all values sent</span>
+    <span class="doccomment">/// **after** it has resubscribed. This will not include elements that are</span>
+    <span class="doccomment">/// in the queue of the current receiver. Consider the following example.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use tokio::sync::broadcast;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// #[tokio::main]</span>
+    <span class="doccomment">/// async fn main() {</span>
+    <span class="doccomment">///   let (tx, mut rx) = broadcast::channel(2);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///   tx.send(1).unwrap();</span>
+    <span class="doccomment">///   let mut rx2 = rx.resubscribe();</span>
+    <span class="doccomment">///   tx.send(2).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///   assert_eq!(rx2.recv().await.unwrap(), 2);</span>
+    <span class="doccomment">///   assert_eq!(rx.recv().await.unwrap(), 1);</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resubscribe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">clone</span>();
+        <span class="ident">new_receiver</span>(<span class="ident">shared</span>)
+    }
     <span class="doccomment">/// Receives the next value for this receiver.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Each [`Receiver`] handle will receive a clone of all values sent</span>

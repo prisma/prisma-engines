@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Iter","An iterator over the entries of a `LruCache`."],["IterMut","An iterator over mutables entries of a `LruCache`."],["LruCache","An LRU Cache"]],"type":[["DefaultHasher",""]]});
+initSidebarItems({"struct":[["IntoIter","An iterator that moves out of a `LruCache`."],["Iter","An iterator over the entries of a `LruCache`."],["IterMut","An iterator over mutables entries of a `LruCache`."],["LruCache","An LRU Cache"]],"type":[["DefaultHasher",""]]});

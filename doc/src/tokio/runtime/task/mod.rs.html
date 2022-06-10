@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/runtime/task/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/runtime/task/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -443,6 +443,83 @@
 <span id="438">438</span>
 <span id="439">439</span>
 <span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The task module.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The task module contains the code that manages spawned tasks and provides a</span>
@@ -580,6 +657,10 @@
 <span class="doccomment">//! poll call will notice it when the poll finishes, and the task is cancelled</span>
 <span class="doccomment">//! at that point.</span>
 
+<span class="comment">// Some task infrastructure is here to support `JoinSet`, which is currently</span>
+<span class="comment">// unstable. This should be removed once `JoinSet` is stabilized.</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tokio_unstable</span>), <span class="ident">allow</span>(<span class="ident">dead_code</span>))]</span>
+
 <span class="kw">mod</span> <span class="ident">core</span>;
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::core::Cell</span>;
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::core::Header</span>;
@@ -596,7 +677,14 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::inject::Inject</span>;
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt&quot;</span>, <span class="ident">any</span>(<span class="ident">tokio_unstable</span>, <span class="ident">test</span>)))]</span>
+<span class="kw">mod</span> <span class="ident">abort</span>;
 <span class="kw">mod</span> <span class="ident">join</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt&quot;</span>, <span class="ident">any</span>(<span class="ident">tokio_unstable</span>, <span class="ident">test</span>)))]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span> <span class="comment">// https://github.com/rust-lang/rust/issues/57411</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::abort::AbortHandle</span>;
+
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span> <span class="comment">// https://github.com/rust-lang/rust/issues/57411</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::join::JoinHandle</span>;
 
@@ -617,6 +705,27 @@
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 <span class="kw">use</span> <span class="ident">std::ptr::NonNull</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">mem</span>};
+
+<span class="doccomment">/// An opaque ID that uniquely identifies a task relative to all other currently</span>
+<span class="doccomment">/// running tasks.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Notes</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// - Task IDs are unique relative to other *currently running* tasks. When a</span>
+<span class="doccomment">///   task completes, the same ID may be used for another task.</span>
+<span class="doccomment">/// - Task IDs are *not* sequential, and do not indicate the order in which</span>
+<span class="doccomment">///   tasks are spawned, what runtime a task is spawned on, or any other data.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **Note**: This is an [unstable API][unstable]. The public API of this type</span>
+<span class="doccomment">/// may break in 1.x releases. See [the documentation on unstable</span>
+<span class="doccomment">/// features][unstable] for details.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [unstable]: crate#unstable-features</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt&quot;</span>, <span class="ident">tokio_unstable</span>))))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tokio_unstable</span>), <span class="ident">allow</span>(<span class="ident">unreachable_pub</span>))]</span>
+<span class="comment">// TODO(eliza): there&#39;s almost certainly no reason not to make this `Copy` as well...</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Id</span>(<span class="ident">u64</span>);
 
 <span class="doccomment">/// An owned handle to the task, tracked by ref count.</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
@@ -684,14 +793,15 @@
     <span class="doccomment">/// notification.</span>
     <span class="kw">fn</span> <span class="ident">new_task</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(
         <span class="ident">task</span>: <span class="ident">T</span>,
-        <span class="ident">scheduler</span>: <span class="ident">S</span>
+        <span class="ident">scheduler</span>: <span class="ident">S</span>,
+        <span class="ident">id</span>: <span class="ident">Id</span>,
     ) -&gt; (<span class="ident">Task</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">Notified</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">T::Output</span><span class="op">&gt;</span>)
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Schedule</span>,
         <span class="ident">T</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">T::Output</span>: <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawTask::new</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">task</span>, <span class="ident">scheduler</span>);
+        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawTask::new</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">task</span>, <span class="ident">scheduler</span>, <span class="ident">id</span>.<span class="ident">clone</span>());
         <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">Task</span> {
             <span class="ident">raw</span>,
             <span class="ident">_p</span>: <span class="ident">PhantomData</span>,
@@ -700,7 +810,7 @@
             <span class="ident">raw</span>,
             <span class="ident">_p</span>: <span class="ident">PhantomData</span>,
         });
-        <span class="kw">let</span> <span class="ident">join</span> <span class="op">=</span> <span class="ident">JoinHandle::new</span>(<span class="ident">raw</span>);
+        <span class="kw">let</span> <span class="ident">join</span> <span class="op">=</span> <span class="ident">JoinHandle::new</span>(<span class="ident">raw</span>, <span class="ident">id</span>);
 
         (<span class="ident">task</span>, <span class="ident">notified</span>, <span class="ident">join</span>)
     }
@@ -709,13 +819,13 @@
     <span class="doccomment">/// only when the task is not going to be stored in an `OwnedTasks` list.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Currently only blocking tasks use this method.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unowned</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">task</span>: <span class="ident">T</span>, <span class="ident">scheduler</span>: <span class="ident">S</span>) -&gt; (<span class="ident">UnownedTask</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">T::Output</span><span class="op">&gt;</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unowned</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">task</span>: <span class="ident">T</span>, <span class="ident">scheduler</span>: <span class="ident">S</span>, <span class="ident">id</span>: <span class="ident">Id</span>) -&gt; (<span class="ident">UnownedTask</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">T::Output</span><span class="op">&gt;</span>)
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Schedule</span>,
         <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Future</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">T::Output</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> (<span class="ident">task</span>, <span class="ident">notified</span>, <span class="ident">join</span>) <span class="op">=</span> <span class="ident">new_task</span>(<span class="ident">task</span>, <span class="ident">scheduler</span>);
+        <span class="kw">let</span> (<span class="ident">task</span>, <span class="ident">notified</span>, <span class="ident">join</span>) <span class="op">=</span> <span class="ident">new_task</span>(<span class="ident">task</span>, <span class="ident">scheduler</span>, <span class="ident">id</span>);
 
         <span class="comment">// This transfers the ref-count of task and notified into an UnownedTask.</span>
         <span class="comment">// This is valid because an UnownedTask holds two ref-counts.</span>
@@ -758,7 +868,7 @@
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
         <span class="kw">fn</span> <span class="ident">into_raw</span>(<span class="self">self</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">into</span>();
+            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">header_ptr</span>();
             <span class="ident">mem::forget</span>(<span class="self">self</span>);
             <span class="ident">ret</span>
         }
@@ -792,6 +902,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Schedule</span><span class="op">&gt;</span> <span class="ident">UnownedTask</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
     <span class="comment">// Used in test of the inject queue.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">allow</span>(<span class="ident">dead_code</span>))]</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">into_notified</span>(<span class="self">self</span>) -&gt; <span class="ident">Notified</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
         <span class="ident">Notified</span>(<span class="self">self</span>.<span class="ident">into_task</span>())
     }
@@ -871,7 +982,7 @@
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Header</span>;
 
     <span class="kw">fn</span> <span class="ident">as_raw</span>(<span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">Task</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span> {
-        <span class="ident">handle</span>.<span class="ident">header</span>().<span class="ident">into</span>()
+        <span class="ident">handle</span>.<span class="ident">raw</span>.<span class="ident">header_ptr</span>()
     }
 
     <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>) -&gt; <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
@@ -881,6 +992,49 @@
     <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">pointers</span>(<span class="ident">target</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">linked_list::Pointers</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Not super great as it avoids some of looms checking...</span>
         <span class="ident">NonNull::from</span>(<span class="ident">target</span>.<span class="ident">as_ref</span>().<span class="ident">owned</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">ptr</span>))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Id</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Id</span> {
+    <span class="comment">// When 64-bit atomics are available, use a static `AtomicU64` counter to</span>
+    <span class="comment">// generate task IDs.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Note(eliza): we _could_ just use `crate::loom::AtomicU64`, which switches</span>
+    <span class="comment">// between an atomic and mutex-based implementation here, rather than having</span>
+    <span class="comment">// two separate functions for targets with and without 64-bit atomics.</span>
+    <span class="comment">// However, because we can&#39;t use the mutex-based implementation in a static</span>
+    <span class="comment">// initializer directly, the 32-bit impl also has to use a `OnceCell`, and I</span>
+    <span class="comment">// thought it was nicer to avoid the `OnceCell` overhead on 64-bit</span>
+    <span class="comment">// platforms...</span>
+    <span class="macro">cfg_has_atomic_u64!</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">next</span>() -&gt; <span class="self">Self</span> {
+            <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering::Relaxed</span>};
+            <span class="kw">static</span> <span class="ident">NEXT_ID</span>: <span class="ident">AtomicU64</span> <span class="op">=</span> <span class="ident">AtomicU64::new</span>(<span class="number">1</span>);
+            <span class="self">Self</span>(<span class="ident">NEXT_ID</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Relaxed</span>))
+        }
+    }
+
+    <span class="macro">cfg_not_has_atomic_u64!</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">next</span>() -&gt; <span class="self">Self</span> {
+            <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
+            <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync::Mutex</span>;
+
+            <span class="kw">static</span> <span class="ident">NEXT_ID</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Mutex::new</span>(<span class="number">1</span>));
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">NEXT_ID</span>.<span class="ident">lock</span>();
+            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">lock</span>;
+            <span class="kw-2">*</span><span class="ident">lock</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="self">Self</span>(<span class="ident">id</span>)
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_u64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
+        <span class="self">self</span>.<span class="number">0</span>
     }
 }
 </code></pre></div>

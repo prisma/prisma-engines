@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sct-0.6.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sct-0.7.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sct/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -265,9 +265,6 @@
 <span id="260">260</span>
 <span id="261">261</span>
 <span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
 </pre><pre class="rust"><code><span class="doccomment">//! # SCT.rs: SCT verification library</span>
 <span class="doccomment">//! This library implements verification of Signed Certificate Timestamps.</span>
 <span class="doccomment">//! These are third-party assurances that a particular certificate has</span>
@@ -278,20 +275,20 @@
 <span class="doccomment">//! It is intended to be useful to libraries which perform certificate</span>
 <span class="doccomment">//! validation, OCSP libraries, and TLS libraries.</span>
 
-<span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>,
-          <span class="ident">unstable_features</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">trivial_casts</span>,
-        <span class="ident">trivial_numeric_casts</span>,
-        <span class="ident">missing_docs</span>,
-        <span class="ident">unused_import_braces</span>,
-        <span class="ident">unused_extern_crates</span>,
-        <span class="ident">unused_qualifications</span>)]</span>
-
+<span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>, <span class="ident">unstable_features</span>)]</span>
+<span class="attribute">#![<span class="ident">deny</span>(
+    <span class="ident">trivial_casts</span>,
+    <span class="ident">trivial_numeric_casts</span>,
+    <span class="ident">missing_docs</span>,
+    <span class="ident">unused_import_braces</span>,
+    <span class="ident">unused_extern_crates</span>,
+    <span class="ident">unused_qualifications</span>
+)]</span>
 <span class="attribute">#![<span class="ident">no_std</span>]</span>
 
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
 
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">vec</span>, <span class="ident">vec::Vec</span>};
 
 <span class="doccomment">/// Describes a CT log</span>
 <span class="doccomment">///</span>
@@ -324,14 +321,14 @@
 
     <span class="doccomment">/// The log&#39;s maximum merge delay.</span>
     <span class="doccomment">/// This field is not used by the library.</span>
-    <span class="kw">pub</span> <span class="ident">max_merge_delay</span>: <span class="ident">usize</span>
+    <span class="kw">pub</span> <span class="ident">max_merge_delay</span>: <span class="ident">usize</span>,
 }
 
 <span class="doccomment">/// How sct.rs reports errors.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
     <span class="doccomment">/// The SCT was somehow misencoded, truncated or otherwise corrupt.</span>
-    <span class="ident">MalformedSCT</span>,
+    <span class="ident">MalformedSct</span>,
 
     <span class="doccomment">/// The SCT contained an invalid signature.</span>
     <span class="ident">InvalidSignature</span>,
@@ -340,7 +337,7 @@
     <span class="ident">TimestampInFuture</span>,
 
     <span class="doccomment">/// The SCT had a version that this library does not handle.</span>
-    <span class="ident">UnsupportedSCTVersion</span>,
+    <span class="ident">UnsupportedSctVersion</span>,
 
     <span class="doccomment">/// The SCT was refers to an unknown log.</span>
     <span class="ident">UnknownLog</span>,
@@ -357,17 +354,13 @@
     <span class="doccomment">/// -- the SCT is unverifiable with this library and set of</span>
     <span class="doccomment">/// logs.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_be_fatal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::UnknownLog</span>
-                <span class="op">|</span> <span class="ident">Error::UnsupportedSCTVersion</span> =&gt; <span class="bool-val">false</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">true</span>
-        }
+        <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Error::UnknownLog</span> <span class="op">|</span> <span class="ident">Error::UnsupportedSctVersion</span>)
     }
 }
 
 <span class="kw">fn</span> <span class="ident">lookup</span>(<span class="ident">logs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">Log</span>], <span class="ident">id</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">l</span>) <span class="kw">in</span> <span class="ident">logs</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">l</span>.<span class="ident">id</span> {
+        <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">l</span>.<span class="ident">id</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>);
         }
     }
@@ -378,14 +371,14 @@
 <span class="kw">fn</span> <span class="ident">decode_u64</span>(<span class="ident">inp</span>: <span class="ident">untrusted::Input</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">inp</span>.<span class="ident">as_slice_less_safe</span>();
     <span class="macro">assert_eq!</span>(<span class="ident">b</span>.<span class="ident">len</span>(), <span class="number">8</span>);
-    (<span class="ident">b</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">56</span> <span class="op">|</span>
-        (<span class="ident">b</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">48</span> <span class="op">|</span>
-        (<span class="ident">b</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">40</span> <span class="op">|</span>
-        (<span class="ident">b</span>[<span class="number">3</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span> <span class="op">|</span>
-        (<span class="ident">b</span>[<span class="number">4</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span> <span class="op">|</span>
-        (<span class="ident">b</span>[<span class="number">5</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span> <span class="op">|</span>
-        (<span class="ident">b</span>[<span class="number">6</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span> <span class="op">|</span>
-        (<span class="ident">b</span>[<span class="number">7</span>] <span class="kw">as</span> <span class="ident">u64</span>)
+    (<span class="ident">b</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">56</span>
+        <span class="op">|</span> (<span class="ident">b</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">48</span>
+        <span class="op">|</span> (<span class="ident">b</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">40</span>
+        <span class="op">|</span> (<span class="ident">b</span>[<span class="number">3</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>
+        <span class="op">|</span> (<span class="ident">b</span>[<span class="number">4</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>
+        <span class="op">|</span> (<span class="ident">b</span>[<span class="number">5</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>
+        <span class="op">|</span> (<span class="ident">b</span>[<span class="number">6</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>
+        <span class="op">|</span> (<span class="ident">b</span>[<span class="number">7</span>] <span class="kw">as</span> <span class="ident">u64</span>)
 }
 
 <span class="kw">fn</span> <span class="ident">decode_u16</span>(<span class="ident">inp</span>: <span class="ident">untrusted::Input</span>) -&gt; <span class="ident">u16</span> {
@@ -416,7 +409,7 @@
     <span class="ident">out</span>.<span class="ident">push</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u8</span>);
 }
 
-<span class="kw">struct</span> <span class="ident">SCT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">struct</span> <span class="ident">Sct</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">log_id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
     <span class="ident">timestamp</span>: <span class="ident">u64</span>,
     <span class="ident">sig_alg</span>: <span class="ident">u16</span>,
@@ -432,19 +425,17 @@
 <span class="kw">const</span> <span class="ident">SCT_TIMESTAMP</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0u8</span>;
 <span class="kw">const</span> <span class="ident">SCT_X509_ENTRY</span>: [<span class="ident">u8</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>];
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SCT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Sct</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cert</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ring::signature::VerificationAlgorithm</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">sig_alg</span> {
             <span class="ident">ECDSA_SHA256</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">ring::signature::ECDSA_P256_SHA256_ASN1</span>,
             <span class="ident">ECDSA_SHA384</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">ring::signature::ECDSA_P384_SHA384_ASN1</span>,
             <span class="ident">RSA_PKCS1_SHA256</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">ring::signature::RSA_PKCS1_2048_8192_SHA256</span>,
             <span class="ident">RSA_PKCS1_SHA384</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">ring::signature::RSA_PKCS1_2048_8192_SHA384</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidSignature</span>)
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidSignature</span>),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">SCT_V1</span>);
-        <span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">SCT_TIMESTAMP</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">SCT_V1</span>, <span class="ident">SCT_TIMESTAMP</span>];
         <span class="ident">write_u64</span>(<span class="self">self</span>.<span class="ident">timestamp</span>, <span class="kw-2">&amp;mut</span> <span class="ident">data</span>);
         <span class="ident">data</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">SCT_X509_ENTRY</span>);
         <span class="ident">write_u24</span>(<span class="ident">cert</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="kw-2">&amp;mut</span> <span class="ident">data</span>);
@@ -458,49 +449,55 @@
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::InvalidSignature</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">enc</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SCT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">enc</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sct</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inp</span> <span class="op">=</span> <span class="ident">untrusted::Input::from</span>(<span class="ident">enc</span>);
 
-        <span class="ident">inp</span>.<span class="ident">read_all</span>(
-            <span class="ident">Error::MalformedSCT</span>,
-            <span class="op">|</span><span class="ident">rd</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">read_byte</span>()
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSCT</span>)<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedSCTVersion</span>);
-                }
+        <span class="ident">inp</span>.<span class="ident">read_all</span>(<span class="ident">Error::MalformedSct</span>, <span class="op">|</span><span class="ident">rd</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">rd</span>
+                .<span class="ident">read_byte</span>()
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSct</span>)<span class="question-mark">?</span>;
+            <span class="kw">if</span> <span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedSctVersion</span>);
+            }
 
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">read_bytes</span>(<span class="number">32</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSCT</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">read_bytes</span>(<span class="number">8</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSCT</span>)
-                    .<span class="ident">map</span>(<span class="ident">decode_u64</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">rd</span>
+                .<span class="ident">read_bytes</span>(<span class="number">32</span>)
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSct</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">rd</span>
+                .<span class="ident">read_bytes</span>(<span class="number">8</span>)
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSct</span>)
+                .<span class="ident">map</span>(<span class="ident">decode_u64</span>)<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">ext_len</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">read_bytes</span>(<span class="number">2</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSCT</span>)
-                    .<span class="ident">map</span>(<span class="ident">decode_u16</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">exts</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">read_bytes</span>(<span class="ident">ext_len</span> <span class="kw">as</span> <span class="ident">usize</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSCT</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">ext_len</span> <span class="op">=</span> <span class="ident">rd</span>
+                .<span class="ident">read_bytes</span>(<span class="number">2</span>)
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSct</span>)
+                .<span class="ident">map</span>(<span class="ident">decode_u16</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">exts</span> <span class="op">=</span> <span class="ident">rd</span>
+                .<span class="ident">read_bytes</span>(<span class="ident">ext_len</span> <span class="kw">as</span> <span class="ident">usize</span>)
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSct</span>)<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">sig_alg</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">read_bytes</span>(<span class="number">2</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSCT</span>)
-                    .<span class="ident">map</span>(<span class="ident">decode_u16</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">sig_len</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">read_bytes</span>(<span class="number">2</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSCT</span>)
-                    .<span class="ident">map</span>(<span class="ident">decode_u16</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">read_bytes</span>(<span class="ident">sig_len</span> <span class="kw">as</span> <span class="ident">usize</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSCT</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">sig_alg</span> <span class="op">=</span> <span class="ident">rd</span>
+                .<span class="ident">read_bytes</span>(<span class="number">2</span>)
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSct</span>)
+                .<span class="ident">map</span>(<span class="ident">decode_u16</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">sig_len</span> <span class="op">=</span> <span class="ident">rd</span>
+                .<span class="ident">read_bytes</span>(<span class="number">2</span>)
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSct</span>)
+                .<span class="ident">map</span>(<span class="ident">decode_u16</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="ident">rd</span>
+                .<span class="ident">read_bytes</span>(<span class="ident">sig_len</span> <span class="kw">as</span> <span class="ident">usize</span>)
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::MalformedSct</span>)<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">SCT</span> {
-                    <span class="ident">log_id</span>: <span class="ident">id</span>.<span class="ident">as_slice_less_safe</span>(),
-                    <span class="ident">timestamp</span>: <span class="ident">timestamp</span>,
-                    <span class="ident">sig_alg</span>: <span class="ident">sig_alg</span>,
-                    <span class="ident">sig</span>: <span class="ident">sig</span>.<span class="ident">as_slice_less_safe</span>(),
-                    <span class="ident">exts</span>: <span class="ident">exts</span>.<span class="ident">as_slice_less_safe</span>(),
-                };
+            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">Sct</span> {
+                <span class="ident">log_id</span>: <span class="ident">id</span>.<span class="ident">as_slice_less_safe</span>(),
+                <span class="ident">timestamp</span>,
+                <span class="ident">sig_alg</span>,
+                <span class="ident">sig</span>: <span class="ident">sig</span>.<span class="ident">as_slice_less_safe</span>(),
+                <span class="ident">exts</span>: <span class="ident">exts</span>.<span class="ident">as_slice_less_safe</span>(),
+            };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
-            })
+            <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
+        })
     }
 }
 
@@ -511,11 +508,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// On success, this function returns the log used as an index into `logs`.</span>
 <span class="doccomment">/// Otherwise, it returns an `Error`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_sct</span>(<span class="ident">cert</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-                  <span class="ident">sct</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-                  <span class="ident">at_time</span>: <span class="ident">u64</span>,
-                  <span class="ident">logs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">Log</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">sct</span> <span class="op">=</span> <span class="ident">SCT::parse</span>(<span class="ident">sct</span>)<span class="question-mark">?</span>;
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_sct</span>(<span class="ident">cert</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">sct</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">at_time</span>: <span class="ident">u64</span>, <span class="ident">logs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">Log</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">sct</span> <span class="op">=</span> <span class="ident">Sct::parse</span>(<span class="ident">sct</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">lookup</span>(<span class="ident">logs</span>, <span class="kw-2">&amp;</span><span class="ident">sct</span>.<span class="ident">log_id</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">log</span> <span class="op">=</span> <span class="ident">logs</span>[<span class="ident">i</span>];
     <span class="ident">sct</span>.<span class="ident">verify</span>(<span class="ident">log</span>.<span class="ident">key</span>, <span class="ident">cert</span>)<span class="question-mark">?</span>;
@@ -528,11 +522,11 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests_google</span>;
+<span class="kw">mod</span> <span class="ident">tests</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests_generated</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span>;
+<span class="kw">mod</span> <span class="ident">tests_google</span>;
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sct" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
 </body></html>

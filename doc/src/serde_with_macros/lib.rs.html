@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with_macros-1.5.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with_macros-1.5.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_with_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1019,16 +1019,14 @@
 <span id="1014">1014</span>
 <span id="1015">1015</span>
 <span id="1016">1016</span>
-<span id="1017">1017</span>
-<span id="1018">1018</span>
-<span id="1019">1019</span>
-<span id="1020">1020</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(
+<span class="attribute">#![<span class="ident">warn</span>(
+    <span class="ident">clippy::semicolon_if_nothing_returned</span>,
     <span class="ident">missing_copy_implementations</span>,
     <span class="comment">// missing_crate_level_docs, not available in MSRV</span>
     <span class="ident">missing_debug_implementations</span>,
     <span class="ident">missing_docs</span>,
+    <span class="ident">rust_2018_idioms</span>,
     <span class="ident">trivial_casts</span>,
     <span class="ident">trivial_numeric_casts</span>,
     <span class="ident">unused_extern_crates</span>,
@@ -1036,7 +1034,6 @@
     <span class="ident">unused_qualifications</span>,
     <span class="ident">variant_size_differences</span>
 )]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>))))]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">deny</span>(
     <span class="ident">missing_copy_implementations</span>,
@@ -1046,12 +1043,11 @@
     <span class="ident">unused_extern_crates</span>,
     <span class="ident">unused_import_braces</span>,
     <span class="ident">unused_qualifications</span>,
-    <span class="ident">variant_size_differences</span>,
 ))))]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">warn</span>(<span class="ident">rust_2018_idioms</span>))))]</span>
 <span class="comment">// Not needed for 2018 edition and conflicts with `rust_2018_idioms`</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">no_crate_inject</span>))]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/serde_with_macros/1.5.0&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/serde_with_macros/1.5.2&quot;</span>)]</span>
 <span class="comment">// Necessary to silence the warning about clippy::unknown_clippy_lints on nightly</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">renamed_and_removed_lints</span>)]</span>
 <span class="comment">// Necessary for nightly clippy lints</span>
@@ -1069,7 +1065,7 @@
 
 <span class="kw">mod</span> <span class="ident">utils</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>::{<span class="ident">DeriveOptions</span>, <span class="ident">IteratorExt</span> <span class="kw">as</span> <span class="kw">_</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>::{<span class="ident">split_with_de_lifetime</span>, <span class="ident">DeriveOptions</span>, <span class="ident">IteratorExt</span> <span class="kw">as</span> <span class="kw">_</span>};
 <span class="kw">use</span> <span class="ident">darling::util::Override</span>;
 <span class="kw">use</span> <span class="ident">darling</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DarlingError</span>, <span class="ident">FromField</span>, <span class="ident">FromMeta</span>};
 <span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
@@ -1503,8 +1499,8 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`serde_as`]: https://docs.rs/serde_with/1.10.0/serde_with/guide/index.html</span>
-<span class="doccomment">/// [re-exporting `serde_as`]: https://docs.rs/serde_with/1.10.0/serde_with/guide/serde_as/index.html#re-exporting-serde_as</span>
+<span class="doccomment">/// [`serde_as`]: https://docs.rs/serde_with/1.12.1/serde_with/guide/index.html</span>
+<span class="doccomment">/// [re-exporting `serde_as`]: https://docs.rs/serde_with/1.12.1/serde_with/guide/serde_as/index.html#re-exporting-serde_as</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serde_as</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">FromMeta</span>, <span class="ident">Debug</span>)]</span>
@@ -1550,12 +1546,12 @@
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">FromField</span>, <span class="ident">Debug</span>)]</span>
     <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">attributes</span>(<span class="ident">serde_as</span>))]</span>
     <span class="kw">struct</span> <span class="ident">SerdeAsOptions</span> {
-        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;as&quot;</span>, <span class="ident">map</span> <span class="op">=</span> <span class="string">&quot;parse_type_from_string&quot;</span>, <span class="ident">default</span>)]</span>
-        <span class="ident">r#as</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Type</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">map</span> <span class="op">=</span> <span class="string">&quot;parse_type_from_string&quot;</span>, <span class="ident">default</span>)]</span>
-        <span class="ident">deserialize_as</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Type</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">map</span> <span class="op">=</span> <span class="string">&quot;parse_type_from_string&quot;</span>, <span class="ident">default</span>)]</span>
-        <span class="ident">serialize_as</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Type</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;as&quot;</span>, <span class="ident">default</span>)]</span>
+        <span class="ident">r#as</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>,
+        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">default</span>)]</span>
+        <span class="ident">deserialize_as</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>,
+        <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">default</span>)]</span>
+        <span class="ident">serialize_as</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>,
     }
 
     <span class="kw">impl</span> <span class="ident">SerdeAsOptions</span> {
@@ -1617,7 +1613,7 @@
 
     <span class="kw">let</span> <span class="ident">type_same</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">syn::parse_quote!</span>(#<span class="ident">serde_with_crate_path::Same</span>);
     <span class="kw">let</span> <span class="ident">type_borrowcow</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">syn::parse_quote!</span>(<span class="ident">BorrowCow</span>);
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">type_</span>)) <span class="op">=</span> <span class="ident">serde_as_options</span>.<span class="ident">r#as</span> {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">type_</span>) <span class="op">=</span> <span class="ident">serde_as_options</span>.<span class="ident">r#as</span> {
         <span class="comment">// If the field is not borrowed yet, check if we need to borrow it.</span>
         <span class="kw">if</span> <span class="ident">serde_options</span>.<span class="ident">borrow</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">type_</span>, <span class="ident">type_borrowcow</span>) {
             <span class="kw">let</span> <span class="ident">attr_borrow</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">borrow</span>)]</span>);
@@ -1629,7 +1625,7 @@
         <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> #<span class="ident">attr_inner_tokens</span>)]</span>);
         <span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">push</span>(<span class="ident">attr</span>);
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">type_</span>)) <span class="op">=</span> <span class="ident">serde_as_options</span>.<span class="ident">deserialize_as</span> {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">type_</span>) <span class="op">=</span> <span class="ident">serde_as_options</span>.<span class="ident">deserialize_as</span> {
         <span class="comment">// If the field is not borrowed yet, check if we need to borrow it.</span>
         <span class="kw">if</span> <span class="ident">serde_options</span>.<span class="ident">borrow</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">type_</span>, <span class="ident">type_borrowcow</span>) {
             <span class="kw">let</span> <span class="ident">attr_borrow</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">borrow</span>)]</span>);
@@ -1642,7 +1638,7 @@
         <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> #<span class="ident">attr_inner_tokens</span>)]</span>);
         <span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">push</span>(<span class="ident">attr</span>);
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">type_</span>)) <span class="op">=</span> <span class="ident">serde_as_options</span>.<span class="ident">serialize_as</span> {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">type_</span>) <span class="op">=</span> <span class="ident">serde_as_options</span>.<span class="ident">serialize_as</span> {
         <span class="kw">let</span> <span class="ident">replacement_type</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">type_same</span>);
         <span class="kw">let</span> <span class="ident">attr_inner_tokens</span> <span class="op">=</span>
             <span class="macro">quote!</span>(#<span class="ident">serde_with_crate_path::As</span>::<span class="op">&lt;</span>#<span class="ident">replacement_type</span><span class="op">&gt;</span><span class="ident">::serialize</span>).<span class="ident">to_string</span>();
@@ -1651,15 +1647,6 @@
     }
 
     <span class="prelude-val">Ok</span>(())
-}
-
-<span class="doccomment">/// Parse a [`String`] and return a [`syn::Type`]</span>
-
-<span class="comment">// Return type is required by the darling struct fields</span>
-<span class="comment">// It needs to be an Option, such that is represents an optional field</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_wraps</span>)]</span>
-<span class="kw">fn</span> <span class="ident">parse_type_from_string</span>(<span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Type</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Some</span>(<span class="ident">syn::parse_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">s</span>))
 }
 
 <span class="doccomment">/// Recursively replace all occurrences of `_` with `replacement` in a [Type][]</span>
@@ -1885,7 +1872,7 @@
 <span class="doccomment">/// [`Display`]: std::fmt::Display</span>
 <span class="doccomment">/// [`FromStr`]: std::str::FromStr</span>
 <span class="doccomment">/// [cargo-toml-rename]: https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#renaming-dependencies-in-cargotoml</span>
-<span class="doccomment">/// [serde-as-crate]: https://docs.rs/serde_with/1.10.0/serde_with/guide/serde_as/index.html#re-exporting-serde_as</span>
+<span class="doccomment">/// [serde-as-crate]: https://docs.rs/serde_with/1.12.1/serde_with/guide/serde_as/index.html#re-exporting-serde_as</span>
 <span class="doccomment">/// [serde-crate]: https://serde.rs/container-attrs.html#crate</span>
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">DeserializeFromStr</span>, <span class="ident">attributes</span>(<span class="ident">serde_with</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_deserialize_fromstr</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
@@ -1902,15 +1889,17 @@
     ))
 }
 
-<span class="kw">fn</span> <span class="ident">deserialize_fromstr</span>(<span class="ident">input</span>: <span class="ident">DeriveInput</span>, <span class="ident">serde_with_crate_path</span>: <span class="ident">Path</span>) -&gt; <span class="ident">TokenStream2</span> {
+<span class="kw">fn</span> <span class="ident">deserialize_fromstr</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">DeriveInput</span>, <span class="ident">serde_with_crate_path</span>: <span class="ident">Path</span>) -&gt; <span class="ident">TokenStream2</span> {
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">ident</span>;
+    <span class="kw">let</span> <span class="ident">where_clause</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">input</span>.<span class="ident">generics</span>.<span class="ident">make_where_clause</span>().<span class="ident">predicates</span>;
+    <span class="ident">where_clause</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span>(<span class="self">Self</span>: <span class="ident">::std::str::FromStr</span>));
+    <span class="ident">where_clause</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span>(
+        <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">::std::str::FromStr</span><span class="op">&gt;</span><span class="ident">::Err</span>: <span class="ident">::std::fmt::Display</span>
+    ));
+    <span class="kw">let</span> (<span class="ident">de_impl_generics</span>, <span class="ident">ty_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">split_with_de_lifetime</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">generics</span>);
     <span class="macro">quote!</span> {
         <span class="attribute">#[<span class="ident">automatically_derived</span>]</span>
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> #<span class="ident">serde_with_crate_path::serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">ident</span>
-        <span class="kw">where</span>
-            <span class="self">Self</span>: <span class="ident">::std::str::FromStr</span>,
-            <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">::std::str::FromStr</span><span class="op">&gt;</span><span class="ident">::Err</span>: <span class="ident">::std::fmt::Display</span>,
-        {
+        <span class="kw">impl</span> #<span class="ident">de_impl_generics</span> #<span class="ident">serde_with_crate_path::serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {
             <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">D</span>: #<span class="ident">serde_with_crate_path::serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
@@ -1995,7 +1984,7 @@
 <span class="doccomment">/// [`Display`]: std::fmt::Display</span>
 <span class="doccomment">/// [`FromStr`]: std::str::FromStr</span>
 <span class="doccomment">/// [cargo-toml-rename]: https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#renaming-dependencies-in-cargotoml</span>
-<span class="doccomment">/// [serde-as-crate]: https://docs.rs/serde_with/1.10.0/serde_with/guide/serde_as/index.html#re-exporting-serde_as</span>
+<span class="doccomment">/// [serde-as-crate]: https://docs.rs/serde_with/1.12.1/serde_with/guide/serde_as/index.html#re-exporting-serde_as</span>
 <span class="doccomment">/// [serde-crate]: https://serde.rs/container-attrs.html#crate</span>
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">SerializeDisplay</span>, <span class="ident">attributes</span>(<span class="ident">serde_with</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_serialize_display</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
@@ -2012,14 +2001,17 @@
     ))
 }
 
-<span class="kw">fn</span> <span class="ident">serialize_display</span>(<span class="ident">input</span>: <span class="ident">DeriveInput</span>, <span class="ident">serde_with_crate_path</span>: <span class="ident">Path</span>) -&gt; <span class="ident">TokenStream2</span> {
+<span class="kw">fn</span> <span class="ident">serialize_display</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">DeriveInput</span>, <span class="ident">serde_with_crate_path</span>: <span class="ident">Path</span>) -&gt; <span class="ident">TokenStream2</span> {
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">ident</span>;
+    <span class="ident">input</span>
+        .<span class="ident">generics</span>
+        .<span class="ident">make_where_clause</span>()
+        .<span class="ident">predicates</span>
+        .<span class="ident">push</span>(<span class="macro">parse_quote!</span>(<span class="self">Self</span>: <span class="ident">::std::fmt::Display</span>));
+    <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
     <span class="macro">quote!</span> {
         <span class="attribute">#[<span class="ident">automatically_derived</span>]</span>
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> #<span class="ident">serde_with_crate_path::serde::Serialize</span> <span class="kw">for</span> #<span class="ident">ident</span>
-        <span class="kw">where</span>
-            <span class="self">Self</span>: <span class="ident">::std::fmt::Display</span>,
-        {
+        <span class="kw">impl</span> #<span class="ident">impl_generics</span> #<span class="ident">serde_with_crate_path::serde::Serialize</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {
             <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">S</span>: #<span class="ident">serde_with_crate_path::serde::Serializer</span>,

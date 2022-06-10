@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.24.0/src/read/coff/symbol.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>symbol.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.28.4/src/read/coff/symbol.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>symbol.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -494,6 +494,33 @@
 <span id="489">489</span>
 <span id="490">490</span>
 <span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::fmt</span>;
 <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
 <span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
@@ -502,25 +529,37 @@
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CoffCommon</span>, <span class="ident">SectionTable</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endian</span>::{<span class="ident">LittleEndian</span> <span class="kw">as</span> <span class="ident">LE</span>, <span class="ident">U32Bytes</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pe</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pod</span>::{<span class="ident">bytes_of_slice</span>, <span class="ident">Bytes</span>, <span class="ident">Pod</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pod</span>::{<span class="ident">bytes_of_slice</span>, <span class="ident">Pod</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read::util::StringTable</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read</span>::{
-    <span class="self">self</span>, <span class="ident">ObjectSymbol</span>, <span class="ident">ObjectSymbolTable</span>, <span class="ident">ReadError</span>, <span class="ident">ReadRef</span>, <span class="prelude-ty">Result</span>, <span class="ident">SectionIndex</span>, <span class="ident">SymbolFlags</span>,
-    <span class="ident">SymbolIndex</span>, <span class="ident">SymbolKind</span>, <span class="ident">SymbolMap</span>, <span class="ident">SymbolMapEntry</span>, <span class="ident">SymbolScope</span>, <span class="ident">SymbolSection</span>,
+    <span class="self">self</span>, <span class="ident">Bytes</span>, <span class="ident">ObjectSymbol</span>, <span class="ident">ObjectSymbolTable</span>, <span class="ident">ReadError</span>, <span class="ident">ReadRef</span>, <span class="prelude-ty">Result</span>, <span class="ident">SectionIndex</span>,
+    <span class="ident">SymbolFlags</span>, <span class="ident">SymbolIndex</span>, <span class="ident">SymbolKind</span>, <span class="ident">SymbolMap</span>, <span class="ident">SymbolMapEntry</span>, <span class="ident">SymbolScope</span>, <span class="ident">SymbolSection</span>,
 };
 
 <span class="doccomment">/// A table of symbol entries in a COFF or PE file.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Also includes the string table used for the symbol names.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+{
     <span class="ident">symbols</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">pe::ImageSymbolBytes</span>],
-    <span class="ident">strings</span>: <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+    <span class="ident">strings</span>: <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">symbols</span>: <span class="kw-2">&amp;</span>[],
+            <span class="ident">strings</span>: <span class="ident">StringTable::default</span>(),
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Read the symbol table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">pe::ImageFileHeader</span>, <span class="ident">data</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">pe::ImageFileHeader</span>, <span class="ident">data</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="comment">// The symbol table may not be present.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">pointer_to_symbol_table</span>.<span class="ident">get</span>(<span class="ident">LE</span>).<span class="ident">into</span>();
         <span class="kw">let</span> (<span class="ident">symbols</span>, <span class="ident">strings</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">offset</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
@@ -533,24 +572,22 @@
                 .<span class="ident">read_at</span>::<span class="op">&lt;</span><span class="ident">U32Bytes</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">offset</span>)
                 .<span class="ident">read_error</span>(<span class="string">&quot;Missing COFF string table&quot;</span>)<span class="question-mark">?</span>
                 .<span class="ident">get</span>(<span class="ident">LE</span>);
-            <span class="kw">let</span> <span class="ident">strings</span> <span class="op">=</span> <span class="ident">data</span>
-                .<span class="ident">read_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">offset</span>, <span class="ident">length</span>.<span class="ident">into</span>())
+            <span class="kw">let</span> <span class="ident">str_end</span> <span class="op">=</span> <span class="ident">offset</span>
+                .<span class="ident">checked_add</span>(<span class="ident">length</span> <span class="kw">as</span> <span class="ident">u64</span>)
                 .<span class="ident">read_error</span>(<span class="string">&quot;Invalid COFF string table length&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">strings</span> <span class="op">=</span> <span class="ident">StringTable::new</span>(<span class="ident">data</span>, <span class="ident">offset</span>, <span class="ident">str_end</span>);
 
             (<span class="ident">symbols</span>, <span class="ident">strings</span>)
         } <span class="kw">else</span> {
-            (<span class="kw-2">&amp;</span>[][..], <span class="kw-2">&amp;</span>[][..])
+            (<span class="kw-2">&amp;</span>[][..], <span class="ident">StringTable::default</span>())
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">SymbolTable</span> {
-            <span class="ident">symbols</span>,
-            <span class="ident">strings</span>: <span class="ident">StringTable::new</span>(<span class="ident">strings</span>),
-        })
+        <span class="prelude-val">Ok</span>(<span class="ident">SymbolTable</span> { <span class="ident">symbols</span>, <span class="ident">strings</span> })
     }
 
     <span class="doccomment">/// Return the string table used for the symbol names.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">strings</span>
     }
 
@@ -570,7 +607,7 @@
 
     <span class="doccomment">/// Iterate over the symbols.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="lifetime">&#39;table</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;table</span> <span class="self">self</span>) -&gt; <span class="ident">SymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;table</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="lifetime">&#39;table</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;table</span> <span class="self">self</span>) -&gt; <span class="ident">SymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;table</span>, <span class="ident">R</span><span class="op">&gt;</span> {
         <span class="ident">SymbolIterator</span> {
             <span class="ident">symbols</span>: <span class="self">self</span>,
             <span class="ident">index</span>: <span class="number">0</span>,
@@ -610,9 +647,9 @@
             .<span class="ident">read_error</span>(<span class="string">&quot;Invalid COFF symbol index&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">bytes_of_slice</span>(<span class="ident">entries</span>);
         <span class="comment">// The name is padded with nulls.</span>
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">bytes</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>) {
+        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">memchr::memchr</span>(<span class="string">b&#39;\0&#39;</span>, <span class="ident">bytes</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">end</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">bytes</span>[..<span class="ident">end</span>],
-            <span class="prelude-val">None</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">bytes</span>[..],
+            <span class="prelude-val">None</span> =&gt; <span class="ident">bytes</span>,
         })
     }
 
@@ -649,12 +686,15 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Yields the index and symbol structure for each symbol.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;table</span><span class="op">&gt;</span> {
-    <span class="ident">symbols</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;table</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;table</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+{
+    <span class="ident">symbols</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;table</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>,
     <span class="ident">index</span>: <span class="ident">usize</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;table</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">SymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;table</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;table</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">SymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;table</span>, <span class="ident">R</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">pe::ImageSymbol</span>);
 
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
@@ -669,7 +709,10 @@
     <span class="doccomment">/// Parse a COFF symbol name.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `strings` must be the string table used for symbol names.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="self">self</span>, <span class="ident">strings</span>: <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="self">self</span>,
+        <span class="ident">strings</span>: <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">name</span>[<span class="number">0</span>] <span class="op">==</span> <span class="number">0</span> {
             <span class="comment">// If the name starts with 0 then the last 4 bytes are a string table offset.</span>
             <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">u32::from_le_bytes</span>(<span class="self">self</span>.<span class="ident">name</span>[<span class="number">4</span>..<span class="number">8</span>].<span class="ident">try_into</span>().<span class="ident">unwrap</span>());
@@ -678,7 +721,7 @@
                 .<span class="ident">read_error</span>(<span class="string">&quot;Invalid COFF symbol name offset&quot;</span>)
         } <span class="kw">else</span> {
             <span class="comment">// The name is inline and padded with nulls.</span>
-            <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>) {
+            <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">memchr::memchr</span>(<span class="string">b&#39;\0&#39;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>) {
                 <span class="prelude-val">Some</span>(<span class="ident">end</span>) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>[..<span class="ident">end</span>],
                 <span class="prelude-val">None</span> =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>[..],
             })
@@ -704,12 +747,8 @@
         }
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">storage_class</span> {
             <span class="ident">pe::IMAGE_SYM_CLASS_STATIC</span> =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">get</span>(<span class="ident">LE</span>) <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">number_of_aux_symbols</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="comment">// This is a section symbol.</span>
-                    <span class="bool-val">false</span>
-                } <span class="kw">else</span> {
-                    <span class="bool-val">true</span>
-                }
+                <span class="comment">// Exclude section symbols.</span>
+                <span class="op">!</span>(<span class="self">self</span>.<span class="ident">value</span>.<span class="ident">get</span>(<span class="ident">LE</span>) <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">number_of_aux_symbols</span> <span class="op">&gt;</span> <span class="number">0</span>)
             }
             <span class="ident">pe::IMAGE_SYM_CLASS_EXTERNAL</span> <span class="op">|</span> <span class="ident">pe::IMAGE_SYM_CLASS_WEAK_EXTERNAL</span> =&gt; <span class="bool-val">true</span>,
             <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
@@ -736,15 +775,20 @@
 
 <span class="doccomment">/// A symbol table of a `CoffFile`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CoffSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">CoffCommon</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CoffSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">CoffCommon</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> <span class="ident">read::private::Sealed</span> <span class="kw">for</span> <span class="ident">CoffSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">read::private::Sealed</span> <span class="kw">for</span> <span class="ident">CoffSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span> {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> <span class="ident">ObjectSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CoffSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Symbol</span> <span class="op">=</span> <span class="ident">CoffSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SymbolIterator</span> <span class="op">=</span> <span class="ident">CoffSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">ObjectSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>
+    <span class="kw">for</span> <span class="ident">CoffSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span>
+{
+    <span class="kw">type</span> <span class="ident">Symbol</span> <span class="op">=</span> <span class="ident">CoffSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">SymbolIterator</span> <span class="op">=</span> <span class="ident">CoffSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">symbols</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::SymbolIterator</span> {
         <span class="ident">CoffSymbolIterator</span> {
@@ -764,19 +808,22 @@
 }
 
 <span class="doccomment">/// An iterator over the symbols of a `CoffFile`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CoffSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">CoffCommon</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CoffSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">CoffCommon</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index</span>: <span class="ident">usize</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">CoffSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">CoffSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;CoffSymbolIterator&quot;</span>).<span class="ident">finish</span>()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">CoffSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">CoffSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">CoffSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">CoffSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>;
@@ -792,28 +839,35 @@
 
 <span class="doccomment">/// A symbol of a `CoffFile`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CoffSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">CoffCommon</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CoffSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">CoffCommon</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index</span>: <span class="ident">SymbolIndex</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">symbol</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">pe::ImageSymbol</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> <span class="ident">read::private::Sealed</span> <span class="kw">for</span> <span class="ident">CoffSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">read::private::Sealed</span> <span class="kw">for</span> <span class="ident">CoffSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span> {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> <span class="ident">ObjectSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CoffSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">ObjectSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CoffSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolIndex</span> {
         <span class="self">self</span>.<span class="ident">index</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">has_aux_file_name</span>() {
+    <span class="kw">fn</span> <span class="ident">name_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">has_aux_file_name</span>() {
             <span class="self">self</span>.<span class="ident">file</span>
                 .<span class="ident">symbols</span>
-                .<span class="ident">aux_file_name</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">number_of_aux_symbols</span>)<span class="question-mark">?</span>
+                .<span class="ident">aux_file_name</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">number_of_aux_symbols</span>)
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">name</span>(<span class="self">self</span>.<span class="ident">file</span>.<span class="ident">symbols</span>.<span class="ident">strings</span>())<span class="question-mark">?</span>
-        };
+            <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">name</span>(<span class="self">self</span>.<span class="ident">file</span>.<span class="ident">symbols</span>.<span class="ident">strings</span>())
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name_bytes</span>()<span class="question-mark">?</span>;
         <span class="ident">str::from_utf8</span>(<span class="ident">name</span>)
             .<span class="ident">ok</span>()
             .<span class="ident">read_error</span>(<span class="string">&quot;Non UTF-8 COFF symbol name&quot;</span>)

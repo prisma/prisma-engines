@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/macros/join.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>join.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/macros/join.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>join.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -122,6 +122,41 @@
 <span id="117">117</span>
 <span id="118">118</span>
 <span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
 </pre><pre class="rust"><code><span class="doccomment">/// Waits on multiple concurrent branches, returning when **all** branches</span>
 <span class="doccomment">/// complete.</span>
 <span class="doccomment">///</span>
@@ -136,7 +171,7 @@
 <span class="doccomment">/// for **all** branches complete regardless if any complete with `Err`. Use</span>
 <span class="doccomment">/// [`try_join!`] to return early when `Err` is encountered.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`try_join!`]: macro@try_join</span>
+<span class="doccomment">/// [`try_join!`]: crate::try_join</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Notes</span>
 <span class="doccomment">///</span>
@@ -184,6 +219,9 @@
         <span class="comment">// normalization is complete.</span>
         ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span>:<span class="ident">tt</span>)<span class="op">*</span> )
 
+        <span class="comment">// The expression `0+1+1+ ... +1` equal to the number of branches.</span>
+        ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">total</span>:<span class="ident">tt</span>)<span class="op">*</span> )
+
         <span class="comment">// Normalized join! branches</span>
         $( ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">skip</span>:<span class="ident">tt</span>)<span class="op">*</span> ) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>, )<span class="op">*</span>
 
@@ -195,22 +233,54 @@
         <span class="comment">// the requirement of `Pin::new_unchecked` called below.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">futures</span> <span class="op">=</span> ( $( <span class="ident">maybe_done</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>), )<span class="op">*</span> );
 
+        <span class="comment">// Each time the future created by poll_fn is polled, a different future will be polled first</span>
+        <span class="comment">// to ensure every future passed to join! gets a chance to make progress even if</span>
+        <span class="comment">// one of the futures consumes the whole budget.</span>
+        <span class="comment">//</span>
+        <span class="comment">// This is number of futures that will be skipped in the first loop</span>
+        <span class="comment">// iteration the next time.</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">skip_next_time</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
+
         <span class="ident">poll_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
+            <span class="kw">const</span> <span class="ident">COUNT</span>: <span class="ident">u32</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">total</span>)<span class="kw-2">*</span>;
+
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_pending</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">to_run</span> <span class="op">=</span> <span class="ident">COUNT</span>;
+
+            <span class="comment">// The number of futures that will be skipped in the first loop iteration.</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">skip</span> <span class="op">=</span> <span class="ident">skip_next_time</span>;
+
+            <span class="ident">skip_next_time</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">skip</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">COUNT</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">skip</span> <span class="op">+</span> <span class="number">1</span> };
+
+            <span class="comment">// This loop runs twice and the first `skip` futures</span>
+            <span class="comment">// are not polled in the first iteration.</span>
+            <span class="kw">loop</span> {
             $(
-                <span class="comment">// Extract the future for this branch from the tuple.</span>
-                <span class="kw">let</span> ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">skip</span>,)<span class="op">*</span> <span class="ident">fut</span>, .. ) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">futures</span>;
+                <span class="kw">if</span> <span class="ident">skip</span> <span class="op">==</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">to_run</span> <span class="op">==</span> <span class="number">0</span> {
+                        <span class="comment">// Every future has been polled</span>
+                        <span class="kw">break</span>;
+                    }
+                    <span class="ident">to_run</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
 
-                <span class="comment">// Safety: future is stored on the stack above</span>
-                <span class="comment">// and never moved.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Pin::new_unchecked</span>(<span class="ident">fut</span>) };
+                    <span class="comment">// Extract the future for this branch from the tuple.</span>
+                    <span class="kw">let</span> ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">skip</span>,)<span class="op">*</span> <span class="ident">fut</span>, .. ) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">futures</span>;
 
-                <span class="comment">// Try polling</span>
-                <span class="kw">if</span> <span class="ident">fut</span>.<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">is_pending</span>() {
-                    <span class="ident">is_pending</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    <span class="comment">// Safety: future is stored on the stack above</span>
+                    <span class="comment">// and never moved.</span>
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Pin::new_unchecked</span>(<span class="ident">fut</span>) };
+
+                    <span class="comment">// Try polling</span>
+                    <span class="kw">if</span> <span class="ident">fut</span>.<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">is_pending</span>() {
+                        <span class="ident">is_pending</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    }
+                } <span class="kw">else</span> {
+                    <span class="comment">// Future skipped, one less future to skip in the next iteration</span>
+                    <span class="ident">skip</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
                 }
             )<span class="op">*</span>
+            }
 
             <span class="kw">if</span> <span class="ident">is_pending</span> {
                 <span class="ident">Pending</span>
@@ -231,14 +301,14 @@
 
     <span class="comment">// ===== Normalize =====</span>
 
-    (@ { ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">tt</span>)<span class="op">*</span> ) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>)<span class="op">*</span> } <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">tt</span>)<span class="op">*</span> ) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::join!</span>(@{ ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>)<span class="op">*</span> <span class="kw">_</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="op">*</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>)<span class="kw-2">*</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>, } $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>)<span class="kw-2">*</span>)
+    (@ { ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">tt</span>)<span class="op">*</span> ) ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">tt</span>)<span class="op">*</span> ) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>)<span class="op">*</span> } <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">tt</span>)<span class="op">*</span> ) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::join!</span>(@{ ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>)<span class="op">*</span> <span class="kw">_</span>) ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>)<span class="op">*</span> <span class="op">+</span> <span class="number">1</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="op">*</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>)<span class="kw-2">*</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>, } $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>)<span class="kw-2">*</span>)
     };
 
     <span class="comment">// ===== Entry point =====</span>
 
     ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::join!</span>(@{ () } $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>,)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$</span><span class="macro">crate::join!</span>(@{ () (<span class="number">0</span>) } $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>,)<span class="kw-2">*</span>)
     };
 }
 </code></pre></div>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.7/src/primitive_date_time.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>primitive_date_time.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.9/src/primitive_date_time.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>primitive_date_time.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -787,6 +787,160 @@
 <span id="780">780</span>
 <span id="781">781</span>
 <span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The [`PrimitiveDateTime`] struct and its associated `impl`s.</span>
 
 <span class="kw">use</span> <span class="ident">core::fmt</span>;
@@ -795,13 +949,11 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::io</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::formatting::Formattable</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::Parsable</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">util</span>, <span class="ident">Date</span>, <span class="ident">Duration</span>, <span class="ident">Month</span>, <span class="ident">OffsetDateTime</span>, <span class="ident">Time</span>, <span class="ident">UtcOffset</span>, <span class="ident">Weekday</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>, <span class="ident">util</span>, <span class="ident">Date</span>, <span class="ident">Duration</span>, <span class="ident">Month</span>, <span class="ident">OffsetDateTime</span>, <span class="ident">Time</span>, <span class="ident">UtcOffset</span>, <span class="ident">Weekday</span>};
 
 <span class="doccomment">/// Combined date and time.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
@@ -1398,6 +1550,162 @@
     <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `PrimitiveDateTime`.&quot;</span>]</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_date</span>(<span class="self">self</span>, <span class="ident">date</span>: <span class="ident">Date</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">date</span>.<span class="ident">with_time</span>(<span class="self">self</span>.<span class="ident">time</span>)
+    }
+
+    <span class="doccomment">/// Replace the year. The month and day will be unchanged.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 12:00).replace_year(2019),</span>
+    <span class="doccomment">///     Ok(datetime!(2019 - 02 - 18 12:00))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 12:00).replace_year(-1_000_000_000).is_err()); // -1_000_000_000 isn&#39;t a valid year</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 12:00).replace_year(1_000_000_000).is_err()); // 1_000_000_000 isn&#39;t a valid year</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `PrimitiveDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_year</span>(<span class="self">self</span>, <span class="ident">year</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="ident">date</span>.<span class="ident">replace_year</span>(<span class="ident">year</span>)).<span class="ident">with_time</span>(<span class="self">self</span>.<span class="ident">time</span>))
+    }
+
+    <span class="doccomment">/// Replace the month of the year.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// # use time::Month;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 12:00).replace_month(Month::January),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 01 - 18 12:00))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 01 - 30 12:00).replace_month(Month::February).is_err()); // 30 isn&#39;t a valid day in February</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `PrimitiveDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_month</span>(<span class="self">self</span>, <span class="ident">month</span>: <span class="ident">Month</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="ident">date</span>.<span class="ident">replace_month</span>(<span class="ident">month</span>)).<span class="ident">with_time</span>(<span class="self">self</span>.<span class="ident">time</span>))
+    }
+
+    <span class="doccomment">/// Replace the day of the month.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 12:00).replace_day(1),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 01 12:00))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 12:00).replace_day(0).is_err()); // 00 isn&#39;t a valid day</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 12:00).replace_day(30).is_err()); // 30 isn&#39;t a valid day in February</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `PrimitiveDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_day</span>(<span class="self">self</span>, <span class="ident">day</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="ident">date</span>.<span class="ident">replace_day</span>(<span class="ident">day</span>)).<span class="ident">with_time</span>(<span class="self">self</span>.<span class="ident">time</span>))
+    }
+
+    <span class="doccomment">/// Replace the clock hour.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 01:02:03.004_005_006).replace_hour(7),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 18 07:02:03.004_005_006))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006).replace_hour(24).is_err()); // 24 isn&#39;t a valid hour</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `PrimitiveDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_hour</span>(<span class="self">self</span>, <span class="ident">hour</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>
+            .<span class="ident">date</span>()
+            .<span class="ident">with_time</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="ident">time</span>.<span class="ident">replace_hour</span>(<span class="ident">hour</span>))))
+    }
+
+    <span class="doccomment">/// Replace the minutes within the hour.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 01:02:03.004_005_006).replace_minute(7),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 18 01:07:03.004_005_006))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006).replace_minute(60).is_err()); // 60 isn&#39;t a valid minute</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `PrimitiveDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_minute</span>(<span class="self">self</span>, <span class="ident">minute</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>
+            .<span class="ident">date</span>()
+            .<span class="ident">with_time</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="ident">time</span>.<span class="ident">replace_minute</span>(<span class="ident">minute</span>))))
+    }
+
+    <span class="doccomment">/// Replace the seconds within the minute.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 01:02:03.004_005_006).replace_second(7),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 18 01:02:07.004_005_006))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006).replace_second(60).is_err()); // 60 isn&#39;t a valid second</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `PrimitiveDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_second</span>(<span class="self">self</span>, <span class="ident">second</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>
+            .<span class="ident">date</span>()
+            .<span class="ident">with_time</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="ident">time</span>.<span class="ident">replace_second</span>(<span class="ident">second</span>))))
+    }
+
+    <span class="doccomment">/// Replace the milliseconds within the second.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 01:02:03.004_005_006).replace_millisecond(7),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 18 01:02:03.007))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006).replace_millisecond(1_000).is_err()); // 1_000 isn&#39;t a valid millisecond</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `PrimitiveDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_millisecond</span>(
+        <span class="self">self</span>,
+        <span class="ident">millisecond</span>: <span class="ident">u16</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>
+            .<span class="ident">date</span>()
+            .<span class="ident">with_time</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="ident">time</span>.<span class="ident">replace_millisecond</span>(<span class="ident">millisecond</span>))))
+    }
+
+    <span class="doccomment">/// Replace the microseconds within the second.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 01:02:03.004_005_006).replace_microsecond(7_008),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 18 01:02:03.007_008))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006).replace_microsecond(1_000_000).is_err()); // 1_000_000 isn&#39;t a valid microsecond</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `PrimitiveDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_microsecond</span>(
+        <span class="self">self</span>,
+        <span class="ident">microsecond</span>: <span class="ident">u32</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>
+            .<span class="ident">date</span>()
+            .<span class="ident">with_time</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="ident">time</span>.<span class="ident">replace_microsecond</span>(<span class="ident">microsecond</span>))))
+    }
+
+    <span class="doccomment">/// Replace the nanoseconds within the second.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 01:02:03.004_005_006).replace_nanosecond(7_008_009),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 18 01:02:03.007_008_009))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006).replace_nanosecond(1_000_000_000).is_err()); // 1_000_000_000 isn&#39;t a valid nanosecond</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `PrimitiveDateTime`.&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_nanosecond</span>(<span class="self">self</span>, <span class="ident">nanosecond</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>
+            .<span class="ident">date</span>()
+            .<span class="ident">with_time</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="ident">time</span>.<span class="ident">replace_nanosecond</span>(<span class="ident">nanosecond</span>))))
     }
 }
 <span class="comment">// endregion replacement</span>

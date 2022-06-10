@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.20.3/src/rr/rdata/tlsa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tlsa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/tlsa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tlsa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -538,6 +538,13 @@
 <span id="533">533</span>
 <span id="534">534</span>
 <span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
@@ -547,6 +554,9 @@
 
 <span class="doccomment">//! TLSA records for storing TLS certificate validation information</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::sshfp</span>;
 
@@ -572,6 +582,7 @@
 <span class="doccomment">///    /                                                               /</span>
 <span class="doccomment">///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 <span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TLSA</span> {
     <span class="ident">cert_usage</span>: <span class="ident">CertUsage</span>,
@@ -606,6 +617,7 @@
 <span class="doccomment">///    that accept other formats for certificates, those certificates will</span>
 <span class="doccomment">///    need their own certificate usage values.</span>
 <span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CertUsage</span> {
     <span class="doccomment">/// ```text</span>
@@ -675,18 +687,18 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CertUsage</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">usage</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">usage</span> {
-            <span class="number">0</span> =&gt; <span class="ident">CertUsage::CA</span>,
-            <span class="number">1</span> =&gt; <span class="ident">CertUsage::Service</span>,
-            <span class="number">2</span> =&gt; <span class="ident">CertUsage::TrustAnchor</span>,
-            <span class="number">3</span> =&gt; <span class="ident">CertUsage::DomainIssued</span>,
-            <span class="number">4</span>..<span class="op">=</span><span class="number">254</span> =&gt; <span class="ident">CertUsage::Unassigned</span>(<span class="ident">usage</span>),
-            <span class="number">255</span> =&gt; <span class="ident">CertUsage::Private</span>,
+            <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::CA</span>,
+            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::Service</span>,
+            <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::TrustAnchor</span>,
+            <span class="number">3</span> =&gt; <span class="ident"><span class="self">Self</span>::DomainIssued</span>,
+            <span class="number">4</span>..<span class="op">=</span><span class="number">254</span> =&gt; <span class="ident"><span class="self">Self</span>::Unassigned</span>(<span class="ident">usage</span>),
+            <span class="number">255</span> =&gt; <span class="ident"><span class="self">Self</span>::Private</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CertUsage</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">usage</span>: <span class="ident">CertUsage</span>) -&gt; <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">usage</span>: <span class="ident">CertUsage</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">usage</span> {
             <span class="ident">CertUsage::CA</span> =&gt; <span class="number">0</span>,
             <span class="ident">CertUsage::Service</span> =&gt; <span class="number">1</span>,
@@ -716,12 +728,13 @@
 <span class="doccomment">///    unrelated to the use of &quot;selector&quot; in DomainKeys Identified Mail</span>
 <span class="doccomment">///    (DKIM) [RFC6376].)</span>
 <span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Selector</span> {
-    <span class="doccomment">/// Full certificate: the Certificate binary structure as defined in [RFC5280]</span>
+    <span class="doccomment">/// Full certificate: the Certificate binary structure as defined in [RFC5280](https://tools.ietf.org/html/rfc5280)</span>
     <span class="ident">Full</span>,
 
-    <span class="doccomment">/// SubjectPublicKeyInfo: DER-encoded binary structure as defined in [RFC5280]</span>
+    <span class="doccomment">/// SubjectPublicKeyInfo: DER-encoded binary structure as defined in [RFC5280](https://tools.ietf.org/html/rfc5280)</span>
     <span class="ident">Spki</span>,
 
     <span class="doccomment">/// Unassigned at the time of this writing</span>
@@ -734,16 +747,16 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Selector</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selector</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">selector</span> {
-            <span class="number">0</span> =&gt; <span class="ident">Selector::Full</span>,
-            <span class="number">1</span> =&gt; <span class="ident">Selector::Spki</span>,
-            <span class="number">2</span>..<span class="op">=</span><span class="number">254</span> =&gt; <span class="ident">Selector::Unassigned</span>(<span class="ident">selector</span>),
-            <span class="number">255</span> =&gt; <span class="ident">Selector::Private</span>,
+            <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::Full</span>,
+            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::Spki</span>,
+            <span class="number">2</span>..<span class="op">=</span><span class="number">254</span> =&gt; <span class="ident"><span class="self">Self</span>::Unassigned</span>(<span class="ident">selector</span>),
+            <span class="number">255</span> =&gt; <span class="ident"><span class="self">Self</span>::Private</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Selector</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selector</span>: <span class="ident">Selector</span>) -&gt; <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selector</span>: <span class="ident">Selector</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">selector</span> {
             <span class="ident">Selector::Full</span> =&gt; <span class="number">0</span>,
             <span class="ident">Selector::Spki</span> =&gt; <span class="number">1</span>,
@@ -774,15 +787,16 @@
 <span class="doccomment">///    certificate (if possible) will assist clients that support a small</span>
 <span class="doccomment">///    number of hash algorithms.</span>
 <span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Matching</span> {
     <span class="doccomment">/// Exact match on selected content</span>
     <span class="ident">Raw</span>,
 
-    <span class="doccomment">/// SHA-256 hash of selected content [RFC6234]</span>
+    <span class="doccomment">/// SHA-256 hash of selected content [RFC6234](https://tools.ietf.org/html/rfc6234)</span>
     <span class="ident">Sha256</span>,
 
-    <span class="doccomment">/// SHA-512 hash of selected content [RFC6234]</span>
+    <span class="doccomment">/// SHA-512 hash of selected content [RFC6234](https://tools.ietf.org/html/rfc6234)</span>
     <span class="ident">Sha512</span>,
 
     <span class="doccomment">/// Unassigned at the time of this writing</span>
@@ -795,17 +809,17 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Matching</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">matching</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">matching</span> {
-            <span class="number">0</span> =&gt; <span class="ident">Matching::Raw</span>,
-            <span class="number">1</span> =&gt; <span class="ident">Matching::Sha256</span>,
-            <span class="number">2</span> =&gt; <span class="ident">Matching::Sha512</span>,
-            <span class="number">3</span>..<span class="op">=</span><span class="number">254</span> =&gt; <span class="ident">Matching::Unassigned</span>(<span class="ident">matching</span>),
-            <span class="number">255</span> =&gt; <span class="ident">Matching::Private</span>,
+            <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::Raw</span>,
+            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::Sha256</span>,
+            <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::Sha512</span>,
+            <span class="number">3</span>..<span class="op">=</span><span class="number">254</span> =&gt; <span class="ident"><span class="self">Self</span>::Unassigned</span>(<span class="ident">matching</span>),
+            <span class="number">255</span> =&gt; <span class="ident"><span class="self">Self</span>::Private</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Matching</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">matching</span>: <span class="ident">Matching</span>) -&gt; <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">matching</span>: <span class="ident">Matching</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">matching</span> {
             <span class="ident">Matching::Raw</span> =&gt; <span class="number">0</span>,
             <span class="ident">Matching::Sha256</span> =&gt; <span class="number">1</span>,
@@ -841,7 +855,7 @@
         <span class="ident">matching</span>: <span class="ident">Matching</span>,
         <span class="ident">cert_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
     ) -&gt; <span class="self">Self</span> {
-        <span class="ident">TLSA</span> {
+        <span class="self">Self</span> {
             <span class="ident">cert_usage</span>,
             <span class="ident">selector</span>,
             <span class="ident">matching</span>,

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-macros-1.7.0/src/entry.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>entry.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-macros-1.8.0/src/entry.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>entry.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -431,8 +431,41 @@
 <span id="426">426</span>
 <span id="427">427</span>
 <span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2::Span</span>;
+<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Ident</span>, <span class="ident">Span</span>};
 <span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">quote</span>, <span class="ident">quote_spanned</span>, <span class="ident">ToTokens</span>};
 <span class="kw">use</span> <span class="ident">syn::parse::Parser</span>;
 
@@ -462,6 +495,7 @@
     <span class="ident">flavor</span>: <span class="ident">RuntimeFlavor</span>,
     <span class="ident">worker_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="ident">start_paused</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="ident">crate_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Config used in case of the attribute not being able to build a valid config</span>
@@ -469,6 +503,7 @@
     <span class="ident">flavor</span>: <span class="ident">RuntimeFlavor::CurrentThread</span>,
     <span class="ident">worker_threads</span>: <span class="prelude-val">None</span>,
     <span class="ident">start_paused</span>: <span class="prelude-val">None</span>,
+    <span class="ident">crate_name</span>: <span class="prelude-val">None</span>,
 };
 
 <span class="kw">struct</span> <span class="ident">Configuration</span> {
@@ -478,6 +513,7 @@
     <span class="ident">worker_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">Span</span>)<span class="op">&gt;</span>,
     <span class="ident">start_paused</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">bool</span>, <span class="ident">Span</span>)<span class="op">&gt;</span>,
     <span class="ident">is_test</span>: <span class="ident">bool</span>,
+    <span class="ident">crate_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Configuration</span> {
@@ -492,6 +528,7 @@
             <span class="ident">worker_threads</span>: <span class="prelude-val">None</span>,
             <span class="ident">start_paused</span>: <span class="prelude-val">None</span>,
             <span class="ident">is_test</span>,
+            <span class="ident">crate_name</span>: <span class="prelude-val">None</span>,
         }
     }
 
@@ -534,6 +571,15 @@
 
         <span class="kw">let</span> <span class="ident">start_paused</span> <span class="op">=</span> <span class="ident">parse_bool</span>(<span class="ident">start_paused</span>, <span class="ident">span</span>, <span class="string">&quot;start_paused&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">start_paused</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">start_paused</span>, <span class="ident">span</span>));
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn</span> <span class="ident">set_crate_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">syn::Lit</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">syn::Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">crate_name</span>.<span class="ident">is_some</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(<span class="ident">span</span>, <span class="string">&quot;`crate` set multiple times.&quot;</span>));
+        }
+        <span class="kw">let</span> <span class="ident">name_ident</span> <span class="op">=</span> <span class="ident">parse_ident</span>(<span class="ident">name</span>, <span class="ident">span</span>, <span class="string">&quot;crate&quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">crate_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name_ident</span>.<span class="ident">to_string</span>());
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -584,6 +630,7 @@
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">FinalConfig</span> {
+            <span class="ident">crate_name</span>: <span class="self">self</span>.<span class="ident">crate_name</span>.<span class="ident">clone</span>(),
             <span class="ident">flavor</span>,
             <span class="ident">worker_threads</span>,
             <span class="ident">start_paused</span>,
@@ -614,6 +661,27 @@
         <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
             <span class="ident">span</span>,
             <span class="macro">format!</span>(<span class="string">&quot;Failed to parse value of `{}` as string.&quot;</span>, <span class="ident">field</span>),
+        )),
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">parse_ident</span>(<span class="ident">lit</span>: <span class="ident">syn::Lit</span>, <span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ident</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
+    <span class="kw">match</span> <span class="ident">lit</span> {
+        <span class="ident">syn::Lit::Str</span>(<span class="ident">s</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">syn::Error::new</span>(
+                <span class="ident">span</span>,
+                <span class="macro">format!</span>(
+                    <span class="string">&quot;Failed to parse value of `{}` as ident: \&quot;{}\&quot;&quot;</span>,
+                    <span class="ident">field</span>,
+                    <span class="ident">s</span>.<span class="ident">value</span>()
+                ),
+            );
+            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">syn::Path</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+            <span class="ident">path</span>.<span class="ident">get_ident</span>().<span class="ident">cloned</span>().<span class="ident">ok_or</span>(<span class="ident">err</span>)
+        }
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
+            <span class="ident">span</span>,
+            <span class="macro">format!</span>(<span class="string">&quot;Failed to parse value of `{}` as ident.&quot;</span>, <span class="ident">field</span>),
         )),
     }
 }
@@ -676,9 +744,15 @@
                         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Attribute `core_threads` is renamed to `worker_threads`&quot;</span>;
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">namevalue</span>, <span class="ident">msg</span>));
                     }
+                    <span class="string">&quot;crate&quot;</span> =&gt; {
+                        <span class="ident">config</span>.<span class="ident">set_crate_name</span>(
+                            <span class="ident">namevalue</span>.<span class="ident">lit</span>.<span class="ident">clone</span>(),
+                            <span class="ident">syn::spanned::Spanned::span</span>(<span class="kw-2">&amp;</span><span class="ident">namevalue</span>.<span class="ident">lit</span>),
+                        )<span class="question-mark">?</span>;
+                    }
                     <span class="ident">name</span> =&gt; {
                         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                            <span class="string">&quot;Unknown attribute {} is specified; expected one of: `flavor`, `worker_threads`, `start_paused`&quot;</span>,
+                            <span class="string">&quot;Unknown attribute {} is specified; expected one of: `flavor`, `worker_threads`, `start_paused`, `crate`&quot;</span>,
                             <span class="ident">name</span>,
                         );
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">namevalue</span>, <span class="ident">msg</span>));
@@ -708,7 +782,7 @@
                         <span class="macro">format!</span>(<span class="string">&quot;The `{}` attribute requires an argument.&quot;</span>, <span class="ident">name</span>)
                     }
                     <span class="ident">name</span> =&gt; {
-                        <span class="macro">format!</span>(<span class="string">&quot;Unknown attribute {} is specified; expected one of: `flavor`, `worker_threads`, `start_paused`&quot;</span>, <span class="ident">name</span>)
+                        <span class="macro">format!</span>(<span class="string">&quot;Unknown attribute {} is specified; expected one of: `flavor`, `worker_threads`, `start_paused`, `crate`&quot;</span>, <span class="ident">name</span>)
                     }
                 };
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">path</span>, <span class="ident">msg</span>));
@@ -746,12 +820,16 @@
         (<span class="ident">start</span>, <span class="ident">end</span>)
     };
 
+    <span class="kw">let</span> <span class="ident">crate_name</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">crate_name</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;tokio&quot;</span>);
+
+    <span class="kw">let</span> <span class="ident">crate_ident</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="ident">crate_name</span>, <span class="ident">last_stmt_start_span</span>);
+
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rt</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">config</span>.<span class="ident">flavor</span> {
         <span class="ident">RuntimeFlavor::CurrentThread</span> =&gt; <span class="macro">quote_spanned!</span> {<span class="ident">last_stmt_start_span</span>=&gt;
-            <span class="ident">tokio::runtime::Builder::new_current_thread</span>()
+            #<span class="ident">crate_ident::runtime::Builder::new_current_thread</span>()
         },
         <span class="ident">RuntimeFlavor::Threaded</span> =&gt; <span class="macro">quote_spanned!</span> {<span class="ident">last_stmt_start_span</span>=&gt;
-            <span class="ident">tokio::runtime::Builder::new_multi_thread</span>()
+            #<span class="ident">crate_ident::runtime::Builder::new_multi_thread</span>()
         },
     };
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">worker_threads</span> {
@@ -771,29 +849,17 @@
 
     <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">block</span>;
     <span class="kw">let</span> <span class="ident">brace_token</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">block</span>.<span class="ident">brace_token</span>;
-    <span class="kw">let</span> (<span class="ident">tail_return</span>, <span class="ident">tail_semicolon</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">body</span>.<span class="ident">stmts</span>.<span class="ident">last</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">syn::Stmt::Semi</span>(<span class="ident">syn::Expr::Return</span>(<span class="kw">_</span>), <span class="kw">_</span>)) =&gt; (<span class="macro">quote!</span> { <span class="kw">return</span> }, <span class="macro">quote!</span> { ; }),
-        <span class="prelude-val">Some</span>(<span class="ident">syn::Stmt::Semi</span>(..)) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">syn::Stmt::Local</span>(..)) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; {
-            <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">output</span> {
-                <span class="ident">syn::ReturnType::Type</span>(<span class="kw">_</span>, <span class="ident">ty</span>) <span class="kw">if</span> <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ty</span>, <span class="ident">syn::Type::Tuple</span>(<span class="ident">ty</span>) <span class="kw">if</span> <span class="ident">ty</span>.<span class="ident">elems</span>.<span class="ident">is_empty</span>()) =&gt;
-                {
-                    (<span class="macro">quote!</span> {}, <span class="macro">quote!</span> { ; }) <span class="comment">// unit</span>
-                }
-                <span class="ident">syn::ReturnType::Default</span> =&gt; (<span class="macro">quote!</span> {}, <span class="macro">quote!</span> { ; }), <span class="comment">// unit</span>
-                <span class="ident">syn::ReturnType::Type</span>(..) =&gt; (<span class="macro">quote!</span> {}, <span class="macro">quote!</span> {}),   <span class="comment">// ! or another</span>
-            }
-        }
-        <span class="kw">_</span> =&gt; (<span class="macro">quote!</span> {}, <span class="macro">quote!</span> {}),
-    };
     <span class="ident">input</span>.<span class="ident">block</span> <span class="op">=</span> <span class="ident">syn::parse2</span>(<span class="macro">quote_spanned!</span> {<span class="ident">last_stmt_end_span</span>=&gt;
         {
             <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">async</span> #<span class="ident">body</span>;
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::expect_used</span>)]</span>
-            #<span class="ident">tail_return</span> #<span class="ident">rt</span>
-                .<span class="ident">enable_all</span>()
-                .<span class="ident">build</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;Failed building the Runtime&quot;</span>)
-                .<span class="ident">block_on</span>(<span class="ident">body</span>)#<span class="ident">tail_semicolon</span>
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::expect_used</span>, <span class="ident">clippy::diverging_sub_expression</span>)]</span>
+            {
+                <span class="kw">return</span> #<span class="ident">rt</span>
+                    .<span class="ident">enable_all</span>()
+                    .<span class="ident">build</span>()
+                    .<span class="ident">expect</span>(<span class="string">&quot;Failed building the Runtime&quot;</span>)
+                    .<span class="ident">block_on</span>(<span class="ident">body</span>);
+            }
         }
     })
     .<span class="ident">expect</span>(<span class="string">&quot;Parsing failure&quot;</span>);

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.1.0/src/event/command.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/event/command.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -162,7 +162,7 @@
     <span class="doccomment">/// The name of the database the command is being run against.</span>
     <span class="kw">pub</span> <span class="ident">db</span>: <span class="ident">String</span>,
 
-    <span class="doccomment">/// The type of command being run, e.g. &quot;find&quot; or &quot;isMaster&quot;.</span>
+    <span class="doccomment">/// The type of command being run, e.g. &quot;find&quot; or &quot;hello&quot;.</span>
     <span class="kw">pub</span> <span class="ident">command_name</span>: <span class="ident">String</span>,
 
     <span class="doccomment">/// The driver-generated identifier for the request. Applications can use this to identify the</span>
@@ -188,7 +188,7 @@
     <span class="doccomment">/// The server&#39;s reply to the command.</span>
     <span class="kw">pub</span> <span class="ident">reply</span>: <span class="ident">Document</span>,
 
-    <span class="doccomment">/// The type of command that was run, e.g. &quot;find&quot; or &quot;isMaster&quot;.</span>
+    <span class="doccomment">/// The type of command that was run, e.g. &quot;find&quot; or &quot;hello&quot;.</span>
     <span class="kw">pub</span> <span class="ident">command_name</span>: <span class="ident">String</span>,
 
     <span class="doccomment">/// The driver-generated identifier for the request. Applications can use this to identify the</span>
@@ -210,7 +210,7 @@
     <span class="doccomment">/// The total execution time of the command (including the network round-trip).</span>
     <span class="kw">pub</span> <span class="ident">duration</span>: <span class="ident">Duration</span>,
 
-    <span class="doccomment">/// The type of command that was run, e.g. &quot;find&quot; or &quot;isMaster&quot;.</span>
+    <span class="doccomment">/// The type of command that was run, e.g. &quot;find&quot; or &quot;hello&quot;.</span>
     <span class="kw">pub</span> <span class="ident">command_name</span>: <span class="ident">String</span>,
 
     <span class="doccomment">/// The error that the driver returned due to the event failing.</span>
@@ -242,9 +242,9 @@
 <span class="doccomment">/// #     },</span>
 <span class="doccomment">/// #     options::ClientOptions,</span>
 <span class="doccomment">/// # };</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;sync&quot;)]</span>
+<span class="doccomment">/// # #[cfg(any(feature = &quot;sync&quot;, feature = &quot;tokio-sync&quot;))]</span>
 <span class="doccomment">/// # use mongodb::sync::Client;</span>
-<span class="doccomment">/// # #[cfg(not(feature = &quot;sync&quot;))]</span>
+<span class="doccomment">/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]</span>
 <span class="doccomment">/// # use mongodb::Client;</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// struct FailedCommandLogger;</span>

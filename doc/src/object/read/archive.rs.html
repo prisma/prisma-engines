@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.24.0/src/read/archive.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>archive.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.28.4/src/read/archive.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>archive.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -435,6 +435,76 @@
 <span id="430">430</span>
 <span id="431">431</span>
 <span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Support for archive files.</span>
 
 <span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
@@ -443,15 +513,21 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read</span>::{<span class="self">self</span>, <span class="ident">Error</span>, <span class="ident">ReadError</span>, <span class="ident">ReadRef</span>};
 
 <span class="doccomment">/// The kind of archive format.</span>
-<span class="comment">// TODO: Gnu64 and Darwin64 (and Darwin for writing)</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ArchiveKind</span> {
     <span class="doccomment">/// There are no special files that indicate the archive format.</span>
     <span class="ident">Unknown</span>,
     <span class="doccomment">/// The GNU (or System V) archive format.</span>
     <span class="ident">Gnu</span>,
+    <span class="doccomment">/// The GNU (or System V) archive format with 64-bit symbol table.</span>
+    <span class="ident">Gnu64</span>,
     <span class="doccomment">/// The BSD archive format.</span>
     <span class="ident">Bsd</span>,
+    <span class="doccomment">/// The BSD archive format with 64-bit symbol table.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is used for Darwin.</span>
+    <span class="ident">Bsd64</span>,
     <span class="doccomment">/// The Windows COFF archive format.</span>
     <span class="ident">Coff</span>,
 }
@@ -463,7 +539,7 @@
     <span class="ident">len</span>: <span class="ident">u64</span>,
     <span class="ident">offset</span>: <span class="ident">u64</span>,
     <span class="ident">kind</span>: <span class="ident">ArchiveKind</span>,
-    <span class="ident">symbols</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>],
+    <span class="ident">symbols</span>: (<span class="ident">u64</span>, <span class="ident">u64</span>),
     <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>],
 }
 
@@ -484,13 +560,13 @@
             <span class="ident">offset</span>: <span class="ident">tail</span>,
             <span class="ident">len</span>,
             <span class="ident">kind</span>: <span class="ident">ArchiveKind::Unknown</span>,
-            <span class="ident">symbols</span>: <span class="kw-2">&amp;</span>[],
+            <span class="ident">symbols</span>: (<span class="number">0</span>, <span class="number">0</span>),
             <span class="ident">names</span>: <span class="kw-2">&amp;</span>[],
         };
 
         <span class="comment">// The first few members may be special, so parse them.</span>
         <span class="comment">// GNU has:</span>
-        <span class="comment">// - &quot;/&quot;: symbol table (optional)</span>
+        <span class="comment">// - &quot;/&quot; or &quot;/SYM64/&quot;: symbol table (optional)</span>
         <span class="comment">// - &quot;//&quot;: names table (optional)</span>
         <span class="comment">// COFF has:</span>
         <span class="comment">// - &quot;/&quot;: first linker member</span>
@@ -498,12 +574,16 @@
         <span class="comment">// - &quot;//&quot;: names table</span>
         <span class="comment">// BSD has:</span>
         <span class="comment">// - &quot;__.SYMDEF&quot; or &quot;__.SYMDEF SORTED&quot;: symbol table (optional)</span>
+        <span class="comment">// BSD 64-bit has:</span>
+        <span class="comment">// - &quot;__.SYMDEF_64&quot; or &quot;__.SYMDEF_64 SORTED&quot;: symbol table (optional)</span>
+        <span class="comment">// BSD may use the extended name for the symbol table. This is handled</span>
+        <span class="comment">// by `ArchiveMember::parse`.</span>
         <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&lt;</span> <span class="ident">len</span> {
             <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">ArchiveMember::parse</span>(<span class="ident">data</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tail</span>, <span class="kw-2">&amp;</span>[])<span class="question-mark">?</span>;
             <span class="kw">if</span> <span class="ident">member</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">b&quot;/&quot;</span> {
                 <span class="comment">// GNU symbol table (unless we later determine this is COFF).</span>
                 <span class="ident">file</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ArchiveKind::Gnu</span>;
-                <span class="ident">file</span>.<span class="ident">symbols</span> <span class="op">=</span> <span class="ident">member</span>.<span class="ident">data</span>(<span class="ident">data</span>)<span class="question-mark">?</span>;
+                <span class="ident">file</span>.<span class="ident">symbols</span> <span class="op">=</span> <span class="ident">member</span>.<span class="ident">file_range</span>();
                 <span class="ident">file</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">tail</span>;
 
                 <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&lt;</span> <span class="ident">len</span> {
@@ -511,7 +591,7 @@
                     <span class="kw">if</span> <span class="ident">member</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">b&quot;/&quot;</span> {
                         <span class="comment">// COFF linker member.</span>
                         <span class="ident">file</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ArchiveKind::Coff</span>;
-                        <span class="ident">file</span>.<span class="ident">symbols</span> <span class="op">=</span> <span class="ident">member</span>.<span class="ident">data</span>(<span class="ident">data</span>)<span class="question-mark">?</span>;
+                        <span class="ident">file</span>.<span class="ident">symbols</span> <span class="op">=</span> <span class="ident">member</span>.<span class="ident">file_range</span>();
                         <span class="ident">file</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">tail</span>;
 
                         <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&lt;</span> <span class="ident">len</span> {
@@ -528,6 +608,20 @@
                         <span class="ident">file</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">tail</span>;
                     }
                 }
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">member</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">b&quot;/SYM64/&quot;</span> {
+                <span class="comment">// GNU 64-bit symbol table.</span>
+                <span class="ident">file</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ArchiveKind::Gnu64</span>;
+                <span class="ident">file</span>.<span class="ident">symbols</span> <span class="op">=</span> <span class="ident">member</span>.<span class="ident">file_range</span>();
+                <span class="ident">file</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">tail</span>;
+
+                <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&lt;</span> <span class="ident">len</span> {
+                    <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">ArchiveMember::parse</span>(<span class="ident">data</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tail</span>, <span class="kw-2">&amp;</span>[])<span class="question-mark">?</span>;
+                    <span class="kw">if</span> <span class="ident">member</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">b&quot;//&quot;</span> {
+                        <span class="comment">// GNU names table.</span>
+                        <span class="ident">file</span>.<span class="ident">names</span> <span class="op">=</span> <span class="ident">member</span>.<span class="ident">data</span>(<span class="ident">data</span>)<span class="question-mark">?</span>;
+                        <span class="ident">file</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">tail</span>;
+                    }
+                }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">member</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">b&quot;//&quot;</span> {
                 <span class="comment">// GNU names table.</span>
                 <span class="ident">file</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ArchiveKind::Gnu</span>;
@@ -536,7 +630,12 @@
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">member</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">b&quot;__.SYMDEF&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">member</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">b&quot;__.SYMDEF SORTED&quot;</span> {
                 <span class="comment">// BSD symbol table.</span>
                 <span class="ident">file</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ArchiveKind::Bsd</span>;
-                <span class="ident">file</span>.<span class="ident">symbols</span> <span class="op">=</span> <span class="ident">member</span>.<span class="ident">data</span>(<span class="ident">data</span>)<span class="question-mark">?</span>;
+                <span class="ident">file</span>.<span class="ident">symbols</span> <span class="op">=</span> <span class="ident">member</span>.<span class="ident">file_range</span>();
+                <span class="ident">file</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">tail</span>;
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">member</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">b&quot;__.SYMDEF_64&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">member</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">b&quot;__.SYMDEF_64 SORTED&quot;</span> {
+                <span class="comment">// BSD 64-bit symbol table.</span>
+                <span class="ident">file</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ArchiveKind::Bsd64</span>;
+                <span class="ident">file</span>.<span class="ident">symbols</span> <span class="op">=</span> <span class="ident">member</span>.<span class="ident">file_range</span>();
                 <span class="ident">file</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">tail</span>;
             } <span class="kw">else</span> {
                 <span class="comment">// TODO: This could still be a BSD file. We leave this as unknown for now.</span>
@@ -567,7 +666,7 @@
 
 <span class="doccomment">/// An iterator over the members of an archive.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArchiveMemberIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArchiveMemberIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
     <span class="ident">data</span>: <span class="ident">R</span>,
     <span class="ident">offset</span>: <span class="ident">u64</span>,
     <span class="ident">len</span>: <span class="ident">u64</span>,
@@ -634,13 +733,12 @@
             <span class="ident">parse_bsd_extended_name</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="ident">name</span>[<span class="number">3</span>..], <span class="ident">data</span>, <span class="kw-2">&amp;mut</span> <span class="ident">file_offset</span>, <span class="kw-2">&amp;mut</span> <span class="ident">file_size</span>)
                 .<span class="ident">read_error</span>(<span class="string">&quot;Invalid archive extended name length&quot;</span>)<span class="question-mark">?</span>
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">header</span>.<span class="ident">name</span>[<span class="number">0</span>] <span class="op">==</span> <span class="string">b&#39;/&#39;</span> {
-            <span class="kw">let</span> <span class="ident">name_len</span> <span class="op">=</span>
-                (<span class="ident">header</span>.<span class="ident">name</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">b&#39; &#39;</span>)).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">header</span>.<span class="ident">name</span>.<span class="ident">len</span>());
+            <span class="kw">let</span> <span class="ident">name_len</span> <span class="op">=</span> <span class="ident">memchr::memchr</span>(<span class="string">b&#39; &#39;</span>, <span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="ident">name</span>).<span class="ident">unwrap_or</span>(<span class="ident">header</span>.<span class="ident">name</span>.<span class="ident">len</span>());
             <span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="ident">name</span>[..<span class="ident">name_len</span>]
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">name_len</span> <span class="op">=</span> (<span class="ident">header</span>.<span class="ident">name</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">b&#39;/&#39;</span>))
-                .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">header</span>.<span class="ident">name</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">b&#39; &#39;</span>))
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">header</span>.<span class="ident">name</span>.<span class="ident">len</span>());
+            <span class="kw">let</span> <span class="ident">name_len</span> <span class="op">=</span> <span class="ident">memchr::memchr</span>(<span class="string">b&#39;/&#39;</span>, <span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="ident">name</span>)
+                .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">memchr::memchr</span>(<span class="string">b&#39; &#39;</span>, <span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="ident">name</span>))
+                .<span class="ident">unwrap_or</span>(<span class="ident">header</span>.<span class="ident">name</span>.<span class="ident">len</span>());
             <span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="ident">name</span>[..<span class="ident">name_len</span>]
         };
 
@@ -705,20 +803,19 @@
 
 <span class="comment">// Ignores bytes starting from the first space.</span>
 <span class="kw">fn</span> <span class="ident">parse_u64_digits</span>(<span class="ident">digits</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">digits</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">b&#39; &#39;</span>)
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">digits</span>.<span class="ident">len</span>());
-    <span class="kw">let</span> <span class="ident">digits</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">digits</span>[..<span class="ident">len</span>];
-    <span class="kw">if</span> <span class="ident">digits</span>.<span class="ident">is_empty</span>() {
+    <span class="kw">if</span> <span class="kw">let</span> [<span class="string">b&#39; &#39;</span>, ..] <span class="op">=</span> <span class="ident">digits</span> {
         <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">c</span> <span class="kw">in</span> <span class="ident">digits</span> {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> (<span class="ident">c</span> <span class="kw">as</span> <span class="ident">char</span>).<span class="ident">to_digit</span>(<span class="ident">radix</span>)<span class="question-mark">?</span>;
-        <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>
-            .<span class="ident">checked_mul</span>(<span class="ident">u64::from</span>(<span class="ident">radix</span>))<span class="question-mark">?</span>
-            .<span class="ident">checked_add</span>(<span class="ident">u64::from</span>(<span class="ident">x</span>))<span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">b&#39; &#39;</span> {
+            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">result</span>);
+        } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> (<span class="ident">c</span> <span class="kw">as</span> <span class="ident">char</span>).<span class="ident">to_digit</span>(<span class="ident">radix</span>)<span class="question-mark">?</span>;
+            <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>
+                .<span class="ident">checked_mul</span>(<span class="ident">u64::from</span>(<span class="ident">radix</span>))<span class="question-mark">?</span>
+                .<span class="ident">checked_add</span>(<span class="ident">u64::from</span>(<span class="ident">x</span>))<span class="question-mark">?</span>;
+        }
     }
     <span class="prelude-val">Some</span>(<span class="ident">result</span>)
 }
@@ -727,7 +824,7 @@
     <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">parse_u64_digits</span>(<span class="ident">digits</span>, <span class="number">10</span>).<span class="ident">ok_or</span>(())<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">offset</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">name_data</span> <span class="op">=</span> <span class="ident">names</span>.<span class="ident">get</span>(<span class="ident">offset</span>..).<span class="ident">ok_or</span>(())<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">name_data</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">b&#39;/&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>) {
+    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">memchr::memchr2</span>(<span class="string">b&#39;/&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="ident">name_data</span>) {
         <span class="prelude-val">Some</span>(<span class="ident">len</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">name_data</span>[..<span class="ident">len</span>],
         <span class="prelude-val">None</span> =&gt; <span class="ident">name_data</span>,
     };
@@ -744,7 +841,7 @@
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">parse_u64_digits</span>(<span class="ident">digits</span>, <span class="number">10</span>).<span class="ident">ok_or</span>(())<span class="question-mark">?</span>;
     <span class="kw-2">*</span><span class="ident">size</span> <span class="op">=</span> <span class="ident">size</span>.<span class="ident">checked_sub</span>(<span class="ident">len</span>).<span class="ident">ok_or</span>(())<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">name_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">read_bytes</span>(<span class="ident">offset</span>, <span class="ident">len</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">name_data</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>) {
+    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">memchr::memchr</span>(<span class="string">b&#39;\0&#39;</span>, <span class="ident">name_data</span>) {
         <span class="prelude-val">Some</span>(<span class="ident">len</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">name_data</span>[..<span class="ident">len</span>],
         <span class="prelude-val">None</span> =&gt; <span class="ident">name_data</span>,
     };
@@ -786,6 +883,22 @@
 
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;\
             !&lt;arch&gt;\n\
+            /SYM64/                                         4         `\n\
+            0000&quot;</span>;
+        <span class="kw">let</span> <span class="ident">archive</span> <span class="op">=</span> <span class="ident">ArchiveFile::parse</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[..]).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">archive</span>.<span class="ident">kind</span>(), <span class="ident">ArchiveKind::Gnu64</span>);
+
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;\
+            !&lt;arch&gt;\n\
+            /SYM64/                                         4         `\n\
+            0000\
+            //                                              4         `\n\
+            0000&quot;</span>;
+        <span class="kw">let</span> <span class="ident">archive</span> <span class="op">=</span> <span class="ident">ArchiveFile::parse</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[..]).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">archive</span>.<span class="ident">kind</span>(), <span class="ident">ArchiveKind::Gnu64</span>);
+
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;\
+            !&lt;arch&gt;\n\
             __.SYMDEF                                       4         `\n\
             0000&quot;</span>;
         <span class="kw">let</span> <span class="ident">archive</span> <span class="op">=</span> <span class="ident">ArchiveFile::parse</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[..]).<span class="ident">unwrap</span>();
@@ -807,6 +920,27 @@
 
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;\
             !&lt;arch&gt;\n\
+            __.SYMDEF_64                                    4         `\n\
+            0000&quot;</span>;
+        <span class="kw">let</span> <span class="ident">archive</span> <span class="op">=</span> <span class="ident">ArchiveFile::parse</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[..]).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">archive</span>.<span class="ident">kind</span>(), <span class="ident">ArchiveKind::Bsd64</span>);
+
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;\
+            !&lt;arch&gt;\n\
+            #1/12                                           16        `\n\
+            __.SYMDEF_640000&quot;</span>;
+        <span class="kw">let</span> <span class="ident">archive</span> <span class="op">=</span> <span class="ident">ArchiveFile::parse</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[..]).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">archive</span>.<span class="ident">kind</span>(), <span class="ident">ArchiveKind::Bsd64</span>);
+
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;\
+            !&lt;arch&gt;\n\
+            #1/19                                           23        `\n\
+            __.SYMDEF_64 SORTED0000&quot;</span>;
+        <span class="kw">let</span> <span class="ident">archive</span> <span class="op">=</span> <span class="ident">ArchiveFile::parse</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[..]).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">archive</span>.<span class="ident">kind</span>(), <span class="ident">ArchiveKind::Bsd64</span>);
+
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;\
+            !&lt;arch&gt;\n\
             /                                               4         `\n\
             0000\
             /                                               4         `\n\
@@ -823,6 +957,8 @@
             !&lt;arch&gt;\n\
             //                                              18        `\n\
             0123456789abcdef/\n\
+            s p a c e/      0           0     0     644     4         `\n\
+            0000\
             0123456789abcde/0           0     0     644     3         `\n\
             odd\n\
             /0              0           0     0     644     4         `\n\
@@ -831,6 +967,10 @@
         <span class="kw">let</span> <span class="ident">archive</span> <span class="op">=</span> <span class="ident">ArchiveFile::parse</span>(<span class="ident">data</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">archive</span>.<span class="ident">kind</span>(), <span class="ident">ArchiveKind::Gnu</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">members</span> <span class="op">=</span> <span class="ident">archive</span>.<span class="ident">members</span>();
+
+        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">members</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">member</span>.<span class="ident">name</span>(), <span class="string">b&quot;s p a c e&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">member</span>.<span class="ident">data</span>(<span class="ident">data</span>).<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="string">b&quot;0000&quot;</span>[..]);
 
         <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">members</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">member</span>.<span class="ident">name</span>(), <span class="string">b&quot;0123456789abcde&quot;</span>);

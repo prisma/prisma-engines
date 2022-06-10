@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.1.0/src/cmap/establish/handshake/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><script defer src="../../../../../main.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/cmap/establish/handshake/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><script defer src="../../../../../main.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -356,42 +356,6 @@
 <span id="351">351</span>
 <span id="352">352</span>
 <span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
-<span id="362">362</span>
-<span id="363">363</span>
-<span id="364">364</span>
-<span id="365">365</span>
-<span id="366">366</span>
-<span id="367">367</span>
-<span id="368">368</span>
-<span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span>;
 
@@ -407,12 +371,12 @@
     <span class="ident">compression::Compressor</span>,
     <span class="ident">error</span>::{<span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
     <span class="ident">event::sdam::SdamEventHandler</span>,
-    <span class="ident">is_master</span>::{<span class="ident">is_master_command</span>, <span class="ident">run_is_master</span>, <span class="ident">IsMasterReply</span>},
+    <span class="ident">hello</span>::{<span class="ident">hello_command</span>, <span class="ident">run_hello</span>, <span class="ident">HelloReply</span>},
     <span class="ident">options</span>::{<span class="ident">AuthMechanism</span>, <span class="ident">ClientOptions</span>, <span class="ident">Credential</span>, <span class="ident">DriverInfo</span>, <span class="ident">ServerApi</span>},
     <span class="ident">sdam::Topology</span>,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
 <span class="kw">const</span> <span class="ident">RUNTIME_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)))]</span>
@@ -421,12 +385,15 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)]</span>
 <span class="kw">const</span> <span class="ident">RUNTIME_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;sync (with async-std)&quot;</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)]</span>
+<span class="kw">const</span> <span class="ident">RUNTIME_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;sync (with tokio)&quot;</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">ClientMetadata</span> {
     <span class="ident">application</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AppMetadata</span><span class="op">&gt;</span>,
     <span class="ident">driver</span>: <span class="ident">DriverMetadata</span>,
     <span class="ident">os</span>: <span class="ident">OsMetadata</span>,
-    <span class="ident">platform</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">platform</span>: <span class="ident">String</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
@@ -465,10 +432,7 @@
         );
 
         <span class="ident">metadata_doc</span>.<span class="ident">insert</span>(<span class="string">&quot;os&quot;</span>, <span class="ident">metadata</span>.<span class="ident">os</span>);
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">platform</span>) <span class="op">=</span> <span class="ident">metadata</span>.<span class="ident">platform</span> {
-            <span class="ident">metadata_doc</span>.<span class="ident">insert</span>(<span class="string">&quot;platform&quot;</span>, <span class="ident">platform</span>);
-        }
+        <span class="ident">metadata_doc</span>.<span class="ident">insert</span>(<span class="string">&quot;platform&quot;</span>, <span class="ident">metadata</span>.<span class="ident">platform</span>);
 
         <span class="ident">Bson::Document</span>(<span class="ident">metadata_doc</span>)
     }
@@ -495,7 +459,7 @@
 <span class="macro">lazy_static!</span> {
     <span class="doccomment">/// Contains the basic handshake information that can be statically determined. This document</span>
     <span class="doccomment">/// (potentially with additional fields added) can be cloned and put in the `client` field of</span>
-    <span class="doccomment">/// the `isMaster` command.</span>
+    <span class="doccomment">/// the `hello` or legacy hello command.</span>
     <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BASE_CLIENT_METADATA</span>: <span class="ident">ClientMetadata</span> <span class="op">=</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">ClientMetadata</span> {
             <span class="ident">application</span>: <span class="prelude-val">None</span>,
@@ -509,7 +473,7 @@
                 <span class="ident">name</span>: <span class="prelude-val">None</span>,
                 <span class="ident">version</span>: <span class="prelude-val">None</span>,
             },
-            <span class="ident">platform</span>: <span class="prelude-val">None</span>,
+            <span class="ident">platform</span>: <span class="macro">format!</span>(<span class="string">&quot;{} with {}&quot;</span>, <span class="ident">rustc_version_runtime::version_meta</span>().<span class="ident">short_version_string</span>, <span class="ident">RUNTIME_NAME</span>),
         };
 
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">os_info::get</span>();
@@ -522,11 +486,6 @@
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">version</span>, <span class="ident">channel</span>, <span class="ident">date</span>)) <span class="op">=</span> <span class="ident">version_check::triple</span>() {
-            <span class="ident">metadata</span>.<span class="ident">platform</span> <span class="op">=</span>
-                <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;rustc {} {} ({}) with {}&quot;</span>, <span class="ident">version</span>, <span class="ident">channel</span>, <span class="ident">date</span>, <span class="ident">RUNTIME_NAME</span>));
-        }
-
         <span class="ident">metadata</span>
     };
 }
@@ -534,12 +493,12 @@
 <span class="doccomment">/// Contains the logic needed to handshake a connection.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Handshaker</span> {
-    <span class="doccomment">/// The `isMaster` command to send when handshaking. This will always be identical</span>
+    <span class="doccomment">/// The hello or legacy hello command to send when handshaking. This will always be identical</span>
     <span class="doccomment">/// given the same pool options, so it can be created at the time the Handshaker is created.</span>
     <span class="ident">command</span>: <span class="ident">Command</span>,
+
     <span class="ident">credential</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credential</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="ident">mock_service_id</span>: <span class="ident">bool</span>,
+
     <span class="comment">// This field is not read without a compression feature flag turned on.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="ident">compressors</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Compressor</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -553,11 +512,10 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">compressors</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command</span> <span class="op">=</span>
-            <span class="ident">is_master_command</span>(<span class="ident">options</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">server_api</span>.<span class="ident">as_ref</span>()));
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mock_service_id</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">hello_command</span>(
+            <span class="ident">options</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">server_api</span>.<span class="ident">as_ref</span>()),
+            <span class="prelude-val">None</span>,
+        );
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">options</span>) <span class="op">=</span> <span class="ident">options</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">app_name</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">app_name</span> {
@@ -573,11 +531,9 @@
                     <span class="ident">metadata</span>.<span class="ident">driver</span>.<span class="ident">version</span>.<span class="ident">push_str</span>(<span class="ident">version</span>);
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">platform</span>) <span class="op">=</span> <span class="ident">metadata</span>.<span class="ident">platform</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">driver_info_platform</span>) <span class="op">=</span> <span class="ident">driver_info</span>.<span class="ident">platform</span> {
-                        <span class="ident">platform</span>.<span class="ident">push</span>(<span class="string">&#39;|&#39;</span>);
-                        <span class="ident">platform</span>.<span class="ident">push_str</span>(<span class="ident">driver_info_platform</span>);
-                    }
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">driver_info_platform</span>) <span class="op">=</span> <span class="ident">driver_info</span>.<span class="ident">platform</span> {
+                    <span class="ident">metadata</span>.<span class="ident">platform</span>.<span class="ident">push</span>(<span class="string">&#39;|&#39;</span>);
+                    <span class="ident">metadata</span>.<span class="ident">platform</span>.<span class="ident">push_str</span>(<span class="ident">driver_info_platform</span>);
                 }
             }
 
@@ -590,10 +546,7 @@
             <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">load_balanced</span> {
                 <span class="ident">command</span>.<span class="ident">body</span>.<span class="ident">insert</span>(<span class="string">&quot;loadBalanced&quot;</span>, <span class="bool-val">true</span>);
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-            {
-                <span class="ident">mock_service_id</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">mock_service_id</span>;
-            }
+
             <span class="comment">// Add compressors to handshake.</span>
             <span class="comment">// See https://github.com/mongodb/specifications/blob/master/source/compression/OP_COMPRESSED.rst</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">compressors</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">compressors</span> {
@@ -613,8 +566,6 @@
         <span class="self">Self</span> {
             <span class="ident">command</span>,
             <span class="ident">credential</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-            <span class="ident">mock_service_id</span>,
             <span class="ident">compressors</span>,
         }
     }
@@ -630,27 +581,10 @@
 
         <span class="kw">let</span> <span class="ident">client_first</span> <span class="op">=</span> <span class="ident">set_speculative_auth_info</span>(<span class="kw-2">&amp;mut</span> <span class="ident">command</span>.<span class="ident">body</span>, <span class="self">self</span>.<span class="ident">credential</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_master_reply</span> <span class="op">=</span> <span class="ident">run_is_master</span>(<span class="ident">conn</span>, <span class="ident">command</span>, <span class="ident">topology</span>, <span class="ident">handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="comment">// TODO PM-2369 Remove serviceId mocking when it&#39;s returned by the server.</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">command</span>.<span class="ident">body</span>.<span class="ident">contains_key</span>(<span class="string">&quot;loadBalanced&quot;</span>)
-                <span class="op">&amp;&amp;</span> <span class="ident">is_master_reply</span>.<span class="ident">command_response</span>.<span class="ident">service_id</span>.<span class="ident">is_none</span>()
-                <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">mock_service_id</span>
-            {
-                <span class="ident">is_master_reply</span>.<span class="ident">command_response</span>.<span class="ident">service_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
-                    <span class="ident">is_master_reply</span>
-                        .<span class="ident">command_response</span>
-                        .<span class="ident">topology_version</span>
-                        .<span class="ident">as_ref</span>()
-                        .<span class="ident">unwrap</span>()
-                        .<span class="ident">get_object_id</span>(<span class="string">&quot;processId&quot;</span>)
-                        .<span class="ident">unwrap</span>(),
-                );
-            }
-        }
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hello_reply</span> <span class="op">=</span> <span class="ident">run_hello</span>(<span class="ident">conn</span>, <span class="ident">command</span>, <span class="ident">topology</span>, <span class="ident">handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">command</span>.<span class="ident">body</span>.<span class="ident">contains_key</span>(<span class="string">&quot;loadBalanced&quot;</span>)
-            <span class="op">&amp;&amp;</span> <span class="ident">is_master_reply</span>.<span class="ident">command_response</span>.<span class="ident">service_id</span>.<span class="ident">is_none</span>()
+            <span class="op">&amp;&amp;</span> <span class="ident">hello_reply</span>.<span class="ident">command_response</span>.<span class="ident">service_id</span>.<span class="ident">is_none</span>()
         {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::IncompatibleServer</span> {
                 <span class="ident">message</span>: <span class="string">&quot;Driver attempted to initialize in load balancing mode, but the server \
@@ -659,12 +593,12 @@
             }
             .<span class="ident">into</span>());
         }
-        <span class="ident">conn</span>.<span class="ident">stream_description</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">StreamDescription::from_is_master</span>(<span class="ident">is_master_reply</span>.<span class="ident">clone</span>()));
+        <span class="ident">conn</span>.<span class="ident">stream_description</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">StreamDescription::from_hello_reply</span>(<span class="kw-2">&amp;</span><span class="ident">hello_reply</span>));
 
         <span class="comment">// Record the client&#39;s message and the server&#39;s response from speculative authentication if</span>
         <span class="comment">// the server did send a response.</span>
         <span class="kw">let</span> <span class="ident">first_round</span> <span class="op">=</span> <span class="ident">client_first</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">client_first</span><span class="op">|</span> {
-            <span class="ident">is_master_reply</span>
+            <span class="ident">hello_reply</span>
                 .<span class="ident">command_response</span>
                 .<span class="ident">speculative_authenticate</span>
                 .<span class="ident">take</span>()
@@ -673,7 +607,7 @@
 
         <span class="comment">// Check that master reply has a compressor list and unpack it</span>
         <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">server_compressors</span>), <span class="prelude-val">Some</span>(<span class="ident">client_compressors</span>)) <span class="op">=</span> (
-            <span class="ident">is_master_reply</span>.<span class="ident">command_response</span>.<span class="ident">compressors</span>.<span class="ident">as_ref</span>(),
+            <span class="ident">hello_reply</span>.<span class="ident">command_response</span>.<span class="ident">compressors</span>.<span class="ident">as_ref</span>(),
             <span class="self">self</span>.<span class="ident">compressors</span>.<span class="ident">as_ref</span>(),
         ) {
             <span class="comment">// Use the Client&#39;s first compressor choice that the server supports (comparing only on</span>
@@ -693,7 +627,7 @@
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">HandshakeResult</span> {
-            <span class="ident">is_master_reply</span>,
+            <span class="ident">hello_reply</span>,
             <span class="ident">first_round</span>,
         })
     }
@@ -706,7 +640,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">HandshakeResult</span> {
     <span class="doccomment">/// The response from the server.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">is_master_reply</span>: <span class="ident">IsMasterReply</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">hello_reply</span>: <span class="ident">HelloReply</span>,
 
     <span class="doccomment">/// The first round of speculative authentication, if applicable.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">first_round</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FirstRound</span><span class="op">&gt;</span>,
@@ -720,8 +654,6 @@
     <span class="ident">driver_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DriverInfo</span><span class="op">&gt;</span>,
     <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
     <span class="ident">load_balanced</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="ident">mock_service_id</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ConnectionPoolOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HandshakerOptions</span> {
@@ -733,8 +665,6 @@
             <span class="ident">driver_info</span>: <span class="ident">options</span>.<span class="ident">driver_info</span>,
             <span class="ident">server_api</span>: <span class="ident">options</span>.<span class="ident">server_api</span>,
             <span class="ident">load_balanced</span>: <span class="ident">options</span>.<span class="ident">load_balanced</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-            <span class="ident">mock_service_id</span>: <span class="ident">options</span>.<span class="ident">mock_service_id</span>,
         }
     }
 }
@@ -748,8 +678,6 @@
             <span class="ident">driver_info</span>: <span class="ident">options</span>.<span class="ident">driver_info</span>,
             <span class="ident">server_api</span>: <span class="ident">options</span>.<span class="ident">server_api</span>,
             <span class="ident">load_balanced</span>: <span class="ident">options</span>.<span class="ident">load_balanced</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-            <span class="ident">mock_service_id</span>: <span class="ident">options</span>.<span class="ident">test_options</span>.<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">to</span><span class="op">|</span> <span class="ident">to</span>.<span class="ident">mock_service_id</span>),
         }
     }
 }

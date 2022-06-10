@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.36/src/ec.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.40/src/ec.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1074,134 +1074,19 @@
 <span id="1069">1069</span>
 <span id="1070">1070</span>
 <span id="1071">1071</span>
-<span id="1072">1072</span>
-<span id="1073">1073</span>
-<span id="1074">1074</span>
-<span id="1075">1075</span>
-<span id="1076">1076</span>
-<span id="1077">1077</span>
-<span id="1078">1078</span>
-<span id="1079">1079</span>
-<span id="1080">1080</span>
-<span id="1081">1081</span>
-<span id="1082">1082</span>
-<span id="1083">1083</span>
-<span id="1084">1084</span>
-<span id="1085">1085</span>
-<span id="1086">1086</span>
-<span id="1087">1087</span>
-<span id="1088">1088</span>
-<span id="1089">1089</span>
-<span id="1090">1090</span>
-<span id="1091">1091</span>
-<span id="1092">1092</span>
-<span id="1093">1093</span>
-<span id="1094">1094</span>
-<span id="1095">1095</span>
-<span id="1096">1096</span>
-<span id="1097">1097</span>
-<span id="1098">1098</span>
-<span id="1099">1099</span>
-<span id="1100">1100</span>
-<span id="1101">1101</span>
-<span id="1102">1102</span>
-<span id="1103">1103</span>
-<span id="1104">1104</span>
-<span id="1105">1105</span>
-<span id="1106">1106</span>
-<span id="1107">1107</span>
-<span id="1108">1108</span>
-<span id="1109">1109</span>
-<span id="1110">1110</span>
-<span id="1111">1111</span>
-<span id="1112">1112</span>
-<span id="1113">1113</span>
-<span id="1114">1114</span>
-<span id="1115">1115</span>
-<span id="1116">1116</span>
-<span id="1117">1117</span>
-<span id="1118">1118</span>
-<span id="1119">1119</span>
-<span id="1120">1120</span>
-<span id="1121">1121</span>
-<span id="1122">1122</span>
-<span id="1123">1123</span>
-<span id="1124">1124</span>
-<span id="1125">1125</span>
-<span id="1126">1126</span>
-<span id="1127">1127</span>
-<span id="1128">1128</span>
-<span id="1129">1129</span>
-<span id="1130">1130</span>
-<span id="1131">1131</span>
-<span id="1132">1132</span>
-<span id="1133">1133</span>
-<span id="1134">1134</span>
-<span id="1135">1135</span>
-<span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-<span id="1139">1139</span>
-<span id="1140">1140</span>
-<span id="1141">1141</span>
-<span id="1142">1142</span>
-<span id="1143">1143</span>
-<span id="1144">1144</span>
-<span id="1145">1145</span>
-<span id="1146">1146</span>
-<span id="1147">1147</span>
-<span id="1148">1148</span>
-<span id="1149">1149</span>
-<span id="1150">1150</span>
-<span id="1151">1151</span>
-<span id="1152">1152</span>
-<span id="1153">1153</span>
-<span id="1154">1154</span>
-<span id="1155">1155</span>
-<span id="1156">1156</span>
-<span id="1157">1157</span>
-<span id="1158">1158</span>
-<span id="1159">1159</span>
-<span id="1160">1160</span>
-<span id="1161">1161</span>
-<span id="1162">1162</span>
-<span id="1163">1163</span>
-<span id="1164">1164</span>
-<span id="1165">1165</span>
-<span id="1166">1166</span>
-<span id="1167">1167</span>
-<span id="1168">1168</span>
-<span id="1169">1169</span>
-<span id="1170">1170</span>
-<span id="1171">1171</span>
-<span id="1172">1172</span>
-<span id="1173">1173</span>
-<span id="1174">1174</span>
-<span id="1175">1175</span>
-<span id="1176">1176</span>
-<span id="1177">1177</span>
-<span id="1178">1178</span>
-<span id="1179">1179</span>
-<span id="1180">1180</span>
-<span id="1181">1181</span>
-<span id="1182">1182</span>
-<span id="1183">1183</span>
-<span id="1184">1184</span>
-<span id="1185">1185</span>
-<span id="1186">1186</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Elliptic Curve</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Cryptology relies on the difficulty of solving mathematical problems, such as the factor</span>
+<span class="doccomment">//! Cryptography relies on the difficulty of solving mathematical problems, such as the factor</span>
 <span class="doccomment">//! of large integers composed of two large prime numbers and the discrete logarithm of a</span>
-<span class="doccomment">//! random eliptic curve.  This module provides low-level features of the latter.</span>
+<span class="doccomment">//! random elliptic curve.  This module provides low-level features of the latter.</span>
 <span class="doccomment">//! Elliptic Curve protocols can provide the same security with smaller keys.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! There are 2 forms of elliptic curves, `Fp` and `F2^m`.  These curves use irreducible</span>
-<span class="doccomment">//! trinomial or pentanomial .  Being a generic interface to a wide range of algorithms,</span>
-<span class="doccomment">//! the cuves are generally referenced by [`EcGroup`].  There are many built in groups</span>
+<span class="doccomment">//! trinomial or pentanomial.  Being a generic interface to a wide range of algorithms,</span>
+<span class="doccomment">//! the curves are generally referenced by [`EcGroup`].  There are many built-in groups</span>
 <span class="doccomment">//! found in [`Nid`].</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! OpenSSL Wiki explains the fields and curves in detail at [Eliptic Curve Cryptography].</span>
+<span class="doccomment">//! OpenSSL Wiki explains the fields and curves in detail at [Elliptic Curve Cryptography].</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [`EcGroup`]: struct.EcGroup.html</span>
 <span class="doccomment">//! [`Nid`]: ../nid/struct.Nid.html</span>
@@ -1217,6 +1102,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pkey</span>::{<span class="ident">HasParams</span>, <span class="ident">HasPrivate</span>, <span class="ident">HasPublic</span>, <span class="ident">Params</span>, <span class="ident">Private</span>, <span class="ident">Public</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::ForeignTypeRefExt</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cvt</span>, <span class="ident">cvt_n</span>, <span class="ident">cvt_p</span>, <span class="ident">init</span>};
+<span class="kw">use</span> <span class="ident">openssl_macros::corresponds</span>;
 
 <span class="doccomment">/// Compressed or Uncompressed conversion</span>
 <span class="doccomment">///</span>
@@ -1306,10 +1192,7 @@
 
 <span class="kw">impl</span> <span class="ident">EcGroup</span> {
     <span class="doccomment">/// Returns the group of a standard named curve.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_GROUP_new`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_GROUP_new`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_GROUP_new.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_GROUP_new_by_curve_name</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_curve_name</span>(<span class="ident">nid</span>: <span class="ident">Nid</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EcGroup</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">init</span>();
@@ -1321,10 +1204,7 @@
 <span class="kw">impl</span> <span class="ident">EcGroupRef</span> {
     <span class="doccomment">/// Places the components of a curve over a prime field in the provided `BigNum`s.</span>
     <span class="doccomment">/// The components make up the formula `y^2 mod p = x^3 + ax + b mod p`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation available at [`EC_GROUP_get_curve_GFp`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_GROUP_get_curve_GFp`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_GROUP_get_curve_GFp.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_GROUP_get_curve_GFp</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components_gfp</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BigNumRef</span>,
@@ -1350,10 +1230,7 @@
     <span class="doccomment">/// In this form `p` relates to the irreducible polynomial.  Each bit represents</span>
     <span class="doccomment">/// a term in the polynomial.  It will be set to 3 `1`s or 5 `1`s depending on</span>
     <span class="doccomment">/// using a trinomial or pentanomial.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_GROUP_get_curve_GF2m`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_GROUP_get_curve_GF2m`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_GROUP_get_curve_GF2m.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_GROUP_get_curve_GF2m</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">osslconf</span> <span class="op">=</span> <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components_gf2m</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1375,10 +1252,7 @@
     }
 
     <span class="doccomment">/// Places the cofactor of the group in the provided `BigNum`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_GROUP_get_cofactor`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_GROUP_get_cofactor`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_GROUP_get_cofactor.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_GROUP_get_cofactor</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cofactor</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cofactor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BigNumRef</span>,
@@ -1395,29 +1269,20 @@
     }
 
     <span class="doccomment">/// Returns the degree of the curve.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_GROUP_get_degree`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_GROUP_get_degree`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_GROUP_get_degree.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_GROUP_get_degree</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">degree</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">unsafe</span> { <span class="ident">ffi::EC_GROUP_get_degree</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="ident">u32</span> }
     }
 
     <span class="doccomment">/// Returns the number of bits in the group order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_GROUP_order_bits`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_GROUP_order_bits`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_GROUP_order_bits.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_GROUP_order_bits</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl110</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">order_bits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">unsafe</span> { <span class="ident">ffi::EC_GROUP_order_bits</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="ident">u32</span> }
     }
 
-    <span class="doccomment">/// Returns the generator for the given curve as a [`EcPoint`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_GROUP_get0_generator`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_GROUP_get0_generator`]: https://www.openssl.org/docs/man1.1.0/man3/EC_GROUP_get0_generator.html</span>
+    <span class="doccomment">/// Returns the generator for the given curve as an [`EcPoint`].</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_GROUP_get0_generator</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">EcPointRef</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">ffi::EC_GROUP_get0_generator</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>());
@@ -1426,10 +1291,7 @@
     }
 
     <span class="doccomment">/// Places the order of the curve in the provided `BigNum`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_GROUP_get_order`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_GROUP_get_order`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_GROUP_get_order.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_GROUP_get_order</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">order</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">order</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BigNumRef</span>,
@@ -1450,6 +1312,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This defaults to `EXPLICIT_CURVE` in OpenSSL 1.0.1 and 1.0.2, but `NAMED_CURVE` in OpenSSL</span>
     <span class="doccomment">/// 1.1.0.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_GROUP_set_asn1_flag</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_asn1_flag</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">Asn1Flag</span>) {
         <span class="kw">unsafe</span> {
             <span class="ident">ffi::EC_GROUP_set_asn1_flag</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">flag</span>.<span class="number">0</span>);
@@ -1457,10 +1320,7 @@
     }
 
     <span class="doccomment">/// Returns the name of the curve, if a name is associated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_GROUP_get_curve_name`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_GROUP_get_curve_name`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_GROUP_get_curve_name.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_GROUP_get_curve_name</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">curve_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Nid</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">nid</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::EC_GROUP_get_curve_name</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) };
         <span class="kw">if</span> <span class="ident">nid</span> <span class="op">&gt;</span> <span class="number">0</span> {
@@ -1476,23 +1336,14 @@
     <span class="kw">fn</span> <span class="ident">drop</span> <span class="op">=</span> <span class="ident">ffi::EC_POINT_free</span>;
 
     <span class="doccomment">/// Represents a point on the curve</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_new`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_new`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_POINT_new.html</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EcPoint</span>;
-    <span class="doccomment">/// Reference to [`EcPoint`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EcPoint`]: struct.EcPoint.html</span>
+    <span class="doccomment">/// A reference a borrowed [`EcPoint`].</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EcPointRef</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">EcPointRef</span> {
     <span class="doccomment">/// Computes `a + b`, storing the result in `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_add`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_add`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_POINT_add.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_add</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>,
@@ -1513,10 +1364,7 @@
     }
 
     <span class="doccomment">/// Computes `q * m`, storing the result in `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_mul`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_mul`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_POINT_mul.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_mul</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>,
@@ -1539,6 +1387,7 @@
     }
 
     <span class="doccomment">/// Computes `generator * n`, storing the result in `self`.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_mul</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul_generator</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>,
@@ -1560,6 +1409,7 @@
     }
 
     <span class="doccomment">/// Computes `generator * n + q * m`, storing the result in `self`.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_mul</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul_full</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>,
@@ -1582,10 +1432,8 @@
     }
 
     <span class="doccomment">/// Inverts `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_invert`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_invert`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_POINT_invert.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_invert</span>)]</span>
+    <span class="comment">// FIXME should be mutable</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">BigNumContextRef</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">cvt</span>(<span class="ident">ffi::EC_POINT_invert</span>(
@@ -1598,10 +1446,7 @@
     }
 
     <span class="doccomment">/// Serializes the point to a binary representation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_point2oct`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_point2oct`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_POINT_point2oct.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_point2oct</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>,
@@ -1638,19 +1483,13 @@
     }
 
     <span class="doccomment">/// Creates a new point on the specified curve with the same value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_dup`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_dup`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_POINT_dup.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_dup</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_owned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EcPoint</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="ident">cvt_p</span>(<span class="ident">ffi::EC_POINT_dup</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">group</span>.<span class="ident">as_ptr</span>())).<span class="ident">map</span>(<span class="ident">EcPoint</span>) }
     }
 
     <span class="doccomment">/// Determines if this point is equal to another.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL doucmentation at [`EC_POINT_cmp`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_cmp`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_POINT_cmp.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_cmp</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eq</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>,
@@ -1668,12 +1507,9 @@
         }
     }
 
-    <span class="doccomment">/// Place affine coordinates of a curve over a prime field in the provided</span>
-    <span class="doccomment">/// `x` and `y` `BigNum`s</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_get_affine_coordinates`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_get_affine_coordinates`]: https://www.openssl.org/docs/man1.1.1/man3/EC_POINT_get_affine_coordinates.html</span>
+    <span class="doccomment">/// Places affine coordinates of a curve over a prime field in the provided</span>
+    <span class="doccomment">/// `x` and `y` `BigNum`s.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_get_affine_coordinates</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">affine_coordinates</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1694,12 +1530,9 @@
         }
     }
 
-    <span class="doccomment">/// Place affine coordinates of a curve over a prime field in the provided</span>
+    <span class="doccomment">/// Places affine coordinates of a curve over a prime field in the provided</span>
     <span class="doccomment">/// `x` and `y` `BigNum`s</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_get_affine_coordinates_GFp`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_get_affine_coordinates_GFp`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_POINT_get_affine_coordinates_GFp.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_get_affine_coordinates_GFp</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">affine_coordinates_gfp</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>,
@@ -1719,12 +1552,9 @@
         }
     }
 
-    <span class="doccomment">/// Place affine coordinates of a curve over a binary field in the provided</span>
+    <span class="doccomment">/// Places affine coordinates of a curve over a binary field in the provided</span>
     <span class="doccomment">/// `x` and `y` `BigNum`s</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_get_affine_coordinates_GF2m`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_get_affine_coordinates_GF2m`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_POINT_get_affine_coordinates_GF2m.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_get_affine_coordinates_GF2m</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">osslconf</span> <span class="op">=</span> <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">affine_coordinates_gf2m</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1746,10 +1576,7 @@
     }
 
     <span class="doccomment">/// Checks if point is infinity</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_is_at_infinity`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_is_at_infinity`]: https://www.openssl.org/docs/man1.1.0/man3/EC_POINT_is_at_infinity.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_is_at_infinity</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_infinity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ffi::EC_POINT_is_at_infinity</span>(<span class="ident">group</span>.<span class="ident">as_ptr</span>(), <span class="self">self</span>.<span class="ident">as_ptr</span>());
@@ -1758,10 +1585,7 @@
     }
 
     <span class="doccomment">/// Checks if point is on a given curve</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_is_on_curve`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_is_on_curve`]: https://www.openssl.org/docs/man1.1.0/man3/EC_POINT_is_on_curve.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_is_on_curve</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_on_curve</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>,
@@ -1780,19 +1604,13 @@
 
 <span class="kw">impl</span> <span class="ident">EcPoint</span> {
     <span class="doccomment">/// Creates a new point on the specified curve.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_new`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_new`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_POINT_new.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_new</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EcPoint</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="ident">cvt_p</span>(<span class="ident">ffi::EC_POINT_new</span>(<span class="ident">group</span>.<span class="ident">as_ptr</span>())).<span class="ident">map</span>(<span class="ident">EcPoint</span>) }
     }
 
     <span class="doccomment">/// Creates point from a binary representation</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_POINT_oct2point`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_POINT_oct2point`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_POINT_oct2point.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_POINT_oct2point</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>,
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
@@ -1816,16 +1634,9 @@
     <span class="kw">type</span> <span class="ident">CType</span> <span class="op">=</span> <span class="ident">ffi::EC_KEY</span>;
     <span class="kw">fn</span> <span class="ident">drop</span> <span class="op">=</span> <span class="ident">ffi::EC_KEY_free</span>;
 
-    <span class="doccomment">/// Public and optional Private key on the given curve</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_KEY_new`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_KEY_new`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_KEY_new.html</span>
+    <span class="doccomment">/// Public and optional private key on the given curve.</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EcKey</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Reference to [`EcKey`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EcKey`]: struct.EcKey.html</span>
+    <span class="doccomment">/// A reference to an [`EcKey`].</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EcKeyRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 }
 
@@ -1837,37 +1648,25 @@
         <span class="doccomment">/// Serializes the private key to a PEM-encoded ECPrivateKey structure.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The output will have a header of `-----BEGIN EC PRIVATE KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_write_bio_ECPrivateKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_write_bio_ECPrivateKey`]: https://www.openssl.org/docs/man1.1.0/crypto/PEM_write_bio_ECPrivateKey.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_write_bio_ECPrivateKey</span>)]</span>
         <span class="ident">private_key_to_pem</span>,
         <span class="doccomment">/// Serializes the private key to a PEM-encoded encrypted ECPrivateKey structure.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The output will have a header of `-----BEGIN EC PRIVATE KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_write_bio_ECPrivateKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_write_bio_ECPrivateKey`]: https://www.openssl.org/docs/man1.1.0/crypto/PEM_write_bio_ECPrivateKey.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_write_bio_ECPrivateKey</span>)]</span>
         <span class="ident">private_key_to_pem_passphrase</span>,
         <span class="ident">ffi::PEM_write_bio_ECPrivateKey</span>
     }
 
     <span class="macro">to_der!</span> {
         <span class="doccomment">/// Serializes the private key into a DER-encoded ECPrivateKey structure.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`i2d_ECPrivateKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`i2d_ECPrivateKey`]: https://www.openssl.org/docs/man1.0.2/crypto/d2i_ECPrivate_key.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">i2d_ECPrivateKey</span>)]</span>
         <span class="ident">private_key_to_der</span>,
         <span class="ident">ffi::i2d_ECPrivateKey</span>
     }
 
-    <span class="doccomment">/// Return [`EcPoint`] associated with the private key</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_KEY_get0_private_key`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_KEY_get0_private_key`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_KEY_get0_private_key.html</span>
+    <span class="doccomment">/// Returns the private key value.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_KEY_get0_private_key</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">ffi::EC_KEY_get0_private_key</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>());
@@ -1881,10 +1680,7 @@
     <span class="ident">T</span>: <span class="ident">HasPublic</span>,
 {
     <span class="doccomment">/// Returns the public key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_KEY_get0_public_key`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_KEY_get0_public_key`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_KEY_get0_public_key.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_KEY_get0_public_key</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">EcPointRef</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">ffi::EC_KEY_get0_public_key</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>());
@@ -1893,23 +1689,17 @@
     }
 
     <span class="macro">to_pem!</span> {
-        <span class="doccomment">/// Serialies the public key into a PEM-encoded SubjectPublicKeyInfo structure.</span>
+        <span class="doccomment">/// Serializes the public key into a PEM-encoded SubjectPublicKeyInfo structure.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The output will have a header of `-----BEGIN PUBLIC KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_write_bio_EC_PUBKEY`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_write_bio_EC_PUBKEY`]: https://www.openssl.org/docs/man1.1.0/crypto/PEM_write_bio_EC_PUBKEY.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_write_bio_EC_PUBKEY</span>)]</span>
         <span class="ident">public_key_to_pem</span>,
         <span class="ident">ffi::PEM_write_bio_EC_PUBKEY</span>
     }
 
     <span class="macro">to_der!</span> {
         <span class="doccomment">/// Serializes the public key into a DER-encoded SubjectPublicKeyInfo structure.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`i2d_EC_PUBKEY`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`i2d_EC_PUBKEY`]: https://www.openssl.org/docs/man1.1.0/crypto/i2d_EC_PUBKEY.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">i2d_EC_PUBKEY</span>)]</span>
         <span class="ident">public_key_to_der</span>,
         <span class="ident">ffi::i2d_EC_PUBKEY</span>
     }
@@ -1919,11 +1709,8 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">HasParams</span>,
 {
-    <span class="doccomment">/// Return [`EcGroup`] of the `EcKey`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_KEY_get0_group`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_KEY_get0_group`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_KEY_get0_group.html</span>
+    <span class="doccomment">/// Returns the key&#39;s group.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_KEY_get0_group</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">ffi::EC_KEY_get0_group</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>());
@@ -1932,10 +1719,7 @@
     }
 
     <span class="doccomment">/// Checks the key for validity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_KEY_check_key`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_KEY_check_key`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_KEY_check_key.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_KEY_check_key</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="ident">cvt</span>(<span class="ident">ffi::EC_KEY_check_key</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>())).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()) }
     }
@@ -1958,10 +1742,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// It will not have an associated public or private key. This kind of key is primarily useful</span>
     <span class="doccomment">/// to be provided to the `set_tmp_ecdh` methods on `Ssl` and `SslContextBuilder`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`EC_KEY_new_by_curve_name`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_KEY_new_by_curve_name`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_KEY_new_by_curve_name.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_KEY_new_by_curve_name</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_curve_name</span>(<span class="ident">nid</span>: <span class="ident">Nid</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EcKey</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">init</span>();
@@ -1970,10 +1751,7 @@
     }
 
     <span class="doccomment">/// Constructs an `EcKey` corresponding to a curve.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`EC_KEY_set_group`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EC_KEY_set_group`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_KEY_new.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_KEY_set_group</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_group</span>(<span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EcKey</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">cvt_p</span>(<span class="ident">ffi::EC_KEY_new</span>())
@@ -2007,6 +1785,7 @@
     <span class="doccomment">/// let point = EcPoint::from_bytes(&amp;group, &amp;public_key, &amp;mut ctx).unwrap();</span>
     <span class="doccomment">/// let key = EcKey::from_public_key(&amp;group, &amp;point);</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_KEY_set_public_key</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_public_key</span>(
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>,
         <span class="ident">public_key</span>: <span class="kw-2">&amp;</span><span class="ident">EcPointRef</span>,
@@ -2028,6 +1807,7 @@
     }
 
     <span class="doccomment">/// Constructs a public key from its affine coordinates.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_KEY_set_public_key_affine_coordinates</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_public_key_affine_coordinates</span>(
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>,
         <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span>,
@@ -2054,10 +1834,7 @@
         <span class="doccomment">/// Decodes a PEM-encoded SubjectPublicKeyInfo structure containing a EC key.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The input should have a header of `-----BEGIN PUBLIC KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_read_bio_EC_PUBKEY`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_read_bio_EC_PUBKEY`]: https://www.openssl.org/docs/man1.1.0/crypto/PEM_read_bio_EC_PUBKEY.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_read_bio_EC_PUBKEY</span>)]</span>
         <span class="ident">public_key_from_pem</span>,
         <span class="ident">EcKey</span><span class="op">&lt;</span><span class="ident">Public</span><span class="op">&gt;</span>,
         <span class="ident">ffi::PEM_read_bio_EC_PUBKEY</span>
@@ -2065,10 +1842,7 @@
 
     <span class="macro">from_der!</span> {
         <span class="doccomment">/// Decodes a DER-encoded SubjectPublicKeyInfo structure containing a EC key.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`d2i_EC_PUBKEY`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`d2i_EC_PUBKEY`]: https://www.openssl.org/docs/man1.1.0/crypto/d2i_EC_PUBKEY.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">d2i_EC_PUBKEY</span>)]</span>
         <span class="ident">public_key_from_der</span>,
         <span class="ident">EcKey</span><span class="op">&lt;</span><span class="ident">Public</span><span class="op">&gt;</span>,
         <span class="ident">ffi::d2i_EC_PUBKEY</span>
@@ -2077,6 +1851,7 @@
 
 <span class="kw">impl</span> <span class="ident">EcKey</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Generates a new public/private key pair on the specified curve.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_KEY_generate_key</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate</span>(<span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EcKey</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">cvt_p</span>(<span class="ident">ffi::EC_KEY_new</span>())
@@ -2089,6 +1864,7 @@
     }
 
     <span class="doccomment">/// Constructs an public/private key pair given a curve, a private key and a public key point.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">EC_KEY_set_private_key</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_private_components</span>(
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">EcGroupRef</span>,
         <span class="ident">private_number</span>: <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span>,
@@ -2121,15 +1897,13 @@
         <span class="doccomment">/// Deserializes a private key from a PEM-encoded ECPrivateKey structure.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The input should have a header of `-----BEGIN EC PRIVATE KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to `PEM_read_bio_ECPrivateKey`.</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_read_bio_ECPrivateKey</span>)]</span>
         <span class="ident">private_key_from_pem</span>,
 
         <span class="doccomment">/// Deserializes a private key from a PEM-encoded encrypted ECPrivateKey structure.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The input should have a header of `-----BEGIN EC PRIVATE KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to `PEM_read_bio_ECPrivateKey`.</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_read_bio_ECPrivateKey</span>)]</span>
         <span class="ident">private_key_from_pem_passphrase</span>,
 
         <span class="doccomment">/// Deserializes a private key from a PEM-encoded encrypted ECPrivateKey structure.</span>
@@ -2137,8 +1911,7 @@
         <span class="doccomment">/// The callback should fill the password into the provided buffer and return its length.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The input should have a header of `-----BEGIN EC PRIVATE KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to `PEM_read_bio_ECPrivateKey`.</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_read_bio_ECPrivateKey</span>)]</span>
         <span class="ident">private_key_from_pem_callback</span>,
         <span class="ident">EcKey</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span>,
         <span class="ident">ffi::PEM_read_bio_ECPrivateKey</span>
@@ -2146,10 +1919,7 @@
 
     <span class="macro">from_der!</span> {
         <span class="doccomment">/// Decodes a DER-encoded elliptic curve private key structure.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`d2i_ECPrivateKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`d2i_ECPrivateKey`]: https://www.openssl.org/docs/man1.0.2/crypto/d2i_ECPrivate_key.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">d2i_ECPrivateKey</span>)]</span>
         <span class="ident">private_key_from_der</span>,
         <span class="ident">EcKey</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span>,
         <span class="ident">ffi::d2i_ECPrivateKey</span>

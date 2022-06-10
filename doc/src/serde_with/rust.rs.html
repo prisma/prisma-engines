@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.10.0/src/rust.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rust.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/rust.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rust.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1938,21 +1938,37 @@
 <span id="1933">1933</span>
 <span id="1934">1934</span>
 <span id="1935">1935</span>
+<span id="1936">1936</span>
+<span id="1937">1937</span>
+<span id="1938">1938</span>
+<span id="1939">1939</span>
+<span id="1940">1940</span>
+<span id="1941">1941</span>
+<span id="1942">1942</span>
+<span id="1943">1943</span>
 </pre><pre class="rust"><code><span class="doccomment">//! De/Serialization for Rust&#39;s builtin and std types</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">utils</span>, <span class="ident">Separator</span>};
-<span class="kw">use</span> <span class="ident">serde::de</span>::{
-    <span class="ident">Deserialize</span>, <span class="ident">DeserializeOwned</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span>, <span class="ident">MapAccess</span>, <span class="ident">SeqAccess</span>, <span class="ident">Visitor</span>,
-};
-<span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
-<span class="kw">use</span> <span class="ident">std::cmp::Eq</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">doc</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>};
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>};
-<span class="kw">use</span> <span class="ident">std::hash::Hash</span>;
-<span class="kw">use</span> <span class="ident">std::iter::FromIterator</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+<span class="kw">use</span> <span class="ident">alloc::collections::BTreeMap</span>;
+<span class="kw">use</span> <span class="ident">alloc</span>::{
+    <span class="ident">string</span>::{<span class="ident">String</span>, <span class="ident">ToString</span>},
+    <span class="ident">vec::Vec</span>,
+};
+<span class="kw">use</span> <span class="ident">core</span>::{
+    <span class="ident">cmp::Eq</span>,
+    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>},
+    <span class="ident">hash::Hash</span>,
+    <span class="ident">iter::FromIterator</span>,
+    <span class="ident">marker::PhantomData</span>,
+    <span class="ident">str::FromStr</span>,
+};
+<span class="kw">use</span> <span class="ident">serde</span>::{
+    <span class="ident">de</span>::{<span class="ident">Deserialize</span>, <span class="ident">DeserializeOwned</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span>, <span class="ident">MapAccess</span>, <span class="ident">SeqAccess</span>, <span class="ident">Visitor</span>},
+    <span class="ident">ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>},
+};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">doc</span>)]</span>
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="doccomment">/// De/Serialize using [`Display`] and [`FromStr`] implementation</span>
 <span class="doccomment">///</span>
@@ -1969,7 +1985,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DisplayFromStr};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[serde_as]</span>
@@ -1984,7 +2000,7 @@
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[derive(Deserialize, Serialize)]</span>
 <span class="doccomment">/// struct A {</span>
@@ -2087,7 +2103,7 @@
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// use std::collections::BTreeSet;</span>
 <span class="doccomment">/// use std::net::Ipv4Addr;</span>
@@ -2209,7 +2225,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, SpaceSeparator, StringWithSeparator};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[serde_as]</span>
@@ -2224,7 +2240,7 @@
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// use serde_with::{CommaSeparator, SpaceSeparator};</span>
 <span class="doccomment">/// use std::collections::BTreeSet;</span>
@@ -2316,7 +2332,7 @@
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # #[derive(Debug, PartialEq, Eq)]</span>
 <span class="doccomment">/// #[derive(Deserialize, Serialize)]</span>
@@ -2387,7 +2403,7 @@
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # #[derive(Debug, Eq, PartialEq)]</span>
 <span class="doccomment">/// #[derive(Deserialize, Serialize)]</span>
@@ -2403,7 +2419,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Transparently add/remove Some() wrapper</span>
 <span class="doccomment">/// # let pretty_config = ron::ser::PrettyConfig::new()</span>
-<span class="doccomment">/// #     .with_new_line(&quot;\n&quot;.into());</span>
+<span class="doccomment">/// #     .new_line(&quot;\n&quot;.into());</span>
 <span class="doccomment">/// let s = r#&quot;(</span>
 <span class="doccomment">///     mandatory: 1,</span>
 <span class="doccomment">///     optional: 2,</span>
@@ -2418,7 +2434,7 @@
 <span class="doccomment">/// // Missing values are deserialized as `None`</span>
 <span class="doccomment">/// // while `None` values are skipped during serialization.</span>
 <span class="doccomment">/// # let pretty_config = ron::ser::PrettyConfig::new()</span>
-<span class="doccomment">/// #     .with_new_line(&quot;\n&quot;.into());</span>
+<span class="doccomment">/// #     .new_line(&quot;\n&quot;.into());</span>
 <span class="doccomment">/// let s = r#&quot;(</span>
 <span class="doccomment">///     mandatory: 1,</span>
 <span class="doccomment">/// )&quot;#;</span>
@@ -2472,7 +2488,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # use std::{collections::HashSet, iter::FromIterator};</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # #[derive(Debug, Eq, PartialEq)]</span>
 <span class="doccomment">/// #[derive(Deserialize)]</span>
@@ -2570,7 +2586,7 @@
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// # use std::collections::HashMap;</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # #[derive(Debug, Eq, PartialEq)]</span>
@@ -2807,7 +2823,7 @@
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// # use std::collections::HashMap;</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # #[derive(Debug, Eq, PartialEq)]</span>
@@ -2910,7 +2926,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, NoneAsEmptyString};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[serde_as]</span>
@@ -2925,7 +2941,7 @@
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::rust::string_empty_as_none;</span>
 <span class="doccomment">/// #</span>
@@ -3039,7 +3055,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_with::serde_as;</span>
 <span class="doccomment">/// # use std::collections::{BTreeMap, HashMap};</span>
 <span class="doccomment">/// #</span>
@@ -3057,7 +3073,7 @@
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use std::collections::BTreeMap;</span>
 <span class="doccomment">/// #</span>
@@ -3081,7 +3097,7 @@
 <span class="doccomment">/// The helper is generic over the hasher type of the [`HashMap`] and works with different variants, such as `FnvHashMap`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// use fnv::FnvHashMap;</span>
@@ -3176,7 +3192,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_with::serde_as;</span>
 <span class="doccomment">/// # use std::collections::HashMap;</span>
 <span class="doccomment">/// #</span>
@@ -3192,7 +3208,7 @@
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use std::collections::HashMap;</span>
 <span class="doccomment">/// #</span>
@@ -3216,7 +3232,7 @@
 <span class="doccomment">/// The helper is generic over the hasher type of the [`HashMap`] and works with different variants, such as `FnvHashMap`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// use fnv::FnvHashMap;</span>
@@ -3280,7 +3296,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_with::serde_as;</span>
 <span class="doccomment">/// # use std::collections::BTreeMap;</span>
 <span class="doccomment">/// #</span>
@@ -3296,7 +3312,7 @@
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use std::collections::BTreeMap;</span>
 <span class="doccomment">/// #</span>
@@ -3353,7 +3369,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_with::serde_as;</span>
 <span class="doccomment">/// # use std::collections::BTreeMap;</span>
 <span class="doccomment">/// #</span>
@@ -3371,7 +3387,7 @@
 <span class="doccomment">/// `Wrapper` does not implement [`Hash`] nor [`Ord`], thus prohibiting the use [`HashMap`] or [`BTreeMap`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[derive(Debug, Deserialize, Serialize, Default)]</span>
 <span class="doccomment">/// struct S {</span>
@@ -3406,7 +3422,7 @@
 <span class="doccomment">/// In this example, the serialized format contains duplicate keys, which is not supported with [`HashMap`] or [`BTreeMap`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[derive(Debug, Deserialize, Serialize, PartialEq, Default)]</span>
 <span class="doccomment">/// struct S {</span>
@@ -3497,7 +3513,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, BytesOrString};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[serde_as]</span>
@@ -3511,7 +3527,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[derive(Debug, Deserialize, Serialize, PartialEq, Default)]</span>
 <span class="doccomment">/// struct S {</span>
@@ -3610,7 +3626,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DefaultOnError, DisplayFromStr};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[serde_as]</span>
@@ -3630,7 +3646,7 @@
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[derive(Deserialize)]</span>
 <span class="doccomment">/// struct A {</span>
@@ -3660,7 +3676,7 @@
 <span class="doccomment">/// Deserializing missing values can be supported by adding the `default` field attribute:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[derive(Deserialize)]</span>
 <span class="doccomment">/// struct B {</span>
@@ -3718,7 +3734,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DefaultOnNull, DisplayFromStr};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[serde_as]</span>
@@ -3738,7 +3754,7 @@
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[derive(Deserialize)]</span>
 <span class="doccomment">/// struct A {</span>

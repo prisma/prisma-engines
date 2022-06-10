@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/runtime/task/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/runtime/task/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -149,16 +149,35 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::any::Any</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::io</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Id</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::SyncWrapper</span>;
-
 <span class="macro">cfg_rt!</span> {
     <span class="doccomment">/// Task failed to execute to completion.</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JoinError</span> {
         <span class="ident">repr</span>: <span class="ident">Repr</span>,
+        <span class="ident">id</span>: <span class="ident">Id</span>,
     }
 }
 
@@ -168,15 +187,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">JoinError</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cancelled</span>() -&gt; <span class="ident">JoinError</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cancelled</span>(<span class="ident">id</span>: <span class="ident">Id</span>) -&gt; <span class="ident">JoinError</span> {
         <span class="ident">JoinError</span> {
             <span class="ident">repr</span>: <span class="ident">Repr::Cancelled</span>,
+            <span class="ident">id</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">panic</span>(<span class="ident">err</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">JoinError</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">panic</span>(<span class="ident">id</span>: <span class="ident">Id</span>, <span class="ident">err</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">JoinError</span> {
         <span class="ident">JoinError</span> {
             <span class="ident">repr</span>: <span class="ident">Repr::Panic</span>(<span class="ident">SyncWrapper::new</span>(<span class="ident">err</span>)),
+            <span class="ident">id</span>,
         }
     }
 
@@ -262,13 +283,28 @@
             <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>),
         }
     }
+
+    <span class="doccomment">/// Returns a [task ID] that identifies the task which errored relative to</span>
+    <span class="doccomment">/// other currently spawned tasks.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This is an [unstable API][unstable]. The public API of this type</span>
+    <span class="doccomment">/// may break in 1.x releases. See [the documentation on unstable</span>
+    <span class="doccomment">/// features][unstable] for details.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [task ID]: crate::task::Id</span>
+    <span class="doccomment">/// [unstable]: crate#unstable-features</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tokio_unstable</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">tokio_unstable</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Id</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">clone</span>()
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">JoinError</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">repr</span> {
-            <span class="ident">Repr::Cancelled</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;cancelled&quot;</span>),
-            <span class="ident">Repr::Panic</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;panic&quot;</span>),
+            <span class="ident">Repr::Cancelled</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;task {} was cancelled&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>),
+            <span class="ident">Repr::Panic</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;task {} panicked&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>),
         }
     }
 }
@@ -276,8 +312,8 @@
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">JoinError</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">repr</span> {
-            <span class="ident">Repr::Cancelled</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;JoinError::Cancelled&quot;</span>),
-            <span class="ident">Repr::Panic</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;JoinError::Panic(...)&quot;</span>),
+            <span class="ident">Repr::Cancelled</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;JoinError::Cancelled({:?})&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>),
+            <span class="ident">Repr::Panic</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;JoinError::Panic({:?}, ...)&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>),
         }
     }
 }

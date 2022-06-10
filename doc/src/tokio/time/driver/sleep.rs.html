@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/time/driver/sleep.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sleep.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/time/driver/sleep.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sleep.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -441,6 +441,8 @@
 <span id="436">436</span>
 <span id="437">437</span>
 <span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::time::driver::ClockTime</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::time::driver</span>::{<span class="ident">Handle</span>, <span class="ident">TimerEntry</span>};
@@ -515,7 +517,9 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// No work is performed while awaiting on the sleep future to complete. `Sleep`</span>
 <span class="doccomment">/// operates at millisecond granularity and should not be used for tasks that</span>
-<span class="doccomment">/// require high-resolution timers.</span>
+<span class="doccomment">/// require high-resolution timers. The implementation is platform specific,</span>
+<span class="doccomment">/// and some platforms (specifically Windows) will provide timers with a</span>
+<span class="doccomment">/// larger resolution than 1 ms.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// To run something regularly on a schedule, see [`interval`].</span>
 <span class="doccomment">///</span>
@@ -704,7 +708,7 @@
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">time_source</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">time_source</span>().<span class="ident">clone</span>();
             <span class="kw">let</span> <span class="ident">deadline_tick</span> <span class="op">=</span> <span class="ident">time_source</span>.<span class="ident">deadline_to_tick</span>(<span class="ident">deadline</span>);
-            <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">deadline_tick</span>.<span class="ident">checked_sub</span>(<span class="ident">time_source</span>.<span class="ident">now</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>);
+            <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">deadline_tick</span>.<span class="ident">saturating_sub</span>(<span class="ident">time_source</span>.<span class="ident">now</span>());
 
             <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="ident">location</span>.<span class="ident">expect</span>(<span class="string">&quot;should have location if tracing&quot;</span>);
             <span class="kw">let</span> <span class="ident">resource_span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(
@@ -816,7 +820,7 @@
             <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> {
                 <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">me</span>.<span class="ident">inner</span>.<span class="ident">time_source</span>.<span class="ident">now</span>();
                 <span class="kw">let</span> <span class="ident">deadline_tick</span> <span class="op">=</span> <span class="ident">me</span>.<span class="ident">inner</span>.<span class="ident">time_source</span>.<span class="ident">deadline_to_tick</span>(<span class="ident">deadline</span>);
-                <span class="ident">deadline_tick</span>.<span class="ident">checked_sub</span>(<span class="ident">now</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>)
+                <span class="ident">deadline_tick</span>.<span class="ident">saturating_sub</span>(<span class="ident">now</span>)
             };
 
             <span class="macro">tracing::trace!</span>(

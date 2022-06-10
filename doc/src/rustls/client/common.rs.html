@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.19.1/src/client/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/client/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -117,184 +117,63 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::hash_hs</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ResolvesClientCert</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;logging&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::log::trace</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::log</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums::ExtensionType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums::NamedGroup</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::CertificatePayload</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::ClientExtension</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::DigitallySignedStruct</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::SCTList</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::ServerExtension</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::SessionID</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::persist</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::session::SessionRandoms</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sign</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites</span>;
-<span class="kw">use</span> <span class="ident">webpki</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">sign</span>, <span class="ident">DistinguishedNames</span>, <span class="ident">SignatureScheme</span>};
 
-<span class="kw">use</span> <span class="ident">std::mem</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerCertDetails</span> {
-    <span class="kw">pub</span> <span class="ident">cert_chain</span>: <span class="ident">CertificatePayload</span>,
-    <span class="kw">pub</span> <span class="ident">ocsp_response</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">scts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SCTList</span><span class="op">&gt;</span>,
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">ServerCertDetails</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">cert_chain</span>: <span class="ident">CertificatePayload</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">ocsp_response</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">scts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SCTList</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ServerCertDetails</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">ServerCertDetails</span> {
-        <span class="ident">ServerCertDetails</span> {
-            <span class="ident">cert_chain</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">ocsp_response</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">scts</span>: <span class="prelude-val">None</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(
+        <span class="ident">cert_chain</span>: <span class="ident">CertificatePayload</span>,
+        <span class="ident">ocsp_response</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+        <span class="ident">scts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SCTList</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">cert_chain</span>,
+            <span class="ident">ocsp_response</span>,
+            <span class="ident">scts</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_chain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">CertificatePayload</span> {
-        <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">cert_chain</span>, <span class="ident">Vec::new</span>())
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">scts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">scts</span>
+            .<span class="ident">as_deref</span>()
+            .<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[])
+            .<span class="ident">iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">payload</span><span class="op">|</span> <span class="ident">payload</span>.<span class="number">0</span>.<span class="ident">as_slice</span>())
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerKXDetails</span> {
-    <span class="kw">pub</span> <span class="ident">kx_params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">kx_sig</span>: <span class="ident">DigitallySignedStruct</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">ServerKXDetails</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">sig</span>: <span class="ident">DigitallySignedStruct</span>) -&gt; <span class="ident">ServerKXDetails</span> {
-        <span class="ident">ServerKXDetails</span> {
-            <span class="ident">kx_params</span>: <span class="ident">params</span>,
-            <span class="ident">kx_sig</span>: <span class="ident">sig</span>,
-        }
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HandshakeDetails</span> {
-    <span class="kw">pub</span> <span class="ident">resuming_session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">persist::ClientSessionValue</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">transcript</span>: <span class="ident">hash_hs::HandshakeHash</span>,
-    <span class="kw">pub</span> <span class="ident">hash_at_client_recvd_server_hello</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">randoms</span>: <span class="ident">SessionRandoms</span>,
-    <span class="kw">pub</span> <span class="ident">using_ems</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="ident">SessionID</span>,
-    <span class="kw">pub</span> <span class="ident">sent_tls13_fake_ccs</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">dns_name</span>: <span class="ident">webpki::DNSName</span>,
-    <span class="kw">pub</span> <span class="ident">extra_exts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ClientExtension</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">HandshakeDetails</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">host_name</span>: <span class="ident">webpki::DNSName</span>, <span class="ident">extra_exts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ClientExtension</span><span class="op">&gt;</span>) -&gt; <span class="ident">HandshakeDetails</span> {
-        <span class="ident">HandshakeDetails</span> {
-            <span class="ident">resuming_session</span>: <span class="prelude-val">None</span>,
-            <span class="ident">transcript</span>: <span class="ident">hash_hs::HandshakeHash::new</span>(),
-            <span class="ident">hash_at_client_recvd_server_hello</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">randoms</span>: <span class="ident">SessionRandoms::for_client</span>(),
-            <span class="ident">using_ems</span>: <span class="bool-val">false</span>,
-            <span class="ident">session_id</span>: <span class="ident">SessionID::empty</span>(),
-            <span class="ident">sent_tls13_fake_ccs</span>: <span class="bool-val">false</span>,
-            <span class="ident">dns_name</span>: <span class="ident">host_name</span>,
-            <span class="ident">extra_exts</span>,
-        }
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientHelloDetails</span> {
-    <span class="kw">pub</span> <span class="ident">sent_extensions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ExtensionType</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">offered_key_shares</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">suites::KeyExchange</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">ClientHelloDetails</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">sent_extensions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ExtensionType</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ClientHelloDetails</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">ClientHelloDetails</span> {
-        <span class="ident">ClientHelloDetails</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
             <span class="ident">sent_extensions</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">offered_key_shares</span>: <span class="ident">Vec::new</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_key_share</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">group</span>: <span class="ident">NamedGroup</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">offered_key_shares</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">share</span><span class="op">|</span> <span class="ident">share</span>.<span class="ident">group</span> <span class="op">==</span> <span class="ident">group</span>)
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">server_may_send_sct_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">sent_extensions</span>
+            .<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ExtensionType::SCT</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_key_share</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="ident">NamedGroup</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">suites::KeyExchange</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">offered_key_shares</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">position</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">group</span> <span class="op">==</span> <span class="ident">group</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">offered_key_shares</span>.<span class="ident">remove</span>(<span class="ident">idx</span>))
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_key_share_and_discard_others</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">group</span>: <span class="ident">NamedGroup</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">suites::KeyExchange</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">find_key_share</span>(<span class="ident">group</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">group</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">offered_key_shares</span>.<span class="ident">clear</span>();
-                <span class="prelude-val">Some</span>(<span class="ident">group</span>)
-            }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_sent_unsolicited_extensions</span>(
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">server_sent_unsolicited_extensions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">received_exts</span>: <span class="kw-2">&amp;</span>[<span class="ident">ServerExtension</span>],
         <span class="ident">allowed_unsolicited</span>: <span class="kw-2">&amp;</span>[<span class="ident">ExtensionType</span>],
@@ -312,37 +191,44 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReceivedTicketDetails</span> {
-    <span class="kw">pub</span> <span class="ident">new_ticket</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">new_ticket_lifetime</span>: <span class="ident">u32</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">ReceivedTicketDetails</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">ReceivedTicketDetails</span> {
-        <span class="ident">ReceivedTicketDetails::from</span>(<span class="ident">Vec::new</span>(), <span class="number">0</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ticket</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">lifetime</span>: <span class="ident">u32</span>) -&gt; <span class="ident">ReceivedTicketDetails</span> {
-        <span class="ident">ReceivedTicketDetails</span> {
-            <span class="ident">new_ticket</span>: <span class="ident">ticket</span>,
-            <span class="ident">new_ticket_lifetime</span>: <span class="ident">lifetime</span>,
-        }
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientAuthDetails</span> {
-    <span class="kw">pub</span> <span class="ident">cert</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificatePayload</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">signer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">sign::Signer</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">auth_context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">ClientAuthDetails</span> {
+    <span class="doccomment">/// Send an empty `Certificate` and no `CertificateVerify`.</span>
+    <span class="ident">Empty</span> { <span class="ident">auth_context_tls13</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> },
+    <span class="doccomment">/// Send a non-empty `Certificate` and a `CertificateVerify`.</span>
+    <span class="ident">Verify</span> {
+        <span class="ident">certkey</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">sign::CertifiedKey</span><span class="op">&gt;</span>,
+        <span class="ident">signer</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">sign::Signer</span><span class="op">&gt;</span>,
+        <span class="ident">auth_context_tls13</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    },
 }
 
 <span class="kw">impl</span> <span class="ident">ClientAuthDetails</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">ClientAuthDetails</span> {
-        <span class="ident">ClientAuthDetails</span> {
-            <span class="ident">cert</span>: <span class="prelude-val">None</span>,
-            <span class="ident">signer</span>: <span class="prelude-val">None</span>,
-            <span class="ident">auth_context</span>: <span class="prelude-val">None</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">resolve</span>(
+        <span class="ident">resolver</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ResolvesClientCert</span>,
+        <span class="ident">canames</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DistinguishedNames</span><span class="op">&gt;</span>,
+        <span class="ident">sigschemes</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>],
+        <span class="ident">auth_context_tls13</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">acceptable_issuers</span> <span class="op">=</span> <span class="ident">canames</span>
+            .<span class="ident">map</span>(<span class="ident">Vec::as_slice</span>)
+            .<span class="ident">unwrap_or_default</span>()
+            .<span class="ident">iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="number">0</span>.<span class="ident">as_slice</span>())
+            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>();
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">certkey</span>) <span class="op">=</span> <span class="ident">resolver</span>.<span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="ident">acceptable_issuers</span>, <span class="ident">sigschemes</span>) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">signer</span>) <span class="op">=</span> <span class="ident">certkey</span>.<span class="ident">key</span>.<span class="ident">choose_scheme</span>(<span class="ident">sigschemes</span>) {
+                <span class="macro">debug!</span>(<span class="string">&quot;Attempting client auth&quot;</span>);
+                <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Verify</span> {
+                    <span class="ident">certkey</span>,
+                    <span class="ident">signer</span>,
+                    <span class="ident">auth_context_tls13</span>,
+                };
+            }
         }
+
+        <span class="macro">debug!</span>(<span class="string">&quot;Client auth requested but no cert/sigscheme available&quot;</span>);
+        <span class="ident"><span class="self">Self</span>::Empty</span> { <span class="ident">auth_context_tls13</span> }
     }
 }
 </code></pre></div>

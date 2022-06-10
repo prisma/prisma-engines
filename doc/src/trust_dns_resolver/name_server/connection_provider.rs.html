@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.20.3/src/name_server/connection_provider.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection_provider.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/name_server/connection_provider.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection_provider.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -362,6 +362,24 @@
 <span id="357">357</span>
 <span id="358">358</span>
 <span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2015-2019 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
@@ -375,6 +393,7 @@
 
 <span class="kw">use</span> <span class="ident">futures_util::future</span>::{<span class="ident">Future</span>, <span class="ident">FutureExt</span>};
 <span class="kw">use</span> <span class="ident">futures_util::ready</span>;
+<span class="kw">use</span> <span class="ident">futures_util::stream</span>::{<span class="ident">Stream</span>, <span class="ident">StreamExt</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tokio::net::TcpStream</span> <span class="kw">as</span> <span class="ident">TokioTcpStream</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-native-tls&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)))]</span>
@@ -388,34 +407,31 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tokio_rustls::client::TlsStream</span> <span class="kw">as</span> <span class="ident">TokioTlsStream</span>;
 
-<span class="kw">use</span> <span class="ident">proto</span>;
-<span class="kw">use</span> <span class="ident">proto::error::ProtoError</span>;
-
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">proto::https</span>::{<span class="ident">HttpsClientConnect</span>, <span class="ident">HttpsClientStream</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">proto::multicast</span>::{<span class="ident">MdnsClientConnect</span>, <span class="ident">MdnsClientStream</span>, <span class="ident">MdnsQueryType</span>};
+<span class="kw">use</span> <span class="ident">proto</span>::{
+    <span class="self">self</span>,
+    <span class="ident">error::ProtoError</span>,
+    <span class="ident">op::NoopMessageFinalizer</span>,
+    <span class="ident">tcp::Connect</span>,
+    <span class="ident">tcp::TcpClientConnect</span>,
+    <span class="ident">tcp::TcpClientStream</span>,
+    <span class="ident">udp::UdpClientConnect</span>,
+    <span class="ident">udp</span>::{<span class="ident">UdpClientStream</span>, <span class="ident">UdpSocket</span>},
+    <span class="ident">xfer</span>::{
+        <span class="ident">DnsExchange</span>, <span class="ident">DnsExchangeConnect</span>, <span class="ident">DnsExchangeSend</span>, <span class="ident">DnsHandle</span>, <span class="ident">DnsMultiplexer</span>,
+        <span class="ident">DnsMultiplexerConnect</span>, <span class="ident">DnsRequest</span>, <span class="ident">DnsResponse</span>,
+    },
+    <span class="ident">Time</span>,
+};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">proto</span>::{<span class="ident">iocompat::AsyncIoTokioAsStd</span>, <span class="ident">TokioTime</span>};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">proto::multicast</span>::{<span class="ident">MdnsClientConnect</span>, <span class="ident">MdnsClientStream</span>, <span class="ident">MdnsQueryType</span>};
-
-<span class="kw">use</span> <span class="ident">proto::op::NoopMessageFinalizer</span>;
-
-<span class="kw">use</span> <span class="ident">proto::udp::UdpClientStream</span>;
-<span class="kw">use</span> <span class="ident">proto::xfer</span>::{<span class="ident">DnsExchange</span>, <span class="ident">DnsExchangeSend</span>, <span class="ident">DnsHandle</span>, <span class="ident">DnsRequest</span>, <span class="ident">DnsResponse</span>};
-
-<span class="kw">use</span> <span class="ident">proto::xfer::DnsMultiplexer</span>;
-
-<span class="kw">use</span> <span class="ident">proto</span>::{
-    <span class="ident">tcp::Connect</span>, <span class="ident">tcp::TcpClientConnect</span>, <span class="ident">tcp::TcpClientStream</span>, <span class="ident">udp::UdpClientConnect</span>,
-    <span class="ident">udp::UdpSocket</span>, <span class="ident">xfer::DnsExchangeConnect</span>, <span class="ident">xfer::DnsMultiplexerConnect</span>, <span class="ident">Time</span>,
-};
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::ResolveError</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">trust_dns_https</span>::{<span class="self">self</span>, <span class="ident">HttpsClientConnect</span>, <span class="ident">HttpsClientStream</span>};
-
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::Protocol</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">NameServerConfig</span>, <span class="ident">ResolverOpts</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::ResolveError</span>;
 
 <span class="doccomment">/// A type to allow for custom ConnectionProviders. Needed mainly for mocking purposes.</span>
 <span class="doccomment">///</span>
@@ -485,17 +501,24 @@
     ) -&gt; <span class="ident"><span class="self">Self</span>::FutureConn</span> {
         <span class="kw">let</span> <span class="ident">dns_connect</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">config</span>.<span class="ident">protocol</span> {
             <span class="ident">Protocol::Udp</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span>
-                    <span class="ident">UdpClientStream</span>::<span class="op">&lt;</span><span class="ident">R::Udp</span><span class="op">&gt;</span><span class="ident">::with_timeout</span>(<span class="ident">config</span>.<span class="ident">socket_addr</span>, <span class="ident">options</span>.<span class="ident">timeout</span>);
+                <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">UdpClientStream</span>::<span class="op">&lt;</span><span class="ident">R::Udp</span><span class="op">&gt;</span><span class="ident">::with_bind_addr_and_timeout</span>(
+                    <span class="ident">config</span>.<span class="ident">socket_addr</span>,
+                    <span class="ident">config</span>.<span class="ident">bind_addr</span>,
+                    <span class="ident">options</span>.<span class="ident">timeout</span>,
+                );
                 <span class="kw">let</span> <span class="ident">exchange</span> <span class="op">=</span> <span class="ident">DnsExchange::connect</span>(<span class="ident">stream</span>);
                 <span class="ident">ConnectionConnect::Udp</span>(<span class="ident">exchange</span>)
             }
             <span class="ident">Protocol::Tcp</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">socket_addr</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">socket_addr</span>;
+                <span class="kw">let</span> <span class="ident">bind_addr</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">bind_addr</span>;
                 <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">timeout</span>;
 
-                <span class="kw">let</span> (<span class="ident">stream</span>, <span class="ident">handle</span>) <span class="op">=</span>
-                    <span class="ident">TcpClientStream</span>::<span class="op">&lt;</span><span class="ident">R::Tcp</span><span class="op">&gt;</span><span class="ident">::with_timeout</span>(<span class="ident">socket_addr</span>, <span class="ident">timeout</span>);
+                <span class="kw">let</span> (<span class="ident">stream</span>, <span class="ident">handle</span>) <span class="op">=</span> <span class="ident">TcpClientStream</span>::<span class="op">&lt;</span><span class="ident">R::Tcp</span><span class="op">&gt;</span><span class="ident">::with_bind_addr_and_timeout</span>(
+                    <span class="ident">socket_addr</span>,
+                    <span class="ident">bind_addr</span>,
+                    <span class="ident">timeout</span>,
+                );
                 <span class="comment">// TODO: need config for Signer...</span>
                 <span class="kw">let</span> <span class="ident">dns_conn</span> <span class="op">=</span> <span class="ident">DnsMultiplexer::with_timeout</span>(
                     <span class="ident">stream</span>,
@@ -510,21 +533,28 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
             <span class="ident">Protocol::Tls</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">socket_addr</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">socket_addr</span>;
+                <span class="kw">let</span> <span class="ident">bind_addr</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">bind_addr</span>;
                 <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">timeout</span>;
                 <span class="kw">let</span> <span class="ident">tls_dns_name</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">tls_dns_name</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or_default</span>();
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
                 <span class="kw">let</span> <span class="ident">client_config</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">tls_config</span>.<span class="ident">clone</span>();
 
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
-                <span class="kw">let</span> (<span class="ident">stream</span>, <span class="ident">handle</span>) <span class="op">=</span>
-                    { <span class="ident"><span class="kw">crate</span>::tls::new_tls_stream</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">socket_addr</span>, <span class="ident">tls_dns_name</span>, <span class="ident">client_config</span>) };
+                <span class="kw">let</span> (<span class="ident">stream</span>, <span class="ident">handle</span>) <span class="op">=</span> {
+                    <span class="ident"><span class="kw">crate</span>::tls::new_tls_stream</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
+                        <span class="ident">socket_addr</span>,
+                        <span class="ident">bind_addr</span>,
+                        <span class="ident">tls_dns_name</span>,
+                        <span class="ident">client_config</span>,
+                    )
+                };
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>))]</span>
                 <span class="kw">let</span> (<span class="ident">stream</span>, <span class="ident">handle</span>) <span class="op">=</span>
-                    { <span class="ident"><span class="kw">crate</span>::tls::new_tls_stream</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">socket_addr</span>, <span class="ident">tls_dns_name</span>) };
+                    { <span class="ident"><span class="kw">crate</span>::tls::new_tls_stream</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">socket_addr</span>, <span class="ident">bind_addr</span>, <span class="ident">tls_dns_name</span>) };
 
                 <span class="kw">let</span> <span class="ident">dns_conn</span> <span class="op">=</span> <span class="ident">DnsMultiplexer::with_timeout</span>(
                     <span class="ident">stream</span>,
-                    <span class="ident">Box::new</span>(<span class="ident">handle</span>),
+                    <span class="ident">handle</span>,
                     <span class="ident">timeout</span>,
                     <span class="ident">NoopMessageFinalizer::new</span>(),
                 );
@@ -535,12 +565,17 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
             <span class="ident">Protocol::Https</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">socket_addr</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">socket_addr</span>;
+                <span class="kw">let</span> <span class="ident">bind_addr</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">bind_addr</span>;
                 <span class="kw">let</span> <span class="ident">tls_dns_name</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">tls_dns_name</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or_default</span>();
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
                 <span class="kw">let</span> <span class="ident">client_config</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">tls_config</span>.<span class="ident">clone</span>();
 
-                <span class="kw">let</span> <span class="ident">exchange</span> <span class="op">=</span>
-                    <span class="ident"><span class="kw">crate</span>::https::new_https_stream</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">socket_addr</span>, <span class="ident">tls_dns_name</span>, <span class="ident">client_config</span>);
+                <span class="kw">let</span> <span class="ident">exchange</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::https::new_https_stream</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
+                    <span class="ident">socket_addr</span>,
+                    <span class="ident">bind_addr</span>,
+                    <span class="ident">tls_dns_name</span>,
+                    <span class="ident">client_config</span>,
+                );
                 <span class="ident">ConnectionConnect::Https</span>(<span class="ident">exchange</span>)
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
@@ -681,19 +716,20 @@
     }
 }
 
-<span class="doccomment">/// A future response from a DNS request.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless polled&quot;</span>]</span>
+<span class="doccomment">/// A stream of response to a DNS request.</span>
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;steam do nothing unless polled&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionResponse</span>(<span class="ident">DnsExchangeSend</span>);
 
-<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">ConnectionResponse</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>;
+<span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">ConnectionResponse</span> {
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">poll_unpin</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="ident">ResolveError::from</span>)
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Poll::Ready</span>(<span class="macro">ready!</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">map_err</span>(<span class="ident">ResolveError::from</span>)))
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tokio_runtime</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;

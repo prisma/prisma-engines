@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/miniz_oxide-0.4.4/src/inflate/core.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>core.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/miniz_oxide-0.5.3/src/inflate/core.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>core.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../miniz_oxide/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1876,6 +1876,64 @@
 <span id="1871">1871</span>
 <span id="1872">1872</span>
 <span id="1873">1873</span>
+<span id="1874">1874</span>
+<span id="1875">1875</span>
+<span id="1876">1876</span>
+<span id="1877">1877</span>
+<span id="1878">1878</span>
+<span id="1879">1879</span>
+<span id="1880">1880</span>
+<span id="1881">1881</span>
+<span id="1882">1882</span>
+<span id="1883">1883</span>
+<span id="1884">1884</span>
+<span id="1885">1885</span>
+<span id="1886">1886</span>
+<span id="1887">1887</span>
+<span id="1888">1888</span>
+<span id="1889">1889</span>
+<span id="1890">1890</span>
+<span id="1891">1891</span>
+<span id="1892">1892</span>
+<span id="1893">1893</span>
+<span id="1894">1894</span>
+<span id="1895">1895</span>
+<span id="1896">1896</span>
+<span id="1897">1897</span>
+<span id="1898">1898</span>
+<span id="1899">1899</span>
+<span id="1900">1900</span>
+<span id="1901">1901</span>
+<span id="1902">1902</span>
+<span id="1903">1903</span>
+<span id="1904">1904</span>
+<span id="1905">1905</span>
+<span id="1906">1906</span>
+<span id="1907">1907</span>
+<span id="1908">1908</span>
+<span id="1909">1909</span>
+<span id="1910">1910</span>
+<span id="1911">1911</span>
+<span id="1912">1912</span>
+<span id="1913">1913</span>
+<span id="1914">1914</span>
+<span id="1915">1915</span>
+<span id="1916">1916</span>
+<span id="1917">1917</span>
+<span id="1918">1918</span>
+<span id="1919">1919</span>
+<span id="1920">1920</span>
+<span id="1921">1921</span>
+<span id="1922">1922</span>
+<span id="1923">1923</span>
+<span id="1924">1924</span>
+<span id="1925">1925</span>
+<span id="1926">1926</span>
+<span id="1927">1927</span>
+<span id="1928">1928</span>
+<span id="1929">1929</span>
+<span id="1930">1930</span>
+<span id="1931">1931</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Streaming decompression functionality.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -1980,15 +2038,50 @@
 <span class="kw">const</span> <span class="ident">DIST_TABLE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
 <span class="kw">const</span> <span class="ident">HUFFLEN_TABLE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
 
+<span class="doccomment">/// Flags to [`decompress()`] to control how inflation works.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// These define bits for a bitmask argument.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">inflate_flags</span> {
     <span class="doccomment">/// Should we try to parse a zlib header?</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If unset, [`decompress()`] will expect an RFC1951 deflate stream.  If set, it will expect an</span>
+    <span class="doccomment">/// RFC1950 zlib wrapper around the deflate stream.</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TINFL_FLAG_PARSE_ZLIB_HEADER</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="doccomment">/// There is more input that hasn&#39;t been given to the decompressor yet.</span>
+
+    <span class="doccomment">/// There will be more input that hasn&#39;t been given to the decompressor yet.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is useful when you want to decompress what you have so far,</span>
+    <span class="doccomment">/// even if you know there is probably more input that hasn&#39;t gotten here yet (_e.g._, over a</span>
+    <span class="doccomment">/// network connection).  When [`decompress()`][super::decompress] reaches the end of the input</span>
+    <span class="doccomment">/// without finding the end of the compressed stream, it will return</span>
+    <span class="doccomment">/// [`TINFLStatus::NeedsMoreInput`][super::TINFLStatus::NeedsMoreInput] if this is set,</span>
+    <span class="doccomment">/// indicating that you should get more data before calling again.  If not set, it will return</span>
+    <span class="doccomment">/// [`TINFLStatus::FailedCannotMakeProgress`][super::TINFLStatus::FailedCannotMakeProgress]</span>
+    <span class="doccomment">/// suggesting the stream is corrupt, since you claimed it was all there.</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TINFL_FLAG_HAS_MORE_INPUT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">2</span>;
+
     <span class="doccomment">/// The output buffer should not wrap around.</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">4</span>;
-    <span class="doccomment">/// Should we calculate the adler32 checksum of the output data?</span>
+
+    <span class="doccomment">/// Calculate the adler32 checksum of the output data even if we&#39;re not inflating a zlib stream.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If [`TINFL_FLAG_IGNORE_ADLER32`] is specified, it will override this.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// NOTE: Enabling/disabling this between calls to decompress will result in an incorect</span>
+    <span class="doccomment">/// checksum.</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TINFL_FLAG_COMPUTE_ADLER32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">8</span>;
+
+    <span class="doccomment">/// Ignore adler32 checksum even if we are inflating a zlib stream.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Overrides [`TINFL_FLAG_COMPUTE_ADLER32`] if both are enabled.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// NOTE: This flag does not exist in miniz as it does not support this and is a</span>
+    <span class="doccomment">/// custom addition for miniz_oxide.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// NOTE: Should not be changed from enabled to disabled after decompression has started,</span>
+    <span class="doccomment">/// this will result in checksum failure (outside the unlikely event where the checksum happens</span>
+    <span class="doccomment">/// to match anyway).</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TINFL_FLAG_IGNORE_ADLER32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">64</span>;
 }
 
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::inflate_flags</span>::<span class="kw-2">*</span>;
@@ -2052,10 +2145,21 @@
     }
 
     <span class="doccomment">/// Returns the adler32 checksum of the currently decompressed data.</span>
+    <span class="doccomment">/// Note: Will return Some(1) if decompressing zlib but ignoring adler32.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adler32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">State::Start</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">is_failure</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">z_header0</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
             <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">check_adler32</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
+    }
+
+    <span class="doccomment">/// Returns the adler32 that was read from the zlib header if it exists.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adler32_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">State::Start</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">State::BadZlibHeader</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">z_header0</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">z_adler32</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -2707,7 +2811,7 @@
 <span class="doccomment">/// and already improves decompression speed a fair bit.</span>
 <span class="kw">fn</span> <span class="ident">decompress_fast</span>(
     <span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DecompressorOxide</span>,
-    <span class="kw-2">mut</span> <span class="ident">in_iter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="ident">in_iter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
     <span class="ident">out_buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">OutputBuffer</span>,
     <span class="ident">flags</span>: <span class="ident">u32</span>,
     <span class="ident">local_vars</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LocalVars</span>,
@@ -2732,7 +2836,7 @@
                 <span class="kw">break</span> <span class="lifetime">&#39;o</span> <span class="ident">TINFLStatus::Done</span>;
             }
 
-            <span class="ident">fill_bit_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="ident">l</span>, <span class="kw-2">&amp;mut</span> <span class="ident">in_iter</span>);
+            <span class="ident">fill_bit_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="ident">l</span>, <span class="ident">in_iter</span>);
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">symbol</span>, <span class="ident">code_len</span>)) <span class="op">=</span> <span class="ident">r</span>.<span class="ident">tables</span>[<span class="ident">LITLEN_TABLE</span>].<span class="ident">lookup</span>(<span class="ident">l</span>.<span class="ident">bit_buf</span>) {
                 <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span> <span class="ident">symbol</span> <span class="kw">as</span> <span class="ident">u32</span>;
@@ -2746,7 +2850,7 @@
                     <span class="comment">// If we have a 32-bit buffer we need to read another two bytes now</span>
                     <span class="comment">// to have enough bits to keep going.</span>
                     <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">not</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)) {
-                        <span class="ident">fill_bit_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="ident">l</span>, <span class="kw-2">&amp;mut</span> <span class="ident">in_iter</span>);
+                        <span class="ident">fill_bit_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="ident">l</span>, <span class="ident">in_iter</span>);
                     }
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">symbol</span>, <span class="ident">code_len</span>)) <span class="op">=</span> <span class="ident">r</span>.<span class="ident">tables</span>[<span class="ident">LITLEN_TABLE</span>].<span class="ident">lookup</span>(<span class="ident">l</span>.<span class="ident">bit_buf</span>) {
@@ -2796,7 +2900,7 @@
             <span class="comment">// Length and distance codes have a number of extra bits depending on</span>
             <span class="comment">// the base, which together with the base gives us the exact value.</span>
 
-            <span class="ident">fill_bit_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="ident">l</span>, <span class="kw-2">&amp;mut</span> <span class="ident">in_iter</span>);
+            <span class="ident">fill_bit_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="ident">l</span>, <span class="ident">in_iter</span>);
             <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">num_extra</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                 <span class="kw">let</span> <span class="ident">extra_bits</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">bit_buf</span> <span class="op">&amp;</span> ((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">l</span>.<span class="ident">num_extra</span>) <span class="op">-</span> <span class="number">1</span>);
                 <span class="ident">l</span>.<span class="ident">bit_buf</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">l</span>.<span class="ident">num_extra</span>;
@@ -2807,7 +2911,7 @@
             <span class="comment">// We found a length code, so a distance code should follow.</span>
 
             <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">not</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)) {
-                <span class="ident">fill_bit_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="ident">l</span>, <span class="kw-2">&amp;mut</span> <span class="ident">in_iter</span>);
+                <span class="ident">fill_bit_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="ident">l</span>, <span class="ident">in_iter</span>);
             }
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw-2">mut</span> <span class="ident">symbol</span>, <span class="ident">code_len</span>)) <span class="op">=</span> <span class="ident">r</span>.<span class="ident">tables</span>[<span class="ident">DIST_TABLE</span>].<span class="ident">lookup</span>(<span class="ident">l</span>.<span class="ident">bit_buf</span>) {
@@ -2827,7 +2931,7 @@
             }
 
             <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">num_extra</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">fill_bit_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="ident">l</span>, <span class="kw-2">&amp;mut</span> <span class="ident">in_iter</span>);
+                <span class="ident">fill_bit_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="ident">l</span>, <span class="ident">in_iter</span>);
                 <span class="kw">let</span> <span class="ident">extra_bits</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">bit_buf</span> <span class="op">&amp;</span> ((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">l</span>.<span class="ident">num_extra</span>) <span class="op">-</span> <span class="number">1</span>);
                 <span class="ident">l</span>.<span class="ident">bit_buf</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">l</span>.<span class="ident">num_extra</span>;
                 <span class="ident">l</span>.<span class="ident">num_bits</span> <span class="op">-</span><span class="op">=</span> <span class="ident">l</span>.<span class="ident">num_extra</span>;
@@ -2861,19 +2965,21 @@
 }
 
 <span class="doccomment">/// Main decompression function. Keeps decompressing data from `in_buf` until the `in_buf` is</span>
-<span class="doccomment">/// empty, `out_cur` is full, the end of the deflate stream is hit, or there is an error in the</span>
+<span class="doccomment">/// empty, `out` is full, the end of the deflate stream is hit, or there is an error in the</span>
 <span class="doccomment">/// deflate stream.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Arguments</span>
 <span class="doccomment">///</span>
+<span class="doccomment">/// `r` is a [`DecompressorOxide`] struct with the state of this stream.</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// `in_buf` is a reference to the compressed data that is to be decompressed. The decompressor will</span>
 <span class="doccomment">/// start at the first byte of this buffer.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// `out_cur` is a mutable cursor into the buffer that will store the decompressed data, and that</span>
+<span class="doccomment">/// `out` is a reference to the buffer that will store the decompressed data, and that</span>
 <span class="doccomment">/// stores previously decompressed data if any.</span>
-<span class="doccomment">/// * The position of the output cursor indicates where in the output buffer slice writing should</span>
-<span class="doccomment">/// start.</span>
-<span class="doccomment">/// * If TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF is not set, the output buffer is used in a</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// * The offset given by `out_pos` indicates where in the output buffer slice writing should start.</span>
+<span class="doccomment">/// * If [`TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF`] is not set, the output buffer is used in a</span>
 <span class="doccomment">/// wrapping manner, and it&#39;s size is required to be a power of 2.</span>
 <span class="doccomment">/// * The decompression function normally needs access to 32KiB of the previously decompressed data</span>
 <span class="doccomment">///(or to the beginning of the decompressed data if less than 32KiB has been decompressed.)</span>
@@ -2883,16 +2989,15 @@
 <span class="doccomment">/// and thus allows a smaller output buffer. The window size can be specified in the zlib</span>
 <span class="doccomment">/// header structure, however, the header data should not be relied on to be correct.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// `flags`</span>
-<span class="doccomment">/// Flags to indicate settings and status to the decompression function.</span>
-<span class="doccomment">/// * The `TINFL_FLAG_HAS_MORE_INPUT` has to be specified if more compressed data is to be provided</span>
+<span class="doccomment">/// `flags` indicates settings and status to the decompression function.</span>
+<span class="doccomment">/// * The [`TINFL_FLAG_HAS_MORE_INPUT`] has to be specified if more compressed data is to be provided</span>
 <span class="doccomment">/// in a subsequent call to this function.</span>
-<span class="doccomment">/// * See the the [`inflate_flags`](inflate_flags/index.html) module for details on other flags.</span>
+<span class="doccomment">/// * See the the [`inflate_flags`] module for details on other flags.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Returns</span>
-<span class="doccomment">/// returns a tuple containing the status of the compressor, the number of input bytes read, and the</span>
-<span class="doccomment">/// number of bytes output to `out_cur`.</span>
-<span class="doccomment">/// Updates the position of `out_cur` to point to the next free spot in the output buffer.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Returns a tuple containing the status of the compressor, the number of input bytes read, and the</span>
+<span class="doccomment">/// number of bytes output to `out`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This function shouldn&#39;t panic pending any bugs.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decompress</span>(
@@ -3479,7 +3584,13 @@
         <span class="number">0</span>
     };
 
-    <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">TINFLStatus::NeedsMoreInput</span> <span class="op">&amp;&amp;</span> <span class="ident">out_buf</span>.<span class="ident">bytes_left</span>() <span class="op">==</span> <span class="number">0</span> {
+    <span class="comment">// Make sure HasMoreOutput overrides NeedsMoreInput if the output buffer is full.</span>
+    <span class="comment">// (Unless the missing input is the adler32 value in which case we don&#39;t need to write anything.)</span>
+    <span class="comment">// TODO: May want to see if we can do this in a better way.</span>
+    <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">TINFLStatus::NeedsMoreInput</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">out_buf</span>.<span class="ident">bytes_left</span>() <span class="op">==</span> <span class="number">0</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">State::ReadAdler32</span>
+    {
         <span class="ident">status</span> <span class="op">=</span> <span class="ident">TINFLStatus::HasMoreOutput</span>
     }
 
@@ -3494,7 +3605,12 @@
 
     <span class="comment">// If this is a zlib stream, and update the adler32 checksum with the decompressed bytes if</span>
     <span class="comment">// requested.</span>
-    <span class="kw">let</span> <span class="ident">need_adler</span> <span class="op">=</span> <span class="ident">flags</span> <span class="op">&amp;</span> (<span class="ident">TINFL_FLAG_PARSE_ZLIB_HEADER</span> <span class="op">|</span> <span class="ident">TINFL_FLAG_COMPUTE_ADLER32</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">let</span> <span class="ident">need_adler</span> <span class="op">=</span> <span class="kw">if</span> (<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">TINFL_FLAG_IGNORE_ADLER32</span>) <span class="op">==</span> <span class="number">0</span> {
+        <span class="ident">flags</span> <span class="op">&amp;</span> (<span class="ident">TINFL_FLAG_PARSE_ZLIB_HEADER</span> <span class="op">|</span> <span class="ident">TINFL_FLAG_COMPUTE_ADLER32</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
+    } <span class="kw">else</span> {
+        <span class="comment">// If TINFL_FLAG_IGNORE_ADLER32 is enabled, ignore the checksum.</span>
+        <span class="bool-val">false</span>
+    };
     <span class="kw">if</span> <span class="ident">need_adler</span> <span class="op">&amp;&amp;</span> <span class="ident">status</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
         <span class="kw">let</span> <span class="ident">out_buf_pos</span> <span class="op">=</span> <span class="ident">out_buf</span>.<span class="ident">position</span>();
         <span class="ident">r</span>.<span class="ident">check_adler32</span> <span class="op">=</span> <span class="ident">update_adler32</span>(<span class="ident">r</span>.<span class="ident">check_adler32</span>, <span class="kw-2">&amp;</span><span class="ident">out_buf</span>.<span class="ident">get_ref</span>()[<span class="ident">out_pos</span>..<span class="ident">out_buf_pos</span>]);

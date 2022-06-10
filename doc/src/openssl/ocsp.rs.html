@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.36/src/ocsp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ocsp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.40/src/ocsp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ocsp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -353,8 +353,6 @@
 <span id="348">348</span>
 <span id="349">349</span>
 <span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
 <span class="kw">use</span> <span class="ident">foreign_types::ForeignTypeRef</span>;
 <span class="kw">use</span> <span class="ident">libc</span>::{<span class="ident">c_int</span>, <span class="ident">c_long</span>, <span class="ident">c_ulong</span>};
@@ -369,6 +367,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::x509::store::X509StoreRef</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::x509</span>::{<span class="ident">X509Ref</span>, <span class="ident">X509</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cvt</span>, <span class="ident">cvt_p</span>};
+<span class="kw">use</span> <span class="ident">openssl_macros::corresponds</span>;
 
 <span class="macro">bitflags!</span> {
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OcspFlag</span>: <span class="ident">c_ulong</span> {
@@ -484,6 +483,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The `maxsec` parameter limits the maximum age of the `this_update` parameter to prohibit</span>
     <span class="doccomment">/// very old responses.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OCSP_check_validity</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_validity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nsec</span>: <span class="ident">u32</span>, <span class="ident">maxsec</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">cvt</span>(<span class="ident">ffi::OCSP_check_validity</span>(
@@ -510,6 +510,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The `certs` parameter contains a set of certificates that will be searched when locating the</span>
     <span class="doccomment">/// OCSP response signing certificate. Some responders do not include this in the response.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OCSP_basic_verify</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">certs</span>: <span class="kw-2">&amp;</span><span class="ident">StackRef</span><span class="op">&lt;</span><span class="ident">X509</span><span class="op">&gt;</span>,
@@ -528,6 +529,7 @@
     }
 
     <span class="doccomment">/// Looks up the status for the specified certificate ID.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OCSP_resp_find_status</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_status</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">OcspCertIdRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OcspStatus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">ffi::V_OCSP_CERTSTATUS_UNKNOWN</span>;
@@ -572,6 +574,7 @@
 
 <span class="kw">impl</span> <span class="ident">OcspCertId</span> {
     <span class="doccomment">/// Constructs a certificate ID for certificate `subject`.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OCSP_cert_to_id</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_cert</span>(
         <span class="ident">digest</span>: <span class="ident">MessageDigest</span>,
         <span class="ident">subject</span>: <span class="kw-2">&amp;</span><span class="ident">X509Ref</span>,
@@ -600,6 +603,7 @@
     <span class="doccomment">/// Creates an OCSP response from the status and optional body.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A body should only be provided if `status` is `RESPONSE_STATUS_SUCCESSFUL`.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OCSP_response_create</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(
         <span class="ident">status</span>: <span class="ident">OcspResponseStatus</span>,
         <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">OcspBasicResponseRef</span><span class="op">&gt;</span>,
@@ -617,10 +621,7 @@
 
     <span class="macro">from_der!</span> {
         <span class="doccomment">/// Deserializes a DER-encoded OCSP response.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`d2i_OCSP_RESPONSE`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`d2i_OCSP_RESPONSE`]: https://www.openssl.org/docs/man1.1.0/crypto/d2i_OCSP_RESPONSE.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">d2i_OCSP_RESPONSE</span>)]</span>
         <span class="ident">from_der</span>,
         <span class="ident">OcspResponse</span>,
         <span class="ident">ffi::d2i_OCSP_RESPONSE</span>
@@ -630,15 +631,13 @@
 <span class="kw">impl</span> <span class="ident">OcspResponseRef</span> {
     <span class="macro">to_der!</span> {
         <span class="doccomment">/// Serializes the response to its standard DER encoding.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`i2d_OCSP_RESPONSE`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`i2d_OCSP_RESPONSE`]: https://www.openssl.org/docs/man1.1.0/crypto/i2d_OCSP_RESPONSE.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">i2d_OCSP_RESPONSE</span>)]</span>
         <span class="ident">to_der</span>,
         <span class="ident">ffi::i2d_OCSP_RESPONSE</span>
     }
 
     <span class="doccomment">/// Returns the status of the response.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OCSP_response_status</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OcspResponseStatus</span> {
         <span class="kw">unsafe</span> { <span class="ident">OcspResponseStatus</span>(<span class="ident">ffi::OCSP_response_status</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>())) }
     }
@@ -646,6 +645,7 @@
     <span class="doccomment">/// Returns the basic response.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will only succeed if `status()` returns `RESPONSE_STATUS_SUCCESSFUL`.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OCSP_response_get1_basic</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">basic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OcspBasicResponse</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="ident">cvt_p</span>(<span class="ident">ffi::OCSP_response_get1_basic</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>())).<span class="ident">map</span>(<span class="ident">OcspBasicResponse</span>) }
     }
@@ -660,6 +660,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">OcspRequest</span> {
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OCSP_REQUEST_new</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OcspRequest</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">ffi::init</span>();
@@ -670,10 +671,7 @@
 
     <span class="macro">from_der!</span> {
         <span class="doccomment">/// Deserializes a DER-encoded OCSP request.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`d2i_OCSP_REQUEST`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`d2i_OCSP_REQUEST`]: https://www.openssl.org/docs/man1.1.0/crypto/d2i_OCSP_REQUEST.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">d2i_OCSP_REQUEST</span>)]</span>
         <span class="ident">from_der</span>,
         <span class="ident">OcspRequest</span>,
         <span class="ident">ffi::d2i_OCSP_REQUEST</span>
@@ -683,14 +681,12 @@
 <span class="kw">impl</span> <span class="ident">OcspRequestRef</span> {
     <span class="macro">to_der!</span> {
         <span class="doccomment">/// Serializes the request to its standard DER encoding.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`i2d_OCSP_REQUEST`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`i2d_OCSP_REQUEST`]: https://www.openssl.org/docs/man1.1.0/crypto/i2d_OCSP_REQUEST.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">i2d_OCSP_REQUEST</span>)]</span>
         <span class="ident">to_der</span>,
         <span class="ident">ffi::i2d_OCSP_REQUEST</span>
     }
 
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OCSP_request_add0_id</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">OcspCertId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">OcspOneReqRef</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">cvt_p</span>(<span class="ident">ffi::OCSP_request_add0_id</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">id</span>.<span class="ident">as_ptr</span>()))<span class="question-mark">?</span>;

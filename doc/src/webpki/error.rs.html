@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.21.4/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -98,6 +98,19 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.</span>
 <span class="comment">//</span>
 <span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
@@ -118,13 +131,13 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
     <span class="doccomment">/// The encoding of some ASN.1 DER-encoded item is invalid.</span>
-    <span class="ident">BadDER</span>,
+    <span class="ident">BadDer</span>,
 
     <span class="doccomment">/// The encoding of an ASN.1 DER-encoded time is invalid.</span>
-    <span class="ident">BadDERTime</span>,
+    <span class="ident">BadDerTime</span>,
 
-    <span class="doccomment">/// A CA certificate is veing used as an end-entity certificate.</span>
-    <span class="ident">CAUsedAsEndEntity</span>,
+    <span class="doccomment">/// A CA certificate is being used as an end-entity certificate.</span>
+    <span class="ident">CaUsedAsEndEntity</span>,
 
     <span class="doccomment">/// The certificate is expired; i.e. the time it is being validated for is</span>
     <span class="doccomment">/// later than the certificate&#39;s notAfter time.</span>
@@ -138,7 +151,7 @@
     <span class="ident">CertNotValidYet</span>,
 
     <span class="doccomment">/// An end-entity certificate is being used as a CA certificate.</span>
-    <span class="ident">EndEntityUsedAsCA</span>,
+    <span class="ident">EndEntityUsedAsCa</span>,
 
     <span class="doccomment">/// An X.509 extension is invalid.</span>
     <span class="ident">ExtensionValueInvalid</span>,
@@ -162,13 +175,23 @@
 
     <span class="doccomment">/// The certificate is not valid for the Extended Key Usage for which it is</span>
     <span class="doccomment">/// being validated.</span>
-    <span class="ident">RequiredEKUNotFound</span>,
+    <span class="ident">RequiredEkuNotFound</span>,
 
     <span class="doccomment">/// A valid issuer for the certificate could not be found.</span>
     <span class="ident">UnknownIssuer</span>,
 
     <span class="doccomment">/// The certificate is not a v3 X.509 certificate.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This error may be also reported if the certificate version field</span>
+    <span class="doccomment">/// is malformed.</span>
     <span class="ident">UnsupportedCertVersion</span>,
+
+    <span class="doccomment">/// The certificate extensions are missing or malformed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// In particular, webpki requires the DNS name(s) be in the subjectAltName</span>
+    <span class="doccomment">/// extension as required by the CA/Browser Forum Baseline Requirements</span>
+    <span class="doccomment">/// and as recommended by RFC6125.</span>
+    <span class="ident">MissingOrMalformedExtensions</span>,
 
     <span class="doccomment">/// The certificate contains an unsupported critical extension.</span>
     <span class="ident">UnsupportedCriticalExtension</span>,
@@ -188,9 +211,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> { <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>) }
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>)
+    }
 }
 
+<span class="doccomment">/// Requires the `std` feature.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">::std::error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
 </code></pre></div>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.20.3/src/rr/record_data.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>record_data.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/record_data.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>record_data.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1244,6 +1244,48 @@
 <span id="1239">1239</span>
 <span id="1240">1240</span>
 <span id="1241">1241</span>
+<span id="1242">1242</span>
+<span id="1243">1243</span>
+<span id="1244">1244</span>
+<span id="1245">1245</span>
+<span id="1246">1246</span>
+<span id="1247">1247</span>
+<span id="1248">1248</span>
+<span id="1249">1249</span>
+<span id="1250">1250</span>
+<span id="1251">1251</span>
+<span id="1252">1252</span>
+<span id="1253">1253</span>
+<span id="1254">1254</span>
+<span id="1255">1255</span>
+<span id="1256">1256</span>
+<span id="1257">1257</span>
+<span id="1258">1258</span>
+<span id="1259">1259</span>
+<span id="1260">1260</span>
+<span id="1261">1261</span>
+<span id="1262">1262</span>
+<span id="1263">1263</span>
+<span id="1264">1264</span>
+<span id="1265">1265</span>
+<span id="1266">1266</span>
+<span id="1267">1267</span>
+<span id="1268">1268</span>
+<span id="1269">1269</span>
+<span id="1270">1270</span>
+<span id="1271">1271</span>
+<span id="1272">1272</span>
+<span id="1273">1273</span>
+<span id="1274">1274</span>
+<span id="1275">1275</span>
+<span id="1276">1276</span>
+<span id="1277">1277</span>
+<span id="1278">1278</span>
+<span id="1279">1279</span>
+<span id="1280">1280</span>
+<span id="1281">1281</span>
+<span id="1282">1282</span>
+<span id="1283">1283</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2015-2021 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
@@ -1253,11 +1295,16 @@
 
 <span class="doccomment">//! record data enum variants</span>
 
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span> <span class="comment">// allows us to deprecate RData types</span>
+
 <span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::convert::From</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">IpAddr</span>, <span class="ident">Ipv4Addr</span>, <span class="ident">Ipv6Addr</span>};
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="kw">use</span> <span class="ident">enum_as_inner::EnumAsInner</span>;
 <span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">trace</span>, <span class="ident">warn</span>};
@@ -1265,7 +1312,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::domain::Name</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::rdata</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::rdata</span>::{
-    <span class="ident">CAA</span>, <span class="ident">HINFO</span>, <span class="ident">MX</span>, <span class="ident">NAPTR</span>, <span class="ident">NULL</span>, <span class="ident">OPENPGPKEY</span>, <span class="ident">OPT</span>, <span class="ident">SOA</span>, <span class="ident">SRV</span>, <span class="ident">SSHFP</span>, <span class="ident">SVCB</span>, <span class="ident">TLSA</span>, <span class="ident">TXT</span>,
+    <span class="ident">CAA</span>, <span class="ident">CSYNC</span>, <span class="ident">HINFO</span>, <span class="ident">MX</span>, <span class="ident">NAPTR</span>, <span class="ident">NULL</span>, <span class="ident">OPENPGPKEY</span>, <span class="ident">OPT</span>, <span class="ident">SOA</span>, <span class="ident">SRV</span>, <span class="ident">SSHFP</span>, <span class="ident">SVCB</span>, <span class="ident">TLSA</span>, <span class="ident">TXT</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::record_type::RecordType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
@@ -1293,7 +1340,9 @@
 <span class="doccomment">/// is treated as binary information, and can be up to 256 characters in</span>
 <span class="doccomment">/// length (including the length octet).</span>
 <span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">EnumAsInner</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RData</span> {
     <span class="doccomment">/// ```text</span>
     <span class="doccomment">/// -- RFC 1035 -- Domain Implementation and Specification    November 1987</span>
@@ -1407,6 +1456,25 @@
     <span class="doccomment">/// the description of name server logic in [RFC-1034] for details.</span>
     <span class="doccomment">/// ```</span>
     <span class="ident">CNAME</span>(<span class="ident">Name</span>),
+
+    <span class="doccomment">/// ```text</span>
+    <span class="doccomment">/// 2.1.  The CSYNC Resource Record Format</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// 2.1.1.  The CSYNC Resource Record Wire Format</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The CSYNC RDATA consists of the following fields:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///                     1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3</span>
+    <span class="doccomment">/// 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span>
+    <span class="doccomment">/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
+    <span class="doccomment">/// |                          SOA Serial                           |</span>
+    <span class="doccomment">/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
+    <span class="doccomment">/// |       Flags                   |            Type Bit Map       /</span>
+    <span class="doccomment">/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
+    <span class="doccomment">/// /                     Type Bit Map (continued)                  /</span>
+    <span class="doccomment">/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
+    <span class="doccomment">/// ```</span>
+    <span class="ident">CSYNC</span>(<span class="ident">CSYNC</span>),
 
     <span class="doccomment">/// ```text</span>
     <span class="doccomment">/// 3.3.2. HINFO RDATA format</span>
@@ -1897,6 +1965,7 @@
     <span class="doccomment">/// These types are in `DNSSECRData` to make them easy to disable when</span>
     <span class="doccomment">/// crypto functionality isn&#39;t needed.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
     <span class="ident">DNSSEC</span>(<span class="ident">DNSSECRData</span>),
 
     <span class="doccomment">/// Unknown RecordData is for record types not supported by Trust-DNS</span>
@@ -1908,6 +1977,7 @@
     },
 
     <span class="doccomment">/// This corresponds to a record type of 0, unspecified</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use None for the RData in the resource record instead&quot;</span>)]</span>
     <span class="ident">ZERO</span>,
 }
 
@@ -1934,98 +2004,108 @@
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">record_type</span> {
             <span class="ident">RecordType::A</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading A&quot;</span>);
-                <span class="ident">rdata::a::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::A</span>)
+                <span class="ident">rdata::a::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::A</span>)
             }
             <span class="ident">RecordType::AAAA</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading AAAA&quot;</span>);
-                <span class="ident">rdata::aaaa::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::AAAA</span>)
+                <span class="ident">rdata::aaaa::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::AAAA</span>)
             }
             <span class="ident">RecordType::ANAME</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading ANAME&quot;</span>);
-                <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::ANAME</span>)
+                <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::ANAME</span>)
             }
             <span class="ident">rt</span> @ <span class="ident">RecordType::ANY</span> <span class="op">|</span> <span class="ident">rt</span> @ <span class="ident">RecordType::AXFR</span> <span class="op">|</span> <span class="ident">rt</span> @ <span class="ident">RecordType::IXFR</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoErrorKind::UnknownRecordTypeValue</span>(<span class="ident">rt</span>.<span class="ident">into</span>()).<span class="ident">into</span>());
             }
             <span class="ident">RecordType::CAA</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading CAA&quot;</span>);
-                <span class="ident">rdata::caa::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::CAA</span>)
+                <span class="ident">rdata::caa::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::CAA</span>)
             }
             <span class="ident">RecordType::CNAME</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading CNAME&quot;</span>);
-                <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::CNAME</span>)
+                <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::CNAME</span>)
+            }
+            <span class="ident">RecordType::CSYNC</span> =&gt; {
+                <span class="macro">trace!</span>(<span class="string">&quot;reading CSYNC&quot;</span>);
+                <span class="ident">rdata::csync::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::CSYNC</span>)
             }
             <span class="ident">RecordType::HINFO</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading HINFO&quot;</span>);
-                <span class="ident">rdata::hinfo::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::HINFO</span>)
+                <span class="ident">rdata::hinfo::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::HINFO</span>)
             }
             <span class="ident">RecordType::HTTPS</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading HTTPS&quot;</span>);
-                <span class="ident">rdata::svcb::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::HTTPS</span>)
+                <span class="ident">rdata::svcb::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::HTTPS</span>)
             }
             <span class="ident">RecordType::ZERO</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading EMPTY&quot;</span>);
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RData::ZERO</span>);
+                <span class="comment">// we should never get here, since ZERO should be 0 length, and None in the Record.</span>
+                <span class="comment">//   this invariant is verified below, and the decoding will fail with an err.</span>
+                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
+                <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ZERO</span>)
             }
             <span class="ident">RecordType::MX</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading MX&quot;</span>);
-                <span class="ident">rdata::mx::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::MX</span>)
+                <span class="ident">rdata::mx::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::MX</span>)
             }
             <span class="ident">RecordType::NAPTR</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading NAPTR&quot;</span>);
-                <span class="ident">rdata::naptr::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::NAPTR</span>)
+                <span class="ident">rdata::naptr::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::NAPTR</span>)
             }
             <span class="ident">RecordType::NULL</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading NULL&quot;</span>);
-                <span class="ident">rdata::null::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::NULL</span>)
+                <span class="ident">rdata::null::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::NULL</span>)
             }
             <span class="ident">RecordType::NS</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading NS&quot;</span>);
-                <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::NS</span>)
+                <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::NS</span>)
             }
             <span class="ident">RecordType::OPENPGPKEY</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading OPENPGPKEY&quot;</span>);
-                <span class="ident">rdata::openpgpkey::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::OPENPGPKEY</span>)
+                <span class="ident">rdata::openpgpkey::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::OPENPGPKEY</span>)
             }
             <span class="ident">RecordType::OPT</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading OPT&quot;</span>);
-                <span class="ident">rdata::opt::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::OPT</span>)
+                <span class="ident">rdata::opt::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::OPT</span>)
             }
             <span class="ident">RecordType::PTR</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading PTR&quot;</span>);
-                <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::PTR</span>)
+                <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::PTR</span>)
             }
             <span class="ident">RecordType::SOA</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading SOA&quot;</span>);
-                <span class="ident">rdata::soa::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::SOA</span>)
+                <span class="ident">rdata::soa::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::SOA</span>)
             }
             <span class="ident">RecordType::SRV</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading SRV&quot;</span>);
-                <span class="ident">rdata::srv::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::SRV</span>)
+                <span class="ident">rdata::srv::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::SRV</span>)
             }
             <span class="ident">RecordType::SSHFP</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading SSHFP&quot;</span>);
-                <span class="ident">rdata::sshfp::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::SSHFP</span>)
+                <span class="ident">rdata::sshfp::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::SSHFP</span>)
             }
             <span class="ident">RecordType::SVCB</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading SVCB&quot;</span>);
-                <span class="ident">rdata::svcb::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::SVCB</span>)
+                <span class="ident">rdata::svcb::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::SVCB</span>)
             }
             <span class="ident">RecordType::TLSA</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading TLSA&quot;</span>);
-                <span class="ident">rdata::tlsa::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::TLSA</span>)
+                <span class="ident">rdata::tlsa::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::TLSA</span>)
             }
             <span class="ident">RecordType::TXT</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading TXT&quot;</span>);
-                <span class="ident">rdata::txt::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::TXT</span>)
+                <span class="ident">rdata::txt::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::TXT</span>)
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RecordType::DNSSEC</span>(<span class="ident">record_type</span>) =&gt; {
-                <span class="ident">DNSSECRData::read</span>(<span class="ident">decoder</span>, <span class="ident">record_type</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::DNSSEC</span>)
+            <span class="ident">r</span> <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">is_dnssec</span>() =&gt; {
+                <span class="ident">DNSSECRData::read</span>(<span class="ident">decoder</span>, <span class="ident">record_type</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::DNSSEC</span>)
             }
-            <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>) =&gt; {
-                <span class="macro">trace!</span>(<span class="string">&quot;reading Unknown&quot;</span>);
-                <span class="ident">rdata::null::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">rdata</span><span class="op">|</span> <span class="ident">RData::Unknown</span> { <span class="ident">code</span>, <span class="ident">rdata</span> })
+            <span class="ident">record_type</span> =&gt; {
+                <span class="macro">trace!</span>(<span class="string">&quot;reading Unknown record: {}&quot;</span>, <span class="ident">record_type</span>);
+                <span class="ident">rdata::null::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">rdata</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::Unknown</span> {
+                    <span class="ident">code</span>: <span class="ident">record_type</span>.<span class="ident">into</span>(),
+                    <span class="ident">rdata</span>,
+                })
             }
         };
 
@@ -2125,6 +2205,7 @@
             <span class="ident">RData::CNAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::NS</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::PTR</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; {
                 <span class="ident">rdata::name::emit</span>(<span class="ident">encoder</span>, <span class="ident">name</span>)
             }
+            <span class="ident">RData::CSYNC</span>(<span class="kw-2">ref</span> <span class="ident">csync</span>) =&gt; <span class="ident">rdata::csync::emit</span>(<span class="ident">encoder</span>, <span class="ident">csync</span>),
             <span class="ident">RData::HINFO</span>(<span class="kw-2">ref</span> <span class="ident">hinfo</span>) =&gt; <span class="ident">rdata::hinfo::emit</span>(<span class="ident">encoder</span>, <span class="ident">hinfo</span>),
             <span class="ident">RData::HTTPS</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) =&gt; <span class="ident">rdata::svcb::emit</span>(<span class="ident">encoder</span>, <span class="ident">svcb</span>),
             <span class="ident">RData::ZERO</span> =&gt; <span class="prelude-val">Ok</span>(()),
@@ -2166,6 +2247,7 @@
             <span class="ident">RData::ANAME</span>(..) =&gt; <span class="ident">RecordType::ANAME</span>,
             <span class="ident">RData::CAA</span>(..) =&gt; <span class="ident">RecordType::CAA</span>,
             <span class="ident">RData::CNAME</span>(..) =&gt; <span class="ident">RecordType::CNAME</span>,
+            <span class="ident">RData::CSYNC</span>(..) =&gt; <span class="ident">RecordType::CSYNC</span>,
             <span class="ident">RData::HINFO</span>(..) =&gt; <span class="ident">RecordType::HINFO</span>,
             <span class="ident">RData::HTTPS</span>(..) =&gt; <span class="ident">RecordType::HTTPS</span>,
             <span class="ident">RData::MX</span>(..) =&gt; <span class="ident">RecordType::MX</span>,
@@ -2182,7 +2264,7 @@
             <span class="ident">RData::TLSA</span>(..) =&gt; <span class="ident">RecordType::TLSA</span>,
             <span class="ident">RData::TXT</span>(..) =&gt; <span class="ident">RecordType::TXT</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) =&gt; <span class="ident">RecordType::DNSSEC</span>(<span class="ident">DNSSECRData::to_record_type</span>(<span class="ident">rdata</span>)),
+            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) =&gt; <span class="ident">DNSSECRData::to_record_type</span>(<span class="ident">rdata</span>),
             <span class="ident">RData::Unknown</span> { <span class="ident">code</span>, .. } =&gt; <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>),
             <span class="ident">RData::ZERO</span> =&gt; <span class="ident">RecordType::ZERO</span>,
         }
@@ -2211,6 +2293,7 @@
             <span class="ident">RData::CAA</span>(<span class="kw-2">ref</span> <span class="ident">caa</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">caa</span>),
             <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
             <span class="ident">RData::CNAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::NS</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::PTR</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">name</span>),
+            <span class="ident">RData::CSYNC</span>(<span class="kw-2">ref</span> <span class="ident">csync</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">csync</span>),
             <span class="ident">RData::HINFO</span>(<span class="kw-2">ref</span> <span class="ident">hinfo</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">hinfo</span>),
             <span class="ident">RData::HTTPS</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">svcb</span>),
             <span class="ident">RData::ZERO</span> =&gt; <span class="prelude-val">Ok</span>(()),
@@ -2236,8 +2319,8 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RData</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RData</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RData</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
     }
 }
@@ -2458,6 +2541,7 @@
             <span class="ident">RData::ANAME</span>(..) =&gt; <span class="ident">RecordType::ANAME</span>,
             <span class="ident">RData::CAA</span>(..) =&gt; <span class="ident">RecordType::CAA</span>,
             <span class="ident">RData::CNAME</span>(..) =&gt; <span class="ident">RecordType::CNAME</span>,
+            <span class="ident">RData::CSYNC</span>(..) =&gt; <span class="ident">RecordType::CSYNC</span>,
             <span class="ident">RData::HINFO</span>(..) =&gt; <span class="ident">RecordType::HINFO</span>,
             <span class="ident">RData::HTTPS</span>(..) =&gt; <span class="ident">RecordType::HTTPS</span>,
             <span class="ident">RData::MX</span>(..) =&gt; <span class="ident">RecordType::MX</span>,
@@ -2474,7 +2558,7 @@
             <span class="ident">RData::TLSA</span>(..) =&gt; <span class="ident">RecordType::TLSA</span>,
             <span class="ident">RData::TXT</span>(..) =&gt; <span class="ident">RecordType::TXT</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) =&gt; <span class="ident">RecordType::DNSSEC</span>(<span class="ident">rdata</span>.<span class="ident">to_record_type</span>()),
+            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) =&gt; <span class="ident">rdata</span>.<span class="ident">to_record_type</span>(),
             <span class="ident">RData::Unknown</span> { <span class="ident">code</span>, .. } =&gt; <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>),
             <span class="ident">RData::ZERO</span> =&gt; <span class="ident">RecordType::ZERO</span>,
         }

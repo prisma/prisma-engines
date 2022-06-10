@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pin-project-internal-1.0.8/src/pin_project/derive.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>derive.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pin-project-internal-1.0.10/src/pin_project/derive.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>derive.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../pin_project_internal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1125,6 +1125,8 @@
 <span id="1120">1120</span>
 <span id="1121">1121</span>
 <span id="1122">1122</span>
+<span id="1123">1123</span>
+<span id="1124">1124</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Delimiter</span>, <span class="ident">Group</span>, <span class="ident">Span</span>, <span class="ident">TokenStream</span>};
 <span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">format_ident</span>, <span class="ident">quote</span>, <span class="ident">quote_spanned</span>, <span class="ident">ToTokens</span>};
 <span class="kw">use</span> <span class="ident">syn</span>::{
@@ -1165,10 +1167,7 @@
             <span class="ident">parse_enum</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cx</span>, <span class="ident">data</span>, <span class="kw-2">&amp;mut</span> <span class="ident">generate</span>)<span class="question-mark">?</span>;
         }
         <span class="ident">Data::Union</span>(<span class="kw">_</span>) =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">error!</span>(
-                <span class="ident">input</span>,
-                <span class="string">&quot;#[pin_project] attribute may only be used on structs or enums&quot;</span>
-            ));
+            <span class="macro">bail!</span>(<span class="ident">input</span>, <span class="string">&quot;#[pin_project] attribute may only be used on structs or enums&quot;</span>);
         }
     }
 
@@ -1210,14 +1209,17 @@
             <span class="comment">// but it is now removed.</span>
             <span class="comment">//</span>
             <span class="comment">// Refs:</span>
-            <span class="comment">// * https://github.com/rust-lang/rust/issues/63281</span>
-            <span class="comment">// * https://github.com/taiki-e/pin-project/pull/53#issuecomment-525906867</span>
-            <span class="comment">// * https://github.com/taiki-e/pin-project/pull/70</span>
+            <span class="comment">// - https://github.com/rust-lang/rust/issues/63281</span>
+            <span class="comment">// - https://github.com/taiki-e/pin-project/pull/53#issuecomment-525906867</span>
+            <span class="comment">// - https://github.com/taiki-e/pin-project/pull/70</span>
             #<span class="ident">allowed_lints</span>
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_qualifications</span>)]</span>
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::semicolon_if_nothing_returned</span>)]</span>
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::use_self</span>)]</span>
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::used_underscore_binding</span>)]</span>
             <span class="kw">const</span> <span class="kw">_</span>: () <span class="op">=</span> {
+                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_extern_crates</span>)]</span>
+                <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">pin_project</span> <span class="kw">as</span> <span class="ident">_pin_project</span>;
                 #<span class="ident">scoped</span>
                 #<span class="ident">unpin_impl</span>
                 #<span class="ident">drop_impl</span>
@@ -1315,7 +1317,7 @@
             .<span class="ident">filter_map</span>(<span class="ident">Option::as_ref</span>)
             .<span class="ident">find</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">name</span> <span class="op">==</span> <span class="ident">ident</span>)
         {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">error!</span>(<span class="ident">name</span>, <span class="string">&quot;name `{}` is the same as the original type name&quot;</span>, <span class="ident">name</span>));
+            <span class="macro">bail!</span>(<span class="ident">name</span>, <span class="string">&quot;name `{}` is the same as the original type name&quot;</span>, <span class="ident">name</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lifetime_name</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;&#39;pin&quot;</span>);
@@ -1420,10 +1422,12 @@
 <span class="kw">fn</span> <span class="ident">validate_struct</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">Fields</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">is_empty</span>() {
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;#[pin_project] attribute may not be used on structs with zero fields&quot;</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Fields::Unit</span> <span class="op">=</span> <span class="ident">fields</span> { <span class="prelude-val">Err</span>(<span class="macro">error!</span>(<span class="ident">ident</span>, <span class="ident">msg</span>)) } <span class="kw">else</span> { <span class="prelude-val">Err</span>(<span class="macro">error!</span>(<span class="ident">fields</span>, <span class="ident">msg</span>)) }
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Ok</span>(())
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Fields::Unit</span> <span class="op">=</span> <span class="ident">fields</span> {
+            <span class="macro">bail!</span>(<span class="ident">ident</span>, <span class="ident">msg</span>)
+        }
+        <span class="macro">bail!</span>(<span class="ident">fields</span>, <span class="ident">msg</span>)
     }
+    <span class="prelude-val">Ok</span>(())
 }
 
 <span class="kw">fn</span> <span class="ident">validate_enum</span>(<span class="ident">brace_token</span>: <span class="ident">token::Brace</span>, <span class="ident">variants</span>: <span class="kw-2">&amp;</span><span class="ident">Variants</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -1435,9 +1439,9 @@
     }
     <span class="kw">let</span> <span class="ident">has_field</span> <span class="op">=</span> <span class="ident">variants</span>.<span class="ident">iter</span>().<span class="ident">try_fold</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">has_field</span>, <span class="ident">v</span><span class="op">|</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">e</span>)) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">discriminant</span> {
-            <span class="prelude-val">Err</span>(<span class="macro">error!</span>(<span class="ident">e</span>, <span class="string">&quot;#[pin_project] attribute may not be used on enums with discriminants&quot;</span>))
+            <span class="macro">bail!</span>(<span class="ident">e</span>, <span class="string">&quot;#[pin_project] attribute may not be used on enums with discriminants&quot;</span>);
         } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attr</span>) <span class="op">=</span> <span class="ident">v</span>.<span class="ident">attrs</span>.<span class="ident">find</span>(<span class="ident">PIN</span>) {
-            <span class="prelude-val">Err</span>(<span class="macro">error!</span>(<span class="ident">attr</span>, <span class="string">&quot;#[pin] attribute may only be used on fields of structs or variants&quot;</span>))
+            <span class="macro">bail!</span>(<span class="ident">attr</span>, <span class="string">&quot;#[pin] attribute may only be used on fields of structs or variants&quot;</span>);
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">has_field</span>)
         } <span class="kw">else</span> {
@@ -1447,7 +1451,7 @@
     <span class="kw">if</span> <span class="ident">has_field</span> {
         <span class="prelude-val">Ok</span>(())
     } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="macro">error!</span>(<span class="ident">variants</span>, <span class="string">&quot;#[pin_project] attribute may not be used on enums with zero fields&quot;</span>))
+        <span class="macro">bail!</span>(<span class="ident">variants</span>, <span class="string">&quot;#[pin_project] attribute may not be used on enums with zero fields&quot;</span>);
     }
 }
 
@@ -1708,10 +1712,10 @@
                 #<span class="ident">vis</span> #<span class="ident">ident</span> #<span class="ident">colon_token</span> <span class="ident">::pin_project::__private::PhantomData</span><span class="op">&lt;</span>#<span class="ident">ty</span><span class="op">&gt;</span>,
             });
             <span class="ident">proj_body</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> {
-                #<span class="ident">ident</span> #<span class="ident">colon_token</span> <span class="ident">::pin_project::__private::Pin::new_unchecked</span>(#<span class="ident">binding</span>),
+                #<span class="ident">ident</span> #<span class="ident">colon_token</span> <span class="ident">_pin_project::__private::Pin::new_unchecked</span>(#<span class="ident">binding</span>),
             });
             <span class="ident">proj_move</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> {
-                #<span class="ident">ident</span> #<span class="ident">colon_token</span> <span class="ident">::pin_project::__private::PhantomData</span>,
+                #<span class="ident">ident</span> #<span class="ident">colon_token</span> <span class="ident">_pin_project::__private::PhantomData</span>,
             });
 
             <span class="ident">cx</span>.<span class="ident">pinned_fields</span>.<span class="ident">push</span>(<span class="ident">ty</span>);
@@ -1730,7 +1734,7 @@
                 #<span class="ident">binding</span>,
             });
             <span class="ident">proj_move</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> {
-                #<span class="ident">ident</span> #<span class="ident">colon_token</span> <span class="ident">::pin_project::__private::ptr::read</span>(#<span class="ident">binding</span>),
+                #<span class="ident">ident</span> #<span class="ident">colon_token</span> <span class="ident">_pin_project::__private::ptr::read</span>(#<span class="ident">binding</span>),
             });
         }
     }
@@ -1785,7 +1789,7 @@
         <span class="comment">// if any of the destructors panic.</span>
         {
             #(
-                <span class="kw">let</span> <span class="ident">__guard</span> <span class="op">=</span> <span class="ident">::pin_project::__private::UnsafeDropInPlaceGuard</span>(#<span class="ident">pinned_fields</span>);
+                <span class="kw">let</span> <span class="ident">__guard</span> <span class="op">=</span> <span class="ident">_pin_project::__private::UnsafeDropInPlaceGuard::new</span>(#<span class="ident">pinned_fields</span>);
             )<span class="op">*</span>
         }
 
@@ -1797,9 +1801,9 @@
 <span class="doccomment">/// Creates `Unpin` implementation for the original type.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The kind of `Unpin` impl generated depends on `unpin_impl` field:</span>
-<span class="doccomment">/// * `UnpinImpl::Unsafe` - Implements `Unpin` via `UnsafeUnpin` impl.</span>
-<span class="doccomment">/// * `UnpinImpl::Negative` - Generates `Unpin` impl with bounds that will never be true.</span>
-<span class="doccomment">/// * `UnpinImpl::Default` - Generates `Unpin` impl that requires `Unpin` for all pinned fields.</span>
+<span class="doccomment">/// - `UnpinImpl::Unsafe` - Implements `Unpin` via `UnsafeUnpin` impl.</span>
+<span class="doccomment">/// - `UnpinImpl::Negative` - Generates `Unpin` impl with bounds that will never be true.</span>
+<span class="doccomment">/// - `UnpinImpl::Default` - Generates `Unpin` impl that requires `Unpin` for all pinned fields.</span>
 <span class="kw">fn</span> <span class="ident">make_unpin_impl</span>(<span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">match</span> <span class="ident">cx</span>.<span class="ident">unpin_impl</span> {
         <span class="ident">UnpinImpl::Unsafe</span>(<span class="ident">span</span>) =&gt; {
@@ -1809,14 +1813,14 @@
 
             <span class="comment">// Make the error message highlight `UnsafeUnpin` argument.</span>
             <span class="ident">proj_generics</span>.<span class="ident">make_where_clause</span>().<span class="ident">predicates</span>.<span class="ident">push</span>(<span class="macro">parse_quote_spanned!</span> { <span class="ident">span</span> =&gt;
-                <span class="ident">::pin_project::__private::Wrapper</span><span class="op">&lt;</span>#<span class="ident">lifetime</span>, <span class="self">Self</span><span class="op">&gt;</span>: <span class="ident">::pin_project::UnsafeUnpin</span>
+                <span class="ident">_pin_project::__private::Wrapper</span><span class="op">&lt;</span>#<span class="ident">lifetime</span>, <span class="self">Self</span><span class="op">&gt;</span>: <span class="ident">_pin_project::UnsafeUnpin</span>
             });
 
             <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="kw">_</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">proj_generics</span>.<span class="ident">split_for_impl</span>();
             <span class="kw">let</span> <span class="ident">ty_generics</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">orig</span>.<span class="ident">generics</span>.<span class="ident">split_for_impl</span>().<span class="number">1</span>;
 
             <span class="macro">quote_spanned!</span> { <span class="ident">span</span> =&gt;
-                <span class="kw">impl</span> #<span class="ident">impl_generics</span> <span class="ident">::pin_project::__private::Unpin</span> <span class="kw">for</span> #<span class="ident">orig_ident</span> #<span class="ident">ty_generics</span>
+                <span class="kw">impl</span> #<span class="ident">impl_generics</span> <span class="ident">_pin_project::__private::Unpin</span> <span class="kw">for</span> #<span class="ident">orig_ident</span> #<span class="ident">ty_generics</span>
                 #<span class="ident">where_clause</span>
                 {
                 }
@@ -1828,9 +1832,9 @@
             <span class="kw">let</span> <span class="ident">lifetime</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">proj</span>.<span class="ident">lifetime</span>;
 
             <span class="ident">proj_generics</span>.<span class="ident">make_where_clause</span>().<span class="ident">predicates</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span> {
-                <span class="ident">::pin_project::__private::Wrapper</span><span class="op">&lt;</span>
-                    #<span class="ident">lifetime</span>, <span class="ident">::pin_project::__private::PhantomPinned</span>
-                <span class="op">&gt;</span>: <span class="ident">::pin_project::__private::Unpin</span>
+                <span class="ident">_pin_project::__private::Wrapper</span><span class="op">&lt;</span>
+                    #<span class="ident">lifetime</span>, <span class="ident">_pin_project::__private::PhantomPinned</span>
+                <span class="op">&gt;</span>: <span class="ident">_pin_project::__private::Unpin</span>
             });
 
             <span class="kw">let</span> (<span class="ident">proj_impl_generics</span>, <span class="kw">_</span>, <span class="ident">proj_where_clause</span>) <span class="op">=</span> <span class="ident">proj_generics</span>.<span class="ident">split_for_impl</span>();
@@ -1840,7 +1844,7 @@
             <span class="comment">// call-site span.</span>
             <span class="kw">let</span> <span class="ident">unsafety</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro">Token!</span>[<span class="kw">unsafe</span>]<span class="op">&gt;</span><span class="ident">::default</span>();
             <span class="macro">quote_spanned!</span> { <span class="ident">span</span> =&gt;
-                <span class="kw">impl</span> #<span class="ident">proj_impl_generics</span> <span class="ident">::pin_project::__private::Unpin</span>
+                <span class="kw">impl</span> #<span class="ident">proj_impl_generics</span> <span class="ident">_pin_project::__private::Unpin</span>
                     <span class="kw">for</span> #<span class="ident">orig_ident</span> #<span class="ident">ty_generics</span>
                 #<span class="ident">proj_where_clause</span>
                 {
@@ -1853,7 +1857,7 @@
                 <span class="comment">// impl, they&#39;ll get a &quot;conflicting implementations of trait&quot; error when</span>
                 <span class="comment">// coherence checks are run.</span>
                 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-                #<span class="ident">unsafety</span> <span class="kw">impl</span> #<span class="ident">proj_impl_generics</span> <span class="ident">::pin_project::UnsafeUnpin</span>
+                #<span class="ident">unsafety</span> <span class="kw">impl</span> #<span class="ident">proj_impl_generics</span> <span class="ident">_pin_project::UnsafeUnpin</span>
                     <span class="kw">for</span> #<span class="ident">orig_ident</span> #<span class="ident">ty_generics</span>
                 #<span class="ident">proj_where_clause</span>
                 {
@@ -1908,7 +1912,7 @@
             <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">ty_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">orig</span>.<span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
 
             <span class="ident">full_where_clause</span>.<span class="ident">predicates</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span> {
-                #<span class="ident">struct_ident</span> #<span class="ident">proj_ty_generics</span>: <span class="ident">::pin_project::__private::Unpin</span>
+                #<span class="ident">struct_ident</span> #<span class="ident">proj_ty_generics</span>: <span class="ident">_pin_project::__private::Unpin</span>
             });
 
             <span class="macro">quote!</span> {
@@ -1924,15 +1928,15 @@
                 <span class="comment">// this &#39;public&#39; type by creating this type in the inside of `const`.</span>
                 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
                 #<span class="ident">vis</span> <span class="kw">struct</span> #<span class="ident">struct_ident</span> #<span class="ident">proj_generics</span> #<span class="ident">where_clause</span> {
-                    <span class="ident">__pin_project_use_generics</span>: <span class="ident">::pin_project::__private::AlwaysUnpin</span><span class="op">&lt;</span>
-                        #<span class="ident">lifetime</span>, (#(<span class="ident">::pin_project::__private::PhantomData</span><span class="op">&lt;</span>#<span class="ident">type_params</span><span class="op">&gt;</span>),<span class="kw-2">*</span>)
+                    <span class="ident">__pin_project_use_generics</span>: <span class="ident">_pin_project::__private::AlwaysUnpin</span><span class="op">&lt;</span>
+                        #<span class="ident">lifetime</span>, (#(<span class="ident">_pin_project::__private::PhantomData</span><span class="op">&lt;</span>#<span class="ident">type_params</span><span class="op">&gt;</span>),<span class="kw-2">*</span>)
                     <span class="op">&gt;</span>,
 
                     #(#<span class="ident">fields</span>,)<span class="op">*</span>
                     #(#<span class="ident">lifetime_fields</span>,)<span class="op">*</span>
                 }
 
-                <span class="kw">impl</span> #<span class="ident">proj_impl_generics</span> <span class="ident">::pin_project::__private::Unpin</span>
+                <span class="kw">impl</span> #<span class="ident">proj_impl_generics</span> <span class="ident">_pin_project::__private::Unpin</span>
                     <span class="kw">for</span> #<span class="ident">orig_ident</span> #<span class="ident">ty_generics</span>
                 #<span class="ident">full_where_clause</span>
                 {
@@ -1945,7 +1949,7 @@
                 <span class="comment">// impl, they&#39;ll get a &quot;conflicting implementations of trait&quot; error when</span>
                 <span class="comment">// coherence checks are run.</span>
                 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-                <span class="kw">unsafe</span> <span class="kw">impl</span> #<span class="ident">proj_impl_generics</span> <span class="ident">::pin_project::UnsafeUnpin</span>
+                <span class="kw">unsafe</span> <span class="kw">impl</span> #<span class="ident">proj_impl_generics</span> <span class="ident">_pin_project::UnsafeUnpin</span>
                     <span class="kw">for</span> #<span class="ident">orig_ident</span> #<span class="ident">ty_generics</span>
                 #<span class="ident">full_where_clause</span>
                 {
@@ -1958,8 +1962,8 @@
 <span class="doccomment">/// Creates `Drop` implementation for the original type.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The kind of `Drop` impl generated depends on `pinned_drop` field:</span>
-<span class="doccomment">/// * `Some` - implements `Drop` via `PinnedDrop` impl.</span>
-<span class="doccomment">/// * `None` - generates code that ensures that `Drop` trait is not implemented,</span>
+<span class="doccomment">/// - `Some` - implements `Drop` via `PinnedDrop` impl.</span>
+<span class="doccomment">/// - `None` - generates code that ensures that `Drop` trait is not implemented,</span>
 <span class="doccomment">///            instead of generating `Drop` impl.</span>
 <span class="kw">fn</span> <span class="ident">make_drop_impl</span>(<span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">orig</span>.<span class="ident">ident</span>;
@@ -1970,18 +1974,18 @@
         <span class="comment">// call-site span.</span>
         <span class="kw">let</span> <span class="ident">unsafety</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro">Token!</span>[<span class="kw">unsafe</span>]<span class="op">&gt;</span><span class="ident">::default</span>();
         <span class="macro">quote_spanned!</span> { <span class="ident">span</span> =&gt;
-            <span class="kw">impl</span> #<span class="ident">impl_generics</span> <span class="ident">::pin_project::__private::Drop</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">ty_generics</span>
+            <span class="kw">impl</span> #<span class="ident">impl_generics</span> <span class="ident">_pin_project::__private::Drop</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">ty_generics</span>
             #<span class="ident">where_clause</span>
             {
                 <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
                     #<span class="ident">unsafety</span> {
                         <span class="comment">// Safety - we&#39;re in &#39;drop&#39;, so we know that &#39;self&#39; will</span>
                         <span class="comment">// never move again.</span>
-                        <span class="kw">let</span> <span class="ident">__pinned_self</span> <span class="op">=</span> <span class="ident">::pin_project::__private::Pin::new_unchecked</span>(<span class="self">self</span>);
+                        <span class="kw">let</span> <span class="ident">__pinned_self</span> <span class="op">=</span> <span class="ident">_pin_project::__private::Pin::new_unchecked</span>(<span class="self">self</span>);
                         <span class="comment">// We call `pinned_drop` only once. Since `PinnedDrop::drop`</span>
                         <span class="comment">// is an unsafe method and a private API, it is never called again in safe</span>
                         <span class="comment">// code *unless the user uses a maliciously crafted macro*.</span>
-                        <span class="ident">::pin_project::__private::PinnedDrop::drop</span>(<span class="ident">__pinned_self</span>);
+                        <span class="ident">_pin_project::__private::PinnedDrop::drop</span>(<span class="ident">__pinned_self</span>);
                     }
                 }
             }
@@ -2013,7 +2017,7 @@
             <span class="comment">// This will result in a compilation error, which is exactly what we want.</span>
             <span class="kw">trait</span> #<span class="ident">trait_ident</span> {}
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::drop_bounds</span>, <span class="ident">drop_bounds</span>)]</span>
-            <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">::pin_project::__private::Drop</span><span class="op">&gt;</span> #<span class="ident">trait_ident</span> <span class="kw">for</span> <span class="ident">T</span> {}
+            <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">_pin_project::__private::Drop</span><span class="op">&gt;</span> #<span class="ident">trait_ident</span> <span class="kw">for</span> <span class="ident">T</span> {}
             <span class="kw">impl</span> #<span class="ident">impl_generics</span> #<span class="ident">trait_ident</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {}
 
             <span class="comment">// Generate a dummy impl of `PinnedDrop`, to ensure that the user cannot implement it.</span>
@@ -2027,10 +2031,10 @@
             <span class="comment">// they&#39;ll get a &quot;conflicting implementations of trait&quot; error when coherence</span>
             <span class="comment">// checks are run.</span>
             <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-            <span class="kw">impl</span> #<span class="ident">impl_generics</span> <span class="ident">::pin_project::__private::PinnedDrop</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">ty_generics</span>
+            <span class="kw">impl</span> #<span class="ident">impl_generics</span> <span class="ident">_pin_project::__private::PinnedDrop</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">ty_generics</span>
             #<span class="ident">where_clause</span>
             {
-                <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">drop</span>(<span class="self">self</span>: <span class="ident">::pin_project::__private::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) {}
+                <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">drop</span>(<span class="self">self</span>: <span class="ident">_pin_project::__private::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) {}
             }
         }
     }
@@ -2061,7 +2065,7 @@
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">project</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">quote!</span> {
         #<span class="ident">vis</span> <span class="kw">fn</span> <span class="ident">project</span><span class="op">&lt;</span>#<span class="ident">lifetime</span><span class="op">&gt;</span>(
-            <span class="self">self</span>: <span class="ident">::pin_project::__private::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>#<span class="ident">lifetime</span> <span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
+            <span class="self">self</span>: <span class="ident">_pin_project::__private::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>#<span class="ident">lifetime</span> <span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         ) -&gt; #<span class="ident">proj_ident</span> #<span class="ident">proj_ty_generics</span> {
             <span class="kw">unsafe</span> {
                 #<span class="ident">proj_body</span>
@@ -2071,7 +2075,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">project_ref</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">quote!</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_const_for_fn</span>)]</span>
         #<span class="ident">vis</span> <span class="kw">fn</span> <span class="ident">project_ref</span><span class="op">&lt;</span>#<span class="ident">lifetime</span><span class="op">&gt;</span>(
-            <span class="self">self</span>: <span class="ident">::pin_project::__private::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>#<span class="ident">lifetime</span> <span class="self">Self</span><span class="op">&gt;</span>,
+            <span class="self">self</span>: <span class="ident">_pin_project::__private::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>#<span class="ident">lifetime</span> <span class="self">Self</span><span class="op">&gt;</span>,
         ) -&gt; #<span class="ident">proj_ref_ident</span> #<span class="ident">proj_ty_generics</span> {
             <span class="kw">unsafe</span> {
                 #<span class="ident">proj_ref_body</span>
@@ -2082,7 +2086,7 @@
         <span class="comment">// It is enough to only set the span of the signature.</span>
         <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="macro">quote_spanned!</span> { <span class="ident">span</span> =&gt;
             #<span class="ident">vis</span> <span class="kw">fn</span> <span class="ident">project_replace</span>(
-                <span class="self">self</span>: <span class="ident">::pin_project::__private::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
+                <span class="self">self</span>: <span class="ident">_pin_project::__private::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
                 <span class="ident">__replacement</span>: <span class="self">Self</span>,
             ) -&gt; #<span class="ident">proj_own_ident</span> #<span class="ident">orig_ty_generics</span>
         };
@@ -2093,10 +2097,10 @@
 
                     <span class="comment">// Destructors will run in reverse order, so next create a guard to overwrite</span>
                     <span class="comment">// `self` with the replacement value without calling destructors.</span>
-                    <span class="kw">let</span> <span class="ident">__guard</span> <span class="op">=</span> <span class="ident">::pin_project::__private::UnsafeOverwriteGuard</span> {
-                        <span class="ident">target</span>: <span class="ident">__self_ptr</span>,
-                        <span class="ident">value</span>: <span class="ident">::pin_project::__private::ManuallyDrop::new</span>(<span class="ident">__replacement</span>),
-                    };
+                    <span class="kw">let</span> <span class="ident">__guard</span> <span class="op">=</span> <span class="ident">_pin_project::__private::UnsafeOverwriteGuard::new</span>(
+                        <span class="ident">__self_ptr</span>,
+                        <span class="ident">__replacement</span>,
+                    );
 
                     #<span class="ident">proj_own_body</span>
                 }
@@ -2128,8 +2132,8 @@
 <span class="doccomment">/// Checks that the `[repr(packed)]` attribute is not included.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This currently does two checks:</span>
-<span class="doccomment">/// * Checks the attributes of structs to ensure there is no `[repr(packed)]`.</span>
-<span class="doccomment">/// * Generates a function that borrows fields without an unsafe block and</span>
+<span class="doccomment">/// - Checks the attributes of structs to ensure there is no `[repr(packed)]`.</span>
+<span class="doccomment">/// - Generates a function that borrows fields without an unsafe block and</span>
 <span class="doccomment">///   forbidding `unaligned_references` lint.</span>
 <span class="kw">fn</span> <span class="ident">ensure_not_packed</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">OriginalType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">fields</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Fields</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
     <span class="kw">for</span> <span class="ident">meta</span> <span class="kw">in</span> <span class="ident">orig</span>.<span class="ident">attrs</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">parse_meta</span>().<span class="ident">ok</span>()) {
@@ -2155,7 +2159,7 @@
                                 } <span class="kw">else</span> {
                                     <span class="string">&quot;#[pin_project] attribute may not be used on #[repr(packed)] types&quot;</span>
                                 };
-                                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">error!</span>(<span class="ident">repr</span>, <span class="ident">msg</span>));
+                                <span class="macro">bail!</span>(<span class="ident">repr</span>, <span class="ident">msg</span>);
                             }
                         }
                         <span class="ident">NestedMeta::Lit</span>(..) =&gt; {}

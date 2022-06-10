@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ipnet-2.3.1/src/ipnet.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ipnet.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ipnet-2.5.0/src/ipnet.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ipnet.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ipnet/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1743,6 +1743,28 @@
 <span id="1738">1738</span>
 <span id="1739">1739</span>
 <span id="1740">1740</span>
+<span id="1741">1741</span>
+<span id="1742">1742</span>
+<span id="1743">1743</span>
+<span id="1744">1744</span>
+<span id="1745">1745</span>
+<span id="1746">1746</span>
+<span id="1747">1747</span>
+<span id="1748">1748</span>
+<span id="1749">1749</span>
+<span id="1750">1750</span>
+<span id="1751">1751</span>
+<span id="1752">1752</span>
+<span id="1753">1753</span>
+<span id="1754">1754</span>
+<span id="1755">1755</span>
+<span id="1756">1756</span>
+<span id="1757">1757</span>
+<span id="1758">1758</span>
+<span id="1759">1759</span>
+<span id="1760">1760</span>
+<span id="1761">1761</span>
+<span id="1762">1762</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp</span>::{<span class="ident">min</span>, <span class="ident">max</span>};
 <span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>::{<span class="ident">Less</span>, <span class="ident">Equal</span>};
 <span class="kw">use</span> <span class="ident">std::convert::From</span>;
@@ -1752,7 +1774,7 @@
 <span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">IpAddr</span>, <span class="ident">Ipv4Addr</span>, <span class="ident">Ipv6Addr</span>};
 <span class="kw">use</span> <span class="ident">std::option::Option</span>::{<span class="prelude-val">Some</span>, <span class="prelude-val">None</span>};
 
-<span class="kw">use</span> <span class="ident">ipext</span>::{<span class="ident">IpAdd</span>, <span class="ident">IpSub</span>, <span class="ident">IpStep</span>, <span class="ident">IpAddrRange</span>, <span class="ident">Ipv4AddrRange</span>, <span class="ident">Ipv6AddrRange</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ipext</span>::{<span class="ident">IpAdd</span>, <span class="ident">IpSub</span>, <span class="ident">IpStep</span>, <span class="ident">IpAddrRange</span>, <span class="ident">Ipv4AddrRange</span>, <span class="ident">Ipv6AddrRange</span>};
 
 <span class="doccomment">/// An IP network address, either IPv4 or IPv6.</span>
 <span class="doccomment">///</span>
@@ -1801,7 +1823,7 @@
 <span class="doccomment">/// addresses represented in CIDR notation. See [IETF RFC 4632] for the</span>
 <span class="doccomment">/// CIDR notation.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`IpNet`]: enum.IpAddr.html</span>
+<span class="doccomment">/// [`IpNet`]: enum.IpNet.html</span>
 <span class="doccomment">/// [`FromStr`]: https://doc.rust-lang.org/std/str/trait.FromStr.html</span>
 <span class="doccomment">/// [IETF RFC 4632]: https://tools.ietf.org/html/rfc4632</span>
 <span class="doccomment">///</span>
@@ -1831,7 +1853,7 @@
 <span class="doccomment">/// addresses represented in CIDR notation. See [IETF RFC 4632] for the</span>
 <span class="doccomment">/// CIDR notation.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`IpNet`]: enum.IpAddr.html</span>
+<span class="doccomment">/// [`IpNet`]: enum.IpNet.html</span>
 <span class="doccomment">/// [`FromStr`]: https://doc.rust-lang.org/std/str/trait.FromStr.html</span>
 <span class="doccomment">/// [IETF RFC 4632]: https://tools.ietf.org/html/rfc4632</span>
 <span class="doccomment">///</span>
@@ -1865,6 +1887,28 @@
 <span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">PrefixLenError</span> {}
 
 <span class="kw">impl</span> <span class="ident">IpNet</span> {
+    <span class="doccomment">/// Creates a new IP network address from an `IpAddr` and prefix</span>
+    <span class="doccomment">/// length.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use std::net::Ipv6Addr;</span>
+    <span class="doccomment">/// use ipnet::{IpNet, PrefixLenError};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let net = IpNet::new(Ipv6Addr::LOCALHOST.into(), 48);</span>
+    <span class="doccomment">/// assert!(net.is_ok());</span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// let bad_prefix_len = IpNet::new(Ipv6Addr::LOCALHOST.into(), 129);</span>
+    <span class="doccomment">/// assert_eq!(bad_prefix_len, Err(PrefixLenError));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ip</span>: <span class="ident">IpAddr</span>, <span class="ident">prefix_len</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IpNet</span>, <span class="ident">PrefixLenError</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">ip</span> {
+            <span class="ident">IpAddr::V4</span>(<span class="ident">a</span>) =&gt; <span class="ident">Ipv4Net::new</span>(<span class="ident">a</span>, <span class="ident">prefix_len</span>)<span class="question-mark">?</span>.<span class="ident">into</span>(),
+            <span class="ident">IpAddr::V6</span>(<span class="ident">a</span>) =&gt; <span class="ident">Ipv6Net::new</span>(<span class="ident">a</span>, <span class="ident">prefix_len</span>)<span class="question-mark">?</span>.<span class="ident">into</span>(),
+        })
+    }
+
     <span class="doccomment">/// Returns a copy of the network with the address truncated to the</span>
     <span class="doccomment">/// prefix length.</span>
     <span class="doccomment">///</span>
@@ -3003,7 +3047,7 @@
 <span class="doccomment">/// Generates the subnets between the provided `start` and `end` IP</span>
 <span class="doccomment">/// addresses inclusive of `end`. Each iteration generates the next</span>
 <span class="doccomment">/// network address of the largest valid size it can, while using a</span>
-<span class="doccomment">/// prefix lenth not less than `min_prefix_len`.</span>
+<span class="doccomment">/// prefix length not less than `min_prefix_len`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -3050,7 +3094,7 @@
 <span class="doccomment">/// Generates the subnets between the provided `start` and `end` IP</span>
 <span class="doccomment">/// addresses inclusive of `end`. Each iteration generates the next</span>
 <span class="doccomment">/// network address of the largest valid size it can, while using a</span>
-<span class="doccomment">/// prefix lenth not less than `min_prefix_len`.</span>
+<span class="doccomment">/// prefix length not less than `min_prefix_len`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -3084,7 +3128,7 @@
 <span class="doccomment">/// Generates the subnets between the provided `start` and `end` IP</span>
 <span class="doccomment">/// addresses inclusive of `end`. Each iteration generates the next</span>
 <span class="doccomment">/// network address of the largest valid size it can, while using a</span>
-<span class="doccomment">/// prefix lenth not less than `min_prefix_len`.</span>
+<span class="doccomment">/// prefix length not less than `min_prefix_len`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>

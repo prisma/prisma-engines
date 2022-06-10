@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.19.1/src/msgs/deframer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>deframer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/deframer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>deframer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -345,18 +345,92 @@
 <span id="340">340</span>
 <span id="341">341</span>
 <span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::VecDeque</span>;
 <span class="kw">use</span> <span class="ident">std::io</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::codec</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::message</span>::{<span class="ident">Message</span>, <span class="ident">MessageError</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::message</span>::{<span class="ident">MessageError</span>, <span class="ident">OpaqueMessage</span>};
 
 <span class="doccomment">/// This deframer works to reconstruct TLS messages</span>
 <span class="doccomment">/// from arbitrary-sized reads, buffering as necessary.</span>
 <span class="doccomment">/// The input is `read()`, the output is the `frames` deque.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageDeframer</span> {
     <span class="doccomment">/// Completed frames for output.</span>
-    <span class="kw">pub</span> <span class="ident">frames</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">frames</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">OpaqueMessage</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Set to true if the peer is not talking TLS, but some other</span>
     <span class="doccomment">/// protocol.  The caller should abort the connection, because</span>
@@ -365,7 +439,7 @@
 
     <span class="doccomment">/// A fixed-size buffer containing the currently-accumulating</span>
     <span class="doccomment">/// TLS message.</span>
-    <span class="ident">buf</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">Message::MAX_WIRE_SIZE</span>]<span class="op">&gt;</span>,
+    <span class="ident">buf</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">OpaqueMessage::MAX_WIRE_SIZE</span>]<span class="op">&gt;</span>,
 
     <span class="doccomment">/// What size prefix of `buf` is used.</span>
     <span class="ident">used</span>: <span class="ident">usize</span>,
@@ -390,11 +464,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MessageDeframer</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">MessageDeframer</span> {
-        <span class="ident">MessageDeframer</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
             <span class="ident">frames</span>: <span class="ident">VecDeque::new</span>(),
             <span class="ident">desynced</span>: <span class="bool-val">false</span>,
-            <span class="ident">buf</span>: <span class="ident">Box::new</span>([<span class="number">0u8</span>; <span class="ident">Message::MAX_WIRE_SIZE</span>]),
+            <span class="ident">buf</span>: <span class="ident">Box::new</span>([<span class="number">0u8</span>; <span class="ident">OpaqueMessage::MAX_WIRE_SIZE</span>]),
             <span class="ident">used</span>: <span class="number">0</span>,
         }
     }
@@ -407,7 +481,7 @@
         <span class="comment">// we get a message with a length field out of range here,</span>
         <span class="comment">// we do a zero length read.  That looks like an EOF to</span>
         <span class="comment">// the next layer up, which is fine.</span>
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">used</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">Message::MAX_WIRE_SIZE</span>);
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">used</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">OpaqueMessage::MAX_WIRE_SIZE</span>);
         <span class="kw">let</span> <span class="ident">new_bytes</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buf</span>[<span class="self">self</span>.<span class="ident">used</span>..])<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">used</span> <span class="op">+</span><span class="op">=</span> <span class="ident">new_bytes</span>;
@@ -440,7 +514,7 @@
         <span class="comment">// Try to decode a message off the front of buf.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rd</span> <span class="op">=</span> <span class="ident">codec::Reader::init</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[..<span class="self">self</span>.<span class="ident">used</span>]);
 
-        <span class="kw">match</span> <span class="ident">Message::read_with_detailed_error</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rd</span>) {
+        <span class="kw">match</span> <span class="ident">OpaqueMessage::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rd</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">used</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">used</span>();
                 <span class="self">self</span>.<span class="ident">frames</span>.<span class="ident">push_back</span>(<span class="ident">m</span>);
@@ -454,6 +528,7 @@
         }
     }
 
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::comparison_chain</span>)]</span>
     <span class="kw">fn</span> <span class="ident">buf_consume</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">taken</span>: <span class="ident">usize</span>) {
         <span class="kw">if</span> <span class="ident">taken</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">used</span> {
             <span class="comment">/* Before:
@@ -471,7 +546,7 @@
 
             <span class="self">self</span>.<span class="ident">buf</span>
                 .<span class="ident">copy_within</span>(<span class="ident">taken</span>..<span class="self">self</span>.<span class="ident">used</span>, <span class="number">0</span>);
-            <span class="self">self</span>.<span class="ident">used</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">used</span> <span class="op">-</span> <span class="ident">taken</span>;
+            <span class="self">self</span>.<span class="ident">used</span> <span class="op">-</span><span class="op">=</span> <span class="ident">taken</span>;
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">taken</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">used</span> {
             <span class="self">self</span>.<span class="ident">used</span> <span class="op">=</span> <span class="number">0</span>;
         }
@@ -482,10 +557,22 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::MessageDeframer</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::message::Message</span>;
+    <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
     <span class="kw">use</span> <span class="ident">std::io</span>;
 
-    <span class="kw">const</span> <span class="ident">FIRST_MESSAGE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>] <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/deframer-test.1.bin&quot;</span>);
-    <span class="kw">const</span> <span class="ident">SECOND_MESSAGE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>] <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/deframer-test.2.bin&quot;</span>);
+    <span class="kw">const</span> <span class="ident">FIRST_MESSAGE</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/deframer-test.1.bin&quot;</span>);
+    <span class="kw">const</span> <span class="ident">SECOND_MESSAGE</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/deframer-test.2.bin&quot;</span>);
+
+    <span class="kw">const</span> <span class="ident">EMPTY_APPLICATIONDATA_MESSAGE</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span>
+        <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/deframer-empty-applicationdata.bin&quot;</span>);
+
+    <span class="kw">const</span> <span class="ident">INVALID_EMPTY_MESSAGE</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/deframer-invalid-empty.bin&quot;</span>);
+    <span class="kw">const</span> <span class="ident">INVALID_CONTENTTYPE_MESSAGE</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span>
+        <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/deframer-invalid-contenttype.bin&quot;</span>);
+    <span class="kw">const</span> <span class="ident">INVALID_VERSION_MESSAGE</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span>
+        <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/deframer-invalid-version.bin&quot;</span>);
+    <span class="kw">const</span> <span class="ident">INVALID_LENGTH_MESSAGE</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../testdata/deframer-invalid-length.bin&quot;</span>);
 
     <span class="kw">struct</span> <span class="ident">ByteRead</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
@@ -493,7 +580,7 @@
     }
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ByteRead</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">ByteRead</span> {
+        <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
             <span class="ident">ByteRead</span> {
                 <span class="ident">buf</span>: <span class="ident">bytes</span>,
                 <span class="ident">offs</span>: <span class="number">0</span>,
@@ -538,8 +625,8 @@
     }
 
     <span class="kw">impl</span> <span class="ident">ErrorRead</span> {
-        <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">error</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">ErrorRead</span> {
-            <span class="ident">ErrorRead</span> { <span class="ident">error</span>: <span class="prelude-val">Some</span>(<span class="ident">error</span>) }
+        <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">error</span>: <span class="ident">io::Error</span>) -&gt; <span class="self">Self</span> {
+            <span class="self">Self</span> { <span class="ident">error</span>: <span class="prelude-val">Some</span>(<span class="ident">error</span>) }
         }
     }
 
@@ -566,7 +653,7 @@
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">bytes</span>.<span class="ident">len</span>() {
             <span class="ident">assert_len</span>(<span class="number">1</span>, <span class="ident">input_bytes</span>(<span class="ident">d</span>, <span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">i</span>..<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>]));
-            <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">true</span>);
+            <span class="macro">assert!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>());
 
             <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
                 <span class="macro">assert_eq!</span>(<span class="ident">frames_before</span>, <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>());
@@ -580,75 +667,79 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">gotval</span>) <span class="op">=</span> <span class="ident">got</span> {
             <span class="macro">assert_eq!</span>(<span class="ident">gotval</span>, <span class="ident">want</span>);
         } <span class="kw">else</span> {
-            <span class="macro">assert!</span>(<span class="bool-val">false</span>, <span class="string">&quot;read failed, expected {:?} bytes&quot;</span>, <span class="ident">want</span>);
+            <span class="macro">panic!</span>(<span class="string">&quot;read failed, expected {:?} bytes&quot;</span>, <span class="ident">want</span>);
         }
     }
 
     <span class="kw">fn</span> <span class="ident">pop_first</span>(<span class="ident">d</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MessageDeframer</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">pop_front</span>().<span class="ident">unwrap</span>();
-        <span class="ident">m</span>.<span class="ident">decode_payload</span>();
+        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">pop_front</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">typ</span>, <span class="ident">msgs::enums::ContentType::Handshake</span>);
+        <span class="ident">Message::try_from</span>(<span class="ident">m</span>.<span class="ident">into_plain_message</span>()).<span class="ident">unwrap</span>();
     }
 
     <span class="kw">fn</span> <span class="ident">pop_second</span>(<span class="ident">d</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MessageDeframer</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">pop_front</span>().<span class="ident">unwrap</span>();
-        <span class="ident">m</span>.<span class="ident">decode_payload</span>();
+        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">pop_front</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">typ</span>, <span class="ident">msgs::enums::ContentType::Alert</span>);
+        <span class="ident">Message::try_from</span>(<span class="ident">m</span>.<span class="ident">into_plain_message</span>()).<span class="ident">unwrap</span>();
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">check_incremental</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
         <span class="ident">input_whole_incremental</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">true</span>);
+        <span class="macro">assert!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>());
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>());
         <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">desynced</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">check_incremental_2</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
         <span class="ident">input_whole_incremental</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">true</span>);
+        <span class="macro">assert!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>());
         <span class="ident">input_whole_incremental</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">SECOND_MESSAGE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">true</span>);
+        <span class="macro">assert!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>());
         <span class="macro">assert_eq!</span>(<span class="number">2</span>, <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>());
         <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">true</span>);
+        <span class="macro">assert!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>());
         <span class="ident">pop_second</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">desynced</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">check_whole</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
         <span class="ident">assert_len</span>(<span class="ident">FIRST_MESSAGE</span>.<span class="ident">len</span>(), <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">true</span>);
+        <span class="macro">assert!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>());
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">desynced</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">check_whole_2</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
         <span class="ident">assert_len</span>(<span class="ident">FIRST_MESSAGE</span>.<span class="ident">len</span>(), <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>));
         <span class="ident">assert_len</span>(<span class="ident">SECOND_MESSAGE</span>.<span class="ident">len</span>(), <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">SECOND_MESSAGE</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>(), <span class="number">2</span>);
         <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
         <span class="ident">pop_second</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">desynced</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_two_in_one_read</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
         <span class="ident">assert_len</span>(
             <span class="ident">FIRST_MESSAGE</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">SECOND_MESSAGE</span>.<span class="ident">len</span>(),
             <span class="ident">input_bytes_concat</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>, <span class="ident">SECOND_MESSAGE</span>),
@@ -656,13 +747,14 @@
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>(), <span class="number">2</span>);
         <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
         <span class="ident">pop_second</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">desynced</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_two_in_one_read_shortest_first</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
         <span class="ident">assert_len</span>(
             <span class="ident">FIRST_MESSAGE</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">SECOND_MESSAGE</span>.<span class="ident">len</span>(),
             <span class="ident">input_bytes_concat</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">SECOND_MESSAGE</span>, <span class="ident">FIRST_MESSAGE</span>),
@@ -670,7 +762,8 @@
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>(), <span class="number">2</span>);
         <span class="ident">pop_second</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
         <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">desynced</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -684,7 +777,62 @@
         );
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">desynced</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_invalid_contenttype_errors</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
+        <span class="ident">assert_len</span>(
+            <span class="ident">INVALID_CONTENTTYPE_MESSAGE</span>.<span class="ident">len</span>(),
+            <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">INVALID_CONTENTTYPE_MESSAGE</span>),
+        );
+        <span class="macro">assert!</span>(<span class="ident">d</span>.<span class="ident">desynced</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_invalid_version_errors</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
+        <span class="ident">assert_len</span>(
+            <span class="ident">INVALID_VERSION_MESSAGE</span>.<span class="ident">len</span>(),
+            <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">INVALID_VERSION_MESSAGE</span>),
+        );
+        <span class="macro">assert!</span>(<span class="ident">d</span>.<span class="ident">desynced</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_invalid_length_errors</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
+        <span class="ident">assert_len</span>(
+            <span class="ident">INVALID_LENGTH_MESSAGE</span>.<span class="ident">len</span>(),
+            <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">INVALID_LENGTH_MESSAGE</span>),
+        );
+        <span class="macro">assert!</span>(<span class="ident">d</span>.<span class="ident">desynced</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_empty_applicationdata</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
+        <span class="ident">assert_len</span>(
+            <span class="ident">EMPTY_APPLICATIONDATA_MESSAGE</span>.<span class="ident">len</span>(),
+            <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">EMPTY_APPLICATIONDATA_MESSAGE</span>),
+        );
+        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">pop_front</span>().<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">typ</span>, <span class="ident">msgs::enums::ContentType::ApplicationData</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">payload</span>.<span class="number">0</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">has_pending</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">d</span>.<span class="ident">desynced</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_invalid_empty_errors</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
+        <span class="ident">assert_len</span>(
+            <span class="ident">INVALID_EMPTY_MESSAGE</span>.<span class="ident">len</span>(),
+            <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">INVALID_EMPTY_MESSAGE</span>),
+        );
+        <span class="macro">assert!</span>(<span class="ident">d</span>.<span class="ident">desynced</span>);
     }
 }
 </code></pre></div>

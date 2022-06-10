@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.36/src/sha.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sha.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.40/src/sha.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sha.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -445,6 +445,27 @@
 <span id="440">440</span>
 <span id="441">441</span>
 <span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SHA family of hashes.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! SHA, or Secure Hash Algorithms, are a family of cryptographic hashing algorithms published by</span>
@@ -484,6 +505,7 @@
 <span class="doccomment">//! ```</span>
 <span class="kw">use</span> <span class="ident">cfg_if::cfg_if</span>;
 <span class="kw">use</span> <span class="ident">libc::c_void</span>;
+<span class="kw">use</span> <span class="ident">openssl_macros::corresponds</span>;
 <span class="kw">use</span> <span class="ident">std::mem::MaybeUninit</span>;
 
 <span class="doccomment">/// Computes the SHA1 hash of some data.</span>
@@ -492,6 +514,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// SHA1 is known to be insecure - it should not be used unless required for</span>
 <span class="doccomment">/// compatibility with existing systems.</span>
+<span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA1</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha1</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; [<span class="ident">u8</span>; <span class="number">20</span>] {
     <span class="kw">unsafe</span> {
@@ -502,6 +525,7 @@
 }
 
 <span class="doccomment">/// Computes the SHA224 hash of some data.</span>
+<span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SH224</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha224</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; [<span class="ident">u8</span>; <span class="number">28</span>] {
     <span class="kw">unsafe</span> {
@@ -512,6 +536,7 @@
 }
 
 <span class="doccomment">/// Computes the SHA256 hash of some data.</span>
+<span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA256</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha256</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; [<span class="ident">u8</span>; <span class="number">32</span>] {
     <span class="kw">unsafe</span> {
@@ -522,6 +547,7 @@
 }
 
 <span class="doccomment">/// Computes the SHA384 hash of some data.</span>
+<span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA384</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha384</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; [<span class="ident">u8</span>; <span class="number">48</span>] {
     <span class="kw">unsafe</span> {
@@ -532,6 +558,7 @@
 }
 
 <span class="doccomment">/// Computes the SHA512 hash of some data.</span>
+<span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA512</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha512</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; [<span class="ident">u8</span>; <span class="number">64</span>] {
     <span class="kw">unsafe</span> {
@@ -561,6 +588,7 @@
 
         <span class="kw">impl</span> <span class="ident">Sha1</span> {
             <span class="doccomment">/// Creates a new hasher.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA1_Init</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Sha1</span> {
                 <span class="kw">unsafe</span> {
@@ -573,6 +601,7 @@
             <span class="doccomment">/// Feeds some data into the hasher.</span>
             <span class="doccomment">///</span>
             <span class="doccomment">/// This can be called multiple times.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA1_Update</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
                 <span class="kw">unsafe</span> {
@@ -581,6 +610,7 @@
             }
 
             <span class="doccomment">/// Returns the hash of the data.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA1_Final</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">20</span>] {
                 <span class="kw">unsafe</span> {
@@ -604,6 +634,7 @@
 
         <span class="kw">impl</span> <span class="ident">Sha224</span> {
             <span class="doccomment">/// Creates a new hasher.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA224_Init</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Sha224</span> {
                 <span class="kw">unsafe</span> {
@@ -616,6 +647,7 @@
             <span class="doccomment">/// Feeds some data into the hasher.</span>
             <span class="doccomment">///</span>
             <span class="doccomment">/// This can be called multiple times.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA224_Update</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
                 <span class="kw">unsafe</span> {
@@ -624,6 +656,7 @@
             }
 
             <span class="doccomment">/// Returns the hash of the data.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA224_Final</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">28</span>] {
                 <span class="kw">unsafe</span> {
@@ -647,6 +680,7 @@
 
         <span class="kw">impl</span> <span class="ident">Sha256</span> {
             <span class="doccomment">/// Creates a new hasher.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA256_Init</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Sha256</span> {
                 <span class="kw">unsafe</span> {
@@ -659,6 +693,7 @@
             <span class="doccomment">/// Feeds some data into the hasher.</span>
             <span class="doccomment">///</span>
             <span class="doccomment">/// This can be called multiple times.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA256_Update</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
                 <span class="kw">unsafe</span> {
@@ -667,6 +702,7 @@
             }
 
             <span class="doccomment">/// Returns the hash of the data.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA256_Final</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">32</span>] {
                 <span class="kw">unsafe</span> {
@@ -690,6 +726,7 @@
 
         <span class="kw">impl</span> <span class="ident">Sha384</span> {
             <span class="doccomment">/// Creates a new hasher.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA384_Init</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Sha384</span> {
                 <span class="kw">unsafe</span> {
@@ -702,6 +739,7 @@
             <span class="doccomment">/// Feeds some data into the hasher.</span>
             <span class="doccomment">///</span>
             <span class="doccomment">/// This can be called multiple times.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA384_Update</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
                 <span class="kw">unsafe</span> {
@@ -710,6 +748,7 @@
             }
 
             <span class="doccomment">/// Returns the hash of the data.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA384_Final</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">48</span>] {
                 <span class="kw">unsafe</span> {
@@ -733,6 +772,7 @@
 
         <span class="kw">impl</span> <span class="ident">Sha512</span> {
             <span class="doccomment">/// Creates a new hasher.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA512_Init</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Sha512</span> {
                 <span class="kw">unsafe</span> {
@@ -745,6 +785,7 @@
             <span class="doccomment">/// Feeds some data into the hasher.</span>
             <span class="doccomment">///</span>
             <span class="doccomment">/// This can be called multiple times.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA512_Update</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
                 <span class="kw">unsafe</span> {
@@ -753,6 +794,7 @@
             }
 
             <span class="doccomment">/// Returns the hash of the data.</span>
+            <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SHA512_Final</span>)]</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">64</span>] {
                 <span class="kw">unsafe</span> {

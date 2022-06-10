@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.20.3/src/op/edns.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edns.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/op/edns.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edns.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -248,6 +248,7 @@
 <span id="243">243</span>
 <span id="244">244</span>
 <span id="245">245</span>
+<span id="246">246</span>
 </pre><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2015 Benjamin Fry &lt;benjaminfry@me.com&gt;
  *
@@ -292,7 +293,7 @@
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Edns</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Edns</span> {
+        <span class="self">Self</span> {
             <span class="ident">rcode_high</span>: <span class="number">0</span>,
             <span class="ident">version</span>: <span class="number">0</span>,
             <span class="ident">dnssec_ok</span>: <span class="bool-val">false</span>,
@@ -305,7 +306,7 @@
 <span class="kw">impl</span> <span class="ident">Edns</span> {
     <span class="doccomment">/// Creates a new extended DNS object.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Default::default</span>()
+        <span class="ident"><span class="self">Self</span>::default</span>()
     }
 
     <span class="doccomment">/// The high order bytes for the response code in the DNS Message</span>
@@ -375,6 +376,7 @@
     }
 }
 
+<span class="comment">// FIXME: this should be a TryFrom</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Record</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Edns</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Record</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(<span class="ident">value</span>.<span class="ident">rr_type</span>() <span class="op">==</span> <span class="ident">RecordType::OPT</span>);
@@ -384,21 +386,21 @@
         <span class="kw">let</span> <span class="ident">dnssec_ok</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">ttl</span>() <span class="op">&amp;</span> <span class="number">0x0000_8000</span> <span class="op">==</span> <span class="number">0x0000_8000</span>;
         <span class="kw">let</span> <span class="ident">max_payload</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="ident">u16::from</span>(<span class="ident">value</span>.<span class="ident">dns_class</span>());
 
-        <span class="kw">let</span> <span class="ident">options</span>: <span class="ident">OPT</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">rdata</span>() {
-            <span class="ident">RData::NULL</span>(..) =&gt; {
+        <span class="kw">let</span> <span class="ident">options</span>: <span class="ident">OPT</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">data</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">RData::NULL</span>(..)) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; {
                 <span class="comment">// NULL, there was no data in the OPT</span>
                 <span class="ident">OPT::default</span>()
             }
-            <span class="ident">RData::OPT</span>(<span class="kw-2">ref</span> <span class="ident">option_data</span>) =&gt; {
+            <span class="prelude-val">Some</span>(<span class="ident">RData::OPT</span>(<span class="kw-2">ref</span> <span class="ident">option_data</span>)) =&gt; {
                 <span class="ident">option_data</span>.<span class="ident">clone</span>() <span class="comment">// TODO: Edns should just refer to this, have the same lifetime as the Record</span>
             }
             <span class="kw">_</span> =&gt; {
                 <span class="comment">// this should be a coding error, as opposed to a parsing error.</span>
-                <span class="macro">panic!</span>(<span class="string">&quot;rr_type doesn&#39;t match the RData: {:?}&quot;</span>, <span class="ident">value</span>.<span class="ident">rdata</span>()) <span class="comment">// valid panic, never should happen</span>
+                <span class="macro">panic!</span>(<span class="string">&quot;rr_type doesn&#39;t match the RData: {:?}&quot;</span>, <span class="ident">value</span>.<span class="ident">data</span>()) <span class="comment">// valid panic, never should happen</span>
             }
         };
 
-        <span class="ident">Edns</span> {
+        <span class="self">Self</span> {
             <span class="ident">rcode_high</span>,
             <span class="ident">version</span>,
             <span class="ident">dnssec_ok</span>,
@@ -411,8 +413,8 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Edns</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Record</span> {
     <span class="doccomment">/// This returns a Resource Record that is formatted for Edns(0).</span>
     <span class="doccomment">/// Note: the rcode_high value is only part of the rcode, the rest is part of the base</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Edns</span>) -&gt; <span class="ident">Record</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">record</span>: <span class="ident">Record</span> <span class="op">=</span> <span class="ident">Record::new</span>();
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Edns</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
 
         <span class="ident">record</span>.<span class="ident">set_name</span>(<span class="ident">Name::root</span>());
         <span class="ident">record</span>.<span class="ident">set_rr_type</span>(<span class="ident">RecordType::OPT</span>);
@@ -431,7 +433,7 @@
         <span class="comment">//  also, since this is a hash, there is no guarantee that ordering will be preserved from</span>
         <span class="comment">//  the original binary format.</span>
         <span class="comment">// maybe switch to: https://crates.io/crates/linked-hash-map/</span>
-        <span class="ident">record</span>.<span class="ident">set_rdata</span>(<span class="ident">RData::OPT</span>(<span class="ident">value</span>.<span class="ident">options</span>().<span class="ident">clone</span>()));
+        <span class="ident">record</span>.<span class="ident">set_data</span>(<span class="prelude-val">Some</span>(<span class="ident">RData::OPT</span>(<span class="ident">value</span>.<span class="ident">options</span>().<span class="ident">clone</span>())));
 
         <span class="ident">record</span>
     }

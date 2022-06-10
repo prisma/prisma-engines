@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-0.1.31/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-0.1.35/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1112,61 +1112,6 @@
 <span id="1105">1105</span>
 <span id="1106">1106</span>
 <span id="1107">1107</span>
-<span id="1108">1108</span>
-<span id="1109">1109</span>
-<span id="1110">1110</span>
-<span id="1111">1111</span>
-<span id="1112">1112</span>
-<span id="1113">1113</span>
-<span id="1114">1114</span>
-<span id="1115">1115</span>
-<span id="1116">1116</span>
-<span id="1117">1117</span>
-<span id="1118">1118</span>
-<span id="1119">1119</span>
-<span id="1120">1120</span>
-<span id="1121">1121</span>
-<span id="1122">1122</span>
-<span id="1123">1123</span>
-<span id="1124">1124</span>
-<span id="1125">1125</span>
-<span id="1126">1126</span>
-<span id="1127">1127</span>
-<span id="1128">1128</span>
-<span id="1129">1129</span>
-<span id="1130">1130</span>
-<span id="1131">1131</span>
-<span id="1132">1132</span>
-<span id="1133">1133</span>
-<span id="1134">1134</span>
-<span id="1135">1135</span>
-<span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-<span id="1139">1139</span>
-<span id="1140">1140</span>
-<span id="1141">1141</span>
-<span id="1142">1142</span>
-<span id="1143">1143</span>
-<span id="1144">1144</span>
-<span id="1145">1145</span>
-<span id="1146">1146</span>
-<span id="1147">1147</span>
-<span id="1148">1148</span>
-<span id="1149">1149</span>
-<span id="1150">1150</span>
-<span id="1151">1151</span>
-<span id="1152">1152</span>
-<span id="1153">1153</span>
-<span id="1154">1154</span>
-<span id="1155">1155</span>
-<span id="1156">1156</span>
-<span id="1157">1157</span>
-<span id="1158">1158</span>
-<span id="1159">1159</span>
-<span id="1160">1160</span>
-<span id="1161">1161</span>
-<span id="1162">1162</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A scoped, structured logging and diagnostics system.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Overview</span>
@@ -1287,8 +1232,6 @@
 <span class="doccomment">//! [dependencies]</span>
 <span class="doccomment">//! tracing = &quot;0.1&quot;</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! *Compiler support: [requires `rustc` 1.42+][msrv]*</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Recording Spans and Events</span>
 <span class="doccomment">//!</span>
@@ -1603,13 +1546,13 @@
 <span class="doccomment">//! Specifying a formatted message in this manner does not allocate by default.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [struct initializers]: https://doc.rust-lang.org/book/ch05-01-defining-structs.html#using-the-field-init-shorthand-when-variables-and-fields-have-the-same-name</span>
-<span class="doccomment">//! [target]: struct.Metadata.html#method.target</span>
-<span class="doccomment">//! [parent span]: span/struct.Attributes.html#method.parent</span>
-<span class="doccomment">//! [determined contextually]: span/struct.Attributes.html#method.is_contextual</span>
-<span class="doccomment">//! [`fmt::Debug`]: https://doc.rust-lang.org/std/fmt/trait.Debug.html</span>
-<span class="doccomment">//! [`fmt::Display`]: https://doc.rust-lang.org/std/fmt/trait.Display.html</span>
-<span class="doccomment">//! [fmt]: https://doc.rust-lang.org/std/fmt/#usage</span>
-<span class="doccomment">//! [`Empty`]: field/struct.Empty.html</span>
+<span class="doccomment">//! [target]: Metadata::target</span>
+<span class="doccomment">//! [parent span]: span::Attributes::parent</span>
+<span class="doccomment">//! [determined contextually]: span::Attributes::is_contextual</span>
+<span class="doccomment">//! [`fmt::Debug`]: std::fmt::Debug</span>
+<span class="doccomment">//! [`fmt::Display`]: std::fmt::Display</span>
+<span class="doccomment">//! [fmt]: std::fmt#usage</span>
+<span class="doccomment">//! [`Empty`]: field::Empty</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Shorthand Macros</span>
 <span class="doccomment">//!</span>
@@ -1623,19 +1566,18 @@
 <span class="doccomment">//! These are intended both as a shorthand, and for compatibility with the [`log`]</span>
 <span class="doccomment">//! crate (see the next section).</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`span!`]: macro.span.html</span>
-<span class="doccomment">//! [`event!`]: macro.event.html</span>
-<span class="doccomment">//! [`trace!`]: macro.trace.html</span>
-<span class="doccomment">//! [`debug!`]: macro.debug.html</span>
-<span class="doccomment">//! [`info!`]: macro.info.html</span>
-<span class="doccomment">//! [`warn!`]: macro.warn.html</span>
-<span class="doccomment">//! [`error!`]: macro.error.html</span>
-<span class="doccomment">//! [`trace_span!`]: macro.trace_span.html</span>
-<span class="doccomment">//! [`debug_span!`]: macro.debug_span.html</span>
-<span class="doccomment">//! [`info_span!`]: macro.info_span.html</span>
-<span class="doccomment">//! [`warn_span!`]: macro.warn_span.html</span>
-<span class="doccomment">//! [`error_span!`]: macro.error_span.html</span>
-<span class="doccomment">//! [`Level`]: struct.Level.html</span>
+<span class="doccomment">//! [`span!`]: span!</span>
+<span class="doccomment">//! [`event!`]: event!</span>
+<span class="doccomment">//! [`trace!`]: trace!</span>
+<span class="doccomment">//! [`debug!`]: debug!</span>
+<span class="doccomment">//! [`info!`]: info!</span>
+<span class="doccomment">//! [`warn!`]: warn!</span>
+<span class="doccomment">//! [`error!`]: error!</span>
+<span class="doccomment">//! [`trace_span!`]: trace_span!</span>
+<span class="doccomment">//! [`debug_span!`]: debug_span!</span>
+<span class="doccomment">//! [`info_span!`]: info_span!</span>
+<span class="doccomment">//! [`warn_span!`]: warn_span!</span>
+<span class="doccomment">//! [`error_span!`]: error_span!</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### For `log` Users</span>
 <span class="doccomment">//!</span>
@@ -1914,6 +1856,7 @@
 <span class="doccomment">//!  - [`sentry-tracing`] provides a layer for reporting events and traces to [Sentry].</span>
 <span class="doccomment">//!  - [`tracing-forest`] provides a subscriber that preserves contextual coherence by</span>
 <span class="doccomment">//!    grouping together logs from the same spans during writing.</span>
+<span class="doccomment">//!  - [`tracing-loki`] provides a layer for shipping logs to [Grafana Loki].</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! If you&#39;re the maintainer of a `tracing` ecosystem crate not listed above,</span>
 <span class="doccomment">//! please let us know! We&#39;d love to add your project to the list!</span>
@@ -1948,6 +1891,8 @@
 <span class="doccomment">//! [`sentry-tracing`]: https://crates.io/crates/sentry-tracing</span>
 <span class="doccomment">//! [Sentry]: https://sentry.io/welcome/</span>
 <span class="doccomment">//! [`tracing-forest`]: https://crates.io/crates/tracing-forest</span>
+<span class="doccomment">//! [`tracing-loki`]: https://crates.io/crates/tracing-loki</span>
+<span class="doccomment">//! [Grafana Loki]: https://grafana.com/oss/loki/</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! &lt;pre class=&quot;ignore&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;</span>
 <span class="doccomment">//!     &lt;strong&gt;Note&lt;/strong&gt;: Some of these ecosystem crates are currently</span>
@@ -1978,7 +1923,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//!   ```toml</span>
 <span class="doccomment">//!   [dependencies]</span>
-<span class="doccomment">//!   tracing = { version = &quot;0.1.31&quot;, default-features = false }</span>
+<span class="doccomment">//!   tracing = { version = &quot;0.1.35&quot;, default-features = false }</span>
 <span class="doccomment">//!   ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! &lt;pre class=&quot;ignore&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;</span>
@@ -2056,12 +2001,12 @@
 <span class="doccomment">//! [`tracing-appender`]: https://crates.io/crates/tracing-appender</span>
 <span class="doccomment">//! [`env_logger`]: https://crates.io/crates/env_logger</span>
 <span class="doccomment">//! [`FmtSubscriber`]: https://docs.rs/tracing-subscriber/latest/tracing_subscriber/fmt/struct.Subscriber.html</span>
-<span class="doccomment">//! [static verbosity level]: level_filters/index.html#compile-time-filters</span>
+<span class="doccomment">//! [static verbosity level]: level_filters#compile-time-filters</span>
 <span class="doccomment">//! [instrument]: https://docs.rs/tracing-attributes/latest/tracing_attributes/attr.instrument.html</span>
 <span class="doccomment">//! [flags]: #crate-feature-flags</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>), <span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>))]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tracing/0.1.31&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tracing/0.1.35&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">doc</span>(
     <span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png&quot;</span>,
     <span class="ident">issue_tracker_base_url</span> <span class="op">=</span> <span class="string">&quot;https://github.com/tokio-rs/tracing/issues/&quot;</span>
@@ -2091,10 +2036,6 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">log</span>;
 
 <span class="comment">// Somehow this `use` statement is necessary for us to re-export the `core`</span>
 <span class="comment">// macros on Rust 1.26.0. I&#39;m not sure how this makes it work, but it does.</span>
@@ -2138,13 +2079,8 @@
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">__macro_support</span> {
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::callsite::Callsite</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::stdlib</span>::{
-        <span class="ident">fmt</span>,
-        <span class="ident">sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>},
-    };
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">subscriber::Interest</span>, <span class="ident">Metadata</span>};
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">core::concat</span>;
-    <span class="kw">use</span> <span class="ident">tracing_core::Once</span>;
 
     <span class="doccomment">/// Callsite implementation used by macro-generated code.</span>
     <span class="doccomment">///</span>
@@ -2154,174 +2090,128 @@
     <span class="doccomment">/// by the `tracing` macros, but it is not part of the stable versioned API.</span>
     <span class="doccomment">/// Breaking changes to this module may occur in small-numbered versions</span>
     <span class="doccomment">/// without warning.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MacroCallsite</span> {
-        <span class="ident">interest</span>: <span class="ident">AtomicUsize</span>,
-        <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-        <span class="ident">registration</span>: <span class="ident">Once</span>,
-    }
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tracing_core::callsite::DefaultCallsite</span> <span class="kw">as</span> <span class="ident">MacroCallsite</span>;
 
-    <span class="kw">impl</span> <span class="ident">MacroCallsite</span> {
-        <span class="doccomment">/// Returns a new `MacroCallsite` with the specified `Metadata`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// /!\ WARNING: This is *not* a stable API! /!\</span>
-        <span class="doccomment">/// This method, and all code contained in the `__macro_support` module, is</span>
-        <span class="doccomment">/// a *private* API of `tracing`. It is exposed publicly because it is used</span>
-        <span class="doccomment">/// by the `tracing` macros, but it is not part of the stable versioned API.</span>
-        <span class="doccomment">/// Breaking changes to this module may occur in small-numbered versions</span>
-        <span class="doccomment">/// without warning.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-            <span class="self">Self</span> {
-                <span class="ident">interest</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0xDEADFACED</span>),
-                <span class="ident">meta</span>,
-                <span class="ident">registration</span>: <span class="ident">Once::new</span>(),
-            }
-        }
-
-        <span class="doccomment">/// Registers this callsite with the global callsite registry.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// If the callsite is already registered, this does nothing.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// /!\ WARNING: This is *not* a stable API! /!\</span>
-        <span class="doccomment">/// This method, and all code contained in the `__macro_support` module, is</span>
-        <span class="doccomment">/// a *private* API of `tracing`. It is exposed publicly because it is used</span>
-        <span class="doccomment">/// by the `tracing` macros, but it is not part of the stable versioned API.</span>
-        <span class="doccomment">/// Breaking changes to this module may occur in small-numbered versions</span>
-        <span class="doccomment">/// without warning.</span>
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
-        <span class="comment">// This only happens once (or if the cached interest value was corrupted).</span>
-        <span class="attribute">#[<span class="ident">cold</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="self">self</span>) -&gt; <span class="ident">Interest</span> {
-            <span class="self">self</span>.<span class="ident">registration</span>
-                .<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::callsite::register</span>(<span class="self">self</span>));
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">interest</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) {
-                <span class="number">0</span> =&gt; <span class="ident">Interest::never</span>(),
-                <span class="number">2</span> =&gt; <span class="ident">Interest::always</span>(),
-                <span class="kw">_</span> =&gt; <span class="ident">Interest::sometimes</span>(),
-            }
-        }
-
-        <span class="doccomment">/// Returns the callsite&#39;s cached Interest, or registers it for the</span>
-        <span class="doccomment">/// first time if it has not yet been registered.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// /!\ WARNING: This is *not* a stable API! /!\</span>
-        <span class="doccomment">/// This method, and all code contained in the `__macro_support` module, is</span>
-        <span class="doccomment">/// a *private* API of `tracing`. It is exposed publicly because it is used</span>
-        <span class="doccomment">/// by the `tracing` macros, but it is not part of the stable versioned API.</span>
-        <span class="doccomment">/// Breaking changes to this module may occur in small-numbered versions</span>
-        <span class="doccomment">/// without warning.</span>
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interest</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="self">self</span>) -&gt; <span class="ident">Interest</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">interest</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) {
-                <span class="number">0</span> =&gt; <span class="ident">Interest::never</span>(),
-                <span class="number">1</span> =&gt; <span class="ident">Interest::sometimes</span>(),
-                <span class="number">2</span> =&gt; <span class="ident">Interest::always</span>(),
-                <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">register</span>(),
-            }
-        }
-
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">interest</span>: <span class="ident">Interest</span>) -&gt; <span class="ident">bool</span> {
-            <span class="ident">interest</span>.<span class="ident">is_always</span>()
-                <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::dispatcher::get_default</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="ident">default</span>.<span class="ident">enabled</span>(<span class="self">self</span>.<span class="ident">meta</span>))
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Span</span> {
-            <span class="ident"><span class="kw">crate</span>::Span::new_disabled</span>(<span class="self">self</span>.<span class="ident">meta</span>)
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>))]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Span</span> {
-            <span class="ident"><span class="kw">crate</span>::Span::none</span>()
-        }
-    }
-
-    <span class="kw">impl</span> <span class="ident">Callsite</span> <span class="kw">for</span> <span class="ident">MacroCallsite</span> {
-        <span class="kw">fn</span> <span class="ident">set_interest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">interest</span>: <span class="ident">Interest</span>) {
-            <span class="kw">let</span> <span class="ident">interest</span> <span class="op">=</span> <span class="kw">match</span> () {
-                <span class="kw">_</span> <span class="kw">if</span> <span class="ident">interest</span>.<span class="ident">is_never</span>() =&gt; <span class="number">0</span>,
-                <span class="kw">_</span> <span class="kw">if</span> <span class="ident">interest</span>.<span class="ident">is_always</span>() =&gt; <span class="number">2</span>,
-                <span class="kw">_</span> =&gt; <span class="number">1</span>,
-            };
-            <span class="self">self</span>.<span class="ident">interest</span>.<span class="ident">store</span>(<span class="ident">interest</span>, <span class="ident">Ordering::SeqCst</span>);
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">meta</span>
-        }
-    }
-
-    <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">MacroCallsite</span> {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-            <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;MacroCallsite&quot;</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;interest&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">interest</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;meta&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">meta</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;registration&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">registration</span>)
-                .<span class="ident">finish</span>()
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="ident">tracing_core::field</span>::{<span class="ident">Field</span>, <span class="ident">ValueSet</span>, <span class="ident">Visit</span>};
-
-    <span class="doccomment">/// Utility to format [`ValueSet`] for logging, used by macro-generated code.</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// /!\ WARNING: This is *not* a stable API! /!\</span>
-    <span class="doccomment">/// This type, and all code contained in the `__macro_support` module, is</span>
+    <span class="doccomment">/// This function, and all code contained in the `__macro_support` module, is</span>
+    <span class="doccomment">/// a *private* API of `tracing`. It is exposed publicly because it is used</span>
+    <span class="doccomment">/// by the `tracing` macros, but it is not part of the stable versioned API.</span>
+    <span class="doccomment">/// Breaking changes to this module may occur in small-numbered versions</span>
+    <span class="doccomment">/// without warning.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__is_enabled</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="ident">interest</span>: <span class="ident">Interest</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">interest</span>.<span class="ident">is_always</span>() <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::dispatcher::get_default</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="ident">default</span>.<span class="ident">enabled</span>(<span class="ident">meta</span>))
+    }
+
+    <span class="doccomment">/// /!\ WARNING: This is *not* a stable API! /!\</span>
+    <span class="doccomment">/// This function, and all code contained in the `__macro_support` module, is</span>
+    <span class="doccomment">/// a *private* API of `tracing`. It is exposed publicly because it is used</span>
+    <span class="doccomment">/// by the `tracing` macros, but it is not part of the stable versioned API.</span>
+    <span class="doccomment">/// Breaking changes to this module may occur in small-numbered versions</span>
+    <span class="doccomment">/// without warning.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__disabled_span</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Span</span> {
+        <span class="ident"><span class="kw">crate</span>::Span::new_disabled</span>(<span class="ident">meta</span>)
+    }
+
+    <span class="doccomment">/// /!\ WARNING: This is *not* a stable API! /!\</span>
+    <span class="doccomment">/// This function, and all code contained in the `__macro_support` module, is</span>
+    <span class="doccomment">/// a *private* API of `tracing`. It is exposed publicly because it is used</span>
+    <span class="doccomment">/// by the `tracing` macros, but it is not part of the stable versioned API.</span>
+    <span class="doccomment">/// Breaking changes to this module may occur in small-numbered versions</span>
+    <span class="doccomment">/// without warning.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__disabled_span</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Span</span> {
+        <span class="ident"><span class="kw">crate</span>::Span::none</span>()
+    }
+
+    <span class="doccomment">/// /!\ WARNING: This is *not* a stable API! /!\</span>
+    <span class="doccomment">/// This function, and all code contained in the `__macro_support` module, is</span>
     <span class="doccomment">/// a *private* API of `tracing`. It is exposed publicly because it is used</span>
     <span class="doccomment">/// by the `tracing` macros, but it is not part of the stable versioned API.</span>
     <span class="doccomment">/// Breaking changes to this module may occur in small-numbered versions</span>
     <span class="doccomment">/// without warning.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LogValueSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ValueSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__tracing_log</span>(
+        <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
+        <span class="ident">logger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">log::Log</span>,
+        <span class="ident">log_meta</span>: <span class="ident">log::Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">tracing_core::field::ValueSet</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    ) {
+        <span class="ident">logger</span>.<span class="ident">log</span>(
+            <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::log::Record::builder</span>()
+                .<span class="ident">file</span>(<span class="ident">meta</span>.<span class="ident">file</span>())
+                .<span class="ident">module_path</span>(<span class="ident">meta</span>.<span class="ident">module_path</span>())
+                .<span class="ident">line</span>(<span class="ident">meta</span>.<span class="ident">line</span>())
+                .<span class="ident">metadata</span>(<span class="ident">log_meta</span>)
+                .<span class="ident">args</span>(<span class="macro">format_args!</span>(
+                    <span class="string">&quot;{}&quot;</span>,
+                    <span class="ident"><span class="kw">crate</span>::log::LogValueSet</span> {
+                        <span class="ident">values</span>,
+                        <span class="ident">is_first</span>: <span class="bool-val">true</span>
+                    }
+                ))
+                .<span class="ident">build</span>(),
+        );
+    }
+}
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">log</span> {
+    <span class="kw">use</span> <span class="ident">core::fmt</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">tracing_core::field</span>::{<span class="ident">Field</span>, <span class="ident">ValueSet</span>, <span class="ident">Visit</span>};
+
+    <span class="doccomment">/// Utility to format [`ValueSet`]s for logging.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">LogValueSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ValueSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">is_first</span>: <span class="ident">bool</span>,
+    }
+
     <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">LogValueSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="attribute">#[<span class="ident">inline</span>]</span>
         <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+            <span class="kw">struct</span> <span class="ident">LogVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
+                <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
+                <span class="ident">is_first</span>: <span class="ident">bool</span>,
+                <span class="ident">result</span>: <span class="ident">fmt::Result</span>,
+            }
+
+            <span class="kw">impl</span> <span class="ident">Visit</span> <span class="kw">for</span> <span class="ident">LogVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+                <span class="kw">fn</span> <span class="ident">record_debug</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) {
+                    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_first</span> {
+                        <span class="self">self</span>.<span class="ident">is_first</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                        <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;message&quot;</span> {
+                            <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>)
+                        } <span class="kw">else</span> {
+                            <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">f</span>, <span class="string">&quot;{}={:?}&quot;</span>, <span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">value</span>)
+                        }
+                    } <span class="kw">else</span> {
+                        <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">f</span>, <span class="string">&quot; {}={:?}&quot;</span>, <span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">value</span>)
+                    };
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">res</span> {
+                        <span class="self">self</span>.<span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">and</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>));
+                    }
+                }
+
+                <span class="kw">fn</span> <span class="ident">record_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+                    <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;message&quot;</span> {
+                        <span class="self">self</span>.<span class="ident">record_debug</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>))
+                    } <span class="kw">else</span> {
+                        <span class="self">self</span>.<span class="ident">record_debug</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">value</span>)
+                    }
+                }
+            }
+
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">visit</span> <span class="op">=</span> <span class="ident">LogVisitor</span> {
                 <span class="ident">f</span>,
-                <span class="ident">is_first</span>: <span class="bool-val">true</span>,
+                <span class="ident">is_first</span>: <span class="self">self</span>.<span class="ident">is_first</span>,
                 <span class="ident">result</span>: <span class="prelude-val">Ok</span>(()),
             };
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">visit</span>);
+            <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">visit</span>);
             <span class="ident">visit</span>.<span class="ident">result</span>
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">LogVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
-        <span class="ident">is_first</span>: <span class="ident">bool</span>,
-        <span class="ident">result</span>: <span class="ident">fmt::Result</span>,
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>)]</span>
-    <span class="kw">impl</span> <span class="ident">Visit</span> <span class="kw">for</span> <span class="ident">LogVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">record_debug</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_first</span> {
-                <span class="self">self</span>.<span class="ident">is_first</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;message&quot;</span> {
-                    <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>)
-                } <span class="kw">else</span> {
-                    <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">f</span>, <span class="string">&quot;{}={:?}&quot;</span>, <span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">value</span>)
-                }
-            } <span class="kw">else</span> {
-                <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">f</span>, <span class="string">&quot; {}={:?}&quot;</span>, <span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">value</span>)
-            };
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">res</span> {
-                <span class="self">self</span>.<span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">and</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>));
-            }
-        }
-
-        <span class="kw">fn</span> <span class="ident">record_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-            <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;message&quot;</span> {
-                <span class="self">self</span>.<span class="ident">record_debug</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>))
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">record_debug</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">value</span>)
-            }
         }
     }
 }

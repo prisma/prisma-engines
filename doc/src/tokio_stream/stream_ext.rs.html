@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-stream-0.1.8/src/stream_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stream_ext.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-stream-0.1.9/src/stream_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stream_ext.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_stream/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -920,7 +920,114 @@
 <span id="915">915</span>
 <span id="916">916</span>
 <span id="917">917</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">futures_core::Stream</span>;
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
+<span id="971">971</span>
+<span id="972">972</span>
+<span id="973">973</span>
+<span id="974">974</span>
+<span id="975">975</span>
+<span id="976">976</span>
+<span id="977">977</span>
+<span id="978">978</span>
+<span id="979">979</span>
+<span id="980">980</span>
+<span id="981">981</span>
+<span id="982">982</span>
+<span id="983">983</span>
+<span id="984">984</span>
+<span id="985">985</span>
+<span id="986">986</span>
+<span id="987">987</span>
+<span id="988">988</span>
+<span id="989">989</span>
+<span id="990">990</span>
+<span id="991">991</span>
+<span id="992">992</span>
+<span id="993">993</span>
+<span id="994">994</span>
+<span id="995">995</span>
+<span id="996">996</span>
+<span id="997">997</span>
+<span id="998">998</span>
+<span id="999">999</span>
+<span id="1000">1000</span>
+<span id="1001">1001</span>
+<span id="1002">1002</span>
+<span id="1003">1003</span>
+<span id="1004">1004</span>
+<span id="1005">1005</span>
+<span id="1006">1006</span>
+<span id="1007">1007</span>
+<span id="1008">1008</span>
+<span id="1009">1009</span>
+<span id="1010">1010</span>
+<span id="1011">1011</span>
+<span id="1012">1012</span>
+<span id="1013">1013</span>
+<span id="1014">1014</span>
+<span id="1015">1015</span>
+<span id="1016">1016</span>
+<span id="1017">1017</span>
+<span id="1018">1018</span>
+<span id="1019">1019</span>
+<span id="1020">1020</span>
+<span id="1021">1021</span>
+<span id="1022">1022</span>
+<span id="1023">1023</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::future::Future</span>;
+<span class="kw">use</span> <span class="ident">futures_core::Stream</span>;
 
 <span class="kw">mod</span> <span class="ident">all</span>;
 <span class="kw">use</span> <span class="ident">all::AllFuture</span>;
@@ -949,6 +1056,9 @@
 <span class="kw">mod</span> <span class="ident">map</span>;
 <span class="kw">use</span> <span class="ident">map::Map</span>;
 
+<span class="kw">mod</span> <span class="ident">map_while</span>;
+<span class="kw">use</span> <span class="ident">map_while::MapWhile</span>;
+
 <span class="kw">mod</span> <span class="ident">merge</span>;
 <span class="kw">use</span> <span class="ident">merge::Merge</span>;
 
@@ -961,17 +1071,20 @@
 <span class="kw">mod</span> <span class="ident">skip_while</span>;
 <span class="kw">use</span> <span class="ident">skip_while::SkipWhile</span>;
 
-<span class="kw">mod</span> <span class="ident">try_next</span>;
-<span class="kw">use</span> <span class="ident">try_next::TryNext</span>;
-
 <span class="kw">mod</span> <span class="ident">take</span>;
 <span class="kw">use</span> <span class="ident">take::Take</span>;
 
 <span class="kw">mod</span> <span class="ident">take_while</span>;
 <span class="kw">use</span> <span class="ident">take_while::TakeWhile</span>;
 
+<span class="kw">mod</span> <span class="ident">then</span>;
+<span class="kw">use</span> <span class="ident">then::Then</span>;
+
+<span class="kw">mod</span> <span class="ident">try_next</span>;
+<span class="kw">use</span> <span class="ident">try_next::TryNext</span>;
+
 <span class="macro">cfg_time!</span> {
-    <span class="kw">mod</span> <span class="ident">timeout</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">timeout</span>;
     <span class="kw">use</span> <span class="ident">timeout::Timeout</span>;
     <span class="kw">use</span> <span class="ident">tokio::time::Duration</span>;
     <span class="kw">mod</span> <span class="ident">throttle</span>;
@@ -1028,6 +1141,12 @@
     <span class="doccomment">/// pinning it to the stack using the `pin_mut!` macro from the `pin_utils`</span>
     <span class="doccomment">/// crate.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// # Cancel safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method is cancel safe. The returned future only</span>
+    <span class="doccomment">/// holds onto a reference to the underlying stream,</span>
+    <span class="doccomment">/// so dropping it will never lose a value.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
@@ -1063,6 +1182,12 @@
     <span class="doccomment">/// but returns a [`Result&lt;Option&lt;T&gt;, E&gt;`](Result) rather than</span>
     <span class="doccomment">/// an [`Option&lt;Result&lt;T, E&gt;&gt;`](Option), making for easy use</span>
     <span class="doccomment">/// with the [`?`](std::ops::Try) operator.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Cancel safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method is cancel safe. The returned future only</span>
+    <span class="doccomment">/// holds onto a reference to the underlying stream,</span>
+    <span class="doccomment">/// so dropping it will never lose a value.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1117,6 +1242,93 @@
         <span class="self">Self</span>: <span class="ident">Sized</span>,
     {
         <span class="ident">Map::new</span>(<span class="self">self</span>, <span class="ident">f</span>)
+    }
+
+    <span class="doccomment">/// Map this stream&#39;s items to a different type for as long as determined by</span>
+    <span class="doccomment">/// the provided closure. A stream of the target type will be returned,</span>
+    <span class="doccomment">/// which will yield elements until the closure returns `None`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The provided closure is executed over all elements of this stream as</span>
+    <span class="doccomment">/// they are made available, until it returns `None`. It is executed inline</span>
+    <span class="doccomment">/// with calls to [`poll_next`](Stream::poll_next). Once `None` is returned,</span>
+    <span class="doccomment">/// the underlying stream will not be polled again.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this function consumes the stream passed into it and returns a</span>
+    <span class="doccomment">/// wrapped version of it, similar to the [`Iterator::map_while`] method in the</span>
+    <span class="doccomment">/// standard library.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # #[tokio::main]</span>
+    <span class="doccomment">/// # async fn main() {</span>
+    <span class="doccomment">/// use tokio_stream::{self as stream, StreamExt};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let stream = stream::iter(1..=10);</span>
+    <span class="doccomment">/// let mut stream = stream.map_while(|x| {</span>
+    <span class="doccomment">///     if x &lt; 4 {</span>
+    <span class="doccomment">///         Some(x + 3)</span>
+    <span class="doccomment">///     } else {</span>
+    <span class="doccomment">///         None</span>
+    <span class="doccomment">///     }</span>
+    <span class="doccomment">/// });</span>
+    <span class="doccomment">/// assert_eq!(stream.next().await, Some(4));</span>
+    <span class="doccomment">/// assert_eq!(stream.next().await, Some(5));</span>
+    <span class="doccomment">/// assert_eq!(stream.next().await, Some(6));</span>
+    <span class="doccomment">/// assert_eq!(stream.next().await, None);</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">fn</span> <span class="ident">map_while</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">MapWhile</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    {
+        <span class="ident">MapWhile::new</span>(<span class="self">self</span>, <span class="ident">f</span>)
+    }
+
+    <span class="doccomment">/// Maps this stream&#39;s items asynchronously to a different type, returning a</span>
+    <span class="doccomment">/// new stream of the resulting type.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The provided closure is executed over all elements of this stream as</span>
+    <span class="doccomment">/// they are made available, and the returned future is executed. Only one</span>
+    <span class="doccomment">/// future is executed at the time.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this function consumes the stream passed into it and returns a</span>
+    <span class="doccomment">/// wrapped version of it, similar to the existing `then` methods in the</span>
+    <span class="doccomment">/// standard library.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Be aware that if the future is not `Unpin`, then neither is the `Stream`</span>
+    <span class="doccomment">/// returned by this method. To handle this, you can use `tokio::pin!` as in</span>
+    <span class="doccomment">/// the example below or put the stream in a `Box` with `Box::pin(stream)`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # #[tokio::main]</span>
+    <span class="doccomment">/// # async fn main() {</span>
+    <span class="doccomment">/// use tokio_stream::{self as stream, StreamExt};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// async fn do_async_work(value: i32) -&gt; i32 {</span>
+    <span class="doccomment">///     value + 3</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let stream = stream::iter(1..=3);</span>
+    <span class="doccomment">/// let stream = stream.then(do_async_work);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// tokio::pin!(stream);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(stream.next().await, Some(4));</span>
+    <span class="doccomment">/// assert_eq!(stream.next().await, Some(5));</span>
+    <span class="doccomment">/// assert_eq!(stream.next().await, Some(6));</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">fn</span> <span class="ident">then</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Fut</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Then</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Fut</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">Fut</span>,
+        <span class="ident">Fut</span>: <span class="ident">Future</span>,
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    {
+        <span class="ident">Then::new</span>(<span class="self">self</span>, <span class="ident">f</span>)
     }
 
     <span class="doccomment">/// Combine two streams into one by interleaving the output of both as it</span>

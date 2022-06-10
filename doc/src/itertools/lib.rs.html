@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/itertools-0.10.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/itertools-0.10.3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../itertools/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -3542,6 +3542,75 @@
 <span id="3537">3537</span>
 <span id="3538">3538</span>
 <span id="3539">3539</span>
+<span id="3540">3540</span>
+<span id="3541">3541</span>
+<span id="3542">3542</span>
+<span id="3543">3543</span>
+<span id="3544">3544</span>
+<span id="3545">3545</span>
+<span id="3546">3546</span>
+<span id="3547">3547</span>
+<span id="3548">3548</span>
+<span id="3549">3549</span>
+<span id="3550">3550</span>
+<span id="3551">3551</span>
+<span id="3552">3552</span>
+<span id="3553">3553</span>
+<span id="3554">3554</span>
+<span id="3555">3555</span>
+<span id="3556">3556</span>
+<span id="3557">3557</span>
+<span id="3558">3558</span>
+<span id="3559">3559</span>
+<span id="3560">3560</span>
+<span id="3561">3561</span>
+<span id="3562">3562</span>
+<span id="3563">3563</span>
+<span id="3564">3564</span>
+<span id="3565">3565</span>
+<span id="3566">3566</span>
+<span id="3567">3567</span>
+<span id="3568">3568</span>
+<span id="3569">3569</span>
+<span id="3570">3570</span>
+<span id="3571">3571</span>
+<span id="3572">3572</span>
+<span id="3573">3573</span>
+<span id="3574">3574</span>
+<span id="3575">3575</span>
+<span id="3576">3576</span>
+<span id="3577">3577</span>
+<span id="3578">3578</span>
+<span id="3579">3579</span>
+<span id="3580">3580</span>
+<span id="3581">3581</span>
+<span id="3582">3582</span>
+<span id="3583">3583</span>
+<span id="3584">3584</span>
+<span id="3585">3585</span>
+<span id="3586">3586</span>
+<span id="3587">3587</span>
+<span id="3588">3588</span>
+<span id="3589">3589</span>
+<span id="3590">3590</span>
+<span id="3591">3591</span>
+<span id="3592">3592</span>
+<span id="3593">3593</span>
+<span id="3594">3594</span>
+<span id="3595">3595</span>
+<span id="3596">3596</span>
+<span id="3597">3597</span>
+<span id="3598">3598</span>
+<span id="3599">3599</span>
+<span id="3600">3600</span>
+<span id="3601">3601</span>
+<span id="3602">3602</span>
+<span id="3603">3603</span>
+<span id="3604">3604</span>
+<span id="3605">3605</span>
+<span id="3606">3606</span>
+<span id="3607">3607</span>
+<span id="3608">3608</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">crate_name</span><span class="op">=</span><span class="string">&quot;itertools&quot;</span>]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use_std&quot;</span>), <span class="ident">no_std</span>)]</span>
@@ -3723,6 +3792,7 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sources</span>::{<span class="ident">repeat_call</span>, <span class="ident">unfold</span>, <span class="ident">iterate</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::with_position::Position</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::unziptuple</span>::{<span class="ident">multiunzip</span>, <span class="ident">MultiUnzip</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ziptuple::multizip</span>;
 <span class="kw">mod</span> <span class="ident">adaptors</span>;
 <span class="kw">mod</span> <span class="ident">either_or_both</span>;
@@ -3781,6 +3851,7 @@
 <span class="kw">mod</span> <span class="ident">duplicates_impl</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use_std&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">unique_impl</span>;
+<span class="kw">mod</span> <span class="ident">unziptuple</span>;
 <span class="kw">mod</span> <span class="ident">with_position</span>;
 <span class="kw">mod</span> <span class="ident">zip_eq_impl</span>;
 <span class="kw">mod</span> <span class="ident">zip_longest</span>;
@@ -4204,7 +4275,7 @@
     }
 
     <span class="doccomment">/// Return an iterator over all contiguous windows producing tuples of</span>
-    <span class="doccomment">/// a specific size (up to 4).</span>
+    <span class="doccomment">/// a specific size (up to 12).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `tuple_windows` clones the iterator elements so that they can be</span>
     <span class="doccomment">/// part of successive windows, this makes it most suited for iterators</span>
@@ -4246,7 +4317,7 @@
 
     <span class="doccomment">/// Return an iterator over all windows, wrapping back to the first</span>
     <span class="doccomment">/// elements when the window would otherwise exceed the length of the</span>
-    <span class="doccomment">/// iterator, producing tuples of a specific size (up to 4).</span>
+    <span class="doccomment">/// iterator, producing tuples of a specific size (up to 12).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `circular_tuple_windows` clones the iterator elements so that they can be</span>
     <span class="doccomment">/// part of successive windows, this makes it most suited for iterators</span>
@@ -4279,7 +4350,7 @@
         <span class="ident">tuple_impl::circular_tuple_windows</span>(<span class="self">self</span>)
     }
     <span class="doccomment">/// Return an iterator that groups the items in tuples of a specific size</span>
-    <span class="doccomment">/// (up to 4).</span>
+    <span class="doccomment">/// (up to 12).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See also the method [`.next_tuple()`](Itertools::next_tuple).</span>
     <span class="doccomment">///</span>
@@ -5785,6 +5856,7 @@
     <span class="doccomment">/// assert_eq!((0..10).fold1(|x, y| x + y).unwrap_or(0), 45);</span>
     <span class="doccomment">/// assert_eq!((0..0).fold1(|x, y| x * y), None);</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.2&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use `Iterator::reduce` instead&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">fold1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>,
               <span class="self">Self</span>: <span class="ident">Sized</span>,
@@ -6209,6 +6281,43 @@
         <span class="ident">v</span>.<span class="ident">into_iter</span>()
     }
 
+    <span class="doccomment">/// Sort all iterator elements into a new iterator in ascending order. The key function is</span>
+    <span class="doccomment">/// called exactly once per key.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note:** This consumes the entire iterator, uses the</span>
+    <span class="doccomment">/// [`slice::sort_by_cached_key`] method and returns the result as a new</span>
+    <span class="doccomment">/// iterator that owns its elements.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The sorted iterator, if directly collected to a `Vec`, is converted</span>
+    <span class="doccomment">/// without any extra copying or allocation cost.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use itertools::Itertools;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // sort people in descending order by age</span>
+    <span class="doccomment">/// let people = vec![(&quot;Jane&quot;, 20), (&quot;John&quot;, 18), (&quot;Jill&quot;, 30), (&quot;Jack&quot;, 27)];</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let oldest_people_first = people</span>
+    <span class="doccomment">///     .into_iter()</span>
+    <span class="doccomment">///     .sorted_by_cached_key(|x| -x.1)</span>
+    <span class="doccomment">///     .map(|(person, _age)| person);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// itertools::assert_equal(oldest_people_first,</span>
+    <span class="doccomment">///                         vec![&quot;Jill&quot;, &quot;Jack&quot;, &quot;Jane&quot;, &quot;John&quot;]);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use_alloc&quot;</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">sorted_by_cached_key</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">VecIntoIter</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+        <span class="ident">K</span>: <span class="ident">Ord</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">K</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::from_iter</span>(<span class="self">self</span>);
+        <span class="ident">v</span>.<span class="ident">sort_by_cached_key</span>(<span class="ident">f</span>);
+        <span class="ident">v</span>.<span class="ident">into_iter</span>()
+    }
+
     <span class="doccomment">/// Sort the k smallest elements into a new iterator, in ascending order.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note:** This consumes the entire iterator, and returns the result</span>
@@ -6314,6 +6423,8 @@
     <span class="doccomment">/// Return a `HashMap` of keys mapped to `Vec`s of values. Keys and values</span>
     <span class="doccomment">/// are taken from `(Key, Value)` tuple pairs yielded by the input iterator.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// Essentially a shorthand for `.into_grouping_map().collect::&lt;Vec&lt;_&gt;&gt;()`.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use itertools::Itertools;</span>
     <span class="doccomment">///</span>
@@ -6335,8 +6446,8 @@
 
     <span class="doccomment">/// Return an `Iterator` on a `HashMap`. Keys mapped to `Vec`s of values. The key is specified</span>
     <span class="doccomment">/// in the closure.</span>
-    <span class="doccomment">/// Different to `into_group_map_by` because the key is still present. It is also more general.</span>
-    <span class="doccomment">/// You can also fold the `group_map`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Essentially a shorthand for `.into_grouping_map_by(f).collect::&lt;Vec&lt;_&gt;&gt;()`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use itertools::Itertools;</span>
@@ -6944,6 +7055,33 @@
         <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">K</span>,
     {
         <span class="self">self</span>.<span class="ident">map</span>(<span class="ident">f</span>).<span class="ident">counts</span>()
+    }
+
+    <span class="doccomment">/// Converts an iterator of tuples into a tuple of containers.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `unzip()` consumes an entire iterator of n-ary tuples, producing `n` collections, one for each</span>
+    <span class="doccomment">/// column.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function is, in some sense, the opposite of [`multizip`].</span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use itertools::Itertools;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let inputs = vec![(1, 2, 3), (4, 5, 6), (7, 8, 9)];</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (a, b, c): (Vec&lt;_&gt;, Vec&lt;_&gt;, Vec&lt;_&gt;) = inputs</span>
+    <span class="doccomment">///     .into_iter()</span>
+    <span class="doccomment">///     .multiunzip();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(a, vec![1, 4, 7]);</span>
+    <span class="doccomment">/// assert_eq!(b, vec![2, 5, 8]);</span>
+    <span class="doccomment">/// assert_eq!(c, vec![3, 6, 9]);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">fn</span> <span class="ident">multiunzip</span><span class="op">&lt;</span><span class="ident">FromI</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">FromI</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">MultiUnzip</span><span class="op">&lt;</span><span class="ident">FromI</span><span class="op">&gt;</span>,
+    {
+        <span class="ident">MultiUnzip::multiunzip</span>(<span class="self">self</span>)
     }
 }
 

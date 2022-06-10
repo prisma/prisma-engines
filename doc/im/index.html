@@ -3,8 +3,8 @@
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../im/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"><a href="#">Crate im</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 13.0.0</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div></section><div id="sidebar-vars" data-name="im" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../im/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">im</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/im/lib.rs.html#5-481">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="immutable-data-structures-for-rust"><a href="#immutable-data-structures-for-rust">Immutable Data Structures for Rust</a></h2>
+        </a><h2 class="location"><a href="#">Crate im</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 15.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li></ul></div></section><div id="sidebar-vars" data-name="im" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../im/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">im</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/im/lib.rs.html#5-507">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="immutable-data-structures-for-rust"><a href="#immutable-data-structures-for-rust">Immutable Data Structures for Rust</a></h2>
 <p>This library implements several of the more commonly useful immutable data
 structures for Rust.</p>
 <h3 id="what-are-immutable-data-structures"><a href="#what-are-immutable-data-structures">What are immutable data structures?</a></h3>
@@ -15,10 +15,10 @@ selection of more modern and flexible data structures with similar
 properties, tuned for the needs of Rust developers.</p>
 <p>Briefly, the following data structures are provided:</p>
 <ul>
-<li><a href="./vector/enum.Vector.html">Vectors</a> based on <a href="https://infoscience.epfl.ch/record/213452/files/rrbvector.pdf">RRB trees</a></li>
-<li><a href="./hashmap/struct.HashMap.html">Hash maps</a>/<a href="./hashset/struct.HashSet.html">sets</a> based on <a href="https://en.wikipedia.org/wiki/Hash_array_mapped_trie">hash
+<li><a href="./struct.Vector.html">Vectors</a> based on <a href="https://infoscience.epfl.ch/record/213452/files/rrbvector.pdf">RRB trees</a></li>
+<li><a href="./struct.HashMap.html">Hash maps</a>/<a href="./struct.HashSet.html">sets</a> based on <a href="https://en.wikipedia.org/wiki/Hash_array_mapped_trie">hash
 array mapped tries</a></li>
-<li><a href="./ordmap/struct.OrdMap.html">Ordered maps</a>/<a href="./ordset/struct.OrdSet.html">sets</a> based on
+<li><a href="./struct.OrdMap.html">Ordered maps</a>/<a href="./struct.OrdSet.html">sets</a> based on
 <a href="https://en.wikipedia.org/wiki/B-tree">B-trees</a></li>
 </ul>
 <h3 id="why-would-i-want-this"><a href="#why-would-i-want-this">Why Would I Want This?</a></h3>
@@ -42,7 +42,7 @@ allocated until you modify either the copy or the original, and
 then only the memory needed to record the difference.</p>
 <p>Another goal of this library has been the idea that you shouldn’t
 even have to think about what data structure to use in any given
-situation, until the point where you need to start worring about
+situation, until the point where you need to start worrying about
 optimisation - which, in practice, often never comes. Beyond the
 shape of your data (ie. whether to use a list or a map), it should
 be fine not to think too carefully about data structures - you can
@@ -59,30 +59,30 @@ closer to the front of the list you get.
 <a href="https://doc.rust-lang.org/std/collections/struct.VecDeque.html"><code>VecDeque</code></a> adds a little bit of
 complexity in order to make operations at the front as efficient
 as operations at the back, but is still bad at insertion and
-especially concatenation. <a href="./vector/enum.Vector.html"><code>Vector</code></a> adds another
+especially concatenation. <a href="./struct.Vector.html"><code>Vector</code></a> adds another
 bit of complexity, and could never match <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a> at
 what it’s best at, but in return every operation you can throw at
 it can be completed in a reasonable amount of time - even normally
 expensive operations like copying and especially concatenation are
-reasonably cheap when using a <a href="./vector/enum.Vector.html"><code>Vector</code></a>.</p>
+reasonably cheap when using a <a href="./struct.Vector.html"><code>Vector</code></a>.</p>
 <p>It should be noted, however, that because of its simplicity,
-<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a> actually beats <a href="./vector/enum.Vector.html"><code>Vector</code></a> even at its
+<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a> actually beats <a href="./struct.Vector.html"><code>Vector</code></a> even at its
 strongest operations at small sizes, just because modern CPUs are
 hyperoptimised for things like copying small chunks of contiguous memory -
 you actually need to go past a certain size (usually in the vicinity of
 several hundred elements) before you get to the point where
 <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a> isn’t always going to be the fastest choice.
-<a href="./vector/enum.Vector.html"><code>Vector</code></a> attempts to overcome this by actually just being
+<a href="./struct.Vector.html"><code>Vector</code></a> attempts to overcome this by actually just being
 an array at very small sizes, and being able to switch efficiently to the
 full data structure when it grows large enough. Thus,
-<a href="./vector/enum.Vector.html"><code>Vector</code></a> will actually be equivalent to
+<a href="./struct.Vector.html"><code>Vector</code></a> will actually be equivalent to
 <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Vec</a> until it grows past the size of a single chunk.</p>
-<p>The maps - <a href="./hashmap/struct.HashMap.html"><code>HashMap</code></a> and
-<a href="./ordmap/struct.OrdMap.html"><code>OrdMap</code></a> - generally perform similarly to their
+<p>The maps - <a href="./struct.HashMap.html"><code>HashMap</code></a> and
+<a href="./struct.OrdMap.html"><code>OrdMap</code></a> - generally perform similarly to their
 equivalents in the standard library, but tend to run a bit slower
-on the basic operations (<a href="./hashmap/struct.HashMap.html"><code>HashMap</code></a> is almost
+on the basic operations (<a href="./struct.HashMap.html"><code>HashMap</code></a> is almost
 neck and neck with its counterpart, while
-<a href="./ordmap/struct.OrdMap.html"><code>OrdMap</code></a> currently tends to run 2-3x slower). On
+<a href="./struct.OrdMap.html"><code>OrdMap</code></a> currently tends to run 2-3x slower). On
 the other hand, they offer the cheap copy and structural sharing
 between copies that you’d expect from immutable data structures.</p>
 <p>In conclusion, the aim of this library is to provide a safe
@@ -187,31 +187,31 @@ I’ve used in these docs to save myself from having to type
 <h4 id="lists"><a href="#lists">Lists</a></h4>
 <p>Lists are sequences of single elements which maintain the order in
 which you inserted them. The only list in this library is
-<a href="./vector/enum.Vector.html"><code>Vector</code></a>, which offers the best all round
+<a href="./struct.Vector.html"><code>Vector</code></a>, which offers the best all round
 performance characteristics: it’s pretty good at everything, even
 if there’s always another kind of list that’s better at something.</p>
-<p>| Type | Algorithm | Constraints | Order | Push | Pop | Split | Append | Lookup |
-| — | — | — | — | — | — | — |
-| <a href="./vector/enum.Vector.html"><code>Vector&lt;A&gt;</code></a> | <a href="https://infoscience.epfl.ch/record/213452/files/rrbvector.pdf">RRB tree</a> | <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> | insertion | O(1)* | O(1)* | O(log n) | O(log n) | O(log n) |</p>
-<h4 id="maps"><a href="#maps">Maps</a></h4>
+<div><table><thead><tr><th>Type</th><th>Algorithm</th><th>Constraints</th><th>Order</th><th>Push</th><th>Pop</th><th>Split</th><th>Append</th><th>Lookup</th></tr></thead><tbody>
+<tr><td><a href="./struct.Vector.html"><code>Vector&lt;A&gt;</code></a></td><td><a href="https://infoscience.epfl.ch/record/213452/files/rrbvector.pdf">RRB tree</a></td><td><a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a></td><td>insertion</td><td>O(1)*</td><td>O(1)*</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td></tr>
+</tbody></table>
+</div><h4 id="maps"><a href="#maps">Maps</a></h4>
 <p>Maps are mappings of keys to values, where the most common read
 operation is to find the value associated with a given key. Maps
 may or may not have a defined order. Any given key can only occur
 once inside a map, and setting a key to a different value will
 overwrite the previous value.</p>
-<p>| Type | Algorithm | Key Constraints | Order | Insert | Remove | Lookup |
-| — | — | — | — | — | — |
-| <a href="./hashmap/struct.HashMap.html"><code>HashMap&lt;K, V&gt;</code></a> | <a href="https://en.wikipedia.org/wiki/Hash_array_mapped_trie">HAMT</a> | <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> + <a href="https://doc.rust-lang.org/std/hash/trait.Hash.html"><code>Hash</code></a> + <a href="https://doc.rust-lang.org/std/cmp/trait.Eq.html"><code>Eq</code></a> | undefined | O(log n) | O(log n) | O(log n) |
-| <a href="./ordmap/struct.OrdMap.html"><code>OrdMap&lt;K, V&gt;</code></a> | <a href="https://en.wikipedia.org/wiki/B-tree">B-tree</a> | <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> + <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a> | sorted | O(log n) | O(log n) | O(log n) |</p>
-<h4 id="sets"><a href="#sets">Sets</a></h4>
+<div><table><thead><tr><th>Type</th><th>Algorithm</th><th>Key Constraints</th><th>Order</th><th>Insert</th><th>Remove</th><th>Lookup</th></tr></thead><tbody>
+<tr><td><a href="./struct.HashMap.html"><code>HashMap&lt;K, V&gt;</code></a></td><td><a href="https://en.wikipedia.org/wiki/Hash_array_mapped_trie">HAMT</a></td><td><a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> + <a href="https://doc.rust-lang.org/std/hash/trait.Hash.html"><code>Hash</code></a> + <a href="https://doc.rust-lang.org/std/cmp/trait.Eq.html"><code>Eq</code></a></td><td>undefined</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td></tr>
+<tr><td><a href="./struct.OrdMap.html"><code>OrdMap&lt;K, V&gt;</code></a></td><td><a href="https://en.wikipedia.org/wiki/B-tree">B-tree</a></td><td><a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> + <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a></td><td>sorted</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td></tr>
+</tbody></table>
+</div><h4 id="sets"><a href="#sets">Sets</a></h4>
 <p>Sets are collections of unique values, and may or may not have a
 defined order. Their crucial property is that any given value can
 only exist once in a given set.</p>
-<p>| Type | Algorithm | Constraints | Order | Insert | Remove | Lookup |
-| — | — | — | — | — | — |
-| <a href="./hashset/struct.HashSet.html"><code>HashSet&lt;A&gt;</code></a> | <a href="https://en.wikipedia.org/wiki/Hash_array_mapped_trie">HAMT</a> | <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> + <a href="https://doc.rust-lang.org/std/hash/trait.Hash.html"><code>Hash</code></a> + <a href="https://doc.rust-lang.org/std/cmp/trait.Eq.html"><code>Eq</code></a> | undefined | O(log n) | O(log n) | O(log n) |
-| <a href="./ordset/struct.OrdSet.html"><code>OrdSet&lt;A&gt;</code></a> | <a href="https://en.wikipedia.org/wiki/B-tree">B-tree</a> | <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> + <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a> | sorted | O(log n) | O(log n) | O(log n) |</p>
-<h3 id="in-place-mutation"><a href="#in-place-mutation">In-place Mutation</a></h3>
+<div><table><thead><tr><th>Type</th><th>Algorithm</th><th>Constraints</th><th>Order</th><th>Insert</th><th>Remove</th><th>Lookup</th></tr></thead><tbody>
+<tr><td><a href="./struct.HashSet.html"><code>HashSet&lt;A&gt;</code></a></td><td><a href="https://en.wikipedia.org/wiki/Hash_array_mapped_trie">HAMT</a></td><td><a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> + <a href="https://doc.rust-lang.org/std/hash/trait.Hash.html"><code>Hash</code></a> + <a href="https://doc.rust-lang.org/std/cmp/trait.Eq.html"><code>Eq</code></a></td><td>undefined</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td></tr>
+<tr><td><a href="./struct.OrdSet.html"><code>OrdSet&lt;A&gt;</code></a></td><td><a href="https://en.wikipedia.org/wiki/B-tree">B-tree</a></td><td><a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> + <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a></td><td>sorted</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td></tr>
+</tbody></table>
+</div><h3 id="in-place-mutation"><a href="#in-place-mutation">In-place Mutation</a></h3>
 <p>All of these data structures support in-place copy-on-write
 mutation, which means that if you’re the sole user of a data
 structure, you can update it in place without taking the
@@ -254,10 +254,12 @@ general performance.</p>
 feature flags. You can enable them in your <code>Cargo.toml</code> file like this:</p>
 <div class="example-wrap"><pre class="language-no_compile"><code>[dependencies]
 im = { version = &quot;*&quot;, features = [&quot;proptest&quot;, &quot;serde&quot;] }</code></pre></div><div><table><thead><tr><th>Feature</th><th>Description</th></tr></thead><tbody>
+<tr><td><a href="https://crates.io/crates/refpool"><code>pool</code></a></td><td>Constructors and pool types for <a href="https://crates.io/crates/refpool"><code>refpool</code></a> memory pools (only available in <code>im-rc</code>)</td></tr>
 <tr><td><a href="https://crates.io/crates/proptest"><code>proptest</code></a></td><td>Strategies for all <code>im</code> datatypes under a <code>proptest</code> namespace, eg. <code>im::vector::proptest::vector()</code></td></tr>
-<tr><td><a href="https://crates.io/crates/quickcheck"><code>quickcheck</code></a></td><td><code>Arbitrary</code> implementations for all <code>im</code> datatypes (not available in <code>im-rc</code>)</td></tr>
-<tr><td><a href="https://crates.io/crates/rayon"><code>rayon</code></a></td><td>parallel iterator implementations for <code>Vector</code> (not available in <code>im-rc</code>)</td></tr>
-<tr><td><a href="https://crates.io/crates/serde"><code>serde</code></a></td><td><code>Serialize</code> and <code>Deserialize</code> implementations for all <code>im</code> datatypes</td></tr>
+<tr><td><a href="https://crates.io/crates/quickcheck"><code>quickcheck</code></a></td><td><a href="https://docs.rs/quickcheck/latest/quickcheck/trait.Arbitrary.html"><code>quickcheck::Arbitrary</code></a> implementations for all <code>im</code> datatypes (not available in <code>im-rc</code>)</td></tr>
+<tr><td><a href="https://crates.io/crates/rayon"><code>rayon</code></a></td><td>parallel iterator implementations for <a href="./struct.Vector.html"><code>Vector</code></a> (not available in <code>im-rc</code>)</td></tr>
+<tr><td><a href="https://crates.io/crates/serde"><code>serde</code></a></td><td><a href="https://docs.rs/serde/latest/serde/trait.Serialize.html"><code>Serialize</code></a> and <a href="https://docs.rs/serde/latest/serde/trait.Deserialize.html"><code>Deserialize</code></a> implementations for all <code>im</code> datatypes</td></tr>
+<tr><td><a href="https://crates.io/crates/arbitrary/"><code>arbitrary</code></a></td><td><a href="https://docs.rs/arbitrary/latest/arbitrary/trait.Arbitrary.html"><code>arbitrary::Arbitrary</code></a> implementations for all <code>im</code> datatypes</td></tr>
 </tbody></table>
 </div></div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="hashmap/index.html" title="im::hashmap mod">hashmap</a></div><div class="item-right docblock-short"><p>An unordered map.</p>
@@ -279,7 +281,6 @@ im = { version = &quot;*&quot;, features = [&quot;proptest&quot;, &quot;serde&qu
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.HashSet.html" title="im::HashSet struct">HashSet</a></div><div class="item-right docblock-short"><p>An unordered set.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OrdMap.html" title="im::OrdMap struct">OrdMap</a></div><div class="item-right docblock-short"><p>An ordered map.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OrdSet.html" title="im::OrdSet struct">OrdSet</a></div><div class="item-right docblock-short"><p>An ordered set.</p>
-</div></div></div><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Vector.html" title="im::Vector enum">Vector</a></div><div class="item-right docblock-short"><p>A persistent vector.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Vector.html" title="im::Vector struct">Vector</a></div><div class="item-right docblock-short"><p>A persistent vector.</p>
 </div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="im" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
 </body></html>

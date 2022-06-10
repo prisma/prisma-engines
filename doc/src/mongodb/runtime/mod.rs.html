@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.1.0/src/runtime/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/runtime/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -168,241 +168,169 @@
 <span id="163">163</span>
 <span id="164">164</span>
 <span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">acknowledged_message</span>;
-<span class="kw">mod</span> <span class="ident">async_read_ext</span>;
-<span class="kw">mod</span> <span class="ident">async_write_ext</span>;
 <span class="kw">mod</span> <span class="ident">http</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">interval</span>;
 <span class="kw">mod</span> <span class="ident">join_handle</span>;
 <span class="kw">mod</span> <span class="ident">resolver</span>;
 <span class="kw">mod</span> <span class="ident">stream</span>;
+<span class="kw">mod</span> <span class="ident">sync_read_ext</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openssl-tls&quot;</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tls_openssl</span>;
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openssl-tls&quot;</span>, <span class="ident">allow</span>(<span class="ident">unused</span>))]</span>
+<span class="kw">mod</span> <span class="ident">tls_rustls</span>;
 
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">future::Future</span>, <span class="ident">net::SocketAddr</span>, <span class="ident">time::Duration</span>};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="self">self</span>::{
     <span class="ident">acknowledged_message::AcknowledgedMessage</span>,
-    <span class="ident">async_read_ext</span>::{<span class="ident">AsyncLittleEndianRead</span>, <span class="ident">SyncLittleEndianRead</span>},
-    <span class="ident">async_write_ext</span>::{<span class="ident">AsyncLittleEndianWrite</span>, <span class="ident">SyncLittleEndianWrite</span>},
     <span class="ident">join_handle::AsyncJoinHandle</span>,
     <span class="ident">resolver::AsyncResolver</span>,
     <span class="ident">stream::AsyncStream</span>,
+    <span class="ident">sync_read_ext::SyncLittleEndianRead</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::Result</span>, <span class="ident">options::ServerAddress</span>};
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">http::HttpClient</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">interval::Interval</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openssl-tls&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">tls_openssl</span> <span class="kw">as</span> <span class="ident">tls</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;openssl-tls&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident">tls_rustls</span> <span class="kw">as</span> <span class="ident">tls</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tokio::time::Interval</span>;
 
-<span class="doccomment">/// An abstract handle to the async runtime.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">AsyncRuntime</span> {
-    <span class="doccomment">/// Represents the `tokio` runtime.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-    <span class="ident">Tokio</span>,
+<span class="doccomment">/// Spawn a task in the background to run a future.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If the runtime is still running, this will return a handle to the background task.</span>
+<span class="doccomment">/// Otherwise, it will return `None`. As a result, this must be called from an async block</span>
+<span class="doccomment">/// or function running on a runtime.</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_wraps</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">spawn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">fut</span>: <span class="ident">F</span>) -&gt; <span class="ident">AsyncJoinHandle</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="ident">O</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+{
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
+    {
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">tokio::runtime::Handle::current</span>();
+        <span class="ident">AsyncJoinHandle::Tokio</span>(<span class="ident">handle</span>.<span class="ident">spawn</span>(<span class="ident">fut</span>))
+    }
 
-    <span class="doccomment">/// Represents the `async-std` runtime.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)]</span>
+    {
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::sync::TOKIO_RUNTIME</span>.<span class="ident">handle</span>();
+        <span class="ident">AsyncJoinHandle::Tokio</span>(<span class="ident">handle</span>.<span class="ident">spawn</span>(<span class="ident">fut</span>))
+    }
+
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-    <span class="ident">AsyncStd</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">AsyncRuntime</span> {
-    <span class="doccomment">/// Spawn a task in the background to run a future.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the runtime is still running, this will return a handle to the background task.</span>
-    <span class="doccomment">/// Otherwise, it will return `None`. As a result, this must be called from an async block</span>
-    <span class="doccomment">/// or function running on a runtime.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_wraps</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">spawn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">fut</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AsyncJoinHandle</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">O</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Tokio</span> =&gt; <span class="kw">match</span> <span class="ident">TokioCallingContext::current</span>() {
-                <span class="ident">TokioCallingContext::Async</span>(<span class="ident">handle</span>) =&gt; {
-                    <span class="prelude-val">Some</span>(<span class="ident">AsyncJoinHandle::Tokio</span>(<span class="ident">handle</span>.<span class="ident">spawn</span>(<span class="ident">fut</span>)))
-                }
-                <span class="ident">TokioCallingContext::Sync</span> =&gt; <span class="prelude-val">None</span>,
-            },
-
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::AsyncStd</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">AsyncJoinHandle::AsyncStd</span>(<span class="ident">async_std::task::spawn</span>(<span class="ident">fut</span>))),
-        }
-    }
-
-    <span class="doccomment">/// Spawn a task in the background to run a future.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: this must only be called from an async block or function running on a runtime.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">fut</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">O</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    {
-        <span class="self">self</span>.<span class="ident">spawn</span>(<span class="ident">fut</span>);
-    }
-
-    <span class="doccomment">/// Run a future in the foreground, blocking on it completing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will panic if called from a sychronous context when tokio is being used.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">test</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">fut</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-    {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)))]</span>
-        {
-            <span class="kw">match</span> <span class="ident">TokioCallingContext::current</span>() {
-                <span class="ident">TokioCallingContext::Async</span>(<span class="ident">_handle</span>) =&gt; {
-                    <span class="ident">tokio::task::block_in_place</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">futures::executor::block_on</span>(<span class="ident">fut</span>))
-                }
-                <span class="ident">TokioCallingContext::Sync</span> =&gt; {
-                    <span class="macro">panic!</span>(<span class="string">&quot;block_on called from tokio outside of async context&quot;</span>)
-                }
-            }
-        }
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-        {
-            <span class="ident">async_std::task::block_on</span>(<span class="ident">fut</span>)
-        }
-    }
-
-    <span class="doccomment">/// Run a future in the foreground, blocking on it completing.</span>
-    <span class="doccomment">/// This does not notify the runtime that it will be blocking and should only be used for</span>
-    <span class="doccomment">/// operations that will immediately (or quickly) succeed.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">block_in_place</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">fut</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">T</span>: <span class="ident">Send</span>,
-    {
-        <span class="ident">futures_executor::block_on</span>(<span class="ident">fut</span>)
-    }
-
-    <span class="doccomment">/// Delay for the specified duration.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delay_for</span>(<span class="self">self</span>, <span class="ident">delay</span>: <span class="ident">Duration</span>) {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-        {
-            <span class="ident">tokio::time::sleep</span>(<span class="ident">delay</span>).<span class="kw">await</span>
-        }
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-        {
-            <span class="ident">async_std::task::sleep</span>(<span class="ident">delay</span>).<span class="kw">await</span>
-        }
-    }
-
-    <span class="doccomment">/// Await on a future for a maximum amount of time before returning an error.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">timeout</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span>(
-        <span class="self">self</span>,
-        <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-        <span class="ident">future</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-        {
-            <span class="ident">tokio::time::timeout</span>(<span class="ident">timeout</span>, <span class="ident">future</span>)
-                .<span class="kw">await</span>
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">std::io::ErrorKind::TimedOut</span>.<span class="ident">into</span>())
-        }
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-        {
-            <span class="ident">async_std::future::timeout</span>(<span class="ident">timeout</span>, <span class="ident">future</span>)
-                .<span class="kw">await</span>
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">std::io::ErrorKind::TimedOut</span>.<span class="ident">into</span>())
-        }
-    }
-
-    <span class="doccomment">/// Create a new `Interval` that yields with interval of `duration`.</span>
-    <span class="doccomment">/// See: &lt;https://docs.rs/tokio/latest/tokio/time/fn.interval.html&gt;</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">interval</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">Interval</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Tokio</span> =&gt; <span class="ident">tokio::time::interval</span>(<span class="ident">duration</span>),
-
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::AsyncStd</span> =&gt; <span class="ident">Interval::new</span>(<span class="ident">duration</span>),
-        }
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">resolve_address</span>(
-        <span class="self">self</span>,
-        <span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">SocketAddr</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Tokio</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">socket_addrs</span> <span class="op">=</span> <span class="ident">tokio::net::lookup_host</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">address</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">socket_addrs</span>)
-            }
-
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::AsyncStd</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> (<span class="ident">address</span>.<span class="ident">host</span>(), <span class="ident">address</span>.<span class="ident">port</span>().<span class="ident">unwrap_or</span>(<span class="number">27017</span>));
-                <span class="kw">let</span> <span class="ident">socket_addrs</span> <span class="op">=</span> <span class="ident">async_std::net::ToSocketAddrs::to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="ident">host</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">socket_addrs</span>)
-            }
-        }
+        <span class="ident">AsyncJoinHandle::AsyncStd</span>(<span class="ident">async_std::task::spawn</span>(<span class="ident">fut</span>))
     }
 }
 
-<span class="doccomment">/// Represents the context in which a given runtime method is being called from.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-<span class="kw">enum</span> <span class="ident">TokioCallingContext</span> {
-    <span class="doccomment">/// From a syncronous setting (i.e. not from a runtime thread).</span>
-    <span class="ident">Sync</span>,
-
-    <span class="doccomment">/// From an asyncronous setting (i.e. from an async block or function being run on a runtime).</span>
-    <span class="doccomment">/// Includes a handle to the current runtime.</span>
-    <span class="ident">Async</span>(<span class="ident">tokio::runtime::Handle</span>),
+<span class="doccomment">/// Spawn a task in the background to run a future.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Note: this must only be called from an async block or function running on a runtime.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">fut</span>: <span class="ident">F</span>)
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="ident">O</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+{
+    <span class="ident">spawn</span>(<span class="ident">fut</span>);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">TokioCallingContext</span> {
-    <span class="doccomment">/// Get the current calling context.</span>
-    <span class="kw">fn</span> <span class="ident">current</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">tokio::runtime::Handle::try_current</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">handle</span>) =&gt; <span class="ident">TokioCallingContext::Async</span>(<span class="ident">handle</span>),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">TokioCallingContext::Sync</span>,
-        }
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>))]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">fut</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span>
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
+{
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
+    {
+        <span class="ident">tokio::task::block_in_place</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">futures::executor::block_on</span>(<span class="ident">fut</span>))
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)]</span>
+    {
+        <span class="ident"><span class="kw">crate</span>::sync::TOKIO_RUNTIME</span>.<span class="ident">block_on</span>(<span class="ident">fut</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
+    {
+        <span class="ident">async_std::task::block_on</span>(<span class="ident">fut</span>)
+    }
+}
+
+<span class="doccomment">/// Run a future in the foreground, blocking on it completing.</span>
+<span class="doccomment">/// This does not notify the runtime that it will be blocking and should only be used for</span>
+<span class="doccomment">/// operations that will immediately (or quickly) succeed.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">block_in_place</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">fut</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span>
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+    <span class="ident">T</span>: <span class="ident">Send</span>,
+{
+    <span class="ident">futures_executor::block_on</span>(<span class="ident">fut</span>)
+}
+
+<span class="doccomment">/// Delay for the specified duration.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delay_for</span>(<span class="ident">delay</span>: <span class="ident">Duration</span>) {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
+    {
+        <span class="ident">tokio::time::sleep</span>(<span class="ident">delay</span>).<span class="kw">await</span>
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
+    {
+        <span class="ident">async_std::task::sleep</span>(<span class="ident">delay</span>).<span class="kw">await</span>
+    }
+}
+
+<span class="doccomment">/// Await on a future for a maximum amount of time before returning an error.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">timeout</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span>(<span class="ident">timeout</span>: <span class="ident">Duration</span>, <span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
+    {
+        <span class="ident">tokio::time::timeout</span>(<span class="ident">timeout</span>, <span class="ident">future</span>)
+            .<span class="kw">await</span>
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">std::io::ErrorKind::TimedOut</span>.<span class="ident">into</span>())
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
+    {
+        <span class="ident">async_std::future::timeout</span>(<span class="ident">timeout</span>, <span class="ident">future</span>)
+            .<span class="kw">await</span>
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">std::io::ErrorKind::TimedOut</span>.<span class="ident">into</span>())
+    }
+}
+
+<span class="doccomment">/// Create a new `Interval` that yields with interval of `duration`.</span>
+<span class="doccomment">/// See: &lt;https://docs.rs/tokio/latest/tokio/time/fn.interval.html&gt;</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">interval</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">Interval</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
+    {
+        <span class="ident">tokio::time::interval</span>(<span class="ident">duration</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
+    {
+        <span class="ident">Interval::new</span>(<span class="ident">duration</span>)
+    }
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">resolve_address</span>(
+    <span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">SocketAddr</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
+    {
+        <span class="kw">let</span> <span class="ident">socket_addrs</span> <span class="op">=</span> <span class="ident">tokio::net::lookup_host</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">address</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">socket_addrs</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
+    {
+        <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> (<span class="ident">address</span>.<span class="ident">host</span>(), <span class="ident">address</span>.<span class="ident">port</span>().<span class="ident">unwrap_or</span>(<span class="number">27017</span>));
+        <span class="kw">let</span> <span class="ident">socket_addrs</span> <span class="op">=</span> <span class="ident">async_std::net::ToSocketAddrs::to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="ident">host</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">socket_addrs</span>)
     }
 }
 </code></pre></div>

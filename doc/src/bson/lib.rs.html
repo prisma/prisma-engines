@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.1.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.3.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -308,6 +308,8 @@
 <span id="303">303</span>
 <span id="304">304</span>
 <span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
 </pre><pre class="rust"><code><span class="comment">// The MIT License (MIT)</span>
 
 <span class="comment">// Copyright (c) 2015 Y. T. Chung &lt;zonyitoo@gmail.com&gt;</span>
@@ -353,7 +355,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Installation</span>
 <span class="doccomment">//! ### Requirements</span>
-<span class="doccomment">//! - Rust 1.48+</span>
+<span class="doccomment">//! - Rust 1.53+</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Importing</span>
 <span class="doccomment">//! This crate is available on [crates.io](https://crates.io/crates/bson). To use it in your application,</span>
@@ -361,7 +363,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! bson = &quot;2.1.0&quot;</span>
+<span class="doccomment">//! bson = &quot;2.3.0&quot;</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Note that if you are using `bson` through the `mongodb` crate, you do not need to specify it in</span>
@@ -570,11 +572,11 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Minimum supported Rust version (MSRV)</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The MSRV for this crate is currently 1.48.0. This will be rarely be increased, and if it ever is,</span>
+<span class="doccomment">//! The MSRV for this crate is currently 1.53.0. This will be rarely be increased, and if it ever is,</span>
 <span class="doccomment">//! it will only happen in a minor or major version release.</span>
 
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::cognitive_complexity</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/bson/2.1.0&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/bson/2.3.0&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
@@ -587,14 +589,16 @@
         <span class="ident">DeserializerOptions</span>,
     },
     <span class="ident">decimal128::Decimal128</span>,
+    <span class="ident">raw</span>::{
+        <span class="ident">RawArray</span>, <span class="ident">RawArrayBuf</span>, <span class="ident">RawBinaryRef</span>, <span class="ident">RawBson</span>, <span class="ident">RawBsonRef</span>, <span class="ident">RawDbPointerRef</span>, <span class="ident">RawDocument</span>,
+        <span class="ident">RawDocumentBuf</span>, <span class="ident">RawJavaScriptCodeWithScope</span>, <span class="ident">RawJavaScriptCodeWithScopeRef</span>, <span class="ident">RawRegexRef</span>,
+    },
     <span class="ident">ser</span>::{
-        <span class="ident">to_bson</span>, <span class="ident">to_bson_with_options</span>, <span class="ident">to_document</span>, <span class="ident">to_document_with_options</span>, <span class="ident">to_vec</span>, <span class="ident">Serializer</span>,
-        <span class="ident">SerializerOptions</span>,
+        <span class="ident">to_bson</span>, <span class="ident">to_bson_with_options</span>, <span class="ident">to_document</span>, <span class="ident">to_document_with_options</span>, <span class="ident">to_raw_document_buf</span>,
+        <span class="ident">to_vec</span>, <span class="ident">Serializer</span>, <span class="ident">SerializerOptions</span>,
     },
     <span class="ident">uuid</span>::{<span class="ident">Uuid</span>, <span class="ident">UuidRepresentation</span>},
 };
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::raw::RawDocument</span>;
 
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">mod</span> <span class="ident">macros</span>;
@@ -605,7 +609,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">document</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">extjson</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">oid</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">raw</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">raw</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ser</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">serde_helpers</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">spec</span>;

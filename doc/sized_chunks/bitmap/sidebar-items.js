@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Bitmap","A compact array of bits."],["Iter","An iterator over the indices in a bitmap which are `true`."]]});

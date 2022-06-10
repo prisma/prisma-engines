@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.24.0/src/read/elf/relocation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relocation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.28.4/src/read/elf/relocation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relocation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -533,6 +533,15 @@
 <span id="528">528</span>
 <span id="529">529</span>
 <span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::fmt</span>;
 <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
 <span class="kw">use</span> <span class="ident">core::fmt::Debug</span>;
@@ -543,7 +552,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pod::Pod</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read</span>::{
     <span class="self">self</span>, <span class="ident">Error</span>, <span class="ident">ReadRef</span>, <span class="ident">Relocation</span>, <span class="ident">RelocationEncoding</span>, <span class="ident">RelocationKind</span>, <span class="ident">RelocationTarget</span>,
-    <span class="ident">SymbolIndex</span>,
+    <span class="ident">SectionIndex</span>, <span class="ident">SymbolIndex</span>,
 };
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ElfFile</span>, <span class="ident">FileHeader</span>, <span class="ident">SectionHeader</span>, <span class="ident">SectionTable</span>};
@@ -558,10 +567,10 @@
     <span class="doccomment">/// Create a new mapping using the section table.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Skips relocation sections that do not use the given symbol table section.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">Elf</span>: <span class="ident">FileHeader</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
-        <span class="ident">sections</span>: <span class="kw-2">&amp;</span><span class="ident">SectionTable</span><span class="op">&lt;</span><span class="ident">Elf</span><span class="op">&gt;</span>,
-        <span class="ident">symbol_section</span>: <span class="ident">usize</span>,
+        <span class="ident">sections</span>: <span class="kw-2">&amp;</span><span class="ident">SectionTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>,
+        <span class="ident">symbol_section</span>: <span class="ident">SectionIndex</span>,
     ) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relocations</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">sections</span>.<span class="ident">len</span>()];
         <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">section</span>) <span class="kw">in</span> <span class="ident">sections</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>().<span class="ident">rev</span>() {
@@ -569,7 +578,7 @@
             <span class="kw">if</span> <span class="ident">sh_type</span> <span class="op">==</span> <span class="ident">elf::SHT_REL</span> <span class="op">|</span><span class="op">|</span> <span class="ident">sh_type</span> <span class="op">==</span> <span class="ident">elf::SHT_RELA</span> {
                 <span class="comment">// The symbol indices used in relocations must be for the symbol table</span>
                 <span class="comment">// we are expecting to use.</span>
-                <span class="kw">let</span> <span class="ident">sh_link</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">sh_link</span>(<span class="ident">endian</span>) <span class="kw">as</span> <span class="ident">usize</span>;
+                <span class="kw">let</span> <span class="ident">sh_link</span> <span class="op">=</span> <span class="ident">SectionIndex</span>(<span class="ident">section</span>.<span class="ident">sh_link</span>(<span class="ident">endian</span>) <span class="kw">as</span> <span class="ident">usize</span>);
                 <span class="kw">if</span> <span class="ident">sh_link</span> <span class="op">!</span><span class="op">=</span> <span class="ident">symbol_section</span> {
                     <span class="kw">continue</span>;
                 }
@@ -640,7 +649,7 @@
     <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// The current relocation section index.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">section_index</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">section_index</span>: <span class="ident">SectionIndex</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">ElfFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">relocations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ElfRelaIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
@@ -665,9 +674,9 @@
             }
 
             <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">sections</span>.<span class="ident">section</span>(<span class="self">self</span>.<span class="ident">section_index</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">section_index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="self">self</span>.<span class="ident">section_index</span>.<span class="number">0</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 
-            <span class="kw">let</span> <span class="ident">sh_link</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">sh_link</span>(<span class="ident">endian</span>) <span class="kw">as</span> <span class="ident">usize</span>;
+            <span class="kw">let</span> <span class="ident">sh_link</span> <span class="op">=</span> <span class="ident">SectionIndex</span>(<span class="ident">section</span>.<span class="ident">sh_link</span>(<span class="ident">endian</span>) <span class="kw">as</span> <span class="ident">usize</span>);
             <span class="kw">if</span> <span class="ident">sh_link</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">dynamic_symbols</span>.<span class="ident">section</span>() {
                 <span class="kw">continue</span>;
             }
@@ -713,7 +722,7 @@
     <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// The current pointer in the chain of relocation sections.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">section_index</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">section_index</span>: <span class="ident">SectionIndex</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">ElfFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>, <span class="ident">R</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">relocations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ElfRelaIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
@@ -736,7 +745,7 @@
                 }
                 <span class="self">self</span>.<span class="ident">relocations</span> <span class="op">=</span> <span class="prelude-val">None</span>;
             }
-            <span class="self">self</span>.<span class="ident">section_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">relocations</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">section_index</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">section_index</span> <span class="op">=</span> <span class="ident">SectionIndex</span>(<span class="self">self</span>.<span class="ident">file</span>.<span class="ident">relocations</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">section_index</span>.<span class="number">0</span>)<span class="question-mark">?</span>);
             <span class="comment">// The construction of RelocationSections ensures section_index is valid.</span>
             <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">sections</span>.<span class="ident">section</span>(<span class="self">self</span>.<span class="ident">section_index</span>).<span class="ident">unwrap</span>();
             <span class="kw">match</span> <span class="ident">section</span>.<span class="ident">sh_type</span>(<span class="ident">endian</span>) {
@@ -775,10 +784,6 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoding</span> <span class="op">=</span> <span class="ident">RelocationEncoding::Generic</span>;
     <span class="kw">let</span> <span class="ident">is_mips64el</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">is_mips64el</span>(<span class="ident">endian</span>);
     <span class="kw">let</span> (<span class="ident">kind</span>, <span class="ident">size</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">header</span>.<span class="ident">e_machine</span>(<span class="ident">endian</span>) {
-        <span class="ident">elf::EM_ARM</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
-            <span class="ident">elf::R_ARM_ABS32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
-            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
-        },
         <span class="ident">elf::EM_AARCH64</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
             <span class="ident">elf::R_AARCH64_ABS64</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">64</span>),
             <span class="ident">elf::R_AARCH64_ABS32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
@@ -786,6 +791,24 @@
             <span class="ident">elf::R_AARCH64_PREL64</span> =&gt; (<span class="ident">RelocationKind::Relative</span>, <span class="number">64</span>),
             <span class="ident">elf::R_AARCH64_PREL32</span> =&gt; (<span class="ident">RelocationKind::Relative</span>, <span class="number">32</span>),
             <span class="ident">elf::R_AARCH64_PREL16</span> =&gt; (<span class="ident">RelocationKind::Relative</span>, <span class="number">16</span>),
+            <span class="ident">elf::R_AARCH64_CALL26</span> =&gt; {
+                <span class="ident">encoding</span> <span class="op">=</span> <span class="ident">RelocationEncoding::AArch64Call</span>;
+                (<span class="ident">RelocationKind::PltRelative</span>, <span class="number">26</span>)
+            }
+            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
+        },
+        <span class="ident">elf::EM_ARM</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
+            <span class="ident">elf::R_ARM_ABS32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
+            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
+        },
+        <span class="ident">elf::EM_AVR</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
+            <span class="ident">elf::R_AVR_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
+            <span class="ident">elf::R_AVR_16</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">16</span>),
+            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
+        },
+        <span class="ident">elf::EM_BPF</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
+            <span class="ident">elf::R_BPF_64_64</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">64</span>),
+            <span class="ident">elf::R_BPF_64_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
             <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
         },
         <span class="ident">elf::EM_386</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
@@ -816,6 +839,40 @@
             <span class="ident">elf::R_X86_64_PC16</span> =&gt; (<span class="ident">RelocationKind::Relative</span>, <span class="number">16</span>),
             <span class="ident">elf::R_X86_64_8</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">8</span>),
             <span class="ident">elf::R_X86_64_PC8</span> =&gt; (<span class="ident">RelocationKind::Relative</span>, <span class="number">8</span>),
+            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
+        },
+        <span class="ident">elf::EM_HEXAGON</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
+            <span class="ident">elf::R_HEX_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
+            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
+        },
+        <span class="ident">elf::EM_LOONGARCH</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
+            <span class="ident">elf::R_LARCH_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
+            <span class="ident">elf::R_LARCH_64</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">64</span>),
+            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
+        },
+        <span class="ident">elf::EM_MIPS</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="ident">is_mips64el</span>) {
+            <span class="ident">elf::R_MIPS_16</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">16</span>),
+            <span class="ident">elf::R_MIPS_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
+            <span class="ident">elf::R_MIPS_64</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">64</span>),
+            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
+        },
+        <span class="ident">elf::EM_MSP430</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
+            <span class="ident">elf::R_MSP430_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
+            <span class="ident">elf::R_MSP430_16_BYTE</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">16</span>),
+            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
+        },
+        <span class="ident">elf::EM_PPC</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
+            <span class="ident">elf::R_PPC_ADDR32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
+            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
+        },
+        <span class="ident">elf::EM_PPC64</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
+            <span class="ident">elf::R_PPC64_ADDR32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
+            <span class="ident">elf::R_PPC64_ADDR64</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">64</span>),
+            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
+        },
+        <span class="ident">elf::EM_RISCV</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
+            <span class="ident">elf::R_RISCV_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
+            <span class="ident">elf::R_RISCV_64</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">64</span>),
             <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
         },
         <span class="ident">elf::EM_S390</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
@@ -859,30 +916,6 @@
             }
             <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
         },
-        <span class="ident">elf::EM_AVR</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
-            <span class="ident">elf::R_AVR_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
-            <span class="ident">elf::R_AVR_16</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">16</span>),
-            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
-        },
-        <span class="ident">elf::EM_MSP430</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
-            <span class="ident">elf::R_MSP430_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
-            <span class="ident">elf::R_MSP430_16_BYTE</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">16</span>),
-            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
-        },
-        <span class="ident">elf::EM_PPC</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
-            <span class="ident">elf::R_PPC_ADDR32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
-            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
-        },
-        <span class="ident">elf::EM_PPC64</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
-            <span class="ident">elf::R_PPC64_ADDR32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
-            <span class="ident">elf::R_PPC64_ADDR64</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">64</span>),
-            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
-        },
-        <span class="ident">elf::EM_RISCV</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
-            <span class="ident">elf::R_RISCV_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
-            <span class="ident">elf::R_RISCV_64</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">64</span>),
-            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
-        },
         <span class="ident">elf::EM_SPARC</span> <span class="op">|</span> <span class="ident">elf::EM_SPARC32PLUS</span> <span class="op">|</span> <span class="ident">elf::EM_SPARCV9</span> =&gt; {
             <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
                 <span class="ident">elf::R_SPARC_32</span> <span class="op">|</span> <span class="ident">elf::R_SPARC_UA32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
@@ -890,21 +923,6 @@
                 <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
             }
         }
-        <span class="ident">elf::EM_MIPS</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="ident">is_mips64el</span>) {
-            <span class="ident">elf::R_MIPS_16</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">16</span>),
-            <span class="ident">elf::R_MIPS_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
-            <span class="ident">elf::R_MIPS_64</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">64</span>),
-            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
-        },
-        <span class="ident">elf::EM_HEXAGON</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
-            <span class="ident">elf::R_HEX_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
-            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
-        },
-        <span class="ident">elf::EM_BPF</span> =&gt; <span class="kw">match</span> <span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>) {
-            <span class="ident">elf::R_BPF_64_64</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">64</span>),
-            <span class="ident">elf::R_BPF_64_32</span> =&gt; (<span class="ident">RelocationKind::Absolute</span>, <span class="number">32</span>),
-            <span class="ident">r_type</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">r_type</span>), <span class="number">0</span>),
-        },
         <span class="kw">_</span> =&gt; (<span class="ident">RelocationKind::Elf</span>(<span class="ident">reloc</span>.<span class="ident">r_type</span>(<span class="ident">endian</span>, <span class="bool-val">false</span>)), <span class="number">0</span>),
     };
     <span class="kw">let</span> <span class="ident">sym</span> <span class="op">=</span> <span class="ident">reloc</span>.<span class="ident">r_sym</span>(<span class="ident">endian</span>, <span class="ident">is_mips64el</span>) <span class="kw">as</span> <span class="ident">usize</span>;

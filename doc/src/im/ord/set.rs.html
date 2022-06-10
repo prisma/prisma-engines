@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/im-13.0.0/./src/ord/set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/im-15.1.0/./src/ord/set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1219,6 +1219,33 @@
 <span id="1214">1214</span>
 <span id="1215">1215</span>
 <span id="1216">1216</span>
+<span id="1217">1217</span>
+<span id="1218">1218</span>
+<span id="1219">1219</span>
+<span id="1220">1220</span>
+<span id="1221">1221</span>
+<span id="1222">1222</span>
+<span id="1223">1223</span>
+<span id="1224">1224</span>
+<span id="1225">1225</span>
+<span id="1226">1226</span>
+<span id="1227">1227</span>
+<span id="1228">1228</span>
+<span id="1229">1229</span>
+<span id="1230">1230</span>
+<span id="1231">1231</span>
+<span id="1232">1232</span>
+<span id="1233">1233</span>
+<span id="1234">1234</span>
+<span id="1235">1235</span>
+<span id="1236">1236</span>
+<span id="1237">1237</span>
+<span id="1238">1238</span>
+<span id="1239">1239</span>
+<span id="1240">1240</span>
+<span id="1241">1241</span>
+<span id="1242">1242</span>
+<span id="1243">1243</span>
 </pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public</span>
 <span class="comment">// License, v. 2.0. If a copy of the MPL was not distributed with this</span>
 <span class="comment">// file, You can obtain one at http://mozilla.org/MPL/2.0/.</span>
@@ -1235,7 +1262,7 @@
 <span class="doccomment">//! [`HashSet`][hashset::HashSet] has no guaranteed ordering.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [1]: https://en.wikipedia.org/wiki/B-tree</span>
-<span class="doccomment">//! [hashset::HashSet]: ../hashset/struct.HashSet.html</span>
+<span class="doccomment">//! [hashset::HashSet]: ./struct.HashSet.html</span>
 <span class="doccomment">//! [std::cmp::Ord]: https://doc.rust-lang.org/std/cmp/trait.Ord.html</span>
 
 <span class="kw">use</span> <span class="ident">std::borrow::Borrow</span>;
@@ -1253,7 +1280,7 @@
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">has_specialisation</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::linear_search_by</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::Ref</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="ident">Pool</span>, <span class="ident">PoolRef</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::nodes::btree::DiffItem</span>;
 
@@ -1377,6 +1404,8 @@
     }
 }
 
+<span class="macro">def_pool!</span>(<span class="ident">OrdSetPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">Node</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+
 <span class="doccomment">/// An ordered set.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// An immutable ordered set implemented as a [B-tree] [1].</span>
@@ -1389,20 +1418,36 @@
 <span class="doccomment">/// [`HashSet`][hashset::HashSet] has no guaranteed ordering.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [1]: https://en.wikipedia.org/wiki/B-tree</span>
-<span class="doccomment">/// [hashset::HashSet]: ../hashset/struct.HashSet.html</span>
+<span class="doccomment">/// [hashset::HashSet]: ./struct.HashSet.html</span>
 <span class="doccomment">/// [std::cmp::Ord]: https://doc.rust-lang.org/std/cmp/trait.Ord.html</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
     <span class="ident">size</span>: <span class="ident">usize</span>,
-    <span class="ident">root</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">pool</span>: <span class="ident">OrdSetPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
+    <span class="ident">root</span>: <span class="ident">PoolRef</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Construct an empty set.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">OrdSetPool::default</span>();
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>);
         <span class="ident">OrdSet</span> {
             <span class="ident">size</span>: <span class="number">0</span>,
-            <span class="ident">root</span>: <span class="ident">Ref::from</span>(<span class="ident">Node::new</span>()),
+            <span class="ident">pool</span>,
+            <span class="ident">root</span>,
+        }
+    }
+
+    <span class="doccomment">/// Construct an empty set using a specific memory pool.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pool&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_pool</span>(<span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">OrdSetPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>);
+        <span class="ident">OrdSet</span> {
+            <span class="ident">size</span>: <span class="number">0</span>,
+            <span class="ident">pool</span>: <span class="ident">pool</span>.<span class="ident">clone</span>(),
+            <span class="ident">root</span>,
         }
     }
 
@@ -1413,17 +1458,18 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::ordset::OrdSet;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let set = OrdSet::unit(123);</span>
     <span class="doccomment">/// assert!(set.contains(&amp;123));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unit</span>(<span class="ident">a</span>: <span class="ident">A</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">OrdSetPool::default</span>();
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::new</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">Node::unit</span>(<span class="ident">Value</span>(<span class="ident">a</span>)));
         <span class="ident">OrdSet</span> {
             <span class="ident">size</span>: <span class="number">1</span>,
-            <span class="ident">root</span>: <span class="ident">Ref::from</span>(<span class="ident">Node::unit</span>(<span class="ident">Value</span>(<span class="ident">a</span>))),
+            <span class="ident">pool</span>,
+            <span class="ident">root</span>,
         }
     }
 
@@ -1436,14 +1482,12 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::ordset::OrdSet;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// assert!(</span>
     <span class="doccomment">///   !ordset![1, 2, 3].is_empty()</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// assert!(</span>
     <span class="doccomment">///   OrdSet::&lt;i32&gt;::new().is_empty()</span>
     <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -1460,14 +1504,34 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::ordset::OrdSet;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// assert_eq!(3, ordset![1, 2, 3].len());</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">size</span>
+    }
+
+    <span class="doccomment">/// Test whether two sets refer to the same content in memory.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is true if the two sides are references to the same set,</span>
+    <span class="doccomment">/// or if the two sets refer to the same root node.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This would return true if you&#39;re comparing a set to itself, or</span>
+    <span class="doccomment">/// if you&#39;re comparing a set to a fresh clone of itself.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Time: O(1)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">std::ptr::eq</span>(<span class="self">self</span>, <span class="ident">other</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">PoolRef::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">root</span>)
+    }
+
+    <span class="doccomment">/// Get a reference to the memory pool used by this set.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that if you didn&#39;t specifically construct it with a pool, you&#39;ll</span>
+    <span class="doccomment">/// get back a reference to a pool of size 0.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pool&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OrdSetPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>
     }
 
     <span class="doccomment">/// Discard all elements from the set.</span>
@@ -1482,15 +1546,13 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::OrdSet;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let mut set = ordset![1, 2, 3];</span>
     <span class="doccomment">/// set.clear();</span>
     <span class="doccomment">/// assert!(set.is_empty());</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">root</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+            <span class="self">self</span>.<span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>);
             <span class="self">self</span>.<span class="ident">size</span> <span class="op">=</span> <span class="number">0</span>;
         }
     }
@@ -1520,17 +1582,17 @@
         <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">max</span>().<span class="ident">map</span>(<span class="ident">Deref::deref</span>)
     }
 
-    <span class="comment">// Create an iterator over the contents of the set.</span>
+    <span class="doccomment">/// Create an iterator over the contents of the set.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">A</span><span class="op">&gt;</span> {
         <span class="ident">Iter</span> {
             <span class="ident">it</span>: <span class="ident">NodeIter::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="self">self</span>.<span class="ident">size</span>, ..),
         }
     }
 
-    <span class="comment">// Create an iterator over a range inside the set.</span>
+    <span class="doccomment">/// Create an iterator over a range inside the set.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">range</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">BA</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="ident">R</span>) -&gt; <span class="ident">RangedIter</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">range</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">BA</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="ident">R</span>) -&gt; <span class="ident">RangedIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">A</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">BA</span><span class="op">&gt;</span>,
         <span class="ident">A</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">BA</span><span class="op">&gt;</span>,
@@ -1553,7 +1615,7 @@
     <span class="doccomment">/// the two sets, minus the number of elements belonging to nodes</span>
     <span class="doccomment">/// shared between them)</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>) -&gt; <span class="ident">DiffIter</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>) -&gt; <span class="ident">DiffIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">A</span><span class="op">&gt;</span> {
         <span class="ident">DiffIter</span> {
             <span class="ident">it</span>: <span class="ident">NodeDiffIter::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">root</span>),
         }
@@ -1568,11 +1630,9 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::ordset::OrdSet;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let mut set = ordset!{1, 2, 3};</span>
     <span class="doccomment">/// assert!(set.contains(&amp;1));</span>
     <span class="doccomment">/// assert!(!set.contains(&amp;4));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -1582,6 +1642,46 @@
         <span class="ident">A</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">BA</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">lookup</span>(<span class="ident">a</span>).<span class="ident">is_some</span>()
+    }
+
+    <span class="doccomment">/// Get the closest smaller value in a set to a given value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the set contains the given value, this is returned.</span>
+    <span class="doccomment">/// Otherwise, the closest value in the set smaller than the</span>
+    <span class="doccomment">/// given value is returned. If the smallest value in the set</span>
+    <span class="doccomment">/// is larger than the given value, `None` is returned.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
+    <span class="doccomment">/// # use im::OrdSet;</span>
+    <span class="doccomment">/// let set = ordset![1, 3, 5, 7, 9];</span>
+    <span class="doccomment">/// assert_eq!(Some(&amp;5), set.get_prev(&amp;6));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_prev</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">lookup_prev</span>(<span class="ident">key</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="number">0</span>)
+    }
+
+    <span class="doccomment">/// Get the closest larger value in a set to a given value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the set contains the given value, this is returned.</span>
+    <span class="doccomment">/// Otherwise, the closest value in the set larger than the</span>
+    <span class="doccomment">/// given value is returned. If the largest value in the set</span>
+    <span class="doccomment">/// is smaller than the given value, `None` is returned.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
+    <span class="doccomment">/// # use im::OrdSet;</span>
+    <span class="doccomment">/// let set = ordset![1, 3, 5, 7, 9];</span>
+    <span class="doccomment">/// assert_eq!(Some(&amp;5), set.get_next(&amp;4));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">lookup_next</span>(<span class="ident">key</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="number">0</span>)
     }
 
     <span class="doccomment">/// Test whether a set is a subset of another set, meaning that</span>
@@ -1597,7 +1697,7 @@
         <span class="kw">if</span> <span class="ident">other</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">len</span>() {
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
-        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">other</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>))
+        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">other</span>.<span class="ident">contains</span>(<span class="ident">a</span>))
     }
 
     <span class="doccomment">/// Test whether a set is a proper subset of another set, meaning</span>
@@ -1627,7 +1727,6 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::ordset::OrdSet;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let mut set = ordset!{};</span>
     <span class="doccomment">/// set.insert(123);</span>
     <span class="doccomment">/// set.insert(456);</span>
@@ -1635,22 +1734,21 @@
     <span class="doccomment">///   set,</span>
     <span class="doccomment">///   ordset![123, 456]</span>
     <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">new_root</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
-            <span class="kw">match</span> <span class="ident">root</span>.<span class="ident">insert</span>(<span class="ident">Value</span>(<span class="ident">a</span>)) {
+            <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
+            <span class="kw">match</span> <span class="ident">root</span>.<span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">Value</span>(<span class="ident">a</span>)) {
                 <span class="ident">Insert::Replaced</span>(<span class="ident">Value</span>(<span class="ident">old_value</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">old_value</span>),
                 <span class="ident">Insert::Added</span> =&gt; {
                     <span class="self">self</span>.<span class="ident">size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="kw">return</span> <span class="prelude-val">None</span>;
                 }
-                <span class="ident">Insert::Update</span>(<span class="ident">root</span>) =&gt; <span class="ident">Ref::from</span>(<span class="ident">root</span>),
-                <span class="ident">Insert::Split</span>(<span class="ident">left</span>, <span class="ident">median</span>, <span class="ident">right</span>) =&gt; {
-                    <span class="ident">Ref::from</span>(<span class="ident">Node::from_split</span>(<span class="ident">left</span>, <span class="ident">median</span>, <span class="ident">right</span>))
-                }
+                <span class="ident">Insert::Split</span>(<span class="ident">left</span>, <span class="ident">median</span>, <span class="ident">right</span>) =&gt; <span class="ident">PoolRef::new</span>(
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>,
+                    <span class="ident">Node::new_from_split</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">left</span>, <span class="ident">median</span>, <span class="ident">right</span>),
+                ),
             }
         };
         <span class="self">self</span>.<span class="ident">size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -1668,9 +1766,9 @@
         <span class="ident">A</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">BA</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> (<span class="ident">new_root</span>, <span class="ident">removed_value</span>) <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
-            <span class="kw">match</span> <span class="ident">root</span>.<span class="ident">remove</span>(<span class="ident">a</span>) {
-                <span class="ident">Remove::Update</span>(<span class="ident">value</span>, <span class="ident">root</span>) =&gt; (<span class="ident">Ref::from</span>(<span class="ident">root</span>), <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="number">0</span>)),
+            <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
+            <span class="kw">match</span> <span class="ident">root</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">a</span>) {
+                <span class="ident">Remove::Update</span>(<span class="ident">value</span>, <span class="ident">root</span>) =&gt; (<span class="ident">PoolRef::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">root</span>), <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="number">0</span>)),
                 <span class="ident">Remove::Removed</span>(<span class="ident">value</span>) =&gt; {
                     <span class="self">self</span>.<span class="ident">size</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="number">0</span>);
@@ -1719,13 +1817,11 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::ordset::OrdSet;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let set = ordset![456];</span>
     <span class="doccomment">/// assert_eq!(</span>
     <span class="doccomment">///   set.update(123),</span>
     <span class="doccomment">///   ordset![123, 456]</span>
     <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">A</span>) -&gt; <span class="self">Self</span> {
@@ -1756,7 +1852,7 @@
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">without_min</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="self">Self</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_min</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; (<span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">clone</span>()), <span class="self">self</span>.<span class="ident">without</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>)),
+            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; (<span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">clone</span>()), <span class="self">self</span>.<span class="ident">without</span>(<span class="ident">v</span>)),
             <span class="prelude-val">None</span> =&gt; (<span class="prelude-val">None</span>, <span class="self">self</span>.<span class="ident">clone</span>()),
         }
     }
@@ -1768,7 +1864,7 @@
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">without_max</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="self">Self</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_max</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; (<span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">clone</span>()), <span class="self">self</span>.<span class="ident">without</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>)),
+            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; (<span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">clone</span>()), <span class="self">self</span>.<span class="ident">without</span>(<span class="ident">v</span>)),
             <span class="prelude-val">None</span> =&gt; (<span class="prelude-val">None</span>, <span class="self">self</span>.<span class="ident">clone</span>()),
         }
     }
@@ -1782,19 +1878,22 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::ordset::OrdSet;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let set1 = ordset!{1, 2};</span>
     <span class="doccomment">/// let set2 = ordset!{2, 3};</span>
     <span class="doccomment">/// let expected = ordset!{1, 2, 3};</span>
     <span class="doccomment">/// assert_eq!(expected, set1.union(set2));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">union</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">other</span> {
-            <span class="self">self</span>.<span class="ident">insert</span>(<span class="ident">value</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">union</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">to_mutate</span>, <span class="ident">to_consume</span>) <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
+            (<span class="self">self</span>, <span class="ident">other</span>)
+        } <span class="kw">else</span> {
+            (<span class="ident">other</span>, <span class="self">self</span>)
+        };
+        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">to_consume</span> {
+            <span class="ident">to_mutate</span>.<span class="ident">insert</span>(<span class="ident">value</span>);
         }
-        <span class="self">self</span>
+        <span class="ident">to_mutate</span>
     }
 
     <span class="doccomment">/// Construct the union of multiple sets.</span>
@@ -1820,13 +1919,13 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::ordset::OrdSet;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let set1 = ordset!{1, 2};</span>
     <span class="doccomment">/// let set2 = ordset!{2, 3};</span>
     <span class="doccomment">/// let expected = ordset!{1, 3};</span>
     <span class="doccomment">/// assert_eq!(expected, set1.difference(set2));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [symmetric_difference]: #method.symmetric_difference</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">difference</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">symmetric_difference</span>(<span class="ident">other</span>)
@@ -1841,12 +1940,10 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::ordset::OrdSet;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let set1 = ordset!{1, 2};</span>
     <span class="doccomment">/// let set2 = ordset!{2, 3};</span>
     <span class="doccomment">/// let expected = ordset!{1, 3};</span>
     <span class="doccomment">/// assert_eq!(expected, set1.symmetric_difference(set2));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">symmetric_difference</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
@@ -1868,12 +1965,10 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::ordset::OrdSet;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let set1 = ordset!{1, 2};</span>
     <span class="doccomment">/// let set2 = ordset!{2, 3};</span>
     <span class="doccomment">/// let expected = ordset!{1};</span>
     <span class="doccomment">/// assert_eq!(expected, set1.relative_complement(set2));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relative_complement</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
@@ -1892,12 +1987,10 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::ordset::OrdSet;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let set1 = ordset!{1, 2};</span>
     <span class="doccomment">/// let set2 = ordset!{2, 3};</span>
     <span class="doccomment">/// let expected = ordset!{2};</span>
     <span class="doccomment">/// assert_eq!(expected, set1.intersection(set2));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersection</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
@@ -1983,9 +2076,14 @@
 <span class="comment">// Core traits</span>
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Clone a set.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Time: O(1)</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OrdSet</span> {
             <span class="ident">size</span>: <span class="self">self</span>.<span class="ident">size</span>,
+            <span class="ident">pool</span>: <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">clone</span>(),
             <span class="ident">root</span>: <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">clone</span>(),
         }
     }
@@ -1993,7 +2091,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Ord</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">Ref::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">root</span>)
+        <span class="ident">PoolRef::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">root</span>)
             <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">diff</span>(<span class="ident">other</span>).<span class="ident">next</span>().<span class="ident">is_none</span>())
     }
 }
@@ -2085,18 +2183,15 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Debug</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">debug_set</span>().<span class="ident">entries</span>(<span class="self">self</span>.<span class="ident">iter</span>()).<span class="ident">finish</span>()
     }
 }
 
 <span class="comment">// Iterators</span>
 
-<span class="comment">// An iterator over the elements of a set.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="lifetime">&#39;a</span>,
-{
+<span class="doccomment">/// An iterator over the elements of a set.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
     <span class="ident">it</span>: <span class="ident">NodeIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
@@ -2129,15 +2224,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">A</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Ord</span> {}
 
-<span class="comment">// A ranged iterator over the elements of a set.</span>
-<span class="comment">//</span>
-<span class="comment">// The only difference from `Iter` is that this one doesn&#39;t implement</span>
-<span class="comment">// `ExactSizeIterator` because we can&#39;t know the size of the range without first</span>
-<span class="comment">// iterating over it to count.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RangedIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="lifetime">&#39;a</span>,
-{
+<span class="doccomment">/// A ranged iterator over the elements of a set.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The only difference from `Iter` is that this one doesn&#39;t implement</span>
+<span class="doccomment">/// `ExactSizeIterator` because we can&#39;t know the size of the range without first</span>
+<span class="doccomment">/// iterating over it to count.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RangedIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
     <span class="ident">it</span>: <span class="ident">NodeIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
@@ -2168,7 +2260,7 @@
     }
 }
 
-<span class="comment">// A consuming iterator over the elements of a set.</span>
+<span class="doccomment">/// A consuming iterator over the elements of a set.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConsumingIter</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
     <span class="ident">it</span>: <span class="ident">ConsumingNodeIter</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
@@ -2187,14 +2279,14 @@
     }
 }
 
-<span class="comment">// An iterator over the difference between two sets.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DiffIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="doccomment">/// An iterator over the difference between two sets.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DiffIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
     <span class="ident">it</span>: <span class="ident">NodeDiffIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">DiffIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">A</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
+    <span class="ident">A</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">DiffItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>;
 
@@ -2324,59 +2416,21 @@
     }
 }
 
-<span class="comment">// QuickCheck</span>
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">threadsafe</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">quickcheck</span>::{<span class="ident">Arbitrary</span>, <span class="ident">Gen</span>};
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">threadsafe</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;mut</span> <span class="ident">G</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">OrdSet::from_iter</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="ident">::arbitrary</span>(<span class="ident">g</span>))
-    }
-}
-
 <span class="comment">// Proptest</span>
-
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;proptest&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">proptest</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">::proptest::strategy</span>::{<span class="ident">BoxedStrategy</span>, <span class="ident">Strategy</span>, <span class="ident">ValueTree</span>};
-    <span class="kw">use</span> <span class="ident">std::ops::Range</span>;
-
-    <span class="doccomment">/// A strategy for a set of a given size.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,ignore</span>
-    <span class="doccomment">/// proptest! {</span>
-    <span class="doccomment">///     #[test]</span>
-    <span class="doccomment">///     fn proptest_a_set(ref s in set(&quot;.*&quot;, 10..100)) {</span>
-    <span class="doccomment">///         assert!(s.len() &lt; 100);</span>
-    <span class="doccomment">///         assert!(s.len() &gt;= 10);</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ord_set</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Strategy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
-        <span class="ident">element</span>: <span class="ident">A</span>,
-        <span class="ident">size</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">BoxedStrategy</span><span class="op">&lt;</span><span class="ident">OrdSet</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">A::Tree</span> <span class="kw">as</span> <span class="ident">ValueTree</span><span class="op">&gt;</span><span class="ident">::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="op">&lt;</span><span class="ident">A::Tree</span> <span class="kw">as</span> <span class="ident">ValueTree</span><span class="op">&gt;</span><span class="ident">::Value</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    {
-        <span class="ident">::proptest::collection::vec</span>(<span class="ident">element</span>, <span class="ident">size</span>.<span class="ident">clone</span>())
-            .<span class="ident">prop_map</span>(<span class="ident">OrdSet::from</span>)
-            .<span class="ident">prop_filter</span>(<span class="string">&quot;OrdSet minimum size&quot;</span>.<span class="ident">to_owned</span>(), <span class="kw">move</span> <span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-                <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">size</span>.<span class="ident">start</span>
-            })
-            .<span class="ident">boxed</span>()
-    }
+    <span class="attribute">#[<span class="ident">deprecated</span>(
+        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;14.3.0&quot;</span>,
+        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;proptest strategies have moved to im::proptest&quot;</span>
+    )]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proptest::ord_set</span>;
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::proptest</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proptest</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">::proptest::proptest</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -2424,12 +2478,12 @@
         <span class="kw">fn</span> <span class="ident">long_ranged_iter</span>(<span class="ident">max</span> <span class="kw">in</span> <span class="number">1</span>..<span class="number">1000</span>) {
             <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="number">0</span>..<span class="ident">max</span>;
             <span class="kw">let</span> <span class="ident">expected</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">range</span>.<span class="ident">clone</span>().<span class="ident">collect</span>();
-            <span class="kw">let</span> <span class="ident">set</span>: <span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">OrdSet::from_iter</span>(<span class="ident">range</span>.<span class="ident">clone</span>());
+            <span class="kw">let</span> <span class="ident">set</span>: <span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">range</span>.<span class="ident">clone</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">OrdSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
             <span class="kw">let</span> <span class="ident">result</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">set</span>.<span class="ident">range</span>(..).<span class="ident">cloned</span>().<span class="ident">collect</span>();
             <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="ident">result</span>);
 
             <span class="kw">let</span> <span class="ident">expected</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">range</span>.<span class="ident">clone</span>().<span class="ident">rev</span>().<span class="ident">collect</span>();
-            <span class="kw">let</span> <span class="ident">set</span>: <span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">OrdSet::from_iter</span>(<span class="ident">range</span>);
+            <span class="kw">let</span> <span class="ident">set</span>: <span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">range</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">OrdSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
             <span class="kw">let</span> <span class="ident">result</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">set</span>.<span class="ident">range</span>(..).<span class="ident">rev</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>();
             <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="ident">result</span>);
         }

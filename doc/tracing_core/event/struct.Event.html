@@ -11,11 +11,11 @@ execution of a program.</p>
 <p>An <code>Event</code> can be compared to a log record in unstructured logging, but with
 two key differences:</p>
 <ul>
-<li><code>Event</code>s exist <em>within the context of a <a href="../span">span</a></em>. Unlike log lines, they
+<li><code>Event</code>s exist <em>within the context of a <a href="../span/index.html">span</a></em>. Unlike log lines, they
 may be located within the trace tree, allowing visibility into the
 <em>temporal</em> context in which the event occurred, as well as the source
 code location.</li>
-<li>Like spans, <code>Event</code>s have structured key-value data known as <em><a href="../field">fields</a></em>,
+<li>Like spans, <code>Event</code>s have structured key-value data known as <em><a href="../field/index.html">fields</a></em>,
 which may include textual message. In general, a majority of the data
 associated with an event should be in the event’s fields rather than in
 the textual message, as the fields are more structured.</li>

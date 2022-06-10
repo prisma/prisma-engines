@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.1.0/src/extjson/models.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>models.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.3.0/src/extjson/models.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>models.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -357,13 +357,8 @@
 <span id="352">352</span>
 <span id="353">353</span>
 <span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A module defining serde models for the extended JSON representations of the various BSON types.</span>
 
-<span class="kw">use</span> <span class="ident">chrono::Utc</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{
     <span class="ident">de</span>::{<span class="ident">Error</span>, <span class="ident">Unexpected</span>},
     <span class="ident">Deserialize</span>,
@@ -619,16 +614,13 @@
                 <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::DateTime::from_millis</span>(<span class="ident">date</span>))
             }
             <span class="ident">DateTimeBody::Relaxed</span>(<span class="ident">date</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">datetime</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> <span class="op">=</span>
-                    <span class="ident">chrono::DateTime::parse_from_rfc3339</span>(<span class="ident">date</span>.<span class="ident">as_str</span>())
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                            <span class="ident">extjson::de::Error::invalid_value</span>(
-                                <span class="ident">Unexpected::Str</span>(<span class="ident">date</span>.<span class="ident">as_str</span>()),
-                                <span class="kw-2">&amp;</span><span class="string">&quot;rfc3339 formatted utc datetime&quot;</span>,
-                            )
-                        })<span class="question-mark">?</span>
-                        .<span class="ident">into</span>();
-                <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::DateTime::from_chrono</span>(<span class="ident">datetime</span>))
+                <span class="kw">let</span> <span class="ident">datetime</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::DateTime::parse_rfc3339_str</span>(<span class="ident">date</span>.<span class="ident">as_str</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
+                    <span class="ident">extjson::de::Error::invalid_value</span>(
+                        <span class="ident">Unexpected::Str</span>(<span class="ident">date</span>.<span class="ident">as_str</span>()),
+                        <span class="kw-2">&amp;</span><span class="string">&quot;rfc3339 formatted utc datetime&quot;</span>,
+                    )
+                })<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(<span class="ident">datetime</span>)
             }
         }
     }

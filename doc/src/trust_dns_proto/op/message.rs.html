@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.20.3/src/op/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/op/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1025,38 +1025,121 @@
 <span id="1020">1020</span>
 <span id="1021">1021</span>
 <span id="1022">1022</span>
-</pre><pre class="rust"><code><span class="comment">/*
- * Copyright (C) 2015 Benjamin Fry &lt;benjaminfry@me.com&gt;
- *
- * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */</span>
+<span id="1023">1023</span>
+<span id="1024">1024</span>
+<span id="1025">1025</span>
+<span id="1026">1026</span>
+<span id="1027">1027</span>
+<span id="1028">1028</span>
+<span id="1029">1029</span>
+<span id="1030">1030</span>
+<span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
+<span id="1035">1035</span>
+<span id="1036">1036</span>
+<span id="1037">1037</span>
+<span id="1038">1038</span>
+<span id="1039">1039</span>
+<span id="1040">1040</span>
+<span id="1041">1041</span>
+<span id="1042">1042</span>
+<span id="1043">1043</span>
+<span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
+<span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
+<span id="1053">1053</span>
+<span id="1054">1054</span>
+<span id="1055">1055</span>
+<span id="1056">1056</span>
+<span id="1057">1057</span>
+<span id="1058">1058</span>
+<span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
+<span id="1062">1062</span>
+<span id="1063">1063</span>
+<span id="1064">1064</span>
+<span id="1065">1065</span>
+<span id="1066">1066</span>
+<span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+<span id="1106">1106</span>
+<span id="1107">1107</span>
+<span id="1108">1108</span>
+<span id="1109">1109</span>
+<span id="1110">1110</span>
+<span id="1111">1111</span>
+<span id="1112">1112</span>
+<span id="1113">1113</span>
+<span id="1114">1114</span>
+<span id="1115">1115</span>
+<span id="1116">1116</span>
+<span id="1117">1117</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2021 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
+<span class="comment">//</span>
+<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
+<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
+<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
+<span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
 <span class="doccomment">//! Basic protocol message for DNS</span>
 
-<span class="kw">use</span> <span class="ident">std::iter</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
-<span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">iter</span>, <span class="ident">mem</span>, <span class="ident">ops::Deref</span>, <span class="ident">sync::Arc</span>};
 
-<span class="kw">use</span> <span class="ident">log::debug</span>;
+<span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">debug</span>, <span class="ident">warn</span>};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Edns</span>, <span class="ident">Header</span>, <span class="ident">MessageType</span>, <span class="ident">OpCode</span>, <span class="ident">Query</span>, <span class="ident">ResponseCode</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr</span>::{<span class="ident">Record</span>, <span class="ident">RecordType</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::{<span class="ident">BinDecodable</span>, <span class="ident">BinDecoder</span>, <span class="ident">BinEncodable</span>, <span class="ident">BinEncoder</span>, <span class="ident">EncodeMode</span>};
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::dnssec::rdata::DNSSECRecordType</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">error</span>::<span class="kw-2">*</span>,
+    <span class="ident">op</span>::{<span class="ident">Edns</span>, <span class="ident">Header</span>, <span class="ident">MessageType</span>, <span class="ident">OpCode</span>, <span class="ident">Query</span>, <span class="ident">ResponseCode</span>},
+    <span class="ident">rr</span>::{<span class="ident">Record</span>, <span class="ident">RecordType</span>},
+    <span class="ident">serialize::binary</span>::{<span class="ident">BinDecodable</span>, <span class="ident">BinDecoder</span>, <span class="ident">BinEncodable</span>, <span class="ident">BinEncoder</span>, <span class="ident">EncodeMode</span>},
+    <span class="ident">xfer::DnsResponse</span>,
+};
 
 <span class="doccomment">/// The basic request and response datastructure, used for all DNS protocols.</span>
 <span class="doccomment">///</span>
@@ -1107,7 +1190,7 @@
     <span class="ident">answers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>,
     <span class="ident">name_servers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>,
     <span class="ident">additionals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>,
-    <span class="ident">sig0</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>,
+    <span class="ident">signature</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>,
     <span class="ident">edns</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Edns</span><span class="op">&gt;</span>,
 }
 
@@ -1152,13 +1235,13 @@
 <span class="kw">impl</span> <span class="ident">Message</span> {
     <span class="doccomment">/// Returns a new &quot;empty&quot; Message</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Message</span> {
+        <span class="self">Self</span> {
             <span class="ident">header</span>: <span class="ident">Header::new</span>(),
             <span class="ident">queries</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">answers</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">name_servers</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">additionals</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">sig0</span>: <span class="ident">Vec::new</span>(),
+            <span class="ident">signature</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">edns</span>: <span class="prelude-val">None</span>,
         }
     }
@@ -1170,8 +1253,8 @@
     <span class="doccomment">/// * `id` - message id should match the request message id</span>
     <span class="doccomment">/// * `op_code` - operation of the request</span>
     <span class="doccomment">/// * `response_code` - the error code for the response</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_msg</span>(<span class="ident">id</span>: <span class="ident">u16</span>, <span class="ident">op_code</span>: <span class="ident">OpCode</span>, <span class="ident">response_code</span>: <span class="ident">ResponseCode</span>) -&gt; <span class="ident">Message</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::new</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_msg</span>(<span class="ident">id</span>: <span class="ident">u16</span>, <span class="ident">op_code</span>: <span class="ident">OpCode</span>, <span class="ident">response_code</span>: <span class="ident">ResponseCode</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
         <span class="ident">message</span>
             .<span class="ident">set_message_type</span>(<span class="ident">MessageType::Response</span>)
             .<span class="ident">set_id</span>(<span class="ident">id</span>)
@@ -1355,11 +1438,23 @@
 
     <span class="doccomment">/// Add a SIG0 record, i.e. sign this message</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This must be don&#39;t only after all records have been associated. Generally this will be handled by the client and not need to be used directly</span>
+    <span class="doccomment">/// This must be used only after all records have been associated. Generally this will be handled by the client and not need to be used directly</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_sig0</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">record</span>: <span class="ident">Record</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="ident">RecordType::DNSSEC</span>(<span class="ident">DNSSECRecordType::SIG</span>), <span class="ident">record</span>.<span class="ident">rr_type</span>());
-        <span class="self">self</span>.<span class="ident">sig0</span>.<span class="ident">push</span>(<span class="ident">record</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">RecordType::SIG</span>, <span class="ident">record</span>.<span class="ident">rr_type</span>());
+        <span class="self">self</span>.<span class="ident">signature</span>.<span class="ident">push</span>(<span class="ident">record</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Add a TSIG record, i.e. authenticate this message</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This must be used only after all records have been associated. Generally this will be handled by the client and not need to be used directly</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_tsig</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">record</span>: <span class="ident">Record</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="macro">assert_eq!</span>(<span class="ident">RecordType::TSIG</span>, <span class="ident">record</span>.<span class="ident">rr_type</span>());
+        <span class="self">self</span>.<span class="ident">signature</span>.<span class="ident">push</span>(<span class="ident">record</span>);
         <span class="self">self</span>
     }
 
@@ -1418,10 +1513,7 @@
     <span class="doccomment">/// The `ResponseCode`, if this is an EDNS message then this will join the section from the OPT</span>
     <span class="doccomment">///  record to create the EDNS `ResponseCode`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">response_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ResponseCode</span> {
-        <span class="ident">ResponseCode::from</span>(
-            <span class="self">self</span>.<span class="ident">edns</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="number">0</span>, <span class="ident">Edns::rcode_high</span>),
-            <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">response_code</span>(),
-        )
+        <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">response_code</span>()
     }
 
     <span class="doccomment">/// ```text</span>
@@ -1438,7 +1530,7 @@
 
     <span class="doccomment">/// Removes all the answers from the Message</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_queries</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&gt;</span> {
-        <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">queries</span>, <span class="macro">vec!</span>[])
+        <span class="ident">mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">queries</span>)
     }
 
     <span class="doccomment">/// ```text</span>
@@ -1455,7 +1547,7 @@
 
     <span class="doccomment">/// Removes all the answers from the Message</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_answers</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span> {
-        <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">answers</span>, <span class="macro">vec!</span>[])
+        <span class="ident">mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">answers</span>)
     }
 
     <span class="doccomment">/// ```text</span>
@@ -1474,7 +1566,7 @@
 
     <span class="doccomment">/// Remove the name servers from the Message</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_name_servers</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span> {
-        <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">name_servers</span>, <span class="macro">vec!</span>[])
+        <span class="ident">mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">name_servers</span>)
     }
 
     <span class="doccomment">/// ```text</span>
@@ -1492,7 +1584,7 @@
 
     <span class="doccomment">/// Remove the additional Records from the Message</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_additionals</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span> {
-        <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">additionals</span>, <span class="macro">vec!</span>[])
+        <span class="ident">mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">additionals</span>)
     }
 
     <span class="doccomment">/// All sections chained</span>
@@ -1577,9 +1669,34 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Return value</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The sig0, i.e. signed record, for verifying the sending and package integrity</span>
+    <span class="doccomment">/// The sig0 and tsig, i.e. signed record, for verifying the sending and package integrity</span>
+    <span class="comment">// comportment change: can now return TSIG instead of SIG0. Maybe should get deprecated in</span>
+    <span class="comment">// favor of signature() which have more correct naming ?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sig0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Record</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sig0</span>
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">signature</span>
+    }
+
+    <span class="doccomment">/// [RFC 2535, Domain Name System Security Extensions, March 1999](https://tools.ietf.org/html/rfc2535#section-4)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```text</span>
+    <span class="doccomment">/// A DNS request may be optionally signed by including one or more SIGs</span>
+    <span class="doccomment">///  at the end of the query. Such SIGs are identified by having a &quot;type</span>
+    <span class="doccomment">///  covered&quot; field of zero. They sign the preceding DNS request message</span>
+    <span class="doccomment">///  including DNS header but not including the IP header or any request</span>
+    <span class="doccomment">///  SIGs at the end and before the request RR counts have been adjusted</span>
+    <span class="doccomment">///  for the inclusions of any request SIG(s).</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Return value</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The sig0 and tsig, i.e. signed record, for verifying the sending and package integrity</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signature</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Record</span>] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">signature</span>
+    }
+
+    <span class="doccomment">/// Remove signatures from the Message</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_signature</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span> {
+        <span class="ident">mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">signature</span>)
     }
 
     <span class="comment">// TODO: only necessary in tests, should it be removed?</span>
@@ -1613,7 +1730,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Returns</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This returns a tuple of first standard Records, then a possibly associated Edns, and then finally any optionally associated SIG0 records.</span>
+    <span class="doccomment">/// This returns a tuple of first standard Records, then a possibly associated Edns, and then finally any optionally associated SIG0 and TSIG records.</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>), <span class="ident">allow</span>(<span class="ident">unused_mut</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_records</span>(
         <span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
@@ -1622,13 +1739,17 @@
     ) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Edns</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">records</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">count</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edns</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Edns</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sig0s</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="kw">if</span> <span class="ident">is_additional</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> });
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sigs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="kw">if</span> <span class="ident">is_additional</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> });
 
         <span class="comment">// sig0 must be last, once this is set, disable.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">saw_sig0</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="comment">// tsig must be last, once this is set, disable.</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">saw_tsig</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">count</span> {
             <span class="kw">let</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident">Record::read</span>(<span class="ident">decoder</span>)<span class="question-mark">?</span>;
-
+            <span class="kw">if</span> <span class="ident">saw_tsig</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;tsig must be final resource record&quot;</span>.<span class="ident">into</span>());
+            } <span class="comment">// TSIG must be last and multiple TSIG records are not allowed</span>
             <span class="kw">if</span> <span class="op">!</span><span class="ident">is_additional</span> {
                 <span class="kw">if</span> <span class="ident">saw_sig0</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;sig0 must be final resource record&quot;</span>.<span class="ident">into</span>());
@@ -1637,9 +1758,17 @@
             } <span class="kw">else</span> {
                 <span class="kw">match</span> <span class="ident">record</span>.<span class="ident">rr_type</span>() {
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-                    <span class="ident">RecordType::DNSSEC</span>(<span class="ident">DNSSECRecordType::SIG</span>) =&gt; {
+                    <span class="ident">RecordType::SIG</span> =&gt; {
                         <span class="ident">saw_sig0</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                        <span class="ident">sig0s</span>.<span class="ident">push</span>(<span class="ident">record</span>);
+                        <span class="ident">sigs</span>.<span class="ident">push</span>(<span class="ident">record</span>);
+                    }
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
+                    <span class="ident">RecordType::TSIG</span> =&gt; {
+                        <span class="kw">if</span> <span class="ident">saw_sig0</span> {
+                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;sig0 must be final resource record&quot;</span>.<span class="ident">into</span>());
+                        } <span class="comment">// SIG0 must be last</span>
+                        <span class="ident">saw_tsig</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                        <span class="ident">sigs</span>.<span class="ident">push</span>(<span class="ident">record</span>);
                     }
                     <span class="ident">RecordType::OPT</span> =&gt; {
                         <span class="kw">if</span> <span class="ident">saw_sig0</span> {
@@ -1660,13 +1789,13 @@
             }
         }
 
-        <span class="prelude-val">Ok</span>((<span class="ident">records</span>, <span class="ident">edns</span>, <span class="ident">sig0s</span>))
+        <span class="prelude-val">Ok</span>((<span class="ident">records</span>, <span class="ident">edns</span>, <span class="ident">sigs</span>))
     }
 
     <span class="doccomment">/// Decodes a message from the buffer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_vec</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_vec</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">buffer</span>);
-        <span class="ident">Message::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>)
+        <span class="ident"><span class="self">Self</span>::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>)
     }
 
     <span class="doccomment">/// Encodes the Message into a buffer</span>
@@ -1691,21 +1820,24 @@
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">finalizer</span>: <span class="kw-2">&amp;</span><span class="ident">MF</span>,
         <span class="ident">inception_time</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageVerifier</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">debug!</span>(<span class="string">&quot;finalizing message: {:?}&quot;</span>, <span class="self">self</span>);
-        <span class="kw">let</span> <span class="ident">finals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">finalizer</span>.<span class="ident">finalize_message</span>(<span class="self">self</span>, <span class="ident">inception_time</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> (<span class="ident">finals</span>, <span class="ident">verifier</span>): (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageVerifier</span><span class="op">&gt;</span>) <span class="op">=</span>
+            <span class="ident">finalizer</span>.<span class="ident">finalize_message</span>(<span class="self">self</span>, <span class="ident">inception_time</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// append all records to message</span>
         <span class="kw">for</span> <span class="ident">fin</span> <span class="kw">in</span> <span class="ident">finals</span> {
             <span class="kw">match</span> <span class="ident">fin</span>.<span class="ident">rr_type</span>() {
                 <span class="comment">// SIG0&#39;s are special, and come at the very end of the message</span>
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-                <span class="ident">RecordType::DNSSEC</span>(<span class="ident">DNSSECRecordType::SIG</span>) =&gt; <span class="self">self</span>.<span class="ident">add_sig0</span>(<span class="ident">fin</span>),
+                <span class="ident">RecordType::SIG</span> =&gt; <span class="self">self</span>.<span class="ident">add_sig0</span>(<span class="ident">fin</span>),
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
+                <span class="ident">RecordType::TSIG</span> =&gt; <span class="self">self</span>.<span class="ident">add_tsig</span>(<span class="ident">fin</span>),
                 <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">add_additional</span>(<span class="ident">fin</span>),
             };
         }
 
-        <span class="prelude-val">Ok</span>(())
+        <span class="prelude-val">Ok</span>(<span class="ident">verifier</span>)
     }
 
     <span class="doccomment">/// Consumes `Message` and returns into components</span>
@@ -1734,7 +1866,9 @@
     <span class="kw">pub</span> <span class="ident">name_servers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>,
     <span class="doccomment">/// message additional records</span>
     <span class="kw">pub</span> <span class="ident">additionals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// sig0</span>
+    <span class="doccomment">/// sig0 or tsig</span>
+    <span class="comment">// this can now contains TSIG too. It should probably be renamed to reflect that, but it&#39;s a</span>
+    <span class="comment">// breaking change</span>
     <span class="kw">pub</span> <span class="ident">sig0</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>,
     <span class="doccomment">/// optional edns records</span>
     <span class="kw">pub</span> <span class="ident">edns</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Edns</span><span class="op">&gt;</span>,
@@ -1748,16 +1882,16 @@
             <span class="ident">answers</span>,
             <span class="ident">name_servers</span>,
             <span class="ident">additionals</span>,
-            <span class="ident">sig0</span>,
+            <span class="ident">signature</span>,
             <span class="ident">edns</span>,
         } <span class="op">=</span> <span class="ident">msg</span>;
-        <span class="ident">MessageParts</span> {
+        <span class="self">Self</span> {
             <span class="ident">header</span>,
             <span class="ident">queries</span>,
             <span class="ident">answers</span>,
             <span class="ident">name_servers</span>,
             <span class="ident">additionals</span>,
-            <span class="ident">sig0</span>,
+            <span class="ident">sig0</span>: <span class="ident">signature</span>,
             <span class="ident">edns</span>,
         }
     }
@@ -1770,6 +1904,10 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">header</span>
     }
 }
+
+<span class="doccomment">/// Alias for a function verifying if a message is properly signed</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MessageVerifier</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">DnsResponse</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>;
+
 <span class="doccomment">/// A trait for performing final amendments to a Message before it is sent.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// An example of this is a SIG0 signer, which needs the final form of the message,</span>
@@ -1786,7 +1924,21 @@
     <span class="doccomment">/// # Return</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A vector to append to the additionals section of the message, sorted in the order as they should appear in the message.</span>
-    <span class="kw">fn</span> <span class="ident">finalize_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">current_time</span>: <span class="ident">u32</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">finalize_message</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
+        <span class="ident">current_time</span>: <span class="ident">u32</span>,
+    ) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageVerifier</span><span class="op">&gt;</span>)<span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Return whether the message require futher processing before being sent</span>
+    <span class="doccomment">/// By default, returns true for AXFR and IXFR queries, and Update and Notify messages</span>
+    <span class="kw">fn</span> <span class="ident">should_finalize_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="ident">bool</span> {
+        [<span class="ident">OpCode::Update</span>, <span class="ident">OpCode::Notify</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">op_code</span>())
+            <span class="op">|</span><span class="op">|</span> <span class="ident">message</span>
+                .<span class="ident">queries</span>()
+                .<span class="ident">iter</span>()
+                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">q</span><span class="op">|</span> [<span class="ident">RecordType::AXFR</span>, <span class="ident">RecordType::IXFR</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">query_type</span>()))
+    }
 }
 
 <span class="doccomment">/// A MessageFinalizer which does nothing</span>
@@ -1803,8 +1955,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MessageFinalizer</span> <span class="kw">for</span> <span class="ident">NoopMessageFinalizer</span> {
-    <span class="kw">fn</span> <span class="ident">finalize_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="kw">_</span>: <span class="ident">u32</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">finalize_message</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
+        <span class="kw">_</span>: <span class="ident">u32</span>,
+    ) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageVerifier</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="macro">panic!</span>(<span class="string">&quot;Misused NoopMessageFinalizer, None should be used instead&quot;</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">should_finalize_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="ident">bool</span> {
+        <span class="bool-val">true</span>
     }
 }
 
@@ -1832,6 +1992,10 @@
 }
 
 <span class="doccomment">/// Emits the different sections of a message properly</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Return</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// In the case of a successful emit, the final header (updated counts, etc) is returned for help with logging, etc.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit_message_parts</span><span class="op">&lt;</span><span class="ident">Q</span>, <span class="ident">A</span>, <span class="ident">N</span>, <span class="ident">D</span><span class="op">&gt;</span>(
     <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">Header</span>,
@@ -1840,16 +2004,16 @@
     <span class="ident">name_servers</span>: <span class="kw-2">&amp;mut</span> <span class="ident">N</span>,
     <span class="ident">additionals</span>: <span class="kw-2">&amp;mut</span> <span class="ident">D</span>,
     <span class="ident">edns</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Edns</span><span class="op">&gt;</span>,
-    <span class="ident">sig0</span>: <span class="kw-2">&amp;</span>[<span class="ident">Record</span>],
+    <span class="ident">signature</span>: <span class="kw-2">&amp;</span>[<span class="ident">Record</span>],
     <span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">Q</span>: <span class="ident">EmitAndCount</span>,
     <span class="ident">A</span>: <span class="ident">EmitAndCount</span>,
     <span class="ident">N</span>: <span class="ident">EmitAndCount</span>,
     <span class="ident">D</span>: <span class="ident">EmitAndCount</span>,
 {
-    <span class="kw">let</span> <span class="ident">include_sig0</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">mode</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">EncodeMode::Signing</span>;
+    <span class="kw">let</span> <span class="ident">include_signature</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">mode</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">EncodeMode::Signing</span>;
     <span class="kw">let</span> <span class="ident">place</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">place</span>::<span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">query_count</span> <span class="op">=</span> <span class="ident">queries</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>;
@@ -1859,18 +2023,26 @@
     <span class="kw">let</span> <span class="ident">nameserver_count</span> <span class="op">=</span> <span class="ident">count_was_truncated</span>(<span class="ident">name_servers</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>))<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">additional_count</span> <span class="op">=</span> <span class="ident">count_was_truncated</span>(<span class="ident">additionals</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>))<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">edns</span>) <span class="op">=</span> <span class="ident">edns</span> {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">edns</span>) <span class="op">=</span> <span class="ident">edns</span>.<span class="ident">cloned</span>() {
         <span class="comment">// need to commit the error code</span>
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">count_was_truncated</span>(<span class="ident">encoder</span>.<span class="ident">emit_all</span>(<span class="ident">iter::once</span>(<span class="kw-2">&amp;</span><span class="ident">Record::from</span>(<span class="ident">edns</span>))))<span class="question-mark">?</span>;
+        <span class="ident">edns</span>.<span class="ident">set_rcode_high</span>(<span class="ident">header</span>.<span class="ident">response_code</span>().<span class="ident">high</span>());
+
+        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">count_was_truncated</span>(<span class="ident">encoder</span>.<span class="ident">emit_all</span>(<span class="ident">iter::once</span>(<span class="kw-2">&amp;</span><span class="ident">Record::from</span>(<span class="kw-2">&amp;</span><span class="ident">edns</span>))))<span class="question-mark">?</span>;
         <span class="ident">additional_count</span>.<span class="number">0</span> <span class="op">+</span><span class="op">=</span> <span class="ident">count</span>.<span class="number">0</span>;
         <span class="ident">additional_count</span>.<span class="number">1</span> <span class="op">|</span><span class="op">=</span> <span class="ident">count</span>.<span class="number">1</span>;
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">header</span>.<span class="ident">response_code</span>().<span class="ident">high</span>() <span class="op">&gt;</span> <span class="number">0</span> {
+        <span class="macro">warn!</span>(
+            <span class="string">&quot;response code: {} for request: {} requires EDNS but none available&quot;</span>,
+            <span class="ident">header</span>.<span class="ident">response_code</span>(),
+            <span class="ident">header</span>.<span class="ident">id</span>()
+        );
     }
 
     <span class="comment">// this is a little hacky, but if we are Verifying a signature, i.e. the original Message</span>
     <span class="comment">//  then the SIG0 records should not be encoded and the edns record (if it exists) is already</span>
     <span class="comment">//  part of the additionals section.</span>
-    <span class="kw">if</span> <span class="ident">include_sig0</span> {
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">count_was_truncated</span>(<span class="ident">encoder</span>.<span class="ident">emit_all</span>(<span class="ident">sig0</span>.<span class="ident">iter</span>()))<span class="question-mark">?</span>;
+    <span class="kw">if</span> <span class="ident">include_signature</span> {
+        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">count_was_truncated</span>(<span class="ident">encoder</span>.<span class="ident">emit_all</span>(<span class="ident">signature</span>.<span class="ident">iter</span>()))<span class="question-mark">?</span>;
         <span class="ident">additional_count</span>.<span class="number">0</span> <span class="op">+</span><span class="op">=</span> <span class="ident">count</span>.<span class="number">0</span>;
         <span class="ident">additional_count</span>.<span class="number">1</span> <span class="op">|</span><span class="op">=</span> <span class="ident">count</span>.<span class="number">1</span>;
     }
@@ -1884,8 +2056,9 @@
     <span class="kw">let</span> <span class="ident">was_truncated</span> <span class="op">=</span>
         <span class="ident">header</span>.<span class="ident">truncated</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">answer_count</span>.<span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">nameserver_count</span>.<span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">additional_count</span>.<span class="number">1</span>;
 
-    <span class="ident">place</span>.<span class="ident">replace</span>(<span class="ident">encoder</span>, <span class="ident">update_header_counts</span>(<span class="ident">header</span>, <span class="ident">was_truncated</span>, <span class="ident">counts</span>))<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(())
+    <span class="kw">let</span> <span class="ident">final_header</span> <span class="op">=</span> <span class="ident">update_header_counts</span>(<span class="ident">header</span>, <span class="ident">was_truncated</span>, <span class="ident">counts</span>);
+    <span class="ident">place</span>.<span class="ident">replace</span>(<span class="ident">encoder</span>, <span class="ident">final_header</span>)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(<span class="ident">final_header</span>)
 }
 
 <span class="kw">impl</span> <span class="ident">BinEncodable</span> <span class="kw">for</span> <span class="ident">Message</span> {
@@ -1897,15 +2070,17 @@
             <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">name_servers</span>.<span class="ident">iter</span>(),
             <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">additionals</span>.<span class="ident">iter</span>(),
             <span class="self">self</span>.<span class="ident">edns</span>.<span class="ident">as_ref</span>(),
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sig0</span>,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">signature</span>,
             <span class="ident">encoder</span>,
-        )
+        )<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="ident">BinDecodable</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Message</span> {
     <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">Header::read</span>(<span class="ident">decoder</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">Header::read</span>(<span class="ident">decoder</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// TODO: return just header, and in the case of the rest of message getting an error.</span>
         <span class="comment">//  this could improve error detection while decoding.</span>
@@ -1924,15 +2099,21 @@
 
         <span class="kw">let</span> (<span class="ident">answers</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::read_records</span>(<span class="ident">decoder</span>, <span class="ident">answer_count</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> (<span class="ident">name_servers</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::read_records</span>(<span class="ident">decoder</span>, <span class="ident">name_server_count</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> (<span class="ident">additionals</span>, <span class="ident">edns</span>, <span class="ident">sig0</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::read_records</span>(<span class="ident">decoder</span>, <span class="ident">additional_count</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> (<span class="ident">additionals</span>, <span class="ident">edns</span>, <span class="ident">signature</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::read_records</span>(<span class="ident">decoder</span>, <span class="ident">additional_count</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Message</span> {
+        <span class="comment">// need to grab error code from EDNS (which might have a higher value)</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">edns</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">edns</span> {
+            <span class="kw">let</span> <span class="ident">high_response_code</span> <span class="op">=</span> <span class="ident">edns</span>.<span class="ident">rcode_high</span>();
+            <span class="ident">header</span>.<span class="ident">merge_response_code</span>(<span class="ident">high_response_code</span>);
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">header</span>,
             <span class="ident">queries</span>,
             <span class="ident">answers</span>,
             <span class="ident">name_servers</span>,
             <span class="ident">additionals</span>,
-            <span class="ident">sig0</span>,
+            <span class="ident">signature</span>,
             <span class="ident">edns</span>,
         })
     }
@@ -2046,6 +2227,15 @@
     <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>).<span class="ident">unwrap</span>();
 
     <span class="macro">assert_eq!</span>(<span class="ident">message</span>.<span class="ident">id</span>(), <span class="number">4096</span>);
+}
+
+<span class="attribute">#[<span class="ident">test</span>]</span>
+<span class="kw">fn</span> <span class="ident">rdata_zero_roundtrip</span>() {
+    <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+        <span class="number">160</span>, <span class="number">160</span>, <span class="number">0</span>, <span class="number">13</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>,
+    ];
+
+    <span class="macro">assert!</span>(<span class="ident">Message::from_bytes</span>(<span class="ident">buf</span>).<span class="ident">is_err</span>());
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>

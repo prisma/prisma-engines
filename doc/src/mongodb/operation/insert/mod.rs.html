@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.1.0/src/operation/insert/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/operation/insert/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -203,72 +203,26 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">io::Write</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">convert::TryInto</span>};
 
-<span class="kw">use</span> <span class="ident">bson</span>::{<span class="ident">oid::ObjectId</span>, <span class="ident">spec::ElementType</span>, <span class="ident">Bson</span>};
+<span class="kw">use</span> <span class="ident">bson</span>::{<span class="ident">oid::ObjectId</span>, <span class="ident">Bson</span>, <span class="ident">RawArrayBuf</span>, <span class="ident">RawDocumentBuf</span>};
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">bson::doc</span>,
     <span class="ident">bson_util</span>,
-    <span class="ident">cmap</span>::{<span class="ident">Command</span>, <span class="ident">StreamDescription</span>},
+    <span class="ident">cmap</span>::{<span class="ident">Command</span>, <span class="ident">RawCommandResponse</span>, <span class="ident">StreamDescription</span>},
     <span class="ident">error</span>::{<span class="ident">BulkWriteFailure</span>, <span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">operation</span>::{<span class="ident">Operation</span>, <span class="ident">Retryability</span>, <span class="ident">WriteResponseBody</span>},
+    <span class="ident">operation</span>::{<span class="ident">remove_empty_write_concern</span>, <span class="ident">Operation</span>, <span class="ident">Retryability</span>, <span class="ident">WriteResponseBody</span>},
     <span class="ident">options</span>::{<span class="ident">InsertManyOptions</span>, <span class="ident">WriteConcern</span>},
     <span class="ident">results::InsertManyResult</span>,
-    <span class="ident">runtime::SyncLittleEndianWrite</span>,
     <span class="ident">Namespace</span>,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CommandBody</span>, <span class="ident">CommandResponse</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CommandBody</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
@@ -303,12 +257,11 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Serialize</span><span class="op">&gt;</span> <span class="ident">Operation</span> <span class="kw">for</span> <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">O</span> <span class="op">=</span> <span class="ident">InsertManyResult</span>;
     <span class="kw">type</span> <span class="ident">Command</span> <span class="op">=</span> <span class="ident">InsertCommand</span>;
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">WriteResponseBody</span><span class="op">&gt;</span>;
 
     <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;insert&quot;</span>;
 
     <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&lt;</span><span class="ident">InsertCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">docs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">docs</span> <span class="op">=</span> <span class="ident">RawArrayBuf::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">size</span> <span class="op">=</span> <span class="number">0</span>;
 
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">d</span>) <span class="kw">in</span> <span class="self">self</span>
@@ -317,31 +270,32 @@
             .<span class="ident">take</span>(<span class="ident">description</span>.<span class="ident">max_write_batch_size</span> <span class="kw">as</span> <span class="ident">usize</span>)
             .<span class="ident">enumerate</span>()
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">bson::to_vec</span>(<span class="ident">d</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bson_util::raw_get</span>(<span class="ident">doc</span>.<span class="ident">as_slice</span>(), <span class="string">&quot;_id&quot;</span>)<span class="question-mark">?</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">bson::to_raw_document_buf</span>(<span class="ident">d</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">doc</span>.<span class="ident">get</span>(<span class="string">&quot;_id&quot;</span>)<span class="question-mark">?</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
                 <span class="prelude-val">None</span> =&gt; {
-                    <span class="comment">// TODO: RUST-924 Use raw document API here instead.</span>
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_doc</span> <span class="op">=</span> <span class="ident">RawDocumentBuf::new</span>();
                     <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="ident">ObjectId::new</span>();
+                    <span class="ident">new_doc</span>.<span class="ident">append</span>(<span class="string">&quot;_id&quot;</span>, <span class="ident">oid</span>);
 
-                    <span class="comment">// write element to temporary buffer</span>
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_id</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                    <span class="ident">new_id</span>.<span class="ident">write_u8</span>(<span class="ident">ElementType::ObjectId</span> <span class="kw">as</span> <span class="ident">u8</span>)<span class="question-mark">?</span>;
-                    <span class="ident">new_id</span>.<span class="ident">write_all</span>(<span class="string">b&quot;_id\0&quot;</span>)<span class="question-mark">?</span>;
-                    <span class="ident">new_id</span>.<span class="ident">extend</span>(<span class="ident">oid</span>.<span class="ident">bytes</span>().<span class="ident">iter</span>());
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_bytes</span> <span class="op">=</span> <span class="ident">new_doc</span>.<span class="ident">into_bytes</span>();
+                    <span class="ident">new_bytes</span>.<span class="ident">pop</span>(); <span class="comment">// remove trailing null byte</span>
 
-                    <span class="comment">// insert element to beginning of existing doc after length</span>
-                    <span class="ident">doc</span>.<span class="ident">splice</span>(<span class="number">4</span>..<span class="number">4</span>, <span class="ident">new_id</span>.<span class="ident">into_iter</span>());
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">into_bytes</span>();
+                    <span class="kw">let</span> <span class="ident">oid_slice</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">new_bytes</span>[<span class="number">4</span>..];
+                    <span class="comment">// insert oid at beginning of document</span>
+                    <span class="ident">bytes</span>.<span class="ident">splice</span>(<span class="number">4</span>..<span class="number">4</span>, <span class="ident">oid_slice</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>());
 
-                    <span class="comment">// update length of doc</span>
-                    <span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span>;
-                    <span class="ident">doc</span>.<span class="ident">splice</span>(<span class="number">0</span>..<span class="number">4</span>, <span class="ident">new_len</span>.<span class="ident">to_le_bytes</span>().<span class="ident">iter</span>().<span class="ident">cloned</span>());
+                    <span class="comment">// overwrite old length</span>
+                    <span class="kw">let</span> <span class="ident">new_length</span> <span class="op">=</span> (<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span>).<span class="ident">to_le_bytes</span>();
+                    (<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>[<span class="number">0</span>..<span class="number">4</span>]).<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">new_length</span>);
+                    <span class="ident">doc</span> <span class="op">=</span> <span class="ident">RawDocumentBuf::from_bytes</span>(<span class="ident">bytes</span>)<span class="question-mark">?</span>;
 
                     <span class="ident">Bson::ObjectId</span>(<span class="ident">oid</span>)
                 }
             };
 
-            <span class="kw">let</span> <span class="ident">doc_size</span> <span class="op">=</span> <span class="ident">bson_util::array_entry_size_bytes</span>(<span class="ident">i</span>, <span class="ident">doc</span>.<span class="ident">len</span>());
+            <span class="kw">let</span> <span class="ident">doc_size</span> <span class="op">=</span> <span class="ident">bson_util::array_entry_size_bytes</span>(<span class="ident">i</span>, <span class="ident">doc</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>());
 
             <span class="kw">if</span> (<span class="ident">size</span> <span class="op">+</span> <span class="ident">doc_size</span>) <span class="op">&lt;</span><span class="op">=</span> <span class="ident">description</span>.<span class="ident">max_bson_object_size</span> <span class="kw">as</span> <span class="ident">u64</span> {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inserted_ids</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">i</span> {
@@ -360,16 +314,13 @@
             }
             .<span class="ident">into</span>());
         }
-
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or_default</span>();
         <span class="ident">options</span>.<span class="ident">ordered</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">is_ordered</span>());
+        <span class="macro">remove_empty_write_concern!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">options</span>));
 
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">InsertCommand</span> {
             <span class="ident">insert</span>: <span class="self">self</span>.<span class="ident">ns</span>.<span class="ident">coll</span>.<span class="ident">clone</span>(),
-            <span class="ident">documents</span>: <span class="ident">DocumentArraySpec</span> {
-                <span class="ident">documents</span>: <span class="ident">docs</span>,
-                <span class="ident">length</span>: <span class="ident">size</span> <span class="kw">as</span> <span class="ident">i32</span>,
-            },
+            <span class="ident">documents</span>: <span class="ident">docs</span>,
             <span class="ident">options</span>,
         };
 
@@ -377,52 +328,20 @@
     }
 
     <span class="kw">fn</span> <span class="ident">serialize_command</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cmd</span>: <span class="ident">Command</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Command</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// TODO: RUST-924 Use raw document API here instead.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">bson::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>)<span class="question-mark">?</span>;
-
-        <span class="ident">serialized</span>.<span class="ident">pop</span>(); <span class="comment">// drop null byte</span>
-
-        <span class="comment">// write element type</span>
-        <span class="ident">serialized</span>.<span class="ident">push</span>(<span class="ident">ElementType::Array</span> <span class="kw">as</span> <span class="ident">u8</span>);
-
-        <span class="comment">// write key cstring</span>
-        <span class="ident">serialized</span>.<span class="ident">write_all</span>(<span class="string">&quot;documents&quot;</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
-        <span class="ident">serialized</span>.<span class="ident">push</span>(<span class="number">0</span>);
-
-        <span class="comment">// write length of array</span>
-        <span class="kw">let</span> <span class="ident">array_length</span> <span class="op">=</span> <span class="number">4</span> <span class="op">+</span> <span class="ident">cmd</span>.<span class="ident">body</span>.<span class="ident">documents</span>.<span class="ident">length</span> <span class="op">+</span> <span class="number">1</span>; <span class="comment">// add in 4 for length of array, 1 for null byte</span>
-        <span class="ident">serialized</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">array_length</span>.<span class="ident">to_le_bytes</span>())<span class="question-mark">?</span>;
-
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">doc</span>) <span class="kw">in</span> <span class="ident">cmd</span>.<span class="ident">body</span>.<span class="ident">documents</span>.<span class="ident">documents</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-            <span class="comment">// write type of document</span>
-            <span class="ident">serialized</span>.<span class="ident">push</span>(<span class="ident">ElementType::EmbeddedDocument</span> <span class="kw">as</span> <span class="ident">u8</span>);
-
-            <span class="comment">// write array index</span>
-            <span class="ident">serialized</span>.<span class="ident">write_all</span>(<span class="ident">i</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
-            <span class="ident">serialized</span>.<span class="ident">push</span>(<span class="number">0</span>);
-
-            <span class="comment">// write document</span>
-            <span class="ident">serialized</span>.<span class="ident">extend</span>(<span class="ident">doc</span>);
-        }
-
-        <span class="comment">// write null byte for array</span>
-        <span class="ident">serialized</span>.<span class="ident">push</span>(<span class="number">0</span>);
-
-        <span class="comment">// write null byte for containing document</span>
-        <span class="ident">serialized</span>.<span class="ident">push</span>(<span class="number">0</span>);
-
-        <span class="comment">// update length of original doc</span>
-        <span class="kw">let</span> <span class="ident">final_length</span> <span class="op">=</span> <span class="ident">serialized</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="ident">serialized</span>.<span class="ident">splice</span>(<span class="number">0</span>..<span class="number">4</span>, <span class="ident">final_length</span>.<span class="ident">to_le_bytes</span>().<span class="ident">iter</span>().<span class="ident">cloned</span>());
-
-        <span class="prelude-val">Ok</span>(<span class="ident">serialized</span>)
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">bson::to_raw_document_buf</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>)<span class="question-mark">?</span>;
+        <span class="comment">// need to append documents separately because #[serde(flatten)] breaks the custom</span>
+        <span class="comment">// serialization logic. See https://github.com/serde-rs/serde/issues/2106.</span>
+        <span class="ident">doc</span>.<span class="ident">append</span>(<span class="string">&quot;documents&quot;</span>, <span class="ident">cmd</span>.<span class="ident">body</span>.<span class="ident">documents</span>);
+        <span class="prelude-val">Ok</span>(<span class="ident">doc</span>.<span class="ident">into_bytes</span>())
     }
 
     <span class="kw">fn</span> <span class="ident">handle_response</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">response</span>: <span class="ident">WriteResponseBody</span>,
+        <span class="ident">raw_response</span>: <span class="ident">RawCommandResponse</span>,
         <span class="ident">_description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::O</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">response</span>: <span class="ident">WriteResponseBody</span> <span class="op">=</span> <span class="ident">raw_response</span>.<span class="ident">body_utf8_lossy</span>()<span class="question-mark">?</span>;
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_ordered</span>() {
             <span class="comment">// in ordered inserts, only the first n were attempted.</span>
@@ -471,22 +390,13 @@
     }
 }
 
-<span class="doccomment">/// Data used for creating a BSON array.</span>
-<span class="kw">struct</span> <span class="ident">DocumentArraySpec</span> {
-    <span class="doccomment">/// The sum of the lengths of all the documents.</span>
-    <span class="ident">length</span>: <span class="ident">i32</span>,
-
-    <span class="doccomment">/// The serialized documents to be inserted.</span>
-    <span class="ident">documents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-}
-
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">InsertCommand</span> {
     <span class="ident">insert</span>: <span class="ident">String</span>,
 
     <span class="doccomment">/// will be serialized in `serialize_command`</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="ident">documents</span>: <span class="ident">DocumentArraySpec</span>,
+    <span class="ident">documents</span>: <span class="ident">RawArrayBuf</span>,
 
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
     <span class="ident">options</span>: <span class="ident">InsertManyOptions</span>,

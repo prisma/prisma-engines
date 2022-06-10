@@ -25,7 +25,7 @@ base-2 logarithm of the sliding window size and must be between 9 and 15.</p>
 <p>This constructor is only available when the <code>zlib</code> feature is used.
 Other backends currently do not support custom window bits.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.new_gzip" class="method has-srclink"><span class="rightside"><a class="srclink" href="../src/flate2/mem.rs.html#427-435">source</a></span><a href="#method.new_gzip" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.new_gzip" class="fnname">new_gzip</a>(window_bits: <a class="primitive" href="https://doc.rust-lang.org/1.61.0/std/primitive.u8.html">u8</a>) -&gt; <a class="struct" href="struct.Decompress.html" title="struct flate2::Decompress">Decompress</a></h4></section></summary><div class="docblock"><p>Creates a new object ready for decompressing data that it’s given.</p>
-<p>The Deompress object produced by this constructor expects gzip headers
+<p>The Decompress object produced by this constructor expects gzip headers
 for the compressed data.</p>
 <h5 id="panics-1"><a href="#panics-1">Panics</a></h5>
 <p>If <code>window_bits</code> does not fall into the range 9 ..= 15,

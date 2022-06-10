@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/net/tcp/socket.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>socket.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/net/tcp/socket.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>socket.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -593,6 +593,111 @@
 <span id="588">588</span>
 <span id="589">589</span>
 <span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net</span>::{<span class="ident">TcpListener</span>, <span class="ident">TcpStream</span>};
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -603,6 +708,7 @@
 <span class="kw">use</span> <span class="ident">std::os::unix::io</span>::{<span class="ident">AsRawFd</span>, <span class="ident">FromRawFd</span>, <span class="ident">IntoRawFd</span>, <span class="ident">RawFd</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::os::windows::io</span>::{<span class="ident">AsRawSocket</span>, <span class="ident">FromRawSocket</span>, <span class="ident">IntoRawSocket</span>, <span class="ident">RawSocket</span>};
+<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
 <span class="macro">cfg_net!</span> {
     <span class="doccomment">/// A TCP socket that has not yet been converted to a `TcpStream` or</span>
@@ -678,7 +784,7 @@
     <span class="doccomment">/// [`socket2`]: https://docs.rs/socket2/</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;connect_std&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TcpSocket</span> {
-        <span class="ident">inner</span>: <span class="ident">mio::net::TcpSocket</span>,
+        <span class="ident">inner</span>: <span class="ident">socket2::Socket</span>,
     }
 }
 
@@ -713,8 +819,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_v4</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpSocket</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">mio::net::TcpSocket::new_v4</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">TcpSocket</span> { <span class="ident">inner</span> })
+        <span class="ident">TcpSocket::new</span>(<span class="ident">socket2::Domain::IPV4</span>)
     }
 
     <span class="doccomment">/// Creates a new socket configured for IPv6.</span>
@@ -747,7 +852,34 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_v6</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpSocket</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">mio::net::TcpSocket::new_v6</span>()<span class="question-mark">?</span>;
+        <span class="ident">TcpSocket::new</span>(<span class="ident">socket2::Domain::IPV6</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">domain</span>: <span class="ident">socket2::Domain</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpSocket</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">socket2::Type::STREAM</span>;
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;dragonfly&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>
+        ))]</span>
+        <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">ty</span>.<span class="ident">nonblocking</span>();
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">socket2::Socket::new</span>(<span class="ident">domain</span>, <span class="ident">ty</span>, <span class="prelude-val">Some</span>(<span class="ident">socket2::Protocol::TCP</span>))<span class="question-mark">?</span>;
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;dragonfly&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
+            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>
+        )))]</span>
+        <span class="ident">inner</span>.<span class="ident">set_nonblocking</span>(<span class="bool-val">true</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">TcpSocket</span> { <span class="ident">inner</span> })
     }
 
@@ -778,7 +910,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reuseaddr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reuseaddr</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_reuseaddr</span>(<span class="ident">reuseaddr</span>)
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_reuse_address</span>(<span class="ident">reuseaddr</span>)
     }
 
     <span class="doccomment">/// Retrieves the value set for `SO_REUSEADDR` on this socket.</span>
@@ -804,7 +936,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reuseaddr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_reuseaddr</span>()
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">reuse_address</span>()
     }
 
     <span class="doccomment">/// Allows the socket to bind to an in-use port. Only available for unix systems</span>
@@ -838,7 +970,7 @@
         <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>), <span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>))))
     )]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reuseport</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reuseport</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_reuseport</span>(<span class="ident">reuseport</span>)
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_reuse_port</span>(<span class="ident">reuseport</span>)
     }
 
     <span class="doccomment">/// Allows the socket to bind to an in-use port. Only available for unix systems</span>
@@ -873,14 +1005,14 @@
         <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>), <span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>))))
     )]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reuseport</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_reuseport</span>()
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">reuse_port</span>()
     }
 
     <span class="doccomment">/// Sets the size of the TCP send buffer on this socket.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// On most operating systems, this sets the `SO_SNDBUF` socket option.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_send_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">size</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_send_buffer_size</span>(<span class="ident">size</span>)
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_send_buffer_size</span>(<span class="ident">size</span> <span class="kw">as</span> <span class="ident">usize</span>)
     }
 
     <span class="doccomment">/// Returns the size of the TCP send buffer for this socket.</span>
@@ -907,14 +1039,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`set_send_buffer_size`]: #method.set_send_buffer_size</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_send_buffer_size</span>()
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">send_buffer_size</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">u32</span>)
     }
 
     <span class="doccomment">/// Sets the size of the TCP receive buffer on this socket.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// On most operating systems, this sets the `SO_RCVBUF` socket option.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_recv_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">size</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_recv_buffer_size</span>(<span class="ident">size</span>)
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_recv_buffer_size</span>(<span class="ident">size</span> <span class="kw">as</span> <span class="ident">usize</span>)
     }
 
     <span class="doccomment">/// Returns the size of the TCP receive buffer for this socket.</span>
@@ -941,7 +1073,29 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`set_recv_buffer_size`]: #method.set_recv_buffer_size</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_recv_buffer_size</span>()
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">recv_buffer_size</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">u32</span>)
+    }
+
+    <span class="doccomment">/// Sets the linger duration of this socket by setting the SO_LINGER option.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This option controls the action taken when a stream has unsent messages and the stream is</span>
+    <span class="doccomment">/// closed. If SO_LINGER is set, the system shall block the process until it can transmit the</span>
+    <span class="doccomment">/// data or until the time expires.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If SO_LINGER is not specified, and the socket is closed, the system handles the call in a</span>
+    <span class="doccomment">/// way that allows the process to continue as quickly as possible.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_linger</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dur</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_linger</span>(<span class="ident">dur</span>)
+    }
+
+    <span class="doccomment">/// Reads the linger duration for this socket by getting the `SO_LINGER`</span>
+    <span class="doccomment">/// option.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For more information about this option, see [`set_linger`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`set_linger`]: TcpSocket::set_linger</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">linger</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">linger</span>()
     }
 
     <span class="doccomment">/// Gets the local address of this socket.</span>
@@ -967,7 +1121,12 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_localaddr</span>()
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">local_addr</span>().<span class="ident">and_then</span>(<span class="ident">convert_address</span>)
+    }
+
+    <span class="doccomment">/// Returns the value of the `SO_ERROR` option.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">take_error</span>()
     }
 
     <span class="doccomment">/// Binds the socket to the given address.</span>
@@ -999,7 +1158,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">bind</span>(<span class="ident">addr</span>)
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">bind</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">into</span>())
     }
 
     <span class="doccomment">/// Establishes a TCP connection with a peer at the specified socket address.</span>
@@ -1035,7 +1194,32 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">mio</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">connect</span>(<span class="ident">addr</span>)<span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">into</span>()) {
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
+            <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">raw_os_error</span>() <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">libc::EINPROGRESS</span>) {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
+            }
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
+            <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">io::ErrorKind::WouldBlock</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
+            }
+        }
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
+        <span class="kw">let</span> <span class="ident">mio</span> <span class="op">=</span> {
+            <span class="kw">use</span> <span class="ident">std::os::unix::io</span>::{<span class="ident">FromRawFd</span>, <span class="ident">IntoRawFd</span>};
+
+            <span class="kw">let</span> <span class="ident">raw_fd</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into_raw_fd</span>();
+            <span class="kw">unsafe</span> { <span class="ident">mio::net::TcpStream::from_raw_fd</span>(<span class="ident">raw_fd</span>) }
+        };
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
+        <span class="kw">let</span> <span class="ident">mio</span> <span class="op">=</span> {
+            <span class="kw">use</span> <span class="ident">std::os::windows::io</span>::{<span class="ident">FromRawSocket</span>, <span class="ident">IntoRawSocket</span>};
+
+            <span class="kw">let</span> <span class="ident">raw_socket</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into_raw_socket</span>();
+            <span class="kw">unsafe</span> { <span class="ident">mio::net::TcpStream::from_raw_socket</span>(<span class="ident">raw_socket</span>) }
+        };
+
         <span class="ident">TcpStream::connect_mio</span>(<span class="ident">mio</span>).<span class="kw">await</span>
     }
 
@@ -1075,7 +1259,23 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">listen</span>(<span class="self">self</span>, <span class="ident">backlog</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpListener</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">mio</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">listen</span>(<span class="ident">backlog</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">listen</span>(<span class="ident">backlog</span> <span class="kw">as</span> <span class="ident">i32</span>)<span class="question-mark">?</span>;
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
+        <span class="kw">let</span> <span class="ident">mio</span> <span class="op">=</span> {
+            <span class="kw">use</span> <span class="ident">std::os::unix::io</span>::{<span class="ident">FromRawFd</span>, <span class="ident">IntoRawFd</span>};
+
+            <span class="kw">let</span> <span class="ident">raw_fd</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into_raw_fd</span>();
+            <span class="kw">unsafe</span> { <span class="ident">mio::net::TcpListener::from_raw_fd</span>(<span class="ident">raw_fd</span>) }
+        };
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
+        <span class="kw">let</span> <span class="ident">mio</span> <span class="op">=</span> {
+            <span class="kw">use</span> <span class="ident">std::os::windows::io</span>::{<span class="ident">FromRawSocket</span>, <span class="ident">IntoRawSocket</span>};
+
+            <span class="kw">let</span> <span class="ident">raw_socket</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into_raw_socket</span>();
+            <span class="kw">unsafe</span> { <span class="ident">mio::net::TcpListener::from_raw_socket</span>(<span class="ident">raw_socket</span>) }
+        };
+
         <span class="ident">TcpListener::new</span>(<span class="ident">mio</span>)
     }
 
@@ -1095,7 +1295,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// #[tokio::main]</span>
     <span class="doccomment">/// async fn main() -&gt; std::io::Result&lt;()&gt; {</span>
-    <span class="doccomment">///     </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">///     let socket2_socket = Socket::new(Domain::IPV4, Type::STREAM, None)?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     let socket = TcpSocket::from_std_stream(socket2_socket.into());</span>
@@ -1122,6 +1322,16 @@
     }
 }
 
+<span class="kw">fn</span> <span class="ident">convert_address</span>(<span class="ident">address</span>: <span class="ident">socket2::SockAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
+    <span class="kw">match</span> <span class="ident">address</span>.<span class="ident">as_socket</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">address</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">address</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
+            <span class="ident">io::ErrorKind::InvalidInput</span>,
+            <span class="string">&quot;invalid address family (not IPv4 or IPv6)&quot;</span>,
+        )),
+    }
+}
+
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TcpSocket</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>)
@@ -1144,7 +1354,7 @@
     <span class="doccomment">/// The caller is responsible for ensuring that the socket is in</span>
     <span class="doccomment">/// non-blocking mode.</span>
     <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_fd</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>) -&gt; <span class="ident">TcpSocket</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">mio::net::TcpSocket::from_raw_fd</span>(<span class="ident">fd</span>);
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">socket2::Socket::from_raw_fd</span>(<span class="ident">fd</span>);
         <span class="ident">TcpSocket</span> { <span class="ident">inner</span> }
     }
 }
@@ -1179,7 +1389,7 @@
     <span class="doccomment">/// The caller is responsible for ensuring that the socket is in</span>
     <span class="doccomment">/// non-blocking mode.</span>
     <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_socket</span>(<span class="ident">socket</span>: <span class="ident">RawSocket</span>) -&gt; <span class="ident">TcpSocket</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">mio::net::TcpSocket::from_raw_socket</span>(<span class="ident">socket</span>);
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">socket2::Socket::from_raw_socket</span>(<span class="ident">socket</span>);
         <span class="ident">TcpSocket</span> { <span class="ident">inner</span> }
     }
 }

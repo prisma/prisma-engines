@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/time/driver/entry.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>entry.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/time/driver/entry.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>entry.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -634,6 +634,8 @@
 <span id="629">629</span>
 <span id="630">630</span>
 <span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Timer state structures.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This module contains the heart of the intrusive timer implementation, and as</span>
@@ -962,14 +964,15 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Note that this structure is located inside the `TimerEntry` structure.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span> <span class="comment">// required by `link_list::Link` impl</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TimerShared</span> {
+    <span class="doccomment">/// Data manipulated by the driver thread itself, only.</span>
+    <span class="ident">driver_state</span>: <span class="ident">CachePadded</span><span class="op">&lt;</span><span class="ident">TimerSharedPadded</span><span class="op">&gt;</span>,
+
     <span class="doccomment">/// Current state. This records whether the timer entry is currently under</span>
     <span class="doccomment">/// the ownership of the driver, and if not, its current state (not</span>
     <span class="doccomment">/// complete, fired, error, etc).</span>
     <span class="ident">state</span>: <span class="ident">StateCell</span>,
-
-    <span class="doccomment">/// Data manipulated by the driver thread itself, only.</span>
-    <span class="ident">driver_state</span>: <span class="ident">CachePadded</span><span class="op">&lt;</span><span class="ident">TimerSharedPadded</span><span class="op">&gt;</span>,
 
     <span class="ident">_p</span>: <span class="ident">PhantomPinned</span>,
 }
@@ -1056,7 +1059,14 @@
 <span class="doccomment">/// padded. This contains the information that the driver thread accesses most</span>
 <span class="doccomment">/// frequently to minimize contention. In particular, we move it away from the</span>
 <span class="doccomment">/// waker, as the waker is updated on every poll.</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span> <span class="comment">// required by `link_list::Link` impl</span>
 <span class="kw">struct</span> <span class="ident">TimerSharedPadded</span> {
+    <span class="doccomment">/// A link within the doubly-linked list of timers on a particular level and</span>
+    <span class="doccomment">/// slot. Valid only if state is equal to Registered.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Only accessed under the entry lock.</span>
+    <span class="ident">pointers</span>: <span class="ident">linked_list::Pointers</span><span class="op">&lt;</span><span class="ident">TimerShared</span><span class="op">&gt;</span>,
+
     <span class="doccomment">/// The expiration time for which this entry is currently registered.</span>
     <span class="doccomment">/// Generally owned by the driver, but is accessed by the entry when not</span>
     <span class="doccomment">/// registered.</span>
@@ -1064,12 +1074,6 @@
 
     <span class="doccomment">/// The true expiration time. Set by the timer future, read by the driver.</span>
     <span class="ident">true_when</span>: <span class="ident">AtomicU64</span>,
-
-    <span class="doccomment">/// A link within the doubly-linked list of timers on a particular level and</span>
-    <span class="doccomment">/// slot. Valid only if state is equal to Registered.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only accessed under the entry lock.</span>
-    <span class="ident">pointers</span>: <span class="ident">StdUnsafeCell</span><span class="op">&lt;</span><span class="ident">linked_list::Pointers</span><span class="op">&lt;</span><span class="ident">TimerShared</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">TimerSharedPadded</span> {
@@ -1086,7 +1090,7 @@
         <span class="self">Self</span> {
             <span class="ident">cached_when</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
             <span class="ident">true_when</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
-            <span class="ident">pointers</span>: <span class="ident">StdUnsafeCell::new</span>(<span class="ident">linked_list::Pointers::new</span>()),
+            <span class="ident">pointers</span>: <span class="ident">linked_list::Pointers::new</span>(),
         }
     }
 }
@@ -1110,7 +1114,7 @@
     <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">pointers</span>(
         <span class="ident">target</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Target</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">linked_list::Pointers</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Target</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> { <span class="ident">NonNull::new</span>(<span class="ident">target</span>.<span class="ident">as_ref</span>().<span class="ident">driver_state</span>.<span class="number">0</span>.<span class="ident">pointers</span>.<span class="ident">get</span>()).<span class="ident">unwrap</span>() }
+        <span class="ident">target</span>.<span class="ident">cast</span>()
     }
 }
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/runtime/task/list.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>list.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/runtime/task/list.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>list.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -300,6 +300,8 @@
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module has containers for storing the tasks spawned on a scheduler. The</span>
 <span class="doccomment">//! `OwnedTasks` container is thread-safe but can only store tasks that</span>
 <span class="doccomment">//! implement Send. The `LocalOwnedTasks` container is not thread safe, but can</span>
@@ -386,13 +388,14 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">task</span>: <span class="ident">T</span>,
         <span class="ident">scheduler</span>: <span class="ident">S</span>,
+        <span class="ident">id</span>: <span class="ident"><span class="kw">super</span>::Id</span>,
     ) -&gt; (<span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">T::Output</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Notified</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>)
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Schedule</span>,
         <span class="ident">T</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">T::Output</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> (<span class="ident">task</span>, <span class="ident">notified</span>, <span class="ident">join</span>) <span class="op">=</span> <span class="ident"><span class="kw">super</span>::new_task</span>(<span class="ident">task</span>, <span class="ident">scheduler</span>);
+        <span class="kw">let</span> (<span class="ident">task</span>, <span class="ident">notified</span>, <span class="ident">join</span>) <span class="op">=</span> <span class="ident"><span class="kw">super</span>::new_task</span>(<span class="ident">task</span>, <span class="ident">scheduler</span>, <span class="ident">id</span>);
 
         <span class="kw">unsafe</span> {
             <span class="comment">// safety: We just created the task, so we have exclusive access</span>
@@ -489,13 +492,14 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">task</span>: <span class="ident">T</span>,
         <span class="ident">scheduler</span>: <span class="ident">S</span>,
+        <span class="ident">id</span>: <span class="ident"><span class="kw">super</span>::Id</span>,
     ) -&gt; (<span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">T::Output</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Notified</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>)
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Schedule</span>,
         <span class="ident">T</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">T::Output</span>: <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> (<span class="ident">task</span>, <span class="ident">notified</span>, <span class="ident">join</span>) <span class="op">=</span> <span class="ident"><span class="kw">super</span>::new_task</span>(<span class="ident">task</span>, <span class="ident">scheduler</span>);
+        <span class="kw">let</span> (<span class="ident">task</span>, <span class="ident">notified</span>, <span class="ident">join</span>) <span class="op">=</span> <span class="ident"><span class="kw">super</span>::new_task</span>(<span class="ident">task</span>, <span class="ident">scheduler</span>, <span class="ident">id</span>);
 
         <span class="kw">unsafe</span> {
             <span class="comment">// safety: We just created the task, so we have exclusive access</span>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-log-0.1.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-log-0.1.3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_log/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -630,6 +630,9 @@
 <span id="623">623</span>
 <span id="624">624</span>
 <span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Adapters for connecting unstructured log records from the `log` crate into</span>
 <span class="doccomment">//! the `tracing` ecosystem.</span>
 <span class="doccomment">//!</span>
@@ -648,7 +651,7 @@
 <span class="doccomment">//! - An [`env_logger`] module, with helpers for using the [`env_logger` crate]</span>
 <span class="doccomment">//!   with `tracing` (optional, enabled by the `env-logger` feature).</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! *Compiler support: [requires `rustc` 1.42+][msrv]*</span>
+<span class="doccomment">//! *Compiler support: [requires `rustc` 1.49+][msrv]*</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [msrv]: #supported-rust-versions</span>
 <span class="doccomment">//!</span>
@@ -706,11 +709,13 @@
 <span class="doccomment">//! * `log-tracer`: enables the `LogTracer` type (on by default)</span>
 <span class="doccomment">//! * `env_logger`: enables the `env_logger` module, with helpers for working</span>
 <span class="doccomment">//!   with the [`env_logger` crate].</span>
+<span class="doccomment">//! * `interest-cache`: makes it possible to configure an interest cache for</span>
+<span class="doccomment">//!   logs emitted through the `log` crate (see [`Builder::with_interest_cache`]); requires `std`</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Supported Rust Versions</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Tracing is built against the latest stable release. The minimum supported</span>
-<span class="doccomment">//! version is 1.42. The current Tracing version is not guaranteed to build on</span>
+<span class="doccomment">//! version is 1.49. The current Tracing version is not guaranteed to build on</span>
 <span class="doccomment">//! Rust versions earlier than the minimum supported version.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Tracing follows the same compiler support policies as the rest of the Tokio</span>
@@ -721,28 +726,21 @@
 <span class="doccomment">//! supported compiler version is not considered a semver breaking change as</span>
 <span class="doccomment">//! long as doing so complies with this policy.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`init`]: struct.LogTracer.html#method.init</span>
-<span class="doccomment">//! [`init_with_filter`]: struct.LogTracer.html#method.init_with_filter</span>
-<span class="doccomment">//! [`AsTrace`]: trait.AsTrace.html</span>
-<span class="doccomment">//! [`AsLog`]: trait.AsLog.html</span>
-<span class="doccomment">//! [`LogTracer`]: struct.LogTracer.html</span>
-<span class="doccomment">//! [`TraceLogger`]: struct.TraceLogger.html</span>
-<span class="doccomment">//! [`env_logger`]: env_logger/index.html</span>
+<span class="doccomment">//! [`init`]: LogTracer::init</span>
+<span class="doccomment">//! [`init_with_filter`]: LogTracer::init_with_filter</span>
 <span class="doccomment">//! [`tracing`]: https://crates.io/crates/tracing</span>
-<span class="doccomment">//! [`log`]: https://crates.io/crates/log</span>
 <span class="doccomment">//! [`env_logger` crate]: https://crates.io/crates/env-logger</span>
-<span class="doccomment">//! [`log::Log`]: https://docs.rs/log/latest/log/trait.Log.html</span>
-<span class="doccomment">//! [`log::Record`]: https://docs.rs/log/latest/log/struct.Record.html</span>
 <span class="doccomment">//! [`tracing::Subscriber`]: https://docs.rs/tracing/latest/tracing/trait.Subscriber.html</span>
 <span class="doccomment">//! [`Subscriber`]: https://docs.rs/tracing/latest/tracing/trait.Subscriber.html</span>
 <span class="doccomment">//! [`tracing::Event`]: https://docs.rs/tracing/latest/tracing/struct.Event.html</span>
 <span class="doccomment">//! [flags]: https://docs.rs/tracing/latest/tracing/#crate-feature-flags</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tracing-log/0.1.2&quot;</span>)]</span>
+<span class="doccomment">//! [`Builder::with_interest_cache`]: log_tracer::Builder::with_interest_cache</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tracing-log/0.1.3&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">doc</span>(
     <span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png&quot;</span>,
     <span class="ident">issue_tracker_base_url</span> <span class="op">=</span> <span class="string">&quot;https://github.com/tokio-rs/tracing/issues/&quot;</span>
 )]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>), <span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>), <span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>))]</span>
 <span class="attribute">#![<span class="ident">warn</span>(
     <span class="ident">missing_debug_implementations</span>,
     <span class="ident">missing_docs</span>,
@@ -806,6 +804,16 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">env_logger</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">log</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;interest-cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log-tracer&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
+<span class="kw">mod</span> <span class="ident">interest_cache</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;interest-cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log-tracer&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">docsrs</span>,
+    <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;interest-cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log-tracer&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))
+)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::interest_cache::InterestCacheConfig</span>;
 
 <span class="doccomment">/// Format a log record as a trace event in the current span.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format_trace</span>(<span class="ident">record</span>: <span class="kw-2">&amp;</span><span class="ident">log::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -1106,9 +1114,7 @@
 <span class="doccomment">/// to allow accessing its complete metadata in a consistent way,</span>
 <span class="doccomment">/// regardless of the source of its source.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`normalized_metadata`]: trait.NormalizeEvent.html#normalized_metadata</span>
-<span class="doccomment">/// [`AsTrace`]: trait.AsTrace.html</span>
-<span class="doccomment">/// [`log::Record`]: https://docs.rs/log/0.4.7/log/struct.Record.html</span>
+<span class="doccomment">/// [`normalized_metadata`]: NormalizeEvent#normalized_metadata</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NormalizeEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>: <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span> {
     <span class="doccomment">/// If this `Event` comes from a `log`, this method provides a new</span>
     <span class="doccomment">/// normalized `Metadata` which has all available attributes</span>

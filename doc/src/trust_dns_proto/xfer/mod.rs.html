@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.20.3/src/xfer/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/xfer/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -256,6 +256,41 @@
 <span id="251">251</span>
 <span id="252">252</span>
 <span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
 </pre><pre class="rust"><code><span class="doccomment">//! DNS high level transit implimentations.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Primarily there are two types in this module of interest, the `DnsMultiplexer` type and the `DnsHandle` type. `DnsMultiplexer` can be thought of as the state machine responsible for sending and receiving DNS messages. `DnsHandle` is the type given to API users of the `trust-dns-proto` library to send messages into the `DnsMultiplexer` for delivery. Finally there is the `DnsRequest` type. This allows for customizations, through `DnsRequestOptions`, to the delivery of messages via a `DnsMultiplexer`.</span>
@@ -283,6 +318,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dns_request</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dns_response</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dnssec_dns_handle</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">retry_dns_handle</span>;
 <span class="kw">mod</span> <span class="ident">serial_message</span>;
@@ -290,11 +326,12 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::dns_exchange</span>::{
     <span class="ident">DnsExchange</span>, <span class="ident">DnsExchangeBackground</span>, <span class="ident">DnsExchangeConnect</span>, <span class="ident">DnsExchangeSend</span>,
 };
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::dns_handle</span>::{<span class="ident">DnsHandle</span>, <span class="ident">DnsStreamHandle</span>, <span class="ident">StreamHandle</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::dns_handle</span>::{<span class="ident">DnsHandle</span>, <span class="ident">DnsStreamHandle</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::dns_multiplexer</span>::{<span class="ident">DnsMultiplexer</span>, <span class="ident">DnsMultiplexerConnect</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::dns_request</span>::{<span class="ident">DnsRequest</span>, <span class="ident">DnsRequestOptions</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::dns_response</span>::{<span class="ident">DnsResponse</span>, <span class="ident">DnsResponseFuture</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::dns_response</span>::{<span class="ident">DnsResponse</span>, <span class="ident">DnsResponseStream</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::dnssec_dns_handle::DnssecDnsHandle</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::retry_dns_handle::RetryDnsHandle</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::serial_message::SerialMessage</span>;
@@ -317,35 +354,18 @@
     <span class="kw">fn</span> <span class="ident">name_server_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SocketAddr</span>;
 }
 
-<span class="comment">// TODO: change to Sink</span>
-<span class="doccomment">/// A sender to which serialized DNS Messages can be sent</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BufStreamHandle</span> {
-    <span class="ident">sender</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">SerialMessage</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">BufStreamHandle</span> {
-    <span class="doccomment">/// Constructs a new BufStreamHandle with associated StreamReceiver</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>() -&gt; (<span class="self">Self</span>, <span class="ident">StreamReceiver</span>) {
-        <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="ident">CHANNEL_BUFFER_SIZE</span>);
-        (<span class="ident">BufStreamHandle</span> { <span class="ident">sender</span> }, <span class="ident">receiver</span>.<span class="ident">fuse</span>().<span class="ident">peekable</span>())
-    }
-
-    <span class="doccomment">/// Send SerialMessage over the channel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">SerialMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">mpsc::TrySendError</span><span class="op">&lt;</span><span class="ident">SerialMessage</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">try_send</span>(<span class="ident">msg</span>)
-    }
-}
-
 <span class="doccomment">/// Receiver handle for peekable fused SerialMessage channel</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">StreamReceiver</span> <span class="op">=</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">Fuse</span><span class="op">&lt;</span><span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">SerialMessage</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="kw">const</span> <span class="ident">CHANNEL_BUFFER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
 
 <span class="doccomment">/// A buffering stream bound to a `SocketAddr`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This stream handle ensures that all messages sent via this handle have the remote_addr set as the destination for the packet</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BufDnsStreamHandle</span> {
-    <span class="ident">name_server</span>: <span class="ident">SocketAddr</span>,
-    <span class="ident">sender</span>: <span class="ident">BufStreamHandle</span>,
+    <span class="ident">remote_addr</span>: <span class="ident">SocketAddr</span>,
+    <span class="ident">sender</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">SerialMessage</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">BufDnsStreamHandle</span> {
@@ -353,22 +373,37 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// * `name_server` - the address of the DNS server</span>
+    <span class="doccomment">/// * `remote_addr` - the address of the remote DNS system (client or server)</span>
     <span class="doccomment">/// * `sender` - the handle being used to send data to the server</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name_server</span>: <span class="ident">SocketAddr</span>, <span class="ident">sender</span>: <span class="ident">BufStreamHandle</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">BufDnsStreamHandle</span> {
-            <span class="ident">name_server</span>,
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">remote_addr</span>: <span class="ident">SocketAddr</span>) -&gt; (<span class="self">Self</span>, <span class="ident">StreamReceiver</span>) {
+        <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="ident">CHANNEL_BUFFER_SIZE</span>);
+        <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">receiver</span>.<span class="ident">fuse</span>().<span class="ident">peekable</span>();
+
+        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">Self</span> {
+            <span class="ident">remote_addr</span>,
             <span class="ident">sender</span>,
+        };
+
+        (<span class="ident">this</span>, <span class="ident">receiver</span>)
+    }
+
+    <span class="doccomment">/// Associates a different remote address for any responses.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is mainly useful in server use cases where the incoming address is only known after receiving a packet.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_remote_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">remote_addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">remote_addr</span>,
+            <span class="ident">sender</span>: <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">clone</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">DnsStreamHandle</span> <span class="kw">for</span> <span class="ident">BufDnsStreamHandle</span> {
     <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buffer</span>: <span class="ident">SerialMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ProtoError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name_server</span>: <span class="ident">SocketAddr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name_server</span>;
+        <span class="kw">let</span> <span class="ident">remote_addr</span>: <span class="ident">SocketAddr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remote_addr</span>;
         <span class="kw">let</span> <span class="ident">sender</span>: <span class="kw-2">&amp;mut</span> <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">sender</span>;
         <span class="ident">sender</span>
-            .<span class="ident">send</span>(<span class="ident">SerialMessage::new</span>(<span class="ident">buffer</span>.<span class="ident">into_parts</span>().<span class="number">0</span>, <span class="ident">name_server</span>))
+            .<span class="ident">try_send</span>(<span class="ident">SerialMessage::new</span>(<span class="ident">buffer</span>.<span class="ident">into_parts</span>().<span class="number">0</span>, <span class="ident">remote_addr</span>))
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="macro">format!</span>(<span class="string">&quot;mpsc::SendError {}&quot;</span>, <span class="ident">e</span>)))
     }
 }
@@ -379,12 +414,12 @@
 <span class="doccomment">///   NotReady, if it is not ready to send a message, and `Err` or `None` in the case that the stream is</span>
 <span class="doccomment">///   done, and should be shutdown.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DnsRequestSender</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
-    <span class="doccomment">/// Send a message, and return a future of the response</span>
+    <span class="doccomment">/// Send a message, and return a stream of response</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Return</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// A future which will resolve to a SerialMessage response</span>
-    <span class="kw">fn</span> <span class="ident">send_message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="ident">DnsRequest</span>) -&gt; <span class="ident">DnsResponseFuture</span>;
+    <span class="doccomment">/// A stream which will resolve to SerialMessage responses</span>
+    <span class="kw">fn</span> <span class="ident">send_message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="ident">DnsRequest</span>) -&gt; <span class="ident">DnsResponseStream</span>;
 
     <span class="doccomment">/// Allows the upstream user to inform the underling stream that it should shutdown.</span>
     <span class="doccomment">///</span>
@@ -407,9 +442,7 @@
 
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expr</span> {
             <span class="ident">Result::Ok</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>,
-            <span class="ident">Result::Err</span>(<span class="ident">err</span>) =&gt; {
-                <span class="kw">return</span> <span class="ident">OneshotDnsResponseReceiver::Err</span>(<span class="prelude-val">Some</span>(<span class="ident">ProtoError::from</span>(<span class="ident">err</span>)))
-            }
+            <span class="ident">Result::Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">DnsResponseReceiver::Err</span>(<span class="prelude-val">Some</span>(<span class="ident">ProtoError::from</span>(<span class="ident">err</span>))),
         }
     }};
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">expr</span>:<span class="ident">expr</span>,) =&gt; {
@@ -418,7 +451,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DnsHandle</span> <span class="kw">for</span> <span class="ident">BufDnsRequestStreamHandle</span> {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">OneshotDnsResponseReceiver</span>;
+    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">DnsResponseReceiver</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ProtoError</span>;
 
     <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
@@ -431,7 +464,7 @@
             <span class="ident">ProtoError::from</span>(<span class="ident">ProtoErrorKind::Busy</span>)
         }));
 
-        <span class="ident">OneshotDnsResponseReceiver::Receiver</span>(<span class="ident">oneshot</span>)
+        <span class="ident">DnsResponseReceiver::Receiver</span>(<span class="ident">oneshot</span>)
     }
 }
 
@@ -439,17 +472,15 @@
 <span class="doccomment">/// A OneshotDnsRequest creates a channel for a response to message</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OneshotDnsRequest</span> {
     <span class="ident">dns_request</span>: <span class="ident">DnsRequest</span>,
-    <span class="ident">sender_for_response</span>: <span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="ident">DnsResponseFuture</span><span class="op">&gt;</span>,
+    <span class="ident">sender_for_response</span>: <span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="ident">DnsResponseStream</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">OneshotDnsRequest</span> {
-    <span class="kw">fn</span> <span class="ident">oneshot</span>(
-        <span class="ident">dns_request</span>: <span class="ident">DnsRequest</span>,
-    ) -&gt; (<span class="ident">OneshotDnsRequest</span>, <span class="ident">oneshot::Receiver</span><span class="op">&lt;</span><span class="ident">DnsResponseFuture</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">oneshot</span>(<span class="ident">dns_request</span>: <span class="ident">DnsRequest</span>) -&gt; (<span class="self">Self</span>, <span class="ident">oneshot::Receiver</span><span class="op">&lt;</span><span class="ident">DnsResponseStream</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">sender_for_response</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
 
         (
-            <span class="ident">OneshotDnsRequest</span> {
+            <span class="self">Self</span> {
                 <span class="ident">dns_request</span>,
                 <span class="ident">sender_for_response</span>,
             },
@@ -465,48 +496,87 @@
     }
 }
 
-<span class="kw">struct</span> <span class="ident">OneshotDnsResponse</span>(<span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="ident">DnsResponseFuture</span><span class="op">&gt;</span>);
+<span class="kw">struct</span> <span class="ident">OneshotDnsResponse</span>(<span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="ident">DnsResponseStream</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">OneshotDnsResponse</span> {
-    <span class="kw">fn</span> <span class="ident">send_response</span>(<span class="self">self</span>, <span class="ident">serial_response</span>: <span class="ident">DnsResponseFuture</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DnsResponseFuture</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">send_response</span>(<span class="self">self</span>, <span class="ident">serial_response</span>: <span class="ident">DnsResponseStream</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DnsResponseStream</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">send</span>(<span class="ident">serial_response</span>)
     }
 }
 
-<span class="doccomment">/// A Future that wraps a oneshot::Receiver and resolves to the final value</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OneshotDnsResponseReceiver</span> {
+<span class="doccomment">/// A Stream that wraps a oneshot::Receiver&lt;Stream&gt; and resolves to items in the inner Stream</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DnsResponseReceiver</span> {
     <span class="doccomment">/// The receiver</span>
-    <span class="ident">Receiver</span>(<span class="ident">oneshot::Receiver</span><span class="op">&lt;</span><span class="ident">DnsResponseFuture</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// The future once received</span>
-    <span class="ident">Received</span>(<span class="ident">DnsResponseFuture</span>),
+    <span class="ident">Receiver</span>(<span class="ident">oneshot::Receiver</span><span class="op">&lt;</span><span class="ident">DnsResponseStream</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// The stream once received</span>
+    <span class="ident">Received</span>(<span class="ident">DnsResponseStream</span>),
     <span class="doccomment">/// Error during the send operation</span>
     <span class="prelude-val">Err</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span>),
 }
 
-<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">OneshotDnsResponseReceiver</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span>;
+<span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">DnsResponseReceiver</span> {
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">as_mut</span>() {
-                <span class="ident">OneshotDnsResponseReceiver::Receiver</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">receiver</span>) =&gt; {
+                <span class="ident">DnsResponseReceiver::Receiver</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">receiver</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="ident">receiver</span>);
                     <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">receiver</span>
                         .<span class="ident">poll</span>(<span class="ident">cx</span>)
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="string">&quot;receiver was canceled&quot;</span>)))<span class="question-mark">?</span>;
-                    <span class="ident">OneshotDnsResponseReceiver::Received</span>(<span class="ident">future</span>)
+                    <span class="ident"><span class="self">Self</span>::Received</span>(<span class="ident">future</span>)
                 }
-                <span class="ident">OneshotDnsResponseReceiver::Received</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">future</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="ident">future</span>);
-                    <span class="kw">return</span> <span class="ident">future</span>.<span class="ident">poll</span>(<span class="ident">cx</span>);
+                <span class="ident">DnsResponseReceiver::Received</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; {
+                    <span class="kw">return</span> <span class="ident">stream</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>);
                 }
-                <span class="ident">OneshotDnsResponseReceiver::Err</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; {
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>
-                        .<span class="ident">take</span>()
-                        .<span class="ident">expect</span>(<span class="string">&quot;futures should not be polled after complete&quot;</span>)))
-                }
+                <span class="ident">DnsResponseReceiver::Err</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="ident">err</span>.<span class="ident">take</span>().<span class="ident">map</span>(<span class="prelude-val">Err</span>)),
             };
         }
+    }
+}
+
+<span class="doccomment">/// Helper trait to convert a Stream of dns response into a Future</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FirstAnswer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Sized</span> {
+    <span class="doccomment">/// Convert a Stream of dns response into a Future yielding the first answer,</span>
+    <span class="doccomment">/// discarding others if any.</span>
+    <span class="kw">fn</span> <span class="ident">first_answer</span>(<span class="self">self</span>) -&gt; <span class="ident">FirstAnswerFuture</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="ident">FirstAnswerFuture</span> { <span class="ident">stream</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>) }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FirstAnswer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">S</span>
+<span class="kw">where</span>
+    <span class="ident">S</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Sized</span>,
+    <span class="ident">E</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span>,
+{
+}
+
+<span class="doccomment">/// See [FirstAnswer::first_answer]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FirstAnswerFuture</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="ident">stream</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">S</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">FirstAnswerFuture</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">S</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Sized</span>,
+    <span class="ident">E</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span>,
+{
+    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">S::Item</span>;
+
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">stream</span>
+            .<span class="ident">as_mut</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;polling FirstAnswerFuture twice&quot;</span>);
+        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">s</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>)) {
+            <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ProtoError::from</span>(<span class="ident">ProtoErrorKind::Timeout</span>).<span class="ident">into</span>()),
+        };
+        <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">take</span>();
+        <span class="ident">Poll::Ready</span>(<span class="ident">item</span>)
     }
 }
 </code></pre></div>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/toml-0.5.8/src/datetime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datetime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/toml-0.5.9/src/datetime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datetime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../toml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -428,6 +428,125 @@
 <span id="423">423</span>
 <span id="424">424</span>
 <span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::error</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::str</span>::{<span class="self">self</span>, <span class="ident">FromStr</span>};
@@ -451,11 +570,74 @@
 <span class="doccomment">/// Also note though that while this type implements `Serialize` and</span>
 <span class="doccomment">/// `Deserialize` it&#39;s only recommended to use this type with the TOML format,</span>
 <span class="doccomment">/// otherwise encoded in other formats it may look a little odd.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Depending on how the option values are used, this struct will correspond</span>
+<span class="doccomment">/// with one of the following four datetimes from the [TOML v1.0.0 spec]:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// | `date`    | `time`    | `offset`  | TOML type          |</span>
+<span class="doccomment">/// | --------- | --------- | --------- | ------------------ |</span>
+<span class="doccomment">/// | `Some(_)` | `Some(_)` | `Some(_)` | [Offset Date-Time] |</span>
+<span class="doccomment">/// | `Some(_)` | `Some(_)` | `None`    | [Local Date-Time]  |</span>
+<span class="doccomment">/// | `Some(_)` | `None`    | `None`    | [Local Date]       |</span>
+<span class="doccomment">/// | `None`    | `Some(_)` | `None`    | [Local Time]       |</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **1. Offset Date-Time**: If all the optional values are used, `Datetime`</span>
+<span class="doccomment">/// corresponds to an [Offset Date-Time]. From the TOML v1.0.0 spec:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// &gt; To unambiguously represent a specific instant in time, you may use an</span>
+<span class="doccomment">/// &gt; RFC 3339 formatted date-time with offset.</span>
+<span class="doccomment">/// &gt;</span>
+<span class="doccomment">/// &gt; ```toml</span>
+<span class="doccomment">/// &gt; odt1 = 1979-05-27T07:32:00Z</span>
+<span class="doccomment">/// &gt; odt2 = 1979-05-27T00:32:00-07:00</span>
+<span class="doccomment">/// &gt; odt3 = 1979-05-27T00:32:00.999999-07:00</span>
+<span class="doccomment">/// &gt; ```</span>
+<span class="doccomment">/// &gt;</span>
+<span class="doccomment">/// &gt; For the sake of readability, you may replace the T delimiter between date</span>
+<span class="doccomment">/// &gt; and time with a space character (as permitted by RFC 3339 section 5.6).</span>
+<span class="doccomment">/// &gt;</span>
+<span class="doccomment">/// &gt; ```toml</span>
+<span class="doccomment">/// &gt; odt4 = 1979-05-27 07:32:00Z</span>
+<span class="doccomment">/// &gt; ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **2. Local Date-Time**: If `date` and `time` are given but `offset` is</span>
+<span class="doccomment">/// `None`, `Datetime` corresponds to a [Local Date-Time]. From the spec:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// &gt; If you omit the offset from an RFC 3339 formatted date-time, it will</span>
+<span class="doccomment">/// &gt; represent the given date-time without any relation to an offset or</span>
+<span class="doccomment">/// &gt; timezone. It cannot be converted to an instant in time without additional</span>
+<span class="doccomment">/// &gt; information. Conversion to an instant, if required, is implementation-</span>
+<span class="doccomment">/// &gt; specific.</span>
+<span class="doccomment">/// &gt;</span>
+<span class="doccomment">/// &gt; ```toml</span>
+<span class="doccomment">/// &gt; ldt1 = 1979-05-27T07:32:00</span>
+<span class="doccomment">/// &gt; ldt2 = 1979-05-27T00:32:00.999999</span>
+<span class="doccomment">/// &gt; ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **3. Local Date**: If only `date` is given, `Datetime` corresponds to a</span>
+<span class="doccomment">/// [Local Date]; see the docs for [`Date`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **4. Local Time**: If only `time` is given, `Datetime` corresponds to a</span>
+<span class="doccomment">/// [Local Time]; see the docs for [`Time`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [TOML v1.0.0 spec]: https://toml.io/en/v1.0.0</span>
+<span class="doccomment">/// [Offset Date-Time]: https://toml.io/en/v1.0.0#offset-date-time</span>
+<span class="doccomment">/// [Local Date-Time]: https://toml.io/en/v1.0.0#local-date-time</span>
+<span class="doccomment">/// [Local Date]: https://toml.io/en/v1.0.0#local-date</span>
+<span class="doccomment">/// [Local Time]: https://toml.io/en/v1.0.0#local-time</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Datetime</span> {
-    <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span>,
-    <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span>,
-    <span class="ident">offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Offset</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Optional date.</span>
+    <span class="doccomment">/// Required for: *Offset Date-Time*, *Local Date-Time*, *Local Date*.</span>
+    <span class="kw">pub</span> <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Optional time.</span>
+    <span class="doccomment">/// Required for: *Offset Date-Time*, *Local Date-Time*, *Local Time*.</span>
+    <span class="kw">pub</span> <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Optional offset.</span>
+    <span class="doccomment">/// Required for: *Offset Date-Time*.</span>
+    <span class="kw">pub</span> <span class="ident">offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Offset</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Error returned from parsing a `Datetime` in the `FromStr` implementation.</span>
@@ -465,7 +647,7 @@
 }
 
 <span class="comment">// Currently serde itself doesn&#39;t have a datetime type, so we map our `Datetime`</span>
-<span class="comment">// to a special valid in the serde data model. Namely one with thiese special</span>
+<span class="comment">// to a special valid in the serde data model. Namely one with these special</span>
 <span class="comment">// fields/struct names.</span>
 <span class="comment">//</span>
 <span class="comment">// In general the TOML encoder/decoder will catch this and not literally emit</span>
@@ -473,25 +655,81 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FIELD</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;$__toml_private_datetime&quot;</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;$__toml_private_Datetime&quot;</span>;
 
+<span class="doccomment">/// A parsed TOML date value</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// May be part of a [`Datetime`]. Alone, `Date` corresponds to a [Local Date].</span>
+<span class="doccomment">/// From the TOML v1.0.0 spec:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// &gt; If you include only the date portion of an RFC 3339 formatted date-time,</span>
+<span class="doccomment">/// &gt; it will represent that entire day without any relation to an offset or</span>
+<span class="doccomment">/// &gt; timezone.</span>
+<span class="doccomment">/// &gt;</span>
+<span class="doccomment">/// &gt; ```toml</span>
+<span class="doccomment">/// &gt; ld1 = 1979-05-27</span>
+<span class="doccomment">/// &gt; ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Local Date]: https://toml.io/en/v1.0.0#local-date</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Date</span> {
-    <span class="ident">year</span>: <span class="ident">u16</span>,
-    <span class="ident">month</span>: <span class="ident">u8</span>,
-    <span class="ident">day</span>: <span class="ident">u8</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Date</span> {
+    <span class="doccomment">/// Year: four digits</span>
+    <span class="kw">pub</span> <span class="ident">year</span>: <span class="ident">u16</span>,
+    <span class="doccomment">/// Month: 1 to 12</span>
+    <span class="kw">pub</span> <span class="ident">month</span>: <span class="ident">u8</span>,
+    <span class="doccomment">/// Day: 1 to {28, 29, 30, 31} (based on month/year)</span>
+    <span class="kw">pub</span> <span class="ident">day</span>: <span class="ident">u8</span>,
 }
 
+<span class="doccomment">/// A parsed TOML time value</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// May be part of a [`Datetime`]. Alone, `Time` corresponds to a [Local Time].</span>
+<span class="doccomment">/// From the TOML v1.0.0 spec:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// &gt; If you include only the time portion of an RFC 3339 formatted date-time,</span>
+<span class="doccomment">/// &gt; it will represent that time of day without any relation to a specific</span>
+<span class="doccomment">/// &gt; day or any offset or timezone.</span>
+<span class="doccomment">/// &gt;</span>
+<span class="doccomment">/// &gt; ```toml</span>
+<span class="doccomment">/// &gt; lt1 = 07:32:00</span>
+<span class="doccomment">/// &gt; lt2 = 00:32:00.999999</span>
+<span class="doccomment">/// &gt; ```</span>
+<span class="doccomment">/// &gt;</span>
+<span class="doccomment">/// &gt; Millisecond precision is required. Further precision of fractional</span>
+<span class="doccomment">/// &gt; seconds is implementation-specific. If the value contains greater</span>
+<span class="doccomment">/// &gt; precision than the implementation can support, the additional precision</span>
+<span class="doccomment">/// &gt; must be truncated, not rounded.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Local Time]: https://toml.io/en/v1.0.0#local-time</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Time</span> {
-    <span class="ident">hour</span>: <span class="ident">u8</span>,
-    <span class="ident">minute</span>: <span class="ident">u8</span>,
-    <span class="ident">second</span>: <span class="ident">u8</span>,
-    <span class="ident">nanosecond</span>: <span class="ident">u32</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Time</span> {
+    <span class="doccomment">/// Hour: 0 to 23</span>
+    <span class="kw">pub</span> <span class="ident">hour</span>: <span class="ident">u8</span>,
+    <span class="doccomment">/// Minute: 0 to 59</span>
+    <span class="kw">pub</span> <span class="ident">minute</span>: <span class="ident">u8</span>,
+    <span class="doccomment">/// Second: 0 to {58, 59, 60} (based on leap second rules)</span>
+    <span class="kw">pub</span> <span class="ident">second</span>: <span class="ident">u8</span>,
+    <span class="doccomment">/// Nanosecond: 0 to 999_999_999</span>
+    <span class="kw">pub</span> <span class="ident">nanosecond</span>: <span class="ident">u32</span>,
 }
 
+<span class="doccomment">/// A parsed TOML time offset</span>
+<span class="doccomment">///</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Offset</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Offset</span> {
+    <span class="doccomment">/// &gt; A suffix which, when applied to a time, denotes a UTC offset of 00:00;</span>
+    <span class="doccomment">/// &gt; often spoken &quot;Zulu&quot; from the ICAO phonetic alphabet representation of</span>
+    <span class="doccomment">/// &gt; the letter &quot;Z&quot;. --- [RFC 3339 section 2]</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [RFC 3339 section 2]: https://datatracker.ietf.org/doc/html/rfc3339#section-2</span>
     <span class="ident">Z</span>,
-    <span class="ident">Custom</span> { <span class="ident">hours</span>: <span class="ident">i8</span>, <span class="ident">minutes</span>: <span class="ident">u8</span> },
+
+    <span class="doccomment">/// Offset between local time and UTC</span>
+    <span class="ident">Custom</span> {
+        <span class="doccomment">/// Hours: -12 to +12</span>
+        <span class="ident">hours</span>: <span class="ident">i8</span>,
+
+        <span class="doccomment">/// Minutes: 0 to 59</span>
+        <span class="ident">minutes</span>: <span class="ident">u8</span>,
+    },
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Datetime</span> {

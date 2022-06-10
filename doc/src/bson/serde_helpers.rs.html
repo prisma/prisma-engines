@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.1.0/src/serde_helpers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde_helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.3.0/src/serde_helpers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde_helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -602,6 +602,56 @@
 <span id="597">597</span>
 <span id="598">598</span>
 <span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Collection of helper functions for serializing to and deserializing from BSON using Serde</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">result::Result</span>};
@@ -630,6 +680,12 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rfc3339_string_as_bson_datetime</span>::{
     <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_rfc3339_string_from_bson_datetime</span>,
     <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_rfc3339_string_as_bson_datetime</span>,
+};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time_0_3_offsetdatetime_as_bson_datetime</span>::{
+    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_time_0_3_offsetdatetime_from_bson_datetime</span>,
+    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_time_0_3_offsetdatetime_as_bson_datetime</span>,
 };
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">timestamp_as_u32</span>::{
@@ -789,6 +845,49 @@
     }
 }
 
+<span class="doccomment">/// Contains functions to serialize a [`time::OffsetDateTime`] as a [`crate::DateTime`] and</span>
+<span class="doccomment">/// deserialize a [`time::OffsetDateTime`] from a [`crate::DateTime`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// # #[cfg(feature = &quot;time-0_3&quot;)]</span>
+<span class="doccomment">/// # {</span>
+<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
+<span class="doccomment">/// # use bson::serde_helpers::time_0_3_offsetdatetime_as_bson_datetime;</span>
+<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
+<span class="doccomment">/// struct Event {</span>
+<span class="doccomment">///     #[serde(with = &quot;time_0_3_offsetdatetime_as_bson_datetime&quot;)]</span>
+<span class="doccomment">///     pub date: time::OffsetDateTime,</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)))]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">time_0_3_offsetdatetime_as_bson_datetime</span> {
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DateTime</span>;
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
+    <span class="kw">use</span> <span class="ident">std::result::Result</span>;
+
+    <span class="doccomment">/// Deserializes a [`time::OffsetDateTime`] from a [`crate::DateTime`].</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">time::OffsetDateTime</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">let</span> <span class="ident">datetime</span> <span class="op">=</span> <span class="ident">DateTime::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">datetime</span>.<span class="ident">to_time_0_3</span>())
+    }
+
+    <span class="doccomment">/// Serializes a [`time::OffsetDateTime`] as a [`crate::DateTime`].</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
+        <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">time::OffsetDateTime</span>,
+        <span class="ident">serializer</span>: <span class="ident">S</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">datetime</span> <span class="op">=</span> <span class="ident">DateTime::from_time_0_3</span>(<span class="ident">val</span>.<span class="ident">to_owned</span>());
+        <span class="ident">datetime</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+    }
+}
+
 <span class="doccomment">/// Contains functions to serialize a [`chrono::DateTime`] as a [`crate::DateTime`] and deserialize</span>
 <span class="doccomment">/// a [`chrono::DateTime`] from a [`crate::DateTime`].</span>
 <span class="doccomment">///</span>
@@ -847,7 +946,7 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rfc3339_string_as_bson_datetime</span> {
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Bson</span>, <span class="ident">DateTime</span>};
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">ser</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de</span>, <span class="ident">ser</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
     <span class="kw">use</span> <span class="ident">std::result::Result</span>;
 
     <span class="doccomment">/// Deserializes an ISO string from a DateTime.</span>
@@ -856,16 +955,15 @@
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">DateTime::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">date</span>.<span class="ident">to_rfc3339_string</span>())
+        <span class="ident">date</span>.<span class="ident">try_to_rfc3339_string</span>()
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">de::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot format {} as RFC 3339: {}&quot;</span>, <span class="ident">date</span>, <span class="ident">e</span>)))
     }
 
     <span class="doccomment">/// Serializes an ISO string as a DateTime.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span>
-            <span class="ident">chrono::DateTime</span>::<span class="op">&lt;</span><span class="ident">chrono::FixedOffset</span><span class="op">&gt;</span><span class="ident">::parse_from_rfc3339</span>(<span class="ident">val</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="ident">ser::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot convert {} to chrono::DateTime&quot;</span>, <span class="ident">val</span>))
-            })<span class="question-mark">?</span>;
-        <span class="ident">Bson::DateTime</span>(<span class="ident"><span class="kw">crate</span>::DateTime::from_chrono</span>(<span class="ident">date</span>)).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::DateTime::parse_rfc3339_str</span>(<span class="ident">val</span>)
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ser::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot convert {} to DateTime&quot;</span>, <span class="ident">val</span>)))<span class="question-mark">?</span>;
+        <span class="ident">Bson::DateTime</span>(<span class="ident">date</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
 
@@ -883,7 +981,7 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bson_datetime_as_rfc3339_string</span> {
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DateTime</span>;
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de</span>, <span class="ident">ser</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
     <span class="kw">use</span> <span class="ident">std::result::Result</span>;
 
     <span class="doccomment">/// Deserializes a [`crate::DateTime`] from an RFC 3339 formatted string.</span>
@@ -892,16 +990,18 @@
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">iso</span> <span class="op">=</span> <span class="ident">String::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span>
-            <span class="ident">chrono::DateTime</span>::<span class="op">&lt;</span><span class="ident">chrono::FixedOffset</span><span class="op">&gt;</span><span class="ident">::parse_from_rfc3339</span>(<span class="kw-2">&amp;</span><span class="ident">iso</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="ident">de::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot parse RFC 3339 datetime from \&quot;{}\&quot;&quot;</span>, <span class="ident">iso</span>))
-            })<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">DateTime::from_chrono</span>(<span class="ident">date</span>))
+        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::DateTime::parse_rfc3339_str</span>(<span class="kw-2">&amp;</span><span class="ident">iso</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
+            <span class="ident">de::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot parse RFC 3339 datetime from \&quot;{}\&quot;&quot;</span>, <span class="ident">iso</span>))
+        })<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">date</span>)
     }
 
     <span class="doccomment">/// Serializes a [`crate::DateTime`] as an RFC 3339 (ISO 8601) formatted string.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">DateTime</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>.<span class="ident">to_rfc3339_string</span>())
+        <span class="kw">let</span> <span class="ident">formatted</span> <span class="op">=</span> <span class="ident">val</span>
+            .<span class="ident">try_to_rfc3339_string</span>()
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">ser::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot format {} as RFC 3339: {}&quot;</span>, <span class="ident">val</span>, <span class="ident">e</span>)))<span class="question-mark">?</span>;
+        <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="kw-2">&amp;</span><span class="ident">formatted</span>)
     }
 }
 

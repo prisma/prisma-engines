@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.24.0/src/elf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>elf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.28.4/src/elf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>elf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -6059,6 +6059,342 @@
 <span id="6054">6054</span>
 <span id="6055">6055</span>
 <span id="6056">6056</span>
+<span id="6057">6057</span>
+<span id="6058">6058</span>
+<span id="6059">6059</span>
+<span id="6060">6060</span>
+<span id="6061">6061</span>
+<span id="6062">6062</span>
+<span id="6063">6063</span>
+<span id="6064">6064</span>
+<span id="6065">6065</span>
+<span id="6066">6066</span>
+<span id="6067">6067</span>
+<span id="6068">6068</span>
+<span id="6069">6069</span>
+<span id="6070">6070</span>
+<span id="6071">6071</span>
+<span id="6072">6072</span>
+<span id="6073">6073</span>
+<span id="6074">6074</span>
+<span id="6075">6075</span>
+<span id="6076">6076</span>
+<span id="6077">6077</span>
+<span id="6078">6078</span>
+<span id="6079">6079</span>
+<span id="6080">6080</span>
+<span id="6081">6081</span>
+<span id="6082">6082</span>
+<span id="6083">6083</span>
+<span id="6084">6084</span>
+<span id="6085">6085</span>
+<span id="6086">6086</span>
+<span id="6087">6087</span>
+<span id="6088">6088</span>
+<span id="6089">6089</span>
+<span id="6090">6090</span>
+<span id="6091">6091</span>
+<span id="6092">6092</span>
+<span id="6093">6093</span>
+<span id="6094">6094</span>
+<span id="6095">6095</span>
+<span id="6096">6096</span>
+<span id="6097">6097</span>
+<span id="6098">6098</span>
+<span id="6099">6099</span>
+<span id="6100">6100</span>
+<span id="6101">6101</span>
+<span id="6102">6102</span>
+<span id="6103">6103</span>
+<span id="6104">6104</span>
+<span id="6105">6105</span>
+<span id="6106">6106</span>
+<span id="6107">6107</span>
+<span id="6108">6108</span>
+<span id="6109">6109</span>
+<span id="6110">6110</span>
+<span id="6111">6111</span>
+<span id="6112">6112</span>
+<span id="6113">6113</span>
+<span id="6114">6114</span>
+<span id="6115">6115</span>
+<span id="6116">6116</span>
+<span id="6117">6117</span>
+<span id="6118">6118</span>
+<span id="6119">6119</span>
+<span id="6120">6120</span>
+<span id="6121">6121</span>
+<span id="6122">6122</span>
+<span id="6123">6123</span>
+<span id="6124">6124</span>
+<span id="6125">6125</span>
+<span id="6126">6126</span>
+<span id="6127">6127</span>
+<span id="6128">6128</span>
+<span id="6129">6129</span>
+<span id="6130">6130</span>
+<span id="6131">6131</span>
+<span id="6132">6132</span>
+<span id="6133">6133</span>
+<span id="6134">6134</span>
+<span id="6135">6135</span>
+<span id="6136">6136</span>
+<span id="6137">6137</span>
+<span id="6138">6138</span>
+<span id="6139">6139</span>
+<span id="6140">6140</span>
+<span id="6141">6141</span>
+<span id="6142">6142</span>
+<span id="6143">6143</span>
+<span id="6144">6144</span>
+<span id="6145">6145</span>
+<span id="6146">6146</span>
+<span id="6147">6147</span>
+<span id="6148">6148</span>
+<span id="6149">6149</span>
+<span id="6150">6150</span>
+<span id="6151">6151</span>
+<span id="6152">6152</span>
+<span id="6153">6153</span>
+<span id="6154">6154</span>
+<span id="6155">6155</span>
+<span id="6156">6156</span>
+<span id="6157">6157</span>
+<span id="6158">6158</span>
+<span id="6159">6159</span>
+<span id="6160">6160</span>
+<span id="6161">6161</span>
+<span id="6162">6162</span>
+<span id="6163">6163</span>
+<span id="6164">6164</span>
+<span id="6165">6165</span>
+<span id="6166">6166</span>
+<span id="6167">6167</span>
+<span id="6168">6168</span>
+<span id="6169">6169</span>
+<span id="6170">6170</span>
+<span id="6171">6171</span>
+<span id="6172">6172</span>
+<span id="6173">6173</span>
+<span id="6174">6174</span>
+<span id="6175">6175</span>
+<span id="6176">6176</span>
+<span id="6177">6177</span>
+<span id="6178">6178</span>
+<span id="6179">6179</span>
+<span id="6180">6180</span>
+<span id="6181">6181</span>
+<span id="6182">6182</span>
+<span id="6183">6183</span>
+<span id="6184">6184</span>
+<span id="6185">6185</span>
+<span id="6186">6186</span>
+<span id="6187">6187</span>
+<span id="6188">6188</span>
+<span id="6189">6189</span>
+<span id="6190">6190</span>
+<span id="6191">6191</span>
+<span id="6192">6192</span>
+<span id="6193">6193</span>
+<span id="6194">6194</span>
+<span id="6195">6195</span>
+<span id="6196">6196</span>
+<span id="6197">6197</span>
+<span id="6198">6198</span>
+<span id="6199">6199</span>
+<span id="6200">6200</span>
+<span id="6201">6201</span>
+<span id="6202">6202</span>
+<span id="6203">6203</span>
+<span id="6204">6204</span>
+<span id="6205">6205</span>
+<span id="6206">6206</span>
+<span id="6207">6207</span>
+<span id="6208">6208</span>
+<span id="6209">6209</span>
+<span id="6210">6210</span>
+<span id="6211">6211</span>
+<span id="6212">6212</span>
+<span id="6213">6213</span>
+<span id="6214">6214</span>
+<span id="6215">6215</span>
+<span id="6216">6216</span>
+<span id="6217">6217</span>
+<span id="6218">6218</span>
+<span id="6219">6219</span>
+<span id="6220">6220</span>
+<span id="6221">6221</span>
+<span id="6222">6222</span>
+<span id="6223">6223</span>
+<span id="6224">6224</span>
+<span id="6225">6225</span>
+<span id="6226">6226</span>
+<span id="6227">6227</span>
+<span id="6228">6228</span>
+<span id="6229">6229</span>
+<span id="6230">6230</span>
+<span id="6231">6231</span>
+<span id="6232">6232</span>
+<span id="6233">6233</span>
+<span id="6234">6234</span>
+<span id="6235">6235</span>
+<span id="6236">6236</span>
+<span id="6237">6237</span>
+<span id="6238">6238</span>
+<span id="6239">6239</span>
+<span id="6240">6240</span>
+<span id="6241">6241</span>
+<span id="6242">6242</span>
+<span id="6243">6243</span>
+<span id="6244">6244</span>
+<span id="6245">6245</span>
+<span id="6246">6246</span>
+<span id="6247">6247</span>
+<span id="6248">6248</span>
+<span id="6249">6249</span>
+<span id="6250">6250</span>
+<span id="6251">6251</span>
+<span id="6252">6252</span>
+<span id="6253">6253</span>
+<span id="6254">6254</span>
+<span id="6255">6255</span>
+<span id="6256">6256</span>
+<span id="6257">6257</span>
+<span id="6258">6258</span>
+<span id="6259">6259</span>
+<span id="6260">6260</span>
+<span id="6261">6261</span>
+<span id="6262">6262</span>
+<span id="6263">6263</span>
+<span id="6264">6264</span>
+<span id="6265">6265</span>
+<span id="6266">6266</span>
+<span id="6267">6267</span>
+<span id="6268">6268</span>
+<span id="6269">6269</span>
+<span id="6270">6270</span>
+<span id="6271">6271</span>
+<span id="6272">6272</span>
+<span id="6273">6273</span>
+<span id="6274">6274</span>
+<span id="6275">6275</span>
+<span id="6276">6276</span>
+<span id="6277">6277</span>
+<span id="6278">6278</span>
+<span id="6279">6279</span>
+<span id="6280">6280</span>
+<span id="6281">6281</span>
+<span id="6282">6282</span>
+<span id="6283">6283</span>
+<span id="6284">6284</span>
+<span id="6285">6285</span>
+<span id="6286">6286</span>
+<span id="6287">6287</span>
+<span id="6288">6288</span>
+<span id="6289">6289</span>
+<span id="6290">6290</span>
+<span id="6291">6291</span>
+<span id="6292">6292</span>
+<span id="6293">6293</span>
+<span id="6294">6294</span>
+<span id="6295">6295</span>
+<span id="6296">6296</span>
+<span id="6297">6297</span>
+<span id="6298">6298</span>
+<span id="6299">6299</span>
+<span id="6300">6300</span>
+<span id="6301">6301</span>
+<span id="6302">6302</span>
+<span id="6303">6303</span>
+<span id="6304">6304</span>
+<span id="6305">6305</span>
+<span id="6306">6306</span>
+<span id="6307">6307</span>
+<span id="6308">6308</span>
+<span id="6309">6309</span>
+<span id="6310">6310</span>
+<span id="6311">6311</span>
+<span id="6312">6312</span>
+<span id="6313">6313</span>
+<span id="6314">6314</span>
+<span id="6315">6315</span>
+<span id="6316">6316</span>
+<span id="6317">6317</span>
+<span id="6318">6318</span>
+<span id="6319">6319</span>
+<span id="6320">6320</span>
+<span id="6321">6321</span>
+<span id="6322">6322</span>
+<span id="6323">6323</span>
+<span id="6324">6324</span>
+<span id="6325">6325</span>
+<span id="6326">6326</span>
+<span id="6327">6327</span>
+<span id="6328">6328</span>
+<span id="6329">6329</span>
+<span id="6330">6330</span>
+<span id="6331">6331</span>
+<span id="6332">6332</span>
+<span id="6333">6333</span>
+<span id="6334">6334</span>
+<span id="6335">6335</span>
+<span id="6336">6336</span>
+<span id="6337">6337</span>
+<span id="6338">6338</span>
+<span id="6339">6339</span>
+<span id="6340">6340</span>
+<span id="6341">6341</span>
+<span id="6342">6342</span>
+<span id="6343">6343</span>
+<span id="6344">6344</span>
+<span id="6345">6345</span>
+<span id="6346">6346</span>
+<span id="6347">6347</span>
+<span id="6348">6348</span>
+<span id="6349">6349</span>
+<span id="6350">6350</span>
+<span id="6351">6351</span>
+<span id="6352">6352</span>
+<span id="6353">6353</span>
+<span id="6354">6354</span>
+<span id="6355">6355</span>
+<span id="6356">6356</span>
+<span id="6357">6357</span>
+<span id="6358">6358</span>
+<span id="6359">6359</span>
+<span id="6360">6360</span>
+<span id="6361">6361</span>
+<span id="6362">6362</span>
+<span id="6363">6363</span>
+<span id="6364">6364</span>
+<span id="6365">6365</span>
+<span id="6366">6366</span>
+<span id="6367">6367</span>
+<span id="6368">6368</span>
+<span id="6369">6369</span>
+<span id="6370">6370</span>
+<span id="6371">6371</span>
+<span id="6372">6372</span>
+<span id="6373">6373</span>
+<span id="6374">6374</span>
+<span id="6375">6375</span>
+<span id="6376">6376</span>
+<span id="6377">6377</span>
+<span id="6378">6378</span>
+<span id="6379">6379</span>
+<span id="6380">6380</span>
+<span id="6381">6381</span>
+<span id="6382">6382</span>
+<span id="6383">6383</span>
+<span id="6384">6384</span>
+<span id="6385">6385</span>
+<span id="6386">6386</span>
+<span id="6387">6387</span>
+<span id="6388">6388</span>
+<span id="6389">6389</span>
+<span id="6390">6390</span>
+<span id="6391">6391</span>
+<span id="6392">6392</span>
 </pre><pre class="rust"><code><span class="doccomment">//! ELF definitions.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! These definitions are independent of read/write support, although we do implement</span>
@@ -6623,6 +6959,8 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EM_BPF</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">247</span>;
 <span class="doccomment">/// C-SKY</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EM_CSKY</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">252</span>;
+<span class="doccomment">/// Loongson LoongArch</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EM_LOONGARCH</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">258</span>;
 <span class="doccomment">/// Digital Alpha</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EM_ALPHA</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">0x9026</span>;
 
@@ -6756,6 +7094,33 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_SYMTAB_SHNDX</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">18</span>;
 <span class="doccomment">/// Start of OS-specific section types.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_LOOS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6000_0000</span>;
+<span class="doccomment">/// Object attributes.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_GNU_ATTRIBUTES</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_fff5</span>;
+<span class="doccomment">/// GNU-style hash table.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_GNU_HASH</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_fff6</span>;
+<span class="doccomment">/// Prelink library list</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_GNU_LIBLIST</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_fff7</span>;
+<span class="doccomment">/// Checksum for DSO content.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_CHECKSUM</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_fff8</span>;
+<span class="doccomment">/// Sun-specific low bound.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_LOSUNW</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_fffa</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>, <span class="ident">non_upper_case_globals</span>)]</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_SUNW_move</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_fffa</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_SUNW_COMDAT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_fffb</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>, <span class="ident">non_upper_case_globals</span>)]</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_SUNW_syminfo</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_fffc</span>;
+<span class="doccomment">/// Version definition section.</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_upper_case_globals</span>)]</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_GNU_VERDEF</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_fffd</span>;
+<span class="doccomment">/// Version needs section.</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_upper_case_globals</span>)]</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_GNU_VERNEED</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_fffe</span>;
+<span class="doccomment">/// Version symbol table.</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_upper_case_globals</span>)]</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_GNU_VERSYM</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_ffff</span>;
+<span class="doccomment">/// Sun-specific high bound.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_HISUNW</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_ffff</span>;
 <span class="doccomment">/// End of OS-specific section types.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHT_HIOS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6fff_ffff</span>;
 <span class="doccomment">/// Start of processor-specific section types.</span>
@@ -6796,6 +7161,8 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHF_MASKOS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x0ff0_0000</span>;
 <span class="doccomment">/// Processor-specific section flags.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHF_MASKPROC</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0xf000_0000</span>;
+<span class="doccomment">/// This section is excluded from the final executable or shared library.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHF_EXCLUDE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_0000</span>;
 
 <span class="doccomment">/// Section compression header.</span>
 <span class="doccomment">///</span>
@@ -6849,7 +7216,7 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GRP_COMDAT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span>;
 
 <span class="doccomment">/// Symbol table entry.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Sym32</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endian</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Symbol name.</span>
@@ -6899,7 +7266,7 @@
 }
 
 <span class="doccomment">/// Symbol table entry.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Sym64</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endian</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Symbol name.</span>
@@ -7210,13 +7577,21 @@
     }
 
     <span class="doccomment">/// Calculate the `r_info` field given the `r_sym` and `r_type` components.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">r_info</span>(<span class="ident">endian</span>: <span class="ident">E</span>, <span class="ident">r_sym</span>: <span class="ident">u32</span>, <span class="ident">r_type</span>: <span class="ident">u32</span>) -&gt; <span class="ident">U64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-        <span class="ident">U64::new</span>(<span class="ident">endian</span>, (<span class="ident">u64::from</span>(<span class="ident">r_sym</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> <span class="ident">u64::from</span>(<span class="ident">r_type</span>))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">r_info</span>(<span class="ident">endian</span>: <span class="ident">E</span>, <span class="ident">is_mips64el</span>: <span class="ident">bool</span>, <span class="ident">r_sym</span>: <span class="ident">u32</span>, <span class="ident">r_type</span>: <span class="ident">u32</span>) -&gt; <span class="ident">U64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span> <span class="op">=</span> (<span class="ident">u64::from</span>(<span class="ident">r_sym</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> <span class="ident">u64::from</span>(<span class="ident">r_type</span>);
+        <span class="kw">if</span> <span class="ident">is_mips64el</span> {
+            <span class="ident">t</span> <span class="op">=</span> (<span class="ident">t</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>)
+                <span class="op">|</span> ((<span class="ident">t</span> <span class="op">&amp;</span> <span class="number">0xff000000</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>)
+                <span class="op">|</span> ((<span class="ident">t</span> <span class="op">&amp;</span> <span class="number">0x00ff0000</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>)
+                <span class="op">|</span> ((<span class="ident">t</span> <span class="op">&amp;</span> <span class="number">0x0000ff00</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">40</span>)
+                <span class="op">|</span> ((<span class="ident">t</span> <span class="op">&amp;</span> <span class="number">0x000000ff</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">56</span>);
+        }
+        <span class="ident">U64::new</span>(<span class="ident">endian</span>, <span class="ident">t</span>)
     }
 
     <span class="doccomment">/// Set the `r_info` field given the `r_sym` and `r_type` components.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_r_info</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">endian</span>: <span class="ident">E</span>, <span class="ident">r_sym</span>: <span class="ident">u32</span>, <span class="ident">r_type</span>: <span class="ident">u32</span>) {
-        <span class="self">self</span>.<span class="ident">r_info</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::r_info</span>(<span class="ident">endian</span>, <span class="ident">r_sym</span>, <span class="ident">r_type</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_r_info</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">endian</span>: <span class="ident">E</span>, <span class="ident">is_mips64el</span>: <span class="ident">bool</span>, <span class="ident">r_sym</span>: <span class="ident">u32</span>, <span class="ident">r_type</span>: <span class="ident">u32</span>) {
+        <span class="self">self</span>.<span class="ident">r_info</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::r_info</span>(<span class="ident">endian</span>, <span class="ident">is_mips64el</span>, <span class="ident">r_sym</span>, <span class="ident">r_type</span>);
     }
 }
 
@@ -7713,10 +8088,103 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DF_1_PIE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x0800_0000</span>;
 
-<span class="comment">// TODO: ELF*_Verdef, VER_DEF_*, VER_FLG_*, VER_NDX_*</span>
-<span class="comment">// TODO: Elf*_Verdaux</span>
-<span class="comment">// TODO: Elf*_Verneed, VER_NEED_*</span>
-<span class="comment">// TODO: Elf*_Vernaux, VER_FLG_*</span>
+<span class="doccomment">/// Version symbol information</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Versym</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endian</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">U16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>);
+
+<span class="doccomment">/// Symbol is hidden.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VERSYM_HIDDEN</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">0x8000</span>;
+<span class="doccomment">/// Symbol version index.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VERSYM_VERSION</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">0x7fff</span>;
+
+<span class="doccomment">/// Version definition sections</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Verdef</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endian</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Version revision</span>
+    <span class="kw">pub</span> <span class="ident">vd_version</span>: <span class="ident">U16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Version information</span>
+    <span class="kw">pub</span> <span class="ident">vd_flags</span>: <span class="ident">U16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Version Index</span>
+    <span class="kw">pub</span> <span class="ident">vd_ndx</span>: <span class="ident">U16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Number of associated aux entries</span>
+    <span class="kw">pub</span> <span class="ident">vd_cnt</span>: <span class="ident">U16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Version name hash value</span>
+    <span class="kw">pub</span> <span class="ident">vd_hash</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Offset in bytes to verdaux array</span>
+    <span class="kw">pub</span> <span class="ident">vd_aux</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Offset in bytes to next verdef entry</span>
+    <span class="kw">pub</span> <span class="ident">vd_next</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+}
+
+<span class="comment">// Legal values for vd_version (version revision).</span>
+<span class="doccomment">/// No version</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VER_DEF_NONE</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="doccomment">/// Current version</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VER_DEF_CURRENT</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span>;
+
+<span class="comment">// Legal values for vd_flags (version information flags).</span>
+<span class="doccomment">/// Version definition of file itself</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VER_FLG_BASE</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">0x1</span>;
+<span class="comment">// Legal values for vd_flags and vna_flags (version information flags).</span>
+<span class="doccomment">/// Weak version identifier</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VER_FLG_WEAK</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">0x2</span>;
+
+<span class="comment">// Versym symbol index values.</span>
+<span class="doccomment">/// Symbol is local.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VER_NDX_LOCAL</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="doccomment">/// Symbol is global.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VER_NDX_GLOBAL</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span>;
+
+<span class="doccomment">/// Auxiliary version information.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Verdaux</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endian</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Version or dependency names</span>
+    <span class="kw">pub</span> <span class="ident">vda_name</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Offset in bytes to next verdaux</span>
+    <span class="kw">pub</span> <span class="ident">vda_next</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+}
+
+<span class="doccomment">/// Version dependency.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Verneed</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endian</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Version of structure</span>
+    <span class="kw">pub</span> <span class="ident">vn_version</span>: <span class="ident">U16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Number of associated aux entries</span>
+    <span class="kw">pub</span> <span class="ident">vn_cnt</span>: <span class="ident">U16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Offset of filename for this dependency</span>
+    <span class="kw">pub</span> <span class="ident">vn_file</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Offset in bytes to vernaux array</span>
+    <span class="kw">pub</span> <span class="ident">vn_aux</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Offset in bytes to next verneed entry</span>
+    <span class="kw">pub</span> <span class="ident">vn_next</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+}
+
+<span class="comment">// Legal values for vn_version (version revision).</span>
+<span class="doccomment">/// No version</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VER_NEED_NONE</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="doccomment">/// Current version</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VER_NEED_CURRENT</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span>;
+
+<span class="doccomment">/// Auxiliary needed version information.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Vernaux</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endian</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Hash value of dependency name</span>
+    <span class="kw">pub</span> <span class="ident">vna_hash</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Dependency specific information</span>
+    <span class="kw">pub</span> <span class="ident">vna_flags</span>: <span class="ident">U16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Version Index</span>
+    <span class="kw">pub</span> <span class="ident">vna_other</span>: <span class="ident">U16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Dependency name string offset</span>
+    <span class="kw">pub</span> <span class="ident">vna_name</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Offset in bytes to next vernaux entry</span>
+    <span class="kw">pub</span> <span class="ident">vna_next</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+}
+
 <span class="comment">// TODO: Elf*_auxv_t, AT_*</span>
 
 <span class="doccomment">/// Note section entry header.</span>
@@ -7812,6 +8280,65 @@
 
 <span class="comment">// TODO: GNU_PROPERTY_*</span>
 <span class="comment">// TODO: Elf*_Move</span>
+
+<span class="doccomment">/// Header of `SHT_HASH` section.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HashHeader</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endian</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// The number of hash buckets.</span>
+    <span class="kw">pub</span> <span class="ident">bucket_count</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The number of chain values.</span>
+    <span class="kw">pub</span> <span class="ident">chain_count</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="comment">// Array of hash bucket start indices.</span>
+    <span class="comment">// buckets: U32&lt;E&gt;[bucket_count]</span>
+    <span class="comment">// Array of hash chain links. An index of 0 terminates the chain.</span>
+    <span class="comment">// chains: U32&lt;E&gt;[chain_count]</span>
+}
+
+<span class="doccomment">/// Calculate the SysV hash for a symbol name.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Used for `SHT_HASH`.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u32</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="number">0u32</span>;
+    <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">name</span> {
+        <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_mul</span>(<span class="number">16</span>).<span class="ident">wrapping_add</span>(<span class="ident">u32::from</span>(<span class="kw-2">*</span><span class="ident">byte</span>));
+        <span class="ident">hash</span> <span class="op">^</span><span class="op">=</span> (<span class="ident">hash</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">24</span>) <span class="op">&amp;</span> <span class="number">0xf0</span>;
+    }
+    <span class="ident">hash</span> <span class="op">&amp;</span> <span class="number">0xfff_ffff</span>
+}
+
+<span class="doccomment">/// Header of `SHT_GNU_HASH` section.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GnuHashHeader</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Endian</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// The number of hash buckets.</span>
+    <span class="kw">pub</span> <span class="ident">bucket_count</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The symbol table index of the first symbol in the hash.</span>
+    <span class="kw">pub</span> <span class="ident">symbol_base</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The number of words in the bloom filter.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Must be a non-zero power of 2.</span>
+    <span class="kw">pub</span> <span class="ident">bloom_count</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The bit shift count for the bloom filter.</span>
+    <span class="kw">pub</span> <span class="ident">bloom_shift</span>: <span class="ident">U32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="comment">// Array of bloom filter words.</span>
+    <span class="comment">// bloom_filters: U32&lt;E&gt;[bloom_count] or U64&lt;E&gt;[bloom_count]</span>
+    <span class="comment">// Array of hash bucket start indices.</span>
+    <span class="comment">// buckets: U32&lt;E&gt;[bucket_count]</span>
+    <span class="comment">// Array of hash values, one for each symbol starting at symbol_base.</span>
+    <span class="comment">// values: U32&lt;E&gt;[symbol_count]</span>
+}
+
+<span class="doccomment">/// Calculate the GNU hash for a symbol name.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Used for `SHT_GNU_HASH`.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gnu_hash</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u32</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="number">5381u32</span>;
+    <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">name</span> {
+        <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">wrapping_mul</span>(<span class="number">33</span>).<span class="ident">wrapping_add</span>(<span class="ident">u32::from</span>(<span class="kw-2">*</span><span class="ident">byte</span>));
+    }
+    <span class="ident">hash</span>
+}
 
 <span class="comment">// Motorola 68k specific definitions.</span>
 
@@ -8243,6 +8770,17 @@
 <span class="doccomment">/// MIPS architecture level.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_MIPS_ARCH</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0xf000_0000</span>;
 
+<span class="doccomment">/// The first MIPS 32 bit ABI</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_MIPS_ABI_O32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x0000_1000</span>;
+<span class="doccomment">/// O32 ABI extended for 64-bit architectures</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_MIPS_ABI_O64</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x0000_2000</span>;
+<span class="doccomment">/// EABI in 32-bit mode</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_MIPS_ABI_EABI32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x0000_3000</span>;
+<span class="doccomment">/// EABI in 64-bit mode</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_MIPS_ABI_EABI64</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x0000_4000</span>;
+<span class="doccomment">/// Mask for selecting EF_MIPS_ABI_ variant</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_MIPS_ABI</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x0000_f000</span>;
+
 <span class="comment">// Legal values for MIPS architecture level.</span>
 
 <span class="doccomment">/// -mips1 code.</span>
@@ -8263,6 +8801,10 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_MIPS_ARCH_32R2</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x7000_0000</span>;
 <span class="doccomment">/// MIPS64r2 code.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_MIPS_ARCH_64R2</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_0000</span>;
+<span class="doccomment">/// MIPS32r6 code</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_MIPS_ARCH_32R6</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x9000_0000</span>;
+<span class="doccomment">/// MIPS64r6 code</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_MIPS_ARCH_64R6</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0xa000_0000</span>;
 
 <span class="comment">// MIPS values for `Sym32::st_shndx`.</span>
 
@@ -8448,7 +8990,7 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OHW_R8KPFETCH</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x2</span>;
 <span class="doccomment">/// R5000 end-of-page patch.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OHW_R5KEOP</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x4</span>;
-<span class="doccomment">/// R5000 cvt.[ds].l bug.  clean=1.</span>
+<span class="doccomment">/// R5000 cvt.\[ds\].l bug.  clean=1.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OHW_R5KCVTL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8</span>;
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
@@ -12093,6 +12635,129 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_NDS32_TLS_DESC</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">119</span>;
 
+<span class="comment">// LoongArch values `FileHeader*::e_flags`.</span>
+<span class="doccomment">/// Uses 64-bit GPRs and the stack for parameter passing</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_LARCH_ABI_LP64S</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x1</span>;
+<span class="doccomment">/// Uses 64-bit GPRs, 32-bit FPRs and the stack for parameter passing</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_LARCH_ABI_LP64F</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x2</span>;
+<span class="doccomment">/// Uses 64-bit GPRs, 64-bit FPRs and the stack for parameter passing</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_LARCH_ABI_LP64D</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x3</span>;
+<span class="doccomment">/// Uses 32-bit GPRs and the stack for parameter passing</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_LARCH_ABI_ILP32S</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x5</span>;
+<span class="doccomment">/// Uses 32-bit GPRs, 32-bit FPRs and the stack for parameter passing</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_LARCH_ABI_ILP32F</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x6</span>;
+<span class="doccomment">/// Uses 32-bit GPRs, 64-bit FPRs and the stack for parameter passing</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EF_LARCH_ABI_ILP32D</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x7</span>;
+
+<span class="comment">// LoongArch values `Rel*::r_type`.</span>
+<span class="doccomment">/// No reloc</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_NONE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="doccomment">/// Runtime address resolving</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="doccomment">/// Runtime address resolving</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_64</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">2</span>;
+<span class="doccomment">/// Runtime fixup for load-address</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_RELATIVE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">3</span>;
+<span class="doccomment">/// Runtime memory copy in executable</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_COPY</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">4</span>;
+<span class="doccomment">/// Runtime PLT supporting</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_JUMP_SLOT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">5</span>;
+<span class="doccomment">/// Runtime relocation for TLS-GD</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_TLS_DTPMOD32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">6</span>;
+<span class="doccomment">/// Runtime relocation for TLS-GD</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_TLS_DTPMOD64</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">7</span>;
+<span class="doccomment">/// Runtime relocation for TLS-GD</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_TLS_DTPREL32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">8</span>;
+<span class="doccomment">/// Runtime relocation for TLS-GD</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_TLS_DTPREL64</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">9</span>;
+<span class="doccomment">/// Runtime relocation for TLE-IE</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_TLS_TPREL32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">10</span>;
+<span class="doccomment">/// Runtime relocation for TLE-IE</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_TLS_TPREL64</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">11</span>;
+<span class="doccomment">/// Runtime local indirect function resolving</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_IRELATIVE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">12</span>;
+<span class="doccomment">/// Mark la.abs: load absolute address for static link.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_MARK_LA</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">20</span>;
+<span class="doccomment">/// Mark external label branch: access PC relative address for static link.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_MARK_PCREL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">21</span>;
+<span class="doccomment">/// Push PC-relative offset</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_PUSH_PCREL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">22</span>;
+<span class="doccomment">/// Push constant or absolute address</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_PUSH_ABSOLUTE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">23</span>;
+<span class="doccomment">/// Duplicate stack top</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_PUSH_DUP</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">24</span>;
+<span class="doccomment">/// Push for access GOT entry</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_PUSH_GPREL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">25</span>;
+<span class="doccomment">/// Push for TLS-LE</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_PUSH_TLS_TPREL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">26</span>;
+<span class="doccomment">/// Push for TLS-IE</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_PUSH_TLS_GOT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">27</span>;
+<span class="doccomment">/// Push for TLS-GD</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_PUSH_TLS_GD</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">28</span>;
+<span class="doccomment">/// Push for external function calling</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_PUSH_PLT_PCREL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">29</span>;
+<span class="doccomment">/// Assert stack top</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_ASSERT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">30</span>;
+<span class="doccomment">/// Stack top logical not (unary)</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_NOT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">31</span>;
+<span class="doccomment">/// Stack top subtraction (binary)</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_SUB</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">32</span>;
+<span class="doccomment">/// Stack top left shift (binary)</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_SL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">33</span>;
+<span class="doccomment">/// Stack top right shift (binary)</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_SR</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">34</span>;
+<span class="doccomment">/// Stack top addition (binary)</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_ADD</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">35</span>;
+<span class="doccomment">/// Stack top bitwise and (binary)</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_AND</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">36</span>;
+<span class="doccomment">/// Stack top selection (tertiary)</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_IF_ELSE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">37</span>;
+<span class="doccomment">/// Pop stack top to fill 5-bit signed immediate operand</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_POP_32_S_10_5</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">38</span>;
+<span class="doccomment">/// Pop stack top to fill 12-bit unsigned immediate operand</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_POP_32_U_10_12</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">39</span>;
+<span class="doccomment">/// Pop stack top to fill 12-bit signed immediate operand</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_POP_32_S_10_12</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">40</span>;
+<span class="doccomment">/// Pop stack top to fill 16-bit signed immediate operand</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_POP_32_S_10_16</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">41</span>;
+<span class="doccomment">/// Pop stack top to fill 18-bit signed immediate operand with two trailing</span>
+<span class="doccomment">/// zeros implied</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_POP_32_S_10_16_S2</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">42</span>;
+<span class="doccomment">/// Pop stack top to fill 20-bit signed immediate operand</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_POP_32_S_5_20</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">43</span>;
+<span class="doccomment">/// Pop stack top to fill 23-bit signed immediate operand with two trailing</span>
+<span class="doccomment">/// zeros implied</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_POP_32_S_0_5_10_16_S2</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">44</span>;
+<span class="doccomment">/// Pop stack top to fill 28-bit signed immediate operand with two trailing</span>
+<span class="doccomment">/// zeros implied</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_POP_32_S_0_10_10_16_S2</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">45</span>;
+<span class="doccomment">/// Pop stack top to fill an instruction</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SOP_POP_32_U</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">46</span>;
+<span class="doccomment">/// 8-bit in-place addition</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_ADD8</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">47</span>;
+<span class="doccomment">/// 16-bit in-place addition</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_ADD16</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">48</span>;
+<span class="doccomment">/// 24-bit in-place addition</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_ADD24</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">49</span>;
+<span class="doccomment">/// 32-bit in-place addition</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_ADD32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">50</span>;
+<span class="doccomment">/// 64-bit in-place addition</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_ADD64</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">51</span>;
+<span class="doccomment">/// 8-bit in-place subtraction</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SUB8</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">52</span>;
+<span class="doccomment">/// 16-bit in-place subtraction</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SUB16</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">53</span>;
+<span class="doccomment">/// 24-bit in-place subtraction</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SUB24</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">54</span>;
+<span class="doccomment">/// 32-bit in-place subtraction</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SUB32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">55</span>;
+<span class="doccomment">/// 64-bit in-place subtraction</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_SUB64</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">56</span>;
+<span class="doccomment">/// GNU C++ vtable hierarchy</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_GNU_VTINHERIT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">57</span>;
+<span class="doccomment">/// GNU C++ vtable member usage</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">R_LARCH_GNU_VTENTRY</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">58</span>;
+
 <span class="macro">unsafe_impl_endian_pod!</span>(
     <span class="ident">FileHeader32</span>,
     <span class="ident">FileHeader64</span>,
@@ -12112,8 +12777,15 @@
     <span class="ident">ProgramHeader64</span>,
     <span class="ident">Dyn32</span>,
     <span class="ident">Dyn64</span>,
+    <span class="ident">Versym</span>,
+    <span class="ident">Verdef</span>,
+    <span class="ident">Verdaux</span>,
+    <span class="ident">Verneed</span>,
+    <span class="ident">Vernaux</span>,
     <span class="ident">NoteHeader32</span>,
     <span class="ident">NoteHeader64</span>,
+    <span class="ident">HashHeader</span>,
+    <span class="ident">GnuHashHeader</span>,
 );
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="object" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>

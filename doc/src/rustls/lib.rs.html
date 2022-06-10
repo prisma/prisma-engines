@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.19.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -337,6 +337,202 @@
 <span id="332">332</span>
 <span id="333">333</span>
 <span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
 </pre><pre class="rust"><code><span class="doccomment">//! # Rustls - a modern TLS library</span>
 <span class="doccomment">//! Rustls is a TLS library that aims to provide a good level of cryptographic security,</span>
 <span class="doccomment">//! requires no configuration to achieve that security, and provides no unsafe features or</span>
@@ -352,16 +548,17 @@
 <span class="doccomment">//! * ChaCha20-Poly1305 bulk encryption ([RFC7905](https://tools.ietf.org/html/rfc7905)).</span>
 <span class="doccomment">//! * ALPN support.</span>
 <span class="doccomment">//! * SNI support.</span>
-<span class="doccomment">//! * Tunable MTU to make TLS messages match size of underlying transport.</span>
+<span class="doccomment">//! * Tunable fragment size to make TLS messages match size of underlying transport.</span>
 <span class="doccomment">//! * Optional use of vectored IO to minimise system calls.</span>
 <span class="doccomment">//! * TLS1.2 session resumption.</span>
-<span class="doccomment">//! * TLS1.2 resumption via tickets (RFC5077).</span>
+<span class="doccomment">//! * TLS1.2 resumption via tickets ([RFC5077](https://tools.ietf.org/html/rfc5077)).</span>
 <span class="doccomment">//! * TLS1.3 resumption via tickets or session storage.</span>
 <span class="doccomment">//! * TLS1.3 0-RTT data for clients.</span>
+<span class="doccomment">//! * TLS1.3 0-RTT data for servers.</span>
 <span class="doccomment">//! * Client authentication by clients.</span>
 <span class="doccomment">//! * Client authentication by servers.</span>
-<span class="doccomment">//! * Extended master secret support (RFC7627).</span>
-<span class="doccomment">//! * Exporters (RFC5705).</span>
+<span class="doccomment">//! * Extended master secret support ([RFC7627](https://tools.ietf.org/html/rfc7627)).</span>
+<span class="doccomment">//! * Exporters ([RFC5705](https://tools.ietf.org/html/rfc5705)).</span>
 <span class="doccomment">//! * OCSP stapling by servers.</span>
 <span class="doccomment">//! * SCT stapling by servers.</span>
 <span class="doccomment">//! * SCT verification by clients.</span>
@@ -374,8 +571,8 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Non-features</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The following things are broken, obsolete, badly designed, underspecified,</span>
-<span class="doccomment">//! dangerous and/or insane. Rustls does not support:</span>
+<span class="doccomment">//! For reasons [explained in the manual](manual),</span>
+<span class="doccomment">//! rustls does not and will not support:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! * SSL1, SSL2, SSL3, TLS1 or TLS1.1.</span>
 <span class="doccomment">//! * RC4.</span>
@@ -388,7 +585,6 @@
 <span class="doccomment">//! * Compression.</span>
 <span class="doccomment">//! * Discrete-log Diffie-Hellman.</span>
 <span class="doccomment">//! * Automatic protocol version downgrade.</span>
-<span class="doccomment">//! * AES-GCM with unsafe nonces.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! There are plenty of other libraries that provide these features should you</span>
 <span class="doccomment">//! need them.</span>
@@ -408,20 +604,23 @@
 <span class="doccomment">//! IO.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Rustls provides encrypted pipes</span>
-<span class="doccomment">//! These are the `ServerSession` and `ClientSession` types.  You supply raw TLS traffic</span>
-<span class="doccomment">//! on the left (via the `read_tls()` and `write_tls()` methods) and then read/write the</span>
+<span class="doccomment">//! These are the [`ServerConnection`] and [`ClientConnection`] types.  You supply raw TLS traffic</span>
+<span class="doccomment">//! on the left (via the [`read_tls()`] and [`write_tls()`] methods) and then read/write the</span>
 <span class="doccomment">//! plaintext on the right:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`read_tls()`]: Connection::read_tls</span>
+<span class="doccomment">//! [`write_tls()`]: Connection::read_tls</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```text</span>
 <span class="doccomment">//!          TLS                                   Plaintext</span>
 <span class="doccomment">//!          ===                                   =========</span>
-<span class="doccomment">//!     read_tls()      +-----------------------+      io::Read</span>
+<span class="doccomment">//!     read_tls()      +-----------------------+      reader() as io::Read</span>
 <span class="doccomment">//!                     |                       |</span>
-<span class="doccomment">//!           +---------&gt;     ClientSession     +---------&gt;</span>
+<span class="doccomment">//!           +---------&gt;   ClientConnection    +---------&gt;</span>
 <span class="doccomment">//!                     |          or           |</span>
-<span class="doccomment">//!           &lt;---------+     ServerSession     &lt;---------+</span>
+<span class="doccomment">//!           &lt;---------+   ServerConnection    &lt;---------+</span>
 <span class="doccomment">//!                     |                       |</span>
-<span class="doccomment">//!     write_tls()     +-----------------------+      io::Write</span>
+<span class="doccomment">//!     write_tls()     +-----------------------+      writer() as io::Write</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Rustls takes care of server certificate verification</span>
@@ -431,32 +630,65 @@
 <span class="doccomment">//! ## Getting started</span>
 <span class="doccomment">//! This is the minimum you need to do to make a TLS client connection.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! First, we make a `ClientConfig`.  You&#39;re likely to make one of these per process,</span>
-<span class="doccomment">//! and use it for all connections made by that process.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! let mut config = rustls::ClientConfig::new();</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Next we load some root certificates.  These are used to authenticate the server.</span>
+<span class="doccomment">//! First we load some root certificates.  These are used to authenticate the server.</span>
 <span class="doccomment">//! The recommended way is to depend on the `webpki_roots` crate which contains</span>
 <span class="doccomment">//! the Mozilla set of root certificates.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust,ignore</span>
-<span class="doccomment">//! config.root_store.add_server_trust_anchors(&amp;webpki_roots::TLS_SERVER_ROOTS);</span>
+<span class="doccomment">//! ```rust,no_run</span>
+<span class="doccomment">//! let mut root_store = rustls::RootCertStore::empty();</span>
+<span class="doccomment">//! root_store.add_server_trust_anchors(</span>
+<span class="doccomment">//!     webpki_roots::TLS_SERVER_ROOTS</span>
+<span class="doccomment">//!         .0</span>
+<span class="doccomment">//!         .iter()</span>
+<span class="doccomment">//!         .map(|ta| {</span>
+<span class="doccomment">//!             rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(</span>
+<span class="doccomment">//!                 ta.subject,</span>
+<span class="doccomment">//!                 ta.spki,</span>
+<span class="doccomment">//!                 ta.name_constraints,</span>
+<span class="doccomment">//!             )</span>
+<span class="doccomment">//!         })</span>
+<span class="doccomment">//! );</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Now we can make a session.  You need to provide the server&#39;s hostname so we</span>
+<span class="doccomment">//! Next, we make a `ClientConfig`.  You&#39;re likely to make one of these per process,</span>
+<span class="doccomment">//! and use it for all connections made by that process.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust,no_run</span>
+<span class="doccomment">//! # let root_store: rustls::RootCertStore = panic!();</span>
+<span class="doccomment">//! let config = rustls::ClientConfig::builder()</span>
+<span class="doccomment">//!     .with_safe_defaults()</span>
+<span class="doccomment">//!     .with_root_certificates(root_store)</span>
+<span class="doccomment">//!     .with_no_client_auth();</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Now we can make a connection.  You need to provide the server&#39;s hostname so we</span>
 <span class="doccomment">//! know what to expect to find in the server&#39;s certificate.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! ```rust</span>
 <span class="doccomment">//! # use rustls;</span>
 <span class="doccomment">//! # use webpki;</span>
 <span class="doccomment">//! # use std::sync::Arc;</span>
-<span class="doccomment">//! # let mut config = rustls::ClientConfig::new();</span>
+<span class="doccomment">//! # use std::convert::TryInto;</span>
+<span class="doccomment">//! # let mut root_store = rustls::RootCertStore::empty();</span>
+<span class="doccomment">//! # root_store.add_server_trust_anchors(</span>
+<span class="doccomment">//! #  webpki_roots::TLS_SERVER_ROOTS</span>
+<span class="doccomment">//! #      .0</span>
+<span class="doccomment">//! #      .iter()</span>
+<span class="doccomment">//! #      .map(|ta| {</span>
+<span class="doccomment">//! #          rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(</span>
+<span class="doccomment">//! #              ta.subject,</span>
+<span class="doccomment">//! #              ta.spki,</span>
+<span class="doccomment">//! #              ta.name_constraints,</span>
+<span class="doccomment">//! #          )</span>
+<span class="doccomment">//! #      })</span>
+<span class="doccomment">//! # );</span>
+<span class="doccomment">//! # let config = rustls::ClientConfig::builder()</span>
+<span class="doccomment">//! #     .with_safe_defaults()</span>
+<span class="doccomment">//! #     .with_root_certificates(root_store)</span>
+<span class="doccomment">//! #     .with_no_client_auth();</span>
 <span class="doccomment">//! let rc_config = Arc::new(config);</span>
-<span class="doccomment">//! let example_com = webpki::DNSNameRef::try_from_ascii_str(&quot;example.com&quot;).unwrap();</span>
-<span class="doccomment">//! let mut client = rustls::ClientSession::new(&amp;rc_config, example_com);</span>
+<span class="doccomment">//! let example_com = &quot;example.com&quot;.try_into().unwrap();</span>
+<span class="doccomment">//! let mut client = rustls::ClientConnection::new(rc_config, example_com);</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Now you should do appropriate IO for the `client` object.  If `client.wants_read()` yields</span>
@@ -468,24 +700,45 @@
 <span class="doccomment">//! The return types of `read_tls()` and `write_tls()` only tell you if the IO worked.  No</span>
 <span class="doccomment">//! parsing or processing of the TLS messages is done.  After each `read_tls()` you should</span>
 <span class="doccomment">//! therefore call `client.process_new_packets()` which parses and processes the messages.</span>
-<span class="doccomment">//! Any error returned from `process_new_packets` is fatal to the session, and will tell you</span>
+<span class="doccomment">//! Any error returned from `process_new_packets` is fatal to the connection, and will tell you</span>
 <span class="doccomment">//! why.  For example, if the server&#39;s certificate is expired `process_new_packets` will</span>
-<span class="doccomment">//! return `Err(WebPKIError(CertExpired))`.  From this point on, `process_new_packets` will</span>
-<span class="doccomment">//! not do any new work and will return that error continually.</span>
+<span class="doccomment">//! return `Err(WebPkiError(CertExpired, ValidateServerCert))`.  From this point on,</span>
+<span class="doccomment">//! `process_new_packets` will not do any new work and will return that error continually.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! You can extract newly received data by calling `client.read()` (via the `io::Read`</span>
-<span class="doccomment">//! trait).  You can send data to the peer by calling `client.write()` (via the `io::Write`</span>
-<span class="doccomment">//! trait).  Note that `client.write()` buffers data you send if the TLS session is not</span>
-<span class="doccomment">//! yet established: this is useful for writing (say) a HTTP request, but don&#39;t write huge</span>
-<span class="doccomment">//! amounts of data.</span>
+<span class="doccomment">//! You can extract newly received data by calling `client.reader()` (which implements the</span>
+<span class="doccomment">//! `io::Read` trait).  You can send data to the peer by calling `client.writer()` (which</span>
+<span class="doccomment">//! implements `io::Write` trait).  Note that `client.writer().write()` buffers data you</span>
+<span class="doccomment">//! send if the TLS connection is not yet established: this is useful for writing (say) a</span>
+<span class="doccomment">//! HTTP request, but this is buffered so avoid large amounts of data.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The following code uses a fictional socket IO API for illustration, and does not handle</span>
 <span class="doccomment">//! errors.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ```text</span>
+<span class="doccomment">//! ```rust,no_run</span>
+<span class="doccomment">//! # let mut client = rustls::ClientConnection::new(panic!(), panic!()).unwrap();</span>
+<span class="doccomment">//! # struct Socket { }</span>
+<span class="doccomment">//! # impl Socket {</span>
+<span class="doccomment">//! #   fn ready_for_write(&amp;self) -&gt; bool { false }</span>
+<span class="doccomment">//! #   fn ready_for_read(&amp;self) -&gt; bool { false }</span>
+<span class="doccomment">//! #   fn wait_for_something_to_happen(&amp;self) { }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # use std::io::{Read, Write, Result};</span>
+<span class="doccomment">//! # impl Read for Socket {</span>
+<span class="doccomment">//! #   fn read(&amp;mut self, buf: &amp;mut [u8]) -&gt; Result&lt;usize&gt; { panic!() }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! # impl Write for Socket {</span>
+<span class="doccomment">//! #   fn write(&amp;mut self, buf: &amp;[u8]) -&gt; Result&lt;usize&gt; { panic!() }</span>
+<span class="doccomment">//! #   fn flush(&amp;mut self) -&gt; Result&lt;()&gt; { panic!() }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # fn connect(_address: &amp;str, _port: u16) -&gt; Socket {</span>
+<span class="doccomment">//! #   panic!();</span>
+<span class="doccomment">//! # }</span>
 <span class="doccomment">//! use std::io;</span>
+<span class="doccomment">//! use rustls::Connection;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! client.write(b&quot;GET / HTTP/1.0\r\n\r\n&quot;).unwrap();</span>
+<span class="doccomment">//! client.writer().write(b&quot;GET / HTTP/1.0\r\n\r\n&quot;).unwrap();</span>
 <span class="doccomment">//! let mut socket = connect(&quot;example.com&quot;, 443);</span>
 <span class="doccomment">//! loop {</span>
 <span class="doccomment">//!   if client.wants_read() &amp;&amp; socket.ready_for_read() {</span>
@@ -493,7 +746,7 @@
 <span class="doccomment">//!     client.process_new_packets().unwrap();</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     let mut plaintext = Vec::new();</span>
-<span class="doccomment">//!     client.read_to_end(&amp;mut plaintext).unwrap();</span>
+<span class="doccomment">//!     client.reader().read_to_end(&amp;mut plaintext).unwrap();</span>
 <span class="doccomment">//!     io::stdout().write(&amp;plaintext).unwrap();</span>
 <span class="doccomment">//!   }</span>
 <span class="doccomment">//!</span>
@@ -528,13 +781,26 @@
 <span class="doccomment">//!   details of these.  You will only need this if you&#39;re writing a QUIC</span>
 <span class="doccomment">//!   implementation.</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! - `tls12`: enables support for TLS version 1.2. This feature is in the default</span>
+<span class="doccomment">//!   set. Note that, due to the additive nature of Cargo features and because it</span>
+<span class="doccomment">//!   is enabled by default, other crates in your dependency graph could re-enable</span>
+<span class="doccomment">//!   it for your application. If you want to disable TLS 1.2 for security reasons,</span>
+<span class="doccomment">//!   consider explicitly enabling TLS 1.3 only in the config builder API.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `read_buf`: When building with Rust Nightly, adds support for the unstable</span>
+<span class="doccomment">//!   `std::io::ReadBuf` and related APIs. This reduces costs from initializing</span>
+<span class="doccomment">//!   buffers. Will do nothing on non-Nightly releases.</span>
 
 <span class="comment">// Require docs for public APIs, deny unsafe code, etc.</span>
-<span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>, <span class="ident">unused_must_use</span>, <span class="ident">unstable_features</span>)]</span>
+<span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>, <span class="ident">unused_must_use</span>)]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">read_buf</span>), <span class="ident">forbid</span>(<span class="ident">unstable_features</span>))]</span>
 <span class="attribute">#![<span class="ident">deny</span>(
+    <span class="ident">clippy::clone_on_ref_ptr</span>,
+    <span class="ident">clippy::use_self</span>,
     <span class="ident">trivial_casts</span>,
     <span class="ident">trivial_numeric_casts</span>,
     <span class="ident">missing_docs</span>,
+    <span class="ident">unreachable_pub</span>,
     <span class="ident">unused_import_braces</span>,
     <span class="ident">unused_extern_crates</span>,
     <span class="ident">unused_qualifications</span>
@@ -542,9 +808,31 @@
 <span class="comment">// Relax these clippy lints:</span>
 <span class="comment">// - ptr_arg: this triggers on references to type aliases that are Vec</span>
 <span class="comment">//   underneath.</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>))]</span>
+<span class="comment">// - too_many_arguments: some things just need a lot of state, wrapping it</span>
+<span class="comment">//   doesn&#39;t necessarily make it easier to follow what&#39;s going on</span>
+<span class="comment">// - new_ret_no_self: we sometimes return `Arc&lt;Self&gt;`, which seems fine</span>
+<span class="comment">// - single_component_path_imports: our top-level `use log` import causes</span>
+<span class="comment">//   a false positive, https://github.com/rust-lang/rust-clippy/issues/5210</span>
+<span class="comment">// - new_without_default: for internal constructors, the indirection is not</span>
+<span class="comment">//   helpful</span>
+<span class="attribute">#![<span class="ident">allow</span>(
+    <span class="ident">clippy::too_many_arguments</span>,
+    <span class="ident">clippy::new_ret_no_self</span>,
+    <span class="ident">clippy::ptr_arg</span>,
+    <span class="ident">clippy::single_component_path_imports</span>,
+    <span class="ident">clippy::new_without_default</span>
+)]</span>
 <span class="comment">// Enable documentation for all features on docs.rs</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
+<span class="comment">// XXX: Because of https://github.com/rust-lang/rust/issues/54726, we cannot</span>
+<span class="comment">// write `#![rustversion::attr(nightly, feature(read_buf))]` here. Instead,</span>
+<span class="comment">// build.rs set `read_buf` for (only) Rust Nightly to get the same effect.</span>
+<span class="comment">//</span>
+<span class="comment">// All the other conditional logic in the crate could use</span>
+<span class="comment">// `#[rustversion::nightly]` instead of `#[cfg(read_buf)]`; `#[cfg(read_buf)]`</span>
+<span class="comment">// is used to avoid needing `rustversion` to be compiled twice during</span>
+<span class="comment">// cross-compiling.</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">read_buf</span>, <span class="ident">feature</span>(<span class="ident">read_buf</span>))]</span>
 
 <span class="comment">// log for logging (optional).</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;logging&quot;</span>)]</span>
@@ -564,15 +852,16 @@
 <span class="kw">mod</span> <span class="ident">msgs</span>;
 <span class="kw">mod</span> <span class="ident">anchors</span>;
 <span class="kw">mod</span> <span class="ident">cipher</span>;
+<span class="kw">mod</span> <span class="ident">conn</span>;
 <span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">mod</span> <span class="ident">hash_hs</span>;
-<span class="kw">mod</span> <span class="ident">key_schedule</span>;
-<span class="kw">mod</span> <span class="ident">pemfile</span>;
-<span class="kw">mod</span> <span class="ident">prf</span>;
+<span class="kw">mod</span> <span class="ident">limited_cache</span>;
 <span class="kw">mod</span> <span class="ident">rand</span>;
 <span class="kw">mod</span> <span class="ident">record_layer</span>;
-<span class="kw">mod</span> <span class="ident">session</span>;
 <span class="kw">mod</span> <span class="ident">stream</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tls12</span>;
+<span class="kw">mod</span> <span class="ident">tls13</span>;
 <span class="kw">mod</span> <span class="ident">vecbuf</span>;
 <span class="kw">mod</span> <span class="ident">verify</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -581,65 +870,161 @@
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">mod</span> <span class="ident">check</span>;
 <span class="kw">mod</span> <span class="ident">bs_debug</span>;
-<span class="kw">mod</span> <span class="ident">client</span>;
+<span class="kw">mod</span> <span class="ident">builder</span>;
 <span class="kw">mod</span> <span class="ident">key</span>;
-<span class="kw">mod</span> <span class="ident">keylog</span>;
-<span class="kw">mod</span> <span class="ident">server</span>;
+<span class="kw">mod</span> <span class="ident">key_log</span>;
+<span class="kw">mod</span> <span class="ident">key_log_file</span>;
+<span class="kw">mod</span> <span class="ident">kx</span>;
 <span class="kw">mod</span> <span class="ident">suites</span>;
 <span class="kw">mod</span> <span class="ident">ticketer</span>;
+<span class="kw">mod</span> <span class="ident">versions</span>;
 
 <span class="doccomment">/// Internal classes which may be useful outside the library.</span>
 <span class="doccomment">/// The contents of this section DO NOT form part of the stable interface.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">internal</span> {
-    <span class="doccomment">/// Functions for parsing PEM files containing certificates/keys.</span>
-    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pemfile</span> {
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pemfile</span>::{<span class="ident">certs</span>, <span class="ident">pkcs8_private_keys</span>, <span class="ident">rsa_private_keys</span>};
-    }
-
     <span class="doccomment">/// Low-level TLS message parsing and encoding functions.</span>
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">msgs</span> {
         <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs</span>::<span class="kw-2">*</span>;
     }
+    <span class="doccomment">/// Low-level TLS message decryption functions.</span>
+    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cipher</span> {
+        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cipher::MessageDecrypter</span>;
+    }
 }
 
 <span class="comment">// The public interface is:</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::anchors</span>::{<span class="ident">DistinguishedNames</span>, <span class="ident">OwnedTrustAnchor</span>, <span class="ident">RootCertStore</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::handy</span>::{<span class="ident">ClientSessionMemoryCache</span>, <span class="ident">NoClientSessionStorage</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::ResolvesClientCert</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::StoresClientSessions</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">ClientConfig</span>, <span class="ident">ClientSession</span>, <span class="ident">WriteEarlyData</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::TLSError</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::anchors</span>::{<span class="ident">OwnedTrustAnchor</span>, <span class="ident">RootCertStore</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
+    <span class="ident">ConfigBuilder</span>, <span class="ident">ConfigSide</span>, <span class="ident">WantsCipherSuites</span>, <span class="ident">WantsKxGroups</span>, <span class="ident">WantsVerifier</span>, <span class="ident">WantsVersions</span>,
+};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::conn</span>::{
+    <span class="ident">CommonState</span>, <span class="ident">Connection</span>, <span class="ident">ConnectionCommon</span>, <span class="ident">IoState</span>, <span class="ident">Reader</span>, <span class="ident">SideData</span>, <span class="ident">Writer</span>,
+};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::key</span>::{<span class="ident">Certificate</span>, <span class="ident">PrivateKey</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::keylog</span>::{<span class="ident">KeyLog</span>, <span class="ident">KeyLogFile</span>, <span class="ident">NoKeyLog</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::key_log</span>::{<span class="ident">KeyLog</span>, <span class="ident">NoKeyLog</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::key_log_file::KeyLogFile</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kx</span>::{<span class="ident">SupportedKxGroup</span>, <span class="ident">ALL_KX_GROUPS</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums::CipherSuite</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums::ProtocolVersion</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums::SignatureScheme</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server::handy::ResolvesServerCertUsingSNI</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server::handy</span>::{<span class="ident">NoServerSessionStorage</span>, <span class="ident">ServerSessionMemoryCache</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server::StoresServerSessions</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server</span>::{<span class="ident">ClientHello</span>, <span class="ident">ProducesTickets</span>, <span class="ident">ResolvesServerCert</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server</span>::{<span class="ident">ServerConfig</span>, <span class="ident">ServerSession</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::session::Session</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::DistinguishedNames</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::stream</span>::{<span class="ident">Stream</span>, <span class="ident">StreamOwned</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites</span>::{<span class="ident">BulkAlgorithm</span>, <span class="ident">SupportedCipherSuite</span>, <span class="ident">ALL_CIPHERSUITES</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ticketer::Ticketer</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::verify</span>::{
-    <span class="ident">AllowAnyAnonymousOrAuthenticatedClient</span>, <span class="ident">AllowAnyAuthenticatedClient</span>, <span class="ident">NoClientAuth</span>,
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites</span>::{
+    <span class="ident">BulkAlgorithm</span>, <span class="ident">SupportedCipherSuite</span>, <span class="ident">ALL_CIPHER_SUITES</span>, <span class="ident">DEFAULT_CIPHER_SUITES</span>,
 };
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ticketer::Ticketer</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls12::Tls12CipherSuite</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls13::Tls13CipherSuite</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::versions</span>::{<span class="ident">SupportedProtocolVersion</span>, <span class="ident">ALL_VERSIONS</span>, <span class="ident">DEFAULT_VERSIONS</span>};
+
+<span class="doccomment">/// Items for use in a client.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">client</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">builder</span>;
+    <span class="kw">mod</span> <span class="ident">client_conn</span>;
+    <span class="kw">mod</span> <span class="ident">common</span>;
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">handy</span>;
+    <span class="kw">mod</span> <span class="ident">hs</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
+    <span class="kw">mod</span> <span class="ident">tls12</span>;
+    <span class="kw">mod</span> <span class="ident">tls13</span>;
+
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">builder</span>::{<span class="ident">WantsClientCert</span>, <span class="ident">WantsTransparencyPolicyOrClientCert</span>};
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">client_conn::ClientQuicExt</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">client_conn::InvalidDnsNameError</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">client_conn::ResolvesClientCert</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">client_conn::ServerName</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">client_conn::StoresClientSessions</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">client_conn</span>::{<span class="ident">ClientConfig</span>, <span class="ident">ClientConnection</span>, <span class="ident">ClientConnectionData</span>, <span class="ident">WriteEarlyData</span>};
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">handy</span>::{<span class="ident">ClientSessionMemoryCache</span>, <span class="ident">NoClientSessionStorage</span>};
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::verify</span>::{
+        <span class="ident">CertificateTransparencyPolicy</span>, <span class="ident">HandshakeSignatureValid</span>, <span class="ident">ServerCertVerified</span>,
+        <span class="ident">ServerCertVerifier</span>, <span class="ident">WebPkiVerifier</span>,
+    };
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">client_conn::danger::DangerousClientConfig</span>;
+}
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">client</span>::{<span class="ident">ClientConfig</span>, <span class="ident">ClientConnection</span>, <span class="ident">ServerName</span>};
+
+<span class="doccomment">/// Items for use in a server.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">server</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">builder</span>;
+    <span class="kw">mod</span> <span class="ident">common</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">handy</span>;
+    <span class="kw">mod</span> <span class="ident">hs</span>;
+    <span class="kw">mod</span> <span class="ident">server_conn</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
+    <span class="kw">mod</span> <span class="ident">tls12</span>;
+    <span class="kw">mod</span> <span class="ident">tls13</span>;
+
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::verify</span>::{
+        <span class="ident">AllowAnyAnonymousOrAuthenticatedClient</span>, <span class="ident">AllowAnyAuthenticatedClient</span>, <span class="ident">NoClientAuth</span>,
+    };
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">builder::WantsServerCert</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">handy::ResolvesServerCertUsingSni</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">handy</span>::{<span class="ident">NoServerSessionStorage</span>, <span class="ident">ServerSessionMemoryCache</span>};
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">server_conn::ServerQuicExt</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">server_conn::StoresServerSessions</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">server_conn</span>::{
+        <span class="ident">Accepted</span>, <span class="ident">Acceptor</span>, <span class="ident">ReadEarlyData</span>, <span class="ident">ServerConfig</span>, <span class="ident">ServerConnection</span>, <span class="ident">ServerConnectionData</span>,
+    };
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">server_conn</span>::{<span class="ident">ClientHello</span>, <span class="ident">ProducesTickets</span>, <span class="ident">ResolvesServerCert</span>};
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::verify</span>::{<span class="ident">ClientCertVerified</span>, <span class="ident">ClientCertVerifier</span>, <span class="ident">DnsName</span>};
+}
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">server</span>::{<span class="ident">ServerConfig</span>, <span class="ident">ServerConnection</span>};
 
 <span class="doccomment">/// All defined ciphersuites appear in this module.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ALL_CIPHERSUITES is provided an array of all of these values.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ciphersuite</span> {
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites::TLS13_AES_128_GCM_SHA256</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites::TLS13_AES_256_GCM_SHA384</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites::TLS13_CHACHA20_POLY1305_SHA256</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites::TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites::TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites::TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites::TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites::TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites::TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256</span>;
+<span class="doccomment">/// [`ALL_CIPHER_SUITES`] is provided as an array of all of these values.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cipher_suite</span> {
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites::CipherSuiteCommon</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls12::TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls12::TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls12::TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls12::TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls12::TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls12::TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls13::TLS13_AES_128_GCM_SHA256</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls13::TLS13_AES_256_GCM_SHA384</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls13::TLS13_CHACHA20_POLY1305_SHA256</span>;
+}
+
+<span class="doccomment">/// All defined protocol versions appear in this module.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ALL_VERSIONS is a provided as an array of all of these values.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">version</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::versions::TLS12</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::versions::TLS13</span>;
+}
+
+<span class="doccomment">/// All defined key exchange groups appear in this module.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ALL_KX_GROUPS is provided as an array of all of these values.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">kx_group</span> {
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kx::SECP256R1</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kx::SECP384R1</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kx::X25519</span>;
 }
 
 <span class="doccomment">/// Message signing interfaces and implementations.</span>
@@ -650,27 +1035,34 @@
 <span class="doccomment">/// APIs for implementing QUIC TLS</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">quic</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>))]</span>
-<span class="comment">// If QUIC support is disabled, just define a private module with an empty</span>
-<span class="comment">// trait to allow Session having QuicExt as a trait bound.</span>
-<span class="kw">mod</span> <span class="ident">quic</span> {
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">QuicExt</span> {}
-    <span class="kw">impl</span> <span class="ident">QuicExt</span> <span class="kw">for</span> <span class="ident"><span class="kw">super</span>::ClientSession</span> {}
-    <span class="kw">impl</span> <span class="ident">QuicExt</span> <span class="kw">for</span> <span class="ident"><span class="kw">super</span>::ServerSession</span> {}
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::danger::DangerousClientConfig</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::verify</span>::{
-    <span class="ident">ClientCertVerified</span>, <span class="ident">ClientCertVerifier</span>, <span class="ident">HandshakeSignatureValid</span>, <span class="ident">ServerCertVerified</span>,
-    <span class="ident">ServerCertVerifier</span>, <span class="ident">WebPKIVerifier</span>,
-};
-
 <span class="doccomment">/// This is the rustls manual.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">manual</span>;
+
+<span class="doccomment">/** Type renames. */</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::upper_case_acronyms</span>)]</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.20.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use ResolvesServerCertUsingSni&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ResolvesServerCertUsingSNI</span> <span class="op">=</span> <span class="ident">server::ResolvesServerCertUsingSni</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::upper_case_acronyms</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dangerous_configuration&quot;</span>)))]</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.20.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use client::WebPkiVerifier&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">WebPKIVerifier</span> <span class="op">=</span> <span class="ident">client::WebPkiVerifier</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::upper_case_acronyms</span>)]</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.20.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use Error&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TLSError</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.20.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use ClientConnection&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ClientSession</span> <span class="op">=</span> <span class="ident">ClientConnection</span>;
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.20.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use ServerConnection&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ServerSession</span> <span class="op">=</span> <span class="ident">ServerConnection</span>;
+
+<span class="comment">/* Apologies: would make a trait alias here, but those remain unstable.
+pub trait Session = Connection;
+*/</span>
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
 </body></html>

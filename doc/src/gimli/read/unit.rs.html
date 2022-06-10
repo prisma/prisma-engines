@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gimli-0.24.0/src/read/unit.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>unit.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gimli-0.26.1/src/read/unit.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>unit.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../gimli/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -6077,6 +6077,78 @@
 <span id="6072">6072</span>
 <span id="6073">6073</span>
 <span id="6074">6074</span>
+<span id="6075">6075</span>
+<span id="6076">6076</span>
+<span id="6077">6077</span>
+<span id="6078">6078</span>
+<span id="6079">6079</span>
+<span id="6080">6080</span>
+<span id="6081">6081</span>
+<span id="6082">6082</span>
+<span id="6083">6083</span>
+<span id="6084">6084</span>
+<span id="6085">6085</span>
+<span id="6086">6086</span>
+<span id="6087">6087</span>
+<span id="6088">6088</span>
+<span id="6089">6089</span>
+<span id="6090">6090</span>
+<span id="6091">6091</span>
+<span id="6092">6092</span>
+<span id="6093">6093</span>
+<span id="6094">6094</span>
+<span id="6095">6095</span>
+<span id="6096">6096</span>
+<span id="6097">6097</span>
+<span id="6098">6098</span>
+<span id="6099">6099</span>
+<span id="6100">6100</span>
+<span id="6101">6101</span>
+<span id="6102">6102</span>
+<span id="6103">6103</span>
+<span id="6104">6104</span>
+<span id="6105">6105</span>
+<span id="6106">6106</span>
+<span id="6107">6107</span>
+<span id="6108">6108</span>
+<span id="6109">6109</span>
+<span id="6110">6110</span>
+<span id="6111">6111</span>
+<span id="6112">6112</span>
+<span id="6113">6113</span>
+<span id="6114">6114</span>
+<span id="6115">6115</span>
+<span id="6116">6116</span>
+<span id="6117">6117</span>
+<span id="6118">6118</span>
+<span id="6119">6119</span>
+<span id="6120">6120</span>
+<span id="6121">6121</span>
+<span id="6122">6122</span>
+<span id="6123">6123</span>
+<span id="6124">6124</span>
+<span id="6125">6125</span>
+<span id="6126">6126</span>
+<span id="6127">6127</span>
+<span id="6128">6128</span>
+<span id="6129">6129</span>
+<span id="6130">6130</span>
+<span id="6131">6131</span>
+<span id="6132">6132</span>
+<span id="6133">6133</span>
+<span id="6134">6134</span>
+<span id="6135">6135</span>
+<span id="6136">6136</span>
+<span id="6137">6137</span>
+<span id="6138">6138</span>
+<span id="6139">6139</span>
+<span id="6140">6140</span>
+<span id="6141">6141</span>
+<span id="6142">6142</span>
+<span id="6143">6143</span>
+<span id="6144">6144</span>
+<span id="6145">6145</span>
+<span id="6146">6146</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions for parsing DWARF `.debug_info` and `.debug_types` sections.</span>
 
 <span class="kw">use</span> <span class="ident">core::cell::Cell</span>;
@@ -6088,13 +6160,14 @@
     <span class="ident">DebugLineStrOffset</span>, <span class="ident">DebugLocListsBase</span>, <span class="ident">DebugLocListsIndex</span>, <span class="ident">DebugMacinfoOffset</span>,
     <span class="ident">DebugMacroOffset</span>, <span class="ident">DebugRngListsBase</span>, <span class="ident">DebugRngListsIndex</span>, <span class="ident">DebugStrOffset</span>, <span class="ident">DebugStrOffsetsBase</span>,
     <span class="ident">DebugStrOffsetsIndex</span>, <span class="ident">DebugTypeSignature</span>, <span class="ident">DebugTypesOffset</span>, <span class="ident">DwoId</span>, <span class="ident">Encoding</span>, <span class="ident">Format</span>,
-    <span class="ident">LocationListsOffset</span>, <span class="ident">RangeListsOffset</span>, <span class="ident">SectionId</span>, <span class="ident">UnitSectionOffset</span>,
+    <span class="ident">LocationListsOffset</span>, <span class="ident">RawRangeListsOffset</span>, <span class="ident">SectionId</span>, <span class="ident">UnitSectionOffset</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endianity::Endianity</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read::abbrev::get_attribute_size</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read</span>::{
     <span class="ident">Abbreviation</span>, <span class="ident">Abbreviations</span>, <span class="ident">AttributeSpecification</span>, <span class="ident">DebugAbbrev</span>, <span class="ident">DebugStr</span>, <span class="ident">EndianSlice</span>, <span class="ident">Error</span>,
-    <span class="ident">Expression</span>, <span class="ident">Reader</span>, <span class="ident">ReaderOffset</span>, <span class="prelude-ty">Result</span>, <span class="ident">Section</span>,
+    <span class="ident">Expression</span>, <span class="ident">Reader</span>, <span class="ident">ReaderOffset</span>, <span class="prelude-ty">Result</span>, <span class="ident">Section</span>, <span class="ident">UnitOffset</span>,
 };
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ReaderOffset</span><span class="op">&gt;</span> <span class="ident">DebugTypesOffset</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
@@ -6130,10 +6203,6 @@
         <span class="prelude-val">Some</span>(<span class="ident">offset</span>)
     }
 }
-
-<span class="doccomment">/// An offset into the current compilation or type unit.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnitOffset</span><span class="op">&lt;</span><span class="ident">T</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ReaderOffset</span><span class="op">&gt;</span> <span class="ident">UnitOffset</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Convert an offset to be relative to the start of the .debug_info section,</span>
@@ -7123,7 +7192,7 @@
     <span class="ident">DebugMacroRef</span>(<span class="ident">DebugMacroOffset</span><span class="op">&lt;</span><span class="ident">Offset</span><span class="op">&gt;</span>),
 
     <span class="doccomment">/// An offset into the `.debug_ranges` section.</span>
-    <span class="ident">RangeListsRef</span>(<span class="ident">RangeListsOffset</span><span class="op">&lt;</span><span class="ident">Offset</span><span class="op">&gt;</span>),
+    <span class="ident">RangeListsRef</span>(<span class="ident">RawRangeListsOffset</span><span class="op">&lt;</span><span class="ident">Offset</span><span class="op">&gt;</span>),
 
     <span class="doccomment">/// An offset to a set of offsets in the `.debug_rnglists` section.</span>
     <span class="ident">DebugRngListsBase</span>(<span class="ident">DebugRngListsBase</span><span class="op">&lt;</span><span class="ident">Offset</span><span class="op">&gt;</span>),
@@ -7365,7 +7434,7 @@
             () =&gt; {
                 <span class="comment">// DebugRngListsIndex is also an allowed form in DWARF version 5.</span>
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">offset</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset_value</span>() {
-                    <span class="kw">return</span> <span class="ident">AttributeValue::RangeListsRef</span>(<span class="ident">RangeListsOffset</span>(<span class="ident">offset</span>));
+                    <span class="kw">return</span> <span class="ident">AttributeValue::RangeListsRef</span>(<span class="ident">RawRangeListsOffset</span>(<span class="ident">offset</span>));
                 }
             };
         }
@@ -8287,6 +8356,74 @@
     }
 }
 
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">skip_attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;unit</span>, <span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(
+    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
+    <span class="ident">encoding</span>: <span class="ident">Encoding</span>,
+    <span class="ident">specs</span>: <span class="kw-2">&amp;</span>[<span class="ident">AttributeSpecification</span>],
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">skip_bytes</span> <span class="op">=</span> <span class="ident">R::Offset::from_u8</span>(<span class="number">0</span>);
+    <span class="kw">for</span> <span class="ident">spec</span> <span class="kw">in</span> <span class="ident">specs</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">form</span> <span class="op">=</span> <span class="ident">spec</span>.<span class="ident">form</span>();
+        <span class="kw">loop</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="ident">get_attribute_size</span>(<span class="ident">form</span>, <span class="ident">encoding</span>) {
+                <span class="comment">// We know the length of this attribute. Accumulate that length.</span>
+                <span class="ident">skip_bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">R::Offset::from_u8</span>(<span class="ident">len</span>);
+                <span class="kw">break</span>;
+            }
+
+            <span class="comment">// We have encountered a variable-length attribute.</span>
+            <span class="kw">if</span> <span class="ident">skip_bytes</span> <span class="op">!</span><span class="op">=</span> <span class="ident">R::Offset::from_u8</span>(<span class="number">0</span>) {
+                <span class="comment">// Skip the accumulated skip bytes and then read the attribute normally.</span>
+                <span class="ident">input</span>.<span class="ident">skip</span>(<span class="ident">skip_bytes</span>)<span class="question-mark">?</span>;
+                <span class="ident">skip_bytes</span> <span class="op">=</span> <span class="ident">R::Offset::from_u8</span>(<span class="number">0</span>);
+            }
+
+            <span class="kw">match</span> <span class="ident">form</span> {
+                <span class="ident">constants::DW_FORM_indirect</span> =&gt; {
+                    <span class="kw">let</span> <span class="ident">dynamic_form</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128_u16</span>()<span class="question-mark">?</span>;
+                    <span class="ident">form</span> <span class="op">=</span> <span class="ident">constants::DwForm</span>(<span class="ident">dynamic_form</span>);
+                    <span class="kw">continue</span>;
+                }
+                <span class="ident">constants::DW_FORM_block1</span> =&gt; {
+                    <span class="ident">skip_bytes</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u8</span>().<span class="ident">map</span>(<span class="ident">R::Offset::from_u8</span>)<span class="question-mark">?</span>;
+                }
+                <span class="ident">constants::DW_FORM_block2</span> =&gt; {
+                    <span class="ident">skip_bytes</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u16</span>().<span class="ident">map</span>(<span class="ident">R::Offset::from_u16</span>)<span class="question-mark">?</span>;
+                }
+                <span class="ident">constants::DW_FORM_block4</span> =&gt; {
+                    <span class="ident">skip_bytes</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u32</span>().<span class="ident">map</span>(<span class="ident">R::Offset::from_u32</span>)<span class="question-mark">?</span>;
+                }
+                <span class="ident">constants::DW_FORM_block</span> <span class="op">|</span> <span class="ident">constants::DW_FORM_exprloc</span> =&gt; {
+                    <span class="ident">skip_bytes</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>().<span class="ident">and_then</span>(<span class="ident">R::Offset::from_u64</span>)<span class="question-mark">?</span>;
+                }
+                <span class="ident">constants::DW_FORM_string</span> =&gt; {
+                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_null_terminated_slice</span>()<span class="question-mark">?</span>;
+                }
+                <span class="ident">constants::DW_FORM_udata</span>
+                <span class="op">|</span> <span class="ident">constants::DW_FORM_sdata</span>
+                <span class="op">|</span> <span class="ident">constants::DW_FORM_ref_udata</span>
+                <span class="op">|</span> <span class="ident">constants::DW_FORM_strx</span>
+                <span class="op">|</span> <span class="ident">constants::DW_FORM_GNU_str_index</span>
+                <span class="op">|</span> <span class="ident">constants::DW_FORM_addrx</span>
+                <span class="op">|</span> <span class="ident">constants::DW_FORM_GNU_addr_index</span>
+                <span class="op">|</span> <span class="ident">constants::DW_FORM_loclistx</span>
+                <span class="op">|</span> <span class="ident">constants::DW_FORM_rnglistx</span> =&gt; {
+                    <span class="ident">input</span>.<span class="ident">skip_leb128</span>()<span class="question-mark">?</span>;
+                }
+                <span class="kw">_</span> =&gt; {
+                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownForm</span>);
+                }
+            };
+            <span class="kw">break</span>;
+        }
+    }
+    <span class="kw">if</span> <span class="ident">skip_bytes</span> <span class="op">!</span><span class="op">=</span> <span class="ident">R::Offset::from_u8</span>(<span class="number">0</span>) {
+        <span class="comment">// Skip the remaining accumulated skip bytes.</span>
+        <span class="ident">input</span>.<span class="ident">skip</span>(<span class="ident">skip_bytes</span>)<span class="question-mark">?</span>;
+    }
+    <span class="prelude-val">Ok</span>(())
+}
+
 <span class="doccomment">/// An iterator over a particular entry&#39;s attributes.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// See [the documentation for</span>
@@ -8399,9 +8536,7 @@
 <span class="doccomment">///         }</span>
 <span class="doccomment">///         _ =&gt; {</span>
 <span class="doccomment">///             // Skip attributes for DIEs we don&#39;t care about.</span>
-<span class="doccomment">///             for spec in abbrev.attributes() {</span>
-<span class="doccomment">///                 entries.read_attribute(*spec)?;</span>
-<span class="doccomment">///             }</span>
+<span class="doccomment">///             entries.skip_attributes(abbrev.attributes());</span>
 <span class="doccomment">///         }</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
@@ -8467,6 +8602,12 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_attribute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">spec</span>: <span class="ident">AttributeSpecification</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">parse_attribute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">unit</span>.<span class="ident">encoding</span>(), <span class="ident">spec</span>)
+    }
+
+    <span class="doccomment">/// Skip all the attributes of an abbreviation.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip_attributes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">specs</span>: <span class="kw-2">&amp;</span>[<span class="ident">AttributeSpecification</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="ident">skip_attributes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">unit</span>.<span class="ident">encoding</span>(), <span class="ident">specs</span>)
     }
 }
 
@@ -10317,6 +10458,9 @@
             <span class="prelude-val">Ok</span>(<span class="ident">attr</span>) =&gt; {
                 <span class="macro">assert_eq!</span>(<span class="ident">attr</span>, <span class="ident">expect</span>);
                 <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">rest</span>, <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="ident">len</span>..], <span class="ident">Endian::default</span>()));
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">size</span>) <span class="op">=</span> <span class="ident">spec</span>.<span class="ident">size</span>(<span class="ident">unit</span>) {
+                    <span class="macro">assert_eq!</span>(<span class="ident">rest</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">size</span>, <span class="ident">buf</span>.<span class="ident">len</span>());
+                }
             }
             <span class="ident">otherwise</span> =&gt; {
                 <span class="macro">assert!</span>(<span class="bool-val">false</span>, <span class="string">&quot;Unexpected parse result = {:#?}&quot;</span>, <span class="ident">otherwise</span>);

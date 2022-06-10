@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/im-13.0.0/./src/vector/focus.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>focus.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/im-15.1.0/./src/vector/focus.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>focus.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -912,17 +912,6 @@
 <span id="907">907</span>
 <span id="908">908</span>
 <span id="909">909</span>
-<span id="910">910</span>
-<span id="911">911</span>
-<span id="912">912</span>
-<span id="913">913</span>
-<span id="914">914</span>
-<span id="915">915</span>
-<span id="916">916</span>
-<span id="917">917</span>
-<span id="918">918</span>
-<span id="919">919</span>
-<span id="920">920</span>
 </pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public</span>
 <span class="comment">// License, v. 2.0. If a copy of the MPL was not distributed with this</span>
 <span class="comment">// file, You can obtain one at http://mozilla.org/MPL/2.0/.</span>
@@ -934,8 +923,11 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::nodes::chunk::Chunk</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::Lock</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="ident">to_range</span>, <span class="ident">Ref</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vector</span>::{<span class="ident">Iter</span>, <span class="ident">IterMut</span>, <span class="ident">Vector</span>, <span class="ident">RRB</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="ident">to_range</span>, <span class="ident">PoolRef</span>, <span class="ident">Ref</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vector</span>::{
+    <span class="ident">Iter</span>, <span class="ident">IterMut</span>, <span class="ident">RRBPool</span>, <span class="ident">Rrb</span>, <span class="ident">Vector</span>,
+    <span class="ident">VectorInner</span>::{<span class="ident">Full</span>, <span class="ident">Inline</span>, <span class="ident">Single</span>},
+};
 
 <span class="doccomment">/// Focused indexing over a [`Vector`][Vector].</span>
 <span class="doccomment">///</span>
@@ -978,7 +970,6 @@
 <span class="doccomment">/// # #[macro_use] extern crate im;</span>
 <span class="doccomment">/// # use im::vector::Vector;</span>
 <span class="doccomment">/// # use std::iter::FromIterator;</span>
-<span class="doccomment">/// # fn main() {</span>
 <span class="doccomment">/// let mut vec: Vector&lt;i64&gt; = Vector::from_iter(0..1000);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Summing a vector, the slow way:</span>
@@ -999,17 +990,13 @@
 <span class="doccomment">/// // And the easy way, for completeness:</span>
 <span class="doccomment">/// let sum: i64 = vec.iter().sum();</span>
 <span class="doccomment">/// assert_eq!(499500, sum);</span>
-<span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [Vector]: enum.Vector.html</span>
 <span class="doccomment">/// [Iter]: struct.Iter.html</span>
 <span class="doccomment">/// [narrow]: #method.narrow</span>
 <span class="doccomment">/// [split_at]: #method.split_at</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="lifetime">&#39;a</span>,
-{
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="ident">Single</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">A</span>]),
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
@@ -1024,10 +1011,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Vector]: enum.Vector.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">vector</span> {
-            <span class="ident">Vector::Inline</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">Vector::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">Vector::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">Focus::Full</span>(<span class="ident">TreeFocus::new</span>(<span class="ident">tree</span>)),
+        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">vector</span>.<span class="ident">vector</span> {
+            <span class="ident">Inline</span>(<span class="kw">_</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
+            <span class="ident">Single</span>(<span class="kw">_</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
+            <span class="ident">Full</span>(<span class="kw">_</span>, <span class="ident">tree</span>) =&gt; <span class="ident">Focus::Full</span>(<span class="ident">TreeFocus::new</span>(<span class="ident">tree</span>)),
         }
     }
 
@@ -1091,12 +1078,10 @@
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::vector::Vector;</span>
     <span class="doccomment">/// # use std::iter::FromIterator;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let vec = Vector::from_iter(0..1000);</span>
     <span class="doccomment">/// let narrowed = vec.focus().narrow(100..200);</span>
     <span class="doccomment">/// let narrowed_vec = narrowed.into_iter().cloned().collect();</span>
     <span class="doccomment">/// assert_eq!(Vector::from_iter(100..200), narrowed_vec);</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at</span>
@@ -1133,14 +1118,12 @@
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::vector::Vector;</span>
     <span class="doccomment">/// # use std::iter::FromIterator;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let vec = Vector::from_iter(0..1000);</span>
     <span class="doccomment">/// let (left, right) = vec.focus().split_at(500);</span>
     <span class="doccomment">/// let left_vec = left.into_iter().cloned().collect();</span>
     <span class="doccomment">/// let right_vec = right.into_iter().cloned().collect();</span>
     <span class="doccomment">/// assert_eq!(Vector::from_iter(0..500), left_vec);</span>
     <span class="doccomment">/// assert_eq!(Vector::from_iter(500..1000), right_vec);</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at</span>
@@ -1187,7 +1170,7 @@
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="ident">tree</span>: <span class="ident">RRB</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
+    <span class="ident">tree</span>: <span class="ident">Rrb</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
     <span class="ident">view</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="ident">middle_range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="ident">target_range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
@@ -1209,10 +1192,10 @@
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">threadsafe</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {}
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">threadsafe</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {}
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Ord</span><span class="op">&gt;</span>(<span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">bool</span> {
@@ -1223,7 +1206,7 @@
 <span class="kw">where</span>
     <span class="ident">A</span>: <span class="ident">Clone</span>,
 {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tree</span>: <span class="kw-2">&amp;</span><span class="ident">RRB</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tree</span>: <span class="kw-2">&amp;</span><span class="ident">Rrb</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">middle_start</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">outer_f</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">inner_f</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">middle_end</span> <span class="op">=</span> <span class="ident">middle_start</span> <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">middle</span>.<span class="ident">len</span>();
         <span class="ident">TreeFocus</span> {
@@ -1320,7 +1303,7 @@
         <span class="kw">if</span> <span class="op">!</span><span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target_range</span>, <span class="kw-2">&amp;</span><span class="ident">phys_index</span>) {
             <span class="self">self</span>.<span class="ident">set_focus</span>(<span class="ident">phys_index</span>);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">A</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_focus</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">A</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_focus</span>().<span class="ident">as_slice</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span> {
@@ -1347,7 +1330,6 @@
 <span class="doccomment">/// # #[macro_use] extern crate im;</span>
 <span class="doccomment">/// # use im::vector::Vector;</span>
 <span class="doccomment">/// # use std::iter::FromIterator;</span>
-<span class="doccomment">/// # fn main() {</span>
 <span class="doccomment">/// let mut vec = Vector::from_iter(0..1000);</span>
 <span class="doccomment">/// let focus1 = vec.focus_mut();</span>
 <span class="doccomment">/// // Fails here in 2015 edition because you&#39;re creating</span>
@@ -1356,7 +1338,6 @@
 <span class="doccomment">/// // Fails here in 2018 edition because creating focus2</span>
 <span class="doccomment">/// // made focus1&#39;s lifetime go out of scope.</span>
 <span class="doccomment">/// assert_eq!(Some(&amp;0), focus1.get(0));</span>
-<span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// On the other hand, you can split that one focus into multiple sub-focuses,</span>
@@ -1366,13 +1347,11 @@
 <span class="doccomment">/// # #[macro_use] extern crate im;</span>
 <span class="doccomment">/// # use im::vector::Vector;</span>
 <span class="doccomment">/// # use std::iter::FromIterator;</span>
-<span class="doccomment">/// # fn main() {</span>
 <span class="doccomment">/// let mut vec = Vector::from_iter(0..1000);</span>
 <span class="doccomment">/// let focus = vec.focus_mut();</span>
 <span class="doccomment">/// let (mut left, mut right) = focus.split_at(500);</span>
 <span class="doccomment">/// assert_eq!(Some(&amp;0), left.get(0));</span>
 <span class="doccomment">/// assert_eq!(Some(&amp;500), right.get(0));</span>
-<span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// These sub-foci also work as a lock on the vector, even if the focus they</span>
@@ -1382,7 +1361,6 @@
 <span class="doccomment">/// # #[macro_use] extern crate im;</span>
 <span class="doccomment">/// # use im::vector::Vector;</span>
 <span class="doccomment">/// # use std::iter::FromIterator;</span>
-<span class="doccomment">/// # fn main() {</span>
 <span class="doccomment">/// let mut vec = Vector::from_iter(0..1000);</span>
 <span class="doccomment">/// let (left, right) = {</span>
 <span class="doccomment">///     let focus = vec.focus_mut();</span>
@@ -1392,18 +1370,14 @@
 <span class="doccomment">/// // create another focus:</span>
 <span class="doccomment">/// let focus2 = vec.focus_mut();</span>
 <span class="doccomment">/// assert_eq!(Some(&amp;0), left.get(0));</span>
-<span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [Focus]: enum.Focus.html</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="lifetime">&#39;a</span>,
-{
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">Single</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">A</span>]),
+    <span class="ident">Single</span>(<span class="ident">RRBPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">A</span>]),
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">Full</span>(<span class="ident">TreeFocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>),
+    <span class="ident">Full</span>(<span class="ident">RRBPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">TreeFocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>),
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">FocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
@@ -1412,18 +1386,21 @@
 {
     <span class="doccomment">/// Construct a `FocusMut` for a `Vector`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">vector</span> {
-            <span class="ident">Vector::Inline</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">Vector::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">FocusMut::Single</span>(<span class="ident">Ref::make_mut</span>(<span class="ident">chunk</span>).<span class="ident">as_mut_slice</span>()),
-            <span class="ident">Vector::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">FocusMut::Full</span>(<span class="ident">TreeFocusMut::new</span>(<span class="ident">tree</span>)),
+        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="ident">vector</span>.<span class="ident">vector</span> {
+            <span class="ident">Inline</span>(<span class="ident">pool</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">FocusMut::Single</span>(<span class="ident">pool</span>.<span class="ident">clone</span>(), <span class="ident">chunk</span>),
+            <span class="ident">Single</span>(<span class="ident">pool</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">FocusMut::Single</span>(
+                <span class="ident">pool</span>.<span class="ident">clone</span>(),
+                <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="ident">value_pool</span>, <span class="ident">chunk</span>).<span class="ident">as_mut_slice</span>(),
+            ),
+            <span class="ident">Full</span>(<span class="ident">pool</span>, <span class="ident">tree</span>) =&gt; <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>.<span class="ident">clone</span>(), <span class="ident">TreeFocusMut::new</span>(<span class="ident">tree</span>)),
         }
     }
 
     <span class="doccomment">/// Get the length of the focused `Vector`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">chunk</span>.<span class="ident">len</span>(),
-            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">len</span>(),
+            <span class="ident">FocusMut::Single</span>(<span class="kw">_</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">chunk</span>.<span class="ident">len</span>(),
+            <span class="ident">FocusMut::Full</span>(<span class="kw">_</span>, <span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">len</span>(),
         }
     }
 
@@ -1440,8 +1417,8 @@
     <span class="doccomment">/// Get a mutable reference to the value at a given index.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">chunk</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>),
-            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">get</span>(<span class="ident">index</span>),
+            <span class="ident">FocusMut::Single</span>(<span class="kw">_</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">chunk</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>),
+            <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>, <span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">get</span>(<span class="ident">pool</span>, <span class="ident">index</span>),
         }
     }
 
@@ -1465,10 +1442,7 @@
     <span class="doccomment">/// Returns `None` if the index is out of bounds, or the replaced value</span>
     <span class="doccomment">/// otherwise.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>) {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">pos</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">replace</span>(<span class="ident">pos</span>, <span class="ident">value</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        }
+        <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">replace</span>(<span class="ident">pos</span>, <span class="ident">value</span>))
     }
 
     <span class="doccomment">/// Swap the values at two given indices.</span>
@@ -1496,11 +1470,9 @@
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::vector::Vector;</span>
     <span class="doccomment">/// # use std::iter::FromIterator;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let mut vec = vector![1, 2, 3, 4, 5];</span>
     <span class="doccomment">/// vec.focus_mut().pair(1, 3, |a, b| *a += *b);</span>
     <span class="doccomment">/// assert_eq!(vector![1, 6, 3, 4, 5], vec);</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pair</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">B</span>
@@ -1528,11 +1500,9 @@
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::vector::Vector;</span>
     <span class="doccomment">/// # use std::iter::FromIterator;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let mut vec = vector![1, 2, 3, 4, 5];</span>
     <span class="doccomment">/// vec.focus_mut().triplet(0, 2, 4, |a, b, c| *a += *b + *c);</span>
     <span class="doccomment">/// assert_eq!(vector![9, 2, 3, 4, 5], vec);</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">triplet</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>, <span class="ident">c</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">B</span>
@@ -1558,9 +1528,9 @@
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::chunk_at: index out of bounds&quot;</span>);
         }
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) =&gt; (<span class="number">0</span>..<span class="ident">len</span>, <span class="ident">chunk</span>),
-            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">range</span>, <span class="ident">chunk</span>) <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">get_chunk</span>(<span class="ident">index</span>);
+            <span class="ident">FocusMut::Single</span>(<span class="kw">_</span>, <span class="ident">chunk</span>) =&gt; (<span class="number">0</span>..<span class="ident">len</span>, <span class="ident">chunk</span>),
+            <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>, <span class="ident">tree</span>) =&gt; {
+                <span class="kw">let</span> (<span class="ident">range</span>, <span class="ident">chunk</span>) <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">get_chunk</span>(<span class="ident">pool</span>, <span class="ident">index</span>);
                 (<span class="ident">range</span>, <span class="ident">chunk</span>)
             }
         }
@@ -1579,12 +1549,10 @@
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::vector::Vector;</span>
     <span class="doccomment">/// # use std::iter::FromIterator;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let mut vec = Vector::from_iter(0..1000);</span>
     <span class="doccomment">/// let narrowed = vec.focus_mut().narrow(100..200);</span>
     <span class="doccomment">/// let narrowed_vec = narrowed.unmut().into_iter().cloned().collect();</span>
     <span class="doccomment">/// assert_eq!(Vector::from_iter(100..200), narrowed_vec);</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at</span>
@@ -1598,8 +1566,8 @@
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::narrow: range out of bounds&quot;</span>);
         }
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">FocusMut::Single</span>(<span class="kw-2">&amp;mut</span> <span class="ident">chunk</span>[<span class="ident">r</span>]),
-            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>.<span class="ident">narrow</span>(<span class="ident">r</span>)),
+            <span class="ident">FocusMut::Single</span>(<span class="ident">pool</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">FocusMut::Single</span>(<span class="ident">pool</span>, <span class="kw-2">&amp;mut</span> <span class="ident">chunk</span>[<span class="ident">r</span>]),
+            <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>, <span class="ident">tree</span>) =&gt; <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>, <span class="ident">tree</span>.<span class="ident">narrow</span>(<span class="ident">r</span>)),
         }
     }
 
@@ -1621,7 +1589,6 @@
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::vector::Vector;</span>
     <span class="doccomment">/// # use std::iter::FromIterator;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let mut vec = Vector::from_iter(0..1000);</span>
     <span class="doccomment">/// {</span>
     <span class="doccomment">///     let (left, right) = vec.focus_mut().split_at(500);</span>
@@ -1635,23 +1602,29 @@
     <span class="doccomment">/// let expected = Vector::from_iter(100..600)</span>
     <span class="doccomment">///              + Vector::from_iter(400..900);</span>
     <span class="doccomment">/// assert_eq!(expected, vec);</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at</span>
     <span class="doccomment">/// [Vector::split_at]: enum.Vector.html#method.split_at</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::redundant_clone</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
         <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">len</span>() {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::split_at: index out of bounds&quot;</span>);
         }
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) =&gt; {
+            <span class="ident">FocusMut::Single</span>(<span class="ident">pool</span>, <span class="ident">chunk</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">split_at_mut</span>(<span class="ident">index</span>);
-                (<span class="ident">FocusMut::Single</span>(<span class="ident">left</span>), <span class="ident">FocusMut::Single</span>(<span class="ident">right</span>))
+                (
+                    <span class="ident">FocusMut::Single</span>(<span class="ident">pool</span>.<span class="ident">clone</span>(), <span class="ident">left</span>),
+                    <span class="ident">FocusMut::Single</span>(<span class="ident">pool</span>, <span class="ident">right</span>),
+                )
             }
-            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) =&gt; {
+            <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>, <span class="ident">tree</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">split_at</span>(<span class="ident">index</span>);
-                (<span class="ident">FocusMut::Full</span>(<span class="ident">left</span>), <span class="ident">FocusMut::Full</span>(<span class="ident">right</span>))
+                (
+                    <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>.<span class="ident">clone</span>(), <span class="ident">left</span>),
+                    <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>, <span class="ident">right</span>),
+                )
             }
         }
     }
@@ -1659,8 +1632,8 @@
     <span class="doccomment">/// Convert a `FocusMut` into a `Focus`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unmut</span>(<span class="self">self</span>) -&gt; <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">FocusMut::Full</span>(<span class="kw-2">mut</span> <span class="ident">tree</span>) =&gt; <span class="ident">Focus::Full</span>(<span class="ident">TreeFocus</span> {
+            <span class="ident">FocusMut::Single</span>(<span class="kw">_</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
+            <span class="ident">FocusMut::Full</span>(<span class="kw">_</span>, <span class="kw-2">mut</span> <span class="ident">tree</span>) =&gt; <span class="ident">Focus::Full</span>(<span class="ident">TreeFocus</span> {
                 <span class="ident">tree</span>: {
                     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">tree</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
                     (<span class="kw-2">*</span><span class="ident">t</span>).<span class="ident">clone</span>()
@@ -1686,20 +1659,17 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">unmut</span>()
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">FocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">f</span>.<span class="ident">unmut</span>()
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TreeFocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="lifetime">&#39;a</span>,
-{
-    <span class="ident">tree</span>: <span class="ident">Lock</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">RRB</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TreeFocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="ident">tree</span>: <span class="ident">Lock</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Rrb</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">view</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="ident">middle_range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="ident">target_range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
@@ -1710,7 +1680,7 @@
 <span class="kw">where</span>
     <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tree</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">RRB</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tree</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Rrb</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">middle_start</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">outer_f</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">inner_f</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">middle_end</span> <span class="op">=</span> <span class="ident">middle_start</span> <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">middle</span>.<span class="ident">len</span>();
         <span class="ident">TreeFocusMut</span> {
@@ -1768,7 +1738,7 @@
         (<span class="ident">range</span>.<span class="ident">start</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>)..(<span class="ident">range</span>.<span class="ident">end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">set_focus</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) {
+    <span class="kw">fn</span> <span class="ident">set_focus</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">RRBPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">index</span>: <span class="ident">usize</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tree</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">tree</span>
             .<span class="ident">lock</span>()
@@ -1777,29 +1747,37 @@
             <span class="kw">let</span> <span class="ident">outer_len</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">outer_f</span>.<span class="ident">len</span>();
             <span class="kw">if</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">outer_len</span> {
                 <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span> <span class="number">0</span>..<span class="ident">outer_len</span>;
-                <span class="self">self</span>.<span class="ident">target_ptr</span>
-                    .<span class="ident">store</span>(<span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">outer_f</span>), <span class="ident">Ordering::Relaxed</span>);
+                <span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">store</span>(
+                    <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="ident">value_pool</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">outer_f</span>),
+                    <span class="ident">Ordering::Relaxed</span>,
+                );
             } <span class="kw">else</span> {
                 <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span> <span class="ident">outer_len</span>..<span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span>;
-                <span class="self">self</span>.<span class="ident">target_ptr</span>
-                    .<span class="ident">store</span>(<span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">inner_f</span>), <span class="ident">Ordering::Relaxed</span>);
+                <span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">store</span>(
+                    <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="ident">value_pool</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">inner_f</span>),
+                    <span class="ident">Ordering::Relaxed</span>,
+                );
             }
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">end</span> {
             <span class="kw">let</span> <span class="ident">outer_start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">end</span> <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">inner_b</span>.<span class="ident">len</span>();
             <span class="kw">if</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">outer_start</span> {
                 <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">end</span>..<span class="ident">outer_start</span>;
-                <span class="self">self</span>.<span class="ident">target_ptr</span>
-                    .<span class="ident">store</span>(<span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">inner_b</span>), <span class="ident">Ordering::Relaxed</span>);
+                <span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">store</span>(
+                    <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="ident">value_pool</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">inner_b</span>),
+                    <span class="ident">Ordering::Relaxed</span>,
+                );
             } <span class="kw">else</span> {
                 <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span> <span class="ident">outer_start</span>..<span class="ident">tree</span>.<span class="ident">length</span>;
-                <span class="self">self</span>.<span class="ident">target_ptr</span>
-                    .<span class="ident">store</span>(<span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">outer_b</span>), <span class="ident">Ordering::Relaxed</span>);
+                <span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">store</span>(
+                    <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="ident">value_pool</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">outer_b</span>),
+                    <span class="ident">Ordering::Relaxed</span>,
+                );
             }
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">tree_index</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span>;
             <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">middle_level</span>;
             <span class="kw">let</span> <span class="ident">middle</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">middle</span>);
-            <span class="kw">let</span> (<span class="ident">range</span>, <span class="ident">ptr</span>) <span class="op">=</span> <span class="ident">middle</span>.<span class="ident">lookup_chunk_mut</span>(<span class="ident">level</span>, <span class="number">0</span>, <span class="ident">tree_index</span>);
+            <span class="kw">let</span> (<span class="ident">range</span>, <span class="ident">ptr</span>) <span class="op">=</span> <span class="ident">middle</span>.<span class="ident">lookup_chunk_mut</span>(<span class="ident">pool</span>, <span class="ident">level</span>, <span class="number">0</span>, <span class="ident">tree_index</span>);
             <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span>
                 (<span class="ident">range</span>.<span class="ident">start</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span>)..(<span class="ident">range</span>.<span class="ident">end</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span>);
             <span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">store</span>(<span class="ident">ptr</span>, <span class="ident">Ordering::Relaxed</span>);
@@ -1811,22 +1789,22 @@
         <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">RRBPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
         <span class="kw">let</span> <span class="ident">phys_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">physical_index</span>(<span class="ident">index</span>);
         <span class="kw">if</span> <span class="op">!</span><span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target_range</span>, <span class="kw-2">&amp;</span><span class="ident">phys_index</span>) {
-            <span class="self">self</span>.<span class="ident">set_focus</span>(<span class="ident">phys_index</span>);
+            <span class="self">self</span>.<span class="ident">set_focus</span>(<span class="ident">pool</span>, <span class="ident">phys_index</span>);
         }
         <span class="kw">let</span> <span class="ident">target_phys_index</span> <span class="op">=</span> <span class="ident">phys_index</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">start</span>;
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">get_focus</span>()[<span class="ident">target_phys_index</span>])
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_chunk</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;mut</span> [<span class="ident">A</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_chunk</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">RRBPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;mut</span> [<span class="ident">A</span>]) {
         <span class="kw">let</span> <span class="ident">phys_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">physical_index</span>(<span class="ident">index</span>);
         <span class="kw">if</span> <span class="op">!</span><span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target_range</span>, <span class="kw-2">&amp;</span><span class="ident">phys_index</span>) {
-            <span class="self">self</span>.<span class="ident">set_focus</span>(<span class="ident">phys_index</span>);
+            <span class="self">self</span>.<span class="ident">set_focus</span>(<span class="ident">pool</span>, <span class="ident">phys_index</span>);
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right</span> <span class="op">=</span> <span class="number">0</span>;

@@ -4,7 +4,7 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../gimli/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"><a href="#">Module read</a></h2><div class="sidebar-elems"><section><div class="block"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div></section><div id="sidebar-vars" data-name="read" data-ty="mod" data-relpath="./"></div><script defer src="./sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../gimli/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">gimli</a>::<wbr><a class="mod" href="#">read</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/gimli/read/mod.rs.html#1-766">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Read DWARF debugging information.</p>
+    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">gimli</a>::<wbr><a class="mod" href="#">read</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/gimli/read/mod.rs.html#1-821">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Read DWARF debugging information.</p>
 <ul>
 <li><a href="#example-usage">Example Usage</a></li>
 <li><a href="#api-structure">API Structure</a></li>
@@ -57,7 +57,7 @@ compilers used to create each compilation unit within a shared library or
 executable (via <code>DW_AT_producer</code>)</p>
 </li>
 <li>
-<p><a href="http://github.com/gimli-rs/gimli/blob/master/examples/dwarf-validate.rs"><code>dwarf-validate</code></a>,
+<p><a href="https://github.com/gimli-rs/gimli/blob/master/examples/dwarf-validate.rs"><code>dwarf-validate</code></a>,
 a program to validate the integrity of some DWARF and its references
 between sections and compilation units.</p>
 </li>
@@ -128,6 +128,12 @@ section.</p>
 <p><a href="./struct.DebugTypes.html"><code>DebugTypes</code></a>: The <code>.debug_types</code> section.</p>
 </li>
 <li>
+<p><a href="./struct.DebugCuIndex.html"><code>DebugCuIndex</code></a>: The <code>.debug_cu_index</code> section.</p>
+</li>
+<li>
+<p><a href="./struct.DebugTuIndex.html"><code>DebugTuIndex</code></a>: The <code>.debug_tu_index</code> section.</p>
+</li>
+<li>
 <p><a href="./struct.EhFrame.html"><code>EhFrame</code></a>: The <code>.eh_frame</code> section.</p>
 </li>
 <li>
@@ -196,7 +202,7 @@ associated value.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.AttributeSpecification.html" title="gimli::read::AttributeSpecification struct">AttributeSpecification</a></div><div class="item-right docblock-short"><p>The description of an attribute in an abbreviated type. It is a pair of name
 and form.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.AttrsIter.html" title="gimli::read::AttrsIter struct">AttrsIter</a></div><div class="item-right docblock-short"><p>An iterator over a particular entry’s attributes.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Augmentation.html" title="gimli::read::Augmentation struct">Augmentation</a></div><div class="item-right docblock-short"><p>We support the z-style augmentation <a href="http://refspecs.linuxfoundation.org/LSB_3.0.0/LSB-Core-generic/LSB-Core-generic/ehframechpt.html">defined by <code>.eh_frame</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Augmentation.html" title="gimli::read::Augmentation struct">Augmentation</a></div><div class="item-right docblock-short"><p>We support the z-style augmentation <a href="https://refspecs.linuxfoundation.org/LSB_3.0.0/LSB-Core-generic/LSB-Core-generic/ehframechpt.html">defined by <code>.eh_frame</code></a>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.BaseAddresses.html" title="gimli::read::BaseAddresses struct">BaseAddresses</a></div><div class="item-right docblock-short"><p>Optional base addresses for the relative <code>DW_EH_PE_*</code> encoded pointers.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.CallFrameInstructionIter.html" title="gimli::read::CallFrameInstructionIter struct">CallFrameInstructionIter</a></div><div class="item-right docblock-short"><p>A lazy iterator parsing call frame instructions.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.CfiEntriesIter.html" title="gimli::read::CfiEntriesIter struct">CfiEntriesIter</a></div><div class="item-right docblock-short"><p>An iterator over CIE and FDE entries in a <code>.debug_frame</code> or <code>.eh_frame</code>
@@ -213,6 +219,7 @@ Frame Description Entries. There is at least one CIE in every non-empty
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DebugAddr.html" title="gimli::read::DebugAddr struct">DebugAddr</a></div><div class="item-right docblock-short"><p>The raw contents of the <code>.debug_addr</code> section.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DebugAranges.html" title="gimli::read::DebugAranges struct">DebugAranges</a></div><div class="item-right docblock-short"><p>The <code>DebugAranges</code> struct represents the DWARF address range information
 found in the <code>.debug_aranges</code> section.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DebugCuIndex.html" title="gimli::read::DebugCuIndex struct">DebugCuIndex</a></div><div class="item-right docblock-short"><p>The data in the <code>.debug_cu_index</code> section of a <code>.dwp</code> file.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DebugFrame.html" title="gimli::read::DebugFrame struct">DebugFrame</a></div><div class="item-right docblock-short"><p><code>DebugFrame</code> contains the <code>.debug_frame</code> section’s frame unwinding
 information required to unwind to and recover registers from older frames on
 the stack. For example, this is useful for a debugger that wants to print
@@ -237,11 +244,13 @@ found in the <code>.debug_info</code> section.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DebugStr.html" title="gimli::read::DebugStr struct">DebugStr</a></div><div class="item-right docblock-short"><p>The <code>DebugStr</code> struct represents the DWARF strings
 found in the <code>.debug_str</code> section.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DebugStrOffsets.html" title="gimli::read::DebugStrOffsets struct">DebugStrOffsets</a></div><div class="item-right docblock-short"><p>The raw contents of the <code>.debug_str_offsets</code> section.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DebugTuIndex.html" title="gimli::read::DebugTuIndex struct">DebugTuIndex</a></div><div class="item-right docblock-short"><p>The data in the <code>.debug_tu_index</code> section of a <code>.dwp</code> file.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DebugTypes.html" title="gimli::read::DebugTypes struct">DebugTypes</a></div><div class="item-right docblock-short"><p>The <code>DebugTypes</code> struct represents the DWARF type information
 found in the <code>.debug_types</code> section.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DebugTypesUnitHeadersIter.html" title="gimli::read::DebugTypesUnitHeadersIter struct">DebugTypesUnitHeadersIter</a></div><div class="item-right docblock-short"><p>An iterator over the type-units of this <code>.debug_types</code> section.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DebuggingInformationEntry.html" title="gimli::read::DebuggingInformationEntry struct">DebuggingInformationEntry</a></div><div class="item-right docblock-short"><p>A Debugging Information Entry (DIE).</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Dwarf.html" title="gimli::read::Dwarf struct">Dwarf</a></div><div class="item-right docblock-short"><p>All of the commonly used DWARF sections, and other common information.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DwarfPackage.html" title="gimli::read::DwarfPackage struct">DwarfPackage</a></div><div class="item-right docblock-short"><p>The sections from a <code>.dwp</code> file.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.EhFrame.html" title="gimli::read::EhFrame struct">EhFrame</a></div><div class="item-right docblock-short"><p><code>EhFrame</code> contains the frame unwinding information needed during exception
 handling found in the <code>.eh_frame</code> section.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.EhFrameHdr.html" title="gimli::read::EhFrameHdr struct">EhFrameHdr</a></div><div class="item-right docblock-short"><p><code>EhFrameHdr</code> contains the information about the <code>.eh_frame_hdr</code> section.</p>
@@ -289,13 +298,16 @@ expression.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.RngListIter.html" title="gimli::read::RngListIter struct">RngListIter</a></div><div class="item-right docblock-short"><p>An iterator over an address range list.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SectionBaseAddresses.html" title="gimli::read::SectionBaseAddresses struct">SectionBaseAddresses</a></div><div class="item-right docblock-short"><p>Optional base addresses for the relative <code>DW_EH_PE_*</code> encoded pointers
 in a particular section.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.UninitializedUnwindContext.html" title="gimli::read::UninitializedUnwindContext struct">UninitializedUnwindContext</a></div><div class="item-right docblock-short"><p>Common context needed when evaluating the call frame unwinding information.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.StoreOnHeap.html" title="gimli::read::StoreOnHeap struct">StoreOnHeap</a></div><div class="item-right docblock-short"><p>Indicates that storage should be allocated on heap.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Unit.html" title="gimli::read::Unit struct">Unit</a></div><div class="item-right docblock-short"><p>All of the commonly used information for a unit in the <code>.debug_info</code> or <code>.debug_types</code>
 sections.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.UnitHeader.html" title="gimli::read::UnitHeader struct">UnitHeader</a></div><div class="item-right docblock-short"><p>The common fields for the headers of compilation units and
 type units.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.UnitIndex.html" title="gimli::read::UnitIndex struct">UnitIndex</a></div><div class="item-right docblock-short"><p>The partially parsed index from a <code>DebugCuIndex</code> or <code>DebugTuIndex</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.UnitIndexSection.html" title="gimli::read::UnitIndexSection struct">UnitIndexSection</a></div><div class="item-right docblock-short"><p>Information about a unit’s contribution to a section in a <code>.dwp</code> file.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.UnitIndexSectionIterator.html" title="gimli::read::UnitIndexSectionIterator struct">UnitIndexSectionIterator</a></div><div class="item-right docblock-short"><p>An iterator over the section offsets and sizes for a row in a <code>UnitIndex</code>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.UnitOffset.html" title="gimli::read::UnitOffset struct">UnitOffset</a></div><div class="item-right docblock-short"><p>An offset into the current compilation or type unit.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.UnwindContext.html" title="gimli::read::UnwindContext struct">UnwindContext</a></div><div class="item-right docblock-short"><p>An unwinding context.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.UnwindContext.html" title="gimli::read::UnwindContext struct">UnwindContext</a></div><div class="item-right docblock-short"><p>Common context needed when evaluating the call frame unwinding information.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.UnwindTable.html" title="gimli::read::UnwindTable struct">UnwindTable</a></div><div class="item-right docblock-short"><p>The <code>UnwindTable</code> iteratively evaluates a <code>FrameDescriptionEntry</code>’s
 <code>CallFrameInstruction</code> program, yielding the each row one at a time.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.UnwindTableRow.html" title="gimli::read::UnwindTableRow struct">UnwindTableRow</a></div><div class="item-right docblock-short"><p>A row in the virtual unwind table that describes how to find the values of
@@ -326,13 +338,16 @@ signature/type offset of a type unit).</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Value.html" title="gimli::read::Value enum">Value</a></div><div class="item-right docblock-short"><p>The value of an entry on the DWARF stack.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ValueType.html" title="gimli::read::ValueType enum">ValueType</a></div><div class="item-right docblock-short"><p>The type of an entry on the DWARF stack.</p>
 </div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.LineProgram.html" title="gimli::read::LineProgram trait">LineProgram</a></div><div class="item-right docblock-short"><p>A <code>LineProgram</code> provides access to a <code>LineProgramHeader</code> and
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ArrayLike.html" title="gimli::read::ArrayLike trait">ArrayLike</a></div><div class="item-right docblock-short"><p>Marker trait for types that can be used as backing storage when a growable array type is needed.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.EvaluationStorage.html" title="gimli::read::EvaluationStorage trait">EvaluationStorage</a></div><div class="item-right docblock-short"><p>Specification of what storage should be used for <a href="struct.Evaluation.html" title="Evaluation"><code>Evaluation</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.LineProgram.html" title="gimli::read::LineProgram trait">LineProgram</a></div><div class="item-right docblock-short"><p>A <code>LineProgram</code> provides access to a <code>LineProgramHeader</code> and
 a way to add files to the files table if necessary. Gimli consumers should
 never need to use or see this trait.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Reader.html" title="gimli::read::Reader trait">Reader</a></div><div class="item-right docblock-short"><p>A trait for reading the data from a DWARF section.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ReaderOffset.html" title="gimli::read::ReaderOffset trait">ReaderOffset</a></div><div class="item-right docblock-short"><p>A trait for offsets with a DWARF section.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Section.html" title="gimli::read::Section trait">Section</a></div><div class="item-right docblock-short"><p>A convenience trait for loading DWARF sections from object files.  To be
 used like:</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.UnwindContextStorage.html" title="gimli::read::UnwindContextStorage trait">UnwindContextStorage</a></div><div class="item-right docblock-short"><p>Specification of what storage should be used for <a href="struct.UnwindContext.html" title="UnwindContext"><code>UnwindContext</code></a>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.UnwindOffset.html" title="gimli::read::UnwindOffset trait">UnwindOffset</a></div><div class="item-right docblock-short"><p>An offset into an <code>UnwindSection</code>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.UnwindSection.html" title="gimli::read::UnwindSection trait">UnwindSection</a></div><div class="item-right docblock-short"><p>A section holding unwind information: either <code>.debug_frame</code> or
 <code>.eh_frame</code>. See <a href="./struct.DebugFrame.html"><code>DebugFrame</code></a> and

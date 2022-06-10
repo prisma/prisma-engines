@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.19.1/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -171,15 +171,93 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">AlertDescription</span>, <span class="ident">ContentType</span>, <span class="ident">HandshakeType</span>};
-<span class="kw">use</span> <span class="ident">sct</span>;
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rand</span>;
+
+<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">webpki</span>;
+<span class="kw">use</span> <span class="ident">std::time::SystemTimeError</span>;
 
 <span class="doccomment">/// rustls reports protocol errors using this type.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TLSError</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
     <span class="doccomment">/// We received a TLS message that isn&#39;t valid right now.</span>
     <span class="doccomment">/// `expect_types` lists the message types we can expect right now.</span>
     <span class="doccomment">/// `got_type` is the type we found.  This error is typically</span>
@@ -211,8 +289,15 @@
     <span class="doccomment">/// The peer didn&#39;t give us any certificates.</span>
     <span class="ident">NoCertificatesPresented</span>,
 
+    <span class="doccomment">/// The certificate verifier doesn&#39;t support the given type of name.</span>
+    <span class="ident">UnsupportedNameType</span>,
+
     <span class="doccomment">/// We couldn&#39;t decrypt a message.  This is invariably fatal.</span>
     <span class="ident">DecryptError</span>,
+
+    <span class="doccomment">/// We couldn&#39;t encrypt a message because it was larger than the allowed message size.</span>
+    <span class="doccomment">/// This should never happen if the application is using valid record sizes.</span>
+    <span class="ident">EncryptError</span>,
 
     <span class="doccomment">/// The peer doesn&#39;t support a protocol version/feature we require.</span>
     <span class="doccomment">/// The parameter gives a hint as to what version/feature it is.</span>
@@ -225,17 +310,29 @@
     <span class="doccomment">/// We received a fatal alert.  This means the peer is unhappy.</span>
     <span class="ident">AlertReceived</span>(<span class="ident">AlertDescription</span>),
 
-    <span class="doccomment">/// The presented certificate chain is invalid.</span>
-    <span class="ident">WebPKIError</span>(<span class="ident">webpki::Error</span>),
+    <span class="doccomment">/// We received an invalidly encoded certificate from the peer.</span>
+    <span class="ident">InvalidCertificateEncoding</span>,
+
+    <span class="doccomment">/// We received a certificate with invalid signature type.</span>
+    <span class="ident">InvalidCertificateSignatureType</span>,
+
+    <span class="doccomment">/// We received a certificate with invalid signature.</span>
+    <span class="ident">InvalidCertificateSignature</span>,
+
+    <span class="doccomment">/// We received a certificate which includes invalid data.</span>
+    <span class="ident">InvalidCertificateData</span>(<span class="ident">String</span>),
 
     <span class="doccomment">/// The presented SCT(s) were invalid.</span>
-    <span class="ident">InvalidSCT</span>(<span class="ident">sct::Error</span>),
+    <span class="ident">InvalidSct</span>(<span class="ident">sct::Error</span>),
 
     <span class="doccomment">/// A catch-all error for unlikely errors.</span>
     <span class="ident">General</span>(<span class="ident">String</span>),
 
     <span class="doccomment">/// We failed to figure out what time it currently is.</span>
     <span class="ident">FailedToGetCurrentTime</span>,
+
+    <span class="doccomment">/// We failed to acquire random bytes from the system.</span>
+    <span class="ident">FailedToGetRandomBytes</span>,
 
     <span class="doccomment">/// This function doesn&#39;t work until the TLS handshake</span>
     <span class="doccomment">/// is complete.</span>
@@ -246,6 +343,10 @@
 
     <span class="doccomment">/// An incoming connection did not support any known application protocol.</span>
     <span class="ident">NoApplicationProtocol</span>,
+
+    <span class="doccomment">/// The `max_fragment_size` value supplied in configuration was too small,</span>
+    <span class="doccomment">/// or too large.</span>
+    <span class="ident">BadMaxFragmentSize</span>,
 }
 
 <span class="kw">fn</span> <span class="ident">join</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) -&gt; <span class="ident">String</span> {
@@ -256,10 +357,10 @@
         .<span class="ident">join</span>(<span class="string">&quot; or &quot;</span>)
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TLSError</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">TLSError::InappropriateMessage</span> {
+            <span class="ident"><span class="self">Self</span>::InappropriateMessage</span> {
                 <span class="kw-2">ref</span> <span class="ident">expect_types</span>,
                 <span class="kw-2">ref</span> <span class="ident">got_type</span>,
             } =&gt; <span class="macro">write!</span>(
@@ -268,7 +369,7 @@
                 <span class="ident">got_type</span>,
                 <span class="ident">join</span>::<span class="op">&lt;</span><span class="ident">ContentType</span><span class="op">&gt;</span>(<span class="ident">expect_types</span>)
             ),
-            <span class="ident">TLSError::InappropriateHandshakeMessage</span> {
+            <span class="ident"><span class="self">Self</span>::InappropriateHandshakeMessage</span> {
                 <span class="kw-2">ref</span> <span class="ident">expect_types</span>,
                 <span class="kw-2">ref</span> <span class="ident">got_type</span>,
             } =&gt; <span class="macro">write!</span>(
@@ -277,66 +378,119 @@
                 <span class="ident">got_type</span>,
                 <span class="ident">join</span>::<span class="op">&lt;</span><span class="ident">HandshakeType</span><span class="op">&gt;</span>(<span class="ident">expect_types</span>)
             ),
-            <span class="ident">TLSError::CorruptMessagePayload</span>(<span class="kw-2">ref</span> <span class="ident">typ</span>) =&gt; {
+            <span class="ident"><span class="self">Self</span>::CorruptMessagePayload</span>(<span class="kw-2">ref</span> <span class="ident">typ</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;received corrupt message of type {:?}&quot;</span>, <span class="ident">typ</span>)
             }
-            <span class="ident">TLSError::PeerIncompatibleError</span>(<span class="kw-2">ref</span> <span class="ident">why</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer is incompatible: {}&quot;</span>, <span class="ident">why</span>),
-            <span class="ident">TLSError::PeerMisbehavedError</span>(<span class="kw-2">ref</span> <span class="ident">why</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer misbehaved: {}&quot;</span>, <span class="ident">why</span>),
-            <span class="ident">TLSError::AlertReceived</span>(<span class="kw-2">ref</span> <span class="ident">alert</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;received fatal alert: {:?}&quot;</span>, <span class="ident">alert</span>),
-            <span class="ident">TLSError::WebPKIError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid certificate: {:?}&quot;</span>, <span class="ident">err</span>),
-            <span class="ident">TLSError::CorruptMessage</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;received corrupt message&quot;</span>),
-            <span class="ident">TLSError::NoCertificatesPresented</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer sent no certificates&quot;</span>),
-            <span class="ident">TLSError::DecryptError</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;cannot decrypt peer&#39;s message&quot;</span>),
-            <span class="ident">TLSError::PeerSentOversizedRecord</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer sent excess record size&quot;</span>),
-            <span class="ident">TLSError::HandshakeNotComplete</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;handshake not complete&quot;</span>),
-            <span class="ident">TLSError::NoApplicationProtocol</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer doesn&#39;t support any known protocol&quot;</span>),
-            <span class="ident">TLSError::InvalidSCT</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid certificate timestamp: {:?}&quot;</span>, <span class="ident">err</span>),
-            <span class="ident">TLSError::FailedToGetCurrentTime</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;failed to get current time&quot;</span>),
-            <span class="ident">TLSError::General</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unexpected error: {}&quot;</span>, <span class="ident">err</span>), <span class="comment">// (please file a bug)</span>
+            <span class="ident"><span class="self">Self</span>::PeerIncompatibleError</span>(<span class="kw-2">ref</span> <span class="ident">why</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer is incompatible: {}&quot;</span>, <span class="ident">why</span>),
+            <span class="ident"><span class="self">Self</span>::PeerMisbehavedError</span>(<span class="kw-2">ref</span> <span class="ident">why</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer misbehaved: {}&quot;</span>, <span class="ident">why</span>),
+            <span class="ident"><span class="self">Self</span>::AlertReceived</span>(<span class="kw-2">ref</span> <span class="ident">alert</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;received fatal alert: {:?}&quot;</span>, <span class="ident">alert</span>),
+            <span class="ident"><span class="self">Self</span>::InvalidCertificateEncoding</span> =&gt; {
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid peer certificate encoding&quot;</span>)
+            }
+            <span class="ident"><span class="self">Self</span>::InvalidCertificateSignatureType</span> =&gt; {
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid peer certificate signature type&quot;</span>)
+            }
+            <span class="ident"><span class="self">Self</span>::InvalidCertificateSignature</span> =&gt; {
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid peer certificate signature&quot;</span>)
+            }
+            <span class="ident"><span class="self">Self</span>::InvalidCertificateData</span>(<span class="kw-2">ref</span> <span class="ident">reason</span>) =&gt; {
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid peer certificate contents: {}&quot;</span>, <span class="ident">reason</span>)
+            }
+            <span class="ident"><span class="self">Self</span>::CorruptMessage</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;received corrupt message&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::NoCertificatesPresented</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer sent no certificates&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::UnsupportedNameType</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;presented server name type wasn&#39;t supported&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::DecryptError</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;cannot decrypt peer&#39;s message&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::EncryptError</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;cannot encrypt message&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::PeerSentOversizedRecord</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer sent excess record size&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::HandshakeNotComplete</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;handshake not complete&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::NoApplicationProtocol</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer doesn&#39;t support any known protocol&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::InvalidSct</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid certificate timestamp: {:?}&quot;</span>, <span class="ident">err</span>),
+            <span class="ident"><span class="self">Self</span>::FailedToGetCurrentTime</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;failed to get current time&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::FailedToGetRandomBytes</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;failed to get random bytes&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::BadMaxFragmentSize</span> =&gt; {
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;the supplied max_fragment_size was too small or large&quot;</span>)
+            }
+            <span class="ident"><span class="self">Self</span>::General</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unexpected error: {}&quot;</span>, <span class="ident">err</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">TLSError</span> {}
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SystemTimeError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident">SystemTimeError</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::FailedToGetCurrentTime</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">rand::GetRandomFailed</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident">rand::GetRandomFailed</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::FailedToGetRandomBytes</span>
+    }
+}
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Error</span>;
+
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">smoke</span>() {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TLSError</span>;
         <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">AlertDescription</span>, <span class="ident">ContentType</span>, <span class="ident">HandshakeType</span>};
         <span class="kw">use</span> <span class="ident">sct</span>;
-        <span class="kw">use</span> <span class="ident">webpki</span>;
 
         <span class="kw">let</span> <span class="ident">all</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">TLSError::InappropriateMessage</span> {
+            <span class="ident">Error::InappropriateMessage</span> {
                 <span class="ident">expect_types</span>: <span class="macro">vec!</span>[<span class="ident">ContentType::Alert</span>],
                 <span class="ident">got_type</span>: <span class="ident">ContentType::Handshake</span>,
             },
-            <span class="ident">TLSError::InappropriateHandshakeMessage</span> {
+            <span class="ident">Error::InappropriateHandshakeMessage</span> {
                 <span class="ident">expect_types</span>: <span class="macro">vec!</span>[<span class="ident">HandshakeType::ClientHello</span>, <span class="ident">HandshakeType::Finished</span>],
                 <span class="ident">got_type</span>: <span class="ident">HandshakeType::ServerHello</span>,
             },
-            <span class="ident">TLSError::CorruptMessage</span>,
-            <span class="ident">TLSError::CorruptMessagePayload</span>(<span class="ident">ContentType::Alert</span>),
-            <span class="ident">TLSError::NoCertificatesPresented</span>,
-            <span class="ident">TLSError::DecryptError</span>,
-            <span class="ident">TLSError::PeerIncompatibleError</span>(<span class="string">&quot;no tls1.2&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">TLSError::PeerMisbehavedError</span>(<span class="string">&quot;inconsistent something&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">TLSError::AlertReceived</span>(<span class="ident">AlertDescription::ExportRestriction</span>),
-            <span class="ident">TLSError::WebPKIError</span>(<span class="ident">webpki::Error::ExtensionValueInvalid</span>),
-            <span class="ident">TLSError::InvalidSCT</span>(<span class="ident">sct::Error::MalformedSCT</span>),
-            <span class="ident">TLSError::General</span>(<span class="string">&quot;undocumented error&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">TLSError::FailedToGetCurrentTime</span>,
-            <span class="ident">TLSError::HandshakeNotComplete</span>,
-            <span class="ident">TLSError::PeerSentOversizedRecord</span>,
-            <span class="ident">TLSError::NoApplicationProtocol</span>,
+            <span class="ident">Error::CorruptMessage</span>,
+            <span class="ident">Error::CorruptMessagePayload</span>(<span class="ident">ContentType::Alert</span>),
+            <span class="ident">Error::NoCertificatesPresented</span>,
+            <span class="ident">Error::DecryptError</span>,
+            <span class="ident">Error::PeerIncompatibleError</span>(<span class="string">&quot;no tls1.2&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">Error::PeerMisbehavedError</span>(<span class="string">&quot;inconsistent something&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">Error::AlertReceived</span>(<span class="ident">AlertDescription::ExportRestriction</span>),
+            <span class="ident">Error::InvalidCertificateEncoding</span>,
+            <span class="ident">Error::InvalidCertificateSignatureType</span>,
+            <span class="ident">Error::InvalidCertificateSignature</span>,
+            <span class="ident">Error::InvalidCertificateData</span>(<span class="string">&quot;Data&quot;</span>.<span class="ident">into</span>()),
+            <span class="ident">Error::InvalidSct</span>(<span class="ident">sct::Error::MalformedSct</span>),
+            <span class="ident">Error::General</span>(<span class="string">&quot;undocumented error&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">Error::FailedToGetCurrentTime</span>,
+            <span class="ident">Error::FailedToGetRandomBytes</span>,
+            <span class="ident">Error::HandshakeNotComplete</span>,
+            <span class="ident">Error::PeerSentOversizedRecord</span>,
+            <span class="ident">Error::NoApplicationProtocol</span>,
+            <span class="ident">Error::BadMaxFragmentSize</span>,
         ];
 
         <span class="kw">for</span> <span class="ident">err</span> <span class="kw">in</span> <span class="ident">all</span> {
             <span class="macro">println!</span>(<span class="string">&quot;{:?}:&quot;</span>, <span class="ident">err</span>);
             <span class="macro">println!</span>(<span class="string">&quot;  fmt &#39;{}&#39;&quot;</span>, <span class="ident">err</span>);
         }
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">rand_error_mapping</span>() {
+        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::rand</span>;
+        <span class="kw">let</span> <span class="ident">err</span>: <span class="ident">Error</span> <span class="op">=</span> <span class="ident">rand::GetRandomFailed</span>.<span class="ident">into</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">err</span>, <span class="ident">Error::FailedToGetRandomBytes</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">time_error_mapping</span>() {
+        <span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
+
+        <span class="kw">let</span> <span class="ident">time_error</span> <span class="op">=</span> <span class="ident">SystemTime::UNIX_EPOCH</span>
+            .<span class="ident">duration_since</span>(<span class="ident">SystemTime::now</span>())
+            .<span class="ident">unwrap_err</span>();
+        <span class="kw">let</span> <span class="ident">err</span>: <span class="ident">Error</span> <span class="op">=</span> <span class="ident">time_error</span>.<span class="ident">into</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">err</span>, <span class="ident">Error::FailedToGetCurrentTime</span>);
     }
 }
 </code></pre></div>

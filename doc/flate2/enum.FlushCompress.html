@@ -27,7 +27,7 @@ not aligned to a byte boundary.</p>
 <p>All of the input data so far will be available to the decompressor (as
 with <code>Flush::Sync</code>. This completes the current deflate block and follows
 it with an empty fixed codes block that is 10 bites long, and it assures
-that enough bytes are output in order for the decompessor to finish the
+that enough bytes are output in order for the decompressor to finish the
 block before the empty fixed code block.</p>
 </div><h3 id="variant.Full" class="variant small-section-header"><a href="#variant.Full" class="anchor field"></a><code>Full</code></h3><div class="docblock"><p>All output is flushed as with <code>Flush::Sync</code> and the compression state is
 reset so decompression can restart from this point if previous

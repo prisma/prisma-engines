@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.24.0/src/read/macho/section.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>section.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.28.4/src/read/macho/section.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>section.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -369,6 +369,24 @@
 <span id="364">364</span>
 <span id="365">365</span>
 <span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::fmt::Debug</span>;
 <span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">result</span>, <span class="ident">slice</span>, <span class="ident">str</span>};
 
@@ -451,9 +469,11 @@
     <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
 {
     <span class="kw">fn</span> <span class="ident">bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">segment_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">internal</span>.<span class="ident">segment_index</span>;
+        <span class="kw">let</span> <span class="ident">segment</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">segment_internal</span>(<span class="ident">segment_index</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">internal</span>
             .<span class="ident">section</span>
-            .<span class="ident">data</span>(<span class="self">self</span>.<span class="ident">file</span>.<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">data</span>)
+            .<span class="ident">data</span>(<span class="self">self</span>.<span class="ident">file</span>.<span class="ident">endian</span>, <span class="ident">segment</span>.<span class="ident">data</span>)
             .<span class="ident">read_error</span>(<span class="string">&quot;Invalid Mach-O section size or offset&quot;</span>)
     }
 }
@@ -499,7 +519,7 @@
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">bytes</span>()<span class="question-mark">?</span>)
+        <span class="self">self</span>.<span class="ident">bytes</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">data_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">address</span>: <span class="ident">u64</span>, <span class="ident">size</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -522,10 +542,20 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">name_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">internal</span>.<span class="ident">section</span>.<span class="ident">name</span>())
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">str::from_utf8</span>(<span class="self">self</span>.<span class="ident">internal</span>.<span class="ident">section</span>.<span class="ident">name</span>())
             .<span class="ident">ok</span>()
             .<span class="ident">read_error</span>(<span class="string">&quot;Non UTF-8 Mach-O section name&quot;</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">segment_name_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">internal</span>.<span class="ident">section</span>.<span class="ident">segment_name</span>()))
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -563,12 +593,17 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">MachOSectionInternal</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach</span>: <span class="ident">MachHeader</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">SectionIndex</span>,
+    <span class="kw">pub</span> <span class="ident">segment_index</span>: <span class="ident">usize</span>,
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">SectionKind</span>,
     <span class="kw">pub</span> <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Mach::Section</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach</span>: <span class="ident">MachHeader</span><span class="op">&gt;</span> <span class="ident">MachOSectionInternal</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">index</span>: <span class="ident">SectionIndex</span>, <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Mach::Section</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse</span>(
+        <span class="ident">index</span>: <span class="ident">SectionIndex</span>,
+        <span class="ident">segment_index</span>: <span class="ident">usize</span>,
+        <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Mach::Section</span>,
+    ) -&gt; <span class="self">Self</span> {
         <span class="comment">// TODO: we don&#39;t validate flags, should we?</span>
         <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">section</span>.<span class="ident">segment_name</span>(), <span class="ident">section</span>.<span class="ident">name</span>()) {
             (<span class="string">b&quot;__TEXT&quot;</span>, <span class="string">b&quot;__text&quot;</span>) =&gt; <span class="ident">SectionKind::Text</span>,
@@ -591,6 +626,7 @@
         };
         <span class="ident">MachOSectionInternal</span> {
             <span class="ident">index</span>,
+            <span class="ident">segment_index</span>,
             <span class="ident">kind</span>,
             <span class="ident">section</span>,
         }
@@ -616,7 +652,7 @@
     <span class="doccomment">/// Return the `sectname` bytes up until the null terminator.</span>
     <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">let</span> <span class="ident">sectname</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sectname</span>()[..];
-        <span class="kw">match</span> <span class="ident">sectname</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>) {
+        <span class="kw">match</span> <span class="ident">memchr::memchr</span>(<span class="string">b&#39;\0&#39;</span>, <span class="ident">sectname</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">end</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">sectname</span>[..<span class="ident">end</span>],
             <span class="prelude-val">None</span> =&gt; <span class="ident">sectname</span>,
         }
@@ -625,7 +661,7 @@
     <span class="doccomment">/// Return the `segname` bytes up until the null terminator.</span>
     <span class="kw">fn</span> <span class="ident">segment_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">let</span> <span class="ident">segname</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">segname</span>()[..];
-        <span class="kw">match</span> <span class="ident">segname</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>) {
+        <span class="kw">match</span> <span class="ident">memchr::memchr</span>(<span class="string">b&#39;\0&#39;</span>, <span class="ident">segname</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">end</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">segname</span>[..<span class="ident">end</span>],
             <span class="prelude-val">None</span> =&gt; <span class="ident">segname</span>,
         }

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/sync/mutex.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mutex.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/sync/mutex.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mutex.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -952,6 +952,24 @@
 <span id="947">947</span>
 <span id="948">948</span>
 <span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>), <span class="ident">allow</span>(<span class="ident">unreachable_pub</span>, <span class="ident">dead_code</span>))]</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::batch_semaphore</span> <span class="kw">as</span> <span class="ident">semaphore</span>;
@@ -1318,11 +1336,21 @@
         }
     }
 
-    <span class="doccomment">/// Blocking lock this mutex. When the lock has been acquired, function returns a</span>
+    <span class="doccomment">/// Blockingly locks this `Mutex`. When the lock has been acquired, function returns a</span>
     <span class="doccomment">/// [`MutexGuard`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method is intended for use cases where you</span>
     <span class="doccomment">/// need to use this mutex in asynchronous code as well as in synchronous code.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function panics if called within an asynchronous execution context.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///   - If you find yourself in an asynchronous execution context and needing</span>
+    <span class="doccomment">///     to call some (synchronous) function which performs one of these</span>
+    <span class="doccomment">///     `blocking_` operations, then consider wrapping that call inside</span>
+    <span class="doccomment">///     [`spawn_blocking()`][crate::runtime::Handle::spawn_blocking]</span>
+    <span class="doccomment">///     (or [`block_in_place()`][crate::task::block_in_place]).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1333,16 +1361,24 @@
     <span class="doccomment">/// #[tokio::main]</span>
     <span class="doccomment">/// async fn main() {</span>
     <span class="doccomment">///     let mutex =  Arc::new(Mutex::new(1));</span>
+    <span class="doccomment">///     let lock = mutex.lock().await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     let mutex1 = Arc::clone(&amp;mutex);</span>
-    <span class="doccomment">///     let sync_code = tokio::task::spawn_blocking(move || {</span>
+    <span class="doccomment">///     let blocking_task = tokio::task::spawn_blocking(move || {</span>
+    <span class="doccomment">///         // This shall block until the `lock` is released.</span>
     <span class="doccomment">///         let mut n = mutex1.blocking_lock();</span>
     <span class="doccomment">///         *n = 2;</span>
     <span class="doccomment">///     });</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///     sync_code.await.unwrap();</span>
+    <span class="doccomment">///     assert_eq!(*lock, 1);</span>
+    <span class="doccomment">///     // Release the lock.</span>
+    <span class="doccomment">///     drop(lock);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///     let n = mutex.lock().await;</span>
+    <span class="doccomment">///     // Await the completion of the blocking task.</span>
+    <span class="doccomment">///     blocking_task.await.unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     // Assert uncontended.</span>
+    <span class="doccomment">///     let n = mutex.try_lock().unwrap();</span>
     <span class="doccomment">///     assert_eq!(*n, 2);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>

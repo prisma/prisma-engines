@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.24.0/src/read/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.28.4/src/read/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -637,6 +637,82 @@
 <span id="632">632</span>
 <span id="633">633</span>
 <span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Interface for reading object files.</span>
 
 <span class="kw">use</span> <span class="ident">alloc::borrow::Cow</span>;
@@ -644,7 +720,6 @@
 <span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">result</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ByteString</span>, <span class="ident">Endianness</span>};
 
 <span class="kw">mod</span> <span class="ident">read_ref</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">read_ref</span>::<span class="kw-2">*</span>;
@@ -655,9 +730,23 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">read_cache</span>::<span class="kw-2">*</span>;
 
 <span class="kw">mod</span> <span class="ident">util</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">util::StringTable</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">util</span>::<span class="kw-2">*</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;coff&quot;</span>,
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;elf&quot;</span>,
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macho&quot;</span>,
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pe&quot;</span>,
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;wasm&quot;</span>
+))]</span>
 <span class="kw">mod</span> <span class="ident">any</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;coff&quot;</span>,
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;elf&quot;</span>,
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macho&quot;</span>,
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pe&quot;</span>,
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;wasm&quot;</span>
+))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">any</span>::<span class="kw-2">*</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;archive&quot;</span>)]</span>
@@ -712,6 +801,12 @@
     }
 }
 
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ReadError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read_error</span>(<span class="self">self</span>, <span class="ident">error</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error</span>(<span class="ident">error</span>))
+    }
+}
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ReadError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">read_error</span>(<span class="self">self</span>, <span class="ident">error</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">ok_or</span>(<span class="ident">Error</span>(<span class="ident">error</span>))
@@ -725,7 +820,7 @@
     <span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>,
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;elf&quot;</span>
 ))]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">NativeFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">elf::ElfFile32</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Endianness</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">NativeFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">elf::ElfFile32</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident"><span class="kw">crate</span>::Endianness</span>, <span class="ident">R</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// The native executable file for the target platform.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
@@ -734,15 +829,15 @@
     <span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>,
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;elf&quot;</span>
 ))]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">NativeFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">elf::ElfFile64</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Endianness</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">NativeFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">elf::ElfFile64</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident"><span class="kw">crate</span>::Endianness</span>, <span class="ident">R</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// The native executable file for the target platform.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>, <span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macho&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">NativeFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">macho::MachOFile32</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Endianness</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">NativeFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">macho::MachOFile32</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident"><span class="kw">crate</span>::Endianness</span>, <span class="ident">R</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// The native executable file for the target platform.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>, <span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macho&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">NativeFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">macho::MachOFile64</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Endianness</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">NativeFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">macho::MachOFile64</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident"><span class="kw">crate</span>::Endianness</span>, <span class="ident">R</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// The native executable file for the target platform.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>, <span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pe&quot;</span>))]</span>
@@ -756,8 +851,8 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;wasm&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;wasm&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">NativeFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">wasm::WasmFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>;
 
-<span class="doccomment">/// An object file kind.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="doccomment">/// A file format kind.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FileKind</span> {
     <span class="doccomment">/// A Unix archive.</span>
@@ -766,6 +861,9 @@
     <span class="doccomment">/// A COFF object file.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;coff&quot;</span>)]</span>
     <span class="ident">Coff</span>,
+    <span class="doccomment">/// A dyld cache file containing Mach-O images.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macho&quot;</span>)]</span>
+    <span class="ident">DyldCache</span>,
     <span class="doccomment">/// A 32-bit ELF file.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;elf&quot;</span>)]</span>
     <span class="ident">Elf32</span>,
@@ -798,8 +896,13 @@
 <span class="kw">impl</span> <span class="ident">FileKind</span> {
     <span class="doccomment">/// Determine a file kind by parsing the start of the file.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FileKind</span><span class="op">&gt;</span> {
+        <span class="ident"><span class="self">Self</span>::parse_at</span>(<span class="ident">data</span>, <span class="number">0</span>)
+    }
+
+    <span class="doccomment">/// Determine a file kind by parsing at the given offset.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_at</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="ident">R</span>, <span class="ident">offset</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FileKind</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">magic</span> <span class="op">=</span> <span class="ident">data</span>
-            .<span class="ident">read_bytes_at</span>(<span class="number">0</span>, <span class="number">16</span>)
+            .<span class="ident">read_bytes_at</span>(<span class="ident">offset</span>, <span class="number">16</span>)
             .<span class="ident">read_error</span>(<span class="string">&quot;Could not read file magic&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">magic</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">16</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>(<span class="string">&quot;File too short&quot;</span>));
@@ -808,6 +911,8 @@
         <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> [<span class="ident">magic</span>[<span class="number">0</span>], <span class="ident">magic</span>[<span class="number">1</span>], <span class="ident">magic</span>[<span class="number">2</span>], <span class="ident">magic</span>[<span class="number">3</span>], <span class="ident">magic</span>[<span class="number">4</span>], <span class="ident">magic</span>[<span class="number">5</span>], <span class="ident">magic</span>[<span class="number">6</span>], <span class="ident">magic</span>[<span class="number">7</span>]] {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;archive&quot;</span>)]</span>
             [<span class="string">b&#39;!&#39;</span>, <span class="string">b&#39;&lt;&#39;</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;r&#39;</span>, <span class="string">b&#39;c&#39;</span>, <span class="string">b&#39;h&#39;</span>, <span class="string">b&#39;&gt;&#39;</span>, <span class="string">b&#39;\n&#39;</span>] =&gt; <span class="ident">FileKind::Archive</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macho&quot;</span>)]</span>
+            [<span class="string">b&#39;d&#39;</span>, <span class="string">b&#39;y&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;d&#39;</span>, <span class="string">b&#39;_&#39;</span>, <span class="string">b&#39;v&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39; &#39;</span>] =&gt; <span class="ident">FileKind::DyldCache</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;elf&quot;</span>)]</span>
             [<span class="number">0x7f</span>, <span class="string">b&#39;E&#39;</span>, <span class="string">b&#39;L&#39;</span>, <span class="string">b&#39;F&#39;</span>, <span class="number">1</span>, ..] =&gt; <span class="ident">FileKind::Elf32</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;elf&quot;</span>)]</span>
@@ -852,6 +957,22 @@
     }
 }
 
+<span class="doccomment">/// An object kind.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ObjectKind</span> {
+    <span class="doccomment">/// The object kind is unknown.</span>
+    <span class="ident">Unknown</span>,
+    <span class="doccomment">/// Relocatable object.</span>
+    <span class="ident">Relocatable</span>,
+    <span class="doccomment">/// Executable.</span>
+    <span class="ident">Executable</span>,
+    <span class="doccomment">/// Dynamic shared object.</span>
+    <span class="ident">Dynamic</span>,
+    <span class="doccomment">/// Core.</span>
+    <span class="ident">Core</span>,
+}
+
 <span class="doccomment">/// The index used to identify a section of a file.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SectionIndex</span>(<span class="kw">pub</span> <span class="ident">usize</span>);
@@ -862,6 +983,7 @@
 
 <span class="doccomment">/// The section where a symbol is defined.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SymbolSection</span> {
     <span class="doccomment">/// The section is unknown.</span>
     <span class="ident">Unknown</span>,
@@ -1047,9 +1169,9 @@
 <span class="doccomment">/// An imported symbol.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Import</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
+    <span class="ident">library</span>: <span class="ident">ByteString</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
     <span class="comment">// TODO: or ordinal</span>
     <span class="ident">name</span>: <span class="ident">ByteString</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
-    <span class="ident">library</span>: <span class="ident">ByteString</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="ident">Import</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
@@ -1081,15 +1203,44 @@
         <span class="self">self</span>.<span class="ident">name</span>.<span class="number">0</span>
     }
 
-    <span class="doccomment">/// The symbol address.</span>
+    <span class="doccomment">/// The virtual address of the symbol.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">address</span>
     }
 }
 
+<span class="doccomment">/// PDB Information</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeView</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
+    <span class="ident">guid</span>: [<span class="ident">u8</span>; <span class="number">16</span>],
+    <span class="ident">path</span>: <span class="ident">ByteString</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+    <span class="ident">age</span>: <span class="ident">u32</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="ident">CodeView</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// The path to the PDB as stored in CodeView</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>] {
+        <span class="self">self</span>.<span class="ident">path</span>.<span class="number">0</span>
+    }
+
+    <span class="doccomment">/// The age of the PDB</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">age</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
+        <span class="self">self</span>.<span class="ident">age</span>
+    }
+
+    <span class="doccomment">/// The GUID of the PDB.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">16</span>] {
+        <span class="self">self</span>.<span class="ident">guid</span>
+    }
+}
+
 <span class="doccomment">/// The target referenced by a relocation.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RelocationTarget</span> {
     <span class="doccomment">/// The target is a symbol.</span>
     <span class="ident">Symbol</span>(<span class="ident">SymbolIndex</span>),
@@ -1159,6 +1310,7 @@
 
 <span class="doccomment">/// A data compression format.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CompressionFormat</span> {
     <span class="doccomment">/// The data is uncompressed.</span>
     <span class="prelude-val">None</span>,

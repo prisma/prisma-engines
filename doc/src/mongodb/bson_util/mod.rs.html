@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.1.0/src/bson_util/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/bson_util/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -236,153 +236,19 @@
 <span id="231">231</span>
 <span id="232">232</span>
 <span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
-<span id="362">362</span>
-<span id="363">363</span>
-<span id="364">364</span>
-<span id="365">365</span>
-<span id="366">366</span>
-<span id="367">367</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
+    <span class="ident">convert::TryFrom</span>,
     <span class="ident">io</span>::{<span class="ident">Read</span>, <span class="ident">Write</span>},
     <span class="ident">time::Duration</span>,
 };
 
-<span class="kw">use</span> <span class="ident">bson::spec::ElementType</span>;
+<span class="kw">use</span> <span class="ident">bson::RawBsonRef</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::Error</span> <span class="kw">as</span> <span class="ident">SerdeDeError</span>, <span class="ident">ser</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>},
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">runtime</span>::{<span class="ident">SyncLittleEndianRead</span>, <span class="ident">SyncLittleEndianWrite</span>},
+    <span class="ident">error</span>::{<span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
+    <span class="ident">runtime::SyncLittleEndianRead</span>,
 };
 
 <span class="doccomment">/// Coerce numeric types into an `i64` if it would be lossless to do so. If this Bson is not numeric</span>
@@ -392,6 +258,17 @@
         <span class="ident">Bson::Int32</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i64::from</span>(<span class="ident">i</span>)),
         <span class="ident">Bson::Int64</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
         <span class="ident">Bson::Double</span>(<span class="ident">f</span>) <span class="kw">if</span> (<span class="ident">f</span> <span class="op">-</span> (<span class="ident">f</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="kw">as</span> <span class="ident">f64</span>)).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">f64::EPSILON</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">f</span> <span class="kw">as</span> <span class="ident">i64</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    }
+}
+
+<span class="doccomment">/// Coerce numeric types into an `i64` if it would be lossless to do so. If this Bson is not numeric</span>
+<span class="doccomment">/// or the conversion would be lossy (e.g. 1.5 -&gt; 1), this returns `None`.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_int_raw</span>(<span class="ident">val</span>: <span class="ident">RawBsonRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+    <span class="kw">match</span> <span class="ident">val</span> {
+        <span class="ident">RawBsonRef::Int32</span>(<span class="ident">i</span>) =&gt; <span class="ident">get_int</span>(<span class="kw-2">&amp;</span><span class="ident">Bson::Int32</span>(<span class="ident">i</span>)),
+        <span class="ident">RawBsonRef::Int64</span>(<span class="ident">i</span>) =&gt; <span class="ident">get_int</span>(<span class="kw-2">&amp;</span><span class="ident">Bson::Int64</span>(<span class="ident">i</span>)),
+        <span class="ident">RawBsonRef::Double</span>(<span class="ident">i</span>) =&gt; <span class="ident">get_int</span>(<span class="kw-2">&amp;</span><span class="ident">Bson::Double</span>(<span class="ident">i</span>)),
         <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
@@ -543,7 +420,6 @@
 
 <span class="doccomment">/// The size in bytes of the provided document&#39;s entry in a BSON array at the given index.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">array_entry_size_bytes</span>(<span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">doc_len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
-    <span class="comment">// </span>
     <span class="comment">//   * type (1 byte)</span>
     <span class="comment">//   * number of decimal digits in key</span>
     <span class="comment">//   * null terminator for the key (1 byte)</span>
@@ -569,166 +445,22 @@
 
 <span class="doccomment">/// Read a document&#39;s raw BSON bytes from the provided reader.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_document_bytes</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32</span>()<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32_sync</span>()<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">length</span> <span class="kw">as</span> <span class="ident">usize</span>);
-    <span class="ident">bytes</span>.<span class="ident">write_i32</span>(<span class="ident">length</span>)<span class="question-mark">?</span>;
+    <span class="ident">bytes</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">length</span>.<span class="ident">to_le_bytes</span>())<span class="question-mark">?</span>;
 
     <span class="ident">reader</span>.<span class="ident">take</span>(<span class="ident">length</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">-</span> <span class="number">4</span>).<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>)<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>)
 }
 
-<span class="doccomment">/// Get the value for the provided key from a buffer containing a BSON document.</span>
-<span class="doccomment">/// If the key is not present, None will be returned.</span>
-<span class="doccomment">/// If the BSON is not properly formatted, an internal error would be returned.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// TODO: RUST-924 replace this with raw document API usage.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">raw_get</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">read_i32</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::io::Cursor</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
-        <span class="ident">reader</span>.<span class="ident">read_i32</span>().<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">read_u8</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::io::Cursor</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="ident">reader</span>.<span class="ident">read_u8</span>().<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">deserialize_error</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">std::error::Error</span><span class="op">&gt;</span>(<span class="ident">_e</span>: <span class="ident">T</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">deserialize_error_no_arg</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">deserialize_error_no_arg</span>() -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::from</span>(<span class="ident">ErrorKind::Internal</span> {
-            <span class="ident">message</span>: <span class="string">&quot;failed to read from serialized document&quot;</span>.<span class="ident">to_string</span>(),
-        })
-    }
-
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">std::io::Cursor::new</span>(<span class="ident">doc</span>);
-    <span class="kw">let</span> <span class="ident">len</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>
-        .<span class="ident">try_into</span>()
-        .<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)<span class="question-mark">?</span>;
-
-    <span class="kw">while</span> <span class="ident">reader</span>.<span class="ident">position</span>() <span class="op">&lt;</span> <span class="ident">len</span> {
-        <span class="kw">let</span> <span class="ident">element_start</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">position</span>().<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)<span class="question-mark">?</span>;
-
-        <span class="comment">// read the element type</span>
-        <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
-
-        <span class="comment">// check if we reached the end of the document</span>
-        <span class="kw">if</span> <span class="ident">tag</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">reader</span>.<span class="ident">position</span>() <span class="op">==</span> <span class="ident">len</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
-        }
-
-        <span class="kw">let</span> <span class="ident">element_type</span> <span class="op">=</span> <span class="ident">ElementType::from</span>(<span class="ident">tag</span>).<span class="ident">ok_or_else</span>(<span class="ident">deserialize_error_no_arg</span>)<span class="question-mark">?</span>;
-
-        <span class="comment">// walk through the document until a null byte is encountered</span>
-        <span class="kw">while</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="ident">reader</span>.<span class="ident">position</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">len</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">deserialize_error_no_arg</span>());
-            }
-        }
-
-        <span class="comment">// parse the key</span>
-        <span class="kw">let</span> <span class="ident">string_end</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">reader</span>
-            .<span class="ident">position</span>()
-            .<span class="ident">checked_sub</span>(<span class="number">1</span>) <span class="comment">// back from null byte</span>
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">usize::try_from</span>(<span class="ident">u</span>).<span class="ident">ok</span>())
-            .<span class="ident">ok_or_else</span>(<span class="ident">deserialize_error_no_arg</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">reader</span>.<span class="ident">get_ref</span>()[(<span class="ident">element_start</span> <span class="op">+</span> <span class="number">1</span>)..<span class="ident">string_end</span>];
-        <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">std::str::from_utf8</span>(<span class="ident">slice</span>).<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)<span class="question-mark">?</span>;
-
-        <span class="comment">// move to the end of the element</span>
-        <span class="kw">let</span> <span class="ident">skip_len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">element_type</span> {
-            <span class="ident">ElementType::Array</span>
-            <span class="op">|</span> <span class="ident">ElementType::EmbeddedDocument</span>
-            <span class="op">|</span> <span class="ident">ElementType::JavaScriptCodeWithScope</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
-                <span class="comment">// length includes the 4 bytes for the length, so subtrack them out</span>
-                <span class="ident">l</span>.<span class="ident">checked_sub</span>(<span class="number">4</span>).<span class="ident">ok_or_else</span>(<span class="ident">deserialize_error_no_arg</span>)<span class="question-mark">?</span>
-            }
-            <span class="ident">ElementType::Binary</span> =&gt; <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>
-                .<span class="ident">checked_add</span>(<span class="number">1</span>) <span class="comment">// add one for subtype</span>
-                .<span class="ident">ok_or_else</span>(<span class="ident">deserialize_error_no_arg</span>)<span class="question-mark">?</span>,
-            <span class="ident">ElementType::Int32</span> =&gt; <span class="number">4</span>,
-            <span class="ident">ElementType::Int64</span> =&gt; <span class="number">8</span>,
-            <span class="ident">ElementType::String</span> <span class="op">|</span> <span class="ident">ElementType::Symbol</span> <span class="op">|</span> <span class="ident">ElementType::JavaScriptCode</span> =&gt; {
-                <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>
-            }
-            <span class="ident">ElementType::Boolean</span> =&gt; <span class="number">1</span>,
-            <span class="ident">ElementType::Double</span> =&gt; <span class="number">8</span>,
-            <span class="ident">ElementType::Timestamp</span> =&gt; <span class="number">8</span>,
-            <span class="ident">ElementType::Decimal128</span> =&gt; <span class="number">16</span>,
-            <span class="ident">ElementType::MinKey</span>
-            <span class="op">|</span> <span class="ident">ElementType::MaxKey</span>
-            <span class="op">|</span> <span class="ident">ElementType::Null</span>
-            <span class="op">|</span> <span class="ident">ElementType::Undefined</span> =&gt; <span class="number">0</span>,
-            <span class="ident">ElementType::DateTime</span> =&gt; <span class="number">8</span>,
-            <span class="ident">ElementType::ObjectId</span> =&gt; <span class="number">12</span>,
-            <span class="ident">ElementType::DbPointer</span> =&gt; <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>
-                .<span class="ident">checked_add</span>(<span class="number">12</span>) <span class="comment">// add 12 for objectid</span>
-                .<span class="ident">ok_or_else</span>(<span class="ident">deserialize_error_no_arg</span>)<span class="question-mark">?</span>,
-            <span class="ident">ElementType::RegularExpression</span> =&gt; {
-                <span class="comment">// read two cstr&#39;s</span>
-                <span class="kw">for</span> <span class="ident">_i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">2</span> {
-                    <span class="kw">while</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                        <span class="kw">if</span> <span class="ident">reader</span>.<span class="ident">position</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">len</span> {
-                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">deserialize_error_no_arg</span>());
-                        }
-                    }
-                }
-
-                <span class="number">0</span> <span class="comment">// don&#39;t need to skip anymore since we already read the whole value</span>
-            }
-        };
-        <span class="kw">let</span> <span class="ident">skip_len</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">skip_len</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)<span class="question-mark">?</span>;
-        <span class="ident">reader</span>.<span class="ident">set_position</span>(
-            <span class="ident">reader</span>
-                .<span class="ident">position</span>()
-                .<span class="ident">checked_add</span>(<span class="ident">skip_len</span>)
-                .<span class="ident">ok_or_else</span>(<span class="ident">deserialize_error_no_arg</span>)<span class="question-mark">?</span>,
-        );
-
-        <span class="kw">if</span> <span class="ident">k</span> <span class="op">==</span> <span class="ident">key</span> {
-            <span class="comment">// if this is the element we&#39;re looking for, extract it.</span>
-            <span class="kw">let</span> <span class="ident">element_end</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">position</span>().<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">element_slice</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">reader</span>.<span class="ident">get_ref</span>()[<span class="ident">element_start</span>..<span class="ident">element_end</span>];
-            <span class="kw">let</span> <span class="ident">element_length</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">element_slice</span>.<span class="ident">len</span>().<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)<span class="question-mark">?</span>;
-
-            <span class="comment">// create a new temporary document which just has the element we want and grab the value</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">temp_doc</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-
-            <span class="comment">// write the document length</span>
-            <span class="kw">let</span> <span class="ident">temp_len</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">element_length</span>
-                .<span class="ident">checked_add</span>(<span class="number">4</span> <span class="op">+</span> <span class="number">1</span>)
-                .<span class="ident">ok_or_else</span>(<span class="ident">deserialize_error_no_arg</span>)<span class="question-mark">?</span>;
-            <span class="ident">temp_doc</span>
-                .<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">temp_len</span>.<span class="ident">to_le_bytes</span>())
-                .<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)<span class="question-mark">?</span>;
-
-            <span class="comment">// add in the element</span>
-            <span class="ident">temp_doc</span>.<span class="ident">extend</span>(<span class="ident">element_slice</span>);
-
-            <span class="comment">// write the null byte</span>
-            <span class="ident">temp_doc</span>.<span class="ident">push</span>(<span class="number">0</span>);
-
-            <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Document::from_reader</span>(<span class="ident">temp_doc</span>.<span class="ident">as_slice</span>()).<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
-                <span class="ident">d</span>.<span class="ident">get</span>(<span class="string">&quot;_id&quot;</span>).<span class="ident">ok_or_else</span>(<span class="ident">deserialize_error_no_arg</span>)<span class="question-mark">?</span>.<span class="ident">clone</span>(),
-            ));
-        }
-    }
-
-    <span class="comment">// read all bytes but didn&#39;t reach null byte</span>
-    <span class="prelude-val">Err</span>(<span class="ident">deserialize_error_no_arg</span>())
-}
-
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::bson_util::num_decimal_digits</span>;
 
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>, <span class="ident">tokio::test</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>, <span class="ident">async_std::test</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">num_digits</span>() {
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">num_digits</span>() {
         <span class="macro">assert_eq!</span>(<span class="ident">num_decimal_digits</span>(<span class="number">0</span>), <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">num_decimal_digits</span>(<span class="number">1</span>), <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">num_decimal_digits</span>(<span class="number">10</span>), <span class="number">2</span>);

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/net/tcp/stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/net/tcp/stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1320,17 +1320,6 @@
 <span id="1315">1315</span>
 <span id="1316">1316</span>
 <span id="1317">1317</span>
-<span id="1318">1318</span>
-<span id="1319">1319</span>
-<span id="1320">1320</span>
-<span id="1321">1321</span>
-<span id="1322">1322</span>
-<span id="1323">1323</span>
-<span id="1324">1324</span>
-<span id="1325">1325</span>
-<span id="1326">1326</span>
-<span id="1327">1327</span>
-<span id="1328">1328</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::future::poll_fn</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">Interest</span>, <span class="ident">PollEvented</span>, <span class="ident">ReadBuf</span>, <span class="ident">Ready</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net::tcp::split</span>::{<span class="ident">split</span>, <span class="ident">ReadHalf</span>, <span class="ident">WriteHalf</span>};
@@ -1597,6 +1586,11 @@
         <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">local_addr</span>()
     }
 
+    <span class="doccomment">/// Returns the value of the `SO_ERROR` option.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">take_error</span>()
+    }
+
     <span class="doccomment">/// Returns the remote address that this stream is connected to.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -1720,7 +1714,7 @@
     <span class="doccomment">///             // if the readiness event is a false positive.</span>
     <span class="doccomment">///             match stream.try_read(&amp;mut data) {</span>
     <span class="doccomment">///                 Ok(n) =&gt; {</span>
-    <span class="doccomment">///                     println!(&quot;read {} bytes&quot;, n);        </span>
+    <span class="doccomment">///                     println!(&quot;read {} bytes&quot;, n);</span>
     <span class="doccomment">///                 }</span>
     <span class="doccomment">///                 Err(ref e) if e.kind() == io::ErrorKind::WouldBlock =&gt; {</span>
     <span class="doccomment">///                     continue;</span>
@@ -2301,7 +2295,9 @@
         <span class="ident">interest</span>: <span class="ident">Interest</span>,
         <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">registration</span>().<span class="ident">try_io</span>(<span class="ident">interest</span>, <span class="ident">f</span>)
+        <span class="self">self</span>.<span class="ident">io</span>
+            .<span class="ident">registration</span>()
+            .<span class="ident">try_io</span>(<span class="ident">interest</span>, <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">try_io</span>(<span class="ident">f</span>))
     }
 
     <span class="doccomment">/// Receives data on the socket from the remote address to which it is</span>
@@ -2423,9 +2419,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">linger</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">mio_socket</span> <span class="op">=</span> <span class="ident">std::mem::ManuallyDrop::new</span>(<span class="self">self</span>.<span class="ident">to_mio</span>());
-
-        <span class="ident">mio_socket</span>.<span class="ident">get_linger</span>()
+        <span class="ident">socket2::SockRef::from</span>(<span class="self">self</span>).<span class="ident">linger</span>()
     }
 
     <span class="doccomment">/// Sets the linger duration of this socket by setting the SO_LINGER option.</span>
@@ -2450,23 +2444,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_linger</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dur</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">mio_socket</span> <span class="op">=</span> <span class="ident">std::mem::ManuallyDrop::new</span>(<span class="self">self</span>.<span class="ident">to_mio</span>());
-
-        <span class="ident">mio_socket</span>.<span class="ident">set_linger</span>(<span class="ident">dur</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">to_mio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">mio::net::TcpSocket</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-        {
-            <span class="kw">use</span> <span class="ident">std::os::windows::io</span>::{<span class="ident">AsRawSocket</span>, <span class="ident">FromRawSocket</span>};
-            <span class="kw">unsafe</span> { <span class="ident">mio::net::TcpSocket::from_raw_socket</span>(<span class="self">self</span>.<span class="ident">as_raw_socket</span>()) }
-        }
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-        {
-            <span class="kw">use</span> <span class="ident">std::os::unix::io</span>::{<span class="ident">AsRawFd</span>, <span class="ident">FromRawFd</span>};
-            <span class="kw">unsafe</span> { <span class="ident">mio::net::TcpSocket::from_raw_fd</span>(<span class="self">self</span>.<span class="ident">as_raw_fd</span>()) }
-        }
+        <span class="ident">socket2::SockRef::from</span>(<span class="self">self</span>).<span class="ident">set_linger</span>(<span class="ident">dur</span>)
     }
 
     <span class="doccomment">/// Gets the value of the `IP_TTL` option for this socket.</span>

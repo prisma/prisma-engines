@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.10.0/src/serde_conv.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde_conv.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/serde_conv.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde_conv.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -146,17 +146,21 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
 </pre><pre class="rust"><code><span class="doccomment">/// Create new conversion adapters from functions</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The macro lets you create a new converter, which is usable for serde&#39;s with-attribute and `#[serde_as]`.</span>
-<span class="doccomment">/// Its main use case is to write simple converters for types which are not serializable.</span>
+<span class="doccomment">/// Its main use case is to write simple converters for types, which are not serializable.</span>
 <span class="doccomment">/// Another use-case is to change the serialization behavior if the implemented `Serialize`/`Deserialize` trait is insufficient.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The macro takes four arguments:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// 1. The name of the converter type.</span>
 <span class="doccomment">///     The type can be prefixed with a visibility modifies like `pub` or `pub(crate)`.</span>
-<span class="doccomment">///     By default the type is not marked as public (`pub(self)`).</span>
+<span class="doccomment">///     By default, the type is not marked as public (`pub(self)`).</span>
 <span class="doccomment">/// 2. The type `T` we want to extend with custom behavior.</span>
 <span class="doccomment">/// 3. A function or macro taking a `&amp;T` and returning a serializable type.</span>
 <span class="doccomment">/// 4. A function or macro taking a deserializable type and returning a `Result&lt;T, E&gt;`.</span>
@@ -164,10 +168,13 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// In this example we write custom serialization behavior for a `Rgb` type.</span>
+<span class="doccomment">/// In this example, we write custom serialization behavior for a `Rgb` type.</span>
 <span class="doccomment">/// We want to serialize it as a `[u8; 3]`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
+<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// #[derive(Clone, Copy, Debug, PartialEq)]</span>
 <span class="doccomment">/// struct Rgb {</span>
 <span class="doccomment">///     red: u8,</span>
@@ -201,7 +208,7 @@
 <span class="doccomment">/// // We can now use the `RgbAsArray` adapter with `serde_as`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// #[serde_with::serde_as]</span>
-<span class="doccomment">/// #[derive(Debug, PartialEq, serde::Serialize, serde::Deserialize)]</span>
+<span class="doccomment">/// #[derive(Debug, PartialEq, Serialize, Deserialize)]</span>
 <span class="doccomment">/// struct Colors {</span>
 <span class="doccomment">///     #[serde_as(as = &quot;RgbAsArray&quot;)]</span>
 <span class="doccomment">///     one_rgb: Rgb,</span>
@@ -228,7 +235,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// // The types generated by `serde_conv` is also compatible with serde&#39;s with attribute</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Debug, PartialEq, serde::Serialize, serde::Deserialize)]</span>
+<span class="doccomment">/// #[derive(Debug, PartialEq, Serialize, Deserialize)]</span>
 <span class="doccomment">/// struct ColorsWith {</span>
 <span class="doccomment">///     #[serde(with = &quot;RgbAsArray&quot;)]</span>
 <span class="doccomment">///     rgb_with: Rgb,</span>
@@ -243,6 +250,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(json, serde_json::to_value(&amp;data).unwrap());</span>
 <span class="doccomment">/// assert_eq!(data, serde_json::from_value(json).unwrap());</span>
+<span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">serde_conv</span> {

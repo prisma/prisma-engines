@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.7/src/offset_date_time.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>offset_date_time.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.9/src/offset_date_time.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>offset_date_time.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1132,6 +1132,200 @@
 <span id="1125">1125</span>
 <span id="1126">1126</span>
 <span id="1127">1127</span>
+<span id="1128">1128</span>
+<span id="1129">1129</span>
+<span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
+<span id="1152">1152</span>
+<span id="1153">1153</span>
+<span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
+<span id="1159">1159</span>
+<span id="1160">1160</span>
+<span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
+<span id="1172">1172</span>
+<span id="1173">1173</span>
+<span id="1174">1174</span>
+<span id="1175">1175</span>
+<span id="1176">1176</span>
+<span id="1177">1177</span>
+<span id="1178">1178</span>
+<span id="1179">1179</span>
+<span id="1180">1180</span>
+<span id="1181">1181</span>
+<span id="1182">1182</span>
+<span id="1183">1183</span>
+<span id="1184">1184</span>
+<span id="1185">1185</span>
+<span id="1186">1186</span>
+<span id="1187">1187</span>
+<span id="1188">1188</span>
+<span id="1189">1189</span>
+<span id="1190">1190</span>
+<span id="1191">1191</span>
+<span id="1192">1192</span>
+<span id="1193">1193</span>
+<span id="1194">1194</span>
+<span id="1195">1195</span>
+<span id="1196">1196</span>
+<span id="1197">1197</span>
+<span id="1198">1198</span>
+<span id="1199">1199</span>
+<span id="1200">1200</span>
+<span id="1201">1201</span>
+<span id="1202">1202</span>
+<span id="1203">1203</span>
+<span id="1204">1204</span>
+<span id="1205">1205</span>
+<span id="1206">1206</span>
+<span id="1207">1207</span>
+<span id="1208">1208</span>
+<span id="1209">1209</span>
+<span id="1210">1210</span>
+<span id="1211">1211</span>
+<span id="1212">1212</span>
+<span id="1213">1213</span>
+<span id="1214">1214</span>
+<span id="1215">1215</span>
+<span id="1216">1216</span>
+<span id="1217">1217</span>
+<span id="1218">1218</span>
+<span id="1219">1219</span>
+<span id="1220">1220</span>
+<span id="1221">1221</span>
+<span id="1222">1222</span>
+<span id="1223">1223</span>
+<span id="1224">1224</span>
+<span id="1225">1225</span>
+<span id="1226">1226</span>
+<span id="1227">1227</span>
+<span id="1228">1228</span>
+<span id="1229">1229</span>
+<span id="1230">1230</span>
+<span id="1231">1231</span>
+<span id="1232">1232</span>
+<span id="1233">1233</span>
+<span id="1234">1234</span>
+<span id="1235">1235</span>
+<span id="1236">1236</span>
+<span id="1237">1237</span>
+<span id="1238">1238</span>
+<span id="1239">1239</span>
+<span id="1240">1240</span>
+<span id="1241">1241</span>
+<span id="1242">1242</span>
+<span id="1243">1243</span>
+<span id="1244">1244</span>
+<span id="1245">1245</span>
+<span id="1246">1246</span>
+<span id="1247">1247</span>
+<span id="1248">1248</span>
+<span id="1249">1249</span>
+<span id="1250">1250</span>
+<span id="1251">1251</span>
+<span id="1252">1252</span>
+<span id="1253">1253</span>
+<span id="1254">1254</span>
+<span id="1255">1255</span>
+<span id="1256">1256</span>
+<span id="1257">1257</span>
+<span id="1258">1258</span>
+<span id="1259">1259</span>
+<span id="1260">1260</span>
+<span id="1261">1261</span>
+<span id="1262">1262</span>
+<span id="1263">1263</span>
+<span id="1264">1264</span>
+<span id="1265">1265</span>
+<span id="1266">1266</span>
+<span id="1267">1267</span>
+<span id="1268">1268</span>
+<span id="1269">1269</span>
+<span id="1270">1270</span>
+<span id="1271">1271</span>
+<span id="1272">1272</span>
+<span id="1273">1273</span>
+<span id="1274">1274</span>
+<span id="1275">1275</span>
+<span id="1276">1276</span>
+<span id="1277">1277</span>
+<span id="1278">1278</span>
+<span id="1279">1279</span>
+<span id="1280">1280</span>
+<span id="1281">1281</span>
+<span id="1282">1282</span>
+<span id="1283">1283</span>
+<span id="1284">1284</span>
+<span id="1285">1285</span>
+<span id="1286">1286</span>
+<span id="1287">1287</span>
+<span id="1288">1288</span>
+<span id="1289">1289</span>
+<span id="1290">1290</span>
+<span id="1291">1291</span>
+<span id="1292">1292</span>
+<span id="1293">1293</span>
+<span id="1294">1294</span>
+<span id="1295">1295</span>
+<span id="1296">1296</span>
+<span id="1297">1297</span>
+<span id="1298">1298</span>
+<span id="1299">1299</span>
+<span id="1300">1300</span>
+<span id="1301">1301</span>
+<span id="1302">1302</span>
+<span id="1303">1303</span>
+<span id="1304">1304</span>
+<span id="1305">1305</span>
+<span id="1306">1306</span>
+<span id="1307">1307</span>
+<span id="1308">1308</span>
+<span id="1309">1309</span>
+<span id="1310">1310</span>
+<span id="1311">1311</span>
+<span id="1312">1312</span>
+<span id="1313">1313</span>
+<span id="1314">1314</span>
+<span id="1315">1315</span>
+<span id="1316">1316</span>
+<span id="1317">1317</span>
+<span id="1318">1318</span>
+<span id="1319">1319</span>
+<span id="1320">1320</span>
+<span id="1321">1321</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The [`OffsetDateTime`] struct and its associated `impl`s.</span>
 
 <span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
@@ -1150,6 +1344,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::formatting::Formattable</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::Parsable</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>, <span class="ident">Date</span>, <span class="ident">Duration</span>, <span class="ident">Month</span>, <span class="ident">PrimitiveDateTime</span>, <span class="ident">Time</span>, <span class="ident">UtcOffset</span>, <span class="ident">Weekday</span>};
 
 <span class="doccomment">/// The Julian day of the Unix epoch.</span>
@@ -2017,6 +2213,186 @@
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_offset</span>(<span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">UtcOffset</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">assume_offset</span>(<span class="ident">offset</span>)
     }
+
+    <span class="doccomment">/// Replace the year. The month and day will be unchanged.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 12:00 +01).replace_year(2019),</span>
+    <span class="doccomment">///     Ok(datetime!(2019 - 02 - 18 12:00 +01))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 12:00 +01).replace_year(-1_000_000_000).is_err()); // -1_000_000_000 isn&#39;t a valid year</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 12:00 +01).replace_year(1_000_000_000).is_err()); // 1_000_000_000 isn&#39;t a valid year</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_year</span>(<span class="self">self</span>, <span class="ident">year</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(
+            <span class="self">self</span>.<span class="ident">utc_datetime</span>
+                .<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+                .<span class="ident">replace_year</span>(<span class="ident">year</span>)
+        )
+        .<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>))
+    }
+
+    <span class="doccomment">/// Replace the month of the year.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// # use time::Month;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 12:00 +01).replace_month(Month::January),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 01 - 18 12:00 +01))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 01 - 30 12:00 +01).replace_month(Month::February).is_err()); // 30 isn&#39;t a valid day in February</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_month</span>(<span class="self">self</span>, <span class="ident">month</span>: <span class="ident">Month</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(
+            <span class="self">self</span>.<span class="ident">utc_datetime</span>
+                .<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+                .<span class="ident">replace_month</span>(<span class="ident">month</span>)
+        )
+        .<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>))
+    }
+
+    <span class="doccomment">/// Replace the day of the month.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 12:00 +01).replace_day(1),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 01 12:00 +01))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 12:00 +01).replace_day(0).is_err()); // 00 isn&#39;t a valid day</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 12:00 +01).replace_day(30).is_err()); // 30 isn&#39;t a valid day in February</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_day</span>(<span class="self">self</span>, <span class="ident">day</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(
+            <span class="self">self</span>.<span class="ident">utc_datetime</span>
+                .<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+                .<span class="ident">replace_day</span>(<span class="ident">day</span>)
+        )
+        .<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>))
+    }
+
+    <span class="doccomment">/// Replace the clock hour.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_hour(7),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 18 07:02:03.004_005_006 +01))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_hour(24).is_err()); // 24 isn&#39;t a valid hour</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_hour</span>(<span class="self">self</span>, <span class="ident">hour</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(
+            <span class="self">self</span>.<span class="ident">utc_datetime</span>
+                .<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+                .<span class="ident">replace_hour</span>(<span class="ident">hour</span>)
+        )
+        .<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>))
+    }
+
+    <span class="doccomment">/// Replace the minutes within the hour.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_minute(7),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 18 01:07:03.004_005_006 +01))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_minute(60).is_err()); // 60 isn&#39;t a valid minute</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_minute</span>(<span class="self">self</span>, <span class="ident">minute</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(
+            <span class="self">self</span>.<span class="ident">utc_datetime</span>
+                .<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+                .<span class="ident">replace_minute</span>(<span class="ident">minute</span>)
+        )
+        .<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>))
+    }
+
+    <span class="doccomment">/// Replace the seconds within the minute.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_second(7),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 18 01:02:07.004_005_006 +01))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_second(60).is_err()); // 60 isn&#39;t a valid second</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_second</span>(<span class="self">self</span>, <span class="ident">second</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(
+            <span class="self">self</span>.<span class="ident">utc_datetime</span>
+                .<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+                .<span class="ident">replace_second</span>(<span class="ident">second</span>)
+        )
+        .<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>))
+    }
+
+    <span class="doccomment">/// Replace the milliseconds within the second.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_millisecond(7),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 18 01:02:03.007 +01))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_millisecond(1_000).is_err()); // 1_000 isn&#39;t a valid millisecond</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_millisecond</span>(
+        <span class="self">self</span>,
+        <span class="ident">millisecond</span>: <span class="ident">u16</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(
+            <span class="self">self</span>.<span class="ident">utc_datetime</span>
+                .<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+                .<span class="ident">replace_millisecond</span>(<span class="ident">millisecond</span>)
+        )
+        .<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>))
+    }
+
+    <span class="doccomment">/// Replace the microseconds within the second.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_microsecond(7_008),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 18 01:02:03.007_008 +01))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_microsecond(1_000_000).is_err()); // 1_000_000 isn&#39;t a valid microsecond</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_microsecond</span>(
+        <span class="self">self</span>,
+        <span class="ident">microsecond</span>: <span class="ident">u32</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(
+            <span class="self">self</span>.<span class="ident">utc_datetime</span>
+                .<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+                .<span class="ident">replace_microsecond</span>(<span class="ident">microsecond</span>)
+        )
+        .<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>))
+    }
+
+    <span class="doccomment">/// Replace the nanoseconds within the second.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_nanosecond(7_008_009),</span>
+    <span class="doccomment">///     Ok(datetime!(2022 - 02 - 18 01:02:03.007_008_009 +01))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_nanosecond(1_000_000_000).is_err()); // 1_000_000_000 isn&#39;t a valid nanosecond</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_nanosecond</span>(<span class="self">self</span>, <span class="ident">nanosecond</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(
+            <span class="self">self</span>.<span class="ident">utc_datetime</span>
+                .<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+                .<span class="ident">replace_nanosecond</span>(<span class="ident">nanosecond</span>)
+        )
+        .<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>))
+    }
 }
 <span class="comment">// endregion replacement</span>
 
@@ -2082,6 +2458,18 @@
         <span class="ident">description</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Parsable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>),
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Parse</span><span class="op">&gt;</span> {
         <span class="ident">description</span>.<span class="ident">parse_offset_date_time</span>(<span class="ident">input</span>.<span class="ident">as_bytes</span>())
+    }
+
+    <span class="doccomment">/// A helper method to check if the `OffsetDateTime` is a valid representation of a leap second.</span>
+    <span class="doccomment">/// Leap seconds, when parsed, are represented as the preceding nanosecond. However, leap</span>
+    <span class="doccomment">/// seconds can only occur as the last second of a month UTC.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_valid_leap_second_stand_in</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">let</span> <span class="ident">udt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>;
+        <span class="ident">udt</span>.<span class="ident">hour</span>() <span class="op">==</span> <span class="number">23</span>
+            <span class="op">&amp;&amp;</span> <span class="ident">udt</span>.<span class="ident">minute</span>() <span class="op">==</span> <span class="number">59</span>
+            <span class="op">&amp;&amp;</span> <span class="ident">udt</span>.<span class="ident">second</span>() <span class="op">==</span> <span class="number">59</span>
+            <span class="op">&amp;&amp;</span> <span class="ident">udt</span>.<span class="ident">nanosecond</span>() <span class="op">==</span> <span class="number">999_999_999</span>
+            <span class="op">&amp;&amp;</span> <span class="ident">udt</span>.<span class="ident">day</span>() <span class="op">==</span> <span class="ident">util::days_in_year_month</span>(<span class="ident">udt</span>.<span class="ident">year</span>(), <span class="ident">udt</span>.<span class="ident">month</span>())
     }
 }
 

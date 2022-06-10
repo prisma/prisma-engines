@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/im-13.0.0/./src/hash/map.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>map.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/im-15.1.0/./src/hash/map.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>map.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -2306,13 +2306,89 @@
 <span id="2301">2301</span>
 <span id="2302">2302</span>
 <span id="2303">2303</span>
+<span id="2304">2304</span>
+<span id="2305">2305</span>
+<span id="2306">2306</span>
+<span id="2307">2307</span>
+<span id="2308">2308</span>
+<span id="2309">2309</span>
+<span id="2310">2310</span>
+<span id="2311">2311</span>
+<span id="2312">2312</span>
+<span id="2313">2313</span>
+<span id="2314">2314</span>
+<span id="2315">2315</span>
+<span id="2316">2316</span>
+<span id="2317">2317</span>
+<span id="2318">2318</span>
+<span id="2319">2319</span>
+<span id="2320">2320</span>
+<span id="2321">2321</span>
+<span id="2322">2322</span>
+<span id="2323">2323</span>
+<span id="2324">2324</span>
+<span id="2325">2325</span>
+<span id="2326">2326</span>
+<span id="2327">2327</span>
+<span id="2328">2328</span>
+<span id="2329">2329</span>
+<span id="2330">2330</span>
+<span id="2331">2331</span>
+<span id="2332">2332</span>
+<span id="2333">2333</span>
+<span id="2334">2334</span>
+<span id="2335">2335</span>
+<span id="2336">2336</span>
+<span id="2337">2337</span>
+<span id="2338">2338</span>
+<span id="2339">2339</span>
+<span id="2340">2340</span>
+<span id="2341">2341</span>
+<span id="2342">2342</span>
+<span id="2343">2343</span>
+<span id="2344">2344</span>
+<span id="2345">2345</span>
+<span id="2346">2346</span>
+<span id="2347">2347</span>
+<span id="2348">2348</span>
+<span id="2349">2349</span>
+<span id="2350">2350</span>
+<span id="2351">2351</span>
+<span id="2352">2352</span>
+<span id="2353">2353</span>
+<span id="2354">2354</span>
+<span id="2355">2355</span>
+<span id="2356">2356</span>
+<span id="2357">2357</span>
+<span id="2358">2358</span>
+<span id="2359">2359</span>
+<span id="2360">2360</span>
+<span id="2361">2361</span>
+<span id="2362">2362</span>
+<span id="2363">2363</span>
+<span id="2364">2364</span>
+<span id="2365">2365</span>
+<span id="2366">2366</span>
+<span id="2367">2367</span>
+<span id="2368">2368</span>
+<span id="2369">2369</span>
+<span id="2370">2370</span>
+<span id="2371">2371</span>
+<span id="2372">2372</span>
+<span id="2373">2373</span>
+<span id="2374">2374</span>
+<span id="2375">2375</span>
+<span id="2376">2376</span>
+<span id="2377">2377</span>
+<span id="2378">2378</span>
+<span id="2379">2379</span>
 </pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public</span>
 <span class="comment">// License, v. 2.0. If a copy of the MPL was not distributed with this</span>
 <span class="comment">// file, You can obtain one at http://mozilla.org/MPL/2.0/.</span>
 
 <span class="doccomment">//! An unordered map.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! An immutable hash map using [hash array mapped tries] [1].</span>
+<span class="doccomment">//! An immutable hash map using [hash array mapped tries][1].</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Most operations on this map are O(log&lt;sub&gt;x&lt;/sub&gt; n) for a</span>
 <span class="doccomment">//! suitably high *x* that it should be nearly O(1) for most maps.</span>
@@ -2343,7 +2419,7 @@
     <span class="ident">hash_key</span>, <span class="ident">Drain</span> <span class="kw">as</span> <span class="ident">NodeDrain</span>, <span class="ident">HashBits</span>, <span class="ident">HashValue</span>, <span class="ident">Iter</span> <span class="kw">as</span> <span class="ident">NodeIter</span>, <span class="ident">IterMut</span> <span class="kw">as</span> <span class="ident">NodeIterMut</span>,
     <span class="ident">Node</span>,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::Ref</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="ident">Pool</span>, <span class="ident">PoolRef</span>, <span class="ident">Ref</span>};
 
 <span class="doccomment">/// Construct a hash map from a sequence of key/value pairs.</span>
 <span class="doccomment">///</span>
@@ -2384,6 +2460,8 @@
     }};
 }
 
+<span class="macro">def_pool!</span>(<span class="ident">HashMapPool</span><span class="op">&lt;</span><span class="ident">K</span>,<span class="ident">V</span><span class="op">&gt;</span>, <span class="ident">Node</span><span class="op">&lt;</span>(<span class="ident">K</span>,<span class="ident">V</span>)<span class="op">&gt;</span>);
+
 <span class="doccomment">/// An unordered map.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// An immutable hash map using [hash array mapped tries] [1].</span>
@@ -2405,7 +2483,8 @@
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span> <span class="op">=</span> <span class="ident">RandomState</span><span class="op">&gt;</span> {
     <span class="ident">size</span>: <span class="ident">usize</span>,
-    <span class="ident">root</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">pool</span>: <span class="ident">HashMapPool</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+    <span class="ident">root</span>: <span class="ident">PoolRef</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">hasher</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
 }
 
@@ -2431,6 +2510,19 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::default</span>()
     }
+
+    <span class="doccomment">/// Construct an empty hash map using a specific memory pool.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pool&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_pool</span>(<span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">HashMapPool</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>);
+        <span class="self">Self</span> {
+            <span class="ident">size</span>: <span class="number">0</span>,
+            <span class="ident">hasher</span>: <span class="ident">Default::default</span>(),
+            <span class="ident">pool</span>: <span class="ident">pool</span>.<span class="ident">clone</span>(),
+            <span class="ident">root</span>,
+        }
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">RandomState</span><span class="op">&gt;</span>
@@ -2445,13 +2537,11 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map = HashMap::unit(123, &quot;onetwothree&quot;);</span>
     <span class="doccomment">/// assert_eq!(</span>
     <span class="doccomment">///   map.get(&amp;123),</span>
     <span class="doccomment">///   Some(&amp;&quot;onetwothree&quot;)</span>
     <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -2470,14 +2560,12 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// assert!(</span>
     <span class="doccomment">///   !hashmap!{1 =&gt; 2}.is_empty()</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// assert!(</span>
     <span class="doccomment">///   HashMap::&lt;i32, i32&gt;::new().is_empty()</span>
     <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -2494,18 +2582,38 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// assert_eq!(3, hashmap!{</span>
     <span class="doccomment">///   1 =&gt; 11,</span>
     <span class="doccomment">///   2 =&gt; 22,</span>
     <span class="doccomment">///   3 =&gt; 33</span>
     <span class="doccomment">/// }.len());</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">size</span>
+    }
+
+    <span class="doccomment">/// Test whether two maps refer to the same content in memory.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is true if the two sides are references to the same map,</span>
+    <span class="doccomment">/// or if the two maps refer to the same root node.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This would return true if you&#39;re comparing a map to itself, or</span>
+    <span class="doccomment">/// if you&#39;re comparing a map to a fresh clone of itself.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Time: O(1)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">std::ptr::eq</span>(<span class="self">self</span>, <span class="ident">other</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">PoolRef::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">root</span>)
+    }
+
+    <span class="doccomment">/// Get a reference to the memory pool used by this map.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that if you didn&#39;t specifically construct it with a pool, you&#39;ll</span>
+    <span class="doccomment">/// get back a reference to a pool of size 0.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pool&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">HashMapPool</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>
     }
 
     <span class="doccomment">/// Construct an empty hash map using the provided hasher.</span>
@@ -2515,10 +2623,29 @@
     <span class="kw">where</span>
         <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RS</span><span class="op">&gt;</span>,
     {
+        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">HashMapPool::default</span>();
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>);
         <span class="ident">HashMap</span> {
             <span class="ident">size</span>: <span class="number">0</span>,
-            <span class="ident">root</span>: <span class="ident">Ref::new</span>(<span class="ident">Node::new</span>()),
-            <span class="ident">hasher</span>: <span class="ident">From::from</span>(<span class="ident">hasher</span>),
+            <span class="ident">hasher</span>: <span class="ident">hasher</span>.<span class="ident">into</span>(),
+            <span class="ident">pool</span>,
+            <span class="ident">root</span>,
+        }
+    }
+
+    <span class="doccomment">/// Construct an empty hash map using a specific memory pool and hasher.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pool&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_pool_hasher</span><span class="op">&lt;</span><span class="ident">RS</span><span class="op">&gt;</span>(<span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">HashMapPool</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>, <span class="ident">hasher</span>: <span class="ident">RS</span>) -&gt; <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RS</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>);
+        <span class="self">Self</span> {
+            <span class="ident">size</span>: <span class="number">0</span>,
+            <span class="ident">hasher</span>: <span class="ident">hasher</span>.<span class="ident">into</span>(),
+            <span class="ident">pool</span>: <span class="ident">pool</span>.<span class="ident">clone</span>(),
+            <span class="ident">root</span>,
         }
     }
 
@@ -2539,9 +2666,12 @@
         <span class="ident">K1</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
         <span class="ident">V1</span>: <span class="ident">Clone</span>,
     {
+        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">HashMapPool::default</span>();
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>);
         <span class="ident">HashMap</span> {
             <span class="ident">size</span>: <span class="number">0</span>,
-            <span class="ident">root</span>: <span class="ident">Ref::new</span>(<span class="ident">Node::new</span>()),
+            <span class="ident">pool</span>,
+            <span class="ident">root</span>,
             <span class="ident">hasher</span>: <span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">clone</span>(),
         }
     }
@@ -2570,7 +2700,7 @@
     <span class="doccomment">/// the same map.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Keys</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Keys</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="ident">Keys</span> {
             <span class="ident">it</span>: <span class="ident">NodeIter::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="self">self</span>.<span class="ident">size</span>),
         }
@@ -2585,7 +2715,7 @@
     <span class="doccomment">/// the same map.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Values</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="ident">Values</span> {
             <span class="ident">it</span>: <span class="ident">NodeIter::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="self">self</span>.<span class="ident">size</span>),
         }
@@ -2603,15 +2733,13 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let mut map = hashmap![1=&gt;1, 2=&gt;2, 3=&gt;3];</span>
     <span class="doccomment">/// map.clear();</span>
     <span class="doccomment">/// assert!(map.is_empty());</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">root</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+            <span class="self">self</span>.<span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>);
             <span class="self">self</span>.<span class="ident">size</span> <span class="op">=</span> <span class="number">0</span>;
         }
     }
@@ -2632,7 +2760,7 @@
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seen</span> <span class="op">=</span> <span class="ident">collections::HashSet::new</span>();
         <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>() {
-            <span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>) {
+            <span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">get</span>(<span class="ident">key</span>) {
                 <span class="kw">return</span> <span class="bool-val">false</span>;
             }
             <span class="ident">seen</span>.<span class="ident">insert</span>(<span class="ident">key</span>);
@@ -2654,13 +2782,11 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map = hashmap!{123 =&gt; &quot;lol&quot;};</span>
     <span class="doccomment">/// assert_eq!(</span>
     <span class="doccomment">///   map.get(&amp;123),</span>
     <span class="doccomment">///   Some(&amp;&quot;lol&quot;)</span>
     <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">BK</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">BK</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">V</span><span class="op">&gt;</span>
@@ -2673,6 +2799,32 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>)
     }
 
+    <span class="doccomment">/// Get the key/value pair for a key from a hash map.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Time: O(log n)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
+    <span class="doccomment">/// # use im::hashmap::HashMap;</span>
+    <span class="doccomment">/// let map = hashmap!{123 =&gt; &quot;lol&quot;};</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///   map.get_key_value(&amp;123),</span>
+    <span class="doccomment">///   Some((&amp;123, &amp;&quot;lol&quot;))</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_key_value</span><span class="op">&lt;</span><span class="ident">BK</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">BK</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">BK</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+        <span class="ident">K</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">BK</span><span class="op">&gt;</span>,
+    {
+        <span class="self">self</span>.<span class="ident">root</span>
+            .<span class="ident">get</span>(<span class="ident">hash_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="ident">key</span>), <span class="number">0</span>, <span class="ident">key</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">k</span>, <span class="kw-2">ref</span> <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>, <span class="ident">v</span>))
+    }
+
     <span class="doccomment">/// Test for the presence of a key in a hash map.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Time: O(log n)</span>
@@ -2682,7 +2834,6 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map = hashmap!{123 =&gt; &quot;lol&quot;};</span>
     <span class="doccomment">/// assert!(</span>
     <span class="doccomment">///   map.contains_key(&amp;123)</span>
@@ -2690,7 +2841,6 @@
     <span class="doccomment">/// assert!(</span>
     <span class="doccomment">///   !map.contains_key(&amp;321)</span>
     <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -2747,11 +2897,9 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map1 = hashmap!{1 =&gt; 1, 2 =&gt; 2};</span>
     <span class="doccomment">/// let map2 = hashmap!{1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 3};</span>
     <span class="doccomment">/// assert!(map1.is_submap(map2));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -2775,7 +2923,6 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map1 = hashmap!{1 =&gt; 1, 2 =&gt; 2};</span>
     <span class="doccomment">/// let map2 = hashmap!{1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 3};</span>
     <span class="doccomment">/// assert!(map1.is_proper_submap(map2));</span>
@@ -2783,7 +2930,6 @@
     <span class="doccomment">/// let map3 = hashmap!{1 =&gt; 1, 2 =&gt; 2};</span>
     <span class="doccomment">/// let map4 = hashmap!{1 =&gt; 1, 2 =&gt; 2};</span>
     <span class="doccomment">/// assert!(!map3.is_proper_submap(map4));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -2812,9 +2958,9 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
         <span class="ident">IterMut</span> {
-            <span class="ident">it</span>: <span class="ident">NodeIterMut::new</span>(<span class="ident">root</span>, <span class="self">self</span>.<span class="ident">size</span>),
+            <span class="ident">it</span>: <span class="ident">NodeIterMut::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">root</span>, <span class="self">self</span>.<span class="ident">size</span>),
         }
     }
 
@@ -2828,13 +2974,14 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let map = hashmap!{123 =&gt; &quot;lol&quot;};</span>
+    <span class="doccomment">/// let mut map = hashmap!{123 =&gt; &quot;lol&quot;};</span>
+    <span class="doccomment">/// if let Some(value) = map.get_mut(&amp;123) {</span>
+    <span class="doccomment">///     *value = &quot;omg&quot;;</span>
+    <span class="doccomment">/// }</span>
     <span class="doccomment">/// assert_eq!(</span>
     <span class="doccomment">///   map.get(&amp;123),</span>
-    <span class="doccomment">///   Some(&amp;&quot;lol&quot;)</span>
+    <span class="doccomment">///   Some(&amp;&quot;omg&quot;)</span>
     <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span><span class="op">&lt;</span><span class="ident">BK</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">BK</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">V</span><span class="op">&gt;</span>
@@ -2842,8 +2989,8 @@
         <span class="ident">BK</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
         <span class="ident">K</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">BK</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
-        <span class="kw">match</span> <span class="ident">root</span>.<span class="ident">get_mut</span>(<span class="ident">hash_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="ident">key</span>), <span class="number">0</span>, <span class="ident">key</span>) {
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
+        <span class="kw">match</span> <span class="ident">root</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">hash_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="ident">key</span>), <span class="number">0</span>, <span class="ident">key</span>) {
             <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
             <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> (<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">value</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">value</span>),
         }
@@ -2861,7 +3008,6 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let mut map = hashmap!{};</span>
     <span class="doccomment">/// map.insert(123, &quot;123&quot;);</span>
     <span class="doccomment">/// map.insert(456, &quot;456&quot;);</span>
@@ -2869,13 +3015,12 @@
     <span class="doccomment">///   map,</span>
     <span class="doccomment">///   hashmap!{123 =&gt; &quot;123&quot;, 456 =&gt; &quot;456&quot;}</span>
     <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="ident">K</span>, <span class="ident">v</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="kw-2">&amp;</span><span class="ident">k</span>);
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">insert</span>(<span class="ident">hash</span>, <span class="number">0</span>, (<span class="ident">k</span>, <span class="ident">v</span>));
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">hash</span>, <span class="number">0</span>, (<span class="ident">k</span>, <span class="ident">v</span>));
         <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_none</span>() {
             <span class="self">self</span>.<span class="ident">size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         }
@@ -2896,13 +3041,11 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let mut map = hashmap!{123 =&gt; &quot;123&quot;, 456 =&gt; &quot;456&quot;};</span>
     <span class="doccomment">/// assert_eq!(Some(&quot;123&quot;), map.remove(&amp;123));</span>
     <span class="doccomment">/// assert_eq!(Some(&quot;456&quot;), map.remove(&amp;456));</span>
     <span class="doccomment">/// assert_eq!(None, map.remove(&amp;789));</span>
     <span class="doccomment">/// assert!(map.is_empty());</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span><span class="op">&lt;</span><span class="ident">BK</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">BK</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -2922,21 +3065,19 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let mut map = hashmap!{123 =&gt; &quot;123&quot;, 456 =&gt; &quot;456&quot;};</span>
     <span class="doccomment">/// assert_eq!(Some((123, &quot;123&quot;)), map.remove_with_key(&amp;123));</span>
     <span class="doccomment">/// assert_eq!(Some((456, &quot;456&quot;)), map.remove_with_key(&amp;456));</span>
     <span class="doccomment">/// assert_eq!(None, map.remove_with_key(&amp;789));</span>
     <span class="doccomment">/// assert!(map.is_empty());</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_with_key</span><span class="op">&lt;</span><span class="ident">BK</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">BK</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">BK</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
         <span class="ident">K</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">BK</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">remove</span>(<span class="ident">hash_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="ident">k</span>), <span class="number">0</span>, <span class="ident">k</span>);
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">hash_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="ident">k</span>), <span class="number">0</span>, <span class="ident">k</span>);
         <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_some</span>() {
             <span class="self">self</span>.<span class="ident">size</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
         }
@@ -2978,13 +3119,11 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map = hashmap!{};</span>
     <span class="doccomment">/// assert_eq!(</span>
     <span class="doccomment">///   map.update(123, &quot;123&quot;),</span>
     <span class="doccomment">///   hashmap!{123 =&gt; &quot;123&quot;}</span>
     <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -3102,6 +3241,38 @@
         }
     }
 
+    <span class="doccomment">/// Filter out values from a map which don&#39;t satisfy a predicate.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is slightly more efficient than filtering using an</span>
+    <span class="doccomment">/// iterator, in that it doesn&#39;t need to rehash the retained</span>
+    <span class="doccomment">/// values, but it still needs to reconstruct the entire tree</span>
+    <span class="doccomment">/// structure of the map.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Time: O(n log n)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
+    <span class="doccomment">/// # use im::HashMap;</span>
+    <span class="doccomment">/// let mut map = hashmap!{1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 3};</span>
+    <span class="doccomment">/// map.retain(|k, v| *k &gt; 1);</span>
+    <span class="doccomment">/// let expected = hashmap!{2 =&gt; 2, 3 =&gt; 3};</span>
+    <span class="doccomment">/// assert_eq!(expected, map);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retain</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>)
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>) -&gt; <span class="ident">bool</span>,
+    {
+        <span class="kw">let</span> <span class="ident">old_root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
+        <span class="kw">for</span> ((<span class="ident">key</span>, <span class="ident">value</span>), <span class="ident">hash</span>) <span class="kw">in</span> <span class="ident">NodeIter::new</span>(<span class="kw-2">&amp;</span><span class="ident">old_root</span>, <span class="self">self</span>.<span class="ident">size</span>) {
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">f</span>(<span class="ident">key</span>, <span class="ident">value</span>) <span class="op">&amp;&amp;</span> <span class="ident">root</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">hash</span>, <span class="number">0</span>, <span class="ident">key</span>).<span class="ident">is_some</span>() {
+                <span class="self">self</span>.<span class="ident">size</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+            }
+        }
+    }
+
     <span class="doccomment">/// Remove a key/value pair from a map, if it exists, and return</span>
     <span class="doccomment">/// the removed value as well as the updated map.</span>
     <span class="doccomment">///</span>
@@ -3139,19 +3310,22 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map1 = hashmap!{1 =&gt; 1, 3 =&gt; 3};</span>
     <span class="doccomment">/// let map2 = hashmap!{2 =&gt; 2, 3 =&gt; 4};</span>
     <span class="doccomment">/// let expected = hashmap!{1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 3};</span>
     <span class="doccomment">/// assert_eq!(expected, map1.union(map2));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">union</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">other</span> {
-            <span class="self">self</span>.<span class="ident">entry</span>(<span class="ident">k</span>).<span class="ident">or_insert</span>(<span class="ident">v</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">union</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">to_mutate</span>, <span class="ident">to_consume</span>) <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
+            (<span class="self">self</span>, <span class="ident">other</span>)
+        } <span class="kw">else</span> {
+            (<span class="ident">other</span>, <span class="self">self</span>)
+        };
+        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">to_consume</span> {
+            <span class="ident">to_mutate</span>.<span class="ident">entry</span>(<span class="ident">k</span>).<span class="ident">or_insert</span>(<span class="ident">v</span>);
         }
-        <span class="self">self</span>
+        <span class="ident">to_mutate</span>
     }
 
     <span class="doccomment">/// Construct the union of two maps, using a function to decide</span>
@@ -3188,7 +3362,6 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map1 = hashmap!{1 =&gt; 1, 3 =&gt; 4};</span>
     <span class="doccomment">/// let map2 = hashmap!{2 =&gt; 2, 3 =&gt; 5};</span>
     <span class="doccomment">/// let expected = hashmap!{1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 9};</span>
@@ -3196,10 +3369,22 @@
     <span class="doccomment">///     map2,</span>
     <span class="doccomment">///     |key, left, right| left + right</span>
     <span class="doccomment">/// ));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">union_with_key</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">union_with_key</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">V</span>) -&gt; <span class="ident">V</span>,
+    {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
+            <span class="self">self</span>.<span class="ident">union_with_key_inner</span>(<span class="ident">other</span>, <span class="ident">f</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">other</span>.<span class="ident">union_with_key_inner</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">key</span>, <span class="ident">other_value</span>, <span class="ident">self_value</span><span class="op">|</span> {
+                <span class="ident">f</span>(<span class="ident">key</span>, <span class="ident">self_value</span>, <span class="ident">other_value</span>)
+            })
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">union_with_key_inner</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">V</span>) -&gt; <span class="ident">V</span>,
     {
@@ -3227,12 +3412,10 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map1 = hashmap!{1 =&gt; 1, 3 =&gt; 3};</span>
     <span class="doccomment">/// let map2 = hashmap!{2 =&gt; 2};</span>
     <span class="doccomment">/// let expected = hashmap!{1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 3};</span>
     <span class="doccomment">/// assert_eq!(expected, HashMap::unions(vec![map1, map2]));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unions</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
@@ -3299,13 +3482,13 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map1 = hashmap!{1 =&gt; 1, 3 =&gt; 4};</span>
     <span class="doccomment">/// let map2 = hashmap!{2 =&gt; 2, 3 =&gt; 5};</span>
     <span class="doccomment">/// let expected = hashmap!{1 =&gt; 1, 2 =&gt; 2};</span>
     <span class="doccomment">/// assert_eq!(expected, map1.difference(map2));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [symmetric_difference]: #method.symmetric_difference</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">difference</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
@@ -3322,12 +3505,10 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map1 = hashmap!{1 =&gt; 1, 3 =&gt; 4};</span>
     <span class="doccomment">/// let map2 = hashmap!{2 =&gt; 2, 3 =&gt; 5};</span>
     <span class="doccomment">/// let expected = hashmap!{1 =&gt; 1, 2 =&gt; 2};</span>
     <span class="doccomment">/// assert_eq!(expected, map1.symmetric_difference(map2));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -3342,6 +3523,8 @@
     <span class="doccomment">/// [`symmetric_difference_with`][symmetric_difference_with] method.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Time: O(n log n)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [symmetric_difference_with]: #method.symmetric_difference_with</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">difference_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
@@ -3379,7 +3562,6 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map1 = hashmap!{1 =&gt; 1, 3 =&gt; 4};</span>
     <span class="doccomment">/// let map2 = hashmap!{2 =&gt; 2, 3 =&gt; 5};</span>
     <span class="doccomment">/// let expected = hashmap!{1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 9};</span>
@@ -3387,8 +3569,9 @@
     <span class="doccomment">///     map2,</span>
     <span class="doccomment">///     |key, left, right| Some(left + right)</span>
     <span class="doccomment">/// ));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [symmetric_difference_with_key]: #method.symmetric_difference_with_key</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">difference_with_key</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
@@ -3408,7 +3591,6 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map1 = hashmap!{1 =&gt; 1, 3 =&gt; 4};</span>
     <span class="doccomment">/// let map2 = hashmap!{2 =&gt; 2, 3 =&gt; 5};</span>
     <span class="doccomment">/// let expected = hashmap!{1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 9};</span>
@@ -3416,7 +3598,6 @@
     <span class="doccomment">///     map2,</span>
     <span class="doccomment">///     |key, left, right| Some(left + right)</span>
     <span class="doccomment">/// ));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">symmetric_difference_with_key</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
@@ -3449,12 +3630,10 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::ordmap::OrdMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map1 = ordmap!{1 =&gt; 1, 3 =&gt; 4};</span>
     <span class="doccomment">/// let map2 = ordmap!{2 =&gt; 2, 3 =&gt; 5};</span>
     <span class="doccomment">/// let expected = ordmap!{1 =&gt; 1};</span>
     <span class="doccomment">/// assert_eq!(expected, map1.relative_complement(map2));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -3475,12 +3654,10 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map1 = hashmap!{1 =&gt; 1, 2 =&gt; 2};</span>
     <span class="doccomment">/// let map2 = hashmap!{2 =&gt; 3, 3 =&gt; 4};</span>
     <span class="doccomment">/// let expected = hashmap!{2 =&gt; 2};</span>
     <span class="doccomment">/// assert_eq!(expected, map1.intersection(map2));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -3515,7 +3692,6 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[macro_use] extern crate im;</span>
     <span class="doccomment">/// # use im::hashmap::HashMap;</span>
-    <span class="doccomment">/// # fn main() {</span>
     <span class="doccomment">/// let map1 = hashmap!{1 =&gt; 1, 2 =&gt; 2};</span>
     <span class="doccomment">/// let map2 = hashmap!{2 =&gt; 3, 3 =&gt; 4};</span>
     <span class="doccomment">/// let expected = hashmap!{2 =&gt; 5};</span>
@@ -3523,7 +3699,6 @@
     <span class="doccomment">///     map2,</span>
     <span class="doccomment">///     |key, left, right| left + right</span>
     <span class="doccomment">/// ));</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersection_with_key</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">F</span><span class="op">&gt;</span>(
@@ -3565,11 +3740,13 @@
 <span class="doccomment">/// generally perform similarly otherwise.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">K</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">V</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BuildHasher</span>,
+    <span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="ident">V</span>: <span class="ident">Clone</span>,
+    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
 {
+    <span class="doccomment">/// An entry which exists in the map.</span>
     <span class="ident">Occupied</span>(<span class="ident">OccupiedEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// An entry which doesn&#39;t exist in the map.</span>
     <span class="ident">Vacant</span>(<span class="ident">VacantEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>),
 }
 
@@ -3633,9 +3810,9 @@
 <span class="doccomment">/// An entry for a mapping that already exists in the map.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OccupiedEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">K</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">V</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BuildHasher</span>,
+    <span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="ident">V</span>: <span class="ident">Clone</span>,
+    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
 {
     <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>,
     <span class="ident">hash</span>: <span class="ident">HashBits</span>,
@@ -3656,8 +3833,8 @@
 
     <span class="doccomment">/// Remove this entry from the map and return the removed mapping.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_entry</span>(<span class="self">self</span>) -&gt; (<span class="ident">K</span>, <span class="ident">V</span>) {
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">root</span>);
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">remove</span>(<span class="self">self</span>.<span class="ident">hash</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>);
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">root</span>);
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">hash</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>);
         <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">size</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
         <span class="ident">result</span>.<span class="ident">unwrap</span>()
     }
@@ -3671,15 +3848,21 @@
     <span class="doccomment">/// Get a mutable reference to the current value.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">V</span> {
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">root</span>);
-        <span class="kw-2">&amp;mut</span> <span class="ident">root</span>.<span class="ident">get_mut</span>(<span class="self">self</span>.<span class="ident">hash</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>).<span class="ident">unwrap</span>().<span class="number">1</span>
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">root</span>);
+        <span class="kw-2">&amp;mut</span> <span class="ident">root</span>
+            .<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">hash</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>)
+            .<span class="ident">unwrap</span>()
+            .<span class="number">1</span>
     }
 
     <span class="doccomment">/// Convert this entry into a mutable reference.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_mut</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span> {
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">root</span>);
-        <span class="kw-2">&amp;mut</span> <span class="ident">root</span>.<span class="ident">get_mut</span>(<span class="self">self</span>.<span class="ident">hash</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>).<span class="ident">unwrap</span>().<span class="number">1</span>
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">root</span>);
+        <span class="kw-2">&amp;mut</span> <span class="ident">root</span>
+            .<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">hash</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>)
+            .<span class="ident">unwrap</span>()
+            .<span class="number">1</span>
     }
 
     <span class="doccomment">/// Overwrite the current value.</span>
@@ -3696,9 +3879,9 @@
 <span class="doccomment">/// An entry for a mapping that does not already exist in the map.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VacantEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">K</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">V</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BuildHasher</span>,
+    <span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="ident">V</span>: <span class="ident">Clone</span>,
+    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
 {
     <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>,
     <span class="ident">hash</span>: <span class="ident">HashBits</span>,
@@ -3725,16 +3908,19 @@
 
     <span class="doccomment">/// Insert a value into this entry.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span> {
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">root</span>);
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">root</span>);
         <span class="kw">if</span> <span class="ident">root</span>
-            .<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">hash</span>, <span class="number">0</span>, (<span class="self">self</span>.<span class="ident">key</span>.<span class="ident">clone</span>(), <span class="ident">value</span>))
+            .<span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">hash</span>, <span class="number">0</span>, (<span class="self">self</span>.<span class="ident">key</span>.<span class="ident">clone</span>(), <span class="ident">value</span>))
             .<span class="ident">is_none</span>()
         {
             <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         }
         <span class="comment">// TODO it&#39;s unfortunate that we need to look up the key again</span>
         <span class="comment">// here to get the mut ref.</span>
-        <span class="kw-2">&amp;mut</span> <span class="ident">root</span>.<span class="ident">get_mut</span>(<span class="self">self</span>.<span class="ident">hash</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>).<span class="ident">unwrap</span>().<span class="number">1</span>
+        <span class="kw-2">&amp;mut</span> <span class="ident">root</span>
+            .<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">hash</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>)
+            .<span class="ident">unwrap</span>()
+            .<span class="number">1</span>
     }
 }
 
@@ -3745,10 +3931,14 @@
     <span class="ident">K</span>: <span class="ident">Clone</span>,
     <span class="ident">V</span>: <span class="ident">Clone</span>,
 {
+    <span class="doccomment">/// Clone a map.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Time: O(1)</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">HashMap</span> {
             <span class="ident">root</span>: <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">clone</span>(),
+            <span class="ident">pool</span>: <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">clone</span>(),
             <span class="ident">size</span>: <span class="self">self</span>.<span class="ident">size</span>,
             <span class="ident">hasher</span>: <span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">clone</span>(),
         }
@@ -3787,7 +3977,7 @@
     <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
 {
     <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="ident">Ref::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">root</span>) {
+        <span class="kw">if</span> <span class="ident">PoolRef::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">root</span>) {
             <span class="kw">return</span> <span class="bool-val">true</span>;
         }
         <span class="self">self</span>.<span class="ident">test_eq</span>(<span class="ident">other</span>)
@@ -3812,9 +4002,7 @@
         <span class="kw">if</span> <span class="ident">Ref::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">hasher</span>) {
             <span class="kw">return</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">iter</span>());
         }
-        <span class="kw">let</span> <span class="ident">m1</span>: <span class="ident">::std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">m2</span>: <span class="ident">::std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>();
-        <span class="ident">m1</span>.<span class="ident">iter</span>().<span class="ident">partial_cmp</span>(<span class="ident">m2</span>.<span class="ident">iter</span>())
+        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">iter</span>())
     }
 }
 
@@ -3828,9 +4016,7 @@
         <span class="kw">if</span> <span class="ident">Ref::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">hasher</span>) {
             <span class="kw">return</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">cmp</span>(<span class="ident">other</span>.<span class="ident">iter</span>());
         }
-        <span class="kw">let</span> <span class="ident">m1</span>: <span class="ident">::std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">m2</span>: <span class="ident">::std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>();
-        <span class="ident">m1</span>.<span class="ident">iter</span>().<span class="ident">cmp</span>(<span class="ident">m2</span>.<span class="ident">iter</span>())
+        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">cmp</span>(<span class="ident">other</span>.<span class="ident">iter</span>())
     }
 }
 
@@ -3856,9 +4042,12 @@
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">HashMapPool::default</span>();
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>);
         <span class="ident">HashMap</span> {
             <span class="ident">size</span>: <span class="number">0</span>,
-            <span class="ident">root</span>: <span class="ident">Ref::new</span>(<span class="ident">Node::new</span>()),
+            <span class="ident">pool</span>,
+            <span class="ident">root</span>,
             <span class="ident">hasher</span>: <span class="ident">Ref</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="ident">::default</span>(),
         }
     }
@@ -3944,8 +4133,8 @@
     <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
 {
     <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">BK</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
-        <span class="kw">match</span> <span class="ident">root</span>.<span class="ident">get_mut</span>(<span class="ident">hash_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="ident">key</span>), <span class="number">0</span>, <span class="ident">key</span>) {
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
+        <span class="kw">match</span> <span class="ident">root</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">hash_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="ident">key</span>), <span class="number">0</span>, <span class="ident">key</span>) {
             <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;HashMap::index_mut: invalid key&quot;</span>),
             <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> (<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">value</span>)) =&gt; <span class="ident">value</span>,
         }
@@ -3959,7 +4148,7 @@
     <span class="ident">V</span>: <span class="ident">Debug</span>,
     <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_map</span>();
         <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="self">self</span> {
             <span class="ident">d</span>.<span class="ident">entry</span>(<span class="ident">k</span>, <span class="ident">v</span>);
@@ -3975,7 +4164,7 @@
     <span class="ident">V</span>: <span class="ident">Debug</span>,
     <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
 {
-    <span class="ident">default</span> <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="ident">default</span> <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_map</span>();
         <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="self">self</span> {
             <span class="ident">d</span>.<span class="ident">entry</span>(<span class="ident">k</span>, <span class="ident">v</span>);
@@ -3991,7 +4180,7 @@
     <span class="ident">V</span>: <span class="ident">Debug</span>,
     <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">collections::BTreeSet::new</span>();
         <span class="ident">keys</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">keys</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_map</span>();
@@ -4004,16 +4193,16 @@
 
 <span class="comment">// // Iterators</span>
 
-<span class="comment">// An iterator over the elements of a map.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>: <span class="lifetime">&#39;a</span>, <span class="ident">V</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="doccomment">/// An iterator over the elements of a map.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
     <span class="ident">it</span>: <span class="ident">NodeIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, (<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="ident">K</span>, <span class="ident">V</span>);
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">V</span>);
 
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">p</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">p</span>)
+        <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">k</span>, <span class="ident">v</span>), <span class="kw">_</span>)<span class="op">|</span> (<span class="ident">k</span>, <span class="ident">v</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
@@ -4025,8 +4214,8 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {}
 
-<span class="comment">// A mutable iterator over the values of a map.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>: <span class="lifetime">&#39;a</span>, <span class="ident">V</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="doccomment">/// A mutable iterator over the elements of a map.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">K</span>: <span class="ident">Clone</span>,
     <span class="ident">V</span>: <span class="ident">Clone</span>,
@@ -4039,10 +4228,10 @@
     <span class="ident">K</span>: <span class="ident">Clone</span>,
     <span class="ident">V</span>: <span class="ident">Clone</span>,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span>;
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span>);
 
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">entry</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">&amp;mut</span> <span class="ident">entry</span>.<span class="number">1</span>)
+        <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">k</span>, <span class="ident">v</span>), <span class="kw">_</span>)<span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">k</span>, <span class="ident">v</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
@@ -4064,7 +4253,7 @@
 {
 }
 
-<span class="comment">// A consuming iterator over the elements of a map.</span>
+<span class="doccomment">/// A consuming iterator over the elements of a map.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConsumingIter</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">HashValue</span><span class="op">&gt;</span> {
     <span class="ident">it</span>: <span class="ident">NodeDrain</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
 }
@@ -4088,8 +4277,8 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">ConsumingIter</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">HashValue</span> <span class="op">+</span> <span class="ident">Clone</span> {}
 
-<span class="comment">// An iterator over the keys of a map.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Keys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>: <span class="lifetime">&#39;a</span>, <span class="ident">V</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="doccomment">/// An iterator over the keys of a map.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Keys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
     <span class="ident">it</span>: <span class="ident">NodeIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, (<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>,
 }
 
@@ -4109,8 +4298,8 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">Keys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {}
 
-<span class="comment">// An iterator over the values of a map.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>: <span class="lifetime">&#39;a</span>, <span class="ident">V</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="doccomment">/// An iterator over the values of a map.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
     <span class="ident">it</span>: <span class="ident">NodeIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, (<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>,
 }
 
@@ -4135,7 +4324,7 @@
     <span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>,
     <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="ident">K</span>, <span class="ident">V</span>);
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">V</span>);
     <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -4156,7 +4345,7 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="ident">ConsumingIter</span> {
-            <span class="ident">it</span>: <span class="ident">NodeDrain::new</span>(<span class="self">self</span>.<span class="ident">root</span>, <span class="self">self</span>.<span class="ident">size</span>),
+            <span class="ident">it</span>: <span class="ident">NodeDrain::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">root</span>, <span class="self">self</span>.<span class="ident">size</span>),
         }
     }
 }
@@ -4299,55 +4488,15 @@
 <span class="comment">//     }</span>
 <span class="comment">// }</span>
 
-<span class="comment">// QuickCheck</span>
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arc&quot;</span>, <span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident">quickcheck</span>::{<span class="ident">Arbitrary</span>, <span class="ident">Gen</span>};
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arc&quot;</span>, <span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Sync</span>, <span class="ident">V</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;mut</span> <span class="ident">G</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">HashMap::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span><span class="ident">::arbitrary</span>(<span class="ident">g</span>))
-    }
-}
-
 <span class="comment">// Proptest</span>
-
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;proptest&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">proptest</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">::proptest::strategy</span>::{<span class="ident">BoxedStrategy</span>, <span class="ident">Strategy</span>, <span class="ident">ValueTree</span>};
-    <span class="kw">use</span> <span class="ident">std::ops::Range</span>;
-
-    <span class="doccomment">/// A strategy for a hash map of a given size.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,ignore</span>
-    <span class="doccomment">/// proptest! {</span>
-    <span class="doccomment">///     #[test]</span>
-    <span class="doccomment">///     fn proptest_works(ref m in hash_map(0..9999, &quot;.*&quot;, 10..100)) {</span>
-    <span class="doccomment">///         assert!(m.len() &lt; 100);</span>
-    <span class="doccomment">///         assert!(m.len() &gt;= 10);</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash_map</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Strategy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>, <span class="ident">V</span>: <span class="ident">Strategy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
-        <span class="ident">key</span>: <span class="ident">K</span>,
-        <span class="ident">value</span>: <span class="ident">V</span>,
-        <span class="ident">size</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">BoxedStrategy</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">K::Tree</span> <span class="kw">as</span> <span class="ident">ValueTree</span><span class="op">&gt;</span><span class="ident">::Value</span>, <span class="op">&lt;</span><span class="ident">V::Tree</span> <span class="kw">as</span> <span class="ident">ValueTree</span><span class="op">&gt;</span><span class="ident">::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="op">&lt;</span><span class="ident">K::Tree</span> <span class="kw">as</span> <span class="ident">ValueTree</span><span class="op">&gt;</span><span class="ident">::Value</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-        <span class="op">&lt;</span><span class="ident">V::Tree</span> <span class="kw">as</span> <span class="ident">ValueTree</span><span class="op">&gt;</span><span class="ident">::Value</span>: <span class="ident">Clone</span>,
-    {
-        <span class="ident">::proptest::collection::vec</span>((<span class="ident">key</span>, <span class="ident">value</span>), <span class="ident">size</span>.<span class="ident">clone</span>())
-            .<span class="ident">prop_map</span>(<span class="ident">HashMap::from</span>)
-            .<span class="ident">prop_filter</span>(<span class="string">&quot;Map minimum size&quot;</span>.<span class="ident">to_owned</span>(), <span class="kw">move</span> <span class="op">|</span><span class="ident">m</span><span class="op">|</span> {
-                <span class="ident">m</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">size</span>.<span class="ident">start</span>
-            })
-            .<span class="ident">boxed</span>()
-    }
+    <span class="attribute">#[<span class="ident">deprecated</span>(
+        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;14.3.0&quot;</span>,
+        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;proptest strategies have moved to im::proptest&quot;</span>
+    )]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proptest::hash_map</span>;
 }
 
 <span class="comment">// Tests</span>
@@ -4362,7 +4511,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">safe_mutation</span>() {
-        <span class="kw">let</span> <span class="ident">v1</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::from_iter</span>((<span class="number">0</span>..<span class="number">131_072</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> (<span class="ident">i</span>, <span class="ident">i</span>)));
+        <span class="kw">let</span> <span class="ident">v1</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="number">0</span>..<span class="number">131_072</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> (<span class="ident">i</span>, <span class="ident">i</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">v1</span>.<span class="ident">clone</span>();
         <span class="ident">v2</span>.<span class="ident">insert</span>(<span class="number">131_000</span>, <span class="number">23</span>);
         <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">23</span>), <span class="ident">v2</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">131_000</span>));
@@ -4388,13 +4537,13 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">remove_failing</span>() {
         <span class="kw">let</span> <span class="ident">pairs</span> <span class="op">=</span> [(<span class="number">1469</span>, <span class="number">0</span>), (<span class="op">-</span><span class="number">67</span>, <span class="number">0</span>)];
-        <span class="kw">let</span> <span class="ident">hasher</span>: <span class="ident">BuildHasherDefault</span><span class="op">&lt;</span><span class="ident">LolHasher</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span>: <span class="ident">collections::HashMap</span><span class="op">&lt;</span><span class="ident">i16</span>, <span class="ident">i16</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">collections::HashMap::with_hasher</span>(<span class="ident">hasher</span>.<span class="ident">clone</span>());
+            <span class="ident">collections::HashMap::with_hasher</span>(<span class="ident">BuildHasherDefault</span>::<span class="op">&lt;</span><span class="ident">LolHasher</span><span class="op">&gt;</span><span class="ident">::default</span>());
         <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">k</span>, <span class="kw-2">ref</span> <span class="ident">v</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">pairs</span> {
             <span class="ident">m</span>.<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">k</span>, <span class="kw-2">*</span><span class="ident">v</span>);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">i16</span>, <span class="ident">i16</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::with_hasher</span>(<span class="ident">hasher</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">i16</span>, <span class="ident">i16</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
+            <span class="ident">HashMap::with_hasher</span>(<span class="ident">BuildHasherDefault</span>::<span class="op">&lt;</span><span class="ident">LolHasher</span><span class="op">&gt;</span><span class="ident">::default</span>());
         <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">m</span> {
             <span class="ident">map</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">update</span>(<span class="kw-2">*</span><span class="ident">k</span>, <span class="kw-2">*</span><span class="ident">v</span>);
         }
@@ -4449,20 +4598,25 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">entry_api</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">hashmap!</span> {<span class="string">&quot;bar&quot;</span> =&gt; <span class="number">5</span>};
-        <span class="ident">map</span>.<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="string">&quot;foo&quot;</span>).<span class="ident">and_modify</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">v</span> <span class="op">+</span><span class="op">=</span> <span class="number">5</span>).<span class="ident">or_insert</span>(<span class="number">1</span>);
+        <span class="ident">map</span>.<span class="ident">entry</span>(<span class="string">&quot;foo&quot;</span>).<span class="ident">and_modify</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">v</span> <span class="op">+</span><span class="op">=</span> <span class="number">5</span>).<span class="ident">or_insert</span>(<span class="number">1</span>);
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">map</span>[<span class="kw-2">&amp;</span><span class="string">&quot;foo&quot;</span>]);
-        <span class="ident">map</span>.<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="string">&quot;foo&quot;</span>).<span class="ident">and_modify</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">v</span> <span class="op">+</span><span class="op">=</span> <span class="number">5</span>).<span class="ident">or_insert</span>(<span class="number">1</span>);
+        <span class="ident">map</span>.<span class="ident">entry</span>(<span class="string">&quot;foo&quot;</span>).<span class="ident">and_modify</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">v</span> <span class="op">+</span><span class="op">=</span> <span class="number">5</span>).<span class="ident">or_insert</span>(<span class="number">1</span>);
         <span class="macro">assert_eq!</span>(<span class="number">6</span>, <span class="ident">map</span>[<span class="kw-2">&amp;</span><span class="string">&quot;foo&quot;</span>]);
-        <span class="ident">map</span>.<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="string">&quot;bar&quot;</span>).<span class="ident">and_modify</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">v</span> <span class="op">+</span><span class="op">=</span> <span class="number">5</span>).<span class="ident">or_insert</span>(<span class="number">1</span>);
+        <span class="ident">map</span>.<span class="ident">entry</span>(<span class="string">&quot;bar&quot;</span>).<span class="ident">and_modify</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">v</span> <span class="op">+</span><span class="op">=</span> <span class="number">5</span>).<span class="ident">or_insert</span>(<span class="number">1</span>);
         <span class="macro">assert_eq!</span>(<span class="number">10</span>, <span class="ident">map</span>[<span class="kw-2">&amp;</span><span class="string">&quot;bar&quot;</span>]);
         <span class="macro">assert_eq!</span>(
             <span class="number">10</span>,
-            <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="string">&quot;bar&quot;</span>) {
+            <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">entry</span>(<span class="string">&quot;bar&quot;</span>) {
                 <span class="ident">Entry::Occupied</span>(<span class="ident">entry</span>) =&gt; <span class="ident">entry</span>.<span class="ident">remove</span>(),
                 <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(),
             }
         );
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="string">&quot;bar&quot;</span>));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">refpool_crash</span>() {
+        <span class="kw">let</span> <span class="ident">_map</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="op">&lt;</span><span class="ident">u128</span>, <span class="ident">usize</span><span class="op">&gt;</span><span class="ident">::new</span>();
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -4519,13 +4673,12 @@
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">without</span>(<span class="kw-2">ref</span> <span class="ident">pairs</span> <span class="kw">in</span> <span class="ident">collection::vec</span>((<span class="ident">i16::ANY</span>, <span class="ident">i16::ANY</span>), <span class="number">0</span>..<span class="number">100</span>)) {
-            <span class="kw">let</span> <span class="ident">hasher</span>: <span class="ident">BuildHasherDefault</span><span class="op">&lt;</span><span class="ident">LolHasher</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span>: <span class="ident">collections::HashMap</span><span class="op">&lt;</span><span class="ident">i16</span>, <span class="ident">i16</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
-                <span class="ident">collections::HashMap::with_hasher</span>(<span class="ident">hasher</span>.<span class="ident">clone</span>());
+                <span class="ident">collections::HashMap::with_hasher</span>(<span class="ident">BuildHasherDefault</span>::<span class="op">&lt;</span><span class="ident">LolHasher</span><span class="op">&gt;</span><span class="ident">::default</span>());
             <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">k</span>, <span class="kw-2">ref</span> <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">pairs</span> {
                 <span class="ident">m</span>.<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">k</span>, <span class="kw-2">*</span><span class="ident">v</span>);
             }
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">i16</span>, <span class="ident">i16</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::with_hasher</span>(<span class="ident">hasher</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">i16</span>, <span class="ident">i16</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::with_hasher</span>(<span class="ident">BuildHasherDefault</span>::<span class="op">&lt;</span><span class="ident">LolHasher</span><span class="op">&gt;</span><span class="ident">::default</span>());
             <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">m</span> {
                 <span class="ident">map</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">update</span>(<span class="kw-2">*</span><span class="ident">k</span>, <span class="kw-2">*</span><span class="ident">v</span>);
             }
@@ -4553,13 +4706,12 @@
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">ref</span> <span class="ident">pairs</span> <span class="kw">in</span> <span class="ident">collection::vec</span>((<span class="ident">i16::ANY</span>, <span class="ident">i16::ANY</span>), <span class="number">0</span>..<span class="number">100</span>)) {
-            <span class="kw">let</span> <span class="ident">hasher</span>: <span class="ident">BuildHasherDefault</span><span class="op">&lt;</span><span class="ident">LolHasher</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span>: <span class="ident">collections::HashMap</span><span class="op">&lt;</span><span class="ident">i16</span>, <span class="ident">i16</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
-                <span class="ident">collections::HashMap::with_hasher</span>(<span class="ident">hasher</span>.<span class="ident">clone</span>());
+                <span class="ident">collections::HashMap::with_hasher</span>(<span class="ident">BuildHasherDefault</span>::<span class="op">&lt;</span><span class="ident">LolHasher</span><span class="op">&gt;</span><span class="ident">::default</span>());
             <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">k</span>, <span class="kw-2">ref</span> <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">pairs</span> {
                 <span class="ident">m</span>.<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">k</span>, <span class="kw-2">*</span><span class="ident">v</span>);
             }
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">i16</span>, <span class="ident">i16</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::with_hasher</span>(<span class="ident">hasher</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">i16</span>, <span class="ident">i16</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::with_hasher</span>(<span class="ident">BuildHasherDefault</span>::<span class="op">&lt;</span><span class="ident">LolHasher</span><span class="op">&gt;</span><span class="ident">::default</span>());
             <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">m</span> {
                 <span class="ident">map</span>.<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">k</span>, <span class="kw-2">*</span><span class="ident">v</span>);
             }

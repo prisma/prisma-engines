@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.10.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1905,11 +1905,145 @@
 <span id="1900">1900</span>
 <span id="1901">1901</span>
 <span id="1902">1902</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(
+<span id="1903">1903</span>
+<span id="1904">1904</span>
+<span id="1905">1905</span>
+<span id="1906">1906</span>
+<span id="1907">1907</span>
+<span id="1908">1908</span>
+<span id="1909">1909</span>
+<span id="1910">1910</span>
+<span id="1911">1911</span>
+<span id="1912">1912</span>
+<span id="1913">1913</span>
+<span id="1914">1914</span>
+<span id="1915">1915</span>
+<span id="1916">1916</span>
+<span id="1917">1917</span>
+<span id="1918">1918</span>
+<span id="1919">1919</span>
+<span id="1920">1920</span>
+<span id="1921">1921</span>
+<span id="1922">1922</span>
+<span id="1923">1923</span>
+<span id="1924">1924</span>
+<span id="1925">1925</span>
+<span id="1926">1926</span>
+<span id="1927">1927</span>
+<span id="1928">1928</span>
+<span id="1929">1929</span>
+<span id="1930">1930</span>
+<span id="1931">1931</span>
+<span id="1932">1932</span>
+<span id="1933">1933</span>
+<span id="1934">1934</span>
+<span id="1935">1935</span>
+<span id="1936">1936</span>
+<span id="1937">1937</span>
+<span id="1938">1938</span>
+<span id="1939">1939</span>
+<span id="1940">1940</span>
+<span id="1941">1941</span>
+<span id="1942">1942</span>
+<span id="1943">1943</span>
+<span id="1944">1944</span>
+<span id="1945">1945</span>
+<span id="1946">1946</span>
+<span id="1947">1947</span>
+<span id="1948">1948</span>
+<span id="1949">1949</span>
+<span id="1950">1950</span>
+<span id="1951">1951</span>
+<span id="1952">1952</span>
+<span id="1953">1953</span>
+<span id="1954">1954</span>
+<span id="1955">1955</span>
+<span id="1956">1956</span>
+<span id="1957">1957</span>
+<span id="1958">1958</span>
+<span id="1959">1959</span>
+<span id="1960">1960</span>
+<span id="1961">1961</span>
+<span id="1962">1962</span>
+<span id="1963">1963</span>
+<span id="1964">1964</span>
+<span id="1965">1965</span>
+<span id="1966">1966</span>
+<span id="1967">1967</span>
+<span id="1968">1968</span>
+<span id="1969">1969</span>
+<span id="1970">1970</span>
+<span id="1971">1971</span>
+<span id="1972">1972</span>
+<span id="1973">1973</span>
+<span id="1974">1974</span>
+<span id="1975">1975</span>
+<span id="1976">1976</span>
+<span id="1977">1977</span>
+<span id="1978">1978</span>
+<span id="1979">1979</span>
+<span id="1980">1980</span>
+<span id="1981">1981</span>
+<span id="1982">1982</span>
+<span id="1983">1983</span>
+<span id="1984">1984</span>
+<span id="1985">1985</span>
+<span id="1986">1986</span>
+<span id="1987">1987</span>
+<span id="1988">1988</span>
+<span id="1989">1989</span>
+<span id="1990">1990</span>
+<span id="1991">1991</span>
+<span id="1992">1992</span>
+<span id="1993">1993</span>
+<span id="1994">1994</span>
+<span id="1995">1995</span>
+<span id="1996">1996</span>
+<span id="1997">1997</span>
+<span id="1998">1998</span>
+<span id="1999">1999</span>
+<span id="2000">2000</span>
+<span id="2001">2001</span>
+<span id="2002">2002</span>
+<span id="2003">2003</span>
+<span id="2004">2004</span>
+<span id="2005">2005</span>
+<span id="2006">2006</span>
+<span id="2007">2007</span>
+<span id="2008">2008</span>
+<span id="2009">2009</span>
+<span id="2010">2010</span>
+<span id="2011">2011</span>
+<span id="2012">2012</span>
+<span id="2013">2013</span>
+<span id="2014">2014</span>
+<span id="2015">2015</span>
+<span id="2016">2016</span>
+<span id="2017">2017</span>
+<span id="2018">2018</span>
+<span id="2019">2019</span>
+<span id="2020">2020</span>
+<span id="2021">2021</span>
+<span id="2022">2022</span>
+<span id="2023">2023</span>
+<span id="2024">2024</span>
+<span id="2025">2025</span>
+<span id="2026">2026</span>
+<span id="2027">2027</span>
+<span id="2028">2028</span>
+<span id="2029">2029</span>
+<span id="2030">2030</span>
+<span id="2031">2031</span>
+<span id="2032">2032</span>
+<span id="2033">2033</span>
+<span id="2034">2034</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">warn</span>(
+    <span class="ident">clippy::semicolon_if_nothing_returned</span>,
     <span class="ident">missing_copy_implementations</span>,
     <span class="comment">// missing_crate_level_docs, not available in MSRV</span>
     <span class="ident">missing_debug_implementations</span>,
     <span class="ident">missing_docs</span>,
+    <span class="ident">rust_2018_idioms</span>,
     <span class="ident">trivial_casts</span>,
     <span class="ident">trivial_numeric_casts</span>,
     <span class="ident">unused_extern_crates</span>,
@@ -1917,7 +2051,6 @@
     <span class="ident">unused_qualifications</span>,
     <span class="ident">variant_size_differences</span>
 )]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>))))]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">deny</span>(
     <span class="ident">missing_copy_implementations</span>,
@@ -1927,18 +2060,27 @@
     <span class="ident">unused_extern_crates</span>,
     <span class="ident">unused_import_braces</span>,
     <span class="ident">unused_qualifications</span>,
-    <span class="ident">variant_size_differences</span>,
 ))))]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">warn</span>(<span class="ident">rust_2018_idioms</span>))))]</span>
 <span class="comment">// Not needed for 2018 edition and conflicts with `rust_2018_idioms`</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">no_crate_inject</span>))]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/serde_with/1.10.0&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/serde_with/1.14.0&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
+<span class="attribute">#![<span class="ident">allow</span>(
+    <span class="comment">// clippy is broken and shows wrong warnings</span>
+    <span class="comment">// clippy on stable does not know yet about the lint name</span>
+    <span class="ident">unknown_lints</span>,
+    <span class="comment">// https://github.com/rust-lang/rust-clippy/issues/8560</span>
+    <span class="ident">clippy::only_used_in_recursion</span>,
+    <span class="comment">// https://github.com/rust-lang/rust-clippy/issues/8867</span>
+    <span class="ident">clippy::derive_partial_eq_without_eq</span>,
+)]</span>
+<span class="attribute">#![<span class="ident">no_std</span>]</span>
 
-<span class="doccomment">//! [![docs.rs badge](https://docs.rs/serde_with/badge.svg)](https://docs.rs/serde_with/)</span>
 <span class="doccomment">//! [![crates.io badge](https://img.shields.io/crates/v/serde_with.svg)](https://crates.io/crates/serde_with/)</span>
 <span class="doccomment">//! [![Build Status](https://github.com/jonasbb/serde_with/workflows/Rust%20CI/badge.svg)](https://github.com/jonasbb/serde_with)</span>
 <span class="doccomment">//! [![codecov](https://codecov.io/gh/jonasbb/serde_with/branch/master/graph/badge.svg)](https://codecov.io/gh/jonasbb/serde_with)</span>
+<span class="doccomment">//! [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4322/badge)](https://bestpractices.coreinfrastructure.org/projects/4322)</span>
 <span class="doccomment">//! [![Binder](https://img.shields.io/badge/Try%20on%20-binder-579ACA.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFkAAABZCAMAAABi1XidAAAB8lBMVEX///9XmsrmZYH1olJXmsr1olJXmsrmZYH1olJXmsr1olJXmsrmZYH1olL1olJXmsr1olJXmsrmZYH1olL1olJXmsrmZYH1olJXmsr1olL1olJXmsrmZYH1olL1olJXmsrmZYH1olL1olL0nFf1olJXmsrmZYH1olJXmsq8dZb1olJXmsrmZYH1olJXmspXmspXmsr1olL1olJXmsrmZYH1olJXmsr1olL1olJXmsrmZYH1olL1olLeaIVXmsrmZYH1olL1olL1olJXmsrmZYH1olLna31Xmsr1olJXmsr1olJXmsrmZYH1olLqoVr1olJXmsr1olJXmsrmZYH1olL1olKkfaPobXvviGabgadXmsqThKuofKHmZ4Dobnr1olJXmsr1olJXmspXmsr1olJXmsrfZ4TuhWn1olL1olJXmsqBi7X1olJXmspZmslbmMhbmsdemsVfl8ZgmsNim8Jpk8F0m7R4m7F5nLB6jbh7jbiDirOEibOGnKaMhq+PnaCVg6qWg6qegKaff6WhnpKofKGtnomxeZy3noG6dZi+n3vCcpPDcpPGn3bLb4/Mb47UbIrVa4rYoGjdaIbeaIXhoWHmZYHobXvpcHjqdHXreHLroVrsfG/uhGnuh2bwj2Hxk17yl1vzmljzm1j0nlX1olL3AJXWAAAAbXRSTlMAEBAQHx8gICAuLjAwMDw9PUBAQEpQUFBXV1hgYGBkcHBwcXl8gICAgoiIkJCQlJicnJ2goKCmqK+wsLC4usDAwMjP0NDQ1NbW3Nzg4ODi5+3v8PDw8/T09PX29vb39/f5+fr7+/z8/Pz9/v7+zczCxgAABC5JREFUeAHN1ul3k0UUBvCb1CTVpmpaitAGSLSpSuKCLWpbTKNJFGlcSMAFF63iUmRccNG6gLbuxkXU66JAUef/9LSpmXnyLr3T5AO/rzl5zj137p136BISy44fKJXuGN/d19PUfYeO67Znqtf2KH33Id1psXoFdW30sPZ1sMvs2D060AHqws4FHeJojLZqnw53cmfvg+XR8mC0OEjuxrXEkX5ydeVJLVIlV0e10PXk5k7dYeHu7Cj1j+49uKg7uLU61tGLw1lq27ugQYlclHC4bgv7VQ+TAyj5Zc/UjsPvs1sd5cWryWObtvWT2EPa4rtnWW3JkpjggEpbOsPr7F7EyNewtpBIslA7p43HCsnwooXTEc3UmPmCNn5lrqTJxy6nRmcavGZVt/3Da2pD5NHvsOHJCrdc1G2r3DITpU7yic7w/7Rxnjc0kt5GC4djiv2Sz3Fb2iEZg41/ddsFDoyuYrIkmFehz0HR2thPgQqMyQYb2OtB0WxsZ3BeG3+wpRb1vzl2UYBog8FfGhttFKjtAclnZYrRo9ryG9uG/FZQU4AEg8ZE9LjGMzTmqKXPLnlWVnIlQQTvxJf8ip7VgjZjyVPrjw1te5otM7RmP7xm+sK2Gv9I8Gi++BRbEkR9EBw8zRUcKxwp73xkaLiqQb+kGduJTNHG72zcW9LoJgqQxpP3/Tj//c3yB0tqzaml05/+orHLksVO+95kX7/7qgJvnjlrfr2Ggsyx0eoy9uPzN5SPd86aXggOsEKW2Prz7du3VID3/tzs/sSRs2w7ovVHKtjrX2pd7ZMlTxAYfBAL9jiDwfLkq55Tm7ifhMlTGPyCAs7RFRhn47JnlcB9RM5T97ASuZXIcVNuUDIndpDbdsfrqsOppeXl5Y+XVKdjFCTh+zGaVuj0d9zy05PPK3QzBamxdwtTCrzyg/2Rvf2EstUjordGwa/kx9mSJLr8mLLtCW8HHGJc2R5hS219IiF6PnTusOqcMl57gm0Z8kanKMAQg0qSyuZfn7zItsbGyO9QlnxY0eCuD1XL2ys/MsrQhltE7Ug0uFOzufJFE2PxBo/YAx8XPPdDwWN0MrDRYIZF0mSMKCNHgaIVFoBbNoLJ7tEQDKxGF0kcLQimojCZopv0OkNOyWCCg9XMVAi7ARJzQdM2QUh0gmBozjc3Skg6dSBRqDGYSUOu66Zg+I2fNZs/M3/f/Grl/XnyF1Gw3VKCez0PN5IUfFLqvgUN4C0qNqYs5YhPL+aVZYDE4IpUk57oSFnJm4FyCqqOE0jhY2SMyLFoo56zyo6becOS5UVDdj7Vih0zp+tcMhwRpBeLyqtIjlJKAIZSbI8SGSF3k0pA3mR5tHuwPFoa7N7reoq2bqCsAk1HqCu5uvI1n6JuRXI+S1Mco54YmYTwcn6Aeic+kssXi8XpXC4V3t7/ADuTNKaQJdScAAAAAElFTkSuQmCC)](https://mybinder.org/v2/gist/jonasbb/18b9aece4c17f617b1c2b3946d29eeb0/HEAD?filepath=serde-with-demo.ipynb)</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ---</span>
@@ -1961,7 +2103,7 @@
 <span class="doccomment">//! **Check out the [user guide][user guide] to find out more tips and tricks about this crate.**</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! For further help using this crate you can [open a new discussion](https://github.com/jonasbb/serde_with/discussions/new) or ask on [users.rust-lang.org](https://users.rust-lang.org/).</span>
-<span class="doccomment">//! For bugs please open a [new issue](https://github.com/jonasbb/serde_with/issues/new) on Github.</span>
+<span class="doccomment">//! For bugs, please open a [new issue](https://github.com/jonasbb/serde_with/issues/new) on GitHub.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Use `serde_with` in your Project</span>
 <span class="doccomment">//!</span>
@@ -1969,7 +2111,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies.serde_with]</span>
-<span class="doccomment">//! version = &quot;1.10.0&quot;</span>
+<span class="doccomment">//! version = &quot;1.14.0&quot;</span>
 <span class="doccomment">//! features = [ &quot;...&quot; ]</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
@@ -1979,12 +2121,13 @@
 <span class="doccomment">//! # Examples</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Annotate your struct or enum to enable the custom de/serializer.</span>
+<span class="doccomment">//! The `#[serde_as]` attribute must be place *before* the `#[derive]`.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## `DisplayFromStr`</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;macros&quot;)]</span>
-<span class="doccomment">//! # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">//! # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;macros&quot;)]</span>
 <span class="doccomment">//! # use serde_with::{serde_as, DisplayFromStr};</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;macros&quot;)]</span>
@@ -2015,7 +2158,7 @@
 <span class="doccomment">//! ## Large and const-generic arrays</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! serde does not support arrays with more than 32 elements or using const-generics.</span>
-<span class="doccomment">//! The `serde_as` attribute allows to circumvent this restriction, even for nested types and nested arrays.</span>
+<span class="doccomment">//! The `serde_as` attribute allows circumventing this restriction, even for nested types and nested arrays.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust</span>
 <span class="doccomment">//! # #[cfg(FALSE)] {</span>
@@ -2054,10 +2197,11 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This situation often occurs with JSON, but other formats also support optional fields.</span>
 <span class="doccomment">//! If many fields are optional, putting the annotations on the structs can become tedious.</span>
+<span class="doccomment">//! The `#[skip_serializing_none]` attribute must be place *before* the `#[derive]`.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;macros&quot;)]</span>
-<span class="doccomment">//! # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">//! # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;macros&quot;)]</span>
 <span class="doccomment">//! # use serde_with::skip_serializing_none;</span>
 <span class="doccomment">//! # #[cfg(feature = &quot;macros&quot;)]</span>
@@ -2097,7 +2241,7 @@
 <span class="doccomment">//! ```rust</span>
 <span class="doccomment">//! # #[cfg(all(feature = &quot;macros&quot;, feature = &quot;hex&quot;))]</span>
 <span class="doccomment">//! # use {</span>
-<span class="doccomment">//! #     serde_derive::{Deserialize, Serialize},</span>
+<span class="doccomment">//! #     serde::{Deserialize, Serialize},</span>
 <span class="doccomment">//! #     serde_with::{serde_as, DisplayFromStr, DurationSeconds, hex::Hex},</span>
 <span class="doccomment">//! #     std::time::Duration,</span>
 <span class="doccomment">//! #     std::collections::BTreeMap,</span>
@@ -2146,24 +2290,31 @@
 <span class="doccomment">//! # }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`DisplayFromStr`]: https://docs.rs/serde_with/1.10.0/serde_with/struct.DisplayFromStr.html</span>
-<span class="doccomment">//! [`with_prefix!`]: https://docs.rs/serde_with/1.10.0/serde_with/macro.with_prefix.html</span>
-<span class="doccomment">//! [display_fromstr]: https://docs.rs/serde_with/1.10.0/serde_with/rust/display_fromstr/index.html</span>
-<span class="doccomment">//! [feature flags]: https://docs.rs/serde_with/1.10.0/serde_with/guide/feature_flags/index.html</span>
-<span class="doccomment">//! [skip_serializing_none]: https://docs.rs/serde_with/1.10.0/serde_with/attr.skip_serializing_none.html</span>
-<span class="doccomment">//! [StringWithSeparator]: https://docs.rs/serde_with/1.10.0/serde_with/rust/struct.StringWithSeparator.html</span>
-<span class="doccomment">//! [user guide]: https://docs.rs/serde_with/1.10.0/serde_with/guide/index.html</span>
+<span class="doccomment">//! [`DisplayFromStr`]: https://docs.rs/serde_with/1.14.0/serde_with/struct.DisplayFromStr.html</span>
+<span class="doccomment">//! [`with_prefix!`]: https://docs.rs/serde_with/1.14.0/serde_with/macro.with_prefix.html</span>
+<span class="doccomment">//! [display_fromstr]: https://docs.rs/serde_with/1.14.0/serde_with/rust/display_fromstr/index.html</span>
+<span class="doccomment">//! [feature flags]: https://docs.rs/serde_with/1.14.0/serde_with/guide/feature_flags/index.html</span>
+<span class="doccomment">//! [skip_serializing_none]: https://docs.rs/serde_with/1.14.0/serde_with/attr.skip_serializing_none.html</span>
+<span class="doccomment">//! [StringWithSeparator]: https://docs.rs/serde_with/1.14.0/serde_with/rust/struct.StringWithSeparator.html</span>
+<span class="doccomment">//! [user guide]: https://docs.rs/serde_with/1.14.0/serde_with/guide/index.html</span>
 <span class="doccomment">//! [with-annotation]: https://serde.rs/field-attrs.html#with</span>
-<span class="doccomment">//! [as-annotation]: https://docs.rs/serde_with/1.10.0/serde_with/guide/serde_as/index.html</span>
+<span class="doccomment">//! [as-annotation]: https://docs.rs/serde_with/1.14.0/serde_with/guide/serde_as/index.html</span>
 
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;base64&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;base64&quot;</span>)))]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">base64</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">chrono</span>;
+<span class="kw">mod</span> <span class="ident">content</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">de</span>;
 <span class="kw">mod</span> <span class="ident">duplicate_key_impls</span>;
+<span class="kw">mod</span> <span class="ident">enum_map</span>;
 <span class="kw">mod</span> <span class="ident">flatten_maybe</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">formats</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hex&quot;</span>)]</span>
@@ -2175,6 +2326,9 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rust</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ser</span>;
 <span class="kw">mod</span> <span class="ident">serde_conv</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time_0_3&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time_0_3&quot;</span>)))]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">time_0_3</span>;
 <span class="kw">mod</span> <span class="ident">utils</span>;
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">with_prefix</span>;
@@ -2183,6 +2337,7 @@
 <span class="comment">// Originally licensed as MIT+Apache 2</span>
 <span class="comment">// https://github.com/shepmaster/snafu/blob/fd37d79d4531ed1d3eebffad0d658928eb860cfe/src/lib.rs#L121-L165</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;guide&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_macro_rules</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">generate_guide</span> {
     (<span class="kw">pub</span> <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">generate_guide!</span>(@<span class="ident">gen</span> <span class="string">&quot;.&quot;</span>, <span class="kw">pub</span> <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> { } $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>);
@@ -2219,14 +2374,16 @@
 }
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">de::DeserializeAs</span>, <span class="ident">rust::StringWithSeparator</span>, <span class="ident">ser::SerializeAs</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">de::DeserializeAs</span>, <span class="ident">enum_map::EnumMap</span>, <span class="ident">rust::StringWithSeparator</span>, <span class="ident">ser::SerializeAs</span>,
+};
+<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="comment">// Re-Export all proc_macros, as these should be seen as part of the serde_with crate</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macros&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macros&quot;</span>)))]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde_with_macros</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 
 <span class="doccomment">/// Separator for string-based collection de/serialization</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Separator</span> {
@@ -2269,7 +2426,7 @@
 <span class="doccomment">/// If the use of the use of the proc-macro is not acceptable, then `As` can be used directly with serde.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_with::{As, DisplayFromStr};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[derive(Deserialize, Serialize)]</span>
@@ -2283,7 +2440,7 @@
 <span class="doccomment">/// It implements [`DeserializeAs`][]/[`SerializeAs`][], when the underlying type implements `Deserialize`/`Serialize`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_with::{As, DisplayFromStr, Same};</span>
 <span class="doccomment">/// # use std::collections::BTreeMap;</span>
 <span class="doccomment">/// #</span>
@@ -2295,7 +2452,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [serde_as]: https://docs.rs/serde_with/1.10.0/serde_with/attr.serde_as.html</span>
+<span class="doccomment">/// [serde_as]: https://docs.rs/serde_with/1.14.0/serde_with/attr.serde_as.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">As</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
 
@@ -2354,7 +2511,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DisplayFromStr};</span>
 <span class="doccomment">/// #</span>
@@ -2398,7 +2555,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, NoneAsEmptyString};</span>
 <span class="doccomment">/// #</span>
@@ -2446,7 +2603,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DefaultOnError};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[serde_as]</span>
@@ -2480,7 +2637,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DefaultOnError};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[serde_as]</span>
@@ -2497,12 +2654,12 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// `DefaultOnError` can be combined with other conversion methods.</span>
-<span class="doccomment">/// In this example we deserialize a `Vec`, each element is deserialized from a string.</span>
+<span class="doccomment">/// In this example, we deserialize a `Vec`, each element is deserialized from a string.</span>
 <span class="doccomment">/// If the string does not parse as a number, then we get the default value of 0.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DefaultOnError, DisplayFromStr};</span>
 <span class="doccomment">/// #</span>
@@ -2535,7 +2692,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
+<span class="doccomment">/// # use serde::Deserialize;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DefaultOnNull};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// #[serde_as]</span>
@@ -2555,12 +2712,12 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// `DefaultOnNull` can be combined with other conversion methods.</span>
-<span class="doccomment">/// In this example we deserialize a `Vec`, each element is deserialized from a string.</span>
+<span class="doccomment">/// In this example, we deserialize a `Vec`, each element is deserialized from a string.</span>
 <span class="doccomment">/// If we encounter null, then we get the default value of 0.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DefaultOnNull, DisplayFromStr};</span>
 <span class="doccomment">/// #</span>
@@ -2589,7 +2746,7 @@
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, BytesOrString};</span>
 <span class="doccomment">/// #</span>
@@ -2625,6 +2782,7 @@
 <span class="doccomment">/// assert_eq!(&quot;✨Works!&quot;.as_bytes(), &amp;*a.bytes_or_string);</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">/// [`String`]: std::string::String</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BytesOrString</span>;
 
@@ -2640,6 +2798,7 @@
 <span class="doccomment">/// For example, deserializing `DurationSeconds&lt;f64, Flexible&gt;` will discard any subsecond precision during deserialization from `f64` and will parse a `String` as an integer number.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This type also supports [`chrono::Duration`] with the `chrono`-[feature flag].</span>
+<span class="doccomment">/// This type also supports [`time::Duration`][::time_0_3::Duration] with the `time_0_3`-[feature flag].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// | Duration Type         | Converter                 | Available `FORMAT`s    |</span>
 <span class="doccomment">/// | --------------------- | ------------------------- | ---------------------- |</span>
@@ -2647,12 +2806,14 @@
 <span class="doccomment">/// | `std::time::Duration` | `DurationSecondsWithFrac` | `f64`, `String`        |</span>
 <span class="doccomment">/// | `chrono::Duration`    | `DurationSeconds`         | `i64`, `f64`, `String` |</span>
 <span class="doccomment">/// | `chrono::Duration`    | `DurationSecondsWithFrac` | `f64`, `String`        |</span>
+<span class="doccomment">/// | `time::Duration`      | `DurationSeconds`         | `i64`, `f64`, `String` |</span>
+<span class="doccomment">/// | `time::Duration`      | `DurationSecondsWithFrac` | `f64`, `String`        |</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DurationSeconds};</span>
 <span class="doccomment">/// use std::time::Duration;</span>
@@ -2677,7 +2838,7 @@
 <span class="doccomment">///     d_f64: Duration::new(12345, 500_000_000),</span>
 <span class="doccomment">///     d_string: Duration::new(12345, 999_999_999),</span>
 <span class="doccomment">/// };</span>
-<span class="doccomment">/// // Observe the different datatypes</span>
+<span class="doccomment">/// // Observe the different data types</span>
 <span class="doccomment">/// let expected = json!({</span>
 <span class="doccomment">///     &quot;d_u64&quot;: 12345,</span>
 <span class="doccomment">///     &quot;d_f64&quot;: 12346.0,</span>
@@ -2707,7 +2868,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(all(feature = &quot;macros&quot;, feature = &quot;chrono&quot;))] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DurationSeconds};</span>
 <span class="doccomment">/// # use chrono_crate::Duration;</span>
@@ -2735,7 +2896,7 @@
 <span class="doccomment">///     d_f64: Duration::seconds(-12345) + Duration::milliseconds(500),</span>
 <span class="doccomment">///     d_string: Duration::seconds(12345) + Duration::nanoseconds(999_999_999),</span>
 <span class="doccomment">/// };</span>
-<span class="doccomment">/// // Observe the different datatypes</span>
+<span class="doccomment">/// // Observe the different data types</span>
 <span class="doccomment">/// let expected = json!({</span>
 <span class="doccomment">///     &quot;d_i64&quot;: -12345,</span>
 <span class="doccomment">///     &quot;d_f64&quot;: -12345.0,</span>
@@ -2761,7 +2922,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`chrono::Duration`]: chrono_crate::Duration</span>
-<span class="doccomment">/// [feature flag]: https://docs.rs/serde_with/1.10.0/serde_with/guide/feature_flags/index.html</span>
+<span class="doccomment">/// [feature flag]: https://docs.rs/serde_with/1.14.0/serde_with/guide/feature_flags/index.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DurationSeconds</span><span class="op">&lt;</span>
     <span class="ident">FORMAT</span>: <span class="ident">formats::Format</span> <span class="op">=</span> <span class="ident">u64</span>,
@@ -2780,6 +2941,7 @@
 <span class="doccomment">/// For example, deserializing `DurationSeconds&lt;f64, Flexible&gt;` will discard any subsecond precision during deserialization from `f64` and will parse a `String` as an integer number.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This type also supports [`chrono::Duration`] with the `chrono`-[feature flag].</span>
+<span class="doccomment">/// This type also supports [`time::Duration`][::time_0_3::Duration] with the `time_0_3`-[feature flag].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// | Duration Type         | Converter                 | Available `FORMAT`s    |</span>
 <span class="doccomment">/// | --------------------- | ------------------------- | ---------------------- |</span>
@@ -2787,12 +2949,14 @@
 <span class="doccomment">/// | `std::time::Duration` | `DurationSecondsWithFrac` | `f64`, `String`        |</span>
 <span class="doccomment">/// | `chrono::Duration`    | `DurationSeconds`         | `i64`, `f64`, `String` |</span>
 <span class="doccomment">/// | `chrono::Duration`    | `DurationSecondsWithFrac` | `f64`, `String`        |</span>
+<span class="doccomment">/// | `time::Duration`      | `DurationSeconds`         | `i64`, `f64`, `String` |</span>
+<span class="doccomment">/// | `time::Duration`      | `DurationSecondsWithFrac` | `f64`, `String`        |</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DurationSecondsWithFrac};</span>
 <span class="doccomment">/// use std::time::Duration;</span>
@@ -2814,7 +2978,7 @@
 <span class="doccomment">///     d_f64: Duration::new(12345, 500_000_000), // Create from seconds and nanoseconds</span>
 <span class="doccomment">///     d_string: Duration::new(12345, 999_999_000),</span>
 <span class="doccomment">/// };</span>
-<span class="doccomment">/// // Observe the different datatypes</span>
+<span class="doccomment">/// // Observe the different data types</span>
 <span class="doccomment">/// let expected = json!({</span>
 <span class="doccomment">///     &quot;d_f64&quot;: 12345.5,</span>
 <span class="doccomment">///     &quot;d_string&quot;: &quot;12345.999999&quot;,</span>
@@ -2841,7 +3005,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(all(feature = &quot;macros&quot;, feature = &quot;chrono&quot;))] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, DurationSecondsWithFrac};</span>
 <span class="doccomment">/// # use chrono_crate::Duration;</span>
@@ -2865,7 +3029,7 @@
 <span class="doccomment">///     d_f64: Duration::seconds(-12345) + Duration::milliseconds(500),</span>
 <span class="doccomment">///     d_string: Duration::seconds(12345) + Duration::nanoseconds(999_999_000),</span>
 <span class="doccomment">/// };</span>
-<span class="doccomment">/// // Observe the different datatypes</span>
+<span class="doccomment">/// // Observe the different data types</span>
 <span class="doccomment">/// let expected = json!({</span>
 <span class="doccomment">///     &quot;d_f64&quot;: -12344.5,</span>
 <span class="doccomment">///     &quot;d_string&quot;: &quot;12345.999999&quot;,</span>
@@ -2887,7 +3051,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`chrono::Duration`]: chrono_crate::Duration</span>
-<span class="doccomment">/// [feature flag]: https://docs.rs/serde_with/1.10.0/serde_with/guide/feature_flags/index.html</span>
+<span class="doccomment">/// [feature flag]: https://docs.rs/serde_with/1.14.0/serde_with/guide/feature_flags/index.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DurationSecondsWithFrac</span><span class="op">&lt;</span>
     <span class="ident">FORMAT</span>: <span class="ident">formats::Format</span> <span class="op">=</span> <span class="ident">f64</span>,
@@ -2960,6 +3124,7 @@
 <span class="doccomment">/// For example, deserializing `TimestampSeconds&lt;f64, Flexible&gt;` will discard any subsecond precision during deserialization from `f64` and will parse a `String` as an integer number.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This type also supports [`chrono::DateTime`][DateTime] with the `chrono`-[feature flag].</span>
+<span class="doccomment">/// This type also supports [`time::OffsetDateTime`][::time_0_3::OffsetDateTime] and [`time::PrimitiveDateTime`][::time_0_3::PrimitiveDateTime] with the `time_0_3`-[feature flag].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// | Timestamp Type            | Converter                  | Available `FORMAT`s    |</span>
 <span class="doccomment">/// | ------------------------- | -------------------------- | ---------------------- |</span>
@@ -2969,12 +3134,16 @@
 <span class="doccomment">/// | `chrono::DateTime&lt;Utc&gt;`   | `TimestampSecondsWithFrac` | `f64`, `String`        |</span>
 <span class="doccomment">/// | `chrono::DateTime&lt;Local&gt;` | `TimestampSeconds`         | `i64`, `f64`, `String` |</span>
 <span class="doccomment">/// | `chrono::DateTime&lt;Local&gt;` | `TimestampSecondsWithFrac` | `f64`, `String`        |</span>
+<span class="doccomment">/// | `time::OffsetDateTime`    | `TimestampSeconds`         | `i64`, `f64`, `String` |</span>
+<span class="doccomment">/// | `time::OffsetDateTime`    | `TimestampSecondsWithFrac` | `f64`, `String`        |</span>
+<span class="doccomment">/// | `time::PrimitiveDateTime` | `TimestampSeconds`         | `i64`, `f64`, `String` |</span>
+<span class="doccomment">/// | `time::PrimitiveDateTime` | `TimestampSecondsWithFrac` | `f64`, `String`        |</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, TimestampSeconds};</span>
 <span class="doccomment">/// use std::time::{Duration, SystemTime};</span>
@@ -2999,7 +3168,7 @@
 <span class="doccomment">///     st_f64: SystemTime::UNIX_EPOCH.checked_add(Duration::new(12345, 500_000_000)).unwrap(),</span>
 <span class="doccomment">///     st_string: SystemTime::UNIX_EPOCH.checked_add(Duration::new(12345, 999_999_999)).unwrap(),</span>
 <span class="doccomment">/// };</span>
-<span class="doccomment">/// // Observe the different datatypes</span>
+<span class="doccomment">/// // Observe the different data types</span>
 <span class="doccomment">/// let expected = json!({</span>
 <span class="doccomment">///     &quot;st_i64&quot;: 12345,</span>
 <span class="doccomment">///     &quot;st_f64&quot;: 12346.0,</span>
@@ -3029,7 +3198,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(all(feature = &quot;macros&quot;, feature = &quot;chrono&quot;))] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, TimestampSeconds};</span>
 <span class="doccomment">/// # use chrono_crate::{DateTime, Local, TimeZone, Utc};</span>
@@ -3057,7 +3226,7 @@
 <span class="doccomment">///     dt_f64: Local.timestamp(-12345, 500_000_000),</span>
 <span class="doccomment">///     dt_string: Utc.timestamp(12345, 999_999_999),</span>
 <span class="doccomment">/// };</span>
-<span class="doccomment">/// // Observe the different datatypes</span>
+<span class="doccomment">/// // Observe the different data types</span>
 <span class="doccomment">/// let expected = json!({</span>
 <span class="doccomment">///     &quot;dt_i64&quot;: -12345,</span>
 <span class="doccomment">///     &quot;dt_f64&quot;: -12345.0,</span>
@@ -3084,7 +3253,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`SystemTime`]: std::time::SystemTime</span>
 <span class="doccomment">/// [DateTime]: chrono_crate::DateTime</span>
-<span class="doccomment">/// [feature flag]: https://docs.rs/serde_with/1.10.0/serde_with/guide/feature_flags/index.html</span>
+<span class="doccomment">/// [feature flag]: https://docs.rs/serde_with/1.14.0/serde_with/guide/feature_flags/index.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TimestampSeconds</span><span class="op">&lt;</span>
     <span class="ident">FORMAT</span>: <span class="ident">formats::Format</span> <span class="op">=</span> <span class="ident">i64</span>,
@@ -3102,7 +3271,8 @@
 <span class="doccomment">/// [`formats::Flexible`] means that deserialization will perform a best effort to extract the correct timestamp and allows deserialization from any type.</span>
 <span class="doccomment">/// For example, deserializing `TimestampSeconds&lt;f64, Flexible&gt;` will discard any subsecond precision during deserialization from `f64` and will parse a `String` as an integer number.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This type also supports [`chrono::DateTime`][DateTime] with the `chrono`-[feature flag].</span>
+<span class="doccomment">/// This type also supports [`chrono::DateTime`][DateTime] and [`chrono::NaiveDateTime`][NaiveDateTime] with the `chrono`-[feature flag].</span>
+<span class="doccomment">/// This type also supports [`time::OffsetDateTime`][::time_0_3::OffsetDateTime] and [`time::PrimitiveDateTime`][::time_0_3::PrimitiveDateTime] with the `time_0_3`-[feature flag].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// | Timestamp Type            | Converter                  | Available `FORMAT`s    |</span>
 <span class="doccomment">/// | ------------------------- | -------------------------- | ---------------------- |</span>
@@ -3112,12 +3282,18 @@
 <span class="doccomment">/// | `chrono::DateTime&lt;Utc&gt;`   | `TimestampSecondsWithFrac` | `f64`, `String`        |</span>
 <span class="doccomment">/// | `chrono::DateTime&lt;Local&gt;` | `TimestampSeconds`         | `i64`, `f64`, `String` |</span>
 <span class="doccomment">/// | `chrono::DateTime&lt;Local&gt;` | `TimestampSecondsWithFrac` | `f64`, `String`        |</span>
+<span class="doccomment">/// | `chrono::NaiveDateTime`   | `TimestampSeconds`         | `i64`, `f64`, `String` |</span>
+<span class="doccomment">/// | `chrono::NaiveDateTime`   | `TimestampSecondsWithFrac` | `f64`, `String`        |</span>
+<span class="doccomment">/// | `time::OffsetDateTime`    | `TimestampSeconds`         | `i64`, `f64`, `String` |</span>
+<span class="doccomment">/// | `time::OffsetDateTime`    | `TimestampSecondsWithFrac` | `f64`, `String`        |</span>
+<span class="doccomment">/// | `time::PrimitiveDateTime` | `TimestampSeconds`         | `i64`, `f64`, `String` |</span>
+<span class="doccomment">/// | `time::PrimitiveDateTime` | `TimestampSecondsWithFrac` | `f64`, `String`        |</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, TimestampSecondsWithFrac};</span>
 <span class="doccomment">/// use std::time::{Duration, SystemTime};</span>
@@ -3139,7 +3315,7 @@
 <span class="doccomment">///     st_f64: SystemTime::UNIX_EPOCH.checked_add(Duration::new(12345, 500_000_000)).unwrap(),</span>
 <span class="doccomment">///     st_string: SystemTime::UNIX_EPOCH.checked_add(Duration::new(12345, 999_999_000)).unwrap(),</span>
 <span class="doccomment">/// };</span>
-<span class="doccomment">/// // Observe the different datatypes</span>
+<span class="doccomment">/// // Observe the different data types</span>
 <span class="doccomment">/// let expected = json!({</span>
 <span class="doccomment">///     &quot;st_f64&quot;: 12345.5,</span>
 <span class="doccomment">///     &quot;st_string&quot;: &quot;12345.999999&quot;,</span>
@@ -3166,7 +3342,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # #[cfg(all(feature = &quot;macros&quot;, feature = &quot;chrono&quot;))] {</span>
-<span class="doccomment">/// # use serde_derive::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
 <span class="doccomment">/// # use serde_json::json;</span>
 <span class="doccomment">/// # use serde_with::{serde_as, TimestampSecondsWithFrac};</span>
 <span class="doccomment">/// # use chrono_crate::{DateTime, Local, TimeZone, Utc};</span>
@@ -3190,7 +3366,7 @@
 <span class="doccomment">///     dt_f64: Utc.timestamp(-12345, 500_000_000),</span>
 <span class="doccomment">///     dt_string: Local.timestamp(12345, 999_999_000),</span>
 <span class="doccomment">/// };</span>
-<span class="doccomment">/// // Observe the different datatypes</span>
+<span class="doccomment">/// // Observe the different data types</span>
 <span class="doccomment">/// let expected = json!({</span>
 <span class="doccomment">///     &quot;dt_f64&quot;: -12344.5,</span>
 <span class="doccomment">///     &quot;dt_string&quot;: &quot;12345.999999&quot;,</span>
@@ -3213,7 +3389,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`SystemTime`]: std::time::SystemTime</span>
 <span class="doccomment">/// [DateTime]: chrono_crate::DateTime</span>
-<span class="doccomment">/// [feature flag]: https://docs.rs/serde_with/1.10.0/serde_with/guide/feature_flags/index.html</span>
+<span class="doccomment">/// [NaiveDateTime]: chrono_crate::NaiveDateTime</span>
+<span class="doccomment">/// [feature flag]: https://docs.rs/serde_with/1.14.0/serde_with/guide/feature_flags/index.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TimestampSecondsWithFrac</span><span class="op">&lt;</span>
     <span class="ident">FORMAT</span>: <span class="ident">formats::Format</span> <span class="op">=</span> <span class="ident">f64</span>,
@@ -3283,14 +3460,14 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The type provides de/serialization for these types:</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// * `[u8; N]`, Rust 1.51+, not possible using `serde_bytes`</span>
-<span class="doccomment">/// * `&amp;[u8; N]`, Rust 1.51+, not possible using `serde_bytes`</span>
+<span class="doccomment">/// * `[u8; N]`, not possible using `serde_bytes`</span>
+<span class="doccomment">/// * `&amp;[u8; N]`, not possible using `serde_bytes`</span>
 <span class="doccomment">/// * `&amp;[u8]`</span>
-<span class="doccomment">/// * `Box&lt;[u8; N]&gt;`, Rust 1.51+, not possible using `serde_bytes`</span>
+<span class="doccomment">/// * `Box&lt;[u8; N]&gt;`, not possible using `serde_bytes`</span>
 <span class="doccomment">/// * `Box&lt;[u8]&gt;`</span>
 <span class="doccomment">/// * `Vec&lt;u8&gt;`</span>
 <span class="doccomment">/// * `Cow&lt;&#39;_, [u8]&gt;`</span>
-<span class="doccomment">/// * `Cow&lt;&#39;_, [u8; N]&gt;`, Rust 1.51+, not possible using `serde_bytes`</span>
+<span class="doccomment">/// * `Cow&lt;&#39;_, [u8; N]&gt;`, not possible using `serde_bytes`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`serde_bytes`]: https://crates.io/crates/serde_bytes</span>
 <span class="doccomment">///</span>
@@ -3347,7 +3524,7 @@
 <span class="doccomment">/// # )&quot;#;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # let pretty_config = ron::ser::PrettyConfig::new()</span>
-<span class="doccomment">/// #     .with_new_line(&quot;\n&quot;.into());</span>
+<span class="doccomment">/// #     .new_line(&quot;\n&quot;.into());</span>
 <span class="doccomment">/// assert_eq!(expected, ron::ser::to_string_pretty(&amp;value, pretty_config).unwrap());</span>
 <span class="doccomment">/// assert_eq!(value, ron::from_str(&amp;expected).unwrap());</span>
 <span class="doccomment">/// # }</span>
@@ -3391,7 +3568,7 @@
 <span class="doccomment">/// # )&quot;#;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # let pretty_config = ron::ser::PrettyConfig::new()</span>
-<span class="doccomment">/// #     .with_new_line(&quot;\n&quot;.into());</span>
+<span class="doccomment">/// #     .new_line(&quot;\n&quot;.into());</span>
 <span class="doccomment">/// assert_eq!(expected, ron::ser::to_string_pretty(&amp;value, pretty_config).unwrap());</span>
 <span class="doccomment">/// // RON doesn&#39;t support borrowed deserialization of byte arrays</span>
 <span class="doccomment">/// # }</span>
@@ -3448,7 +3625,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Sometimes it is desirable to have a shortcut in writing 1-element lists in a config file.</span>
 <span class="doccomment">/// Usually, this is done by either writing a list or the list element itself.</span>
-<span class="doccomment">/// This distinction is not semantically important on the Rust side, thus both forms should serialize into the same `Vec`.</span>
+<span class="doccomment">/// This distinction is not semantically important on the Rust side, thus both forms should deserialize into the same `Vec`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The `OneOrMany` adapter achieves exactly this use case.</span>
 <span class="doccomment">/// The serialization behavior can be tweaked to either always serialize as a list using `PreferMany` or to serialize as the inner element if possible using `PreferOne`.</span>
@@ -3807,6 +3984,93 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BorrowCow</span>;
+
+<span class="doccomment">/// Deserialize a sequence into `Vec&lt;T&gt;`, skipping elements which fail to deserialize.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The serialization behavior is identical to `Vec&lt;T&gt;`. This is an alternative to `Vec&lt;T&gt;`</span>
+<span class="doccomment">/// which is resilient against unexpected data.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde_with::{serde_as, VecSkipError};</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # #[derive(Debug, PartialEq)]</span>
+<span class="doccomment">/// #[derive(Deserialize, Serialize)]</span>
+<span class="doccomment">/// # #[non_exhaustive]</span>
+<span class="doccomment">/// enum Color {</span>
+<span class="doccomment">///     Red,</span>
+<span class="doccomment">///     Green,</span>
+<span class="doccomment">///     Blue,</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// # use Color::*;</span>
+<span class="doccomment">/// #[serde_as]</span>
+<span class="doccomment">/// # #[derive(Debug, PartialEq)]</span>
+<span class="doccomment">/// #[derive(Deserialize, Serialize)]</span>
+<span class="doccomment">/// struct Palette(#[serde_as(as = &quot;VecSkipError&lt;_&gt;&quot;)] Vec&lt;Color&gt;);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let data = Palette(vec![Blue, Green,]);</span>
+<span class="doccomment">/// let source_json = r#&quot;[&quot;Blue&quot;, &quot;Yellow&quot;, &quot;Green&quot;]&quot;#;</span>
+<span class="doccomment">/// let data_json = r#&quot;[&quot;Blue&quot;,&quot;Green&quot;]&quot;#;</span>
+<span class="doccomment">/// // Ensure serialization and deserialization produce the expected results</span>
+<span class="doccomment">/// assert_eq!(data_json, serde_json::to_string(&amp;data).unwrap());</span>
+<span class="doccomment">/// assert_eq!(data, serde_json::from_str(source_json).unwrap());</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// ```</span>
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VecSkipError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+
+<span class="doccomment">/// Deserialize a boolean from a number</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Deserialize a number (of `u8`) and turn it into a boolean.</span>
+<span class="doccomment">/// The adapter supports a [`Strict`](crate::formats::Strict) and [`Flexible`](crate::formats::Flexible) format.</span>
+<span class="doccomment">/// In `Strict` mode, the number must be `0` or `1`.</span>
+<span class="doccomment">/// All other values produce an error.</span>
+<span class="doccomment">/// In `Flexible` mode, the number any non-zero value is converted to `true`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// During serialization only `0` or `1` are ever emitted.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// # #[cfg(feature = &quot;macros&quot;)] {</span>
+<span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
+<span class="doccomment">/// # use serde_json::json;</span>
+<span class="doccomment">/// # use serde_with::{serde_as, BoolFromInt};</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// #[serde_as]</span>
+<span class="doccomment">/// # #[derive(Debug, PartialEq)]</span>
+<span class="doccomment">/// #[derive(Deserialize, Serialize)]</span>
+<span class="doccomment">/// struct Data(#[serde_as(as = &quot;BoolFromInt&quot;)] bool);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let data = Data(true);</span>
+<span class="doccomment">/// let j = json!(1);</span>
+<span class="doccomment">/// // Ensure serialization and deserialization produce the expected results</span>
+<span class="doccomment">/// assert_eq!(j, serde_json::to_value(&amp;data).unwrap());</span>
+<span class="doccomment">/// assert_eq!(data, serde_json::from_value(j).unwrap());</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // false maps to 0</span>
+<span class="doccomment">/// let data = Data(false);</span>
+<span class="doccomment">/// let j = json!(0);</span>
+<span class="doccomment">/// assert_eq!(j, serde_json::to_value(&amp;data).unwrap());</span>
+<span class="doccomment">/// assert_eq!(data, serde_json::from_value(j).unwrap());</span>
+<span class="comment">//</span>
+<span class="doccomment">/// #[serde_as]</span>
+<span class="doccomment">/// # #[derive(Debug, PartialEq)]</span>
+<span class="doccomment">/// #[derive(Deserialize, Serialize)]</span>
+<span class="doccomment">/// struct Flexible(#[serde_as(as = &quot;BoolFromInt&lt;serde_with::formats::Flexible&gt;&quot;)] bool);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Flexible turns any non-zero number into true</span>
+<span class="doccomment">/// let data = Flexible(true);</span>
+<span class="doccomment">/// let j = json!(100);</span>
+<span class="doccomment">/// assert_eq!(data, serde_json::from_value(j).unwrap());</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BoolFromInt</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">formats::Strictness</span> <span class="op">=</span> <span class="ident">formats::Strict</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>);
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
 </body></html>

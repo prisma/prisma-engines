@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.36/src/asn1.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>asn1.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.40/src/asn1.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>asn1.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -772,34 +772,9 @@
 <span id="767">767</span>
 <span id="768">768</span>
 <span id="769">769</span>
-<span id="770">770</span>
-<span id="771">771</span>
-<span id="772">772</span>
-<span id="773">773</span>
-<span id="774">774</span>
-<span id="775">775</span>
-<span id="776">776</span>
-<span id="777">777</span>
-<span id="778">778</span>
-<span id="779">779</span>
-<span id="780">780</span>
-<span id="781">781</span>
-<span id="782">782</span>
-<span id="783">783</span>
-<span id="784">784</span>
-<span id="785">785</span>
-<span id="786">786</span>
-<span id="787">787</span>
-<span id="788">788</span>
-<span id="789">789</span>
-<span id="790">790</span>
-<span id="791">791</span>
-<span id="792">792</span>
-<span id="793">793</span>
-<span id="794">794</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
 
-<span class="doccomment">//! Defines the format of certificiates</span>
+<span class="doccomment">//! Defines the format of certificates</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This module is used by [`x509`] and other certificate building functions</span>
 <span class="doccomment">//! to describe time, strings, and objects.</span>
@@ -840,6 +815,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::nid::Nid</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::string::OpensslString</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cvt</span>, <span class="ident">cvt_p</span>};
+<span class="kw">use</span> <span class="ident">openssl_macros::corresponds</span>;
 
 <span class="macro">foreign_type_and_impl_send_sync!</span> {
     <span class="kw">type</span> <span class="ident">CType</span> <span class="op">=</span> <span class="ident">ffi::ASN1_GENERALIZEDTIME</span>;
@@ -995,10 +971,7 @@
 
 <span class="kw">impl</span> <span class="ident">Asn1TimeRef</span> {
     <span class="doccomment">/// Find difference between two times</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`ASN1_TIME_diff`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ASN1_TIME_diff`]: https://www.openssl.org/docs/man1.1.0/crypto/ASN1_TIME_diff.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_TIME_diff</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl102</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">compare</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TimeDiff</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">days</span> <span class="op">=</span> <span class="number">0</span>;
@@ -1014,12 +987,7 @@
     }
 
     <span class="doccomment">/// Compare two times</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`ASN1_TIME_compare`] but is implemented using [`diff`] so that it is</span>
-    <span class="doccomment">/// also supported on older versions of OpenSSL.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ASN1_TIME_compare`]: https://www.openssl.org/docs/man1.1.1/man3/ASN1_TIME_compare.html</span>
-    <span class="doccomment">/// [`diff`]: struct.Asn1TimeRef.html#method.diff</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_TIME_compare</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl102</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ordering</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">diff</span>(<span class="ident">other</span>)<span class="question-mark">?</span>;
@@ -1105,6 +1073,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Asn1Time</span> {
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_TIME_new</span>)]</span>
     <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Asn1Time</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="ident">ffi::init</span>();
 
@@ -1114,6 +1083,7 @@
         }
     }
 
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">X509_gmtime_adj</span>)]</span>
     <span class="kw">fn</span> <span class="ident">from_period</span>(<span class="ident">period</span>: <span class="ident">c_long</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Asn1Time</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="ident">ffi::init</span>();
 
@@ -1129,6 +1099,7 @@
     }
 
     <span class="doccomment">/// Creates a new time from the specified `time_t` value</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_TIME_set</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_unix</span>(<span class="ident">time</span>: <span class="ident">time_t</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Asn1Time</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="ident">ffi::init</span>();
 
@@ -1139,10 +1110,7 @@
     }
 
     <span class="doccomment">/// Creates a new time corresponding to the specified ASN1 time string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`ASN1_TIME_set_string`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ASN1_TIME_set_string`]: https://www.openssl.org/docs/manmaster/man3/ASN1_TIME_set_string.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_TIME_set_string</span>)]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::should_implement_trait</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Asn1Time</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
@@ -1157,11 +1125,8 @@
 
     <span class="doccomment">/// Creates a new time corresponding to the specified X509 time string.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`ASN1_TIME_set_string_X509`].</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ASN1_TIME_set_string_X509`]: https://www.openssl.org/docs/manmaster/man3/ASN1_TIME_set_string.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_TIME_set_string_X509</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str_x509</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Asn1Time</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
@@ -1234,9 +1199,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [ASN1_STRING-to_UTF8]: https://www.openssl.org/docs/man1.1.0/crypto/ASN1_STRING_to_UTF8.html</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Asn1String</span>;
-    <span class="doccomment">/// Reference to [`Asn1String`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Asn1String`]: struct.Asn1String.html</span>
+    <span class="doccomment">/// A reference to an [`Asn1String`].</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Asn1StringRef</span>;
 }
 
@@ -1246,6 +1209,7 @@
     <span class="doccomment">/// ASN.1 strings may utilize UTF-16, ASCII, BMP, or UTF8.  This is important to</span>
     <span class="doccomment">/// consume the string in a meaningful way without knowing the underlying</span>
     <span class="doccomment">/// format.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_STRING_to_UTF8</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_utf8</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OpensslString</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
@@ -1264,11 +1228,13 @@
     <span class="doccomment">/// strings in rust, it is preferable to use [`as_utf8`]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`as_utf8`]: struct.Asn1String.html#method.as_utf8</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_STRING_get0_data</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts</span>(<span class="ident">ASN1_STRING_get0_data</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()), <span class="self">self</span>.<span class="ident">len</span>()) }
     }
 
     <span class="doccomment">/// Returns the number of bytes in the string.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_STRING_length</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">unsafe</span> { <span class="ident">ffi::ASN1_STRING_length</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="ident">usize</span> }
     }
@@ -1302,9 +1268,7 @@
     <span class="doccomment">/// [`bn`]: ../bn/index.html</span>
     <span class="doccomment">/// [`ASN1_INTEGER_set`]: https://www.openssl.org/docs/man1.1.0/crypto/ASN1_INTEGER_set.html</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Asn1Integer</span>;
-    <span class="doccomment">/// Reference to [`Asn1Integer`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Asn1Integer`]: struct.Asn1Integer.html</span>
+    <span class="doccomment">/// A reference to an [`Asn1Integer`].</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Asn1IntegerRef</span>;
 }
 
@@ -1329,10 +1293,7 @@
     }
 
     <span class="doccomment">/// Converts the integer to a `BigNum`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`ASN1_INTEGER_to_BN`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ASN1_INTEGER_to_BN`]: https://www.openssl.org/docs/man1.1.0/crypto/ASN1_INTEGER_get.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_INTEGER_to_BN</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">cvt_p</span>(<span class="ident">ffi::ASN1_INTEGER_to_BN</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr::null_mut</span>()))
@@ -1343,10 +1304,8 @@
     <span class="doccomment">/// Sets the ASN.1 value to the value of a signed 32-bit integer, for larger numbers</span>
     <span class="doccomment">/// see [`bn`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// OpenSSL documentation at [`ASN1_INTEGER_set`]</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// [`bn`]: ../bn/struct.BigNumRef.html#method.to_asn1_integer</span>
-    <span class="doccomment">/// [`ASN1_INTEGER_set`]: https://www.openssl.org/docs/man1.1.0/crypto/ASN1_INTEGER_set.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_INTEGER_set</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="ident">cvt</span>(<span class="ident">ffi::ASN1_INTEGER_set</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">value</span> <span class="kw">as</span> <span class="ident">c_long</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()) }
     }
@@ -1362,19 +1321,19 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`x509`]: ../x509/struct.X509.html#method.signature</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Asn1BitString</span>;
-    <span class="doccomment">/// Reference to [`Asn1BitString`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Asn1BitString`]: struct.Asn1BitString.html</span>
+    <span class="doccomment">/// A reference to an [`Asn1BitString`].</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Asn1BitStringRef</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">Asn1BitStringRef</span> {
     <span class="doccomment">/// Returns the Asn1BitString as a slice.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_STRING_get0_data</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts</span>(<span class="ident">ASN1_STRING_get0_data</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>), <span class="self">self</span>.<span class="ident">len</span>()) }
     }
 
     <span class="doccomment">/// Returns the number of bytes in the string.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">ASN1_STRING_length</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">unsafe</span> { <span class="ident">ffi::ASN1_STRING_length</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>) <span class="kw">as</span> <span class="ident">usize</span> }
     }
@@ -1403,19 +1362,13 @@
     <span class="doccomment">/// [`nid::COMMONNAME`]: ../nid/constant.COMMONNAME.html</span>
     <span class="doccomment">/// [`OBJ_nid2obj`]: https://www.openssl.org/docs/man1.1.0/crypto/OBJ_obj2nid.html</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Asn1Object</span>;
-    <span class="doccomment">/// Reference to [`Asn1Object`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Asn1Object`]: struct.Asn1Object.html</span>
+    <span class="doccomment">/// A reference to an [`Asn1Object`].</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Asn1ObjectRef</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">Asn1Object</span> {
-    <span class="doccomment">/// Constructs an ASN.1 Object Identifier from a string representation of</span>
-    <span class="doccomment">/// the OID.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`OBJ_txt2obj`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`OBJ_txt2obj`]: https://www.openssl.org/docs/man1.1.0/man3/OBJ_txt2obj.html</span>
+    <span class="doccomment">/// Constructs an ASN.1 Object Identifier from a string representation of the OID.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OBJ_txt2obj</span>)]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::should_implement_trait</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">txt</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Asn1Object</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
@@ -1429,11 +1382,8 @@
     <span class="doccomment">/// Return the OID as an DER encoded array of bytes. This is the ASN.1</span>
     <span class="doccomment">/// value, not including tag or length.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`OBJ_get0_data`].</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`OBJ_get0_data`]: https://www.openssl.org/docs/man1.1.0/man3/OBJ_get0_data.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">OBJ_get0_data</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">unsafe</span> {

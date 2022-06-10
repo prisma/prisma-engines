@@ -20,7 +20,7 @@ It’s a TODO to make these and other extension points async.)</p>
 <p>Once you have these two pieces, configuring a server to use them involves, briefly:</p>
 <ul>
 <li>packaging your <code>sign::SigningKey</code> with the matching certificate chain into a <a href="../../sign/struct.CertifiedKey.html"><code>sign::CertifiedKey</code></a></li>
-<li>making a <a href="../../struct.ResolvesServerCertUsingSNI.html"><code>ResolvesServerCertUsingSNI</code></a> and feeding in your <code>sign::CertifiedKey</code> for all SNI hostnames you want to use it for,</li>
+<li>making a <a href="../../struct.ResolvesServerCertUsingSni.html"><code>ResolvesServerCertUsingSni</code></a> and feeding in your <code>sign::CertifiedKey</code> for all SNI hostnames you want to use it for,</li>
 <li>setting that as your <code>ServerConfig</code>’s <a href="../../struct.ServerConfig.html#structfield.cert_resolver"><code>cert_resolver</code></a></li>
 </ul>
 <div class="footnotes"><hr><ol><li id="fn1"><p>For PKCS#8 it does not support password encryption – there’s not a meaningful threat

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.1.0/src/bson.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bson.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.3.0/src/bson.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bson.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1103,6 +1103,44 @@
 <span id="1098">1098</span>
 <span id="1099">1099</span>
 <span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+<span id="1106">1106</span>
+<span id="1107">1107</span>
+<span id="1108">1108</span>
+<span id="1109">1109</span>
+<span id="1110">1110</span>
+<span id="1111">1111</span>
+<span id="1112">1112</span>
+<span id="1113">1113</span>
+<span id="1114">1114</span>
+<span id="1115">1115</span>
+<span id="1116">1116</span>
+<span id="1117">1117</span>
+<span id="1118">1118</span>
+<span id="1119">1119</span>
+<span id="1120">1120</span>
+<span id="1121">1121</span>
+<span id="1122">1122</span>
+<span id="1123">1123</span>
+<span id="1124">1124</span>
+<span id="1125">1125</span>
+<span id="1126">1126</span>
+<span id="1127">1127</span>
+<span id="1128">1128</span>
+<span id="1129">1129</span>
+<span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
 </pre><pre class="rust"><code><span class="comment">// The MIT License (MIT)</span>
 
 <span class="comment">// Copyright (c) 2015 Y. T. Chung &lt;zonyitoo@gmail.com&gt;</span>
@@ -1131,7 +1169,6 @@
     <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>},
 };
 
-<span class="kw">use</span> <span class="ident">chrono::Datelike</span>;
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::document::Document</span>;
@@ -1139,6 +1176,7 @@
     <span class="ident">oid</span>::{<span class="self">self</span>, <span class="ident">ObjectId</span>},
     <span class="ident">spec</span>::{<span class="ident">BinarySubtype</span>, <span class="ident">ElementType</span>},
     <span class="ident">Decimal128</span>,
+    <span class="ident">RawBinaryRef</span>,
 };
 
 <span class="doccomment">/// Possible BSON value types.</span>
@@ -1415,6 +1453,14 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)))]</span>
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">time::OffsetDateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">time::OffsetDateTime</span>) -&gt; <span class="ident">Bson</span> {
+        <span class="ident">Bson::DateTime</span>(<span class="ident"><span class="kw">crate</span>::DateTime::from</span>(<span class="ident">a</span>))
+    }
+}
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">chrono::TimeZone</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
@@ -1440,6 +1486,12 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DbPointer</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">DbPointer</span>) -&gt; <span class="ident">Bson</span> {
         <span class="ident">Bson::DbPointer</span>(<span class="ident">a</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Decimal128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">d</span>: <span class="ident">Decimal128</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">Bson::Decimal128</span>(<span class="ident">d</span>)
     }
 }
 
@@ -1528,9 +1580,10 @@
                 })
             }
             <span class="ident">Bson::ObjectId</span>(<span class="ident">v</span>) =&gt; <span class="macro">json!</span>({<span class="string">&quot;$oid&quot;</span>: <span class="ident">v</span>.<span class="ident">to_hex</span>()}),
-            <span class="ident">Bson::DateTime</span>(<span class="ident">v</span>) <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">timestamp_millis</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">v</span>.<span class="ident">to_chrono</span>().<span class="ident">year</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">99999</span> =&gt; {
+            <span class="ident">Bson::DateTime</span>(<span class="ident">v</span>) <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">timestamp_millis</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">v</span>.<span class="ident">to_time_0_3</span>().<span class="ident">year</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">9999</span> =&gt; {
                 <span class="macro">json!</span>({
-                    <span class="string">&quot;$date&quot;</span>: <span class="ident">v</span>.<span class="ident">to_rfc3339_string</span>(),
+                    <span class="comment">// Unwrap safety: timestamps in the guarded range can always be formatted.</span>
+                    <span class="string">&quot;$date&quot;</span>: <span class="ident">v</span>.<span class="ident">try_to_rfc3339_string</span>().<span class="ident">unwrap</span>(),
                 })
             }
             <span class="ident">Bson::DateTime</span>(<span class="ident">v</span>) =&gt; <span class="macro">json!</span>({
@@ -1627,7 +1680,7 @@
     <span class="doccomment">/// This function mainly used for [extended JSON format](https://docs.mongodb.com/manual/reference/mongodb-extended-json/).</span>
     <span class="comment">// TODO RUST-426: Investigate either removing this from the serde implementation or unifying</span>
     <span class="comment">// with the extended JSON implementation.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_extended_document</span>(<span class="self">self</span>) -&gt; <span class="ident">Document</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_extended_document</span>(<span class="self">self</span>, <span class="ident">rawbson</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Document</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Bson::RegularExpression</span>(<span class="ident">Regex</span> {
                 <span class="kw-2">ref</span> <span class="ident">pattern</span>,
@@ -1664,12 +1717,21 @@
                     }
                 }
             }
-            <span class="ident">Bson::Binary</span>(<span class="ident">Binary</span> { <span class="ident">subtype</span>, <span class="kw-2">ref</span> <span class="ident">bytes</span> }) =&gt; {
+            <span class="ident">Bson::Binary</span>(<span class="ident">Binary</span> { <span class="ident">subtype</span>, <span class="ident">bytes</span> }) =&gt; {
                 <span class="kw">let</span> <span class="ident">tval</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">From::from</span>(<span class="ident">subtype</span>);
-                <span class="macro">doc!</span> {
-                    <span class="string">&quot;$binary&quot;</span>: {
-                        <span class="string">&quot;base64&quot;</span>: <span class="ident">base64::encode</span>(<span class="ident">bytes</span>),
-                        <span class="string">&quot;subType&quot;</span>: <span class="ident">hex::encode</span>([<span class="ident">tval</span>]),
+                <span class="kw">if</span> <span class="ident">rawbson</span> {
+                    <span class="macro">doc!</span> {
+                        <span class="string">&quot;$binary&quot;</span>: {
+                            <span class="string">&quot;bytes&quot;</span>: <span class="ident">Binary</span> { <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Generic</span>, <span class="ident">bytes</span> },
+                            <span class="string">&quot;subType&quot;</span>: <span class="ident">Bson::Int32</span>(<span class="ident">tval</span>.<span class="ident">into</span>())
+                        }
+                    }
+                } <span class="kw">else</span> {
+                    <span class="macro">doc!</span> {
+                        <span class="string">&quot;$binary&quot;</span>: {
+                            <span class="string">&quot;base64&quot;</span>: <span class="ident">base64::encode</span>(<span class="ident">bytes</span>),
+                            <span class="string">&quot;subType&quot;</span>: <span class="ident">hex::encode</span>([<span class="ident">tval</span>]),
+                        }
                     }
                 }
             }
@@ -1678,9 +1740,13 @@
                     <span class="string">&quot;$oid&quot;</span>: <span class="ident">v</span>.<span class="ident">to_string</span>(),
                 }
             }
-            <span class="ident">Bson::DateTime</span>(<span class="ident">v</span>) <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">timestamp_millis</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">v</span>.<span class="ident">to_chrono</span>().<span class="ident">year</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">9999</span> =&gt; {
+            <span class="ident">Bson::DateTime</span>(<span class="ident">v</span>) <span class="kw">if</span> <span class="ident">rawbson</span> =&gt; <span class="macro">doc!</span> {
+                <span class="string">&quot;$date&quot;</span>: <span class="ident">v</span>.<span class="ident">timestamp_millis</span>(),
+            },
+            <span class="ident">Bson::DateTime</span>(<span class="ident">v</span>) <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">timestamp_millis</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">v</span>.<span class="ident">to_time_0_3</span>().<span class="ident">year</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">9999</span> =&gt; {
                 <span class="macro">doc!</span> {
-                    <span class="string">&quot;$date&quot;</span>: <span class="ident">v</span>.<span class="ident">to_rfc3339_string</span>(),
+                    <span class="comment">// Unwrap safety: timestamps in the guarded range can always be formatted.</span>
+                    <span class="string">&quot;$date&quot;</span>: <span class="ident">v</span>.<span class="ident">try_to_rfc3339_string</span>().<span class="ident">unwrap</span>(),
                 }
             }
             <span class="ident">Bson::DateTime</span>(<span class="ident">v</span>) =&gt; <span class="macro">doc!</span> {
@@ -1837,10 +1903,7 @@
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">regex</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_document</span>(<span class="string">&quot;$regularExpression&quot;</span>) {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">pattern</span>) <span class="op">=</span> <span class="ident">regex</span>.<span class="ident">get_str</span>(<span class="string">&quot;pattern&quot;</span>) {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">options</span>) <span class="op">=</span> <span class="ident">regex</span>.<span class="ident">get_str</span>(<span class="string">&quot;options&quot;</span>) {
-                            <span class="kw">return</span> <span class="ident">Bson::RegularExpression</span>(<span class="ident">Regex::new</span>(
-                                <span class="ident">pattern</span>.<span class="ident">into</span>(),
-                                <span class="ident">options</span>.<span class="ident">into</span>(),
-                            ));
+                            <span class="kw">return</span> <span class="ident">Bson::RegularExpression</span>(<span class="ident">Regex::new</span>(<span class="ident">pattern</span>, <span class="ident">options</span>));
                         }
                     }
                 }
@@ -1865,8 +1928,8 @@
                 }
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">date</span>) <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;$date&quot;</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">date</span>) <span class="op">=</span> <span class="ident">chrono::DateTime::parse_from_rfc3339</span>(<span class="ident">date</span>) {
-                        <span class="kw">return</span> <span class="ident">Bson::DateTime</span>(<span class="ident"><span class="kw">crate</span>::DateTime::from_chrono</span>(<span class="ident">date</span>));
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">dt</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::DateTime::parse_rfc3339_str</span>(<span class="ident">date</span>) {
+                        <span class="kw">return</span> <span class="ident">Bson::DateTime</span>(<span class="ident">dt</span>);
                     }
                 }
             }
@@ -2119,11 +2182,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Regex</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">pattern</span>: <span class="ident">String</span>, <span class="ident">options</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">chars</span>().<span class="ident">collect</span>();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">pattern</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">as_ref</span>().<span class="ident">chars</span>().<span class="ident">collect</span>();
         <span class="ident">chars</span>.<span class="ident">sort_unstable</span>();
         <span class="kw">let</span> <span class="ident">options</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-        <span class="self">Self</span> { <span class="ident">pattern</span>, <span class="ident">options</span> }
+        <span class="self">Self</span> {
+            <span class="ident">pattern</span>: <span class="ident">pattern</span>.<span class="ident">as_ref</span>().<span class="ident">to_string</span>(),
+            <span class="ident">options</span>,
+        }
     }
 }
 
@@ -2136,7 +2202,10 @@
 <span class="doccomment">/// Represents a BSON code with scope value.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JavaScriptCodeWithScope</span> {
+    <span class="doccomment">/// The JavaScript code.</span>
     <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">String</span>,
+
+    <span class="doccomment">/// The scope document containing variable bindings.</span>
     <span class="kw">pub</span> <span class="ident">scope</span>: <span class="ident">Document</span>,
 }
 
@@ -2193,6 +2262,13 @@
                 <span class="ident">bytes</span>: <span class="ident">binary</span>.<span class="ident">clone</span>(),
                 <span class="ident">subtype</span>: <span class="ident">u8::try_from</span>(<span class="ident">subtype</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">into</span>(),
             })
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_raw_binary</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawBinaryRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+        <span class="ident">RawBinaryRef</span> {
+            <span class="ident">bytes</span>: <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">as_slice</span>(),
+            <span class="ident">subtype</span>: <span class="self">self</span>.<span class="ident">subtype</span>,
         }
     }
 }

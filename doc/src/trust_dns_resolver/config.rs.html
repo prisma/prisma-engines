@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.20.3/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -790,6 +790,61 @@
 <span id="785">785</span>
 <span id="786">786</span>
 <span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
@@ -833,7 +888,7 @@
 <span class="kw">impl</span> <span class="ident">ResolverConfig</span> {
     <span class="doccomment">/// Creates a new empty configuration</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolverConfig</span> {
+        <span class="self">Self</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
             <span class="ident">search</span>: <span class="macro">vec!</span>[],
@@ -847,7 +902,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">google</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolverConfig</span> {
+        <span class="self">Self</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
             <span class="ident">search</span>: <span class="macro">vec!</span>[],
@@ -857,11 +912,11 @@
 
     <span class="doccomment">/// Creates a default configuration, using `1.1.1.1`, `1.0.0.1` and `2606:4700:4700::1111`, `2606:4700:4700::1001` (thank you, Cloudflare).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see: https://www.cloudflare.com/dns/</span>
+    <span class="doccomment">/// Please see: &lt;https://www.cloudflare.com/dns/&gt;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolverConfig</span> {
+        <span class="self">Self</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
             <span class="ident">search</span>: <span class="macro">vec!</span>[],
@@ -871,12 +926,13 @@
 
     <span class="doccomment">/// Creates a configuration, using `1.1.1.1`, `1.0.0.1` and `2606:4700:4700::1111`, `2606:4700:4700::1001` (thank you, Cloudflare). This limits the registered connections to just TLS lookups</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see: https://www.cloudflare.com/dns/</span>
+    <span class="doccomment">/// Please see: &lt;https://www.cloudflare.com/dns/&gt;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare_tls</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolverConfig</span> {
+        <span class="self">Self</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
             <span class="ident">search</span>: <span class="macro">vec!</span>[],
@@ -886,12 +942,13 @@
 
     <span class="doccomment">/// Creates a configuration, using `1.1.1.1`, `1.0.0.1` and `2606:4700:4700::1111`, `2606:4700:4700::1001` (thank you, Cloudflare). This limits the registered connections to just HTTPS lookups</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see: https://www.cloudflare.com/dns/</span>
+    <span class="doccomment">/// Please see: &lt;https://www.cloudflare.com/dns/&gt;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare_https</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolverConfig</span> {
+        <span class="self">Self</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
             <span class="ident">search</span>: <span class="macro">vec!</span>[],
@@ -901,11 +958,11 @@
 
     <span class="doccomment">/// Creates a configuration, using `9.9.9.9`, `149.112.112.112` and `2620:fe::fe`, `2620:fe::fe:9`, the &quot;secure&quot; variants of the quad9 settings (thank you, Quad9).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see: https://www.quad9.net/faq/</span>
+    <span class="doccomment">/// Please see: &lt;https://www.quad9.net/faq/&gt;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolverConfig</span> {
+        <span class="self">Self</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
             <span class="ident">search</span>: <span class="macro">vec!</span>[],
@@ -915,12 +972,13 @@
 
     <span class="doccomment">/// Creates a configuration, using `9.9.9.9`, `149.112.112.112` and `2620:fe::fe`, `2620:fe::fe:9`, the &quot;secure&quot; variants of the quad9 settings. This limits the registered connections to just TLS lookups</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see: https://www.quad9.net/faq/</span>
+    <span class="doccomment">/// Please see: &lt;https://www.quad9.net/faq/&gt;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9_tls</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolverConfig</span> {
+        <span class="self">Self</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
             <span class="ident">search</span>: <span class="macro">vec!</span>[],
@@ -930,12 +988,13 @@
 
     <span class="doccomment">/// Creates a configuration, using `9.9.9.9`, `149.112.112.112` and `2620:fe::fe`, `2620:fe::fe:9`, the &quot;secure&quot; variants of the quad9 settings. This limits the registered connections to just HTTPS lookups</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see: https://www.quad9.net/faq/</span>
+    <span class="doccomment">/// Please see: &lt;https://www.quad9.net/faq/&gt;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9_https</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolverConfig</span> {
+        <span class="self">Self</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
             <span class="ident">search</span>: <span class="macro">vec!</span>[],
@@ -955,7 +1014,7 @@
         <span class="ident">search</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>,
         <span class="ident">name_servers</span>: <span class="ident">G</span>,
     ) -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolverConfig</span> {
+        <span class="self">Self</span> {
             <span class="ident">domain</span>,
             <span class="ident">search</span>,
             <span class="ident">name_servers</span>: <span class="ident">name_servers</span>.<span class="ident">into</span>(),
@@ -1000,32 +1059,43 @@
 
     <span class="doccomment">/// return the associated TlsClientConfig</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_config</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TlsClientConfig</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name_servers</span>.<span class="number">1</span>
     }
 
-    <span class="doccomment">/// adds the [`rustls::ClientConf`] for every configured NameServer</span>
+    <span class="doccomment">/// adds the `rustls::ClientConf` for every configured NameServer</span>
     <span class="doccomment">/// of the Resolver.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use std::sync::Arc;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// use rustls::{ClientConfig, ProtocolVersion, RootCertStore};</span>
+    <span class="doccomment">/// use rustls::{ClientConfig, ProtocolVersion, RootCertStore, OwnedTrustAnchor};</span>
     <span class="doccomment">/// use trust_dns_resolver::config::ResolverConfig;</span>
     <span class="doccomment">/// use webpki_roots;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut root_store = RootCertStore::empty();</span>
-    <span class="doccomment">/// root_store.add_server_trust_anchors(&amp;webpki_roots::TLS_SERVER_ROOTS);</span>
-    <span class="doccomment">/// let versions = vec![ProtocolVersion::TLSv1_2];</span>
+    <span class="doccomment">/// root_store.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {</span>
+    <span class="doccomment">///     OwnedTrustAnchor::from_subject_spki_name_constraints(</span>
+    <span class="doccomment">///         ta.subject,</span>
+    <span class="doccomment">///         ta.spki,</span>
+    <span class="doccomment">///         ta.name_constraints,</span>
+    <span class="doccomment">///     )</span>
+    <span class="doccomment">/// }));</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut client_config = ClientConfig::new();</span>
-    <span class="doccomment">/// client_config.root_store = root_store;</span>
-    <span class="doccomment">/// client_config.versions = versions;</span>
+    <span class="doccomment">/// let mut client_config = ClientConfig::builder()</span>
+    <span class="doccomment">///     .with_safe_default_cipher_suites()</span>
+    <span class="doccomment">///     .with_safe_default_kx_groups()</span>
+    <span class="doccomment">///     .with_protocol_versions(&amp;[&amp;rustls::version::TLS12])</span>
+    <span class="doccomment">///     .unwrap()</span>
+    <span class="doccomment">///     .with_root_certificates(root_store)</span>
+    <span class="doccomment">///     .with_no_client_auth();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut resolver_config = ResolverConfig::quad9_tls();</span>
     <span class="doccomment">/// resolver_config.set_tls_client_config(Arc::new(client_config));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_tls_client_config</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">client_config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">name_servers</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name_servers</span>.<span class="ident">clone</span>().<span class="ident">with_client_config</span>(<span class="ident">client_config</span>);
     }
@@ -1036,7 +1106,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see Google&#39;s [privacy statement](https://developers.google.com/speed/public-dns/privacy) for important information about what they track, many ISP&#39;s track similar information in DNS. To use the system configuration see: `Resolver::from_system_conf` and `AsyncResolver::from_system_conf`</span>
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolverConfig::google</span>()
+        <span class="ident"><span class="self">Self</span>::google</span>()
     }
 }
 
@@ -1047,6 +1117,7 @@
     <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>),
     <span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;lowercase&quot;</span>)
 )]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Protocol</span> {
     <span class="doccomment">/// UDP is the traditional DNS port, this is generally the correct choice</span>
     <span class="ident">Udp</span>,
@@ -1054,12 +1125,15 @@
     <span class="ident">Tcp</span>,
     <span class="doccomment">/// Tls for DNS over TLS</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)))]</span>
     <span class="ident">Tls</span>,
     <span class="doccomment">/// Https for DNS over HTTPS</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)))]</span>
     <span class="ident">Https</span>,
     <span class="doccomment">/// mDNS protocol for performing multicast lookups</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)))]</span>
     <span class="ident">Mdns</span>,
 }
 
@@ -1076,7 +1150,7 @@
             <span class="ident">Protocol::Mdns</span> =&gt; <span class="string">&quot;mdns&quot;</span>,
         };
 
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">protocol</span>)
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">protocol</span>)
     }
 }
 
@@ -1118,14 +1192,15 @@
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Protocol</span> {
     <span class="doccomment">/// Default protocol should be UDP, which is supported by all DNS servers</span>
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Protocol::Udp</span>
+        <span class="ident"><span class="self">Self</span>::Udp</span>
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="doccomment">/// a compatibility wrapper around rustls</span>
 <span class="doccomment">/// ClientConfig</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)))]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TlsClientConfig</span>(<span class="kw">pub</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
@@ -1157,16 +1232,25 @@
     <span class="doccomment">/// SPKI name, only relevant for TLS connections</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">serde</span>(<span class="ident">default</span>))]</span>
     <span class="kw">pub</span> <span class="ident">tls_dns_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Default to not trust negative responses from upstream nameservers</span>
+    <span class="doccomment">/// Whether to trust `NXDOMAIN` responses from upstream nameservers.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// When a SERVFAIL, NXDOMAIN and NoError/Empty response is received, the query will be</span>
-    <span class="doccomment">/// retried against other configured name servers.</span>
+    <span class="doccomment">/// When this is `true`, and an empty `NXDOMAIN` response is received, the</span>
+    <span class="doccomment">/// query will not be retried against other configured name servers.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// (On an empty `NoError` response, or a response with any other error</span>
+    <span class="doccomment">/// response code, the query will still be retried regardless of this</span>
+    <span class="doccomment">/// configuration setting.)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Defaults to false.</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">serde</span>(<span class="ident">default</span>))]</span>
     <span class="kw">pub</span> <span class="ident">trust_nx_responses</span>: <span class="ident">bool</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">serde</span>(<span class="ident">skip</span>))]</span>
     <span class="doccomment">/// optional configuration for the tls client</span>
     <span class="kw">pub</span> <span class="ident">tls_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TlsClientConfig</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The client address (IP and port) to use for connecting to the server.</span>
+    <span class="kw">pub</span> <span class="ident">bind_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">NameServerConfig</span> {
@@ -1222,7 +1306,7 @@
 
     <span class="doccomment">/// Creates a new `NameServiceConfigGroup` with the specified capacity</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">NameServerConfigGroup</span>(
+        <span class="self">Self</span>(
             <span class="ident">Vec::with_capacity</span>(<span class="ident">capacity</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
             <span class="prelude-val">None</span>,
@@ -1243,6 +1327,7 @@
                 <span class="ident">trust_nx_responses</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
                 <span class="ident">tls_config</span>: <span class="prelude-val">None</span>,
+                <span class="ident">bind_addr</span>: <span class="prelude-val">None</span>,
             };
             <span class="kw">let</span> <span class="ident">tcp</span> <span class="op">=</span> <span class="ident">NameServerConfig</span> {
                 <span class="ident">socket_addr</span>: <span class="ident">SocketAddr::new</span>(<span class="kw-2">*</span><span class="ident">ip</span>, <span class="ident">port</span>),
@@ -1251,6 +1336,7 @@
                 <span class="ident">trust_nx_responses</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
                 <span class="ident">tls_config</span>: <span class="prelude-val">None</span>,
+                <span class="ident">bind_addr</span>: <span class="prelude-val">None</span>,
             };
 
             <span class="ident">name_servers</span>.<span class="ident">push</span>(<span class="ident">udp</span>);
@@ -1280,6 +1366,7 @@
                 <span class="ident">trust_nx_responses</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
                 <span class="ident">tls_config</span>: <span class="prelude-val">None</span>,
+                <span class="ident">bind_addr</span>: <span class="prelude-val">None</span>,
             };
 
             <span class="ident">name_servers</span>.<span class="ident">push</span>(<span class="ident">config</span>);
@@ -1292,6 +1379,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will create a TLS connections.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ips_tls</span>(
         <span class="ident">ips</span>: <span class="kw-2">&amp;</span>[<span class="ident">IpAddr</span>],
         <span class="ident">port</span>: <span class="ident">u16</span>,
@@ -1305,6 +1393,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will create a HTTPS connections.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ips_https</span>(
         <span class="ident">ips</span>: <span class="kw-2">&amp;</span>[<span class="ident">IpAddr</span>],
         <span class="ident">port</span>: <span class="ident">u16</span>,
@@ -1325,52 +1414,57 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see Google&#39;s [privacy statement](https://developers.google.com/speed/public-dns/privacy) for important information about what they track, many ISP&#39;s track similar information in DNS. To use the system configuration see: `Resolver::from_system_conf` and `AsyncResolver::from_system_conf`</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">google_https</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_https</span>(<span class="ident">GOOGLE_IPS</span>, <span class="number">53</span>, <span class="string">&quot;dns.google&quot;</span>.<span class="ident">to_string</span>(), <span class="bool-val">true</span>)
     }
 
     <span class="doccomment">/// Creates a default configuration, using `1.1.1.1`, `1.0.0.1` and `2606:4700:4700::1111`, `2606:4700:4700::1001` (thank you, Cloudflare).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see: https://www.cloudflare.com/dns/</span>
+    <span class="doccomment">/// Please see: &lt;https://www.cloudflare.com/dns/&gt;</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_clear</span>(<span class="ident">CLOUDFLARE_IPS</span>, <span class="number">53</span>, <span class="bool-val">true</span>)
     }
 
     <span class="doccomment">/// Creates a configuration, using `1.1.1.1`, `1.0.0.1` and `2606:4700:4700::1111`, `2606:4700:4700::1001` (thank you, Cloudflare). This limits the registered connections to just TLS lookups</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see: https://www.cloudflare.com/dns/</span>
+    <span class="doccomment">/// Please see: &lt;https://www.cloudflare.com/dns/&gt;</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare_tls</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_tls</span>(<span class="ident">CLOUDFLARE_IPS</span>, <span class="number">853</span>, <span class="string">&quot;cloudflare-dns.com&quot;</span>.<span class="ident">to_string</span>(), <span class="bool-val">true</span>)
     }
 
     <span class="doccomment">/// Creates a configuration, using `1.1.1.1`, `1.0.0.1` and `2606:4700:4700::1111`, `2606:4700:4700::1001` (thank you, Cloudflare). This limits the registered connections to just HTTPS lookups</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see: https://www.cloudflare.com/dns/</span>
+    <span class="doccomment">/// Please see: &lt;https://www.cloudflare.com/dns/&gt;</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare_https</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_https</span>(<span class="ident">CLOUDFLARE_IPS</span>, <span class="number">443</span>, <span class="string">&quot;cloudflare-dns.com&quot;</span>.<span class="ident">to_string</span>(), <span class="bool-val">true</span>)
     }
 
     <span class="doccomment">/// Creates a configuration, using `9.9.9.9`, `149.112.112.112` and `2620:fe::fe`, `2620:fe::fe:9`, the &quot;secure&quot; variants of the quad9 settings (thank you, Quad9).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see: https://www.quad9.net/faq/</span>
+    <span class="doccomment">/// Please see: &lt;https://www.quad9.net/faq/&gt;</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_clear</span>(<span class="ident">QUAD9_IPS</span>, <span class="number">53</span>, <span class="bool-val">true</span>)
     }
 
     <span class="doccomment">/// Creates a configuration, using `9.9.9.9`, `149.112.112.112` and `2620:fe::fe`, `2620:fe::fe:9`, the &quot;secure&quot; variants of the quad9 settings. This limits the registered connections to just TLS lookups</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see: https://www.quad9.net/faq/</span>
+    <span class="doccomment">/// Please see: &lt;https://www.quad9.net/faq/&gt;</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9_tls</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_tls</span>(<span class="ident">QUAD9_IPS</span>, <span class="number">853</span>, <span class="string">&quot;dns.quad9.net&quot;</span>.<span class="ident">to_string</span>(), <span class="bool-val">true</span>)
     }
 
     <span class="doccomment">/// Creates a configuration, using `9.9.9.9`, `149.112.112.112` and `2620:fe::fe`, `2620:fe::fe:9`, the &quot;secure&quot; variants of the quad9 settings. This limits the registered connections to just HTTPS lookups</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see: https://www.quad9.net/faq/</span>
+    <span class="doccomment">/// Please see: &lt;https://www.quad9.net/faq/&gt;</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9_https</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_https</span>(<span class="ident">QUAD9_IPS</span>, <span class="number">443</span>, <span class="string">&quot;dns.quad9.net&quot;</span>.<span class="ident">to_string</span>(), <span class="bool-val">true</span>)
     }
@@ -1400,10 +1494,19 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
     <span class="doccomment">/// add a [`rustls::ClientConfig`]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_client_config</span>(<span class="self">self</span>, <span class="ident">client_config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="ident">TlsClientConfig</span>(<span class="ident">client_config</span>)))
+    }
+
+    <span class="doccomment">/// Sets the client address (IP and port) to connect from on all name servers.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_bind_addr</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bind_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">for</span> <span class="ident">server</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span> {
+            <span class="ident">server</span>.<span class="ident">bind_addr</span> <span class="op">=</span> <span class="ident">bind_addr</span>;
+        }
+        <span class="self">self</span>
     }
 }
 
@@ -1430,11 +1533,11 @@
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">configs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NameServerConfig</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>))]</span>
         {
-            <span class="ident">NameServerConfigGroup</span>(<span class="ident">configs</span>)
+            <span class="self">Self</span>(<span class="ident">configs</span>)
         }
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
         {
-            <span class="ident">NameServerConfigGroup</span>(<span class="ident">configs</span>, <span class="prelude-val">None</span>)
+            <span class="self">Self</span>(<span class="ident">configs</span>, <span class="prelude-val">None</span>)
         }
     }
 }
@@ -1458,7 +1561,7 @@
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">LookupIpStrategy</span> {
     <span class="doccomment">/// Returns [`LookupIpStrategy::Ipv4thenIpv6`] as the default.</span>
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">LookupIpStrategy::Ipv4thenIpv6</span>
+        <span class="ident"><span class="self">Self</span>::Ipv4thenIpv6</span>
     }
 }
 
@@ -1470,6 +1573,7 @@
     <span class="ident">serde</span>(<span class="ident">default</span>)
 )]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span> <span class="comment">// TODO: remove after all params are supported</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResolverOpts</span> {
     <span class="doccomment">/// Sets the number of dots that must appear (unless it&#39;s a final dot representing the root)</span>
     <span class="doccomment">///  that must appear before a query is assumed to include the TLD. The default is one, which</span>
@@ -1526,6 +1630,8 @@
     <span class="kw">pub</span> <span class="ident">num_concurrent_reqs</span>: <span class="ident">usize</span>,
     <span class="doccomment">/// Preserve all intermediate records in the lookup response, suchas CNAME records</span>
     <span class="kw">pub</span> <span class="ident">preserve_intermediates</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Try queries over TCP if they fail over UDP.</span>
+    <span class="kw">pub</span> <span class="ident">try_tcp_on_error</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ResolverOpts</span> {
@@ -1533,7 +1639,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This follows the resolv.conf defaults as defined in the [Linux man pages](http://man7.org/linux/man-pages/man5/resolv.conf.5.html)</span>
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolverOpts</span> {
+        <span class="self">Self</span> {
             <span class="ident">ndots</span>: <span class="number">1</span>,
             <span class="ident">timeout</span>: <span class="ident">Duration::from_secs</span>(<span class="number">5</span>),
             <span class="ident">attempts</span>: <span class="number">2</span>,
@@ -1549,7 +1655,11 @@
             <span class="ident">positive_max_ttl</span>: <span class="prelude-val">None</span>,
             <span class="ident">negative_max_ttl</span>: <span class="prelude-val">None</span>,
             <span class="ident">num_concurrent_reqs</span>: <span class="number">2</span>,
-            <span class="ident">preserve_intermediates</span>: <span class="bool-val">false</span>,
+
+            <span class="comment">// Defaults to `true` to match the behavior of dig and nslookup.</span>
+            <span class="ident">preserve_intermediates</span>: <span class="bool-val">true</span>,
+
+            <span class="ident">try_tcp_on_error</span>: <span class="bool-val">false</span>,
         }
     }
 }

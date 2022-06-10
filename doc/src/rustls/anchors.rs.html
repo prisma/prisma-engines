@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.19.1/src/anchors.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>anchors.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/anchors.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>anchors.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -138,33 +138,13 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">webpki</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::key</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::key</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;logging&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::log</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake</span>::{<span class="ident">DistinguishedName</span>, <span class="ident">DistinguishedNames</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pemfile</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake</span>::{<span class="ident">DistinguishedName</span>, <span class="ident">DistinguishedNames</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::x509</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
 
-<span class="doccomment">/// This is like a `webpki::TrustAnchor`, except it owns</span>
-<span class="doccomment">/// rather than borrows its memory.  That prevents lifetimes</span>
-<span class="doccomment">/// leaking up the object tree.</span>
+<span class="doccomment">/// A trust anchor, commonly known as a &quot;Root Certificate.&quot;</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OwnedTrustAnchor</span> {
     <span class="ident">subject</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
@@ -173,37 +153,33 @@
 }
 
 <span class="kw">impl</span> <span class="ident">OwnedTrustAnchor</span> {
-    <span class="doccomment">/// Copy a `webpki::TrustAnchor` into owned memory</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_trust_anchor</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="ident">webpki::TrustAnchor</span>) -&gt; <span class="ident">OwnedTrustAnchor</span> {
-        <span class="ident">OwnedTrustAnchor</span> {
-            <span class="ident">subject</span>: <span class="ident">t</span>.<span class="ident">subject</span>.<span class="ident">to_vec</span>(),
-            <span class="ident">spki</span>: <span class="ident">t</span>.<span class="ident">spki</span>.<span class="ident">to_vec</span>(),
-            <span class="ident">name_constraints</span>: <span class="ident">t</span>.<span class="ident">name_constraints</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_vec</span>()),
-        }
-    }
-
     <span class="doccomment">/// Get a `webpki::TrustAnchor` by borrowing the owned elements.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_trust_anchor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">webpki::TrustAnchor</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_trust_anchor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">webpki::TrustAnchor</span> {
         <span class="ident">webpki::TrustAnchor</span> {
             <span class="ident">subject</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">subject</span>,
             <span class="ident">spki</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">spki</span>,
-            <span class="ident">name_constraints</span>: <span class="self">self</span>
-                .<span class="ident">name_constraints</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">map</span>(<span class="ident">Vec::as_slice</span>),
+            <span class="ident">name_constraints</span>: <span class="self">self</span>.<span class="ident">name_constraints</span>.<span class="ident">as_deref</span>(),
         }
     }
-}
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">webpki::TrustAnchor</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedTrustAnchor</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="ident">webpki::TrustAnchor</span>) -&gt; <span class="ident">OwnedTrustAnchor</span> {
-        <span class="ident"><span class="self">Self</span>::from_trust_anchor</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">webpki::TrustAnchor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OwnedTrustAnchor</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">webpki::TrustAnchor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">to_trust_anchor</span>()
+    <span class="doccomment">/// Constructs an `OwnedTrustAnchor` from its components.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `subject` is the subject field of the trust anchor.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `spki` is the `subjectPublicKeyInfo` field of the trust anchor.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `name_constraints` is the value of a DER-encoded name constraints to</span>
+    <span class="doccomment">/// apply for this trust anchor, if any.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_subject_spki_name_constraints</span>(
+        <span class="ident">subject</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">spki</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">name_constraints</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">subject</span>: <span class="ident">subject</span>.<span class="ident">into</span>(),
+            <span class="ident">spki</span>: <span class="ident">spki</span>.<span class="ident">into</span>(),
+            <span class="ident">name_constraints</span>: <span class="ident">name_constraints</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">into</span>()),
+        }
     }
 }
 
@@ -217,8 +193,8 @@
 
 <span class="kw">impl</span> <span class="ident">RootCertStore</span> {
     <span class="doccomment">/// Make a new, empty `RootCertStore`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="ident">RootCertStore</span> {
-        <span class="ident">RootCertStore</span> { <span class="ident">roots</span>: <span class="ident">Vec::new</span>() }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">roots</span>: <span class="ident">Vec::new</span>() }
     }
 
     <span class="doccomment">/// Return true if there are no certificates.</span>
@@ -232,7 +208,7 @@
     }
 
     <span class="doccomment">/// Return the Subject Names for certificates in the container.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_subjects</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DistinguishedNames</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subjects</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DistinguishedNames</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">DistinguishedNames::new</span>();
 
         <span class="kw">for</span> <span class="ident">ota</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">roots</span> {
@@ -247,9 +223,12 @@
 
     <span class="doccomment">/// Add a single DER-encoded certificate to the store.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::Certificate</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">webpki::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ta</span> <span class="op">=</span> <span class="ident">webpki::trust_anchor_util::cert_der_as_trust_anchor</span>(<span class="kw-2">&amp;</span><span class="ident">der</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">ota</span> <span class="op">=</span> <span class="ident">OwnedTrustAnchor::from_trust_anchor</span>(<span class="kw-2">&amp;</span><span class="ident">ta</span>);
+        <span class="kw">let</span> <span class="ident">ta</span> <span class="op">=</span> <span class="ident">webpki::TrustAnchor::try_from_cert_der</span>(<span class="kw-2">&amp;</span><span class="ident">der</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">ota</span> <span class="op">=</span> <span class="ident">OwnedTrustAnchor::from_subject_spki_name_constraints</span>(
+            <span class="ident">ta</span>.<span class="ident">subject</span>,
+            <span class="ident">ta</span>.<span class="ident">spki</span>,
+            <span class="ident">ta</span>.<span class="ident">name_constraints</span>,
+        );
         <span class="self">self</span>.<span class="ident">roots</span>.<span class="ident">push</span>(<span class="ident">ota</span>);
         <span class="prelude-val">Ok</span>(())
     }
@@ -258,35 +237,28 @@
     <span class="doccomment">/// fail.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_server_trust_anchors</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="kw-2">&amp;</span><span class="ident">webpki::TLSServerTrustAnchors</span>(<span class="ident">anchors</span>): <span class="kw-2">&amp;</span><span class="ident">webpki::TLSServerTrustAnchors</span>,
+        <span class="ident">trust_anchors</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">OwnedTrustAnchor</span><span class="op">&gt;</span>,
     ) {
-        <span class="kw">for</span> <span class="ident">ta</span> <span class="kw">in</span> <span class="ident">anchors</span> {
-            <span class="self">self</span>.<span class="ident">roots</span>
-                .<span class="ident">push</span>(<span class="ident">OwnedTrustAnchor::from_trust_anchor</span>(<span class="ident">ta</span>));
-        }
+        <span class="self">self</span>.<span class="ident">roots</span>.<span class="ident">extend</span>(<span class="ident">trust_anchors</span>)
     }
 
-    <span class="doccomment">/// Parse a PEM file and add all certificates found inside.</span>
-    <span class="doccomment">/// Errors are non-specific; they may be io errors in `rd` and</span>
-    <span class="doccomment">/// PEM format errors, but not certificate validity errors.</span>
+    <span class="doccomment">/// Parse the given DER-encoded certificates and add all that can be parsed</span>
+    <span class="doccomment">/// in a best-effort fashion.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is because large collections of root certificates often</span>
-    <span class="doccomment">/// include ancient or syntactically invalid certificates.  CAs</span>
-    <span class="doccomment">/// are competent like that.</span>
+    <span class="doccomment">/// include ancient or syntactically invalid certificates.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the number of certificates added, and the number</span>
-    <span class="doccomment">/// which were extracted from the PEM but ultimately unsuitable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_pem_file</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rd</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">io::BufRead</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>), ()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ders</span> <span class="op">=</span> <span class="ident">pemfile::certs</span>(<span class="ident">rd</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Returns the number of certificates added, and the number that were ignored.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_parsable_certificates</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">der_certs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]) -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">valid_count</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">invalid_count</span> <span class="op">=</span> <span class="number">0</span>;
 
-        <span class="kw">for</span> <span class="ident">der</span> <span class="kw">in</span> <span class="ident">ders</span> {
+        <span class="kw">for</span> <span class="ident">der_cert</span> <span class="kw">in</span> <span class="ident">der_certs</span> {
             <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;logging&quot;</span>), <span class="ident">allow</span>(<span class="ident">unused_variables</span>))]</span>
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">der</span>) {
+            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">key::Certificate</span>(<span class="ident">der_cert</span>.<span class="ident">clone</span>())) {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="ident">valid_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
                 <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                    <span class="macro">trace!</span>(<span class="string">&quot;invalid cert der {:?}&quot;</span>, <span class="ident">der</span>);
+                    <span class="macro">trace!</span>(<span class="string">&quot;invalid cert der {:?}&quot;</span>, <span class="ident">der_cert</span>);
                     <span class="macro">debug!</span>(<span class="string">&quot;certificate parsing failed: {:?}&quot;</span>, <span class="ident">err</span>);
                     <span class="ident">invalid_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>
                 }
@@ -294,11 +266,11 @@
         }
 
         <span class="macro">debug!</span>(
-            <span class="string">&quot;add_pem_file processed {} valid and {} invalid certs&quot;</span>,
+            <span class="string">&quot;add_parsable_certificates processed {} valid and {} invalid certs&quot;</span>,
             <span class="ident">valid_count</span>, <span class="ident">invalid_count</span>
         );
 
-        <span class="prelude-val">Ok</span>((<span class="ident">valid_count</span>, <span class="ident">invalid_count</span>))
+        (<span class="ident">valid_count</span>, <span class="ident">invalid_count</span>)
     }
 }
 </code></pre></div>

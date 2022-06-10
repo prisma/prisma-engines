@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.20.3/src/rr/rdata/opt.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>opt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/opt.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>opt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -561,6 +561,16 @@
 <span id="556">556</span>
 <span id="557">557</span>
 <span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
 </pre><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2015 Benjamin Fry &lt;benjaminfry@me.com&gt;
  *
@@ -580,6 +590,9 @@
 <span class="doccomment">//! option record for passing protocol options between the client and server</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="kw">use</span> <span class="ident">log::warn</span>;
 
@@ -725,6 +738,7 @@
 <span class="doccomment">///       Set to zero by senders and ignored by receivers, unless modified</span>
 <span class="doccomment">///       in a subsequent specification.</span>
 <span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OPT</span> {
     <span class="ident">options</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EdnsCode</span>, <span class="ident">EdnsOption</span><span class="op">&gt;</span>,
@@ -740,8 +754,8 @@
     <span class="doccomment">/// # Return value</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The newly created OPT data</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EdnsCode</span>, <span class="ident">EdnsOption</span><span class="op">&gt;</span>) -&gt; <span class="ident">OPT</span> {
-        <span class="ident">OPT</span> { <span class="ident">options</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EdnsCode</span>, <span class="ident">EdnsOption</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">options</span> }
     }
 
     <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Please use as_ref() or as_mut() for shared/mutable references&quot;</span>)]</span>
@@ -875,7 +889,9 @@
 }
 
 <span class="doccomment">/// The code of the EDNS data option</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Hash</span>, <span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EdnsCode</span> {
     <span class="doccomment">/// [RFC 6891, Reserved](https://tools.ietf.org/html/rfc6891)</span>
     <span class="ident">Zero</span>,
@@ -922,29 +938,29 @@
 
 <span class="comment">// TODO: implement a macro to perform these inversions</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EdnsCode</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="ident">EdnsCode</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="ident">EdnsCode::Zero</span>,
-            <span class="number">1</span> =&gt; <span class="ident">EdnsCode::LLQ</span>,
-            <span class="number">2</span> =&gt; <span class="ident">EdnsCode::UL</span>,
-            <span class="number">3</span> =&gt; <span class="ident">EdnsCode::NSID</span>,
+            <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::Zero</span>,
+            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::LLQ</span>,
+            <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::UL</span>,
+            <span class="number">3</span> =&gt; <span class="ident"><span class="self">Self</span>::NSID</span>,
             <span class="comment">// 4 Reserved [draft-cheshire-edns0-owner-option] -EXPIRED-</span>
-            <span class="number">5</span> =&gt; <span class="ident">EdnsCode::DAU</span>,
-            <span class="number">6</span> =&gt; <span class="ident">EdnsCode::DHU</span>,
-            <span class="number">7</span> =&gt; <span class="ident">EdnsCode::N3U</span>,
-            <span class="number">8</span> =&gt; <span class="ident">EdnsCode::Subnet</span>,
-            <span class="number">9</span> =&gt; <span class="ident">EdnsCode::Expire</span>,
-            <span class="number">10</span> =&gt; <span class="ident">EdnsCode::Cookie</span>,
-            <span class="number">11</span> =&gt; <span class="ident">EdnsCode::Keepalive</span>,
-            <span class="number">12</span> =&gt; <span class="ident">EdnsCode::Padding</span>,
-            <span class="number">13</span> =&gt; <span class="ident">EdnsCode::Chain</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">EdnsCode::Unknown</span>(<span class="ident">value</span>),
+            <span class="number">5</span> =&gt; <span class="ident"><span class="self">Self</span>::DAU</span>,
+            <span class="number">6</span> =&gt; <span class="ident"><span class="self">Self</span>::DHU</span>,
+            <span class="number">7</span> =&gt; <span class="ident"><span class="self">Self</span>::N3U</span>,
+            <span class="number">8</span> =&gt; <span class="ident"><span class="self">Self</span>::Subnet</span>,
+            <span class="number">9</span> =&gt; <span class="ident"><span class="self">Self</span>::Expire</span>,
+            <span class="number">10</span> =&gt; <span class="ident"><span class="self">Self</span>::Cookie</span>,
+            <span class="number">11</span> =&gt; <span class="ident"><span class="self">Self</span>::Keepalive</span>,
+            <span class="number">12</span> =&gt; <span class="ident"><span class="self">Self</span>::Padding</span>,
+            <span class="number">13</span> =&gt; <span class="ident"><span class="self">Self</span>::Chain</span>,
+            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">value</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EdnsCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">EdnsCode</span>) -&gt; <span class="ident">u16</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">EdnsCode</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
             <span class="ident">EdnsCode::Zero</span> =&gt; <span class="number">0</span>,
             <span class="ident">EdnsCode::LLQ</span> =&gt; <span class="number">1</span>,
@@ -969,19 +985,24 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// `note: Not all EdnsOptions are supported at this time.`</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// http://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-13</span>
+<span class="doccomment">/// &lt;http://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-13&gt;</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialOrd</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EdnsOption</span> {
     <span class="doccomment">/// [RFC 6975, DNSSEC Algorithm Understood](https://tools.ietf.org/html/rfc6975)</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
     <span class="ident">DAU</span>(<span class="ident">SupportedAlgorithms</span>),
 
     <span class="doccomment">/// [RFC 6975, DS Hash Understood](https://tools.ietf.org/html/rfc6975)</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
     <span class="ident">DHU</span>(<span class="ident">SupportedAlgorithms</span>),
 
     <span class="doccomment">/// [RFC 6975, NSEC3 Hash Understood](https://tools.ietf.org/html/rfc6975)</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
     <span class="ident">N3U</span>(<span class="ident">SupportedAlgorithms</span>),
 
     <span class="doccomment">/// Unknown, used to deal with unknown or unsupported codes</span>
@@ -1027,21 +1048,21 @@
 <span class="doccomment">/// only the supported extensions are listed right now.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">EdnsCode</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>])<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EdnsOption</span> {
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::match_single_binding</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: (<span class="ident">EdnsCode</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>])) -&gt; <span class="ident">EdnsOption</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: (<span class="ident">EdnsCode</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>])) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">value</span>.<span class="number">0</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsCode::DAU</span> =&gt; <span class="ident">EdnsOption::DAU</span>(<span class="ident">value</span>.<span class="number">1</span>.<span class="ident">into</span>()),
+            <span class="ident">EdnsCode::DAU</span> =&gt; <span class="ident"><span class="self">Self</span>::DAU</span>(<span class="ident">value</span>.<span class="number">1</span>.<span class="ident">into</span>()),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsCode::DHU</span> =&gt; <span class="ident">EdnsOption::DHU</span>(<span class="ident">value</span>.<span class="number">1</span>.<span class="ident">into</span>()),
+            <span class="ident">EdnsCode::DHU</span> =&gt; <span class="ident"><span class="self">Self</span>::DHU</span>(<span class="ident">value</span>.<span class="number">1</span>.<span class="ident">into</span>()),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsCode::N3U</span> =&gt; <span class="ident">EdnsOption::N3U</span>(<span class="ident">value</span>.<span class="number">1</span>.<span class="ident">into</span>()),
-            <span class="kw">_</span> =&gt; <span class="ident">EdnsOption::Unknown</span>(<span class="ident">value</span>.<span class="number">0</span>.<span class="ident">into</span>(), <span class="ident">value</span>.<span class="number">1</span>.<span class="ident">to_vec</span>()),
+            <span class="ident">EdnsCode::N3U</span> =&gt; <span class="ident"><span class="self">Self</span>::N3U</span>(<span class="ident">value</span>.<span class="number">1</span>.<span class="ident">into</span>()),
+            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">value</span>.<span class="number">0</span>.<span class="ident">into</span>(), <span class="ident">value</span>.<span class="number">1</span>.<span class="ident">to_vec</span>()),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EdnsOption</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EdnsOption</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EdnsOption</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
             <span class="ident">EdnsOption::DAU</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>)
@@ -1053,14 +1074,14 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EdnsOption</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EdnsCode</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EdnsOption</span>) -&gt; <span class="ident">EdnsCode</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EdnsOption</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsOption::DAU</span>(..) =&gt; <span class="ident">EdnsCode::DAU</span>,
+            <span class="ident">EdnsOption::DAU</span>(..) =&gt; <span class="ident"><span class="self">Self</span>::DAU</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsOption::DHU</span>(..) =&gt; <span class="ident">EdnsCode::DHU</span>,
+            <span class="ident">EdnsOption::DHU</span>(..) =&gt; <span class="ident"><span class="self">Self</span>::DHU</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsOption::N3U</span>(..) =&gt; <span class="ident">EdnsCode::N3U</span>,
+            <span class="ident">EdnsOption::N3U</span>(..) =&gt; <span class="ident"><span class="self">Self</span>::N3U</span>,
             <span class="ident">EdnsOption::Unknown</span>(<span class="ident">code</span>, <span class="kw">_</span>) =&gt; <span class="ident">code</span>.<span class="ident">into</span>(),
         }
     }
@@ -1070,7 +1091,6 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1091,33 +1111,33 @@
         <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">restrict</span>).<span class="ident">expect</span>(<span class="string">&quot;Decoding error&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">rdata</span>, <span class="ident">read_rdata</span>);
     }
-}
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_read_empty_option_at_end_of_opt</span>() {
-    <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
-        <span class="number">0x00</span>, <span class="number">0x0a</span>, <span class="number">0x00</span>, <span class="number">0x08</span>, <span class="number">0x0b</span>, <span class="number">0x64</span>, <span class="number">0xb4</span>, <span class="number">0xdc</span>, <span class="number">0xd7</span>, <span class="number">0xb0</span>, <span class="number">0xcc</span>, <span class="number">0x8f</span>, <span class="number">0x00</span>, <span class="number">0x08</span>, <span class="number">0x00</span>,
-        <span class="number">0x04</span>, <span class="number">0x00</span>, <span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x0b</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
-    ];
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_read_empty_option_at_end_of_opt</span>() {
+        <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
+            <span class="number">0x00</span>, <span class="number">0x0a</span>, <span class="number">0x00</span>, <span class="number">0x08</span>, <span class="number">0x0b</span>, <span class="number">0x64</span>, <span class="number">0xb4</span>, <span class="number">0xdc</span>, <span class="number">0xd7</span>, <span class="number">0xb0</span>, <span class="number">0xcc</span>, <span class="number">0x8f</span>, <span class="number">0x00</span>, <span class="number">0x08</span>,
+            <span class="number">0x00</span>, <span class="number">0x04</span>, <span class="number">0x00</span>, <span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x0b</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
+        ];
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>);
-    <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">Restrict::new</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>));
-    <span class="macro">assert!</span>(
-        <span class="ident">read_rdata</span>.<span class="ident">is_ok</span>(),
-        <span class="string">&quot;error decoding: {:?}&quot;</span>,
-        <span class="ident">read_rdata</span>.<span class="ident">unwrap_err</span>()
-    );
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>);
+        <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">Restrict::new</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>));
+        <span class="macro">assert!</span>(
+            <span class="ident">read_rdata</span>.<span class="ident">is_ok</span>(),
+            <span class="string">&quot;error decoding: {:?}&quot;</span>,
+            <span class="ident">read_rdata</span>.<span class="ident">unwrap_err</span>()
+        );
 
-    <span class="kw">let</span> <span class="ident">opt</span> <span class="op">=</span> <span class="ident">read_rdata</span>.<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">HashMap::default</span>();
-    <span class="ident">options</span>.<span class="ident">insert</span>(<span class="ident">EdnsCode::Subnet</span>, <span class="ident">EdnsOption::Unknown</span>(<span class="number">8</span>, <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>]));
-    <span class="ident">options</span>.<span class="ident">insert</span>(
-        <span class="ident">EdnsCode::Cookie</span>,
-        <span class="ident">EdnsOption::Unknown</span>(<span class="number">10</span>, <span class="macro">vec!</span>[<span class="number">0x0b</span>, <span class="number">0x64</span>, <span class="number">0xb4</span>, <span class="number">0xdc</span>, <span class="number">0xd7</span>, <span class="number">0xb0</span>, <span class="number">0xcc</span>, <span class="number">0x8f</span>]),
-    );
-    <span class="ident">options</span>.<span class="ident">insert</span>(<span class="ident">EdnsCode::Keepalive</span>, <span class="ident">EdnsOption::Unknown</span>(<span class="number">11</span>, <span class="macro">vec!</span>[]));
-    <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">OPT::new</span>(<span class="ident">options</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">opt</span>, <span class="ident">options</span>);
+        <span class="kw">let</span> <span class="ident">opt</span> <span class="op">=</span> <span class="ident">read_rdata</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">HashMap::default</span>();
+        <span class="ident">options</span>.<span class="ident">insert</span>(<span class="ident">EdnsCode::Subnet</span>, <span class="ident">EdnsOption::Unknown</span>(<span class="number">8</span>, <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>]));
+        <span class="ident">options</span>.<span class="ident">insert</span>(
+            <span class="ident">EdnsCode::Cookie</span>,
+            <span class="ident">EdnsOption::Unknown</span>(<span class="number">10</span>, <span class="macro">vec!</span>[<span class="number">0x0b</span>, <span class="number">0x64</span>, <span class="number">0xb4</span>, <span class="number">0xdc</span>, <span class="number">0xd7</span>, <span class="number">0xb0</span>, <span class="number">0xcc</span>, <span class="number">0x8f</span>]),
+        );
+        <span class="ident">options</span>.<span class="ident">insert</span>(<span class="ident">EdnsCode::Keepalive</span>, <span class="ident">EdnsOption::Unknown</span>(<span class="number">11</span>, <span class="macro">vec!</span>[]));
+        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">OPT::new</span>(<span class="ident">options</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">opt</span>, <span class="ident">options</span>);
+    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>

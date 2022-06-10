@@ -26,7 +26,7 @@ priority inversion).</p>
 <li>No poisoning, the lock is released normally on panic.</li>
 <li>Only requires 1 byte of space, whereas the standard library boxes the
 <code>FairMutex</code> due to platform limitations.</li>
-<li>Can be statically constructed (requires the <code>const_fn</code> nightly feature).</li>
+<li>Can be statically constructed.</li>
 <li>Does not require any drop glue when dropped.</li>
 <li>Inline fast path for the uncontended case.</li>
 <li>Efficient handling of micro-contention using adaptive spinning.</li>

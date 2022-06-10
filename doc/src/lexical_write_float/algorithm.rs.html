@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-float-0.8.2/src/algorithm.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>algorithm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-float-0.8.5/src/algorithm.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>algorithm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1585,133 +1585,6 @@
 <span id="1580">1580</span>
 <span id="1581">1581</span>
 <span id="1582">1582</span>
-<span id="1583">1583</span>
-<span id="1584">1584</span>
-<span id="1585">1585</span>
-<span id="1586">1586</span>
-<span id="1587">1587</span>
-<span id="1588">1588</span>
-<span id="1589">1589</span>
-<span id="1590">1590</span>
-<span id="1591">1591</span>
-<span id="1592">1592</span>
-<span id="1593">1593</span>
-<span id="1594">1594</span>
-<span id="1595">1595</span>
-<span id="1596">1596</span>
-<span id="1597">1597</span>
-<span id="1598">1598</span>
-<span id="1599">1599</span>
-<span id="1600">1600</span>
-<span id="1601">1601</span>
-<span id="1602">1602</span>
-<span id="1603">1603</span>
-<span id="1604">1604</span>
-<span id="1605">1605</span>
-<span id="1606">1606</span>
-<span id="1607">1607</span>
-<span id="1608">1608</span>
-<span id="1609">1609</span>
-<span id="1610">1610</span>
-<span id="1611">1611</span>
-<span id="1612">1612</span>
-<span id="1613">1613</span>
-<span id="1614">1614</span>
-<span id="1615">1615</span>
-<span id="1616">1616</span>
-<span id="1617">1617</span>
-<span id="1618">1618</span>
-<span id="1619">1619</span>
-<span id="1620">1620</span>
-<span id="1621">1621</span>
-<span id="1622">1622</span>
-<span id="1623">1623</span>
-<span id="1624">1624</span>
-<span id="1625">1625</span>
-<span id="1626">1626</span>
-<span id="1627">1627</span>
-<span id="1628">1628</span>
-<span id="1629">1629</span>
-<span id="1630">1630</span>
-<span id="1631">1631</span>
-<span id="1632">1632</span>
-<span id="1633">1633</span>
-<span id="1634">1634</span>
-<span id="1635">1635</span>
-<span id="1636">1636</span>
-<span id="1637">1637</span>
-<span id="1638">1638</span>
-<span id="1639">1639</span>
-<span id="1640">1640</span>
-<span id="1641">1641</span>
-<span id="1642">1642</span>
-<span id="1643">1643</span>
-<span id="1644">1644</span>
-<span id="1645">1645</span>
-<span id="1646">1646</span>
-<span id="1647">1647</span>
-<span id="1648">1648</span>
-<span id="1649">1649</span>
-<span id="1650">1650</span>
-<span id="1651">1651</span>
-<span id="1652">1652</span>
-<span id="1653">1653</span>
-<span id="1654">1654</span>
-<span id="1655">1655</span>
-<span id="1656">1656</span>
-<span id="1657">1657</span>
-<span id="1658">1658</span>
-<span id="1659">1659</span>
-<span id="1660">1660</span>
-<span id="1661">1661</span>
-<span id="1662">1662</span>
-<span id="1663">1663</span>
-<span id="1664">1664</span>
-<span id="1665">1665</span>
-<span id="1666">1666</span>
-<span id="1667">1667</span>
-<span id="1668">1668</span>
-<span id="1669">1669</span>
-<span id="1670">1670</span>
-<span id="1671">1671</span>
-<span id="1672">1672</span>
-<span id="1673">1673</span>
-<span id="1674">1674</span>
-<span id="1675">1675</span>
-<span id="1676">1676</span>
-<span id="1677">1677</span>
-<span id="1678">1678</span>
-<span id="1679">1679</span>
-<span id="1680">1680</span>
-<span id="1681">1681</span>
-<span id="1682">1682</span>
-<span id="1683">1683</span>
-<span id="1684">1684</span>
-<span id="1685">1685</span>
-<span id="1686">1686</span>
-<span id="1687">1687</span>
-<span id="1688">1688</span>
-<span id="1689">1689</span>
-<span id="1690">1690</span>
-<span id="1691">1691</span>
-<span id="1692">1692</span>
-<span id="1693">1693</span>
-<span id="1694">1694</span>
-<span id="1695">1695</span>
-<span id="1696">1696</span>
-<span id="1697">1697</span>
-<span id="1698">1698</span>
-<span id="1699">1699</span>
-<span id="1700">1700</span>
-<span id="1701">1701</span>
-<span id="1702">1702</span>
-<span id="1703">1703</span>
-<span id="1704">1704</span>
-<span id="1705">1705</span>
-<span id="1706">1706</span>
-<span id="1707">1707</span>
-<span id="1708">1708</span>
-<span id="1709">1709</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Implementation of the Dragonbox algorithm.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is modified from the Rust port of Dragonbox, available</span>
@@ -1749,7 +1622,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">lexical_util::f16::f16</span>;
 <span class="kw">use</span> <span class="ident">lexical_util::format</span>::{<span class="ident">NumberFormat</span>, <span class="ident">STANDARD</span>};
-<span class="kw">use</span> <span class="ident">lexical_util::num</span>::{<span class="ident">AsPrimitive</span>, <span class="ident">Float</span>, <span class="ident">Integer</span>};
+<span class="kw">use</span> <span class="ident">lexical_util::num</span>::{<span class="ident">AsPrimitive</span>, <span class="ident">Float</span>};
 <span class="kw">use</span> <span class="ident">lexical_write_integer::decimal::DigitCount</span>;
 <span class="kw">use</span> <span class="ident">lexical_write_integer::write::WriteInteger</span>;
 
@@ -2001,13 +1874,15 @@
         }
     } <span class="kw">else</span> {
         <span class="comment">// Need to shift digits internally, and write the decimal point.</span>
-        <span class="comment">// First, move the digits by 1 after leading digits.</span>
+        <span class="comment">// First, move the digits right by 1 after leading digits.</span>
         <span class="comment">// SAFETY: safe if the buffer is large enough to hold the significant digits.</span>
         <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">digit_count</span> <span class="op">-</span> <span class="ident">leading_digits</span>;
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="macro">index_unchecked!</span>(<span class="ident">bytes</span>[<span class="ident">leading_digits</span>..<span class="ident">digit_count</span>]).<span class="ident">as_ptr</span>();
-            <span class="kw">let</span> <span class="ident">dst</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[<span class="ident">leading_digits</span> <span class="op">+</span> <span class="number">1</span>..<span class="ident">digit_count</span> <span class="op">+</span> <span class="number">1</span>]);
-            <span class="macro">copy_unchecked!</span>(<span class="ident">dst</span>, <span class="ident">src</span>, <span class="ident">count</span>);
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[<span class="ident">leading_digits</span>..<span class="ident">digit_count</span> <span class="op">+</span> <span class="number">1</span>]);
+            <span class="macro">safe_assert!</span>(<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">count</span>);
+            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> (<span class="number">0</span>..<span class="ident">count</span>).<span class="ident">rev</span>() {
+                <span class="macro">index_unchecked_mut!</span>(<span class="ident">buf</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">buf</span>[<span class="ident">i</span>]);
+            }
         }
 
         <span class="comment">// Now, write the decimal point.</span>
@@ -2138,13 +2013,13 @@
     <span class="comment">// Compute k and beta.</span>
     <span class="kw">let</span> <span class="ident">exponent</span> <span class="op">=</span> <span class="ident">float</span>.<span class="ident">exponent</span>();
     <span class="kw">let</span> <span class="ident">minus_k</span> <span class="op">=</span> <span class="ident">floor_log10_pow2_minus_log10_4_over_3</span>(<span class="ident">exponent</span>);
-    <span class="kw">let</span> <span class="ident">beta_minus_1</span> <span class="op">=</span> <span class="ident">exponent</span> <span class="op">+</span> <span class="ident">floor_log2_pow10</span>(<span class="op">-</span><span class="ident">minus_k</span>);
+    <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> <span class="ident">exponent</span> <span class="op">+</span> <span class="ident">floor_log2_pow10</span>(<span class="op">-</span><span class="ident">minus_k</span>);
 
     <span class="comment">// Compute xi and zi.</span>
     <span class="comment">// SAFETY: safe, since value must be finite and therefore in the correct range.</span>
     <span class="kw">let</span> <span class="ident">pow5</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">F::dragonbox_power</span>(<span class="op">-</span><span class="ident">minus_k</span>) };
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">xi</span> <span class="op">=</span> <span class="ident">F::compute_left_endpoint</span>(<span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta_minus_1</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">zi</span> <span class="op">=</span> <span class="ident">F::compute_right_endpoint</span>(<span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta_minus_1</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">xi</span> <span class="op">=</span> <span class="ident">F::compute_left_endpoint</span>(<span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">zi</span> <span class="op">=</span> <span class="ident">F::compute_right_endpoint</span>(<span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta</span>);
 
     <span class="comment">// Get the interval type.</span>
     <span class="comment">// Must be Round since we only use compute_round with a round-nearest direction.</span>
@@ -2171,15 +2046,16 @@
     }
 
     <span class="comment">// Otherwise, compute the round-up of y.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">significand</span> <span class="op">=</span> <span class="ident">F::compute_round_up</span>(<span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta_minus_1</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">significand</span> <span class="op">=</span> <span class="ident">F::compute_round_up</span>(<span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta</span>);
 
     <span class="comment">// When tie occurs, choose one of them according to the rule.</span>
     <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">F::MANTISSA_SIZE</span>;
     <span class="kw">let</span> <span class="ident">lower_threshold</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="op">-</span><span class="ident">floor_log5_pow2_minus_log5_3</span>(<span class="ident">bits</span> <span class="op">+</span> <span class="number">4</span>) <span class="op">-</span> <span class="number">2</span> <span class="op">-</span> <span class="ident">bits</span>;
     <span class="kw">let</span> <span class="ident">upper_threshold</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="op">-</span><span class="ident">floor_log5_pow2</span>(<span class="ident">bits</span> <span class="op">+</span> <span class="number">2</span>) <span class="op">-</span> <span class="number">2</span> <span class="op">-</span> <span class="ident">bits</span>;
 
-    <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">lower_threshold</span> <span class="op">&amp;&amp;</span> <span class="ident">exponent</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">upper_threshold</span> {
-        <span class="ident">significand</span> <span class="op">=</span> <span class="ident">RoundMode::Round</span>.<span class="ident">break_rounding_tie</span>(<span class="ident">significand</span>);
+    <span class="kw">let</span> <span class="ident">round_down</span> <span class="op">=</span> <span class="ident">RoundMode::Round</span>.<span class="ident">prefer_round_down</span>(<span class="ident">significand</span>);
+    <span class="kw">if</span> <span class="ident">round_down</span> <span class="op">&amp;&amp;</span> <span class="ident">exponent</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">lower_threshold</span> <span class="op">&amp;&amp;</span> <span class="ident">exponent</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">upper_threshold</span> {
+        <span class="ident">significand</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">significand</span> <span class="op">&lt;</span> <span class="ident">xi</span> {
         <span class="ident">significand</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
     }
@@ -2205,14 +2081,22 @@
     <span class="kw">let</span> <span class="ident">minus_k</span> <span class="op">=</span> <span class="ident">floor_log10_pow2</span>(<span class="ident">exponent</span>) <span class="op">-</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>;
     <span class="comment">// SAFETY: safe, since value must be finite and therefore in the correct range.</span>
     <span class="kw">let</span> <span class="ident">pow5</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">F::dragonbox_power</span>(<span class="op">-</span><span class="ident">minus_k</span>) };
-    <span class="kw">let</span> <span class="ident">beta_minus_1</span> <span class="op">=</span> <span class="ident">exponent</span> <span class="op">+</span> <span class="ident">floor_log2_pow10</span>(<span class="op">-</span><span class="ident">minus_k</span>);
+    <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> <span class="ident">exponent</span> <span class="op">+</span> <span class="ident">floor_log2_pow10</span>(<span class="op">-</span><span class="ident">minus_k</span>);
 
     <span class="comment">// Compute zi and deltai.</span>
     <span class="comment">// 10^kappa &lt;= deltai &lt; 10^(kappa + 1)</span>
     <span class="kw">let</span> <span class="ident">two_fc</span> <span class="op">=</span> <span class="ident">mantissa</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="ident">deltai</span> <span class="op">=</span> <span class="ident">F::compute_delta</span>(<span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta_minus_1</span>);
-    <span class="kw">let</span> <span class="ident">two_fr</span> <span class="op">=</span> <span class="ident">two_fc</span> <span class="op">|</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="ident">zi</span> <span class="op">=</span> <span class="ident">F::compute_mul</span>(<span class="ident">two_fr</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">beta_minus_1</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>);
+    <span class="kw">let</span> <span class="ident">deltai</span> <span class="op">=</span> <span class="ident">F::compute_delta</span>(<span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta</span>);
+    <span class="comment">// For the case of binary32, the result of integer check is not correct for</span>
+    <span class="comment">// 29711844 * 2^-82</span>
+    <span class="comment">// = 6.1442653300000000008655037797566933477355632930994033813476... * 10^-18</span>
+    <span class="comment">// and 29711844 * 2^-81</span>
+    <span class="comment">// = 1.2288530660000000001731007559513386695471126586198806762695... * 10^-17,</span>
+    <span class="comment">// and they are the unique counterexamples. However, since 29711844 is even,</span>
+    <span class="comment">// this does not cause any problem for the endpoints calculations; it can only</span>
+    <span class="comment">// cause a problem when we need to perform integer check for the center.</span>
+    <span class="comment">// Fortunately, with these inputs, that branch is never executed, so we are fine.</span>
+    <span class="kw">let</span> (<span class="ident">zi</span>, <span class="ident">is_z_integer</span>) <span class="op">=</span> <span class="ident">F::compute_mul</span>((<span class="ident">two_fc</span> <span class="op">|</span> <span class="number">1</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">beta</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>);
 
     <span class="comment">// Step 2: Try larger divisor; remove trailing zeros if necessary</span>
     <span class="kw">let</span> <span class="ident">big_divisor</span> <span class="op">=</span> <span class="ident">pow32</span>(<span class="number">10</span>, <span class="ident">F::KAPPA</span> <span class="op">+</span> <span class="number">1</span>);
@@ -2221,81 +2105,99 @@
     <span class="comment">// Using an upper bound on zi, we might be able to optimize the division</span>
     <span class="comment">// better than the compiler; we are computing zi / big_divisor here.</span>
     <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> <span class="ident">F::KAPPA</span> <span class="op">+</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="ident">max_pow2</span> <span class="op">=</span> <span class="ident">F::MANTISSA_SIZE</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="ident">max_pow5</span> <span class="op">=</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">significand</span> <span class="op">=</span> <span class="ident">divide_by_pow10</span>(<span class="ident">zi</span>, <span class="ident">exp</span>, <span class="ident">max_pow2</span>, <span class="ident">max_pow5</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> (<span class="ident">zi</span> <span class="op">-</span> <span class="ident">big_divisor</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="ident">significand</span>) <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="kw">let</span> <span class="ident">n_max</span> <span class="op">=</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">F::MANTISSA_SIZE</span> <span class="op">+</span> <span class="number">1</span>)) <span class="op">*</span> <span class="ident">big_divisor</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">-</span> <span class="number">1</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">significand</span> <span class="op">=</span> <span class="ident">F::divide_by_pow10</span>(<span class="ident">zi</span>, <span class="ident">exp</span>, <span class="ident">n_max</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> (<span class="ident">zi</span> <span class="op">-</span> (<span class="ident">big_divisor</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">wrapping_mul</span>(<span class="ident">significand</span>)) <span class="kw">as</span> <span class="ident">u32</span>;
 
     <span class="comment">// Get the interval type.</span>
     <span class="comment">// Must be Round since we only use compute_round with a round-nearest direction.</span>
     <span class="kw">let</span> <span class="ident">interval_type</span> <span class="op">=</span> <span class="ident">IntervalType::Symmetric</span>(<span class="ident">is_even</span>);
 
-    <span class="comment">// Short-circuit case.</span>
-    <span class="kw">let</span> <span class="ident">short_circuit</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-        <span class="kw">let</span> (<span class="ident">mant</span>, <span class="ident">exp</span>) <span class="op">=</span> <span class="ident">F::process_trailing_zeros</span>(<span class="ident">significand</span>, <span class="ident">minus_k</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>);
-        <span class="ident">extended_float</span>(<span class="ident">mant</span>, <span class="ident">exp</span>)
-    };
-
     <span class="comment">// Check for short-circuit.</span>
+    <span class="comment">// We use this, since the `goto` statements in dragonbox are unidiomatic</span>
+    <span class="comment">// in Rust and lead to unmaintainable code. Using a simple closure is much</span>
+    <span class="comment">// simpler, however, we do store a boolean in some cases to determine</span>
+    <span class="comment">// if we need to short-circuit.</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">should_short_circuit</span> <span class="op">=</span> <span class="bool-val">true</span>;
     <span class="kw">if</span> <span class="ident">r</span> <span class="op">&lt;</span> <span class="ident">deltai</span> {
         <span class="comment">// Exclude the right endpoint if necessary.</span>
         <span class="kw">let</span> <span class="ident">include_right</span> <span class="op">=</span> <span class="ident">interval_type</span>.<span class="ident">include_right_endpoint</span>();
-        <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">include_right</span> <span class="op">&amp;&amp;</span> <span class="ident">F::is_product_fc_pm_half</span>(<span class="ident">two_fr</span>, <span class="ident">exponent</span>, <span class="ident">minus_k</span>) {
+        <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">include_right</span> <span class="op">&amp;&amp;</span> <span class="ident">is_z_integer</span> {
             <span class="ident">significand</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
             <span class="ident">r</span> <span class="op">=</span> <span class="ident">big_divisor</span>;
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="ident">short_circuit</span>();
+            <span class="ident">should_short_circuit</span> <span class="op">=</span> <span class="bool-val">false</span>;
         }
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="ident">deltai</span> {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">r</span> <span class="op">&gt;</span> <span class="ident">deltai</span> {
+        <span class="ident">should_short_circuit</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    } <span class="kw">else</span> {
         <span class="comment">// r == deltai; compare fractional parts.</span>
-        <span class="comment">// Check conditions in the order different from the paper to take</span>
-        <span class="comment">// advantage of short-circuiting.</span>
+        <span class="comment">// Due to the more complex logic in the new dragonbox algorithm,</span>
+        <span class="comment">// it&#39;s much easier logically to store if we should short circuit,</span>
+        <span class="comment">// the default, and only mark</span>
         <span class="kw">let</span> <span class="ident">two_fl</span> <span class="op">=</span> <span class="ident">two_fc</span> <span class="op">-</span> <span class="number">1</span>;
         <span class="kw">let</span> <span class="ident">include_left</span> <span class="op">=</span> <span class="ident">interval_type</span>.<span class="ident">include_left_endpoint</span>();
-        <span class="kw">let</span> <span class="ident">is_prod</span> <span class="op">=</span> <span class="ident">F::is_product_fc_pm_half</span>(<span class="ident">two_fl</span>, <span class="ident">exponent</span>, <span class="ident">minus_k</span>);
-        <span class="kw">let</span> <span class="ident">is_mul_parity</span> <span class="op">=</span> <span class="ident">F::compute_mul_parity</span>(<span class="ident">two_fl</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta_minus_1</span>);
-        <span class="kw">if</span> (<span class="ident">include_left</span> <span class="op">&amp;&amp;</span> <span class="ident">is_prod</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">is_mul_parity</span> {
-            <span class="kw">return</span> <span class="ident">short_circuit</span>();
-        }
-    }
 
-    <span class="comment">// Step 3: Find the significand with the smaller divisor</span>
-    <span class="ident">significand</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">10</span>;
-
-    <span class="kw">let</span> <span class="ident">dist</span> <span class="op">=</span> <span class="ident">r</span> <span class="op">-</span> (<span class="ident">deltai</span> <span class="op">/</span> <span class="number">2</span>) <span class="op">+</span> (<span class="ident">small_divisor</span> <span class="op">/</span> <span class="number">2</span>);
-    <span class="kw">let</span> <span class="ident">approx_y_parity</span> <span class="op">=</span> ((<span class="ident">dist</span> <span class="op">^</span> (<span class="ident">small_divisor</span> <span class="op">/</span> <span class="number">2</span>)) <span class="op">&amp;</span> <span class="number">1</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
-
-    <span class="comment">// Is dist divisible by 10^kappa?</span>
-    <span class="kw">let</span> (<span class="ident">dist</span>, <span class="ident">is_dist_div_by_kappa</span>) <span class="op">=</span> <span class="ident">F::check_div_pow10</span>(<span class="ident">dist</span>);
-
-    <span class="comment">// Add dist / 10^kappa to the significand.</span>
-    <span class="ident">significand</span> <span class="op">+</span><span class="op">=</span> <span class="ident">dist</span> <span class="kw">as</span> <span class="ident">u64</span>;
-
-    <span class="kw">if</span> <span class="ident">is_dist_div_by_kappa</span> {
-        <span class="comment">// Check z^(f) &gt;= epsilon^(f)</span>
-        <span class="comment">// We have either yi == zi - epsiloni or yi == (zi - epsiloni) - 1,</span>
-        <span class="comment">// where yi == zi - epsiloni if and only if z^(f) &gt;= epsilon^(f)</span>
-        <span class="comment">// Since there are only 2 possibilities, we only need to care about the parity.</span>
-        <span class="comment">// Also, zi and r should have the same parity since the divisor</span>
-        <span class="comment">// is an even number.</span>
-        <span class="kw">if</span> <span class="ident">F::compute_mul_parity</span>(<span class="ident">two_fc</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta_minus_1</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">approx_y_parity</span> {
-            <span class="ident">significand</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">include_left</span> <span class="op">|</span><span class="op">|</span> <span class="ident">exponent</span> <span class="op">&lt;</span> <span class="ident">F::FC_PM_HALF_LOWER</span> <span class="op">|</span><span class="op">|</span> <span class="ident">exponent</span> <span class="op">&gt;</span> <span class="ident">F::DIV_BY_5_THRESHOLD</span> {
+            <span class="comment">// If the left endpoint is not included, the condition for</span>
+            <span class="comment">// success is z^(f) &lt; delta^(f) (odd parity).</span>
+            <span class="comment">// Otherwise, the inequalities on exponent ensure that</span>
+            <span class="comment">// x is not an integer, so if z^(f) &gt;= delta^(f) (even parity), we in fact</span>
+            <span class="comment">// have strict inequality.</span>
+            <span class="kw">let</span> <span class="ident">parity</span> <span class="op">=</span> <span class="ident">F::compute_mul_parity</span>(<span class="ident">two_fl</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta</span>).<span class="number">0</span>;
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">parity</span> {
+                <span class="ident">should_short_circuit</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            }
         } <span class="kw">else</span> {
-            <span class="comment">// If z^(f) &gt;= epsilon^(f), we might have a tie</span>
-            <span class="comment">// when z^(f) == epsilon^(f), or equivalently, when y is an integer.</span>
-            <span class="comment">// For tie-to-up case, we can just choose the upper one.</span>
-            <span class="kw">if</span> <span class="ident">F::is_product_fc</span>(<span class="ident">two_fc</span>, <span class="ident">exponent</span>, <span class="ident">minus_k</span>) {
-                <span class="ident">significand</span> <span class="op">=</span> <span class="ident">RoundMode::Round</span>.<span class="ident">break_rounding_tie</span>(<span class="ident">significand</span>);
+            <span class="kw">let</span> (<span class="ident">xi_parity</span>, <span class="ident">x_is_integer</span>) <span class="op">=</span> <span class="ident">F::compute_mul_parity</span>(<span class="ident">two_fl</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta</span>);
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">xi_parity</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">x_is_integer</span> {
+                <span class="ident">should_short_circuit</span> <span class="op">=</span> <span class="bool-val">false</span>
             }
         }
     }
 
-    <span class="comment">// Ensure we haven&#39;t re-assigned exponent or minus_k, since this</span>
-    <span class="comment">// is a massive potential security vulnerability.</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">float</span>.<span class="ident">exponent</span>() <span class="op">==</span> <span class="ident">exponent</span>);
-    <span class="macro">debug_assert!</span>(<span class="ident">minus_k</span> <span class="op">==</span> <span class="ident">floor_log10_pow2</span>(<span class="ident">exponent</span>) <span class="op">-</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>);
+    <span class="kw">if</span> <span class="ident">should_short_circuit</span> {
+        <span class="comment">// Short-circuit case.</span>
+        <span class="kw">let</span> (<span class="ident">mant</span>, <span class="ident">exp</span>) <span class="op">=</span> <span class="ident">F::process_trailing_zeros</span>(<span class="ident">significand</span>, <span class="ident">minus_k</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>);
+        <span class="ident">extended_float</span>(<span class="ident">mant</span>, <span class="ident">exp</span>)
+    } <span class="kw">else</span> {
+        <span class="comment">// Step 3: Find the significand with the smaller divisor</span>
+        <span class="ident">significand</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">10</span>;
 
-    <span class="ident">extended_float</span>(<span class="ident">significand</span>, <span class="ident">minus_k</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>)
+        <span class="kw">let</span> <span class="ident">dist</span> <span class="op">=</span> <span class="ident">r</span> <span class="op">-</span> (<span class="ident">deltai</span> <span class="op">/</span> <span class="number">2</span>) <span class="op">+</span> (<span class="ident">small_divisor</span> <span class="op">/</span> <span class="number">2</span>);
+        <span class="kw">let</span> <span class="ident">approx_y_parity</span> <span class="op">=</span> ((<span class="ident">dist</span> <span class="op">^</span> (<span class="ident">small_divisor</span> <span class="op">/</span> <span class="number">2</span>)) <span class="op">&amp;</span> <span class="number">1</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
+
+        <span class="comment">// Is dist divisible by 10^kappa?</span>
+        <span class="kw">let</span> (<span class="ident">dist</span>, <span class="ident">is_dist_div_by_kappa</span>) <span class="op">=</span> <span class="ident">F::check_div_pow10</span>(<span class="ident">dist</span>);
+
+        <span class="comment">// Add dist / 10^kappa to the significand.</span>
+        <span class="ident">significand</span> <span class="op">+</span><span class="op">=</span> <span class="ident">dist</span> <span class="kw">as</span> <span class="ident">u64</span>;
+
+        <span class="kw">if</span> <span class="ident">is_dist_div_by_kappa</span> {
+            <span class="comment">// Check z^(f) &gt;= epsilon^(f).</span>
+            <span class="comment">// We have either yi == zi - epsiloni or yi == (zi - epsiloni) - 1,</span>
+            <span class="comment">// where yi == zi - epsiloni if and only if z^(f) &gt;= epsilon^(f).</span>
+            <span class="comment">// Since there are only 2 possibilities, we only need to care about the</span>
+            <span class="comment">// parity. Also, zi and r should have the same parity since the divisor is</span>
+            <span class="comment">// an even number.</span>
+            <span class="kw">let</span> (<span class="ident">yi_parity</span>, <span class="ident">is_y_integer</span>) <span class="op">=</span> <span class="ident">F::compute_mul_parity</span>(<span class="ident">two_fc</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta</span>);
+            <span class="kw">let</span> <span class="ident">round_down</span> <span class="op">=</span> <span class="ident">RoundMode::Round</span>.<span class="ident">prefer_round_down</span>(<span class="ident">significand</span>);
+
+            <span class="kw">if</span> <span class="ident">yi_parity</span> <span class="op">!</span><span class="op">=</span> <span class="ident">approx_y_parity</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">is_y_integer</span> <span class="op">&amp;&amp;</span> <span class="ident">round_down</span>) {
+                <span class="comment">// If z^(f) &gt;= epsilon^(f), we might have a tie</span>
+                <span class="comment">// when z^(f) == epsilon^(f), or equivalently, when y is an integer.</span>
+                <span class="comment">// For tie-to-up case, we can just choose the upper one.</span>
+                <span class="comment">//significand -= 1;</span>
+                <span class="ident">significand</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+            }
+        }
+
+        <span class="comment">// Ensure we haven&#39;t re-assigned exponent or minus_k, since this</span>
+        <span class="comment">// is a massive potential security vulnerability.</span>
+        <span class="macro">debug_assert!</span>(<span class="ident">float</span>.<span class="ident">exponent</span>() <span class="op">==</span> <span class="ident">exponent</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">minus_k</span> <span class="op">==</span> <span class="ident">floor_log10_pow2</span>(<span class="ident">exponent</span>) <span class="op">-</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>);
+
+        <span class="ident">extended_float</span>(<span class="ident">significand</span>, <span class="ident">minus_k</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>)
+    }
 }
 
 <span class="doccomment">/// Compute the interval I = [w,w+).</span>
@@ -2309,15 +2211,25 @@
     <span class="kw">let</span> <span class="ident">minus_k</span> <span class="op">=</span> <span class="ident">floor_log10_pow2</span>(<span class="ident">exponent</span>) <span class="op">-</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>;
     <span class="comment">// SAFETY: safe, since value must be finite and therefore in the correct range.</span>
     <span class="kw">let</span> <span class="ident">pow5</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">F::dragonbox_power</span>(<span class="op">-</span><span class="ident">minus_k</span>) };
-    <span class="kw">let</span> <span class="ident">beta_minus_1</span> <span class="op">=</span> <span class="ident">exponent</span> <span class="op">+</span> <span class="ident">floor_log2_pow10</span>(<span class="op">-</span><span class="ident">minus_k</span>);
+    <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> <span class="ident">exponent</span> <span class="op">+</span> <span class="ident">floor_log2_pow10</span>(<span class="op">-</span><span class="ident">minus_k</span>);
 
     <span class="comment">// Compute zi and deltai.</span>
     <span class="comment">// 10^kappa &lt;= deltai &lt; 10^(kappa + 1)</span>
     <span class="kw">let</span> <span class="ident">two_fc</span> <span class="op">=</span> <span class="ident">mantissa</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="ident">deltai</span> <span class="op">=</span> <span class="ident">F::compute_delta</span>(<span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta_minus_1</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">xi</span> <span class="op">=</span> <span class="ident">F::compute_mul</span>(<span class="ident">two_fc</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">beta_minus_1</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>);
+    <span class="kw">let</span> <span class="ident">deltai</span> <span class="op">=</span> <span class="ident">F::compute_delta</span>(<span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta</span>);
+    <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">xi</span>, <span class="kw-2">mut</span> <span class="ident">is_x_integer</span>) <span class="op">=</span> <span class="ident">F::compute_mul</span>(<span class="ident">two_fc</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">beta</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>);
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">F::is_product_fc</span>(<span class="ident">two_fc</span>, <span class="ident">exponent</span>, <span class="ident">minus_k</span>) {
+    <span class="comment">// Deal with the unique exceptional cases</span>
+    <span class="comment">// 29711844 * 2^-82</span>
+    <span class="comment">// = 6.1442653300000000008655037797566933477355632930994033813476... * 10^-18</span>
+    <span class="comment">// and 29711844 * 2^-81</span>
+    <span class="comment">// = 1.2288530660000000001731007559513386695471126586198806762695... * 10^-17</span>
+    <span class="comment">// for binary32.</span>
+    <span class="kw">if</span> <span class="ident">F::BITS</span> <span class="op">==</span> <span class="number">32</span> <span class="op">&amp;&amp;</span> <span class="ident">exponent</span> <span class="op">&lt;</span><span class="op">=</span> <span class="op">-</span><span class="number">80</span> {
+        <span class="ident">is_x_integer</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    }
+
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_x_integer</span> {
         <span class="ident">xi</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
     }
 
@@ -2327,44 +2239,51 @@
     <span class="comment">// Using an upper bound on xi, we might be able to optimize the division</span>
     <span class="comment">// better than the compiler; we are computing xi / big_divisor here.</span>
     <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> <span class="ident">F::KAPPA</span> <span class="op">+</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="ident">max_pow2</span> <span class="op">=</span> <span class="ident">F::MANTISSA_SIZE</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="ident">max_pow5</span> <span class="op">=</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">significand</span> <span class="op">=</span> <span class="ident">divide_by_pow10</span>(<span class="ident">xi</span>, <span class="ident">exp</span>, <span class="ident">max_pow2</span>, <span class="ident">max_pow5</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> (<span class="ident">xi</span> <span class="op">-</span> <span class="ident">big_divisor</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="ident">significand</span>) <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="kw">let</span> <span class="ident">n_max</span> <span class="op">=</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">F::MANTISSA_SIZE</span> <span class="op">+</span> <span class="number">1</span>)) <span class="op">*</span> <span class="ident">big_divisor</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">-</span> <span class="number">1</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">significand</span> <span class="op">=</span> <span class="ident">F::divide_by_pow10</span>(<span class="ident">xi</span>, <span class="ident">exp</span>, <span class="ident">n_max</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> (<span class="ident">xi</span> <span class="op">-</span> (<span class="ident">big_divisor</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">wrapping_mul</span>(<span class="ident">significand</span>)) <span class="kw">as</span> <span class="ident">u32</span>;
 
     <span class="kw">if</span> <span class="ident">r</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
         <span class="ident">significand</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="ident">r</span> <span class="op">=</span> <span class="ident">big_divisor</span> <span class="op">-</span> <span class="ident">r</span>;
     }
 
-    <span class="comment">// Short-circuit case.</span>
-    <span class="kw">let</span> <span class="ident">short_circuit</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-        <span class="kw">let</span> (<span class="ident">mant</span>, <span class="ident">exp</span>) <span class="op">=</span> <span class="ident">F::process_trailing_zeros</span>(<span class="ident">significand</span>, <span class="ident">minus_k</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>);
-        <span class="ident">extended_float</span>(<span class="ident">mant</span>, <span class="ident">exp</span>)
-    };
-
     <span class="comment">// Check for short-circuit.</span>
-    <span class="kw">if</span> <span class="ident">r</span> <span class="op">&lt;</span> <span class="ident">deltai</span> {
-        <span class="kw">return</span> <span class="ident">short_circuit</span>();
+    <span class="comment">// We use this, since the `goto` statements in dragonbox are unidiomatic</span>
+    <span class="comment">// in Rust and lead to unmaintainable code. Using a simple closure is much</span>
+    <span class="comment">// simpler, however, we do store a boolean in some cases to determine</span>
+    <span class="comment">// if we need to short-circuit.</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">should_short_circuit</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">if</span> <span class="ident">r</span> <span class="op">&gt;</span> <span class="ident">deltai</span> {
+        <span class="ident">should_short_circuit</span> <span class="op">=</span> <span class="bool-val">false</span>;
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="ident">deltai</span> {
         <span class="comment">// Compare the fractional parts.</span>
-        <span class="kw">let</span> <span class="ident">is_prod</span> <span class="op">=</span> <span class="ident">F::is_product_fc</span>(<span class="ident">two_fc</span> <span class="op">+</span> <span class="number">2</span>, <span class="ident">exponent</span>, <span class="ident">minus_k</span>);
-        <span class="kw">let</span> <span class="ident">is_mul_parity</span> <span class="op">=</span> <span class="ident">F::compute_mul_parity</span>(<span class="ident">two_fc</span> <span class="op">+</span> <span class="number">2</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta_minus_1</span>);
-        <span class="kw">if</span> <span class="op">!</span>(<span class="ident">is_mul_parity</span> <span class="op">|</span><span class="op">|</span> <span class="ident">is_prod</span>) {
-            <span class="kw">return</span> <span class="ident">short_circuit</span>();
+        <span class="comment">// This branch is never taken for the exceptional cases</span>
+        <span class="comment">// 2f_c = 29711482, e = -81</span>
+        <span class="comment">// (6.1442649164096937243516663440523473127541365101933479309082... * 10^-18)</span>
+        <span class="comment">// and 2f_c = 29711482, e = -80</span>
+        <span class="comment">// (1.2288529832819387448703332688104694625508273020386695861816... * 10^-17).</span>
+        <span class="kw">let</span> (<span class="ident">zi_parity</span>, <span class="ident">is_z_integer</span>) <span class="op">=</span> <span class="ident">F::compute_mul_parity</span>(<span class="ident">two_fc</span> <span class="op">+</span> <span class="number">2</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta</span>);
+        <span class="kw">if</span> <span class="ident">zi_parity</span> <span class="op">|</span><span class="op">|</span> <span class="ident">is_z_integer</span> {
+            <span class="ident">should_short_circuit</span> <span class="op">=</span> <span class="bool-val">false</span>;
         }
     }
 
-    <span class="comment">// Step 3: Find the significand with the smaller divisor</span>
-    <span class="ident">significand</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">10</span>;
-    <span class="ident">significand</span> <span class="op">-</span><span class="op">=</span> <span class="ident">F::small_div_pow10</span>(<span class="ident">r</span>) <span class="kw">as</span> <span class="ident">u64</span>;
+    <span class="kw">if</span> <span class="ident">should_short_circuit</span> {
+        <span class="kw">let</span> (<span class="ident">mant</span>, <span class="ident">exp</span>) <span class="op">=</span> <span class="ident">F::process_trailing_zeros</span>(<span class="ident">significand</span>, <span class="ident">minus_k</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>);
+        <span class="ident">extended_float</span>(<span class="ident">mant</span>, <span class="ident">exp</span>)
+    } <span class="kw">else</span> {
+        <span class="comment">// Step 3: Find the significand with the smaller divisor</span>
+        <span class="ident">significand</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">10</span>;
+        <span class="ident">significand</span> <span class="op">-</span><span class="op">=</span> <span class="ident">F::div_pow10</span>(<span class="ident">r</span>) <span class="kw">as</span> <span class="ident">u64</span>;
 
-    <span class="comment">// Ensure we haven&#39;t re-assigned exponent or minus_k, since this</span>
-    <span class="comment">// is a massive potential security vulnerability.</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">float</span>.<span class="ident">exponent</span>() <span class="op">==</span> <span class="ident">exponent</span>);
-    <span class="macro">debug_assert!</span>(<span class="ident">minus_k</span> <span class="op">==</span> <span class="ident">floor_log10_pow2</span>(<span class="ident">exponent</span>) <span class="op">-</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>);
+        <span class="comment">// Ensure we haven&#39;t re-assigned exponent or minus_k, since this</span>
+        <span class="comment">// is a massive potential security vulnerability.</span>
+        <span class="macro">debug_assert!</span>(<span class="ident">float</span>.<span class="ident">exponent</span>() <span class="op">==</span> <span class="ident">exponent</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">minus_k</span> <span class="op">==</span> <span class="ident">floor_log10_pow2</span>(<span class="ident">exponent</span>) <span class="op">-</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>);
 
-    <span class="ident">extended_float</span>(<span class="ident">significand</span>, <span class="ident">minus_k</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>)
+        <span class="ident">extended_float</span>(<span class="ident">significand</span>, <span class="ident">minus_k</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>)
+    }
 }
 
 <span class="doccomment">/// Compute the interval I = (w−,w]..</span>
@@ -2378,34 +2297,32 @@
     <span class="kw">let</span> <span class="ident">minus_k</span> <span class="op">=</span> <span class="ident">floor_log10_pow2</span>(<span class="ident">exponent</span> <span class="op">-</span> <span class="ident">shorter</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="op">-</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>;
     <span class="comment">// SAFETY: safe, since value must be finite and therefore in the correct range.</span>
     <span class="kw">let</span> <span class="ident">pow5</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">F::dragonbox_power</span>(<span class="op">-</span><span class="ident">minus_k</span>) };
-    <span class="kw">let</span> <span class="ident">beta_minus_1</span> <span class="op">=</span> <span class="ident">exponent</span> <span class="op">+</span> <span class="ident">floor_log2_pow10</span>(<span class="op">-</span><span class="ident">minus_k</span>);
+    <span class="kw">let</span> <span class="ident">beta</span> <span class="op">=</span> <span class="ident">exponent</span> <span class="op">+</span> <span class="ident">floor_log2_pow10</span>(<span class="op">-</span><span class="ident">minus_k</span>);
 
     <span class="comment">// Compute zi and deltai.</span>
     <span class="comment">// 10^kappa &lt;= deltai &lt; 10^(kappa + 1)</span>
     <span class="kw">let</span> <span class="ident">two_fc</span> <span class="op">=</span> <span class="ident">mantissa</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="ident">deltai</span> <span class="op">=</span> <span class="ident">F::compute_delta</span>(<span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta_minus_1</span> <span class="op">-</span> <span class="ident">shorter</span> <span class="kw">as</span> <span class="ident">i32</span>);
-    <span class="kw">let</span> <span class="ident">zi</span> <span class="op">=</span> <span class="ident">F::compute_mul</span>(<span class="ident">two_fc</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">beta_minus_1</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>);
+    <span class="kw">let</span> <span class="ident">deltai</span> <span class="op">=</span> <span class="ident">F::compute_delta</span>(<span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta</span> <span class="op">-</span> <span class="ident">shorter</span> <span class="kw">as</span> <span class="ident">i32</span>);
+    <span class="kw">let</span> <span class="ident">zi</span> <span class="op">=</span> <span class="ident">F::compute_mul</span>(<span class="ident">two_fc</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">beta</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>).<span class="number">0</span>;
 
     <span class="comment">// Step 2: Try larger divisor; remove trailing zeros if necessary</span>
     <span class="kw">let</span> <span class="ident">big_divisor</span> <span class="op">=</span> <span class="ident">pow32</span>(<span class="number">10</span>, <span class="ident">F::KAPPA</span> <span class="op">+</span> <span class="number">1</span>);
 
-    <span class="comment">// Using an upper bound on zi, we might be able to optimize the division</span>
-    <span class="comment">// better than the compiler; we are computing zi / big_divisor here.</span>
+    <span class="comment">// Using an upper bound on zi, we might be able to optimize the division better than</span>
+    <span class="comment">// the compiler; we are computing zi / big_divisor here.</span>
     <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> <span class="ident">F::KAPPA</span> <span class="op">+</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="ident">max_pow2</span> <span class="op">=</span> <span class="ident">F::MANTISSA_SIZE</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="ident">max_pow5</span> <span class="op">=</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">significand</span> <span class="op">=</span> <span class="ident">divide_by_pow10</span>(<span class="ident">zi</span>, <span class="ident">exp</span>, <span class="ident">max_pow2</span>, <span class="ident">max_pow5</span>);
-    <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> (<span class="ident">zi</span> <span class="op">-</span> <span class="ident">big_divisor</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="ident">significand</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-
-    <span class="comment">// Short-circuit case.</span>
-    <span class="kw">let</span> <span class="ident">short_circuit</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-        <span class="kw">let</span> (<span class="ident">mant</span>, <span class="ident">exp</span>) <span class="op">=</span> <span class="ident">F::process_trailing_zeros</span>(<span class="ident">significand</span>, <span class="ident">minus_k</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>);
-        <span class="ident">extended_float</span>(<span class="ident">mant</span>, <span class="ident">exp</span>)
-    };
+    <span class="kw">let</span> <span class="ident">n_max</span> <span class="op">=</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">F::MANTISSA_SIZE</span> <span class="op">+</span> <span class="number">1</span>)) <span class="op">*</span> <span class="ident">big_divisor</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">-</span> <span class="number">1</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">significand</span> <span class="op">=</span> <span class="ident">F::divide_by_pow10</span>(<span class="ident">zi</span>, <span class="ident">exp</span>, <span class="ident">n_max</span>);
+    <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> (<span class="ident">zi</span> <span class="op">-</span> (<span class="ident">big_divisor</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">wrapping_mul</span>(<span class="ident">significand</span>)) <span class="kw">as</span> <span class="ident">u32</span>;
 
     <span class="comment">// Check for short-circuit.</span>
-    <span class="kw">if</span> <span class="ident">r</span> <span class="op">&lt;</span> <span class="ident">deltai</span> {
-        <span class="kw">return</span> <span class="ident">short_circuit</span>();
+    <span class="comment">// We use this, since the `goto` statements in dragonbox are unidiomatic</span>
+    <span class="comment">// in Rust and lead to unmaintainable code. Using a simple closure is much</span>
+    <span class="comment">// simpler, however, we do store a boolean in some cases to determine</span>
+    <span class="comment">// if we need to short-circuit.</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">should_short_circuit</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">if</span> <span class="ident">r</span> <span class="op">&gt;</span> <span class="ident">deltai</span> {
+        <span class="ident">should_short_circuit</span> <span class="op">=</span> <span class="bool-val">false</span>;
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="ident">deltai</span> {
         <span class="comment">// Compare the fractional parts.</span>
         <span class="kw">let</span> <span class="ident">two_f</span> <span class="op">=</span> <span class="ident">two_fc</span>
@@ -2414,21 +2331,26 @@
             } <span class="kw">else</span> {
                 <span class="number">2</span>
             };
-        <span class="kw">if</span> <span class="ident">F::compute_mul_parity</span>(<span class="ident">two_f</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta_minus_1</span>) {
-            <span class="kw">return</span> <span class="ident">short_circuit</span>();
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">F::compute_mul_parity</span>(<span class="ident">two_f</span>, <span class="kw-2">&amp;</span><span class="ident">pow5</span>, <span class="ident">beta</span>).<span class="number">0</span> {
+            <span class="ident">should_short_circuit</span> <span class="op">=</span> <span class="bool-val">false</span>;
         }
     }
 
-    <span class="comment">// Step 3: Find the significand with the smaller divisor</span>
-    <span class="ident">significand</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">10</span>;
-    <span class="ident">significand</span> <span class="op">-</span><span class="op">=</span> <span class="ident">F::small_div_pow10</span>(<span class="ident">r</span>) <span class="kw">as</span> <span class="ident">u64</span>;
+    <span class="kw">if</span> <span class="ident">should_short_circuit</span> {
+        <span class="kw">let</span> (<span class="ident">mant</span>, <span class="ident">exp</span>) <span class="op">=</span> <span class="ident">F::process_trailing_zeros</span>(<span class="ident">significand</span>, <span class="ident">minus_k</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>);
+        <span class="ident">extended_float</span>(<span class="ident">mant</span>, <span class="ident">exp</span>)
+    } <span class="kw">else</span> {
+        <span class="comment">// Step 3: Find the significand with the smaller divisor</span>
+        <span class="ident">significand</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">10</span>;
+        <span class="ident">significand</span> <span class="op">-</span><span class="op">=</span> <span class="ident">F::div_pow10</span>(<span class="ident">r</span>) <span class="kw">as</span> <span class="ident">u64</span>;
 
-    <span class="comment">// Ensure we haven&#39;t re-assigned exponent or minus_k, since this</span>
-    <span class="comment">// is a massive potential security vulnerability.</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">float</span>.<span class="ident">exponent</span>() <span class="op">==</span> <span class="ident">exponent</span>);
-    <span class="macro">debug_assert!</span>(<span class="ident">minus_k</span> <span class="op">==</span> <span class="ident">floor_log10_pow2</span>(<span class="ident">exponent</span> <span class="op">-</span> <span class="ident">shorter</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="op">-</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>);
+        <span class="comment">// Ensure we haven&#39;t re-assigned exponent or minus_k, since this</span>
+        <span class="comment">// is a massive potential security vulnerability.</span>
+        <span class="macro">debug_assert!</span>(<span class="ident">float</span>.<span class="ident">exponent</span>() <span class="op">==</span> <span class="ident">exponent</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">minus_k</span> <span class="op">==</span> <span class="ident">floor_log10_pow2</span>(<span class="ident">exponent</span> <span class="op">-</span> <span class="ident">shorter</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="op">-</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>);
 
-    <span class="ident">extended_float</span>(<span class="ident">significand</span>, <span class="ident">minus_k</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>)
+        <span class="ident">extended_float</span>(<span class="ident">significand</span>, <span class="ident">minus_k</span> <span class="op">+</span> <span class="ident">F::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>)
+    }
 }
 
 <span class="comment">// DIGITS</span>
@@ -2529,22 +2451,23 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">umul192_upper64</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">hi</span>: <span class="ident">u64</span>, <span class="ident">lo</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g0</span> <span class="op">=</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u128</span> <span class="op">*</span> <span class="ident">hi</span> <span class="kw">as</span> <span class="ident">u128</span>;
-    <span class="ident">g0</span> <span class="op">+</span><span class="op">=</span> <span class="ident">umul128_upper64</span>(<span class="ident">x</span>, <span class="ident">lo</span>) <span class="kw">as</span> <span class="ident">u128</span>;
-    (<span class="ident">g0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u64</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">umul192_upper128</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">hi</span>: <span class="ident">u64</span>, <span class="ident">lo</span>: <span class="ident">u64</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u128</span> <span class="op">*</span> <span class="ident">hi</span> <span class="kw">as</span> <span class="ident">u128</span>;
+    <span class="ident">r</span> <span class="op">+</span><span class="op">=</span> <span class="ident">umul128_upper64</span>(<span class="ident">x</span>, <span class="ident">lo</span>) <span class="kw">as</span> <span class="ident">u128</span>;
+    ((<span class="ident">r</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">r</span> <span class="kw">as</span> <span class="ident">u64</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">umul192_middle64</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">hi</span>: <span class="ident">u64</span>, <span class="ident">lo</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">let</span> <span class="ident">g01</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">wrapping_mul</span>(<span class="ident">hi</span>);
-    <span class="kw">let</span> <span class="ident">g10</span> <span class="op">=</span> <span class="ident">umul128_upper64</span>(<span class="ident">x</span>, <span class="ident">lo</span>);
-    <span class="ident">g01</span>.<span class="ident">wrapping_add</span>(<span class="ident">g10</span>)
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">umul192_lower128</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">yhi</span>: <span class="ident">u64</span>, <span class="ident">ylo</span>: <span class="ident">u64</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
+    <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">wrapping_mul</span>(<span class="ident">yhi</span>);
+    <span class="kw">let</span> <span class="ident">hi_lo</span> <span class="op">=</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u128</span> <span class="op">*</span> <span class="ident">ylo</span> <span class="kw">as</span> <span class="ident">u128</span>;
+    <span class="comment">// NOTE: This can wrap exactly to 0, and this is desired.</span>
+    (<span class="ident">hi</span>.<span class="ident">wrapping_add</span>((<span class="ident">hi_lo</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u64</span>), <span class="ident">hi_lo</span> <span class="kw">as</span> <span class="ident">u64</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">umul96_upper32</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">y</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-    <span class="ident">umul128_upper64</span>(<span class="ident">x</span>, <span class="ident">y</span>) <span class="kw">as</span> <span class="ident">u32</span> <span class="kw">as</span> <span class="kw">_</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">umul96_upper64</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">y</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
+    <span class="ident">umul128_upper64</span>(<span class="ident">x</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>, <span class="ident">y</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
@@ -2638,103 +2561,46 @@
 <span class="comment">// ---</span>
 
 <span class="comment">// Compute floor(n / 10^exp) for small exp.</span>
-<span class="comment">// Precondition: n &lt;= 2^a * 5^b (a = max_pow2, b = max_pow5)</span>
+<span class="comment">// Precondition: exp &gt;= 0.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">divide_by_pow10</span>(<span class="ident">n</span>: <span class="ident">u64</span>, <span class="ident">exp</span>: <span class="ident">u32</span>, <span class="ident">max_pow2</span>: <span class="ident">i32</span>, <span class="ident">max_pow5</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u64</span> {
-    <span class="comment">// Specialize for 64-bit division by 1000.</span>
-    <span class="comment">// Ensure that the correctness condition is met.</span>
-    <span class="kw">let</span> <span class="ident">pow2</span> <span class="op">=</span> <span class="ident">max_pow2</span> <span class="op">+</span> (<span class="ident">floor_log2_pow10</span>(<span class="ident">exp</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="ident">max_pow5</span>) <span class="op">-</span> (<span class="ident">exp</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="ident">max_pow5</span>));
-    <span class="kw">if</span> <span class="ident">exp</span> <span class="op">==</span> <span class="number">3</span> <span class="op">&amp;&amp;</span> <span class="ident">pow2</span> <span class="op">&lt;</span> <span class="number">70</span> {
-        <span class="ident">umul128_upper64</span>(<span class="ident">n</span>, <span class="number">0x8312_6e97_8d4f_df3c</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">9</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">divide_by_pow10_32</span>(<span class="ident">n</span>: <span class="ident">u32</span>, <span class="ident">exp</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
+    <span class="comment">// Specialize for 32-bit division by 100.</span>
+    <span class="comment">// Compiler is supposed to generate the identical code for just writing</span>
+    <span class="comment">// &quot;n / 100&quot;, but for some reason MSVC generates an inefficient code</span>
+    <span class="comment">// (mul + mov for no apparent reason, instead of single imul),</span>
+    <span class="comment">// so we does this manually.</span>
+    <span class="kw">if</span> <span class="ident">exp</span> <span class="op">==</span> <span class="number">2</span> {
+        ((<span class="ident">n</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="number">1374389535</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">37</span>) <span class="kw">as</span> <span class="ident">u32</span>
     } <span class="kw">else</span> {
-        <span class="ident">n</span> <span class="op">/</span> <span class="ident">pow64</span>(<span class="number">10</span>, <span class="ident">exp</span>)
+        <span class="kw">let</span> <span class="ident">divisor</span> <span class="op">=</span> <span class="ident">pow32</span>(<span class="ident">exp</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">10</span>);
+        <span class="ident">n</span> <span class="op">/</span> <span class="ident">divisor</span>
     }
 }
 
-<span class="doccomment">/// Calculate the modular inverse for the type.</span>
-<span class="macro">macro_rules!</span> <span class="ident">mod_inverse</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="comment">// By Euler&#39;s theorem, a^phi(2^n) == 1 (mod 2^n),</span>
-        <span class="comment">// where phi(2^n) = 2^(n-1), so the modular inverse of a is</span>
-        <span class="comment">// a^(2^(n-1) - 1) = a^(1 + 2 + 2^2 + ... + 2^(n-2)).</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mod_inverse</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="kw">as</span> <span class="ident">Integer</span><span class="op">&gt;</span><span class="ident">::BITS</span> {
-            <span class="ident">mod_inverse</span> <span class="op">=</span> <span class="ident">mod_inverse</span>.<span class="ident">wrapping_mul</span>(<span class="ident">mod_inverse</span>).<span class="ident">wrapping_mul</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>);
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        }
-        <span class="ident">mod_inverse</span>
-    }};
-}
-
+<span class="comment">// Compute floor(n / 10^exp) for small exp.</span>
+<span class="comment">// Precondition: n &lt;= n_max</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">mod32_inverse</span>(<span class="ident">a</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-    <span class="macro">mod_inverse!</span>(<span class="ident">u32</span>, <span class="ident">a</span>)
-}
-
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">mod64_inverse</span>(<span class="ident">a</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-    <span class="macro">mod_inverse!</span>(<span class="ident">u64</span>, <span class="ident">a</span>)
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Div32Table</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="ident">mod_inv</span>: [<span class="ident">u32</span>; <span class="ident">N</span>],
-    <span class="ident">max_quotients</span>: [<span class="ident">u32</span>; <span class="ident">N</span>],
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Div64Table</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="ident">mod_inv</span>: [<span class="ident">u64</span>; <span class="ident">N</span>],
-    <span class="ident">max_quotients</span>: [<span class="ident">u64</span>; <span class="ident">N</span>],
-}
-
-<span class="doccomment">/// Generate a division table as a const fn.</span>
-<span class="macro">macro_rules!</span> <span class="ident">div_table</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">modular_inverse</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">mod_inverse</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">modular_inverse</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mod_inv</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">N</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_quotients</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">N</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pow_of_mod_inverse</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pow_of_a</span> <span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">N</span> {
-            <span class="ident">mod_inv</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">pow_of_mod_inverse</span>;
-            <span class="ident">max_quotients</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::MAX</span> <span class="op">/</span> <span class="ident">pow_of_a</span>;
-
-            <span class="ident">pow_of_mod_inverse</span> <span class="op">=</span> <span class="ident">pow_of_mod_inverse</span>.<span class="ident">wrapping_mul</span>(<span class="ident">mod_inverse</span>);
-            <span class="ident">pow_of_a</span> <span class="kw-2">*</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>;
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        }
-
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span> {
-            <span class="ident">mod_inv</span>,
-            <span class="ident">max_quotients</span>,
-        }
-    }};
-}
-
-<span class="doccomment">/// Generate a pre-computed table of u32 constants for division.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">div32_table</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">u32</span>) -&gt; <span class="ident">Div32Table</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="macro">div_table!</span>(<span class="ident">u32</span>, <span class="ident">Div32Table</span>, <span class="ident">mod32_inverse</span>, <span class="ident">a</span>)
-}
-
-<span class="doccomment">/// Generate a pre-computed table of u64 constants for division.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">div64_table</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">u64</span>) -&gt; <span class="ident">Div64Table</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="macro">div_table!</span>(<span class="ident">u64</span>, <span class="ident">Div64Table</span>, <span class="ident">mod64_inverse</span>, <span class="ident">a</span>)
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">divide_by_pow10_64</span>(<span class="ident">n</span>: <span class="ident">u64</span>, <span class="ident">exp</span>: <span class="ident">u32</span>, <span class="ident">n_max</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
+    <span class="comment">// Specialize for 64-bit division by 1000.</span>
+    <span class="comment">// Ensure that the correctness condition is met.</span>
+    <span class="kw">if</span> <span class="ident">exp</span> <span class="op">==</span> <span class="number">3</span> <span class="op">&amp;&amp;</span> <span class="ident">n_max</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">15534100272597517998</span> {
+        <span class="ident">umul128_upper64</span>(<span class="ident">n</span>, <span class="number">2361183241434822607</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">7</span>
+    } <span class="kw">else</span> {
+        <span class="kw">let</span> <span class="ident">divisor</span> <span class="op">=</span> <span class="ident">pow64</span>(<span class="ident">exp</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">10</span>);
+        <span class="ident">n</span> <span class="op">/</span> <span class="ident">divisor</span>
+    }
 }
 
 <span class="comment">// ROUNDING</span>
 <span class="comment">// --------</span>
 
 <span class="kw">impl</span> <span class="ident">RoundMode</span> {
-    <span class="doccomment">/// Zero out the lowest bit.</span>
+    <span class="doccomment">/// Determine if we should round down.</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">break_rounding_tie</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">significand</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">prefer_round_down</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">significand</span>: <span class="ident">u64</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RoundMode::Round</span> =&gt; <span class="ident">significand</span> <span class="op">&amp;</span> <span class="op">!</span><span class="number">1u64</span>,
-            <span class="ident">RoundMode::Truncate</span> =&gt; <span class="ident">significand</span> <span class="op">-</span> <span class="number">1u64</span>,
+            <span class="ident">RoundMode::Round</span> =&gt; <span class="ident">significand</span> <span class="op">%</span> <span class="number">2</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+            <span class="ident">RoundMode::Truncate</span> =&gt; <span class="bool-val">true</span>,
         }
     }
 }
@@ -2797,26 +2663,26 @@
 <span class="comment">// ENDPOINTS</span>
 <span class="comment">// ---------</span>
 
-<span class="doccomment">/// Compute the left endpoint from a 64-bit power-of-5..</span>
+<span class="doccomment">/// Compute the left endpoint from a 64-bit power-of-5.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_left_endpoint_u64</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">DragonboxFloat</span><span class="op">&gt;</span>(<span class="ident">pow5</span>: <span class="ident">u64</span>, <span class="ident">beta_minus_1</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u64</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_left_endpoint_u64</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">DragonboxFloat</span><span class="op">&gt;</span>(<span class="ident">pow5</span>: <span class="ident">u64</span>, <span class="ident">beta</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">zero_carry</span> <span class="op">=</span> <span class="ident">pow5</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">F::MANTISSA_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">2</span>);
     <span class="kw">let</span> <span class="ident">mantissa_shift</span> <span class="op">=</span> <span class="number">64</span> <span class="op">-</span> <span class="ident">F::MANTISSA_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>;
-    (<span class="ident">pow5</span> <span class="op">-</span> <span class="ident">zero_carry</span>) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">mantissa_shift</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="ident">beta_minus_1</span>)
+    (<span class="ident">pow5</span> <span class="op">-</span> <span class="ident">zero_carry</span>) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">mantissa_shift</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="ident">beta</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_right_endpoint_u64</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">DragonboxFloat</span><span class="op">&gt;</span>(<span class="ident">pow5</span>: <span class="ident">u64</span>, <span class="ident">beta_minus_1</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u64</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_right_endpoint_u64</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">DragonboxFloat</span><span class="op">&gt;</span>(<span class="ident">pow5</span>: <span class="ident">u64</span>, <span class="ident">beta</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">zero_carry</span> <span class="op">=</span> <span class="ident">pow5</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">F::MANTISSA_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>);
     <span class="kw">let</span> <span class="ident">mantissa_shift</span> <span class="op">=</span> <span class="number">64</span> <span class="op">-</span> <span class="ident">F::MANTISSA_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>;
-    (<span class="ident">pow5</span> <span class="op">+</span> <span class="ident">zero_carry</span>) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">mantissa_shift</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="ident">beta_minus_1</span>)
+    (<span class="ident">pow5</span> <span class="op">+</span> <span class="ident">zero_carry</span>) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">mantissa_shift</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="ident">beta</span>)
 }
 
 <span class="doccomment">/// Determine if we should round up for the short interval case.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_round_up_u64</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">DragonboxFloat</span><span class="op">&gt;</span>(<span class="ident">pow5</span>: <span class="ident">u64</span>, <span class="ident">beta_minus_1</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u64</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_round_up_u64</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">DragonboxFloat</span><span class="op">&gt;</span>(<span class="ident">pow5</span>: <span class="ident">u64</span>, <span class="ident">beta</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="number">64</span> <span class="op">-</span> <span class="ident">F::MANTISSA_SIZE</span> <span class="op">-</span> <span class="number">2</span>;
-    ((<span class="ident">pow5</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">shift</span> <span class="op">-</span> <span class="ident">beta_minus_1</span>)) <span class="op">+</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">2</span>
+    ((<span class="ident">pow5</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">shift</span> <span class="op">-</span> <span class="ident">beta</span>)) <span class="op">+</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">2</span>
 }
 
 <span class="comment">// DRAGONBOX FLOAT</span>
@@ -2834,144 +2700,63 @@
     <span class="ident">pow5</span>.<span class="number">1</span>
 }
 
-<span class="doccomment">/// Calculate the maximum possible power for the mantissa.</span>
+<span class="doccomment">/// ROR instruction for 32-bit type.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_power</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">DragonboxFloat</span><span class="op">&gt;</span>() -&gt; <span class="ident">i32</span> {
-    <span class="comment">//  NOTE:</span>
-    <span class="comment">//      Dragonbox&#39;s reference implementation uses</span>
-    <span class="comment">//      `max_mantissa = max / pow64(10, F::KAPPA + 1)`, but then does</span>
-    <span class="comment">//      `p &lt; max_mantissa / 10`, which produces the same result in all</span>
-    <span class="comment">//      cases.</span>
-    <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">F::Unsigned::MAX</span>.<span class="ident">as_u64</span>();
-    <span class="kw">let</span> <span class="ident">max_mantissa</span> <span class="op">=</span> <span class="ident">max</span> <span class="op">/</span> <span class="ident">pow64</span>(<span class="number">10</span>, <span class="ident">F::KAPPA</span> <span class="op">+</span> <span class="number">2</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k</span> <span class="op">=</span> <span class="number">0i32</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="number">1u64</span>;
-    <span class="kw">while</span> <span class="ident">p</span> <span class="op">&lt;</span> <span class="ident">max_mantissa</span> {
-        <span class="ident">p</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">10</span>;
-        <span class="ident">k</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-    }
-    <span class="ident">k</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">rotr32</span>(<span class="ident">n</span>: <span class="ident">u32</span>, <span class="ident">r</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
+    <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">r</span> <span class="op">&amp;</span> <span class="number">31</span>;
+    (<span class="ident">n</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">r</span>) <span class="op">|</span> (<span class="ident">n</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">r</span>))
 }
 
-<span class="doccomment">/// Check and calculate quotient for value by 10^N.</span>
-<span class="macro">macro_rules!</span> <span class="ident">div10</span> {
-    (@<span class="number">4</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">quo</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">mul</span>:<span class="ident">ident</span>)<span class="question-mark">?</span>) =&gt; {{
-        <span class="comment">// Is n divisible by 10^4?</span>
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="op">&amp;</span> <span class="number">0xf</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">quo</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>).<span class="ident">wrapping_mul</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>.<span class="ident">mod_inv</span>[<span class="number">4</span>]);
-            <span class="kw">if</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">quo</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>.<span class="ident">max_quotients</span>[<span class="number">4</span>]) {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">quo</span>;
-                $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">mul</span> <span class="op">=</span> <span class="number">10000</span>;)<span class="question-mark">?</span>
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> <span class="op">|</span><span class="op">=</span> <span class="number">0x4</span>;
-            }
-        }
-    }};
-
-    (@<span class="number">2</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">quo</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">mul</span>:<span class="ident">ident</span>)<span class="question-mark">?</span>) =&gt; {{
-        <span class="comment">// Is n divisible by 10^2?</span>
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="op">&amp;</span> <span class="number">0x3</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">quo</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>).<span class="ident">wrapping_mul</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>.<span class="ident">mod_inv</span>[<span class="number">2</span>]);
-            <span class="kw">if</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">quo</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>.<span class="ident">max_quotients</span>[<span class="number">2</span>]) {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">quo</span>;
-                $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">mul</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> <span class="op">==</span> <span class="number">4</span> { <span class="number">100</span> } <span class="kw">else</span> { <span class="number">1000000</span> };)<span class="question-mark">?</span>
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> <span class="op">|</span><span class="op">=</span> <span class="number">0x2</span>;
-            }
-        }
-    }};
-
-    (@<span class="number">1</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">quo</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">mul</span>:<span class="ident">ident</span>)<span class="question-mark">?</span>) =&gt; {{
-        <span class="comment">// Is n divisible by 10^2?</span>
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="op">&amp;</span> <span class="number">0x1</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">quo</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>).<span class="ident">wrapping_mul</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>.<span class="ident">mod_inv</span>[<span class="number">1</span>]);
-            <span class="kw">if</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">quo</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>.<span class="ident">max_quotients</span>[<span class="number">1</span>]) {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">quo</span>;
-                $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">mul</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">mul</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>).<span class="ident">wrapping_mul</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>.<span class="ident">mod_inv</span>[<span class="number">1</span>]); )<span class="question-mark">?</span>
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> <span class="op">|</span><span class="op">=</span> <span class="number">0x1</span>;
-            }
-        }
-    }};
-}
-
-<span class="doccomment">/// Determine if `x` is divisible by `5^exp`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe if `exp &lt; table.mod_inv.len()`</span>
-<span class="macro">macro_rules!</span> <span class="ident">divisible_by_pow5</span> {
-    (<span class="self">Self</span>:: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">exp</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="macro">debug_assert!</span>((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">exp</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&lt;</span> <span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>.<span class="ident">mod_inv</span>.<span class="ident">len</span>());
-        <span class="kw">let</span> <span class="ident">mod_inv</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>.<span class="ident">mod_inv</span>;
-        <span class="kw">let</span> <span class="ident">max_quotients</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>.<span class="ident">max_quotients</span>;
-        <span class="comment">// SAFETY: safe if `exp &lt; TABLE_SIZE`.</span>
-        <span class="kw">let</span> <span class="ident">mod_inv</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="macro">index_unchecked!</span>(<span class="ident">mod_inv</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">exp</span> <span class="kw">as</span> <span class="ident">usize</span>]) };
-        <span class="kw">let</span> <span class="ident">max_quo</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="macro">index_unchecked!</span>(<span class="ident">max_quotients</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">exp</span> <span class="kw">as</span> <span class="ident">usize</span>]) };
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>.<span class="ident">wrapping_mul</span>(<span class="ident">mod_inv</span>) <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max_quo</span>
-    }};
+<span class="doccomment">/// ROR instruction for 64-bit type.</span>
+<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">rotr64</span>(<span class="ident">n</span>: <span class="ident">u64</span>, <span class="ident">r</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
+    <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">r</span> <span class="op">&amp;</span> <span class="number">63</span>;
+    (<span class="ident">n</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">r</span>) <span class="op">|</span> (<span class="ident">n</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="ident">r</span>))
 }
 
 <span class="doccomment">/// Magic numbers for division by a power of 10.</span>
+<span class="doccomment">/// Replace n by floor(n / 10^N).</span>
+<span class="doccomment">/// Returns true if and only if n is divisible by 10^N.</span>
+<span class="doccomment">/// Precondition: n &lt;= 10^(N+1)</span>
+<span class="doccomment">/// !!It takes an in-out parameter!!</span>
 <span class="kw">struct</span> <span class="ident">Div10Info</span> {
     <span class="ident">magic_number</span>: <span class="ident">u32</span>,
-    <span class="ident">bits_for_comparison</span>: <span class="ident">i32</span>,
-    <span class="ident">threshold</span>: <span class="ident">u32</span>,
     <span class="ident">shift_amount</span>: <span class="ident">i32</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Div10Info</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">comparison_mask</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        (<span class="number">1u32</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">bits_for_comparison</span>) <span class="op">-</span> <span class="number">1</span>
-    }
 }
 
 <span class="kw">const</span> <span class="ident">F32_DIV10_INFO</span>: <span class="ident">Div10Info</span> <span class="op">=</span> <span class="ident">Div10Info</span> {
-    <span class="ident">magic_number</span>: <span class="number">0xcccd</span>,
-    <span class="ident">bits_for_comparison</span>: <span class="number">16</span>,
-    <span class="ident">threshold</span>: <span class="number">0x3333</span>,
-    <span class="ident">shift_amount</span>: <span class="number">19</span>,
+    <span class="ident">magic_number</span>: <span class="number">6554</span>,
+    <span class="ident">shift_amount</span>: <span class="number">16</span>,
 };
 
 <span class="kw">const</span> <span class="ident">F64_DIV10_INFO</span>: <span class="ident">Div10Info</span> <span class="op">=</span> <span class="ident">Div10Info</span> {
-    <span class="ident">magic_number</span>: <span class="number">0x147c29</span>,
-    <span class="ident">bits_for_comparison</span>: <span class="number">12</span>,
-    <span class="ident">threshold</span>: <span class="number">0xa3</span>,
-    <span class="ident">shift_amount</span>: <span class="number">27</span>,
+    <span class="ident">magic_number</span>: <span class="number">656</span>,
+    <span class="ident">shift_amount</span>: <span class="number">16</span>,
 };
 
 <span class="macro">macro_rules!</span> <span class="ident">check_div_pow10</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">float</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">magic_number</span>;
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">exp</span>:<span class="ident">literal</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">float</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>:<span class="ident">ident</span>) =&gt; {{
+        <span class="comment">// Make sure the computation for max_n does not overflow.</span>
+        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">exp</span> <span class="op">+</span> <span class="number">2</span> <span class="op">&lt;</span> <span class="ident">floor_log10_pow2</span>(<span class="number">31</span>));
+        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">pow64</span>(<span class="number">10</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">exp</span> <span class="op">+</span> <span class="number">1</span>));
 
-        <span class="comment">// The lowest N bits of (n &amp; comparison_mask) must be zero, and</span>
-        <span class="comment">// (n &gt;&gt; N) &amp; comparison_mask must be at most threshold.</span>
-        <span class="kw">let</span> <span class="ident">shr</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">float::KAPPA</span>;
-        <span class="kw">let</span> <span class="ident">shl</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">bits_for_comparison</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">float::KAPPA</span>;
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> ((<span class="ident">res</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">shr</span>) <span class="op">|</span> (<span class="ident">res</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">shl</span>)) <span class="op">&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">comparison_mask</span>();
+        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>.<span class="ident">wrapping_mul</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">magic_number</span>);
+        <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> (<span class="number">1u32</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">shift_amount</span>) <span class="op">-</span> <span class="number">1</span>;
+        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> (<span class="ident">n</span> <span class="op">&amp;</span> <span class="ident">mask</span>) <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">magic_number</span>;
 
-        <span class="ident">res</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">shift_amount</span>;
-        (<span class="ident">res</span>, <span class="ident">c</span> <span class="op">&lt;</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">threshold</span>)
+        (<span class="ident">n</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">shift_amount</span>, <span class="ident">r</span>)
     }};
 }
 
-<span class="doccomment">/// Magic numbers for division by a small power of 10.</span>
-<span class="kw">struct</span> <span class="ident">SmallDiv10Info</span> {
-    <span class="ident">magic_number</span>: <span class="ident">u32</span>,
-    <span class="ident">shift_amount</span>: <span class="ident">i32</span>,
-}
+<span class="comment">// These constants are efficient because we can do it in 32-bits.</span>
+<span class="kw">const</span> <span class="ident">MOD_INV_5_U32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0xCCCC_CCCD</span>;
+<span class="kw">const</span> <span class="ident">MOD_INV_25_U32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">MOD_INV_5_U32</span>.<span class="ident">wrapping_mul</span>(<span class="ident">MOD_INV_5_U32</span>);
+<span class="kw">const</span> <span class="ident">MOD_INV_5_U64</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0xCCCC_CCCC_CCCC_CCCD</span>;
+<span class="kw">const</span> <span class="ident">MOD_INV_25_U64</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">MOD_INV_5_U64</span>.<span class="ident">wrapping_mul</span>(<span class="ident">MOD_INV_5_U64</span>);
 
-<span class="kw">const</span> <span class="ident">SMALL_F32_DIV10_INFO</span>: <span class="ident">SmallDiv10Info</span> <span class="op">=</span> <span class="ident">SmallDiv10Info</span> {
-    <span class="ident">magic_number</span>: <span class="number">0xcccd</span>,
-    <span class="ident">shift_amount</span>: <span class="number">19</span>,
-};
-
-<span class="kw">const</span> <span class="ident">SMALL_F64_DIV10_INFO</span>: <span class="ident">SmallDiv10Info</span> <span class="op">=</span> <span class="ident">SmallDiv10Info</span> {
-    <span class="ident">magic_number</span>: <span class="number">0xa3d8</span>,
-    <span class="ident">shift_amount</span>: <span class="number">22</span>,
-};
-
-<span class="macro">macro_rules!</span> <span class="ident">small_div_pow10</span> {
+<span class="macro">macro_rules!</span> <span class="ident">div_pow10</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>:<span class="ident">ident</span>) =&gt; {{
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">magic_number</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">shift_amount</span>
+        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>.<span class="ident">wrapping_mul</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">magic_number</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">info</span>.<span class="ident">shift_amount</span>
     }};
 }
 
@@ -2982,14 +2767,10 @@
     <span class="doccomment">/// Ceiling of the maximum number of float decimal digits + 1.</span>
     <span class="doccomment">/// Or, ceil((MANTISSA_SIZE + 1) / log2(10)) + 1.</span>
     <span class="kw">const</span> <span class="ident">DECIMAL_DIGITS</span>: <span class="ident">usize</span>;
-
-    <span class="kw">const</span> <span class="ident">MAX_POW5_FACTOR</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">floor_log5_pow2</span>(<span class="ident"><span class="self">Self</span>::MANTISSA_SIZE</span> <span class="op">+</span> <span class="number">2</span>);
-    <span class="kw">const</span> <span class="ident">TABLE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::MAX_POW5_FACTOR</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>;
-    <span class="kw">const</span> <span class="ident">DIV5_THRESHOLD</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">floor_log2_pow10</span>(<span class="ident"><span class="self">Self</span>::MAX_POW5_FACTOR</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>);
-    <span class="kw">const</span> <span class="ident">DIV5_TABLE</span>: <span class="ident"><span class="self">Self</span>::Table</span>;
+    <span class="kw">const</span> <span class="ident">FC_PM_HALF_LOWER</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident"><span class="self">Self</span>::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="op">-</span> <span class="ident">floor_log5_pow2</span>(<span class="ident"><span class="self">Self</span>::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>);
+    <span class="kw">const</span> <span class="ident">DIV_BY_5_THRESHOLD</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">floor_log2_pow10</span>(<span class="ident"><span class="self">Self</span>::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>);
 
     <span class="kw">type</span> <span class="ident">Power</span>;
-    <span class="kw">type</span> <span class="ident">Table</span>;
 
     <span class="doccomment">/// Quick calculation for the number of significant digits in the float.</span>
     <span class="kw">fn</span> <span class="ident">digit_count</span>(<span class="ident">mantissa</span>: <span class="ident">u64</span>) -&gt; <span class="ident">usize</span>;
@@ -3018,8 +2799,8 @@
     <span class="doccomment">/// Handle rounding-up for the short interval case.</span>
     <span class="kw">fn</span> <span class="ident">compute_round_up</span>(<span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="ident">beta_minus_1</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u64</span>;
 
-    <span class="kw">fn</span> <span class="ident">compute_mul</span>(<span class="ident">u</span>: <span class="ident">u64</span>, <span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>) -&gt; <span class="ident">u64</span>;
-    <span class="kw">fn</span> <span class="ident">compute_mul_parity</span>(<span class="ident">two_f</span>: <span class="ident">u64</span>, <span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="ident">beta_minus_1</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">compute_mul</span>(<span class="ident">u</span>: <span class="ident">u64</span>, <span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">bool</span>);
+    <span class="kw">fn</span> <span class="ident">compute_mul_parity</span>(<span class="ident">two_f</span>: <span class="ident">u64</span>, <span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="ident">beta_minus_1</span>: <span class="ident">i32</span>) -&gt; (<span class="ident">bool</span>, <span class="ident">bool</span>);
     <span class="kw">fn</span> <span class="ident">compute_delta</span>(<span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="ident">beta_minus_1</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u32</span>;
 
     <span class="doccomment">/// Handle trailing zeros, conditional on the float type.</span>
@@ -3028,62 +2809,11 @@
     <span class="doccomment">/// Remove trailing zeros from the float.</span>
     <span class="kw">fn</span> <span class="ident">remove_trailing_zeros</span>(<span class="ident">mantissa</span>: <span class="ident">u64</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">i32</span>);
 
-    <span class="doccomment">/// Determine if two_f is divisible by 5^exp.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Safe if `exp &lt; TABLE_SIZE`.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">divisible_by_pow5</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">exp</span>: <span class="ident">u32</span>) -&gt; <span class="ident">bool</span>;
-
     <span class="doccomment">/// Determine if two_f is divisible by 2^exp.</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">divisible_by_pow2</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">exp</span>: <span class="ident">u32</span>) -&gt; <span class="ident">bool</span> {
         <span class="comment">// Preconditions: exp &gt;= 1 &amp;&amp; x != 0</span>
         <span class="ident">x</span>.<span class="ident">trailing_zeros</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">exp</span>
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_product_fc_pm_half</span>(<span class="ident">two_f</span>: <span class="ident">u64</span>, <span class="ident">exponent</span>: <span class="ident">i32</span>, <span class="ident">minus_k</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">lower_threshold</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident"><span class="self">Self</span>::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="op">-</span> <span class="ident">floor_log5_pow2</span>(<span class="ident"><span class="self">Self</span>::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>);
-        <span class="kw">let</span> <span class="ident">upper_threshold</span> <span class="op">=</span> <span class="ident">floor_log2_pow10</span>(<span class="ident"><span class="self">Self</span>::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>);
-
-        <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">&lt;</span> <span class="ident">lower_threshold</span> {
-            <span class="comment">// Case I: f = fc +- 1/2</span>
-            <span class="bool-val">false</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">upper_threshold</span> {
-            <span class="comment">// For k &gt;= 0</span>
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::DIV5_THRESHOLD</span> {
-            <span class="comment">// For k &lt; 0</span>
-            <span class="bool-val">false</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// SAFETY: safe since `minus_k &lt; MAX_POW5_FACTOR + 1`.</span>
-            <span class="macro">debug_assert!</span>(<span class="ident">minus_k</span> <span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::MAX_POW5_FACTOR</span> <span class="op">+</span> <span class="number">1</span>);
-            <span class="kw">unsafe</span> { <span class="ident"><span class="self">Self</span>::divisible_by_pow5</span>(<span class="ident">two_f</span>, <span class="ident">minus_k</span> <span class="kw">as</span> <span class="ident">u32</span>) }
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_product_fc</span>(<span class="ident">two_f</span>: <span class="ident">u64</span>, <span class="ident">exponent</span>: <span class="ident">i32</span>, <span class="ident">minus_k</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">lower_threshold</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident"><span class="self">Self</span>::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">floor_log5_pow2</span>(<span class="ident"><span class="self">Self</span>::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">upper_threshold</span> <span class="op">=</span> <span class="ident">floor_log2_pow10</span>(<span class="ident"><span class="self">Self</span>::KAPPA</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>);
-
-        <span class="comment">// Case II: f = fc + 1</span>
-        <span class="comment">// Case III: f = fc</span>
-        <span class="comment">// Exponent for 5 is negative</span>
-        <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::DIV5_THRESHOLD</span> {
-            <span class="bool-val">false</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">&gt;</span> <span class="ident">upper_threshold</span> {
-            <span class="comment">// SAFETY: safe since `minus_k &lt; MAX_POW5_FACTOR + 1`.</span>
-            <span class="macro">debug_assert!</span>(<span class="ident">minus_k</span> <span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::MAX_POW5_FACTOR</span> <span class="op">+</span> <span class="number">1</span>);
-            <span class="kw">unsafe</span> { <span class="ident"><span class="self">Self</span>::divisible_by_pow5</span>(<span class="ident">two_f</span>, <span class="ident">minus_k</span> <span class="kw">as</span> <span class="ident">u32</span>) }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">lower_threshold</span> {
-            <span class="comment">// Both exponents are nonnegative</span>
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// Exponent for 2 is negative</span>
-            <span class="ident"><span class="self">Self</span>::divisible_by_pow2</span>(<span class="ident">two_f</span>, (<span class="ident">minus_k</span> <span class="op">-</span> <span class="ident">exponent</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u32</span>)
-        }
     }
 
     <span class="comment">// Replace n by floor(n / 10^N).</span>
@@ -3093,16 +2823,18 @@
 
     <span class="comment">// Compute floor(n / 10^N) for small n and exp.</span>
     <span class="comment">// Precondition: n &lt;= 10^(N+1)</span>
-    <span class="kw">fn</span> <span class="ident">small_div_pow10</span>(<span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span>;
+    <span class="kw">fn</span> <span class="ident">div_pow10</span>(<span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span>;
+
+    <span class="comment">// Compute floor(n / 10^N) for small N.</span>
+    <span class="comment">// Precondition: n &lt;= n_max</span>
+    <span class="kw">fn</span> <span class="ident">divide_by_pow10</span>(<span class="ident">n</span>: <span class="ident">u64</span>, <span class="ident">exp</span>: <span class="ident">u32</span>, <span class="ident">n_max</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">DragonboxFloat</span> <span class="kw">for</span> <span class="ident">f32</span> {
     <span class="kw">const</span> <span class="ident">KAPPA</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span>;
     <span class="kw">const</span> <span class="ident">DECIMAL_DIGITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">9</span>;
-    <span class="kw">const</span> <span class="ident">DIV5_TABLE</span>: <span class="ident"><span class="self">Self</span>::Table</span> <span class="op">=</span> <span class="ident">div32_table</span>::<span class="op">&lt;</span>{ <span class="ident"><span class="self">Self</span>::TABLE_SIZE</span> }<span class="op">&gt;</span>(<span class="number">5</span>);
 
     <span class="kw">type</span> <span class="ident">Power</span> <span class="op">=</span> <span class="ident">u64</span>;
-    <span class="kw">type</span> <span class="ident">Table</span> <span class="op">=</span> <span class="ident">Div32Table</span><span class="op">&lt;</span>{ <span class="ident"><span class="self">Self</span>::TABLE_SIZE</span> }<span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">digit_count</span>(<span class="ident">mantissa</span>: <span class="ident">u64</span>) -&gt; <span class="ident">usize</span> {
@@ -3141,19 +2873,24 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">compute_mul</span>(<span class="ident">u</span>: <span class="ident">u64</span>, <span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>) -&gt; <span class="ident">u64</span> {
-        <span class="ident">umul96_upper32</span>(<span class="ident">u</span>, <span class="kw-2">*</span><span class="ident">pow5</span>)
+    <span class="kw">fn</span> <span class="ident">compute_mul</span>(<span class="ident">u</span>: <span class="ident">u64</span>, <span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">bool</span>) {
+        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">umul96_upper64</span>(<span class="ident">u</span>, <span class="kw-2">*</span><span class="ident">pow5</span>);
+        (<span class="ident">r</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>, (<span class="ident">r</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">==</span> <span class="number">0</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">compute_mul_parity</span>(<span class="ident">two_f</span>: <span class="ident">u64</span>, <span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="ident">beta_minus_1</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// beta_minus_1 ∊ [1, 64]</span>
-        ((<span class="ident">umul96_lower64</span>(<span class="ident">two_f</span>, <span class="kw-2">*</span><span class="ident">pow5</span>) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="ident">beta_minus_1</span>)) <span class="op">&amp;</span> <span class="number">1</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">fn</span> <span class="ident">compute_mul_parity</span>(<span class="ident">two_f</span>: <span class="ident">u64</span>, <span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="ident">beta</span>: <span class="ident">i32</span>) -&gt; (<span class="ident">bool</span>, <span class="ident">bool</span>) {
+        <span class="macro">debug_assert!</span>((<span class="number">1</span>..<span class="number">64</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">beta</span>));
+
+        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">umul96_lower64</span>(<span class="ident">two_f</span>, <span class="kw-2">*</span><span class="ident">pow5</span>);
+        <span class="kw">let</span> <span class="ident">parity</span> <span class="op">=</span> (<span class="ident">r</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="ident">beta</span>)) <span class="op">&amp;</span> <span class="number">1</span>;
+        <span class="kw">let</span> <span class="ident">is_integer</span> <span class="op">=</span> <span class="ident">r</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">beta</span>);
+        (<span class="ident">parity</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, <span class="ident">is_integer</span> <span class="op">==</span> <span class="number">0</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">compute_delta</span>(<span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="ident">beta_minus_1</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u32</span> {
-        (<span class="kw-2">*</span><span class="ident">pow5</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">beta_minus_1</span>)) <span class="kw">as</span> <span class="ident">u32</span>
+    <span class="kw">fn</span> <span class="ident">compute_delta</span>(<span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="ident">beta</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u32</span> {
+        (<span class="kw-2">*</span><span class="ident">pow5</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">beta</span>)) <span class="kw">as</span> <span class="ident">u32</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
@@ -3166,48 +2903,50 @@
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">remove_trailing_zeros</span>(<span class="ident">mantissa</span>: <span class="ident">u64</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">i32</span>) {
         <span class="macro">debug_assert!</span>(<span class="ident">mantissa</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">u64</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">max_power</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">7</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">mantissa</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
 
-        <span class="comment">// Efficient because we can do it in 32-bits.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mantissa</span> <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">div32_table</span>::<span class="op">&lt;</span>{ <span class="ident"><span class="self">Self</span>::DECIMAL_DIGITS</span> }<span class="op">&gt;</span>(<span class="number">5</span>);
-
-        <span class="comment">// Perform a binary search</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quo</span>: <span class="ident">u32</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="macro">div10!</span>(@<span class="number">4</span> <span class="ident">table</span>, <span class="ident">n</span>, <span class="ident">quo</span>, <span class="ident">s</span>);
-        <span class="macro">div10!</span>(@<span class="number">2</span> <span class="ident">table</span>, <span class="ident">n</span>, <span class="ident">quo</span>, <span class="ident">s</span>);
-        <span class="macro">div10!</span>(@<span class="number">1</span> <span class="ident">table</span>, <span class="ident">n</span>, <span class="ident">quo</span>, <span class="ident">s</span>);
+        <span class="kw">loop</span> {
+            <span class="ident">quo</span> <span class="op">=</span> <span class="ident">rotr32</span>(<span class="ident">n</span>.<span class="ident">wrapping_mul</span>(<span class="ident">MOD_INV_25_U32</span>), <span class="number">2</span>);
+            <span class="kw">if</span> <span class="ident">quo</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u32::MAX</span> <span class="op">/</span> <span class="number">100</span> {
+                <span class="ident">n</span> <span class="op">=</span> <span class="ident">quo</span>;
+                <span class="ident">s</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
+            } <span class="kw">else</span> {
+                <span class="kw">break</span>;
+            }
+        }
 
+        <span class="ident">quo</span> <span class="op">=</span> <span class="ident">rotr32</span>(<span class="ident">n</span>.<span class="ident">wrapping_mul</span>(<span class="ident">MOD_INV_5_U32</span>), <span class="number">1</span>);
+        <span class="kw">if</span> <span class="ident">quo</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u32::MAX</span> <span class="op">/</span> <span class="number">10</span> {
+            <span class="ident">n</span> <span class="op">=</span> <span class="ident">quo</span>;
+            <span class="ident">s</span> <span class="op">|</span><span class="op">=</span> <span class="number">1</span>;
+        }
         (<span class="ident">n</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">s</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">divisible_by_pow5</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">exp</span>: <span class="ident">u32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">u64</span>);
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="comment">// SAFETY: safe if `exp &lt; Self::DIV5_TABLE.mod_inv.len()`.</span>
-        <span class="macro">divisible_by_pow5!</span>(<span class="ident"><span class="self">Self</span>::DIV5_TABLE</span>, <span class="ident">x</span>, <span class="ident">exp</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">check_div_pow10</span>(<span class="ident">n</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">u32</span>, <span class="ident">bool</span>) {
-        <span class="macro">check_div_pow10!</span>(<span class="ident">n</span>, <span class="ident">f32</span>, <span class="ident">F32_DIV10_INFO</span>)
+        <span class="macro">check_div_pow10!</span>(<span class="ident">n</span>, <span class="number">1</span>, <span class="ident">f32</span>, <span class="ident">F32_DIV10_INFO</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">small_div_pow10</span>(<span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-        <span class="macro">small_div_pow10!</span>(<span class="ident">n</span>, <span class="ident">SMALL_F32_DIV10_INFO</span>)
+    <span class="kw">fn</span> <span class="ident">div_pow10</span>(<span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
+        <span class="macro">div_pow10!</span>(<span class="ident">n</span>, <span class="ident">F32_DIV10_INFO</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">divide_by_pow10</span>(<span class="ident">n</span>: <span class="ident">u64</span>, <span class="ident">exp</span>: <span class="ident">u32</span>, <span class="kw">_</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
+        <span class="ident">divide_by_pow10_32</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">exp</span>) <span class="kw">as</span> <span class="ident">u64</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">DragonboxFloat</span> <span class="kw">for</span> <span class="ident">f64</span> {
     <span class="kw">const</span> <span class="ident">KAPPA</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">2</span>;
     <span class="kw">const</span> <span class="ident">DECIMAL_DIGITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">17</span>;
-    <span class="kw">const</span> <span class="ident">DIV5_TABLE</span>: <span class="ident"><span class="self">Self</span>::Table</span> <span class="op">=</span> <span class="ident">div64_table</span>::<span class="op">&lt;</span>{ <span class="ident"><span class="self">Self</span>::TABLE_SIZE</span> }<span class="op">&gt;</span>(<span class="number">5</span>);
 
     <span class="kw">type</span> <span class="ident">Power</span> <span class="op">=</span> (<span class="ident">u64</span>, <span class="ident">u64</span>);
-    <span class="kw">type</span> <span class="ident">Table</span> <span class="op">=</span> <span class="ident">Div64Table</span><span class="op">&lt;</span>{ <span class="ident"><span class="self">Self</span>::TABLE_SIZE</span> }<span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">digit_count</span>(<span class="ident">mantissa</span>: <span class="ident">u64</span>) -&gt; <span class="ident">usize</span> {
@@ -3244,19 +2983,24 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">compute_mul</span>(<span class="ident">u</span>: <span class="ident">u64</span>, <span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>) -&gt; <span class="ident">u64</span> {
-        <span class="ident">umul192_upper64</span>(<span class="ident">u</span>, <span class="ident">high</span>(<span class="ident">pow5</span>), <span class="ident">low</span>(<span class="ident">pow5</span>))
+    <span class="kw">fn</span> <span class="ident">compute_mul</span>(<span class="ident">u</span>: <span class="ident">u64</span>, <span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">bool</span>) {
+        <span class="kw">let</span> (<span class="ident">hi</span>, <span class="ident">lo</span>) <span class="op">=</span> <span class="ident">umul192_upper128</span>(<span class="ident">u</span>, <span class="ident">high</span>(<span class="ident">pow5</span>), <span class="ident">low</span>(<span class="ident">pow5</span>));
+        (<span class="ident">hi</span>, <span class="ident">lo</span> <span class="op">==</span> <span class="number">0</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">compute_mul_parity</span>(<span class="ident">two_f</span>: <span class="ident">u64</span>, <span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="ident">beta_minus_1</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// beta_minus_1 ∊ [1, 64]</span>
-        ((<span class="ident">umul192_middle64</span>(<span class="ident">two_f</span>, <span class="ident">high</span>(<span class="ident">pow5</span>), <span class="ident">low</span>(<span class="ident">pow5</span>)) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="ident">beta_minus_1</span>)) <span class="op">&amp;</span> <span class="number">1</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">fn</span> <span class="ident">compute_mul_parity</span>(<span class="ident">two_f</span>: <span class="ident">u64</span>, <span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="ident">beta</span>: <span class="ident">i32</span>) -&gt; (<span class="ident">bool</span>, <span class="ident">bool</span>) {
+        <span class="macro">debug_assert!</span>((<span class="number">1</span>..<span class="number">64</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">beta</span>));
+
+        <span class="kw">let</span> (<span class="ident">rhi</span>, <span class="ident">rlo</span>) <span class="op">=</span> <span class="ident">umul192_lower128</span>(<span class="ident">two_f</span>, <span class="ident">high</span>(<span class="ident">pow5</span>), <span class="ident">low</span>(<span class="ident">pow5</span>));
+        <span class="kw">let</span> <span class="ident">parity</span> <span class="op">=</span> (<span class="ident">rhi</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="ident">beta</span>)) <span class="op">&amp;</span> <span class="number">1</span>;
+        <span class="kw">let</span> <span class="ident">is_integer</span> <span class="op">=</span> (<span class="ident">rhi</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">beta</span>) <span class="op">|</span> (<span class="ident">rlo</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="ident">beta</span>));
+        (<span class="ident">parity</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, <span class="ident">is_integer</span> <span class="op">==</span> <span class="number">0</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">compute_delta</span>(<span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="ident">beta_minus_1</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u32</span> {
-        (<span class="ident">high</span>(<span class="ident">pow5</span>) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">beta_minus_1</span>)) <span class="kw">as</span> <span class="ident">u32</span>
+    <span class="kw">fn</span> <span class="ident">compute_delta</span>(<span class="ident">pow5</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="ident">beta</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u32</span> {
+        (<span class="ident">high</span>(<span class="ident">pow5</span>) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">beta</span>)) <span class="kw">as</span> <span class="ident">u32</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
@@ -3269,69 +3013,78 @@
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">remove_trailing_zeros</span>(<span class="ident">mantissa</span>: <span class="ident">u64</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">i32</span>) {
-        <span class="macro">debug_assert!</span>(<span class="ident">max_power</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">16</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">mantissa</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
 
-        <span class="comment">// Divide by 10^8 and reduce to 32-bits.</span>
-        <span class="comment">// Since ret_value.significand &lt;= (2^64 - 1) / 1000 &lt; 10^17,</span>
-        <span class="comment">// both of the quotient and the r should fit in 32-bits.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mantissa</span>;
-        <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">div32_table</span>::<span class="op">&lt;</span>{ <span class="ident">f32::DECIMAL_DIGITS</span> }<span class="op">&gt;</span>(<span class="number">5</span>);
+        <span class="comment">// This magic number is ceil(2^90 / 10^8).</span>
+        <span class="kw">let</span> <span class="ident">magic_number</span> <span class="op">=</span> <span class="number">12379400392853802749u64</span>;
+        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">mantissa</span> <span class="kw">as</span> <span class="ident">u128</span> <span class="op">*</span> <span class="ident">magic_number</span> <span class="kw">as</span> <span class="ident">u128</span>;
 
-        <span class="comment">// If the number is divisible by 10^8, work with the quotient.</span>
-        <span class="kw">let</span> <span class="ident">quo_pow10_8</span> <span class="op">=</span> <span class="ident">divide_by_pow10</span>(<span class="ident">n</span>, <span class="number">8</span>, <span class="number">54</span>, <span class="number">0</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rem</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">wrapping_sub</span>(<span class="number">100000000</span>.<span class="ident">wrapping_mul</span>(<span class="ident">quo_pow10_8</span> <span class="kw">as</span> <span class="ident">u64</span>)) <span class="kw">as</span> <span class="ident">u32</span>;
+        <span class="comment">// Is n is divisible by 10^8?</span>
+        <span class="kw">let</span> <span class="ident">high</span> <span class="op">=</span> (<span class="ident">nm</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">90</span> <span class="op">-</span> <span class="number">64</span>)) <span class="op">-</span> <span class="number">1</span>;
+        <span class="kw">let</span> <span class="ident">low</span> <span class="op">=</span> <span class="ident">nm</span> <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="kw">if</span> <span class="ident">high</span> <span class="op">&amp;</span> <span class="ident">mask</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">low</span> <span class="op">&lt;</span> <span class="ident">magic_number</span> {
+            <span class="comment">// If yes, work with the quotient.</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> (<span class="ident">high</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">90</span> <span class="op">-</span> <span class="number">64</span>)) <span class="kw">as</span> <span class="ident">u32</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">8</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quo</span>: <span class="ident">u32</span>;
 
-        <span class="kw">if</span> <span class="ident">rem</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n32</span> <span class="op">=</span> <span class="ident">quo_pow10_8</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quo32</span>: <span class="ident">u32</span>;
-
-            <span class="comment">// Is n divisible by 10^8?</span>
-            <span class="comment">// This branch is extremely unlikely.</span>
-            <span class="kw">if</span> <span class="ident">n32</span> <span class="op">&amp;</span> <span class="number">0xff</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="ident">quo32</span> <span class="op">=</span> (<span class="ident">n32</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>).<span class="ident">wrapping_mul</span>(<span class="ident">table</span>.<span class="ident">mod_inv</span>[<span class="number">8</span>]);
-                <span class="kw">if</span> <span class="ident">quo32</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">table</span>.<span class="ident">max_quotients</span>[<span class="number">8</span>] {
-                    <span class="ident">n</span> <span class="op">=</span> <span class="ident">quo32</span> <span class="kw">as</span> <span class="ident">u64</span>;
-                    <span class="kw">return</span> (<span class="ident">n</span>, <span class="number">16</span>);
+            <span class="kw">loop</span> {
+                <span class="ident">quo</span> <span class="op">=</span> <span class="ident">rotr32</span>(<span class="ident">n</span>.<span class="ident">wrapping_mul</span>(<span class="ident">MOD_INV_25_U32</span>), <span class="number">2</span>);
+                <span class="kw">if</span> <span class="ident">quo</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u32::MAX</span> <span class="op">/</span> <span class="number">100</span> {
+                    <span class="ident">n</span> <span class="op">=</span> <span class="ident">quo</span>;
+                    <span class="ident">s</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
+                } <span class="kw">else</span> {
+                    <span class="kw">break</span>;
                 }
             }
 
-            <span class="comment">// Otherwise, perform a binary search.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">8</span>;
+            <span class="ident">quo</span> <span class="op">=</span> <span class="ident">rotr32</span>(<span class="ident">n</span>.<span class="ident">wrapping_mul</span>(<span class="ident">MOD_INV_5_U32</span>), <span class="number">1</span>);
+            <span class="kw">if</span> <span class="ident">quo</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u32::MAX</span> <span class="op">/</span> <span class="number">10</span> {
+                <span class="ident">n</span> <span class="op">=</span> <span class="ident">quo</span>;
+                <span class="ident">s</span> <span class="op">|</span><span class="op">=</span> <span class="number">1</span>;
+            }
 
-            <span class="macro">div10!</span>(@<span class="number">4</span> <span class="ident">table</span>, <span class="ident">n32</span>, <span class="ident">quo32</span>, <span class="ident">s</span>);
-            <span class="macro">div10!</span>(@<span class="number">2</span> <span class="ident">table</span>, <span class="ident">n32</span>, <span class="ident">quo32</span>, <span class="ident">s</span>);
-            <span class="macro">div10!</span>(@<span class="number">1</span> <span class="ident">table</span>, <span class="ident">n32</span>, <span class="ident">quo32</span>, <span class="ident">s</span>);
-
-            (<span class="ident">n32</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">s</span>)
+            (<span class="ident">n</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">s</span>)
         } <span class="kw">else</span> {
-            <span class="comment">// If the number is not divisible by 10^8, work with the remainder.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quo32</span>: <span class="ident">u32</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mul</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">100000000</span>;
+            <span class="comment">// If n is not divisible by 10^8, work with n itself.</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mantissa</span>;
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quo</span>: <span class="ident">u64</span>;
 
-            <span class="macro">div10!</span>(@<span class="number">4</span> <span class="ident">table</span>, <span class="ident">rem</span>, <span class="ident">quo32</span>, <span class="ident">s</span>, <span class="ident">mul</span>);
-            <span class="macro">div10!</span>(@<span class="number">2</span> <span class="ident">table</span>, <span class="ident">rem</span>, <span class="ident">quo32</span>, <span class="ident">s</span>, <span class="ident">mul</span>);
-            <span class="macro">div10!</span>(@<span class="number">1</span> <span class="ident">table</span>, <span class="ident">rem</span>, <span class="ident">quo32</span>, <span class="ident">s</span>, <span class="ident">mul</span>);
+            <span class="kw">loop</span> {
+                <span class="ident">quo</span> <span class="op">=</span> <span class="ident">rotr64</span>(<span class="ident">n</span>.<span class="ident">wrapping_mul</span>(<span class="ident">MOD_INV_25_U64</span>), <span class="number">2</span>);
+                <span class="kw">if</span> <span class="ident">quo</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u64::MAX</span> <span class="op">/</span> <span class="number">100</span> {
+                    <span class="ident">n</span> <span class="op">=</span> <span class="ident">quo</span>;
+                    <span class="ident">s</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
+                } <span class="kw">else</span> {
+                    <span class="kw">break</span>;
+                }
+            }
 
-            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">rem</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">+</span> <span class="ident">quo_pow10_8</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="ident">mul</span> <span class="kw">as</span> <span class="ident">u64</span>;
+            <span class="ident">quo</span> <span class="op">=</span> <span class="ident">rotr64</span>(<span class="ident">n</span>.<span class="ident">wrapping_mul</span>(<span class="ident">MOD_INV_5_U64</span>), <span class="number">1</span>);
+            <span class="kw">if</span> <span class="ident">quo</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u64::MAX</span> <span class="op">/</span> <span class="number">10</span> {
+                <span class="ident">n</span> <span class="op">=</span> <span class="ident">quo</span>;
+                <span class="ident">s</span> <span class="op">|</span><span class="op">=</span> <span class="number">1</span>;
+            }
+
             (<span class="ident">n</span>, <span class="ident">s</span>)
         }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">divisible_by_pow5</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">exp</span>: <span class="ident">u32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// SAFETY: safe if `exp &lt; Self::DIV5_TABLE.mod_inv.len()`.</span>
-        <span class="macro">divisible_by_pow5!</span>(<span class="ident"><span class="self">Self</span>::DIV5_TABLE</span>, <span class="ident">x</span>, <span class="ident">exp</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">check_div_pow10</span>(<span class="ident">n</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">u32</span>, <span class="ident">bool</span>) {
-        <span class="macro">check_div_pow10!</span>(<span class="ident">n</span>, <span class="ident">f64</span>, <span class="ident">F64_DIV10_INFO</span>)
+        <span class="macro">check_div_pow10!</span>(<span class="ident">n</span>, <span class="number">2</span>, <span class="ident">f64</span>, <span class="ident">F64_DIV10_INFO</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">small_div_pow10</span>(<span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-        <span class="macro">small_div_pow10!</span>(<span class="ident">n</span>, <span class="ident">SMALL_F64_DIV10_INFO</span>)
+    <span class="kw">fn</span> <span class="ident">div_pow10</span>(<span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
+        <span class="macro">div_pow10!</span>(<span class="ident">n</span>, <span class="ident">F64_DIV10_INFO</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">divide_by_pow10</span>(<span class="ident">n</span>: <span class="ident">u64</span>, <span class="ident">exp</span>: <span class="ident">u32</span>, <span class="ident">n_max</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
+        <span class="ident">divide_by_pow10_64</span>(<span class="ident">n</span>, <span class="ident">exp</span>, <span class="ident">n_max</span>)
     }
 }
 
@@ -3341,10 +3094,8 @@
         <span class="kw">impl</span> <span class="ident">DragonboxFloat</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
             <span class="kw">const</span> <span class="ident">KAPPA</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
             <span class="kw">const</span> <span class="ident">DECIMAL_DIGITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">const</span> <span class="ident">DIV5_TABLE</span>: <span class="ident"><span class="self">Self</span>::Table</span> <span class="op">=</span> <span class="number">0</span>;
 
             <span class="kw">type</span> <span class="ident">Power</span> <span class="op">=</span> <span class="ident">u64</span>;
-            <span class="kw">type</span> <span class="ident">Table</span> <span class="op">=</span> <span class="ident">u8</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
             <span class="kw">fn</span> <span class="ident">digit_count</span>(<span class="kw">_</span>: <span class="ident">u64</span>) -&gt; <span class="ident">usize</span> {
@@ -3372,17 +3123,17 @@
             }
 
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">compute_round_up</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="kw">_</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u64</span> {
+            <span class="kw">fn</span> <span class="ident">compute_round_up</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="kw">_</span>: <span class="ident">i32</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">bool</span>) {
                 <span class="macro">unimplemented!</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">compute_mul</span>(<span class="kw">_</span>: <span class="ident">u64</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>) -&gt; <span class="ident">u64</span> {
+            <span class="kw">fn</span> <span class="ident">compute_mul</span>(<span class="kw">_</span>: <span class="ident">u64</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">bool</span>) {
                 <span class="macro">unimplemented!</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">compute_mul_parity</span>(<span class="kw">_</span>: <span class="ident">u64</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="kw">_</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
+            <span class="kw">fn</span> <span class="ident">compute_mul_parity</span>(<span class="kw">_</span>: <span class="ident">u64</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Power</span>, <span class="kw">_</span>: <span class="ident">i32</span>) -&gt; (<span class="ident">bool</span>, <span class="ident">bool</span>) {
                 <span class="macro">unimplemented!</span>()
             }
 
@@ -3402,17 +3153,12 @@
             }
 
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">divisible_by_pow5</span>(<span class="kw">_</span>: <span class="ident">u64</span>, <span class="kw">_</span>: <span class="ident">u32</span>) -&gt; <span class="ident">bool</span> {
-                <span class="macro">unimplemented!</span>()
-            }
-
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
             <span class="kw">fn</span> <span class="ident">check_div_pow10</span>(<span class="kw">_</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">u32</span>, <span class="ident">bool</span>) {
                 <span class="macro">unimplemented!</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">small_div_pow10</span>(<span class="kw">_</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
+            <span class="kw">fn</span> <span class="ident">div_pow10</span>(<span class="kw">_</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
                 <span class="macro">unimplemented!</span>()
             }
         }

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.36/src/rsa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rsa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.40/src/rsa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rsa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -844,88 +844,6 @@
 <span id="839">839</span>
 <span id="840">840</span>
 <span id="841">841</span>
-<span id="842">842</span>
-<span id="843">843</span>
-<span id="844">844</span>
-<span id="845">845</span>
-<span id="846">846</span>
-<span id="847">847</span>
-<span id="848">848</span>
-<span id="849">849</span>
-<span id="850">850</span>
-<span id="851">851</span>
-<span id="852">852</span>
-<span id="853">853</span>
-<span id="854">854</span>
-<span id="855">855</span>
-<span id="856">856</span>
-<span id="857">857</span>
-<span id="858">858</span>
-<span id="859">859</span>
-<span id="860">860</span>
-<span id="861">861</span>
-<span id="862">862</span>
-<span id="863">863</span>
-<span id="864">864</span>
-<span id="865">865</span>
-<span id="866">866</span>
-<span id="867">867</span>
-<span id="868">868</span>
-<span id="869">869</span>
-<span id="870">870</span>
-<span id="871">871</span>
-<span id="872">872</span>
-<span id="873">873</span>
-<span id="874">874</span>
-<span id="875">875</span>
-<span id="876">876</span>
-<span id="877">877</span>
-<span id="878">878</span>
-<span id="879">879</span>
-<span id="880">880</span>
-<span id="881">881</span>
-<span id="882">882</span>
-<span id="883">883</span>
-<span id="884">884</span>
-<span id="885">885</span>
-<span id="886">886</span>
-<span id="887">887</span>
-<span id="888">888</span>
-<span id="889">889</span>
-<span id="890">890</span>
-<span id="891">891</span>
-<span id="892">892</span>
-<span id="893">893</span>
-<span id="894">894</span>
-<span id="895">895</span>
-<span id="896">896</span>
-<span id="897">897</span>
-<span id="898">898</span>
-<span id="899">899</span>
-<span id="900">900</span>
-<span id="901">901</span>
-<span id="902">902</span>
-<span id="903">903</span>
-<span id="904">904</span>
-<span id="905">905</span>
-<span id="906">906</span>
-<span id="907">907</span>
-<span id="908">908</span>
-<span id="909">909</span>
-<span id="910">910</span>
-<span id="911">911</span>
-<span id="912">912</span>
-<span id="913">913</span>
-<span id="914">914</span>
-<span id="915">915</span>
-<span id="916">916</span>
-<span id="917">917</span>
-<span id="918">918</span>
-<span id="919">919</span>
-<span id="920">920</span>
-<span id="921">921</span>
-<span id="922">922</span>
-<span id="923">923</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Rivest–Shamir–Adleman cryptosystem</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! RSA is one of the earliest asymmetric public key encryption schemes.</span>
@@ -963,6 +881,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pkey</span>::{<span class="ident">HasPrivate</span>, <span class="ident">HasPublic</span>, <span class="ident">Private</span>, <span class="ident">Public</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::ForeignTypeRefExt</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cvt</span>, <span class="ident">cvt_n</span>, <span class="ident">cvt_p</span>};
+<span class="kw">use</span> <span class="ident">openssl_macros::corresponds</span>;
 
 <span class="doccomment">/// Type of encryption padding to use.</span>
 <span class="doccomment">///</span>
@@ -1026,28 +945,19 @@
         <span class="doccomment">/// Serializes the private key to a PEM-encoded PKCS#1 RSAPrivateKey structure.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The output will have a header of `-----BEGIN RSA PRIVATE KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_write_bio_RSAPrivateKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_write_bio_RSAPrivateKey`]: https://www.openssl.org/docs/man1.1.0/crypto/PEM_write_bio_RSAPrivateKey.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_write_bio_RSAPrivateKey</span>)]</span>
         <span class="ident">private_key_to_pem</span>,
         <span class="doccomment">/// Serializes the private key to a PEM-encoded encrypted PKCS#1 RSAPrivateKey structure.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The output will have a header of `-----BEGIN RSA PRIVATE KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_write_bio_RSAPrivateKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_write_bio_RSAPrivateKey`]: https://www.openssl.org/docs/man1.1.0/crypto/PEM_write_bio_RSAPrivateKey.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_write_bio_RSAPrivateKey</span>)]</span>
         <span class="ident">private_key_to_pem_passphrase</span>,
         <span class="ident">ffi::PEM_write_bio_RSAPrivateKey</span>
     }
 
     <span class="macro">to_der!</span> {
         <span class="doccomment">/// Serializes the private key to a DER-encoded PKCS#1 RSAPrivateKey structure.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`i2d_RSAPrivateKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`i2d_RSAPrivateKey`]: https://www.openssl.org/docs/man1.0.2/crypto/i2d_RSAPrivateKey.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">i2d_RSAPrivateKey</span>)]</span>
         <span class="ident">private_key_to_der</span>,
         <span class="ident">ffi::i2d_RSAPrivateKey</span>
     }
@@ -1058,6 +968,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if `self` has no private components, or if `to` is smaller</span>
     <span class="doccomment">/// than `self.size()`.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_private_decrypt</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_decrypt</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">from</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
@@ -1085,6 +996,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if `self` has no private components, or if `to` is smaller</span>
     <span class="doccomment">/// than `self.size()`.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_private_encrypt</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_encrypt</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">from</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
@@ -1107,10 +1019,7 @@
     }
 
     <span class="doccomment">/// Returns a reference to the private exponent of the key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`RSA_get0_key`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_get0_key`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_get0_key.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_get0_key</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">d</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
@@ -1120,10 +1029,7 @@
     }
 
     <span class="doccomment">/// Returns a reference to the first factor of the exponent of the key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`RSA_get0_factors`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_get0_factors`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_get0_key.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_get0_factors</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">p</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BigNumRef</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
@@ -1133,10 +1039,7 @@
     }
 
     <span class="doccomment">/// Returns a reference to the second factor of the exponent of the key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`RSA_get0_factors`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_get0_factors`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_get0_key.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_get0_factors</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">q</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BigNumRef</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
@@ -1146,10 +1049,7 @@
     }
 
     <span class="doccomment">/// Returns a reference to the first exponent used for CRT calculations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`RSA_get0_crt_params`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_get0_crt_params`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_get0_key.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_get0_crt_params</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dmp1</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BigNumRef</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dp</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
@@ -1159,10 +1059,7 @@
     }
 
     <span class="doccomment">/// Returns a reference to the second exponent used for CRT calculations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`RSA_get0_crt_params`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_get0_crt_params`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_get0_key.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_get0_crt_params</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dmq1</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BigNumRef</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dq</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
@@ -1172,10 +1069,7 @@
     }
 
     <span class="doccomment">/// Returns a reference to the coefficient used for CRT calculations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`RSA_get0_crt_params`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_get0_crt_params`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_get0_key.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_get0_crt_params</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iqmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BigNumRef</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">qi</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
@@ -1185,10 +1079,7 @@
     }
 
     <span class="doccomment">/// Validates RSA parameters for correctness</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`RSA_check_key`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_check_key`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_check_key.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_check_key</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">ffi::RSA_check_key</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="ident">i32</span>;
@@ -1209,20 +1100,14 @@
         <span class="doccomment">/// Serializes the public key into a PEM-encoded SubjectPublicKeyInfo structure.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The output will have a header of `-----BEGIN PUBLIC KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_write_bio_RSA_PUBKEY`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_write_bio_RSA_PUBKEY`]: https://www.openssl.org/docs/man1.0.2/crypto/pem.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_write_bio_RSA_PUBKEY</span>)]</span>
         <span class="ident">public_key_to_pem</span>,
         <span class="ident">ffi::PEM_write_bio_RSA_PUBKEY</span>
     }
 
     <span class="macro">to_der!</span> {
         <span class="doccomment">/// Serializes the public key into a DER-encoded SubjectPublicKeyInfo structure.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`i2d_RSA_PUBKEY`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`i2d_RSA_PUBKEY`]: https://www.openssl.org/docs/man1.1.0/crypto/i2d_RSA_PUBKEY.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">i2d_RSA_PUBKEY</span>)]</span>
         <span class="ident">public_key_to_der</span>,
         <span class="ident">ffi::i2d_RSA_PUBKEY</span>
     }
@@ -1231,29 +1116,20 @@
         <span class="doccomment">/// Serializes the public key into a PEM-encoded PKCS#1 RSAPublicKey structure.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The output will have a header of `-----BEGIN RSA PUBLIC KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_write_bio_RSAPublicKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_write_bio_RSAPublicKey`]: https://www.openssl.org/docs/man1.0.2/crypto/pem.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_write_bio_RSAPublicKey</span>)]</span>
         <span class="ident">public_key_to_pem_pkcs1</span>,
         <span class="ident">ffi::PEM_write_bio_RSAPublicKey</span>
     }
 
     <span class="macro">to_der!</span> {
         <span class="doccomment">/// Serializes the public key into a DER-encoded PKCS#1 RSAPublicKey structure.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`i2d_RSAPublicKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`i2d_RSAPublicKey`]: https://www.openssl.org/docs/man1.0.2/crypto/i2d_RSAPublicKey.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">i2d_RSAPublicKey</span>)]</span>
         <span class="ident">public_key_to_der_pkcs1</span>,
         <span class="ident">ffi::i2d_RSAPublicKey</span>
     }
 
     <span class="doccomment">/// Returns the size of the modulus in bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`RSA_size`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_size`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_size.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_size</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">unsafe</span> { <span class="ident">ffi::RSA_size</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="ident">u32</span> }
     }
@@ -1263,6 +1139,7 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if `to` is smaller than `self.size()`.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_public_decrypt</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_decrypt</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">from</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
@@ -1289,6 +1166,7 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if `to` is smaller than `self.size()`.</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_public_encrypt</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_encrypt</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">from</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
@@ -1311,10 +1189,7 @@
     }
 
     <span class="doccomment">/// Returns a reference to the modulus of the key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`RSA_get0_key`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_get0_key`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_get0_key.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_get0_key</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
@@ -1324,10 +1199,7 @@
     }
 
     <span class="doccomment">/// Returns a reference to the public exponent of the key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`RSA_get0_key`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_get0_key`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_get0_key.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_get0_key</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">e</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
@@ -1345,8 +1217,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This corresponds to [`RSA_new`] and uses [`RSA_set0_key`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_new`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_new.html</span>
-    <span class="doccomment">/// [`RSA_set0_key`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_set0_key.html</span>
+    <span class="doccomment">/// [`RSA_new`]: https://www.openssl.org/docs/manmaster/crypto/RSA_new.html</span>
+    <span class="doccomment">/// [`RSA_set0_key`]: https://www.openssl.org/docs/manmaster/crypto/RSA_set0_key.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_public_components</span>(<span class="ident">n</span>: <span class="ident">BigNum</span>, <span class="ident">e</span>: <span class="ident">BigNum</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rsa</span><span class="op">&lt;</span><span class="ident">Public</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">rsa</span> <span class="op">=</span> <span class="ident">cvt_p</span>(<span class="ident">ffi::RSA_new</span>())<span class="question-mark">?</span>;
@@ -1360,10 +1232,7 @@
         <span class="doccomment">/// Decodes a PEM-encoded SubjectPublicKeyInfo structure containing an RSA key.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The input should have a header of `-----BEGIN PUBLIC KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_read_bio_RSA_PUBKEY`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_read_bio_RSA_PUBKEY`]: https://www.openssl.org/docs/man1.0.2/crypto/PEM_read_bio_RSA_PUBKEY.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_read_bio_RSA_PUBKEY</span>)]</span>
         <span class="ident">public_key_from_pem</span>,
         <span class="ident">Rsa</span><span class="op">&lt;</span><span class="ident">Public</span><span class="op">&gt;</span>,
         <span class="ident">ffi::PEM_read_bio_RSA_PUBKEY</span>
@@ -1373,10 +1242,7 @@
         <span class="doccomment">/// Decodes a PEM-encoded PKCS#1 RSAPublicKey structure.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The input should have a header of `-----BEGIN RSA PUBLIC KEY-----`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_read_bio_RSAPublicKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_read_bio_RSAPublicKey`]: https://www.openssl.org/docs/man1.0.2/crypto/PEM_read_bio_RSAPublicKey.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_read_bio_RSAPublicKey</span>)]</span>
         <span class="ident">public_key_from_pem_pkcs1</span>,
         <span class="ident">Rsa</span><span class="op">&lt;</span><span class="ident">Public</span><span class="op">&gt;</span>,
         <span class="ident">ffi::PEM_read_bio_RSAPublicKey</span>
@@ -1384,10 +1250,7 @@
 
     <span class="macro">from_der!</span> {
         <span class="doccomment">/// Decodes a DER-encoded SubjectPublicKeyInfo structure containing an RSA key.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`d2i_RSA_PUBKEY`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`d2i_RSA_PUBKEY`]: https://www.openssl.org/docs/man1.0.2/crypto/d2i_RSA_PUBKEY.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">d2i_RSA_PUBKEY</span>)]</span>
         <span class="ident">public_key_from_der</span>,
         <span class="ident">Rsa</span><span class="op">&lt;</span><span class="ident">Public</span><span class="op">&gt;</span>,
         <span class="ident">ffi::d2i_RSA_PUBKEY</span>
@@ -1395,10 +1258,7 @@
 
     <span class="macro">from_der!</span> {
         <span class="doccomment">/// Decodes a DER-encoded PKCS#1 RSAPublicKey structure.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`d2i_RSAPublicKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`d2i_RSAPublicKey`]: https://www.openssl.org/docs/man1.0.2/crypto/d2i_RSA_PUBKEY.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">d2i_RSAPublicKey</span>)]</span>
         <span class="ident">public_key_from_der_pkcs1</span>,
         <span class="ident">Rsa</span><span class="op">&lt;</span><span class="ident">Public</span><span class="op">&gt;</span>,
         <span class="ident">ffi::d2i_RSAPublicKey</span>
@@ -1417,8 +1277,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This corresponds to [`RSA_new`] and uses [`RSA_set0_key`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_new`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_new.html</span>
-    <span class="doccomment">/// [`RSA_set0_key`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_set0_key.html</span>
+    <span class="doccomment">/// [`RSA_new`]: https://www.openssl.org/docs/manmaster/crypto/RSA_new.html</span>
+    <span class="doccomment">/// [`RSA_set0_key`]: https://www.openssl.org/docs/manmaster/crypto/RSA_set0_key.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">n</span>: <span class="ident">BigNum</span>, <span class="ident">e</span>: <span class="ident">BigNum</span>, <span class="ident">d</span>: <span class="ident">BigNum</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RsaPrivateKeyBuilder</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">rsa</span> <span class="op">=</span> <span class="ident">cvt_p</span>(<span class="ident">ffi::RSA_new</span>())<span class="question-mark">?</span>;
@@ -1433,10 +1293,7 @@
     <span class="doccomment">/// Sets the factors of the Rsa key.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `p` and `q` are the first and second factors of `n`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This correspond to [`RSA_set0_factors`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_set0_factors`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_set0_factors.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_set0_factors</span>)]</span>
     <span class="comment">// FIXME should be infallible</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_factors</span>(<span class="self">self</span>, <span class="ident">p</span>: <span class="ident">BigNum</span>, <span class="ident">q</span>: <span class="ident">BigNum</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RsaPrivateKeyBuilder</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
@@ -1450,10 +1307,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// `dmp1`, `dmq1`, and `iqmp` are the exponents and coefficient for</span>
     <span class="doccomment">/// CRT calculations which is used to speed up RSA operations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This correspond to [`RSA_set0_crt_params`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_set0_crt_params`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_set0_crt_params.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_set0_crt_params</span>)]</span>
     <span class="comment">// FIXME should be infallible</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_crt_params</span>(
         <span class="self">self</span>,
@@ -1504,10 +1358,7 @@
     <span class="doccomment">/// Generates a public/private key pair with the specified size.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The public exponent will be 65537.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`RSA_generate_key_ex`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_generate_key_ex`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_generate_key_ex.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_generate_key_ex</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate</span>(<span class="ident">bits</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rsa</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">BigNum::from_u32</span>(<span class="ident">ffi::RSA_F4</span> <span class="kw">as</span> <span class="ident">u32</span>)<span class="question-mark">?</span>;
         <span class="ident">Rsa::generate_with_e</span>(<span class="ident">bits</span>, <span class="kw-2">&amp;</span><span class="ident">e</span>)
@@ -1516,10 +1367,7 @@
     <span class="doccomment">/// Generates a public/private key pair with the specified size and a custom exponent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Unless you have specific needs and know what you&#39;re doing, use `Rsa::generate` instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This corresponds to [`RSA_generate_key_ex`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RSA_generate_key_ex`]: https://www.openssl.org/docs/man1.1.0/crypto/RSA_generate_key_ex.html</span>
+    <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">RSA_generate_key_ex</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_with_e</span>(<span class="ident">bits</span>: <span class="ident">u32</span>, <span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rsa</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">rsa</span> <span class="op">=</span> <span class="ident">Rsa::from_ptr</span>(<span class="ident">cvt_p</span>(<span class="ident">ffi::RSA_new</span>())<span class="question-mark">?</span>);
@@ -1536,26 +1384,17 @@
     <span class="comment">// FIXME these need to identify input formats</span>
     <span class="macro">private_key_from_pem!</span> {
         <span class="doccomment">/// Deserializes a private key from a PEM-encoded PKCS#1 RSAPrivateKey structure.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_read_bio_RSAPrivateKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_read_bio_RSAPrivateKey`]: https://www.openssl.org/docs/man1.1.0/crypto/PEM_read_bio_RSAPrivateKey.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_read_bio_RSAPrivateKey</span>)]</span>
         <span class="ident">private_key_from_pem</span>,
 
         <span class="doccomment">/// Deserializes a private key from a PEM-encoded encrypted PKCS#1 RSAPrivateKey structure.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_read_bio_RSAPrivateKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_read_bio_RSAPrivateKey`]: https://www.openssl.org/docs/man1.1.0/crypto/PEM_read_bio_RSAPrivateKey.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_read_bio_RSAPrivateKey</span>)]</span>
         <span class="ident">private_key_from_pem_passphrase</span>,
 
         <span class="doccomment">/// Deserializes a private key from a PEM-encoded encrypted PKCS#1 RSAPrivateKey structure.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The callback should fill the password into the provided buffer and return its length.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`PEM_read_bio_RSAPrivateKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`PEM_read_bio_RSAPrivateKey`]: https://www.openssl.org/docs/man1.1.0/crypto/PEM_read_bio_RSAPrivateKey.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">PEM_read_bio_RSAPrivateKey</span>)]</span>
         <span class="ident">private_key_from_pem_callback</span>,
         <span class="ident">Rsa</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span>,
         <span class="ident">ffi::PEM_read_bio_RSAPrivateKey</span>
@@ -1563,10 +1402,7 @@
 
     <span class="macro">from_der!</span> {
         <span class="doccomment">/// Decodes a DER-encoded PKCS#1 RSAPrivateKey structure.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This corresponds to [`d2i_RSAPrivateKey`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`d2i_RSAPrivateKey`]: https://www.openssl.org/docs/man1.0.2/crypto/d2i_RSA_PUBKEY.html</span>
+        <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">d2i_RSAPrivateKey</span>)]</span>
         <span class="ident">private_key_from_der</span>,
         <span class="ident">Rsa</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span>,
         <span class="ident">ffi::d2i_RSAPrivateKey</span>

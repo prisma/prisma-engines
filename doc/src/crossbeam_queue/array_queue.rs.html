@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-queue-0.3.4/src/array_queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>array_queue.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-queue-0.3.5/src/array_queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>array_queue.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_queue/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -468,6 +468,63 @@
 <span id="463">463</span>
 <span id="464">464</span>
 <span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The implementation is based on Dmitry Vyukov&#39;s bounded MPMC queue.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Source:</span>
@@ -497,9 +554,11 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This queue allocates a fixed-capacity buffer on construction, which is used to store pushed</span>
 <span class="doccomment">/// elements. The queue cannot hold more elements than the buffer allows. Attempting to push an</span>
-<span class="doccomment">/// element into a full queue will fail. Having a buffer allocated upfront makes this queue a bit</span>
-<span class="doccomment">/// faster than [`SegQueue`].</span>
+<span class="doccomment">/// element into a full queue will fail. Alternatively, [`force_push`] makes it possible for</span>
+<span class="doccomment">/// this queue to be used as a ring-buffer. Having a buffer allocated upfront makes this queue</span>
+<span class="doccomment">/// a bit faster than [`SegQueue`].</span>
 <span class="doccomment">///</span>
+<span class="doccomment">/// [`force_push`]: ArrayQueue::force_push</span>
 <span class="doccomment">/// [`SegQueue`]: super::SegQueue</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
@@ -590,21 +649,10 @@
         }
     }
 
-    <span class="doccomment">/// Attempts to push an element into the queue.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the queue is full, the element is returned back as an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::ArrayQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = ArrayQueue::new(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(q.push(10), Ok(()));</span>
-    <span class="doccomment">/// assert_eq!(q.push(20), Err(20));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">push_or_else</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">T</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">T</span>, <span class="ident">usize</span>, <span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+    {
         <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
 
@@ -613,6 +661,16 @@
             <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
             <span class="kw">let</span> <span class="ident">lap</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
 
+            <span class="kw">let</span> <span class="ident">new_tail</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">cap</span> {
+                <span class="comment">// Same lap, incremented index.</span>
+                <span class="comment">// Set to `{ lap: lap, index: index + 1 }`.</span>
+                <span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span>
+            } <span class="kw">else</span> {
+                <span class="comment">// One lap forward, index wraps around to zero.</span>
+                <span class="comment">// Set to `{ lap: lap.wrapping_add(1), index: 0 }`.</span>
+                <span class="ident">lap</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>)
+            };
+
             <span class="comment">// Inspect the corresponding slot.</span>
             <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>());
             <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">get_unchecked</span>(<span class="ident">index</span>) };
@@ -620,16 +678,6 @@
 
             <span class="comment">// If the tail and the stamp match, we may attempt to push.</span>
             <span class="kw">if</span> <span class="ident">tail</span> <span class="op">==</span> <span class="ident">stamp</span> {
-                <span class="kw">let</span> <span class="ident">new_tail</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">cap</span> {
-                    <span class="comment">// Same lap, incremented index.</span>
-                    <span class="comment">// Set to `{ lap: lap, index: index + 1 }`.</span>
-                    <span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span>
-                } <span class="kw">else</span> {
-                    <span class="comment">// One lap forward, index wraps around to zero.</span>
-                    <span class="comment">// Set to `{ lap: lap.wrapping_add(1), index: 0 }`.</span>
-                    <span class="ident">lap</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>)
-                };
-
                 <span class="comment">// Try moving the tail.</span>
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">compare_exchange_weak</span>(
                     <span class="ident">tail</span>,
@@ -652,14 +700,7 @@
                 }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">stamp</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">==</span> <span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span> {
                 <span class="ident">atomic::fence</span>(<span class="ident">Ordering::SeqCst</span>);
-                <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-
-                <span class="comment">// If the head lags one lap behind the tail as well...</span>
-                <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">==</span> <span class="ident">tail</span> {
-                    <span class="comment">// ...then the queue is full.</span>
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">value</span>);
-                }
-
+                <span class="ident">value</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">value</span>, <span class="ident">tail</span>, <span class="ident">new_tail</span>, <span class="ident">slot</span>)<span class="question-mark">?</span>;
                 <span class="ident">backoff</span>.<span class="ident">spin</span>();
                 <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
             } <span class="kw">else</span> {
@@ -668,6 +709,79 @@
                 <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
             }
         }
+    }
+
+    <span class="doccomment">/// Attempts to push an element into the queue.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the queue is full, the element is returned back as an error.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use crossbeam_queue::ArrayQueue;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let q = ArrayQueue::new(1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(q.push(10), Ok(()));</span>
+    <span class="doccomment">/// assert_eq!(q.push(20), Err(20));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">push_or_else</span>(<span class="ident">value</span>, <span class="op">|</span><span class="ident">v</span>, <span class="ident">tail</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+
+            <span class="comment">// If the head lags one lap behind the tail as well...</span>
+            <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">==</span> <span class="ident">tail</span> {
+                <span class="comment">// ...then the queue is full.</span>
+                <span class="prelude-val">Err</span>(<span class="ident">v</span>)
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">v</span>)
+            }
+        })
+    }
+
+    <span class="doccomment">/// Pushes an element into the queue, replacing the oldest element if necessary.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the queue is full, the oldest element is replaced and returned,</span>
+    <span class="doccomment">/// otherwise `None` is returned.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use crossbeam_queue::ArrayQueue;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let q = ArrayQueue::new(2);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(q.force_push(10), None);</span>
+    <span class="doccomment">/// assert_eq!(q.force_push(20), None);</span>
+    <span class="doccomment">/// assert_eq!(q.force_push(30), Some(10));</span>
+    <span class="doccomment">/// assert_eq!(q.pop(), Some(20));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force_push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">push_or_else</span>(<span class="ident">value</span>, <span class="op">|</span><span class="ident">v</span>, <span class="ident">tail</span>, <span class="ident">new_tail</span>, <span class="ident">slot</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">one_lap</span>);
+            <span class="kw">let</span> <span class="ident">new_head</span> <span class="op">=</span> <span class="ident">new_tail</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">one_lap</span>);
+
+            <span class="comment">// Try moving the head.</span>
+            <span class="kw">if</span> <span class="self">self</span>
+                .<span class="ident">head</span>
+                .<span class="ident">compare_exchange_weak</span>(<span class="ident">head</span>, <span class="ident">new_head</span>, <span class="ident">Ordering::SeqCst</span>, <span class="ident">Ordering::Relaxed</span>)
+                .<span class="ident">is_ok</span>()
+            {
+                <span class="comment">// Move the tail.</span>
+                <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">store</span>(<span class="ident">new_tail</span>, <span class="ident">Ordering::SeqCst</span>);
+
+                <span class="comment">// Swap the previous value.</span>
+                <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>().<span class="ident">replace</span>(<span class="ident">MaybeUninit::new</span>(<span class="ident">v</span>)).<span class="ident">assume_init</span>() };
+
+                <span class="comment">// Update the stamp.</span>
+                <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">store</span>(<span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">Ordering::Release</span>);
+
+                <span class="prelude-val">Err</span>(<span class="ident">old</span>)
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">v</span>)
+            }
+        })
+        .<span class="ident">err</span>()
     }
 
     <span class="doccomment">/// Attempts to pop an element from the queue.</span>

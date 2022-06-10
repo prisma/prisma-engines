@@ -4,7 +4,7 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
         </a><div class="sidebar-elems"><h2 class="location"><a href="index.html">In tokio</a></h2><div id="sidebar-vars" data-name="main" data-ty="attr" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../tokio/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Attribute Macro <a href="index.html">tokio</a>::<wbr><a class="attr" href="#">main</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/tokio_macros/lib.rs.html#179">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><pre class="rust attr"><code>#[main]</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Marks async function to be executed by the selected runtime. This macro
+    <h1 class="fqn"><span class="in-band">Attribute Macro <a href="index.html">tokio</a>::<wbr><a class="attr" href="#">main</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/tokio_macros/lib.rs.html#199">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><pre class="rust attr"><code>#[main]</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Marks async function to be executed by the selected runtime. This macro
 helps set up a <code>Runtime</code> without requiring the user to use
 <a href="../tokio/runtime/struct.Runtime.html">Runtime</a> or
 <a href="../tokio/runtime/struct.Builder.html">Builder</a> directly.</p>
@@ -102,10 +102,25 @@ the macro can be configured using</p>
         })
 }</code></pre></div>
 <p>Note that <code>start_paused</code> requires the <code>test-util</code> feature to be enabled.</p>
-<h4 id="note"><a href="#note">NOTE:</a></h4>
-<p>If you rename the Tokio crate in your dependencies this macro will not work.
-If you must rename the current version of Tokio because you’re also using an
-older version of Tokio, you <em>must</em> make the current version of Tokio
-available as <code>tokio</code> in the module where this macro is expanded.</p>
+<h4 id="rename-package"><a href="#rename-package">Rename package</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio</span> <span class="kw">as</span> <span class="ident">tokio1</span>;
+
+<span class="attribute">#[<span class="ident">tokio1::main</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;tokio1&quot;</span>)]</span>
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+    <span class="macro">println!</span>(<span class="string">&quot;Hello world&quot;</span>);
+}</code></pre></div>
+<p>Equivalent code not using <code>#[tokio::main]</code></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio</span> <span class="kw">as</span> <span class="ident">tokio1</span>;
+
+<span class="kw">fn</span> <span class="ident">main</span>() {
+    <span class="ident">tokio1::runtime::Builder::new_multi_thread</span>()
+        .<span class="ident">enable_all</span>()
+        .<span class="ident">build</span>()
+        .<span class="ident">unwrap</span>()
+        .<span class="ident">block_on</span>(<span class="kw">async</span> {
+            <span class="macro">println!</span>(<span class="string">&quot;Hello world&quot;</span>);
+        })
+}</code></pre></div>
 </div></details></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
 </body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.15.0/src/sync/watch.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>watch.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/sync/watch.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>watch.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -744,6 +744,238 @@
 <span id="739">739</span>
 <span id="740">740</span>
 <span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
+<span id="971">971</span>
+<span id="972">972</span>
+<span id="973">973</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>), <span class="ident">allow</span>(<span class="ident">dead_code</span>, <span class="ident">unreachable_pub</span>))]</span>
 
 <span class="doccomment">//! A single-producer, multi-consumer channel that only retains the *last* sent</span>
@@ -806,6 +1038,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span>, <span class="ident">RwLockReadGuard</span>};
 <span class="kw">use</span> <span class="ident">std::mem</span>;
 <span class="kw">use</span> <span class="ident">std::ops</span>;
+<span class="kw">use</span> <span class="ident">std::panic</span>;
 
 <span class="doccomment">/// Receives values from the associated [`Sender`](struct@Sender).</span>
 <span class="doccomment">///</span>
@@ -837,6 +1070,23 @@
 <span class="doccomment">/// Outstanding borrows hold a read lock on the inner value. This means that</span>
 <span class="doccomment">/// long lived borrows could cause the produce half to block. It is recommended</span>
 <span class="doccomment">/// to keep the borrow as short lived as possible.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The priority policy of the lock is dependent on the underlying lock</span>
+<span class="doccomment">/// implementation, and this type does not guarantee that any particular policy</span>
+<span class="doccomment">/// will be used. In particular, a producer which is waiting to acquire the lock</span>
+<span class="doccomment">/// in `send` might or might not block concurrent calls to `borrow`, e.g.:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// &lt;details&gt;&lt;summary&gt;Potential deadlock example&lt;/summary&gt;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```text</span>
+<span class="doccomment">/// // Task 1 (on thread A)    |  // Task 2 (on thread B)</span>
+<span class="doccomment">/// let _ref1 = rx.borrow();   |</span>
+<span class="doccomment">///                            |  // will block</span>
+<span class="doccomment">///                            |  let _ = tx.send(());</span>
+<span class="doccomment">/// // may deadlock            |</span>
+<span class="doccomment">/// let _ref2 = rx.borrow();   |</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// &lt;/details&gt;</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">inner</span>: <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>,
@@ -883,7 +1133,7 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">SendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
 
     <span class="doccomment">/// Error produced when receiving a change notification.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RecvError</span>(<span class="kw">pub</span>(<span class="kw">super</span>) ());
 
     <span class="comment">// ===== impl RecvError =====</span>
@@ -1031,6 +1281,23 @@
     <span class="doccomment">/// could cause the send half to block. It is recommended to keep the borrow</span>
     <span class="doccomment">/// as short lived as possible.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// The priority policy of the lock is dependent on the underlying lock</span>
+    <span class="doccomment">/// implementation, and this type does not guarantee that any particular policy</span>
+    <span class="doccomment">/// will be used. In particular, a producer which is waiting to acquire the lock</span>
+    <span class="doccomment">/// in `send` might or might not block concurrent calls to `borrow`, e.g.:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &lt;details&gt;&lt;summary&gt;Potential deadlock example&lt;/summary&gt;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```text</span>
+    <span class="doccomment">/// // Task 1 (on thread A)    |  // Task 2 (on thread B)</span>
+    <span class="doccomment">/// let _ref1 = rx.borrow();   |</span>
+    <span class="doccomment">///                            |  // will block</span>
+    <span class="doccomment">///                            |  let _ = tx.send(());</span>
+    <span class="doccomment">/// // may deadlock            |</span>
+    <span class="doccomment">/// let _ref2 = rx.borrow();   |</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// &lt;/details&gt;</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// [`changed`]: Receiver::changed</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -1057,11 +1324,70 @@
     <span class="doccomment">/// could cause the send half to block. It is recommended to keep the borrow</span>
     <span class="doccomment">/// as short lived as possible.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// The priority policy of the lock is dependent on the underlying lock</span>
+    <span class="doccomment">/// implementation, and this type does not guarantee that any particular policy</span>
+    <span class="doccomment">/// will be used. In particular, a producer which is waiting to acquire the lock</span>
+    <span class="doccomment">/// in `send` might or might not block concurrent calls to `borrow`, e.g.:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &lt;details&gt;&lt;summary&gt;Potential deadlock example&lt;/summary&gt;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```text</span>
+    <span class="doccomment">/// // Task 1 (on thread A)                |  // Task 2 (on thread B)</span>
+    <span class="doccomment">/// let _ref1 = rx1.borrow_and_update();   |</span>
+    <span class="doccomment">///                                        |  // will block</span>
+    <span class="doccomment">///                                        |  let _ = tx.send(());</span>
+    <span class="doccomment">/// // may deadlock                        |</span>
+    <span class="doccomment">/// let _ref2 = rx2.borrow_and_update();   |</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// &lt;/details&gt;</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// [`changed`]: Receiver::changed</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">borrow_and_update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">value</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>();
         <span class="self">self</span>.<span class="ident">version</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">state</span>.<span class="ident">load</span>().<span class="ident">version</span>();
         <span class="ident">Ref</span> { <span class="ident">inner</span> }
+    }
+
+    <span class="doccomment">/// Checks if this channel contains a message that this receiver has not yet</span>
+    <span class="doccomment">/// seen. The new value is not marked as seen.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Although this method is called `has_changed`, it does not check new</span>
+    <span class="doccomment">/// messages for equality, so this call will return true even if the new</span>
+    <span class="doccomment">/// message is equal to the old message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns an error if the channel has been closed.</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use tokio::sync::watch;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// #[tokio::main]</span>
+    <span class="doccomment">/// async fn main() {</span>
+    <span class="doccomment">///     let (tx, mut rx) = watch::channel(&quot;hello&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     tx.send(&quot;goodbye&quot;).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     assert!(rx.has_changed().unwrap());</span>
+    <span class="doccomment">///     assert_eq!(*rx.borrow_and_update(), &quot;goodbye&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     // The value has been marked as seen</span>
+    <span class="doccomment">///     assert!(!rx.has_changed().unwrap());</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     drop(tx);</span>
+    <span class="doccomment">///     // The `tx` handle has been dropped</span>
+    <span class="doccomment">///     assert!(rx.has_changed().is_err());</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">error::RecvError</span><span class="op">&gt;</span> {
+        <span class="comment">// Load the version from the state</span>
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">state</span>.<span class="ident">load</span>();
+        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_closed</span>() {
+            <span class="comment">// The sender has dropped.</span>
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::RecvError</span>(()));
+        }
+        <span class="kw">let</span> <span class="ident">new_version</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">version</span>();
+
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="ident">new_version</span>)
     }
 
     <span class="doccomment">/// Waits for a change notification, then marks the newest value as seen.</span>
@@ -1117,6 +1443,22 @@
             <span class="ident">notified</span>.<span class="kw">await</span>;
             <span class="comment">// loop around again in case the wake-up was spurious</span>
         }
+    }
+
+    <span class="doccomment">/// Returns `true` if receivers belong to the same channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// let (tx, rx) = tokio::sync::watch::channel(true);</span>
+    <span class="doccomment">/// let rx2 = rx.clone();</span>
+    <span class="doccomment">/// assert!(rx.same_channel(&amp;rx2));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (tx3, rx3) = tokio::sync::watch::channel(true);</span>
+    <span class="doccomment">/// assert!(!rx3.same_channel(&amp;rx2));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">same_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">Arc::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">shared</span>)
     }
 
     <span class="macro">cfg_process_driver!</span> {
@@ -1183,6 +1525,145 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="doccomment">/// Modifies the watched value **unconditionally** in-place,</span>
+    <span class="doccomment">/// notifying all receivers.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This can useful for modifying the watched value, without</span>
+    <span class="doccomment">/// having to allocate a new instance. Additionally, this</span>
+    <span class="doccomment">/// method permits sending values even when there are no receivers.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Prefer to use the more versatile function [`Self::send_if_modified()`]</span>
+    <span class="doccomment">/// if the value is only modified conditionally during the mutable borrow</span>
+    <span class="doccomment">/// to prevent unneeded change notifications for unmodified values.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function panics when the invocation of the `modify` closure panics.</span>
+    <span class="doccomment">/// No receivers are notified when panicking. All changes of the watched</span>
+    <span class="doccomment">/// value applied by the closure before panicking will be visible in</span>
+    <span class="doccomment">/// subsequent calls to `borrow`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use tokio::sync::watch;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// struct State {</span>
+    <span class="doccomment">///     counter: usize,</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// let (state_tx, state_rx) = watch::channel(State { counter: 0 });</span>
+    <span class="doccomment">/// state_tx.send_modify(|state| state.counter += 1);</span>
+    <span class="doccomment">/// assert_eq!(state_rx.borrow().counter, 1);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_modify</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">modify</span>: <span class="ident">F</span>)
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>),
+    {
+        <span class="self">self</span>.<span class="ident">send_if_modified</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
+            <span class="ident">modify</span>(<span class="ident">value</span>);
+            <span class="bool-val">true</span>
+        });
+    }
+
+    <span class="doccomment">/// Modifies the watched value **conditionally** in-place,</span>
+    <span class="doccomment">/// notifying all receivers only if modified.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This can useful for modifying the watched value, without</span>
+    <span class="doccomment">/// having to allocate a new instance. Additionally, this</span>
+    <span class="doccomment">/// method permits sending values even when there are no receivers.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `modify` closure must return `true` if the value has actually</span>
+    <span class="doccomment">/// been modified during the mutable borrow. It should only return `false`</span>
+    <span class="doccomment">/// if the value is guaranteed to be unnmodified despite the mutable</span>
+    <span class="doccomment">/// borrow.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Receivers are only notified if the closure returned `true`. If the</span>
+    <span class="doccomment">/// closure has modified the value but returned `false` this results</span>
+    <span class="doccomment">/// in a *silent modification*, i.e. the modified value will be visible</span>
+    <span class="doccomment">/// in subsequent calls to `borrow`, but receivers will not receive</span>
+    <span class="doccomment">/// a change notification.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns the result of the closure, i.e. `true` if the value has</span>
+    <span class="doccomment">/// been modified and `false` otherwise.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function panics when the invocation of the `modify` closure panics.</span>
+    <span class="doccomment">/// No receivers are notified when panicking. All changes of the watched</span>
+    <span class="doccomment">/// value applied by the closure before panicking will be visible in</span>
+    <span class="doccomment">/// subsequent calls to `borrow`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use tokio::sync::watch;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// struct State {</span>
+    <span class="doccomment">///     counter: usize,</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// let (state_tx, mut state_rx) = watch::channel(State { counter: 1 });</span>
+    <span class="doccomment">/// let inc_counter_if_odd = |state: &amp;mut State| {</span>
+    <span class="doccomment">///     if state.counter % 2 == 1 {</span>
+    <span class="doccomment">///         state.counter += 1;</span>
+    <span class="doccomment">///         return true;</span>
+    <span class="doccomment">///     }</span>
+    <span class="doccomment">///     false</span>
+    <span class="doccomment">/// };</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(state_rx.borrow().counter, 1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(!state_rx.has_changed().unwrap());</span>
+    <span class="doccomment">/// assert!(state_tx.send_if_modified(inc_counter_if_odd));</span>
+    <span class="doccomment">/// assert!(state_rx.has_changed().unwrap());</span>
+    <span class="doccomment">/// assert_eq!(state_rx.borrow_and_update().counter, 2);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(!state_rx.has_changed().unwrap());</span>
+    <span class="doccomment">/// assert!(!state_tx.send_if_modified(inc_counter_if_odd));</span>
+    <span class="doccomment">/// assert!(!state_rx.has_changed().unwrap());</span>
+    <span class="doccomment">/// assert_eq!(state_rx.borrow_and_update().counter, 2);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_if_modified</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">modify</span>: <span class="ident">F</span>) -&gt; <span class="ident">bool</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">bool</span>,
+    {
+        {
+            <span class="comment">// Acquire the write lock and update the value.</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">value</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>();
+
+            <span class="comment">// Update the value and catch possible panic inside func.</span>
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">modify</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lock</span>)));
+            <span class="kw">match</span> <span class="ident">result</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">modified</span>) =&gt; {
+                    <span class="kw">if</span> <span class="op">!</span><span class="ident">modified</span> {
+                        <span class="comment">// Abort, i.e. don&#39;t notify receivers if unmodified</span>
+                        <span class="kw">return</span> <span class="bool-val">false</span>;
+                    }
+                    <span class="comment">// Continue if modified</span>
+                }
+                <span class="prelude-val">Err</span>(<span class="ident">panicked</span>) =&gt; {
+                    <span class="comment">// Drop the lock to avoid poisoning it.</span>
+                    <span class="ident">drop</span>(<span class="ident">lock</span>);
+                    <span class="comment">// Forward the panic to the caller.</span>
+                    <span class="ident">panic::resume_unwind</span>(<span class="ident">panicked</span>);
+                    <span class="comment">// Unreachable</span>
+                }
+            };
+
+            <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">state</span>.<span class="ident">increment_version</span>();
+
+            <span class="comment">// Release the write lock.</span>
+            <span class="comment">//</span>
+            <span class="comment">// Incrementing the version counter while holding the lock ensures</span>
+            <span class="comment">// that receivers are able to figure out the version number of the</span>
+            <span class="comment">// value they are currently looking at.</span>
+            <span class="ident">drop</span>(<span class="ident">lock</span>);
+        }
+
+        <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">notify_rx</span>.<span class="ident">notify_waiters</span>();
+
+        <span class="bool-val">true</span>
+    }
+
     <span class="doccomment">/// Sends a new value via the channel, notifying all receivers and returning</span>
     <span class="doccomment">/// the previous value in the channel.</span>
     <span class="doccomment">///</span>
@@ -1199,28 +1680,11 @@
     <span class="doccomment">/// assert_eq!(tx.send_replace(2), 1);</span>
     <span class="doccomment">/// assert_eq!(tx.send_replace(3), 2);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_replace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="ident">T</span> {
-        <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> {
-            <span class="comment">// Acquire the write lock and update the value.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">value</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">lock</span>, <span class="ident">value</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_replace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="ident">T</span> {
+        <span class="comment">// swap old watched value with the new one</span>
+        <span class="self">self</span>.<span class="ident">send_modify</span>(<span class="op">|</span><span class="ident">old</span><span class="op">|</span> <span class="ident">mem::swap</span>(<span class="ident">old</span>, <span class="kw-2">&amp;mut</span> <span class="ident">value</span>));
 
-            <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">state</span>.<span class="ident">increment_version</span>();
-
-            <span class="comment">// Release the write lock.</span>
-            <span class="comment">//</span>
-            <span class="comment">// Incrementing the version counter while holding the lock ensures</span>
-            <span class="comment">// that receivers are able to figure out the version number of the</span>
-            <span class="comment">// value they are currently looking at.</span>
-            <span class="ident">drop</span>(<span class="ident">lock</span>);
-
-            <span class="ident">old</span>
-        };
-
-        <span class="comment">// Notify all watchers</span>
-        <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">notify_rx</span>.<span class="ident">notify_waiters</span>();
-
-        <span class="ident">old</span>
+        <span class="ident">value</span>
     }
 
     <span class="doccomment">/// Returns a reference to the most recently sent value</span>

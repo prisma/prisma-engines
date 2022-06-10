@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gimli-0.24.0/src/read/cfi.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cfi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gimli-0.26.1/src/read/cfi.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cfi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../gimli/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -7307,18 +7307,181 @@
 <span id="7302">7302</span>
 <span id="7303">7303</span>
 <span id="7304">7304</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
+<span id="7305">7305</span>
+<span id="7306">7306</span>
+<span id="7307">7307</span>
+<span id="7308">7308</span>
+<span id="7309">7309</span>
+<span id="7310">7310</span>
+<span id="7311">7311</span>
+<span id="7312">7312</span>
+<span id="7313">7313</span>
+<span id="7314">7314</span>
+<span id="7315">7315</span>
+<span id="7316">7316</span>
+<span id="7317">7317</span>
+<span id="7318">7318</span>
+<span id="7319">7319</span>
+<span id="7320">7320</span>
+<span id="7321">7321</span>
+<span id="7322">7322</span>
+<span id="7323">7323</span>
+<span id="7324">7324</span>
+<span id="7325">7325</span>
+<span id="7326">7326</span>
+<span id="7327">7327</span>
+<span id="7328">7328</span>
+<span id="7329">7329</span>
+<span id="7330">7330</span>
+<span id="7331">7331</span>
+<span id="7332">7332</span>
+<span id="7333">7333</span>
+<span id="7334">7334</span>
+<span id="7335">7335</span>
+<span id="7336">7336</span>
+<span id="7337">7337</span>
+<span id="7338">7338</span>
+<span id="7339">7339</span>
+<span id="7340">7340</span>
+<span id="7341">7341</span>
+<span id="7342">7342</span>
+<span id="7343">7343</span>
+<span id="7344">7344</span>
+<span id="7345">7345</span>
+<span id="7346">7346</span>
+<span id="7347">7347</span>
+<span id="7348">7348</span>
+<span id="7349">7349</span>
+<span id="7350">7350</span>
+<span id="7351">7351</span>
+<span id="7352">7352</span>
+<span id="7353">7353</span>
+<span id="7354">7354</span>
+<span id="7355">7355</span>
+<span id="7356">7356</span>
+<span id="7357">7357</span>
+<span id="7358">7358</span>
+<span id="7359">7359</span>
+<span id="7360">7360</span>
+<span id="7361">7361</span>
+<span id="7362">7362</span>
+<span id="7363">7363</span>
+<span id="7364">7364</span>
+<span id="7365">7365</span>
+<span id="7366">7366</span>
+<span id="7367">7367</span>
+<span id="7368">7368</span>
+<span id="7369">7369</span>
+<span id="7370">7370</span>
+<span id="7371">7371</span>
+<span id="7372">7372</span>
+<span id="7373">7373</span>
+<span id="7374">7374</span>
+<span id="7375">7375</span>
+<span id="7376">7376</span>
+<span id="7377">7377</span>
+<span id="7378">7378</span>
+<span id="7379">7379</span>
+<span id="7380">7380</span>
+<span id="7381">7381</span>
+<span id="7382">7382</span>
+<span id="7383">7383</span>
+<span id="7384">7384</span>
+<span id="7385">7385</span>
+<span id="7386">7386</span>
+<span id="7387">7387</span>
+<span id="7388">7388</span>
+<span id="7389">7389</span>
+<span id="7390">7390</span>
+<span id="7391">7391</span>
+<span id="7392">7392</span>
+<span id="7393">7393</span>
+<span id="7394">7394</span>
+<span id="7395">7395</span>
+<span id="7396">7396</span>
+<span id="7397">7397</span>
+<span id="7398">7398</span>
+<span id="7399">7399</span>
+<span id="7400">7400</span>
+<span id="7401">7401</span>
+<span id="7402">7402</span>
+<span id="7403">7403</span>
+<span id="7404">7404</span>
+<span id="7405">7405</span>
+<span id="7406">7406</span>
+<span id="7407">7407</span>
+<span id="7408">7408</span>
+<span id="7409">7409</span>
+<span id="7410">7410</span>
+<span id="7411">7411</span>
+<span id="7412">7412</span>
+<span id="7413">7413</span>
+<span id="7414">7414</span>
+<span id="7415">7415</span>
+<span id="7416">7416</span>
+<span id="7417">7417</span>
+<span id="7418">7418</span>
+<span id="7419">7419</span>
+<span id="7420">7420</span>
+<span id="7421">7421</span>
+<span id="7422">7422</span>
+<span id="7423">7423</span>
+<span id="7424">7424</span>
+<span id="7425">7425</span>
+<span id="7426">7426</span>
+<span id="7427">7427</span>
+<span id="7428">7428</span>
+<span id="7429">7429</span>
+<span id="7430">7430</span>
+<span id="7431">7431</span>
+<span id="7432">7432</span>
+<span id="7433">7433</span>
+<span id="7434">7434</span>
+<span id="7435">7435</span>
+<span id="7436">7436</span>
+<span id="7437">7437</span>
+<span id="7438">7438</span>
+<span id="7439">7439</span>
+<span id="7440">7440</span>
+<span id="7441">7441</span>
+<span id="7442">7442</span>
+<span id="7443">7443</span>
+<span id="7444">7444</span>
+<span id="7445">7445</span>
+<span id="7446">7446</span>
+<span id="7447">7447</span>
+<span id="7448">7448</span>
+<span id="7449">7449</span>
+<span id="7450">7450</span>
+<span id="7451">7451</span>
+<span id="7452">7452</span>
+<span id="7453">7453</span>
+<span id="7454">7454</span>
+<span id="7455">7455</span>
+<span id="7456">7456</span>
+<span id="7457">7457</span>
+<span id="7458">7458</span>
+<span id="7459">7459</span>
+<span id="7460">7460</span>
+<span id="7461">7461</span>
+<span id="7462">7462</span>
+<span id="7463">7463</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+
 <span class="kw">use</span> <span class="ident">core::cmp</span>::{<span class="ident">Ord</span>, <span class="ident">Ordering</span>};
 <span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>};
 <span class="kw">use</span> <span class="ident">core::iter::FromIterator</span>;
-<span class="kw">use</span> <span class="ident">core::mem</span>::{<span class="self">self</span>, <span class="ident">MaybeUninit</span>};
+<span class="kw">use</span> <span class="ident">core::mem</span>;
 <span class="kw">use</span> <span class="ident">core::num::Wrapping</span>;
-<span class="kw">use</span> <span class="ident">core::ptr</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::util</span>::{<span class="ident">ArrayLike</span>, <span class="ident">ArrayVec</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">DebugFrameOffset</span>, <span class="ident">EhFrameOffset</span>, <span class="ident">Encoding</span>, <span class="ident">Format</span>, <span class="ident">Register</span>, <span class="ident">SectionId</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="self">self</span>, <span class="ident">DwEhPe</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endianity::Endianity</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read</span>::{<span class="ident">EndianSlice</span>, <span class="ident">Error</span>, <span class="ident">Expression</span>, <span class="ident">Reader</span>, <span class="ident">ReaderOffset</span>, <span class="prelude-ty">Result</span>, <span class="ident">Section</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read</span>::{
+    <span class="ident">EndianSlice</span>, <span class="ident">Error</span>, <span class="ident">Expression</span>, <span class="ident">Reader</span>, <span class="ident">ReaderOffset</span>, <span class="prelude-ty">Result</span>, <span class="ident">Section</span>, <span class="ident">StoreOnHeap</span>,
+};
 
 <span class="doccomment">/// `DebugFrame` contains the `.debug_frame` section&#39;s frame unwinding</span>
 <span class="doccomment">/// information required to unwind to and recover registers from older frames on</span>
@@ -7678,14 +7841,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// You must provide a function to get the associated CIE. See</span>
     <span class="doccomment">/// `PartialFrameDescriptionEntry::parse` for more information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwind_info_for_address</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwind_info_for_address</span><span class="op">&lt;</span><span class="lifetime">&#39;ctx</span>, <span class="ident">F</span>, <span class="ident">A</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">frame</span>: <span class="kw-2">&amp;</span><span class="ident">EhFrame</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
         <span class="ident">bases</span>: <span class="kw-2">&amp;</span><span class="ident">BaseAddresses</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">UninitializedUnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx</span> <span class="kw-2">mut</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">address</span>: <span class="ident">u64</span>,
         <span class="ident">get_cie</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnMut</span>(
             <span class="kw-2">&amp;</span><span class="ident">EhFrame</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
@@ -7946,7 +8109,7 @@
     <span class="doccomment">/// CFI evaluation fails, the error is returned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use gimli::{BaseAddresses, EhFrame, EndianSlice, NativeEndian, UninitializedUnwindContext,</span>
+    <span class="doccomment">/// use gimli::{BaseAddresses, EhFrame, EndianSlice, NativeEndian, UnwindContext,</span>
     <span class="doccomment">///             UnwindSection};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # fn foo() -&gt; gimli::Result&lt;()&gt; {</span>
@@ -7960,7 +8123,7 @@
     <span class="doccomment">/// let address = get_frame_pc();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // This context is reusable, which cuts down on heap allocations.</span>
-    <span class="doccomment">/// let ctx = UninitializedUnwindContext::new();</span>
+    <span class="doccomment">/// let ctx = UnwindContext::new();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Optionally provide base addresses for any relative pointers. If a</span>
     <span class="doccomment">/// // base address isn&#39;t provided and a pointer is found that is relative to</span>
@@ -7985,13 +8148,13 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unwind_info_for_address</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">fn</span> <span class="ident">unwind_info_for_address</span><span class="op">&lt;</span><span class="lifetime">&#39;ctx</span>, <span class="ident">F</span>, <span class="ident">A</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">bases</span>: <span class="kw-2">&amp;</span><span class="ident">BaseAddresses</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">UninitializedUnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx</span> <span class="kw-2">mut</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">address</span>: <span class="ident">u64</span>,
         <span class="ident">get_cie</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="ident">BaseAddresses</span>, <span class="ident"><span class="self">Self</span>::Offset</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommonInformationEntry</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -8335,7 +8498,7 @@
 
 <span class="doccomment">/// We support the z-style augmentation [defined by `.eh_frame`][ehframe].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [ehframe]: http://refspecs.linuxfoundation.org/LSB_3.0.0/LSB-Core-generic/LSB-Core-generic/ehframechpt.html</span>
+<span class="doccomment">/// [ehframe]: https://refspecs.linuxfoundation.org/LSB_3.0.0/LSB-Core-generic/LSB-Core-generic/ehframechpt.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Augmentation</span> {
     <span class="doccomment">/// &gt; A &#39;L&#39; may be present at any position after the first character of the</span>
@@ -8916,12 +9079,12 @@
 
     <span class="doccomment">/// Return the table of unwind information for this FDE.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rows</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Section</span>: <span class="ident">UnwindSection</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rows</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;ctx</span>, <span class="ident">Section</span>: <span class="ident">UnwindSection</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">A</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Section</span>,
         <span class="ident">bases</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BaseAddresses</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">UninitializedUnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UnwindTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx</span> <span class="kw-2">mut</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UnwindTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;ctx</span>, <span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">UnwindTable::new</span>(<span class="ident">section</span>, <span class="ident">bases</span>, <span class="ident">ctx</span>, <span class="self">self</span>)
     }
 
@@ -8931,17 +9094,17 @@
     <span class="doccomment">/// context in the form `Ok((unwind_info, context))`. If not found,</span>
     <span class="doccomment">/// `Err(gimli::Error::NoUnwindInfoForAddress)` is returned. If parsing or</span>
     <span class="doccomment">/// CFI evaluation fails, the error is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwind_info_for_address</span><span class="op">&lt;</span><span class="ident">Section</span>: <span class="ident">UnwindSection</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwind_info_for_address</span><span class="op">&lt;</span><span class="lifetime">&#39;ctx</span>, <span class="ident">Section</span>: <span class="ident">UnwindSection</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">A</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="ident">Section</span>,
         <span class="ident">bases</span>: <span class="kw-2">&amp;</span><span class="ident">BaseAddresses</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">UninitializedUnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx</span> <span class="kw-2">mut</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">address</span>: <span class="ident">u64</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rows</span>(<span class="ident">section</span>, <span class="ident">bases</span>, <span class="ident">ctx</span>)<span class="question-mark">?</span>;
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">row</span>) <span class="op">=</span> <span class="ident">table</span>.<span class="ident">next_row</span>()<span class="question-mark">?</span> {
             <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">contains</span>(<span class="ident">address</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">row</span>.<span class="ident">clone</span>());
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">table</span>.<span class="ident">ctx</span>.<span class="ident">row</span>());
             }
         }
         <span class="prelude-val">Err</span>(<span class="ident">Error::NoUnwindInfoForAddress</span>)
@@ -9042,25 +9205,34 @@
     }
 }
 
-<span class="doccomment">/// Common context needed when evaluating the call frame unwinding information.</span>
+<span class="doccomment">/// Specification of what storage should be used for [`UnwindContext`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// To avoid re-allocating the context multiple times when evaluating multiple</span>
-<span class="doccomment">/// CFI programs, it can be reused. At first, a context is uninitialized</span>
-<span class="doccomment">/// (`UninitializedUnwindContext`). It can be initialized by providing the</span>
-<span class="doccomment">/// `CommonInformationEntry` for the CFI program about to be evaluated and</span>
-<span class="doccomment">/// calling `UninitializedUnwindContext::initialize`. The result is a `&amp;mut UnwindContext`</span>
-<span class="doccomment">/// which borrows the uninitialized context, and can be used to evaluate and run a</span>
-<span class="doccomment">/// `FrameDescriptionEntry`&#39;s CFI program.</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read&quot;</span>,
+    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;
+Normally you would only need to use [`StoreOnHeap`], which places the stack
+on the heap using [`Vec`]. This is the default storage type parameter for [`UnwindContext`].
+&quot;</span>
+)]</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use gimli::{UninitializedUnwindContext, UnwindTable};</span>
-<span class="doccomment">///</span>
+<span class="doccomment">/// If you need to avoid [`UnwindContext`] from allocating memory, e.g. for signal safety,</span>
+<span class="doccomment">/// you can provide you own storage specification:</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// # use gimli::*;</span>
+<span class="doccomment">/// #</span>
 <span class="doccomment">/// # fn foo&lt;&#39;a&gt;(some_fde: gimli::FrameDescriptionEntry&lt;gimli::EndianSlice&lt;&#39;a, gimli::LittleEndian&gt;&gt;)</span>
 <span class="doccomment">/// #            -&gt; gimli::Result&lt;()&gt; {</span>
 <span class="doccomment">/// # let eh_frame: gimli::EhFrame&lt;_&gt; = unreachable!();</span>
 <span class="doccomment">/// # let bases = unimplemented!();</span>
-<span class="doccomment">/// // An uninitialized context.</span>
-<span class="doccomment">/// let mut ctx = UninitializedUnwindContext::new();</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// struct StoreOnStack;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// impl&lt;R: Reader&gt; UnwindContextStorage&lt;R&gt; for StoreOnStack {</span>
+<span class="doccomment">///     type Rules = [(Register, RegisterRule&lt;R&gt;); 192];</span>
+<span class="doccomment">///     type Stack = [UnwindTableRow&lt;R, Self&gt;; 4];</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let mut ctx = UnwindContext::&lt;_, StoreOnStack&gt;::new_in();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Initialize the context by evaluating the CIE&#39;s initial instruction program,</span>
 <span class="doccomment">/// // and generate the unwind table.</span>
@@ -9072,126 +9244,162 @@
 <span class="doccomment">/// # unreachable!()</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UninitializedUnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>: <span class="ident">Sized</span> {
+    <span class="doccomment">/// The storage used for register rules in a unwind table row.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this is nested within the stack.</span>
+    <span class="kw">type</span> <span class="ident">Rules</span>: <span class="ident">ArrayLike</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">Register</span>, <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>)<span class="op">&gt;</span>;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">UninitializedUnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Construct a new call frame unwinding context.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">UninitializedUnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">UninitializedUnwindContext</span>(<span class="ident">Box::new</span>(<span class="ident">UnwindContext::new</span>()))
-    }
+    <span class="doccomment">/// The storage used for unwind table row stack.</span>
+    <span class="kw">type</span> <span class="ident">Stack</span>: <span class="ident">ArrayLike</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">UninitializedUnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
-    }
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read&quot;</span>)]</span>
+<span class="kw">const</span> <span class="ident">MAX_RULES</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">192</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read&quot;</span>)]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StoreOnHeap</span> {
+    <span class="kw">type</span> <span class="ident">Rules</span> <span class="op">=</span> [(<span class="ident">Register</span>, <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>); <span class="ident">MAX_RULES</span>];
+    <span class="kw">type</span> <span class="ident">Stack</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 }
 
-<span class="doccomment">/// # Signal Safe Methods</span>
+<span class="doccomment">/// Common context needed when evaluating the call frame unwinding information.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// These methods are guaranteed not to allocate, acquire locks, or perform any</span>
-<span class="doccomment">/// other signal-unsafe operations.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">UninitializedUnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Run the CIE&#39;s initial instructions, creating and return an</span>
-    <span class="doccomment">/// `UnwindContext`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initialize</span><span class="op">&lt;</span><span class="ident">Section</span>: <span class="ident">UnwindSection</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="ident">Section</span>,
-        <span class="ident">bases</span>: <span class="kw-2">&amp;</span><span class="ident">BaseAddresses</span>,
-        <span class="ident">cie</span>: <span class="kw-2">&amp;</span><span class="ident">CommonInformationEntry</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_initialized</span> {
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">reset</span>();
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">UnwindTable::new_for_cie</span>(<span class="ident">section</span>, <span class="ident">bases</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>, <span class="ident">cie</span>);
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">table</span>.<span class="ident">next_row</span>()<span class="question-mark">?</span> {}
-
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">save_initial_rules</span>();
-        <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>)
-    }
-}
-
-<span class="kw">const</span> <span class="ident">MAX_UNWIND_STACK_DEPTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
-
-<span class="doccomment">/// An unwinding context.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> {
+<span class="doccomment">/// This structure can be large so it is advisable to place it on the heap.</span>
+<span class="doccomment">/// To avoid re-allocating the context multiple times when evaluating multiple</span>
+<span class="doccomment">/// CFI programs, it can be reused.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use gimli::{UnwindContext, UnwindTable};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # fn foo&lt;&#39;a&gt;(some_fde: gimli::FrameDescriptionEntry&lt;gimli::EndianSlice&lt;&#39;a, gimli::LittleEndian&gt;&gt;)</span>
+<span class="doccomment">/// #            -&gt; gimli::Result&lt;()&gt; {</span>
+<span class="doccomment">/// # let eh_frame: gimli::EhFrame&lt;_&gt; = unreachable!();</span>
+<span class="doccomment">/// # let bases = unimplemented!();</span>
+<span class="doccomment">/// // An uninitialized context.</span>
+<span class="doccomment">/// let mut ctx = Box::new(UnwindContext::new());</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Initialize the context by evaluating the CIE&#39;s initial instruction program,</span>
+<span class="doccomment">/// // and generate the unwind table.</span>
+<span class="doccomment">/// let mut table = some_fde.rows(&amp;eh_frame, &amp;bases, &amp;mut ctx)?;</span>
+<span class="doccomment">/// while let Some(row) = table.next_row()? {</span>
+<span class="doccomment">///     // Do stuff with each row...</span>
+<span class="doccomment">/// #   let _ = row;</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// # unreachable!()</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">A</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">StoreOnHeap</span><span class="op">&gt;</span> {
     <span class="comment">// Stack of rows. The last row is the row currently being built by the</span>
     <span class="comment">// program. There is always at least one row. The vast majority of CFI</span>
     <span class="comment">// programs will only ever have one row on the stack.</span>
-    <span class="ident">stack_storage</span>: [<span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>; <span class="ident">MAX_UNWIND_STACK_DEPTH</span>],
-    <span class="ident">stack_len</span>: <span class="ident">usize</span>,
+    <span class="ident">stack</span>: <span class="ident">ArrayVec</span><span class="op">&lt;</span><span class="ident">A::Stack</span><span class="op">&gt;</span>,
 
     <span class="comment">// If we are evaluating an FDE&#39;s instructions, then `is_initialized` will be</span>
-    <span class="comment">// `true` and `initial_rules` will contain the initial register rules</span>
+    <span class="comment">// `true`. If `initial_rule` is `Some`, then the initial register rules are either</span>
+    <span class="comment">// all default rules or have just 1 non-default rule, stored in `initial_rule`.</span>
+    <span class="comment">// If it&#39;s `None`, `stack[0]` will contain the initial register rules</span>
     <span class="comment">// described by the CIE&#39;s initial instructions. These rules are used by</span>
     <span class="comment">// `DW_CFA_restore`. Otherwise, when we are currently evaluating a CIE&#39;s</span>
-    <span class="comment">// initial instructions, `is_initialized` will be `false` and</span>
-    <span class="comment">// `initial_rules` is not to be read from.</span>
-    <span class="ident">initial_rules</span>: <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+    <span class="comment">// initial instructions, `is_initialized` will be `false` and initial rules</span>
+    <span class="comment">// cannot be read.</span>
+    <span class="ident">initial_rule</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Register</span>, <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+
     <span class="ident">is_initialized</span>: <span class="ident">bool</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;UnwindContext&quot;</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;stack&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stack</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;initial_rule&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">initial_rule</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;is_initialized&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_initialized</span>)
+            .<span class="ident">finish</span>()
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">A</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new_in</span>()
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read&quot;</span>)]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Construct a new call frame unwinding context.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new_in</span>()
+    }
 }
 
 <span class="doccomment">/// # Signal Safe Methods</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// These methods are guaranteed not to allocate, acquire locks, or perform any</span>
-<span class="doccomment">/// other signal-unsafe operations.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+<span class="doccomment">/// other signal-unsafe operations, if an non-allocating storage is used.</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">A</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Construct a new call frame unwinding context.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_in</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">UnwindContext</span> {
-            <span class="ident">stack_storage</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">stack_len</span>: <span class="number">0</span>,
+            <span class="ident">stack</span>: <span class="ident">Default::default</span>(),
+            <span class="ident">initial_rule</span>: <span class="prelude-val">None</span>,
             <span class="ident">is_initialized</span>: <span class="bool-val">false</span>,
-            <span class="ident">initial_rules</span>: <span class="ident">Default::default</span>(),
         };
         <span class="ident">ctx</span>.<span class="ident">reset</span>();
         <span class="ident">ctx</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">stack</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stack_storage</span>[..<span class="self">self</span>.<span class="ident">stack_len</span>]
-    }
+    <span class="doccomment">/// Run the CIE&#39;s initial instructions and initialize this `UnwindContext`.</span>
+    <span class="kw">fn</span> <span class="ident">initialize</span><span class="op">&lt;</span><span class="ident">Section</span>: <span class="ident">UnwindSection</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="ident">Section</span>,
+        <span class="ident">bases</span>: <span class="kw-2">&amp;</span><span class="ident">BaseAddresses</span>,
+        <span class="ident">cie</span>: <span class="kw-2">&amp;</span><span class="ident">CommonInformationEntry</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_initialized</span> {
+            <span class="self">self</span>.<span class="ident">reset</span>();
+        }
 
-    <span class="kw">fn</span> <span class="ident">stack_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>] {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stack_storage</span>[..<span class="self">self</span>.<span class="ident">stack_len</span>]
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">UnwindTable::new_for_cie</span>(<span class="ident">section</span>, <span class="ident">bases</span>, <span class="self">self</span>, <span class="ident">cie</span>);
+        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">table</span>.<span class="ident">next_row</span>()<span class="question-mark">?</span> {}
+
+        <span class="self">self</span>.<span class="ident">save_initial_rules</span>()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">stack_len</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_push</span>(<span class="ident">UnwindTableRow::default</span>());
-        <span class="macro">debug_assert!</span>(<span class="ident">res</span>);
-
-        <span class="self">self</span>.<span class="ident">initial_rules</span>.<span class="ident">clear</span>();
+        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">clear</span>();
+        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">try_push</span>(<span class="ident">UnwindTableRow::default</span>()).<span class="ident">unwrap</span>();
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">stack</span>[<span class="number">0</span>].<span class="ident">is_default</span>());
+        <span class="self">self</span>.<span class="ident">initial_rule</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="self">self</span>.<span class="ident">is_initialized</span> <span class="op">=</span> <span class="bool-val">false</span>;
-
-        <span class="self">self</span>.<span class="ident">assert_fully_uninitialized</span>();
     }
 
-    <span class="comment">// Asserts that we are fully uninitialized, ie not initialized *and* not in</span>
-    <span class="comment">// the process of initializing.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assert_fully_uninitialized</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">row</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>()
+    }
+
+    <span class="kw">fn</span> <span class="ident">row_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">last_mut</span>().<span class="ident">unwrap</span>()
+    }
+
+    <span class="kw">fn</span> <span class="ident">save_initial_rules</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">is_initialized</span>, <span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">initial_rules</span>.<span class="ident">rules</span>().<span class="ident">len</span>(), <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">stack</span>().<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">stack</span>()[<span class="number">0</span>].<span class="ident">is_default</span>());
-    }
-
-    <span class="kw">fn</span> <span class="ident">row</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stack</span>().<span class="ident">last</span>().<span class="ident">unwrap</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">row_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stack_mut</span>().<span class="ident">last_mut</span>().<span class="ident">unwrap</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">save_initial_rules</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">is_initialized</span>, <span class="bool-val">false</span>);
-        <span class="kw">let</span> <span class="ident">registers</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stack_storage</span>[<span class="self">self</span>.<span class="ident">stack_len</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">registers</span>;
-        <span class="self">self</span>.<span class="ident">initial_rules</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="ident">registers</span>);
+        <span class="self">self</span>.<span class="ident">initial_rule</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>().<span class="ident">registers</span>.<span class="ident">rules</span> {
+            <span class="comment">// All rules are default (undefined). In this case just synthesize</span>
+            <span class="comment">// an undefined rule.</span>
+            [] =&gt; <span class="prelude-val">Some</span>((<span class="ident">Register</span>(<span class="number">0</span>), <span class="ident">RegisterRule::Undefined</span>)),
+            [<span class="kw-2">ref</span> <span class="ident">rule</span>] =&gt; <span class="prelude-val">Some</span>(<span class="ident">rule</span>.<span class="ident">clone</span>()),
+            <span class="kw">_</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">rules</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>();
+                <span class="self">self</span>.<span class="ident">stack</span>
+                    .<span class="ident">try_insert</span>(<span class="number">0</span>, <span class="ident">rules</span>)
+                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::StackFull</span>)<span class="question-mark">?</span>;
+                <span class="prelude-val">None</span>
+            }
+        };
         <span class="self">self</span>.<span class="ident">is_initialized</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">fn</span> <span class="ident">start_address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
@@ -9214,8 +9422,11 @@
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_initialized</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
-
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">initial_rules</span>.<span class="ident">get</span>(<span class="ident">register</span>))
+        <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="self">self</span>.<span class="ident">initial_rule</span> {
+            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">stack</span>[<span class="number">0</span>].<span class="ident">registers</span>.<span class="ident">get</span>(<span class="ident">register</span>),
+            <span class="prelude-val">Some</span>((<span class="ident">r</span>, <span class="kw-2">ref</span> <span class="ident">rule</span>)) <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="ident">register</span> =&gt; <span class="ident">rule</span>.<span class="ident">clone</span>(),
+            <span class="kw">_</span> =&gt; <span class="ident">RegisterRule::Undefined</span>,
+        })
     }
 
     <span class="kw">fn</span> <span class="ident">set_cfa</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cfa</span>: <span class="ident">CfaRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) {
@@ -9228,34 +9439,20 @@
 
     <span class="kw">fn</span> <span class="ident">push_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">new_row</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">row</span>().<span class="ident">clone</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">try_push</span>(<span class="ident">new_row</span>) {
-            <span class="prelude-val">Ok</span>(())
+        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">try_push</span>(<span class="ident">new_row</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::StackFull</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">pop_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">min_size</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_initialized</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">initial_rule</span>.<span class="ident">is_none</span>() {
+            <span class="number">2</span>
         } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::CfiStackFull</span>)
+            <span class="number">1</span>
+        };
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">min_size</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PopWithEmptyStack</span>);
         }
-    }
-
-    <span class="kw">fn</span> <span class="ident">try_push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">row</span>: <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stack_len</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">stack_storage</span>.<span class="ident">len</span>() {
-            <span class="self">self</span>.<span class="ident">stack_storage</span>[<span class="self">self</span>.<span class="ident">stack_len</span>] <span class="op">=</span> <span class="ident">row</span>;
-            <span class="self">self</span>.<span class="ident">stack_len</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">pop_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">stack</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span>);
-        <span class="self">self</span>.<span class="ident">stack_len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span> <span class="op">+</span> <span class="ident">PartialEq</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">stack</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">stack</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">initial_rules</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">initial_rules</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_initialized</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">is_initialized</span>
+        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
+        <span class="prelude-val">Ok</span>(())
     }
 }
 
@@ -9316,46 +9513,48 @@
 <span class="doccomment">/// &gt; recording just the differences starting at the beginning address of each</span>
 <span class="doccomment">/// &gt; subroutine in the program.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnwindTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnwindTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;ctx</span>, <span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">A</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">StoreOnHeap</span><span class="op">&gt;</span> {
     <span class="ident">code_alignment_factor</span>: <span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="ident">data_alignment_factor</span>: <span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
     <span class="ident">next_start_address</span>: <span class="ident">u64</span>,
     <span class="ident">last_end_address</span>: <span class="ident">u64</span>,
     <span class="ident">returned_last_row</span>: <span class="ident">bool</span>,
+    <span class="ident">current_row_valid</span>: <span class="ident">bool</span>,
     <span class="ident">instructions</span>: <span class="ident">CallFrameInstructionIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx</span> <span class="kw-2">mut</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// # Signal Safe Methods</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// These methods are guaranteed not to allocate, acquire locks, or perform any</span>
 <span class="doccomment">/// other signal-unsafe operations.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">UnwindTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;ctx</span>, <span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">A</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">UnwindTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;ctx</span>, <span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Construct a new `UnwindTable` for the given</span>
     <span class="doccomment">/// `FrameDescriptionEntry`&#39;s CFI unwinding program.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">Section</span>: <span class="ident">UnwindSection</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Section</span>,
         <span class="ident">bases</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BaseAddresses</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">UninitializedUnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx</span> <span class="kw-2">mut</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">fde</span>: <span class="kw-2">&amp;</span><span class="ident">FrameDescriptionEntry</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UnwindTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">initialize</span>(<span class="ident">section</span>, <span class="ident">bases</span>, <span class="ident">fde</span>.<span class="ident">cie</span>())<span class="question-mark">?</span>;
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="ident">ctx</span>.<span class="ident">initialize</span>(<span class="ident">section</span>, <span class="ident">bases</span>, <span class="ident">fde</span>.<span class="ident">cie</span>())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::new_for_fde</span>(<span class="ident">section</span>, <span class="ident">bases</span>, <span class="ident">ctx</span>, <span class="ident">fde</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">new_for_fde</span><span class="op">&lt;</span><span class="ident">Section</span>: <span class="ident">UnwindSection</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Section</span>,
         <span class="ident">bases</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BaseAddresses</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx</span> <span class="kw-2">mut</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">fde</span>: <span class="kw-2">&amp;</span><span class="ident">FrameDescriptionEntry</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">UnwindTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="macro">assert!</span>(<span class="ident">ctx</span>.<span class="ident">stack</span>().<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>);
+    ) -&gt; <span class="self">Self</span> {
+        <span class="macro">assert!</span>(<span class="ident">ctx</span>.<span class="ident">stack</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>);
         <span class="ident">UnwindTable</span> {
             <span class="ident">code_alignment_factor</span>: <span class="ident">Wrapping</span>(<span class="ident">fde</span>.<span class="ident">cie</span>().<span class="ident">code_alignment_factor</span>()),
             <span class="ident">data_alignment_factor</span>: <span class="ident">Wrapping</span>(<span class="ident">fde</span>.<span class="ident">cie</span>().<span class="ident">data_alignment_factor</span>()),
             <span class="ident">next_start_address</span>: <span class="ident">fde</span>.<span class="ident">initial_address</span>(),
             <span class="ident">last_end_address</span>: <span class="ident">fde</span>.<span class="ident">initial_address</span>().<span class="ident">wrapping_add</span>(<span class="ident">fde</span>.<span class="ident">len</span>()),
             <span class="ident">returned_last_row</span>: <span class="bool-val">false</span>,
+            <span class="ident">current_row_valid</span>: <span class="bool-val">false</span>,
             <span class="ident">instructions</span>: <span class="ident">fde</span>.<span class="ident">instructions</span>(<span class="ident">section</span>, <span class="ident">bases</span>),
             <span class="ident">ctx</span>,
         }
@@ -9364,16 +9563,17 @@
     <span class="kw">fn</span> <span class="ident">new_for_cie</span><span class="op">&lt;</span><span class="ident">Section</span>: <span class="ident">UnwindSection</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Section</span>,
         <span class="ident">bases</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BaseAddresses</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx</span> <span class="kw-2">mut</span> <span class="ident">UnwindContext</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">cie</span>: <span class="kw-2">&amp;</span><span class="ident">CommonInformationEntry</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">UnwindTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="macro">assert!</span>(<span class="ident">ctx</span>.<span class="ident">stack</span>().<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>);
+    ) -&gt; <span class="self">Self</span> {
+        <span class="macro">assert!</span>(<span class="ident">ctx</span>.<span class="ident">stack</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>);
         <span class="ident">UnwindTable</span> {
             <span class="ident">code_alignment_factor</span>: <span class="ident">Wrapping</span>(<span class="ident">cie</span>.<span class="ident">code_alignment_factor</span>()),
             <span class="ident">data_alignment_factor</span>: <span class="ident">Wrapping</span>(<span class="ident">cie</span>.<span class="ident">data_alignment_factor</span>()),
             <span class="ident">next_start_address</span>: <span class="number">0</span>,
             <span class="ident">last_end_address</span>: <span class="number">0</span>,
             <span class="ident">returned_last_row</span>: <span class="bool-val">false</span>,
+            <span class="ident">current_row_valid</span>: <span class="bool-val">false</span>,
             <span class="ident">instructions</span>: <span class="ident">cie</span>.<span class="ident">instructions</span>(<span class="ident">section</span>, <span class="ident">bases</span>),
             <span class="ident">ctx</span>,
         }
@@ -9384,9 +9584,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Unfortunately, this cannot be used with `FallibleIterator` because of</span>
     <span class="doccomment">/// the restricted lifetime of the yielded item.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">stack</span>().<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">stack</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>);
         <span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">set_start_address</span>(<span class="self">self</span>.<span class="ident">next_start_address</span>);
+        <span class="self">self</span>.<span class="ident">current_row_valid</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">instructions</span>.<span class="ident">next</span>() {
@@ -9401,15 +9602,26 @@
                     <span class="ident">row</span>.<span class="ident">end_address</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">last_end_address</span>;
 
                     <span class="self">self</span>.<span class="ident">returned_last_row</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    <span class="self">self</span>.<span class="ident">current_row_valid</span> <span class="op">=</span> <span class="bool-val">true</span>;
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">row</span>));
                 }
 
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">instruction</span>)) =&gt; {
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">evaluate</span>(<span class="ident">instruction</span>)<span class="question-mark">?</span> {
+                        <span class="self">self</span>.<span class="ident">current_row_valid</span> <span class="op">=</span> <span class="bool-val">true</span>;
                         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">row</span>()));
                     }
                 }
             };
+        }
+    }
+
+    <span class="doccomment">/// Returns the current row with the lifetime of the context.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_current_row</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">current_row_valid</span> {
+            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">row</span>())
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
         }
     }
 
@@ -9571,13 +9783,9 @@
                 <span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">push_row</span>()<span class="question-mark">?</span>;
             }
             <span class="ident">RestoreState</span> =&gt; {
-                <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">stack</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>);
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">stack</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PopWithEmptyStack</span>);
-                }
                 <span class="comment">// Pop state while preserving current location.</span>
                 <span class="kw">let</span> <span class="ident">start_address</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">start_address</span>();
-                <span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">pop_row</span>();
+                <span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">pop_row</span>()<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">ctx</span>.<span class="ident">set_start_address</span>(<span class="ident">start_address</span>);
             }
 
@@ -9616,45 +9824,31 @@
 <span class="comment">// - https://github.com/libunwind/libunwind/blob/11fd461095ea98f4b3e3a361f5a8a558519363fa/include/tdep-aarch64/dwarf-config.h#L32</span>
 <span class="comment">// - https://github.com/libunwind/libunwind/blob/11fd461095ea98f4b3e3a361f5a8a558519363fa/include/tdep-arm/dwarf-config.h#L31</span>
 <span class="comment">// - https://github.com/libunwind/libunwind/blob/11fd461095ea98f4b3e3a361f5a8a558519363fa/include/tdep-mips/dwarf-config.h#L31</span>
-<span class="comment">//</span>
-<span class="comment">// TODO: Consider using const generics for the array size.</span>
-<span class="kw">struct</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> {
-    <span class="ident">rules_storage</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span>[(<span class="ident">Register</span>, <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>); <span class="ident">MAX_RULES</span>]<span class="op">&gt;</span>,
-    <span class="ident">rules_len</span>: <span class="ident">usize</span>,
+<span class="kw">struct</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">StoreOnHeap</span><span class="op">&gt;</span> {
+    <span class="ident">rules</span>: <span class="ident">ArrayVec</span><span class="op">&lt;</span><span class="ident">S::Rules</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">const</span> <span class="ident">MAX_RULES</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">192</span>;
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span> <span class="op">+</span> <span class="ident">Debug</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RegisterRuleMap&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;rules&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rules</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;rules&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rules</span>)
             .<span class="ident">finish</span>()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">rules</span>: <span class="self">self</span>.<span class="ident">rules</span>.<span class="ident">clone</span>(),
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">RegisterRuleMap</span> {
-            <span class="ident">rules_storage</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">rules_len</span>: <span class="number">0</span>,
+            <span class="ident">rules</span>: <span class="ident">Default::default</span>(),
         }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">RegisterRuleMap::default</span>();
-        <span class="kw">for</span> (<span class="ident">register</span>, <span class="ident">rule</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">rules</span>() {
-            <span class="ident">new</span>.<span class="ident">push</span>(<span class="ident">register</span>.<span class="ident">clone</span>(), <span class="ident">rule</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
-        }
-        <span class="kw">return</span> <span class="ident">new</span>;
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">clear</span>();
     }
 }
 
@@ -9662,33 +9856,13 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// These methods are guaranteed not to allocate, acquire locks, or perform any</span>
 <span class="doccomment">/// other signal-unsafe operations.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">is_default</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">rules_len</span> <span class="op">==</span> <span class="number">0</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">rules</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[(<span class="ident">Register</span>, <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>)] {
-        <span class="comment">// Note that the unsafety here relies on the mutation of</span>
-        <span class="comment">// `self.rules_len` in `self.push` below, which guarantees that once</span>
-        <span class="comment">// we&#39;ve pushed something the `rules_storage` is valid for that many</span>
-        <span class="comment">// elements.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">core::slice::from_raw_parts</span>(<span class="self">self</span>.<span class="ident">rules_storage</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>, <span class="self">self</span>.<span class="ident">rules_len</span>)
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">rules_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [(<span class="ident">Register</span>, <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>)] {
-        <span class="comment">// See the note in `rules` on safety here.</span>
-        <span class="kw">unsafe</span> {
-            <span class="ident">core::slice::from_raw_parts_mut</span>(
-                <span class="self">self</span>.<span class="ident">rules_storage</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>,
-                <span class="self">self</span>.<span class="ident">rules_len</span>,
-            )
-        }
+        <span class="self">self</span>.<span class="ident">rules</span>.<span class="ident">is_empty</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">register</span>: <span class="ident">Register</span>) -&gt; <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">rules</span>()
+        <span class="self">self</span>.<span class="ident">rules</span>
             .<span class="ident">iter</span>()
             .<span class="ident">find</span>(<span class="op">|</span><span class="ident">rule</span><span class="op">|</span> <span class="ident">rule</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">register</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> {
@@ -9701,26 +9875,18 @@
     <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">register</span>: <span class="ident">Register</span>, <span class="ident">rule</span>: <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">rule</span>.<span class="ident">is_defined</span>() {
             <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">rules</span>()
+                .<span class="ident">rules</span>
                 .<span class="ident">iter</span>()
                 .<span class="ident">enumerate</span>()
                 .<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">r</span>)<span class="op">|</span> <span class="ident">r</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">register</span>)
                 .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">i</span>);
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">idx</span>) <span class="op">=</span> <span class="ident">idx</span> {
-                <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">rules_mut</span>().<span class="ident">split_at_mut</span>(<span class="ident">idx</span> <span class="op">+</span> <span class="number">1</span>);
-                <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="ident">mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">a</span>[<span class="ident">a</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>], <span class="kw-2">&amp;mut</span> <span class="ident">b</span>[<span class="ident">b</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>]);
-                }
-                <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rules_storage</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> (<span class="ident">Register</span>, <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>);
-                    <span class="ident">ptr::drop_in_place</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="self">self</span>.<span class="ident">rules_len</span> <span class="op">-</span> <span class="number">1</span>));
-                    <span class="self">self</span>.<span class="ident">rules_len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-                }
+                <span class="self">self</span>.<span class="ident">rules</span>.<span class="ident">swap_remove</span>(<span class="ident">idx</span>);
             }
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
 
-        <span class="kw">for</span> <span class="kw-2">&amp;mut</span> (<span class="ident">reg</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">old_rule</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">rules_mut</span>() {
+        <span class="kw">for</span> <span class="kw-2">&amp;mut</span> (<span class="ident">reg</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">old_rule</span>) <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">rules</span> {
             <span class="macro">debug_assert!</span>(<span class="ident">old_rule</span>.<span class="ident">is_defined</span>());
             <span class="kw">if</span> <span class="ident">reg</span> <span class="op">==</span> <span class="ident">register</span> {
                 <span class="kw-2">*</span><span class="ident">old_rule</span> <span class="op">=</span> <span class="ident">rule</span>;
@@ -9728,44 +9894,22 @@
             }
         }
 
-        <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">register</span>, <span class="ident">rule</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">ptr::drop_in_place</span>(<span class="self">self</span>.<span class="ident">rules_mut</span>());
-            <span class="self">self</span>.<span class="ident">rules_len</span> <span class="op">=</span> <span class="number">0</span>;
-        }
+        <span class="self">self</span>.<span class="ident">rules</span>
+            .<span class="ident">try_push</span>((<span class="ident">register</span>, <span class="ident">rule</span>))
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::TooManyRegisterRules</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RegisterRuleIter</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">RegisterRuleIter</span>(<span class="self">self</span>.<span class="ident">rules</span>().<span class="ident">iter</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">register</span>: <span class="ident">Register</span>, <span class="ident">rule</span>: <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">rules_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">MAX_RULES</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::TooManyRegisterRules</span>);
-        }
-        <span class="comment">// The unsafety here comes from working with `MaybeUninit` to initialize</span>
-        <span class="comment">// our 192-element array. We&#39;re pushing a new element onto that array</span>
-        <span class="comment">// here. Just above we did a bounds check to make sure we actually have</span>
-        <span class="comment">// space to push something and here we&#39;re doing the actual memory write,</span>
-        <span class="comment">// along with an increment of `rules_len` which will affect the unsafe</span>
-        <span class="comment">// implementations of `rules` and `rules_mut` above.</span>
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rules_storage</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> (<span class="ident">Register</span>, <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>);
-            <span class="ident">ptr::write</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="self">self</span>.<span class="ident">rules_len</span>), (<span class="ident">register</span>, <span class="ident">rule</span>));
-            <span class="self">self</span>.<span class="ident">rules_len</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        }
-        <span class="prelude-val">Ok</span>(())
+        <span class="ident">RegisterRuleIter</span>(<span class="self">self</span>.<span class="ident">rules</span>.<span class="ident">iter</span>())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">FromIterator</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="ident">Register</span>, <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">FromIterator</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="ident">Register</span>, <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>)<span class="op">&gt;</span>
+    <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Reader</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">T</span>) -&gt; <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="ident">Register</span>, <span class="ident">RegisterRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
     {
@@ -9781,19 +9925,19 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="ident">Reader</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
 {
     <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">reg</span>, <span class="kw-2">ref</span> <span class="ident">rule</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">rules</span>() {
+        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">reg</span>, <span class="kw-2">ref</span> <span class="ident">rule</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">rules</span> {
             <span class="macro">debug_assert!</span>(<span class="ident">rule</span>.<span class="ident">is_defined</span>());
             <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">rule</span> <span class="op">!</span><span class="op">=</span> <span class="ident">rhs</span>.<span class="ident">get</span>(<span class="ident">reg</span>) {
                 <span class="kw">return</span> <span class="bool-val">false</span>;
             }
         }
 
-        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">reg</span>, <span class="kw-2">ref</span> <span class="ident">rhs_rule</span>) <span class="kw">in</span> <span class="ident">rhs</span>.<span class="ident">rules</span>() {
+        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">reg</span>, <span class="kw-2">ref</span> <span class="ident">rhs_rule</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">rhs</span>.<span class="ident">rules</span> {
             <span class="macro">debug_assert!</span>(<span class="ident">rhs_rule</span>.<span class="ident">is_defined</span>());
             <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">rhs_rule</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">reg</span>) {
                 <span class="kw">return</span> <span class="bool-val">false</span>;
@@ -9804,7 +9948,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">R</span>: <span class="ident">Reader</span> <span class="op">+</span> <span class="ident">Eq</span> {}
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">R</span>: <span class="ident">Reader</span> <span class="op">+</span> <span class="ident">Eq</span> {}
 
 <span class="doccomment">/// An unordered iterator for register rules.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -9822,16 +9966,40 @@
 
 <span class="doccomment">/// A row in the virtual unwind table that describes how to find the values of</span>
 <span class="doccomment">/// the registers in the *previous* frame for a range of PC addresses.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> {
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">StoreOnHeap</span><span class="op">&gt;</span> {
     <span class="ident">start_address</span>: <span class="ident">u64</span>,
     <span class="ident">end_address</span>: <span class="ident">u64</span>,
     <span class="ident">saved_args_size</span>: <span class="ident">u64</span>,
     <span class="ident">cfa</span>: <span class="ident">CfaRule</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="ident">registers</span>: <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+    <span class="ident">registers</span>: <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;UnwindTableRow&quot;</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;start_address&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">start_address</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;end_address&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">end_address</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;saved_args_size&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">saved_args_size</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;cfa&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cfa</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;registers&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">registers</span>)
+            .<span class="ident">finish</span>()
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">start_address</span>: <span class="self">self</span>.<span class="ident">start_address</span>,
+            <span class="ident">end_address</span>: <span class="self">self</span>.<span class="ident">end_address</span>,
+            <span class="ident">saved_args_size</span>: <span class="self">self</span>.<span class="ident">saved_args_size</span>,
+            <span class="ident">cfa</span>: <span class="self">self</span>.<span class="ident">cfa</span>.<span class="ident">clone</span>(),
+            <span class="ident">registers</span>: <span class="self">self</span>.<span class="ident">registers</span>.<span class="ident">clone</span>(),
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">UnwindTableRow</span> {
             <span class="ident">start_address</span>: <span class="number">0</span>,
@@ -9843,7 +10011,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span>, <span class="ident">S</span>: <span class="ident">UnwindContextStorage</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">UnwindTableRow</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">is_default</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">start_address</span> <span class="op">==</span> <span class="number">0</span>
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">end_address</span> <span class="op">==</span> <span class="number">0</span>
@@ -10717,6 +10885,7 @@
         <span class="ident">EndianSlice</span>, <span class="ident">Error</span>, <span class="ident">Expression</span>, <span class="ident">Pointer</span>, <span class="ident">ReaderOffsetId</span>, <span class="prelude-ty">Result</span>, <span class="ident">Section</span> <span class="kw">as</span> <span class="ident">ReadSection</span>,
     };
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_util::GimliSectionMethods</span>;
+    <span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
     <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
     <span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
     <span class="kw">use</span> <span class="ident">core::mem</span>;
@@ -12729,7 +12898,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">UnwindContext::new</span>();
         <span class="ident">ctx</span>.<span class="ident">set_register_rule</span>(<span class="ident">Register</span>(<span class="number">0</span>), <span class="ident">RegisterRule::Offset</span>(<span class="number">1</span>))
             .<span class="ident">unwrap</span>();
-        <span class="ident">ctx</span>.<span class="ident">save_initial_rules</span>();
+        <span class="ident">ctx</span>.<span class="ident">save_initial_rules</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">clone</span>();
         <span class="ident">ctx</span>.<span class="ident">set_register_rule</span>(<span class="ident">Register</span>(<span class="number">0</span>), <span class="ident">RegisterRule::Offset</span>(<span class="number">2</span>))
             .<span class="ident">unwrap</span>();
@@ -12807,6 +12976,155 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_unwind_table_cie_no_rule</span>() {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::identity_op</span>)]</span>
+        <span class="kw">let</span> <span class="ident">initial_instructions</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
+            <span class="comment">// The CFA is -12 from register 4.</span>
+            .<span class="ident">D8</span>(<span class="ident">constants::DW_CFA_def_cfa_sf</span>.<span class="number">0</span>)
+            .<span class="ident">uleb</span>(<span class="number">4</span>)
+            .<span class="ident">sleb</span>(<span class="op">-</span><span class="number">12</span>)
+            .<span class="ident">append_repeated</span>(<span class="ident">constants::DW_CFA_nop</span>.<span class="number">0</span>, <span class="number">4</span>);
+        <span class="kw">let</span> <span class="ident">initial_instructions</span> <span class="op">=</span> <span class="ident">initial_instructions</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">cie</span> <span class="op">=</span> <span class="ident">CommonInformationEntry</span> {
+            <span class="ident">offset</span>: <span class="number">0</span>,
+            <span class="ident">length</span>: <span class="number">0</span>,
+            <span class="ident">format</span>: <span class="ident">Format::Dwarf32</span>,
+            <span class="ident">version</span>: <span class="number">4</span>,
+            <span class="ident">augmentation</span>: <span class="prelude-val">None</span>,
+            <span class="ident">address_size</span>: <span class="number">8</span>,
+            <span class="ident">segment_size</span>: <span class="number">0</span>,
+            <span class="ident">code_alignment_factor</span>: <span class="number">1</span>,
+            <span class="ident">data_alignment_factor</span>: <span class="number">1</span>,
+            <span class="ident">return_address_register</span>: <span class="ident">Register</span>(<span class="number">3</span>),
+            <span class="ident">initial_instructions</span>: <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">initial_instructions</span>, <span class="ident">LittleEndian</span>),
+        };
+
+        <span class="kw">let</span> <span class="ident">instructions</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
+            <span class="comment">// A bunch of nop padding.</span>
+            .<span class="ident">append_repeated</span>(<span class="ident">constants::DW_CFA_nop</span>.<span class="number">0</span>, <span class="number">8</span>);
+        <span class="kw">let</span> <span class="ident">instructions</span> <span class="op">=</span> <span class="ident">instructions</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">fde</span> <span class="op">=</span> <span class="ident">FrameDescriptionEntry</span> {
+            <span class="ident">offset</span>: <span class="number">0</span>,
+            <span class="ident">length</span>: <span class="number">0</span>,
+            <span class="ident">format</span>: <span class="ident">Format::Dwarf32</span>,
+            <span class="ident">cie</span>: <span class="ident">cie</span>.<span class="ident">clone</span>(),
+            <span class="ident">initial_segment</span>: <span class="number">0</span>,
+            <span class="ident">initial_address</span>: <span class="number">0</span>,
+            <span class="ident">address_range</span>: <span class="number">100</span>,
+            <span class="ident">augmentation</span>: <span class="prelude-val">None</span>,
+            <span class="ident">instructions</span>: <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">instructions</span>, <span class="ident">LittleEndian</span>),
+        };
+
+        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">DebugFrame::from</span>(<span class="ident">EndianSlice::default</span>());
+        <span class="kw">let</span> <span class="ident">bases</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">BaseAddresses::default</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">UnwindContext::new</span>());
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">fde</span>
+            .<span class="ident">rows</span>(<span class="ident">section</span>, <span class="ident">bases</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>)
+            .<span class="ident">expect</span>(<span class="string">&quot;Should run initial program OK&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">table</span>.<span class="ident">ctx</span>.<span class="ident">is_initialized</span>);
+        <span class="kw">let</span> <span class="ident">expected_initial_rule</span> <span class="op">=</span> (<span class="ident">Register</span>(<span class="number">0</span>), <span class="ident">RegisterRule::Undefined</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">table</span>.<span class="ident">ctx</span>.<span class="ident">initial_rule</span>, <span class="prelude-val">Some</span>(<span class="ident">expected_initial_rule</span>));
+
+        {
+            <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">next_row</span>().<span class="ident">expect</span>(<span class="string">&quot;Should evaluate first row OK&quot;</span>);
+            <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">UnwindTableRow</span> {
+                <span class="ident">start_address</span>: <span class="number">0</span>,
+                <span class="ident">end_address</span>: <span class="number">100</span>,
+                <span class="ident">saved_args_size</span>: <span class="number">0</span>,
+                <span class="ident">cfa</span>: <span class="ident">CfaRule::RegisterAndOffset</span> {
+                    <span class="ident">register</span>: <span class="ident">Register</span>(<span class="number">4</span>),
+                    <span class="ident">offset</span>: <span class="op">-</span><span class="number">12</span>,
+                },
+                <span class="ident">registers</span>: [].<span class="ident">iter</span>().<span class="ident">collect</span>(),
+            };
+            <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">expected</span>), <span class="ident">row</span>);
+        }
+
+        <span class="comment">// All done!</span>
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="ident">table</span>.<span class="ident">next_row</span>());
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="ident">table</span>.<span class="ident">next_row</span>());
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_unwind_table_cie_single_rule</span>() {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::identity_op</span>)]</span>
+        <span class="kw">let</span> <span class="ident">initial_instructions</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
+            <span class="comment">// The CFA is -12 from register 4.</span>
+            .<span class="ident">D8</span>(<span class="ident">constants::DW_CFA_def_cfa_sf</span>.<span class="number">0</span>)
+            .<span class="ident">uleb</span>(<span class="number">4</span>)
+            .<span class="ident">sleb</span>(<span class="op">-</span><span class="number">12</span>)
+            <span class="comment">// Register 3 is 4 from the CFA.</span>
+            .<span class="ident">D8</span>(<span class="ident">constants::DW_CFA_offset</span>.<span class="number">0</span> <span class="op">|</span> <span class="number">3</span>)
+            .<span class="ident">uleb</span>(<span class="number">4</span>)
+            .<span class="ident">append_repeated</span>(<span class="ident">constants::DW_CFA_nop</span>.<span class="number">0</span>, <span class="number">4</span>);
+        <span class="kw">let</span> <span class="ident">initial_instructions</span> <span class="op">=</span> <span class="ident">initial_instructions</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">cie</span> <span class="op">=</span> <span class="ident">CommonInformationEntry</span> {
+            <span class="ident">offset</span>: <span class="number">0</span>,
+            <span class="ident">length</span>: <span class="number">0</span>,
+            <span class="ident">format</span>: <span class="ident">Format::Dwarf32</span>,
+            <span class="ident">version</span>: <span class="number">4</span>,
+            <span class="ident">augmentation</span>: <span class="prelude-val">None</span>,
+            <span class="ident">address_size</span>: <span class="number">8</span>,
+            <span class="ident">segment_size</span>: <span class="number">0</span>,
+            <span class="ident">code_alignment_factor</span>: <span class="number">1</span>,
+            <span class="ident">data_alignment_factor</span>: <span class="number">1</span>,
+            <span class="ident">return_address_register</span>: <span class="ident">Register</span>(<span class="number">3</span>),
+            <span class="ident">initial_instructions</span>: <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">initial_instructions</span>, <span class="ident">LittleEndian</span>),
+        };
+
+        <span class="kw">let</span> <span class="ident">instructions</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
+            <span class="comment">// A bunch of nop padding.</span>
+            .<span class="ident">append_repeated</span>(<span class="ident">constants::DW_CFA_nop</span>.<span class="number">0</span>, <span class="number">8</span>);
+        <span class="kw">let</span> <span class="ident">instructions</span> <span class="op">=</span> <span class="ident">instructions</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">fde</span> <span class="op">=</span> <span class="ident">FrameDescriptionEntry</span> {
+            <span class="ident">offset</span>: <span class="number">0</span>,
+            <span class="ident">length</span>: <span class="number">0</span>,
+            <span class="ident">format</span>: <span class="ident">Format::Dwarf32</span>,
+            <span class="ident">cie</span>: <span class="ident">cie</span>.<span class="ident">clone</span>(),
+            <span class="ident">initial_segment</span>: <span class="number">0</span>,
+            <span class="ident">initial_address</span>: <span class="number">0</span>,
+            <span class="ident">address_range</span>: <span class="number">100</span>,
+            <span class="ident">augmentation</span>: <span class="prelude-val">None</span>,
+            <span class="ident">instructions</span>: <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">instructions</span>, <span class="ident">LittleEndian</span>),
+        };
+
+        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">DebugFrame::from</span>(<span class="ident">EndianSlice::default</span>());
+        <span class="kw">let</span> <span class="ident">bases</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">BaseAddresses::default</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">UnwindContext::new</span>());
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">fde</span>
+            .<span class="ident">rows</span>(<span class="ident">section</span>, <span class="ident">bases</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>)
+            .<span class="ident">expect</span>(<span class="string">&quot;Should run initial program OK&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">table</span>.<span class="ident">ctx</span>.<span class="ident">is_initialized</span>);
+        <span class="kw">let</span> <span class="ident">expected_initial_rule</span> <span class="op">=</span> (<span class="ident">Register</span>(<span class="number">3</span>), <span class="ident">RegisterRule::Offset</span>(<span class="number">4</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">table</span>.<span class="ident">ctx</span>.<span class="ident">initial_rule</span>, <span class="prelude-val">Some</span>(<span class="ident">expected_initial_rule</span>));
+
+        {
+            <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">next_row</span>().<span class="ident">expect</span>(<span class="string">&quot;Should evaluate first row OK&quot;</span>);
+            <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">UnwindTableRow</span> {
+                <span class="ident">start_address</span>: <span class="number">0</span>,
+                <span class="ident">end_address</span>: <span class="number">100</span>,
+                <span class="ident">saved_args_size</span>: <span class="number">0</span>,
+                <span class="ident">cfa</span>: <span class="ident">CfaRule::RegisterAndOffset</span> {
+                    <span class="ident">register</span>: <span class="ident">Register</span>(<span class="number">4</span>),
+                    <span class="ident">offset</span>: <span class="op">-</span><span class="number">12</span>,
+                },
+                <span class="ident">registers</span>: [(<span class="ident">Register</span>(<span class="number">3</span>), <span class="ident">RegisterRule::Offset</span>(<span class="number">4</span>))].<span class="ident">iter</span>().<span class="ident">collect</span>(),
+            };
+            <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">expected</span>), <span class="ident">row</span>);
+        }
+
+        <span class="comment">// All done!</span>
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="ident">table</span>.<span class="ident">next_row</span>());
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="ident">table</span>.<span class="ident">next_row</span>());
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_unwind_table_next_row</span>() {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::identity_op</span>)]</span>
         <span class="kw">let</span> <span class="ident">initial_instructions</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
@@ -12876,20 +13194,20 @@
 
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">DebugFrame::from</span>(<span class="ident">EndianSlice::default</span>());
         <span class="kw">let</span> <span class="ident">bases</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">BaseAddresses::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">UninitializedUnwindContext::new</span>();
-        <span class="ident">ctx</span>.<span class="number">0</span>.<span class="ident">assert_fully_uninitialized</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">UnwindContext::new</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">fde</span>
             .<span class="ident">rows</span>(<span class="ident">section</span>, <span class="ident">bases</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;Should run initial program OK&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">table</span>.<span class="ident">ctx</span>.<span class="ident">is_initialized</span>);
+        <span class="macro">assert!</span>(<span class="ident">table</span>.<span class="ident">ctx</span>.<span class="ident">initial_rule</span>.<span class="ident">is_none</span>());
         <span class="kw">let</span> <span class="ident">expected_initial_rules</span>: <span class="ident">RegisterRuleMap</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> [
             (<span class="ident">Register</span>(<span class="number">0</span>), <span class="ident">RegisterRule::Offset</span>(<span class="number">8</span>)),
             (<span class="ident">Register</span>(<span class="number">3</span>), <span class="ident">RegisterRule::Offset</span>(<span class="number">4</span>)),
         ]
         .<span class="ident">iter</span>()
         .<span class="ident">collect</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">table</span>.<span class="ident">ctx</span>.<span class="ident">initial_rules</span>, <span class="ident">expected_initial_rules</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">table</span>.<span class="ident">ctx</span>.<span class="ident">stack</span>[<span class="number">0</span>].<span class="ident">registers</span>, <span class="ident">expected_initial_rules</span>);
 
         {
             <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">next_row</span>().<span class="ident">expect</span>(<span class="string">&quot;Should evaluate first row OK&quot;</span>);
@@ -13076,7 +13394,7 @@
 
         <span class="comment">// Get the second row of the unwind table in `instrs3`.</span>
         <span class="kw">let</span> <span class="ident">bases</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">UninitializedUnwindContext::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">UnwindContext::new</span>());
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">debug_frame</span>.<span class="ident">unwind_info_for_address</span>(
             <span class="kw-2">&amp;</span><span class="ident">bases</span>,
             <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>,
@@ -13087,7 +13405,7 @@
         <span class="kw">let</span> <span class="ident">unwind_info</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">unwind_info</span>,
+            <span class="kw-2">*</span><span class="ident">unwind_info</span>,
             <span class="ident">UnwindTableRow</span> {
                 <span class="ident">start_address</span>: <span class="ident">fde1</span>.<span class="ident">initial_address</span>() <span class="op">+</span> <span class="number">100</span>,
                 <span class="ident">end_address</span>: <span class="ident">fde1</span>.<span class="ident">initial_address</span>() <span class="op">+</span> <span class="ident">fde1</span>.<span class="ident">len</span>(),
@@ -13105,7 +13423,7 @@
     <span class="kw">fn</span> <span class="ident">test_unwind_info_for_address_not_found</span>() {
         <span class="kw">let</span> <span class="ident">debug_frame</span> <span class="op">=</span> <span class="ident">DebugFrame::new</span>(<span class="kw-2">&amp;</span>[], <span class="ident">NativeEndian</span>);
         <span class="kw">let</span> <span class="ident">bases</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">UninitializedUnwindContext::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">UnwindContext::new</span>());
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">debug_frame</span>.<span class="ident">unwind_info_for_address</span>(
             <span class="kw-2">&amp;</span><span class="ident">bases</span>,
             <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>,

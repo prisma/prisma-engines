@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["MessageType","Message types are either Query (also Update) or Response"]],"struct":[["Header","Metadata for the `Message` struct."]]});
+initSidebarItems({"enum":[["MessageType","Message types are either Query (also Update) or Response"]],"struct":[["Flags","All the flags of the request/response header"],["Header","Metadata for the `Message` struct."]]});

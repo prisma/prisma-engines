@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.19.1/src/stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -204,51 +204,109 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::session::Session</span>;
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::conn</span>::{<span class="ident">ConnectionCommon</span>, <span class="ident">SideData</span>};
+
 <span class="kw">use</span> <span class="ident">std::io</span>::{<span class="ident">IoSlice</span>, <span class="ident">Read</span>, <span class="prelude-ty">Result</span>, <span class="ident">Write</span>};
+<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
 
 <span class="doccomment">/// This type implements `io::Read` and `io::Write`, encapsulating</span>
-<span class="doccomment">/// a Session `S` and an underlying transport `T`, such as a socket.</span>
+<span class="doccomment">/// a Connection `C` and an underlying transport `T`, such as a socket.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This allows you to use a rustls Session like a normal stream.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Session</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>, <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Our session</span>
-    <span class="kw">pub</span> <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">S</span>,
+<span class="doccomment">/// This allows you to use a rustls Connection like a normal stream.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>, <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Our TLS connection</span>
+    <span class="kw">pub</span> <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">C</span>,
 
     <span class="doccomment">/// The underlying transport, like a socket</span>
     <span class="kw">pub</span> <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">S</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Session</span>,
+    <span class="ident">C</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">DerefMut</span> <span class="op">+</span> <span class="ident">Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="ident">ConnectionCommon</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span>,
+    <span class="ident">S</span>: <span class="ident">SideData</span>,
 {
-    <span class="doccomment">/// Make a new Stream using the Session `sess` and socket-like object</span>
+    <span class="doccomment">/// Make a new Stream using the Connection `conn` and socket-like object</span>
     <span class="doccomment">/// `sock`.  This does not fail and does no IO.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">S</span>, <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Stream</span> { <span class="ident">sess</span>, <span class="ident">sock</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">C</span>, <span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">conn</span>, <span class="ident">sock</span> }
     }
 
     <span class="doccomment">/// If we&#39;re handshaking, complete all the IO for that.</span>
     <span class="doccomment">/// If we have data to write, write it all.</span>
     <span class="kw">fn</span> <span class="ident">complete_prior_io</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">is_handshaking</span>() {
-            <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>)<span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">is_handshaking</span>() {
+            <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">wants_write</span>() {
-            <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>)<span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">wants_write</span>() {
+            <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">S</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Session</span>,
+    <span class="ident">C</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">DerefMut</span> <span class="op">+</span> <span class="ident">Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="ident">ConnectionCommon</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span>,
+    <span class="ident">S</span>: <span class="ident">SideData</span>,
 {
     <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">complete_prior_io</span>()<span class="question-mark">?</span>;
@@ -259,26 +317,62 @@
         <span class="comment">// hit. Otherwise, we will prematurely signal EOF by returning 0. We</span>
         <span class="comment">// determine if EOF has actually been hit by checking if 0 bytes were</span>
         <span class="comment">// read from the underlying transport.</span>
-        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">wants_read</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>)<span class="question-mark">?</span>.<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {}
+        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">wants_read</span>() {
+            <span class="kw">let</span> <span class="ident">at_eof</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>)<span class="question-mark">?</span>.<span class="number">0</span> <span class="op">==</span> <span class="number">0</span>;
+            <span class="kw">if</span> <span class="ident">at_eof</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">io_state</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">process_new_packets</span>() {
+                    <span class="kw">if</span> <span class="ident">at_eof</span> <span class="op">&amp;&amp;</span> <span class="ident">io_state</span>.<span class="ident">plaintext_bytes_to_read</span>() <span class="op">==</span> <span class="number">0</span> {
+                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>);
+                    }
+                }
+                <span class="kw">break</span>;
+            }
+        }
 
-        <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">read</span>(<span class="ident">buf</span>)
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">reader</span>().<span class="ident">read</span>(<span class="ident">buf</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">read_buf</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">read_buf</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::io::ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">complete_prior_io</span>()<span class="question-mark">?</span>;
+
+        <span class="comment">// We call complete_io() in a loop since a single call may read only</span>
+        <span class="comment">// a partial packet from the underlying transport. A full packet is</span>
+        <span class="comment">// needed to get more plaintext, which we must do if EOF has not been</span>
+        <span class="comment">// hit. Otherwise, we will prematurely signal EOF by returning without</span>
+        <span class="comment">// writing anything. We determine if EOF has actually been hit by</span>
+        <span class="comment">// checking if 0 bytes were read from the underlying transport.</span>
+        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">wants_read</span>() {
+            <span class="kw">let</span> <span class="ident">at_eof</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>)<span class="question-mark">?</span>.<span class="number">0</span> <span class="op">==</span> <span class="number">0</span>;
+            <span class="kw">if</span> <span class="ident">at_eof</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">io_state</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">process_new_packets</span>() {
+                    <span class="kw">if</span> <span class="ident">at_eof</span> <span class="op">&amp;&amp;</span> <span class="ident">io_state</span>.<span class="ident">plaintext_bytes_to_read</span>() <span class="op">==</span> <span class="number">0</span> {
+                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+                    }
+                }
+                <span class="kw">break</span>;
+            }
+        }
+
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">reader</span>().<span class="ident">read_buf</span>(<span class="ident">buf</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Write</span> <span class="kw">for</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Write</span> <span class="kw">for</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">S</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Session</span>,
+    <span class="ident">C</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">DerefMut</span> <span class="op">+</span> <span class="ident">Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="ident">ConnectionCommon</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span>,
+    <span class="ident">S</span>: <span class="ident">SideData</span>,
 {
     <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">complete_prior_io</span>()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">write</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">writer</span>().<span class="ident">write</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// Try to write the underlying transport here, but don&#39;t let</span>
         <span class="comment">// any errors mask the fact we&#39;ve consumed `len` bytes.</span>
         <span class="comment">// Callers will learn of permanent errors on the next call.</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>);
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">len</span>)
     }
@@ -286,12 +380,15 @@
     <span class="kw">fn</span> <span class="ident">write_vectored</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">complete_prior_io</span>()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">write_vectored</span>(<span class="ident">bufs</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">conn</span>
+            .<span class="ident">writer</span>()
+            .<span class="ident">write_vectored</span>(<span class="ident">bufs</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// Try to write the underlying transport here, but don&#39;t let</span>
         <span class="comment">// any errors mask the fact we&#39;ve consumed `len` bytes.</span>
         <span class="comment">// Callers will learn of permanent errors on the next call.</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>);
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">len</span>)
     }
@@ -299,39 +396,41 @@
     <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">complete_prior_io</span>()<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">flush</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">wants_write</span>() {
-            <span class="self">self</span>.<span class="ident">sess</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">writer</span>().<span class="ident">flush</span>()<span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">wants_write</span>() {
+            <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">complete_io</span>(<span class="self">self</span>.<span class="ident">sock</span>)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
 <span class="doccomment">/// This type implements `io::Read` and `io::Write`, encapsulating</span>
-<span class="doccomment">/// and owning a Session `S` and an underlying blocking transport</span>
+<span class="doccomment">/// and owning a Connection `C` and an underlying blocking transport</span>
 <span class="doccomment">/// `T`, such as a socket.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This allows you to use a rustls Session like a normal stream.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Session</span> <span class="op">+</span> <span class="ident">Sized</span>, <span class="ident">T</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span> <span class="op">+</span> <span class="ident">Sized</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Our session</span>
-    <span class="kw">pub</span> <span class="ident">sess</span>: <span class="ident">S</span>,
+<span class="doccomment">/// This allows you to use a rustls Connection like a normal stream.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Sized</span>, <span class="ident">T</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span> <span class="op">+</span> <span class="ident">Sized</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Our connection</span>
+    <span class="kw">pub</span> <span class="ident">conn</span>: <span class="ident">C</span>,
 
     <span class="doccomment">/// The underlying transport, like a socket</span>
     <span class="kw">pub</span> <span class="ident">sock</span>: <span class="ident">T</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Session</span>,
+    <span class="ident">C</span>: <span class="ident">DerefMut</span> <span class="op">+</span> <span class="ident">Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="ident">ConnectionCommon</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">T</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span>,
+    <span class="ident">S</span>: <span class="ident">SideData</span>,
 {
-    <span class="doccomment">/// Make a new StreamOwned taking the Session `sess` and socket-like</span>
+    <span class="doccomment">/// Make a new StreamOwned taking the Connection `conn` and socket-like</span>
     <span class="doccomment">/// object `sock`.  This does not fail and does no IO.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the same as `Stream::new` except `sess` and `sock` are</span>
+    <span class="doccomment">/// This is the same as `Stream::new` except `conn` and `sock` are</span>
     <span class="doccomment">/// moved into the StreamOwned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">sess</span>: <span class="ident">S</span>, <span class="ident">sock</span>: <span class="ident">T</span>) -&gt; <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">StreamOwned</span> { <span class="ident">sess</span>, <span class="ident">sock</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="ident">C</span>, <span class="ident">sock</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">conn</span>, <span class="ident">sock</span> }
     }
 
     <span class="doccomment">/// Get a reference to the underlying socket</span>
@@ -345,33 +444,41 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Session</span>,
+    <span class="ident">C</span>: <span class="ident">DerefMut</span> <span class="op">+</span> <span class="ident">Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="ident">ConnectionCommon</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">T</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span>,
+    <span class="ident">S</span>: <span class="ident">SideData</span>,
 {
-    <span class="kw">fn</span> <span class="ident">as_stream</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_stream</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Stream</span> {
-            <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">sess</span>,
+            <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">conn</span>,
             <span class="ident">sock</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">sock</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Session</span>,
+    <span class="ident">C</span>: <span class="ident">DerefMut</span> <span class="op">+</span> <span class="ident">Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="ident">ConnectionCommon</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">T</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span>,
+    <span class="ident">S</span>: <span class="ident">SideData</span>,
 {
     <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">as_stream</span>().<span class="ident">read</span>(<span class="ident">buf</span>)
     }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">read_buf</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">read_buf</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::io::ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">as_stream</span>().<span class="ident">read_buf</span>(<span class="ident">buf</span>)
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Write</span> <span class="kw">for</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Write</span> <span class="kw">for</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Session</span>,
+    <span class="ident">C</span>: <span class="ident">DerefMut</span> <span class="op">+</span> <span class="ident">Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="ident">ConnectionCommon</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">T</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span>,
+    <span class="ident">S</span>: <span class="ident">SideData</span>,
 {
     <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">as_stream</span>().<span class="ident">write</span>(<span class="ident">buf</span>)
@@ -385,24 +492,23 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Stream</span>, <span class="ident">StreamOwned</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::ClientSession</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server::ServerSession</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::session::Session</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::ClientConnection</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server::ServerConnection</span>;
     <span class="kw">use</span> <span class="ident">std::net::TcpStream</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">stream_can_be_created_for_session_and_tcpstream</span>() {
-        <span class="kw">type</span> <span class="ident">_Test</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">dyn</span> <span class="ident">Session</span>, <span class="ident">TcpStream</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">stream_can_be_created_for_connection_and_tcpstream</span>() {
+        <span class="kw">type</span> <span class="ident">_Test</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ClientConnection</span>, <span class="ident">TcpStream</span><span class="op">&gt;</span>;
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">streamowned_can_be_created_for_client_and_tcpstream</span>() {
-        <span class="kw">type</span> <span class="ident">_Test</span> <span class="op">=</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">ClientSession</span>, <span class="ident">TcpStream</span><span class="op">&gt;</span>;
+        <span class="kw">type</span> <span class="ident">_Test</span> <span class="op">=</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">ClientConnection</span>, <span class="ident">TcpStream</span><span class="op">&gt;</span>;
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">streamowned_can_be_created_for_server_and_tcpstream</span>() {
-        <span class="kw">type</span> <span class="ident">_Test</span> <span class="op">=</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">ServerSession</span>, <span class="ident">TcpStream</span><span class="op">&gt;</span>;
+        <span class="kw">type</span> <span class="ident">_Test</span> <span class="op">=</span> <span class="ident">StreamOwned</span><span class="op">&lt;</span><span class="ident">ServerConnection</span>, <span class="ident">TcpStream</span><span class="op">&gt;</span>;
     }
 }
 </code></pre></div>

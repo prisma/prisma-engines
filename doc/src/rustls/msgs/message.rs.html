@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.19.1/src/msgs/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -263,7 +263,31 @@
 <span id="258">258</span>
 <span id="259">259</span>
 <span id="260">260</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::alert::AlertMessagePayload</span>;
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::alert::AlertMessagePayload</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::base::Payload</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::ccs::ChangeCipherSpecPayload</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::codec</span>::{<span class="ident">Codec</span>, <span class="ident">Reader</span>};
@@ -272,122 +296,97 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">ContentType</span>, <span class="ident">ProtocolVersion</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::HandshakeMessagePayload</span>;
 
-<span class="kw">use</span> <span class="ident">std::mem</span>;
+<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessagePayload</span> {
     <span class="ident">Alert</span>(<span class="ident">AlertMessagePayload</span>),
-    <span class="ident">Handshake</span>(<span class="ident">HandshakeMessagePayload</span>),
+    <span class="ident">Handshake</span> {
+        <span class="ident">parsed</span>: <span class="ident">HandshakeMessagePayload</span>,
+        <span class="ident">encoded</span>: <span class="ident">Payload</span>,
+    },
     <span class="ident">ChangeCipherSpec</span>(<span class="ident">ChangeCipherSpecPayload</span>),
-    <span class="ident">Opaque</span>(<span class="ident">Payload</span>),
+    <span class="ident">ApplicationData</span>(<span class="ident">Payload</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">MessagePayload</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">MessagePayload::Alert</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>),
-            <span class="ident">MessagePayload::Handshake</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>),
-            <span class="ident">MessagePayload::ChangeCipherSpec</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>),
-            <span class="ident">MessagePayload::Opaque</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>),
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident"><span class="self">Self</span>::Alert</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>),
+            <span class="ident"><span class="self">Self</span>::Handshake</span> { <span class="ident">encoded</span>, .. } =&gt; <span class="ident">bytes</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>.<span class="number">0</span>),
+            <span class="ident"><span class="self">Self</span>::ChangeCipherSpec</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>),
+            <span class="ident"><span class="self">Self</span>::ApplicationData</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_given_type</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">typ</span>: <span class="ident">ContentType</span>,
-        <span class="ident">vers</span>: <span class="ident">ProtocolVersion</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessagePayload</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessagePayload::Opaque</span>(<span class="kw-2">ref</span> <span class="ident">payload</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Reader::init</span>(<span class="kw-2">&amp;</span><span class="ident">payload</span>.<span class="number">0</span>);
-            <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">typ</span> {
-                <span class="ident">ContentType::Alert</span> =&gt; {
-                    <span class="prelude-val">Some</span>(<span class="ident">MessagePayload::Alert</span>(<span class="ident">AlertMessagePayload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>)<span class="question-mark">?</span>))
-                }
-                <span class="ident">ContentType::Handshake</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">HandshakeMessagePayload::read_version</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>, <span class="ident">vers</span>)<span class="question-mark">?</span>;
-                    <span class="prelude-val">Some</span>(<span class="ident">MessagePayload::Handshake</span>(<span class="ident">p</span>))
-                }
-                <span class="ident">ContentType::ChangeCipherSpec</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">ChangeCipherSpecPayload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>)<span class="question-mark">?</span>;
-                    <span class="prelude-val">Some</span>(<span class="ident">MessagePayload::ChangeCipherSpec</span>(<span class="ident">p</span>))
-                }
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-            };
-
-            <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">any_left</span>() { <span class="prelude-val">None</span> } <span class="kw">else</span> { <span class="ident">parsed</span> }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handshake</span>(<span class="ident">parsed</span>: <span class="ident">HandshakeMessagePayload</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::Handshake</span> {
+            <span class="ident">encoded</span>: <span class="ident">Payload::new</span>(<span class="ident">parsed</span>.<span class="ident">get_encoding</span>()),
+            <span class="ident">parsed</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">MessagePayload::Alert</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">length</span>(),
-            <span class="ident">MessagePayload::Handshake</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">length</span>(),
-            <span class="ident">MessagePayload::ChangeCipherSpec</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">length</span>(),
-            <span class="ident">MessagePayload::Opaque</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="number">0</span>.<span class="ident">len</span>(),
-        }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">typ</span>: <span class="ident">ContentType</span>, <span class="ident">vers</span>: <span class="ident">ProtocolVersion</span>, <span class="ident">payload</span>: <span class="ident">Payload</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Reader::init</span>(<span class="kw-2">&amp;</span><span class="ident">payload</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">typ</span> {
+            <span class="ident">ContentType::ApplicationData</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ApplicationData</span>(<span class="ident">payload</span>)),
+            <span class="ident">ContentType::Alert</span> =&gt; <span class="ident">AlertMessagePayload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>)
+                .<span class="ident">filter</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="op">!</span><span class="ident">r</span>.<span class="ident">any_left</span>())
+                .<span class="ident">map</span>(<span class="ident">MessagePayload::Alert</span>),
+            <span class="ident">ContentType::Handshake</span> =&gt; <span class="ident">HandshakeMessagePayload::read_version</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>, <span class="ident">vers</span>)
+                .<span class="ident">filter</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="op">!</span><span class="ident">r</span>.<span class="ident">any_left</span>())
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">parsed</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::Handshake</span> {
+                    <span class="ident">parsed</span>,
+                    <span class="ident">encoded</span>: <span class="ident">payload</span>,
+                }),
+            <span class="ident">ContentType::ChangeCipherSpec</span> =&gt; <span class="ident">ChangeCipherSpecPayload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>)
+                .<span class="ident">filter</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="op">!</span><span class="ident">r</span>.<span class="ident">any_left</span>())
+                .<span class="ident">map</span>(<span class="ident">MessagePayload::ChangeCipherSpec</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        };
+
+        <span class="ident">parsed</span>.<span class="ident">ok_or</span>(<span class="ident">Error::CorruptMessagePayload</span>(<span class="ident">typ</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_opaque</span>(<span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">MessagePayload</span> {
-        <span class="ident">MessagePayload::Opaque</span>(<span class="ident">Payload::new</span>(<span class="ident">data</span>))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ContentType</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident"><span class="self">Self</span>::Alert</span>(<span class="kw">_</span>) =&gt; <span class="ident">ContentType::Alert</span>,
+            <span class="ident"><span class="self">Self</span>::Handshake</span> { .. } =&gt; <span class="ident">ContentType::Handshake</span>,
+            <span class="ident"><span class="self">Self</span>::ChangeCipherSpec</span>(<span class="kw">_</span>) =&gt; <span class="ident">ContentType::ChangeCipherSpec</span>,
+            <span class="ident"><span class="self">Self</span>::ApplicationData</span>(<span class="kw">_</span>) =&gt; <span class="ident">ContentType::ApplicationData</span>,
+        }
     }
 }
 
 <span class="doccomment">/// A TLS frame, named TLSPlaintext in the standard.</span>
-<span class="doccomment">/// This type owns all memory for its interior parts.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Message</span> {
+<span class="doccomment">///</span>
+<span class="doccomment">/// This type owns all memory for its interior parts. It is used to read/write from/to I/O</span>
+<span class="doccomment">/// buffers as well as for fragmenting, joining and encryption/decryption. It can be converted</span>
+<span class="doccomment">/// into a `Message` by decoding the payload.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OpaqueMessage</span> {
     <span class="kw">pub</span> <span class="ident">typ</span>: <span class="ident">ContentType</span>,
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">ProtocolVersion</span>,
-    <span class="kw">pub</span> <span class="ident">payload</span>: <span class="ident">MessagePayload</span>,
+    <span class="kw">pub</span> <span class="ident">payload</span>: <span class="ident">Payload</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Message</span> {
-    <span class="doccomment">/// This is the maximum on-the-wire size of a TLSCiphertext.</span>
-    <span class="doccomment">/// That&#39;s 2^14 payload bytes, a header, and a 2KB allowance</span>
-    <span class="doccomment">/// for ciphertext overheads.</span>
-    <span class="kw">const</span> <span class="ident">MAX_PAYLOAD</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">16384</span> <span class="op">+</span> <span class="number">2048</span>;
-
-    <span class="doccomment">/// Content type, version and size.</span>
-    <span class="kw">const</span> <span class="ident">HEADER_SIZE</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">+</span> <span class="number">2</span> <span class="op">+</span> <span class="number">2</span>;
-
-    <span class="doccomment">/// Maximum on-wire message size.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_WIRE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> (<span class="ident">Message::MAX_PAYLOAD</span> <span class="op">+</span> <span class="ident">Message::HEADER_SIZE</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-}
-
-<span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">Message</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="ident">Message::read_with_detailed_error</span>(<span class="ident">r</span>).<span class="ident">ok</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">typ</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        (<span class="self">self</span>.<span class="ident">payload</span>.<span class="ident">length</span>() <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageError</span> {
-    <span class="ident">TooShortForHeader</span>,
-    <span class="ident">TooShortForLength</span>,
-    <span class="ident">IllegalLength</span>,
-    <span class="ident">IllegalContentType</span>,
-    <span class="ident">IllegalProtocolVersion</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Message</span> {
-    <span class="doccomment">/// Like Message::read(), but allows the important distinction between:</span>
-    <span class="doccomment">/// this message might be valid if we read more data; and this message will</span>
-    <span class="doccomment">/// never be valid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_with_detailed_error</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">MessageError</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">OpaqueMessage</span> {
+    <span class="doccomment">/// `MessageError` allows callers to distinguish between valid prefixes (might</span>
+    <span class="doccomment">/// become valid if we read more data) and invalid data.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">MessageError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">ContentType::read</span>(<span class="ident">r</span>).<span class="ident">ok_or</span>(<span class="ident">MessageError::TooShortForHeader</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">ProtocolVersion::read</span>(<span class="ident">r</span>).<span class="ident">ok_or</span>(<span class="ident">MessageError::TooShortForHeader</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">u16::read</span>(<span class="ident">r</span>).<span class="ident">ok_or</span>(<span class="ident">MessageError::TooShortForHeader</span>)<span class="question-mark">?</span>;
 
+        <span class="comment">// Reject undersize messages</span>
+        <span class="comment">//  implemented per section 5.1 of RFC8446 (TLSv1.3)</span>
+        <span class="comment">//              per section 6.2.1 of RFC5246 (TLSv1.2)</span>
+        <span class="kw">if</span> <span class="ident">typ</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ContentType::ApplicationData</span> <span class="op">&amp;&amp;</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MessageError::IllegalLength</span>);
+        }
+
         <span class="comment">// Reject oversize messages</span>
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">Message::MAX_PAYLOAD</span> {
+        <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::MAX_PAYLOAD</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MessageError::IllegalLength</span>);
         }
 
@@ -407,78 +406,116 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span> <span class="op">=</span> <span class="ident">r</span>
             .<span class="ident">sub</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)
             .<span class="ident">ok_or</span>(<span class="ident">MessageError::TooShortForLength</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">Payload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">Payload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Message</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">typ</span>,
             <span class="ident">version</span>,
-            <span class="ident">payload</span>: <span class="ident">MessagePayload::Opaque</span>(<span class="ident">payload</span>),
+            <span class="ident">payload</span>,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_content_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">typ</span>: <span class="ident">ContentType</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">typ</span> <span class="op">==</span> <span class="ident">typ</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="self">self</span>.<span class="ident">typ</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
+        <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
+        (<span class="self">self</span>.<span class="ident">payload</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
+        <span class="self">self</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
+        <span class="ident">buf</span>
     }
 
+    <span class="doccomment">/// Force conversion into a plaintext message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This should only be used for messages that are known to be in plaintext. Otherwise, the</span>
+    <span class="doccomment">/// `OpaqueMessage` should be decrypted into a `PlainMessage` using a `MessageDecrypter`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_plain_message</span>(<span class="self">self</span>) -&gt; <span class="ident">PlainMessage</span> {
+        <span class="ident">PlainMessage</span> {
+            <span class="ident">version</span>: <span class="self">self</span>.<span class="ident">version</span>,
+            <span class="ident">typ</span>: <span class="self">self</span>.<span class="ident">typ</span>,
+            <span class="ident">payload</span>: <span class="self">self</span>.<span class="ident">payload</span>,
+        }
+    }
+
+    <span class="doccomment">/// This is the maximum on-the-wire size of a TLSCiphertext.</span>
+    <span class="doccomment">/// That&#39;s 2^14 payload bytes, a header, and a 2KB allowance</span>
+    <span class="doccomment">/// for ciphertext overheads.</span>
+    <span class="kw">const</span> <span class="ident">MAX_PAYLOAD</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">16384</span> <span class="op">+</span> <span class="number">2048</span>;
+
+    <span class="doccomment">/// Content type, version and size.</span>
+    <span class="kw">const</span> <span class="ident">HEADER_SIZE</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">+</span> <span class="number">2</span> <span class="op">+</span> <span class="number">2</span>;
+
+    <span class="doccomment">/// Maximum on-wire message size.</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_WIRE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> (<span class="ident"><span class="self">Self</span>::MAX_PAYLOAD</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::HEADER_SIZE</span>) <span class="kw">as</span> <span class="ident">usize</span>;
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PlainMessage</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">msg</span>: <span class="ident">Message</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">payload</span>.<span class="ident">content_type</span>();
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">msg</span>.<span class="ident">payload</span> {
+            <span class="ident">MessagePayload::ApplicationData</span>(<span class="ident">payload</span>) =&gt; <span class="ident">payload</span>,
+            <span class="kw">_</span> =&gt; {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+                <span class="ident">msg</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
+                <span class="ident">Payload</span>(<span class="ident">buf</span>)
+            }
+        };
+
+        <span class="self">Self</span> {
+            <span class="ident">typ</span>,
+            <span class="ident">version</span>: <span class="ident">msg</span>.<span class="ident">version</span>,
+            <span class="ident">payload</span>,
+        }
+    }
+}
+
+<span class="doccomment">/// A decrypted TLS frame</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This type owns all memory for its interior parts. It can be decrypted from an OpaqueMessage</span>
+<span class="doccomment">/// or encrypted into an OpaqueMessage, and it is also used for joining and fragmenting.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PlainMessage</span> {
+    <span class="kw">pub</span> <span class="ident">typ</span>: <span class="ident">ContentType</span>,
+    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">ProtocolVersion</span>,
+    <span class="kw">pub</span> <span class="ident">payload</span>: <span class="ident">Payload</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">PlainMessage</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_unencrypted_opaque</span>(<span class="self">self</span>) -&gt; <span class="ident">OpaqueMessage</span> {
+        <span class="ident">OpaqueMessage</span> {
+            <span class="ident">version</span>: <span class="self">self</span>.<span class="ident">version</span>,
+            <span class="ident">typ</span>: <span class="self">self</span>.<span class="ident">typ</span>,
+            <span class="ident">payload</span>: <span class="self">self</span>.<span class="ident">payload</span>,
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BorrowedPlainMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+        <span class="ident">BorrowedPlainMessage</span> {
+            <span class="ident">version</span>: <span class="self">self</span>.<span class="ident">version</span>,
+            <span class="ident">typ</span>: <span class="self">self</span>.<span class="ident">typ</span>,
+            <span class="ident">payload</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">payload</span>.<span class="number">0</span>,
+        }
+    }
+}
+
+<span class="doccomment">/// A message with decoded payload</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Message</span> {
+    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">ProtocolVersion</span>,
+    <span class="kw">pub</span> <span class="ident">payload</span>: <span class="ident">MessagePayload</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Message</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_handshake_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hstyp</span>: <span class="ident">HandshakeType</span>) -&gt; <span class="ident">bool</span> {
         <span class="comment">// Bit of a layering violation, but OK.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessagePayload::Handshake</span>(<span class="kw-2">ref</span> <span class="ident">hsp</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">payload</span> {
-            <span class="ident">hsp</span>.<span class="ident">typ</span> <span class="op">==</span> <span class="ident">hstyp</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessagePayload::Handshake</span> { <span class="ident">parsed</span>, .. } <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">payload</span> {
+            <span class="ident">parsed</span>.<span class="ident">typ</span> <span class="op">==</span> <span class="ident">hstyp</span>
         } <span class="kw">else</span> {
             <span class="bool-val">false</span>
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_payload</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// Do we need a decode?</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">typ</span> <span class="op">==</span> <span class="ident">ContentType::ApplicationData</span> {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
-        }
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">payload</span>
-            .<span class="ident">decode_given_type</span>(<span class="self">self</span>.<span class="ident">typ</span>, <span class="self">self</span>.<span class="ident">version</span>)
-        {
-            <span class="self">self</span>.<span class="ident">payload</span> <span class="op">=</span> <span class="ident">x</span>;
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_payload</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">into_opaque</span>()
-            .<span class="ident">take_opaque_payload</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="number">0</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_opaque_payload</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Payload</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessagePayload::Opaque</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">op</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">payload</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">mem::replace</span>(<span class="ident">op</span>, <span class="ident">Payload::empty</span>()))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_opaque</span>(<span class="self">self</span>) -&gt; <span class="ident">Message</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessagePayload::Opaque</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">payload</span> {
-            <span class="kw">return</span> <span class="self">self</span>;
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="self">self</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
-
-        <span class="ident">Message</span> {
-            <span class="ident">typ</span>: <span class="self">self</span>.<span class="ident">typ</span>,
-            <span class="ident">version</span>: <span class="self">self</span>.<span class="ident">version</span>,
-            <span class="ident">payload</span>: <span class="ident">MessagePayload::new_opaque</span>(<span class="ident">buf</span>),
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_alert</span>(<span class="ident">level</span>: <span class="ident">AlertLevel</span>, <span class="ident">desc</span>: <span class="ident">AlertDescription</span>) -&gt; <span class="ident">Message</span> {
-        <span class="ident">Message</span> {
-            <span class="ident">typ</span>: <span class="ident">ContentType::Alert</span>,
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_alert</span>(<span class="ident">level</span>: <span class="ident">AlertLevel</span>, <span class="ident">desc</span>: <span class="ident">AlertDescription</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
             <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
             <span class="ident">payload</span>: <span class="ident">MessagePayload::Alert</span>(<span class="ident">AlertMessagePayload</span> {
                 <span class="ident">level</span>,
@@ -487,41 +524,50 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_key_update_notify</span>() -&gt; <span class="ident">Message</span> {
-        <span class="ident">Message</span> {
-            <span class="ident">typ</span>: <span class="ident">ContentType::Handshake</span>,
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_key_update_notify</span>() -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
             <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_3</span>,
-            <span class="ident">payload</span>: <span class="ident">MessagePayload::Handshake</span>(<span class="ident">HandshakeMessagePayload::build_key_update_notify</span>()),
+            <span class="ident">payload</span>: <span class="ident">MessagePayload::handshake</span>(<span class="ident">HandshakeMessagePayload::build_key_update_notify</span>()),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Message</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_borrowed</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">BorrowMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessagePayload::Opaque</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">payload</span> {
-            <span class="ident">BorrowMessage</span> {
-                <span class="ident">typ</span>: <span class="self">self</span>.<span class="ident">typ</span>,
-                <span class="ident">version</span>: <span class="self">self</span>.<span class="ident">version</span>,
-                <span class="ident">payload</span>: <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="number">0</span>,
-            }
-        } <span class="kw">else</span> {
-            <span class="macro">unreachable!</span>(<span class="string">&quot;to_borrowed must have opaque message&quot;</span>);
-        }
+<span class="doccomment">/// Parses a plaintext message into a well-typed [`Message`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// A [`PlainMessage`] must contain plaintext content. Encrypted content should be stored in an</span>
+<span class="doccomment">/// [`OpaqueMessage`] and decrypted before being stored into a [`PlainMessage`].</span>
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">PlainMessage</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Message</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">plain</span>: <span class="ident">PlainMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+            <span class="ident">version</span>: <span class="ident">plain</span>.<span class="ident">version</span>,
+            <span class="ident">payload</span>: <span class="ident">MessagePayload::new</span>(<span class="ident">plain</span>.<span class="ident">typ</span>, <span class="ident">plain</span>.<span class="ident">version</span>, <span class="ident">plain</span>.<span class="ident">payload</span>)<span class="question-mark">?</span>,
+        })
     }
 }
 
 <span class="doccomment">/// A TLS frame, named TLSPlaintext in the standard.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This type differs from `Message` because it borrows</span>
-<span class="doccomment">/// its payload.  You can make a `Message` from an</span>
+<span class="doccomment">/// This type differs from `OpaqueMessage` because it borrows</span>
+<span class="doccomment">/// its payload.  You can make a `OpaqueMessage` from an</span>
 <span class="doccomment">/// `BorrowMessage`, but this involves a copy.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This type also cannot decode its internals and</span>
-<span class="doccomment">/// is not a `Codec` type, only `Message` can do that.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BorrowMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="doccomment">/// cannot be read/encoded; only `OpaqueMessage` can do that.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BorrowedPlainMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="ident">typ</span>: <span class="ident">ContentType</span>,
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">ProtocolVersion</span>,
     <span class="kw">pub</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageError</span> {
+    <span class="ident">TooShortForHeader</span>,
+    <span class="ident">TooShortForLength</span>,
+    <span class="ident">IllegalLength</span>,
+    <span class="ident">IllegalContentType</span>,
+    <span class="ident">IllegalProtocolVersion</span>,
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
