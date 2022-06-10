@@ -24,9 +24,15 @@ jobs:
             url: "mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true"
           - name: "mongodb5"
             url: "mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true"
-    runs-on: ubuntu-latest
+    runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
       - uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: "Start ${{ matrix.database.name }}"
         run: make start-${{ matrix.database.name }}-single
@@ -35,14 +41,6 @@ jobs:
         with:
           toolchain: stable
           default: true
-
-      # - uses: actions/cache@v2
-      #   with:
-      #     path: |
-      #       ~/.cargo/registry
-      #       ~/.cargo/git
-      #       target
-      #     key: me-ie-ubuntu-latest-mongodb-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: cargo test -p mongodb-introspection-connector
         env:
@@ -102,9 +100,15 @@ jobs:
             is_vitess: true
             single_threaded: true
 
-    runs-on: ubuntu-latest
+    runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
       - uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: "Start ${{ matrix.database.name }}"
         run: make start-${{ matrix.database.name }}
@@ -113,14 +117,6 @@ jobs:
         with:
           toolchain: stable
           default: true
-
-      # - uses: actions/cache@v2
-      #   with:
-      #     path: |
-      #       ~/.cargo/registry
-      #       ~/.cargo/git
-      #       target
-      #     key: me-ie-${{ runner.os }}-${{ matrix.database.name }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: cargo test -p introspection-engine-tests
         if: ${{ !matrix.database.single_threaded }}
