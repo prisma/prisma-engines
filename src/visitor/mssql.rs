@@ -1108,7 +1108,8 @@ mod tests {
         let (sql, params) = Mssql::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::integer(10)], params);
+        // NOTE: Offsets are unsigned, so they only fit in i64, not i32
+        assert_eq!(vec![Value::int64(10)], params);
     }
 
     #[test]
@@ -1122,7 +1123,8 @@ mod tests {
         let (sql, params) = Mssql::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::integer(10), Value::integer(9)], params);
+        // NOTE: offset and limits cannot be negative, they are u32, so they fit in i64
+        assert_eq!(vec![Value::int64(10), Value::int64(9)], params);
     }
 
     #[test]
@@ -1132,7 +1134,7 @@ mod tests {
         let (sql, params) = Mssql::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::integer(10), Value::integer(9)], params);
+        assert_eq!(vec![Value::int64(10), Value::int64(9)], params);
     }
 
     #[test]

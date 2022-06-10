@@ -108,7 +108,9 @@ test_type!(float8_array(
     Value::array(vec![Value::double(1.1234), Value::double(4.321), Value::Double(None)])
 ));
 
-test_type!(oid(postgresql, "oid", Value::Int64(None), Value::integer(10000)));
+// NOTE: OIDs are unsigned 4 byte integers, see https://www.postgresql.org/docs/9.4/datatype-oid.html
+// but a u32 cannot fit in i32, so we use i64
+test_type!(oid(postgresql, "oid", Value::Int64(None), Value::int64(10000)));
 
 test_type!(oid_array(
     postgresql,

@@ -38,7 +38,8 @@ impl<'a> Mysql<'a> {
                 serde_json::Value::String(str) => Ok(Value::text(str)),
                 serde_json::Value::Number(number) => {
                     if let Some(int) = number.as_i64() {
-                        Ok(Value::integer(int))
+                        // NOTE: JS numbers are 64bit numbers
+                        Ok(Value::int64(int))
                     } else if let Some(float) = number.as_f64() {
                         Ok(Value::double(float))
                     } else {

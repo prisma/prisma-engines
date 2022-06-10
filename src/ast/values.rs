@@ -225,9 +225,9 @@ impl<'a> Value<'a> {
     /// Creates a new 64-bit signed integer.
     pub fn integer<I>(value: I) -> Self
     where
-        I: Into<i64>,
+        I: Into<i32>,
     {
-        Value::Int64(Some(value.into()))
+        Value::Int32(Some(value.into()))
     }
 
     /// Creates a new decimal value.
