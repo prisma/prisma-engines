@@ -10,7 +10,7 @@ on:
       - 'LICENSE'
       - 'CODEOWNERS'
       - 'renovate.json'
-      
+
 jobs:
   test:
     name: Workspace unit tests
@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: ubuntu-latest
+    runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
       - uses: actions/checkout@v2
 
@@ -26,14 +26,6 @@ jobs:
         with:
           toolchain: stable
           default: true
-
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: datamodel-cache-v2
 
       - run: |
             cargo test --workspace \
