@@ -92,7 +92,6 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
 ];
 
 const CAPABILITIES: &[ConnectorCapability] = &[
-    ConnectorCapability::RelationsOverNonUniqueCriteria,
     ConnectorCapability::Enums,
     ConnectorCapability::EnumArrayPush,
     ConnectorCapability::Json,

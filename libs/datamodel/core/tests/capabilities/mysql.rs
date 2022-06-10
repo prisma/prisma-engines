@@ -96,30 +96,6 @@ fn json_support() {
 }
 
 #[test]
-fn non_unique_relation_criteria_support() {
-    let dml = indoc! {r#"
-        datasource db {
-          provider = "mysql"
-          url = "mysql://"
-        }
-
-        model Todo {
-          id           Int    @id
-          assigneeName String
-          assignee     User   @relation(fields: [assigneeName], references: [name])
-        }
-
-        model User {
-          id   Int    @id
-          name String
-          todos Todo[]
-        }
-    "#};
-
-    assert!(datamodel::parse_schema(dml).is_ok());
-}
-
-#[test]
 fn auto_increment_on_non_primary_column_support() {
     let dml = indoc! {r#"
         datasource db {
