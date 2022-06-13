@@ -1067,7 +1067,7 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
             "Text",
             vec![
                 ("SmallInt", Value::array(vec![1])),
-                ("Integer", Value::array(vec![Value::integer(i32::MAX)])),
+                ("Integer", Value::array(vec![Value::int32(i32::MAX)])),
                 ("BigInt", Value::array(vec![Value::int64(i64::MAX)])),
                 (
                     "Decimal(10,2)",
@@ -1106,7 +1106,7 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
             "VarChar",
             vec![
                 ("SmallInt", Value::array(vec![1])),
-                ("Integer", Value::array(vec![Value::integer(i32::MAX)])),
+                ("Integer", Value::array(vec![Value::int32(i32::MAX)])),
                 ("BigInt", Value::array(vec![Value::int64(i64::MAX)])),
                 (
                     "Decimal(10,2)",
