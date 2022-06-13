@@ -447,3 +447,68 @@ mod dec_scalar_lists {
         Ok(())
     }
 }
+
+// General defaults tests
+#[test_suite(schema(common), capabilities(ScalarLists))]
+mod defaults {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
+    // empty defaults
+
+    fn common() -> String {
+        let schema = indoc! {
+            r#"model ScalarModel {
+              #id(id, Int, @id)
+              strings   String[]   @default(["Foo", "Bar", "Baz"])
+              ints      Int[]      @default([1, 2, 3])
+              floats    Float[]    @default([1.1, 2.2, 3.3])
+              booleans  Boolean[]  @default([true, false, false, true])
+              enums     MyEnum[]   @default([A, B, B, A])
+              dateTimes DateTime[] @default(["2019-07-31T23:59:01.000Z", "2012-07-31T23:59:01.000Z"])
+              bytes     Bytes[]    @default(["dGVzdA==", "dA=="])
+            }
+
+            enum MyEnum {
+              A
+              B
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test]
+    async fn basic_write(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+          createOneScalarModel(data: {
+            id: 1
+          }) {
+            strings
+            ints
+            floats
+            booleans
+            enums
+            dateTimes
+            bytes
+          }
+        }"#),
+          @r###"{"data":{"createOneScalarModel":{"strings":["Foo","Bar","Baz"],"ints":[1,2,3],"floats":[1.1,2.2,3.3],"booleans":[true,false,false,true],"enums":["A","B","B","A"],"dateTimes":["2019-07-31T23:59:01.000Z","2012-07-31T23:59:01.000Z"],"bytes":["dGVzdA==", "dA=="]}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn decimal() -> String {
+        let schema = indoc! {
+            r#"model ScalarModel {
+            #id(id, Int, @id)
+            dec Decimal[]
+          }"#
+        };
+
+        schema.to_owned()
+    }
+}
