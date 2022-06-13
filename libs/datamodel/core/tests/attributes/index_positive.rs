@@ -300,6 +300,21 @@ fn mysql_allows_index_length_prefix() {
 }
 
 #[test]
+fn mysql_allows_index_length_prefix_on_unsupported_field() {
+    let dml = indoc! {r#"
+        model A {
+          id Int                     @id
+          a  Unsupported("geometry")
+
+          @@index([a(length: 10)])
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mysql, &[]);
+    assert!(datamodel::parse_schema(&schema).is_ok());
+}
+
+#[test]
 fn mysql_allows_unique_sort_order() {
     let dml = indoc! {r#"
         model A {
