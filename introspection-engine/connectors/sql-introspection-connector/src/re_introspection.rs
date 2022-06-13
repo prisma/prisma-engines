@@ -28,7 +28,7 @@ pub fn enrich(
     merge_changed_relation_names(old_data_model, new_data_model);
     merge_changed_enum_names(old_data_model, new_data_model, warnings);
     merge_changed_enum_values(old_data_model, new_data_model, warnings);
-    merge_changed_enum_defaults(old_data_model, new_data_model);
+    merge_changed_enum_defaults(old_data_model, new_data_model, warnings);
     merge_mysql_enum_names(old_data_model, new_data_model, ctx);
     merge_prisma_level_defaults(old_data_model, new_data_model, warnings);
     merge_ignores(old_data_model, new_data_model, warnings);
@@ -54,8 +54,12 @@ pub fn enrich(
 
 /// If we have to map the enum values, this makes sure we handle them
 /// in the default attributes correctly.
-fn merge_changed_enum_defaults(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
-    let mut changes: Vec<(ModelAndField, String)> = Vec::new();
+fn merge_changed_enum_defaults(
+    old_data_model: &Datamodel,
+    new_data_model: &mut Datamodel,
+    warnings: &mut Vec<Warning>,
+) {
+    let mut changes: Vec<ModelFieldAndValue> = Vec::new();
 
     for old_model in old_data_model.models() {
         let new_model = match new_data_model.models().find(|m| m.name == *old_model.name()) {
@@ -95,13 +99,7 @@ fn merge_changed_enum_defaults(old_data_model: &Datamodel, new_data_model: &mut 
                     };
 
                     if let Some(val) = r#enum.find_value_db_name(val) {
-                        changes.push((
-                            ModelAndField {
-                                model: new_model.name().to_string(),
-                                field: new_field.name().to_string(),
-                            },
-                            val.name.to_string(),
-                        ));
+                        changes.push(ModelFieldAndValue::new(new_model.name(), new_field.name(), &val.name));
                     }
                 }
                 _ => continue,
@@ -109,11 +107,15 @@ fn merge_changed_enum_defaults(old_data_model: &Datamodel, new_data_model: &mut 
         }
     }
 
-    for change in changes.into_iter() {
-        let model = new_data_model.find_model_mut(&change.0.model);
-        let field = model.find_scalar_field_mut(&change.0.field);
+    for change in changes.iter() {
+        let model = new_data_model.find_model_mut(&change.model);
+        let field = model.find_scalar_field_mut(&change.field);
 
-        field.set_default_value(DefaultValue::new_single(PrismaValue::Enum(change.1)));
+        field.set_default_value(DefaultValue::new_single(PrismaValue::Enum(change.value.clone())));
+    }
+
+    if !changes.is_empty() {
+        warnings.push(warning_enum_defaults_added_from_the_previous_data_model(&changes));
     }
 }
 

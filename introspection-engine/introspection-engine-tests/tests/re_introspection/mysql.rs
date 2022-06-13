@@ -263,9 +263,15 @@ async fn mysql_keeps_renamed_enum_defaults(api: &TestApi) -> TestResult {
           is_true @map("1")
         }
     "#]];
-    let result = api.re_introspect_dml(input).await?;
 
+    let result = api.re_introspect_dml(input).await?;
     expected.assert_eq(&result);
+
+    let expected = expect![[
+        r#"[{"code":10,"message":"These enum values were enriched with `@map` information taken from the previous Prisma schema.","affected":[{"enm":"A_val","value":"is_false"},{"enm":"A_val","value":"is_true"}]},{"code":20,"message":"Default values were enriched with custom enum variants taken from the previous Prisma schema.","affected":[{"model":"A","field":"val","value":"is_false"}]}]"#
+    ]];
+
+    expected.assert_eq(&api.re_introspect_warnings(input).await?);
 
     Ok(())
 }
