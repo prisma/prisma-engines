@@ -28,6 +28,20 @@ use napi_derive::napi;
 /// The main query engine used by JS
 #[napi]
 pub struct QueryEngine {
+    inner: EngineWrapper,
+}
+
+/// An engine can have multiple states:
+/// - After .connect, an engine is ready to handle queries. "Valid" state.
+/// - After a .disconnect, an engine is returning to a connectable state. "Valid" state.
+/// - After a .destroy, an engine is no longer available for connecting and all subsequent calls on it will fail. "Destroyed" state.
+enum EngineWrapper {
+    ValidEngine(ValidEngine),
+    DestroyedEngine,
+}
+
+/// An engine that is
+struct ValidEngine {
     inner: RwLock<Inner>,
     logger: Logger,
 }
@@ -118,28 +132,7 @@ struct ConstructorOptions {
     ignore_env_var_errors: bool,
 }
 
-impl Inner {
-    /// Returns a builder if the engine is not connected
-    fn as_builder(&self) -> crate::Result<&EngineBuilder> {
-        match self {
-            Inner::Builder(ref builder) => Ok(builder),
-            Inner::Connected(_) => Err(ApiError::AlreadyConnected),
-        }
-    }
-
-    /// Returns the engine if connected
-    fn as_engine(&self) -> crate::Result<&ConnectedEngine> {
-        match self {
-            Inner::Builder(_) => Err(ApiError::NotConnected),
-            Inner::Connected(ref engine) => Ok(engine),
-        }
-    }
-}
-
-#[napi]
-impl QueryEngine {
-    /// Parse a validated datamodel and configuration to allow connecting later on.
-    #[napi(constructor)]
+impl ValidEngine {
     pub fn new(env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
         let mut log_callback = callback.create_threadsafe_function(0, |mut ctx: ThreadSafeCallContext<String>| {
             ctx.env.adjust_external_memory(ctx.value.len() as i64)?;
@@ -204,15 +197,54 @@ impl QueryEngine {
             logger: Logger::new(log_queries, log_level, log_callback, enable_metrics),
         })
     }
+}
+
+impl Inner {
+    /// Returns a builder if the engine is not connected
+    fn as_builder(&self) -> crate::Result<&EngineBuilder> {
+        match self {
+            Inner::Builder(ref builder) => Ok(builder),
+            Inner::Connected(_) => Err(ApiError::AlreadyConnected),
+        }
+    }
+
+    /// Returns the engine if connected
+    fn as_engine(&self) -> crate::Result<&ConnectedEngine> {
+        match self {
+            Inner::Builder(_) => Err(ApiError::NotConnected),
+            Inner::Connected(ref engine) => Ok(engine),
+        }
+    }
+}
+
+#[napi]
+impl QueryEngine {
+    /// Parse a validated datamodel and configuration to allow connecting later on.
+    #[napi(constructor)]
+    pub fn new(env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
+        let engine = ValidEngine::new(env, options, callback)?;
+
+        Ok(Self {
+            inner: EngineWrapper::ValidEngine(engine),
+        })
+    }
+
+    fn as_valid_engine(&self) -> crate::Result<&ValidEngine> {
+        match self.inner {
+            EngineWrapper::ValidEngine(ref ve) => Ok(ve),
+            EngineWrapper::DestroyedEngine => Err(ApiError::Destroyed),
+        }
+    }
 
     /// Connect to the database, allow queries to be run.
     #[napi]
     pub async fn connect(&self) -> napi::Result<()> {
         async_panic_to_js_error(async {
-            let mut inner = self.inner.write().await;
+            let engine = self.as_valid_engine()?;
+            let mut inner = engine.inner.write().await;
             let builder = inner.as_builder()?;
 
-            let dispatcher = self.logger.dispatcher();
+            let dispatcher = engine.logger.dispatcher();
 
             let engine = async move {
                 // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
@@ -249,7 +281,7 @@ impl QueryEngine {
                     executor,
                     config_dir: builder.config_dir.clone(),
                     env: builder.env.clone(),
-                    metrics: self.logger.metrics(),
+                    metrics: engine.logger.metrics(),
                 }) as crate::Result<ConnectedEngine>
             }
             .with_subscriber(dispatcher)
@@ -266,7 +298,8 @@ impl QueryEngine {
     #[napi]
     pub async fn disconnect(&self) -> napi::Result<()> {
         async_panic_to_js_error(async {
-            let mut inner = self.inner.write().await;
+            let valid_engine = self.as_valid_engine()?;
+            let mut inner = valid_engine.inner.write().await;
             let engine = inner.as_engine()?;
 
             let config = datamodel::parse_configuration(&engine.datamodel.raw)
@@ -290,13 +323,14 @@ impl QueryEngine {
     #[napi]
     pub async fn query(&self, body: String, trace: String, tx_id: Option<String>) -> napi::Result<String> {
         async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
+            let valid_engine = self.as_valid_engine()?;
+            let inner = valid_engine.inner.read().await;
             let engine = inner.as_engine()?;
 
             let query = serde_json::from_str(&body)?;
             let trace: HashMap<String, String> = serde_json::from_str(&trace)?;
 
-            let dispatcher = self.logger.dispatcher();
+            let dispatcher = valid_engine.logger.dispatcher();
 
             async move {
                 let trace_id = trace.get("traceparent").map(String::from);
@@ -316,10 +350,11 @@ impl QueryEngine {
     #[napi]
     pub async fn start_transaction(&self, input: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
+            let valid_engine = self.as_valid_engine()?;
+            let inner = valid_engine.inner.read().await;
             let engine = inner.as_engine()?;
 
-            let dispatcher = self.logger.dispatcher();
+            let dispatcher = valid_engine.logger.dispatcher();
 
             async move {
                 let input: TxInput = serde_json::from_str(&input)?;
@@ -342,10 +377,11 @@ impl QueryEngine {
     #[napi]
     pub async fn commit_transaction(&self, tx_id: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
+            let valid_engine = self.as_valid_engine()?;
+            let inner = valid_engine.inner.read().await;
             let engine = inner.as_engine()?;
 
-            let dispatcher = self.logger.dispatcher();
+            let dispatcher = valid_engine.logger.dispatcher();
 
             async move {
                 match engine.executor().commit_tx(TxId::from(tx_id)).await {
@@ -363,10 +399,11 @@ impl QueryEngine {
     #[napi]
     pub async fn rollback_transaction(&self, tx_id: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
+            let valid_engine = self.as_valid_engine()?;
+            let inner = valid_engine.inner.read().await;
             let engine = inner.as_engine()?;
 
-            let dispatcher = self.logger.dispatcher();
+            let dispatcher = valid_engine.logger.dispatcher();
 
             async move {
                 match engine.executor().rollback_tx(TxId::from(tx_id)).await {
@@ -384,7 +421,8 @@ impl QueryEngine {
     #[napi]
     pub async fn sdl_schema(&self) -> napi::Result<String> {
         async_panic_to_js_error(async move {
-            let inner = self.inner.read().await;
+            let valid_engine = self.as_valid_engine()?;
+            let inner = valid_engine.inner.read().await;
             let engine = inner.as_engine()?;
 
             Ok(GraphQLSchemaRenderer::render(engine.query_schema().clone()))
@@ -395,7 +433,8 @@ impl QueryEngine {
     #[napi]
     pub async fn metrics(&self, json_options: String) -> napi::Result<String> {
         async_panic_to_js_error(async move {
-            let inner = self.inner.read().await;
+            let valid_engine = self.as_valid_engine()?;
+            let inner = valid_engine.inner.read().await;
             let engine = inner.as_engine()?;
             let options: MetricOptions = serde_json::from_str(&json_options)?;
 
@@ -415,6 +454,37 @@ impl QueryEngine {
             }
         })
         .await
+    }
+
+    #[napi]
+    pub async fn destroy(&mut self) -> napi::Result<()> {
+        self.inner = EngineWrapper::DestroyedEngine;
+
+        // drop(self)
+
+        // async_panic_to_js_error(async move {
+        //     let inner = self.inner.read().await;
+        //     let engine = inner.as_engine()?;
+        //     let options: MetricOptions = serde_json::from_str(&json_options)?;
+
+        //     if let Some(metrics) = &engine.metrics {
+        //         if options.is_json_format() {
+        //             let engine_metrics = metrics.to_json(options.global_labels);
+        //             let res = serde_json::to_string(&engine_metrics)?;
+        //             Ok(res)
+        //         } else {
+        //             Ok(metrics.to_prometheus(options.global_labels))
+        //         }
+        //     } else {
+        //         Err(ApiError::Configuration(
+        //             "Metrics is not enabled. First set it in the preview features.".to_string(),
+        //         )
+        //         .into())
+        //     }
+        // })
+        // .await
+
+        Ok(())
     }
 }
 

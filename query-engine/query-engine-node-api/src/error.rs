@@ -20,6 +20,9 @@ pub enum ApiError {
     #[error("Can't modify an already connected engine.")]
     AlreadyConnected,
 
+    #[error("Engine has been destroyed and can no longer be used.")]
+    Destroyed,
+
     #[error("Engine is not yet connected.")]
     NotConnected,
 
