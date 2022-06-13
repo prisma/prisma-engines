@@ -63,7 +63,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         let input_type = InputType::object(input_object);
 
         // Shorthand type (`list_field: <typ>`) + full object (`list_field: { set: { <typ> }}`)
-        input_field(sf.name.clone(), vec![input_type, typ], None).optional()
+        input_field(sf.name.clone(), vec![input_type, typ], sf.default_value.clone()).optional()
     }
 
     fn map_relation(&self, ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputField {

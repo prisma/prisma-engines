@@ -45,7 +45,7 @@ mod basic {
             bytes
           }
         }"#),
-          @r###"{"data":{"createOneScalarModel":{"strings":["Foo","Bar","Baz"],"ints":[1,2,3],"floats":[1.1,2.2,3.3],"booleans":[true,false,false,true],"enums":["A","B","B","A"],"dateTimes":["2019-07-31T23:59:01.000Z","2012-07-31T23:59:01.000Z"],"bytes":["dGVzdA==", "dA=="]}}}"###
+          @r###"{"data":{"createOneScalarModel":{"strings":["Foo","Bar","Baz"],"ints":[1,2,3],"floats":[1.1,2.2,3.3],"booleans":[true,false,false,true],"enums":["A","B","B","A"],"dateTimes":["2019-07-31T23:59:01.000Z","2012-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dA=="]}}}"###
         );
 
         Ok(())
