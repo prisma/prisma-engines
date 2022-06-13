@@ -111,7 +111,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "BigInt",
-            Value::integer(i64::MAX),
+            Value::int64(i64::MAX),
             &[
                 "Decimal(19,0)",
                 "Float(24)",
@@ -1447,7 +1447,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "BigInt",
-            Value::integer(i64::MAX),
+            Value::int64(i64::MAX),
             &[
                 "Date",
                 "Time",
