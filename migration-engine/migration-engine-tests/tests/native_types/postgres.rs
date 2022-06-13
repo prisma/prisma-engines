@@ -8,7 +8,7 @@ use std::{collections::HashMap, str::FromStr};
 static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
         ("Oid", Value::integer(u8::MAX), &["VarChar(100)", "Integer", "BigInt"]),
-        ("Money", Value::integer(u8::MAX), &["VarChar(100)"]),
+        ("Money", Value::int64(u8::MAX), &["VarChar(100)"]),
         ("Inet", Value::text("10.1.2.3"), &["VarChar(100)"]),
         (
             "SmallInt",
@@ -154,7 +154,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
 
 static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
-        ("Money", Value::integer(u8::MAX), &["Decimal"]),
+        ("Money", Value::int64(u8::MAX), &["Decimal"]),
         (
             "SmallInt",
             Value::integer(2),
