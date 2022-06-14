@@ -35,15 +35,10 @@ pub(super) fn spgist_indexed_column_count(index: IndexWalker<'_>, errors: &mut D
         return;
     }
 
-    let ast = match index.ast_attribute() {
-        Some(ast) => ast,
-        _ => return,
-    };
-
     errors.push_error(DatamodelError::new_attribute_validation_error(
         "SpGist does not support multi-column indices.",
         index.attribute_name(),
-        ast.span,
+        index.ast_attribute().span,
     ));
 }
 
@@ -72,11 +67,6 @@ pub(super) fn generalized_index_validations(
 
         let opclass = field.operator_class().and_then(|c| c.get().left());
 
-        let attr = match index.ast_attribute() {
-            Some(attr) => attr,
-            _ => continue,
-        };
-
         match opclass {
             Some(opclass) if !opclass.supports_index_type(algo) => {
                 let msg =
@@ -85,7 +75,7 @@ pub(super) fn generalized_index_validations(
                 errors.push_error(DatamodelError::new_attribute_validation_error(
                     &msg,
                     index.attribute_name(),
-                    attr.span,
+                    index.ast_attribute().span,
                 ));
 
                 continue;
@@ -104,7 +94,7 @@ pub(super) fn generalized_index_validations(
                 errors.push_error(DatamodelError::new_attribute_validation_error(
                     &msg,
                     index.attribute_name(),
-                    attr.span,
+                    index.ast_attribute().span,
                 ));
             }
             (Some(native_type), None) => {
@@ -113,7 +103,7 @@ pub(super) fn generalized_index_validations(
                 errors.push_error(DatamodelError::new_attribute_validation_error(
                     &msg,
                     index.attribute_name(),
-                    attr.span,
+                    index.ast_attribute().span,
                 ));
             }
             (None, Some(opclass)) => {
@@ -125,7 +115,7 @@ pub(super) fn generalized_index_validations(
                 errors.push_error(DatamodelError::new_attribute_validation_error(
                     &msg,
                     index.attribute_name(),
-                    attr.span,
+                    index.ast_attribute().span,
                 ));
             }
             _ => {
@@ -136,7 +126,7 @@ pub(super) fn generalized_index_validations(
                     errors.push_error(DatamodelError::new_attribute_validation_error(
                         &msg,
                         index.attribute_name(),
-                        attr.span,
+                        index.ast_attribute().span,
                     ));
                 }
             }
@@ -166,7 +156,7 @@ pub(super) fn generalized_index_validations(
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &msg,
                             index.attribute_name(),
-                            attr.span,
+                            index.ast_attribute().span,
                         ));
                     }
                 }
@@ -191,7 +181,7 @@ pub(super) fn generalized_index_validations(
                     errors.push_error(DatamodelError::new_attribute_validation_error(
                         &msg,
                         index.attribute_name(),
-                        attr.span,
+                        index.ast_attribute().span,
                     ));
                 }
                 _ => err_f(native_type_instance.as_ref().map(|i| i.name.as_str()), opclass),
@@ -215,7 +205,7 @@ pub(super) fn generalized_index_validations(
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &msg,
                             index.attribute_name(),
-                            attr.span,
+                            index.ast_attribute().span,
                         ));
                     }
                 }
@@ -268,7 +258,7 @@ pub(super) fn generalized_index_validations(
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &msg,
                             index.attribute_name(),
-                            attr.span,
+                            index.ast_attribute().span,
                         ));
                     }
                 }
@@ -304,7 +294,7 @@ pub(super) fn generalized_index_validations(
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &msg,
                             index.attribute_name(),
-                            attr.span,
+                            index.ast_attribute().span,
                         ));
                     }
                 }
@@ -327,7 +317,7 @@ pub(super) fn generalized_index_validations(
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &msg,
                             index.attribute_name(),
-                            attr.span,
+                            index.ast_attribute().span,
                         ));
                     }
                 }
@@ -350,7 +340,7 @@ pub(super) fn generalized_index_validations(
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &msg,
                             index.attribute_name(),
-                            attr.span,
+                            index.ast_attribute().span,
                         ));
                     }
                 }
@@ -378,7 +368,7 @@ pub(super) fn generalized_index_validations(
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &msg,
                             index.attribute_name(),
-                            attr.span,
+                            index.ast_attribute().span,
                         ));
                     }
                 }
@@ -403,7 +393,7 @@ pub(super) fn generalized_index_validations(
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &msg,
                             index.attribute_name(),
-                            attr.span,
+                            index.ast_attribute().span,
                         ));
                     }
                 }
@@ -426,7 +416,7 @@ pub(super) fn generalized_index_validations(
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &msg,
                             index.attribute_name(),
-                            attr.span,
+                            index.ast_attribute().span,
                         ));
                     }
                 }

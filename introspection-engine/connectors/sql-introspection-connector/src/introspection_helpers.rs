@@ -140,18 +140,6 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Co
     // keep them. This is a change in introspection behaviour, but due to re-introspection previous
     // datamodels and clients should keep working as before.
 
-    let using = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        index_algorithm(index, ctx)
-    } else {
-        None
-    };
-
-    let clustered = if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        index_is_clustered(index.index_id(), index.schema(), ctx)
-    } else {
-        None
-    };
-
     IndexDefinition {
         name: None,
         db_name: Some(index.name().to_owned()),
@@ -159,32 +147,26 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Co
             .columns()
             .enumerate()
             .map(|(i, c)| {
-                let (sort_order, length, operator_class) =
-                    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                        (None, None, None)
-                    } else {
-                        let sort_order = c.sort_order().map(|sort| match sort {
-                            SQLSortOrder::Asc => SortOrder::Asc,
-                            SQLSortOrder::Desc => SortOrder::Desc,
-                        });
+                let sort_order = c.sort_order().map(|sort| match sort {
+                    SQLSortOrder::Asc => SortOrder::Asc,
+                    SQLSortOrder::Desc => SortOrder::Desc,
+                });
 
-                        let index_field_id = IndexFieldId(index.index_id(), i as u32);
-
-                        (sort_order, c.length(), get_opclass(index_field_id, index.schema(), ctx))
-                    };
+                let index_field_id = IndexFieldId(index.index_id(), i as u32);
+                let operator_class = get_opclass(index_field_id, index.schema(), ctx);
 
                 IndexField {
                     path: vec![(c.as_column().name().to_owned(), None)],
                     sort_order,
-                    length,
+                    length: c.length(),
                     operator_class,
                 }
             })
             .collect(),
         tpe,
         defined_on_field: index.columns().len() == 1,
-        algorithm: using,
-        clustered,
+        algorithm: index_algorithm(index, ctx),
+        clustered: index_is_clustered(index.index_id(), index.schema(), ctx),
     }
 }
 

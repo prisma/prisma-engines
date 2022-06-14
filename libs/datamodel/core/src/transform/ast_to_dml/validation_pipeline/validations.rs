@@ -11,7 +11,7 @@ mod relation_fields;
 mod relations;
 
 use super::context::Context;
-use crate::{ast, transform::ast_to_dml::db::walkers::RefinedRelationWalker};
+use crate::transform::ast_to_dml::db::walkers::RefinedRelationWalker;
 use diagnostics::DatamodelError;
 use names::Names;
 
@@ -43,7 +43,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         models::has_a_strict_unique_criteria(model, ctx);
         models::has_a_unique_primary_key_name(model, &names, ctx);
         models::has_a_unique_custom_primary_key_name_per_model(model, &names, ctx);
-        models::uses_sort_or_length_on_primary_without_preview_flag(model, ctx);
         models::id_has_fields(model, ctx);
         models::id_client_name_does_not_clash_with_field(model, ctx);
         models::primary_key_connector_specific(model, ctx);
@@ -61,7 +60,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             }
 
             fields::id_supports_clustering_setting(pk, ctx);
-            fields::clustering_setting_preview_enabled(pk, ctx);
             fields::clustering_can_be_defined_only_once(pk, ctx);
         }
 
@@ -94,9 +92,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             indexes::has_a_unique_constraint_name(index, &names, ctx);
             indexes::unique_client_name_does_not_clash_with_field(index, ctx);
             indexes::unique_index_has_a_unique_custom_name_per_model(index, &names, ctx);
-            indexes::uses_length_or_sort_without_preview_flag(index, ctx);
             indexes::field_length_prefix_supported(index, ctx);
-            indexes::index_algorithm_preview_feature(index, ctx);
             indexes::index_algorithm_is_supported(index, ctx);
             indexes::hash_index_must_not_use_sort_param(index, ctx);
             indexes::fulltext_index_preview_feature_enabled(index, ctx);
@@ -106,17 +102,13 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             indexes::fulltext_text_columns_should_be_bundled_together(index, ctx);
             indexes::has_valid_mapped_name(index, ctx);
             indexes::supports_clustering_setting(index, ctx);
-            indexes::clustering_setting_preview_enabled(index, ctx);
             indexes::clustering_can_be_defined_only_once(index, ctx);
             indexes::opclasses_are_not_allowed_with_other_than_normal_indices(index, ctx);
 
             for field_attribute in index.scalar_field_attributes() {
-                let span = index
-                    .ast_attribute()
-                    .map(|attr| attr.span)
-                    .unwrap_or_else(ast::Span::empty);
-
+                let span = index.ast_attribute().span;
                 let attribute = (index.attribute_name(), span);
+
                 fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
             }
         }
@@ -155,6 +147,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
                     relations::one_to_one::fields_and_references_are_defined(relation, ctx);
                     relations::one_to_one::fields_and_references_defined_on_one_side_only(relation, ctx);
                     relations::one_to_one::referential_actions(relation, ctx);
+                    relations::one_to_one::fields_must_be_a_unique_constraint(relation, ctx);
 
                     // Run these validations last to prevent validation spam.
                     relations::one_to_one::fields_references_mixups(relation, ctx);
@@ -172,6 +165,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
                 implicit::supports_implicit_relations(relation, ctx);
                 implicit::validate_singular_id(relation, ctx);
                 implicit::validate_no_referential_actions(relation, ctx);
+                implicit::cannot_define_references_argument(relation, ctx);
             }
             RefinedRelationWalker::TwoWayEmbeddedManyToMany(relation) => {
                 use relations::many_to_many::embedded;

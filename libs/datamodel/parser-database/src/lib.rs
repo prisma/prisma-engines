@@ -29,7 +29,6 @@ pub mod walkers;
 
 mod attributes;
 mod context;
-mod indexes;
 mod interner;
 mod names;
 mod relations;
@@ -118,9 +117,6 @@ impl ParserDatabase {
         // Fourth step: relation inference
         relations::infer_relations(&mut ctx);
 
-        // Fifth step: infer implicit indices
-        indexes::infer_implicit_indexes(&mut ctx);
-
         ParserDatabase {
             ast,
             interner,
@@ -128,11 +124,6 @@ impl ParserDatabase {
             types,
             relations,
         }
-    }
-
-    /// The fully resolved (non alias) scalar field type of an alias. .
-    pub fn alias_scalar_field_type(&self, alias_id: &ast::AliasId) -> &ScalarFieldType {
-        &self.types.type_aliases[alias_id]
     }
 
     /// The parsed AST.

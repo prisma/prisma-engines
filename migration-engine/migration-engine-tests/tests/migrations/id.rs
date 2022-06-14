@@ -2,18 +2,13 @@ mod cockroachdb;
 mod mssql;
 mod vitess;
 
-use indoc::{formatdoc, indoc};
+use indoc::formatdoc;
 use migration_engine_tests::test_api::*;
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 fn length_prefixed_primary_key(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id String @id(length: 30) @db.Text
@@ -28,31 +23,9 @@ fn length_prefixed_primary_key(api: TestApi) {
 }
 
 #[test_connector(tags(Mysql8))]
-fn should_not_change_primary_key_length_prefix_without_preview_flag(api: TestApi) {
-    let query = indoc! {r#"
-        CREATE TABLE `A` (id VARCHAR(255) NOT NULL, CONSTRAINT A_id_pkey PRIMARY KEY (id(30)))
-    "#};
-
-    api.raw_cmd(query);
-
-    let dm = indoc! {r#"
-        model A {
-          id String @id @db.VarChar(255)
-        }
-    "#};
-
-    api.schema_push_w_datasource(dm).send().assert_no_steps();
-}
-
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
 fn changing_of_length_prefix(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id String @id(length: 30) @db.VarChar(255)
@@ -67,11 +40,6 @@ fn changing_of_length_prefix(api: TestApi) {
 
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id String @id(length: 20) @db.VarChar(255)
@@ -85,15 +53,10 @@ fn changing_of_length_prefix(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 fn removing_length_prefix(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id String @id(length: 30) @db.VarChar(255)
@@ -109,11 +72,6 @@ fn removing_length_prefix(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
 
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
-
         model A {{
           id String @id @db.VarChar(255)
         }}
@@ -126,15 +84,10 @@ fn removing_length_prefix(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 fn length_prefixed_compound_primary_key(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           a String @db.Text

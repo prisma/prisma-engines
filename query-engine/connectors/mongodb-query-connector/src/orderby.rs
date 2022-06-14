@@ -54,7 +54,7 @@ impl OrderByData {
             let mut folded_stages = stages
                 .into_iter()
                 .rev()
-                .fold1(|right, mut left| {
+                .reduce(|right, mut left| {
                     left.push_nested(right);
                     left
                 })

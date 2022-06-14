@@ -4,11 +4,10 @@ use super::{
     parse_enum::parse_enum,
     parse_model::parse_model,
     parse_source_and_generator::parse_config_block,
-    parse_types::parse_type_alias,
     PrismaDatamodelParser, Rule,
 };
 use crate::ast::*;
-use diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
+use diagnostics::{DatamodelError, Diagnostics};
 use pest::Parser;
 
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
@@ -40,8 +39,12 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
                         top_level_definitions.push(parse_config_block(&current, diagnostics));
                     },
                     Rule::type_alias => {
-                        diagnostics.push_warning(DatamodelWarning::DeprecatedTypeAlias { span: current.as_span().into() });
-                        top_level_definitions.push(Top::Type(parse_type_alias(&current)))
+                        let error = DatamodelError::new_validation_error(
+                            "Invalid type definition. Please check the documentation in https://pris.ly/d/composite-types".to_string(),
+                            current.as_span().into()
+                        );
+
+                        diagnostics.push_error(error);
                     }
                     Rule::comment_block => (),
                     Rule::EOI => {}

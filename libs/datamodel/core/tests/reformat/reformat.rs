@@ -792,14 +792,6 @@ fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one
         // free floating comment
         /// free floating doc comment
 
-        // type alias comment
-        /// type alias doc comment
-        type MyString = String          @default("FooBar")
-
-
-        // free floating comment
-        /// free floating doc comment
-
         // generator comment
         /// generator doc comment
         generator js {
@@ -851,13 +843,6 @@ fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one
           ACTIVE
           DONE
         }
-
-        // free floating comment
-        /// free floating doc comment
-
-        // type alias comment
-        /// type alias doc comment
-        type                       MyString = String @default("FooBar")
 
         // free floating comment
         /// free floating doc comment
@@ -1062,7 +1047,6 @@ fn reformatting_extended_indexes_works() {
         generator client {
           provider        = "prisma-client-js"
           binaryTargets   = ["darwin"]
-          previewFeatures = ["extendedIndexes"]
         }
         
         datasource db {
@@ -1094,9 +1078,8 @@ fn reformatting_extended_indexes_works() {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
-          binaryTargets   = ["darwin"]
-          previewFeatures = ["extendedIndexes"]
+          provider      = "prisma-client-js"
+          binaryTargets = ["darwin"]
         }
 
         datasource db {
@@ -1134,7 +1117,7 @@ fn reformatting_with_empty_indexes() {
     let schema = r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex", "extendedIndexes"]
+          previewFeatures = ["fullTextIndex"]
         }
 
         datasource db {
@@ -1156,7 +1139,7 @@ fn reformatting_with_empty_indexes() {
     let expected = expect![[r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex", "extendedIndexes"]
+          previewFeatures = ["fullTextIndex"]
         }
 
         datasource db {
@@ -1329,80 +1312,6 @@ fn composite_type_native_types_roundtrip() {
         model User {
           id      String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
           address Address?
-        }
-    "#]];
-
-    expected.assert_eq(&reformat(schema));
-}
-
-#[test]
-fn added_missing_at_unique_attribute_with_existing_native_type() {
-    let schema = r#"
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = "mongodb"
-}
-
-datasource db {
-  provider = "mongodb"
-  url      = "m...ty"
-}
-
-model Foo {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  name     String   @unique
-  json     Json
-  bar      Bar
-  bars     Bar[]
-  baz      Baz      @relation(fields: [bazId], references: [id])
-  bazId    String   @db.ObjectId
-  list     String[]
-  jsonList Json[]
-}
-
-type Bar {
-  label  String
-  number Int
-}
-
-model Baz {
-  id  String @id @default(auto()) @map("_id") @db.ObjectId
-  foo Foo?
-}
-
-    "#;
-
-    let expected = expect![[r#"
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = "mongodb"
-        }
-
-        datasource db {
-          provider = "mongodb"
-          url      = "m...ty"
-        }
-
-        model Foo {
-          id       String   @id @default(auto()) @map("_id") @db.ObjectId
-          name     String   @unique
-          json     Json
-          bar      Bar
-          bars     Bar[]
-          baz      Baz      @relation(fields: [bazId], references: [id])
-          bazId    String   @db.ObjectId @unique
-          list     String[]
-          jsonList Json[]
-        }
-
-        type Bar {
-          label  String
-          number Int
-        }
-
-        model Baz {
-          id  String @id @default(auto()) @map("_id") @db.ObjectId
-          foo Foo?
         }
     "#]];
 

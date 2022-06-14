@@ -301,7 +301,7 @@ fn id_accepts_length_arg_on_mysql() {
      }
      "#,
         Provider::Mysql,
-        &["extendedIndexes"],
+        &[],
     );
 
     let schema = parse(&dml);
@@ -362,7 +362,7 @@ fn id_accepts_sort_arg_on_sqlserver() {
      }
      "#,
         Provider::SqlServer,
-        &["extendedIndexes"],
+        &[],
     );
 
     let schema = parse(&dml);
@@ -413,7 +413,7 @@ fn mysql_allows_id_length_prefix() {
           id String @id(length: 30) @test.VarChar(255)
         }
     "#};
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -428,7 +428,7 @@ fn mysql_allows_compound_id_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -440,7 +440,7 @@ fn mssql_allows_id_sort_argument() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 
@@ -455,7 +455,7 @@ fn mssql_allows_compound_id_sort_argument() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     assert!(datamodel::parse_schema(&schema).is_ok());
 }
 

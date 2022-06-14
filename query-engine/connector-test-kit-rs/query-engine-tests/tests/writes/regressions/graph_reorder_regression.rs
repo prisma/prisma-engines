@@ -23,7 +23,7 @@ mod graph_reorder {
               company   Company @relation(fields: [companyId], references: [id])
               companyId String
               visit     Visit?  @relation(fields: [visitId], references: [id])
-              visitId   String?
+              visitId   String? @unique
             }"#
         };
 

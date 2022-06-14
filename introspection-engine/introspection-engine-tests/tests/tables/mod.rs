@@ -711,33 +711,6 @@ async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
-async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Blog", move |t| {
-                t.add_column("id", types::primary());
-                t.add_column("int_col", types::integer());
-                t.inject_custom("blob_col mediumblob");
-                t.inject_custom("Index `partial_blob_col_index` (blob_col(10))");
-                t.inject_custom("Index `partial_compound` (blob_col(10), int_col)");
-            });
-        })
-        .await?;
-
-    let expected = expect![[r#"
-        model Blog {
-          id       Int    @id @default(autoincrement())
-          int_col  Int
-          blob_col Bytes? @db.MediumBlob
-        }
-    "#]];
-
-    expected.assert_eq(&api.introspect_dml().await?);
-
-    Ok(())
-}
-
 #[test_connector(tags(Sqlite))]
 async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestResult {
     api.barrel()

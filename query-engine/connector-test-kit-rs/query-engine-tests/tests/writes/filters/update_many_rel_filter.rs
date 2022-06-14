@@ -10,7 +10,7 @@ mod update_many_rel_filter {
             r#"model Top{
               #id(id, Int, @id)
               top      String
-              bottomId Int?
+              bottomId Int? @unique
 
               bottom Bottom? @relation(fields: [bottomId], references: [id])
            }
@@ -18,7 +18,7 @@ mod update_many_rel_filter {
            model Bottom{
               #id(id, Int, @id)
               bottom       String
-              veryBottomId Int?
+              veryBottomId Int? @unique
 
               top        Top?
               veryBottom VeryBottom? @relation(fields: [veryBottomId], references: [id])

@@ -11,7 +11,7 @@ fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: Tes
 
         model Box {
             id     Int @id
-            cat_id Int
+            cat_id Int @unique
             cat    Cat @relation(fields: [cat_id], references: [id])
         }
     "#;
@@ -172,8 +172,8 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
 
     let dm2 = r#"
         model A {
-            id Int @id
-            b Int
+            id Int  @id
+            b Int   @unique
             b_rel B @relation(fields: [b], references: [id])
         }
 
@@ -200,8 +200,8 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
 fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
     let dm1 = r#"
         model A {
-            id Int @id
-            b Int
+            id Int  @id
+            b Int   @unique
             b_rel B @relation(fields: [b], references: [id])
         }
 

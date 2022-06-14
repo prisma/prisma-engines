@@ -243,8 +243,12 @@ impl QueryDocumentParser {
             (QueryValue::Int(i), ScalarType::BigInt) => Ok(PrismaValue::BigInt(i)),
 
             (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
-            (QueryValue::Float(f), ScalarType::Int) => Ok(PrismaValue::Int(f.to_i64().unwrap())),
-            (QueryValue::Float(d), ScalarType::Decimal) => Ok(PrismaValue::Float(d)),
+            (QueryValue::Float(f), ScalarType::Decimal) => Ok(PrismaValue::Float(f)),
+            (QueryValue::Float(f), ScalarType::Int) => match f.to_i64() {
+                Some(converted) => Ok(PrismaValue::Int(converted)),
+                None => Err(QueryParserError::new(parent_path.clone(), QueryParserErrorKind::ValueFitError(
+                    format!("Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`.", f, parent_path.last().unwrap())))),
+            },
 
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
 

@@ -41,6 +41,23 @@ impl ModelAndField {
 }
 
 #[derive(Serialize, Debug, Clone)]
+pub struct ModelFieldAndValue {
+    pub(crate) model: String,
+    pub(crate) field: String,
+    pub(crate) value: String,
+}
+
+impl ModelFieldAndValue {
+    pub fn new(model: &str, field: &str, value: &str) -> Self {
+        Self {
+            model: model.to_owned(),
+            field: field.to_owned(),
+            value: value.to_owned(),
+        }
+    }
+}
+
+#[derive(Serialize, Debug, Clone)]
 pub struct ModelAndIndex {
     pub(crate) model: String,
     pub(crate) index_db_name: String,
@@ -241,6 +258,14 @@ pub fn warning_relations_added_from_the_previous_data_model(affected: &[Model]) 
     Warning {
         code: 19,
         message: "Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore.".into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub fn warning_enum_defaults_added_from_the_previous_data_model(affected: &[ModelFieldAndValue]) -> Warning {
+    Warning {
+        code: 20,
+        message: "Default values were enriched with custom enum variants taken from the previous Prisma schema.".into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
 }

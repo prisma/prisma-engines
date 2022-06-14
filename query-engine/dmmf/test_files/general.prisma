@@ -1,4 +1,3 @@
-
 datasource pg1 {
   provider = "postgresql"
   url      = "postgresql://"
@@ -21,7 +20,7 @@ model User {
 
 model Profile {
   id     Int    @id
-  userId Int
+  userId Int    @unique
   user   User   @relation(fields: [userId], references: [id])
   bio    String
 
@@ -64,10 +63,9 @@ model PostToCategory {
   @@map("post_to_category")
 }
 
-
 model A {
   id  Int @id
-  bId Int
+  bId Int @unique
   b   B   @relation(fields: [bId], references: [id])
 }
 
@@ -77,18 +75,18 @@ model B {
 }
 
 model NamedCompounds {
-  a             Int
-  b             Int
-  c             Int
-  d             Int
+  a Int
+  b Int
+  c Int
+  d Int
 
   @@id([a, b], name: "MyPrimary", map: "DbPrimary")
   @@unique([c, d], name: "MyUnique", map: "DbUnique")
 }
 
-model MappedSingles{
-  a             Int @id(map: "Primary")
-  b             Int @unique(map: "Unique")
+model MappedSingles {
+  a Int @id(map: "Primary")
+  b Int @unique(map: "Unique")
 }
 
 enum CategoryEnum {

@@ -19,18 +19,13 @@ pub(super) fn inverted_index_validations(index: IndexWalker<'_>, errors: &mut Di
     for (i, field) in index.scalar_field_attributes().enumerate() {
         let r#type = field.as_index_field().scalar_field_type();
 
-        let attr = match index.ast_attribute() {
-            Some(attr) => attr,
-            _ => continue,
-        };
-
         if field.operator_class().is_some() {
             let msg = "Custom operator classes are not supported with the current connector.";
 
             errors.push_error(DatamodelError::new_attribute_validation_error(
                 msg,
                 index.attribute_name(),
-                attr.span,
+                index.ast_attribute().span,
             ));
 
             return;
@@ -43,7 +38,7 @@ pub(super) fn inverted_index_validations(index: IndexWalker<'_>, errors: &mut Di
             errors.push_error(DatamodelError::new_attribute_validation_error(
                 &msg,
                 index.attribute_name(),
-                attr.span,
+                index.ast_attribute().span,
             ));
         }
 
@@ -52,7 +47,7 @@ pub(super) fn inverted_index_validations(index: IndexWalker<'_>, errors: &mut Di
             errors.push_error(DatamodelError::new_attribute_validation_error(
                 msg,
                 index.attribute_name(),
-                attr.span,
+                index.ast_attribute().span,
             ));
         }
     }

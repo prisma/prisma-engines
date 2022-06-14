@@ -231,9 +231,9 @@ fn required_relation_field_must_error_if_it_is_virtual() {
     }
 
     model Address {
-        id     Int     @id
-        userId Int
-        user   User    @relation(fields: [userId], references: [id])
+        id     Int  @id
+        userId Int  @unique
+        user   User @relation(fields: [userId], references: [id])
     }
     "#;
 
@@ -478,27 +478,6 @@ fn relation_must_error_when_number_of_fields_and_references_is_not_equal() {
 }
 
 #[test]
-fn relation_must_succeed_when_type_alias_is_used_for_referenced_field() {
-    let dml = r#"
-    type CustomId = Int @id @default(autoincrement())
-
-    model User {
-        id        CustomId
-        firstName String
-        posts     Post[]
-    }
-
-    model Post {
-        id     Int     @id
-        userId Int
-        user   User    @relation(fields: [userId], references: [id])
-    }
-    "#;
-
-    let _ = parse(dml);
-}
-
-#[test]
 fn must_error_when_references_argument_is_missing_for_one_to_many() {
     let dml = r#"
     model User {
@@ -607,9 +586,9 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
     }
 
     model Post {
-        id     Int     @id
-        userId Int
-        user   User    @relation(references: [id])
+        id     Int  @id
+        userId Int  @unique
+        user   User @relation(references: [id])
     }
     "#;
 
@@ -617,8 +596,8 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m10 | [0m        userId Int
-        [1;94m11 | [0m        [1;91muser   User    @relation(references: [id])[0m
+        [1;94m10 | [0m        userId Int  @unique
+        [1;94m11 | [0m        [1;91muser   User @relation(references: [id])[0m
         [1;94m12 | [0m    }
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
@@ -643,9 +622,9 @@ fn must_error_when_references_argument_is_missing_for_one_to_one() {
     }
 
     model Post {
-        id     Int     @id
-        userId Int
-        user   User    @relation(fields: [userId])
+        id     Int  @id
+        userId Int  @unique
+        user   User @relation(fields: [userId])
     }
     "#;
 
@@ -653,8 +632,8 @@ fn must_error_when_references_argument_is_missing_for_one_to_one() {
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m10 | [0m        userId Int
-        [1;94m11 | [0m        [1;91muser   User    @relation(fields: [userId])[0m
+        [1;94m10 | [0m        userId Int  @unique
+        [1;94m11 | [0m        [1;91muser   User @relation(fields: [userId])[0m
         [1;94m12 | [0m    }
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
@@ -673,16 +652,16 @@ fn must_error_when_references_argument_is_missing_for_one_to_one() {
 fn must_error_when_fields_and_references_argument_are_placed_on_different_sides_for_one_to_one() {
     let dml = r#"
     model User {
-        id        Int @id
+        id        Int    @id
         firstName String
         postId    Int
-        post      Post @relation(references: [id])
+        post      Post   @relation(references: [id])
     }
 
     model Post {
-        id     Int     @id
-        userId Int
-        user   User    @relation(fields: [userId])
+        id     Int  @id
+        userId Int  @unique
+        user   User @relation(fields: [userId])
     }
     "#;
 
@@ -690,15 +669,15 @@ fn must_error_when_fields_and_references_argument_are_placed_on_different_sides_
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `user` on Model `Post` provides the `fields` argument in the @relation attribute. And the related field `post` on Model `User` provides the `references` argument. You must provide both arguments on the same side.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m11 | [0m        userId Int
-        [1;94m12 | [0m        [1;91muser   User    @relation(fields: [userId])[0m
+        [1;94m11 | [0m        userId Int  @unique
+        [1;94m12 | [0m        [1;91muser   User @relation(fields: [userId])[0m
         [1;94m13 | [0m    }
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `user` on Model `Post` provides the `fields` argument in the @relation attribute. And the related field `post` on Model `User` provides the `references` argument. You must provide both arguments on the same side.[0m
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m        postId    Int
-        [1;94m 6 | [0m        [1;91mpost      Post @relation(references: [id])[0m
+        [1;94m 6 | [0m        [1;91mpost      Post   @relation(references: [id])[0m
         [1;94m 7 | [0m    }
         [1;94m   | [0m
     "#]];
@@ -710,16 +689,16 @@ fn must_error_when_fields_and_references_argument_are_placed_on_different_sides_
 fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one_to_one() {
     let dml = r#"
     model User {
-        id        Int @id
+        id        Int    @id
         firstName String
         postId    Int
-        post      Post @relation(fields: [postId], references: [id])
+        post      Post   @relation(fields: [postId], references: [id])
     }
 
     model Post {
-        id     Int     @id
-        userId Int
-        user   User    @relation(fields: [userId], references: [id])
+        id     Int  @id
+        userId Int  @unique
+        user   User @relation(fields: [userId], references: [id])
     }
     "#;
 
@@ -727,29 +706,29 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `references` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m11 | [0m        userId Int
-        [1;94m12 | [0m        [1;91muser   User    @relation(fields: [userId], references: [id])[0m
+        [1;94m11 | [0m        userId Int  @unique
+        [1;94m12 | [0m        [1;91muser   User @relation(fields: [userId], references: [id])[0m
         [1;94m13 | [0m    }
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `references` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m        postId    Int
-        [1;94m 6 | [0m        [1;91mpost      Post @relation(fields: [postId], references: [id])[0m
+        [1;94m 6 | [0m        [1;91mpost      Post   @relation(fields: [postId], references: [id])[0m
         [1;94m 7 | [0m    }
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `fields` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m11 | [0m        userId Int
-        [1;94m12 | [0m        [1;91muser   User    @relation(fields: [userId], references: [id])[0m
+        [1;94m11 | [0m        userId Int  @unique
+        [1;94m12 | [0m        [1;91muser   User @relation(fields: [userId], references: [id])[0m
         [1;94m13 | [0m    }
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `fields` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m        postId    Int
-        [1;94m 6 | [0m        [1;91mpost      Post @relation(fields: [postId], references: [id])[0m
+        [1;94m 6 | [0m        [1;91mpost      Post   @relation(fields: [postId], references: [id])[0m
         [1;94m 7 | [0m    }
         [1;94m   | [0m
     "#]];
@@ -762,7 +741,7 @@ fn must_error_for_required_one_to_one_self_relations() {
     let dml = r#"
     model User {
       id       Int  @id
-      friendId Int
+      friendId Int  @unique
       friend   User @relation("Friends", fields: friendId, references: id)
       friendOf User @relation("Friends")
     }
@@ -782,85 +761,20 @@ fn must_error_for_required_one_to_one_self_relations() {
 }
 
 #[test]
-fn must_error_when_non_id_field_is_referenced_in_a_many_to_many() {
-    let dml = r#"
-    model Post {
-      id         Int        @id
-      slug       Int        @unique
-      categories Category[] @relation(references: [id])
-    }
-
-    model Category {
-      id    Int    @id @default(autoincrement())
-      posts Post[] @relation(references: [slug])
-    }
-    "#;
-
-    let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: Implicit many-to-many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `Post`. But it is referencing the following fields that are not the id: slug[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
-        [1;94m   | [0m
-        [1;94m 9 | [0m      id    Int    @id @default(autoincrement())
-        [1;94m10 | [0m      [1;91mposts Post[] @relation(references: [slug])[0m
-        [1;94m11 | [0m    }
-        [1;94m   | [0m
-    "#]];
-
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
-}
-
-#[test]
-fn must_succeed_when_id_field_is_referenced_in_a_many_to_many() {
-    let dml = r#"
-    model Post {
-      id_post    Int @id        
-      slug       Int        @unique
-      categories Category[] @relation(references: [id_category])
-    }
-
-    model Category {
-      id_category    Int    @default(autoincrement()) @id
-      posts          Post[] @relation(references: [id_post])
-    }
-    "#;
-
-    assert!(datamodel::parse_datamodel(dml).is_ok());
-
-    let dml2 = r#"
-    model Post {
-      id_post         Int
-      slug            Int        @unique
-      categories      Category[] @relation(references: [id_category])
-
-      @@id([id_post])
-    }
-
-    model Category {
-      id_category     Int    @default(autoincrement())
-      posts           Post[] @relation(references: [id_post])
-
-      @@id([id_category])
-    }
-    "#;
-
-    assert!(datamodel::parse_datamodel(dml2).is_ok());
-}
-
-#[test]
 fn must_error_nicely_when_a_many_to_many_is_not_possible() {
     // many 2 many is not possible because Post does not have a singular id field
     let dml = r#"
     model Post {
       id         Int
       slug       Int        @unique
-      categories Category[] @relation(references: [id])
+      categories Category[] @relation("foo")
 
       @@id([id, slug])
     }
 
     model Category {
       id    Int    @id @default(autoincrement())
-      posts Post[] @relation(references: [slug])
+      posts Post[] @relation("foo")
     }"#;
 
     let expect = expect![[r#"
@@ -868,7 +782,7 @@ fn must_error_nicely_when_a_many_to_many_is_not_possible() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m      id    Int    @id @default(autoincrement())
-        [1;94m12 | [0m      [1;91mposts Post[] @relation(references: [slug])[0m
+        [1;94m12 | [0m      [1;91mposts Post[] @relation("foo")[0m
         [1;94m13 | [0m    }
         [1;94m   | [0m
     "#]];

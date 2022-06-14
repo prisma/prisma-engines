@@ -1,7 +1,6 @@
 use super::*;
 use crate::utils::quote_connector;
 use darling::FromMeta;
-use itertools::Itertools;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use query_tests_setup::schema_with_relation;
@@ -57,7 +56,7 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
 
     // Renders the connectors as list to use in the code.
     let connectors = args.connectors_to_test();
-    let connectors = connectors.into_iter().map(quote_connector).fold1(|aggr, next| {
+    let connectors = connectors.into_iter().map(quote_connector).reduce(|aggr, next| {
         quote! {
             #aggr, #next
         }
@@ -147,7 +146,7 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
     });
 
     let all_funcs: proc_macro2::TokenStream = test_shells
-        .fold1(|aggr, next| {
+        .reduce(|aggr, next| {
             quote! {
                 #aggr
 

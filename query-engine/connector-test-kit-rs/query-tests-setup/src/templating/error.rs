@@ -49,7 +49,7 @@ pub enum TemplatingErrorKind {
     #[error("Unexpected number of arguments: Expected (at least) {expected}, got {got}.")]
     NumArgsError { expected: usize, got: usize },
 
-    #[error("Unkown schema interpolation identifier.")]
+    #[error("Unknown schema interpolation identifier.")]
     UnknownIdentError,
 
     #[error("Error parsing schema: {0}")]

@@ -2,7 +2,7 @@
 
 ## Concepts
 
-### Core / Connector
+### Core / Connector
 
 Migrate exposes the same API on all supported databases. That API is defined by
 the `migration-core` crate in the `migration-engine/core` directory. The core

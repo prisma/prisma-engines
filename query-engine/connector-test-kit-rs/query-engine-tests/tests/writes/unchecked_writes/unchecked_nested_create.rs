@@ -201,9 +201,9 @@ mod unchecked_nested_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
-              b_id Int
-              c_id Int
-              d_id Int
+              b_id Int @unique
+              c_id Int @unique
+              d_id Int @unique
 
               b ModelB @relation(fields: [b_id], references: [id])
               c ModelC @relation(fields: [c_id], references: [id])
@@ -263,8 +263,8 @@ mod unchecked_nested_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
-              b_id Int
-              d_id Int
+              b_id Int @unique
+              d_id Int @unique
 
               b ModelB  @relation(fields: [b_id], references: [id])
               c ModelC?
@@ -278,7 +278,7 @@ mod unchecked_nested_create {
 
             model ModelC {
               #id(id, Int, @id)
-              a_id Int
+              a_id Int @unique
               a    ModelA @relation(fields: [a_id], references: [id])
             }
 
@@ -324,7 +324,7 @@ mod unchecked_nested_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
-              b_id Int
+              b_id Int @unique
               c_id Int    @default(1)
               b    ModelB @relation(fields: [b_id], references: [id])
               c    ModelC @relation(fields: [c_id], references: [id])
@@ -368,7 +368,7 @@ mod unchecked_nested_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id, @default(autoincrement()))
-              b_id Int
+              b_id Int @unique
               b    ModelB @relation(fields: [b_id], references: [id])
             }
 
@@ -407,7 +407,7 @@ mod unchecked_nested_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, BigInt, @id, @default(autoincrement()))
-              b_id BigInt
+              b_id BigInt @unique
               b    ModelB @relation(fields: [b_id], references: [id])
             }
 

@@ -1,16 +1,16 @@
- datasource db {
-   provider = "mongodb"
-   url      = "mongodb://"
- }
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb://"
+}
 
- generator js {
-   provider        = "prisma-client-js"
-   previewFeatures = ["extendedIndexes", "fullTextIndex"]
- }
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextIndex"]
+}
 
- model User {
-   id   String @id @map("_id") @db.ObjectId
-   name String
+model User {
+  id   String @id @map("_id") @db.ObjectId
+  name String
 
-   @@fulltext([name])
- }
+  @@fulltext([name])
+}

@@ -540,15 +540,10 @@ fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestA
     });
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 fn length_prefixed_index(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int    @id
@@ -571,15 +566,10 @@ fn length_prefixed_index(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 fn length_prefixed_unique(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int    @id
@@ -602,15 +592,10 @@ fn length_prefixed_unique(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 fn removal_length_prefix_unique(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int    @id
@@ -634,11 +619,6 @@ fn removal_length_prefix_unique(api: TestApi) {
 
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int    @id
@@ -663,15 +643,10 @@ fn removal_length_prefix_unique(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql8))]
 fn removal_length_prefix_index(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int    @id
@@ -696,11 +671,6 @@ fn removal_length_prefix_index(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
 
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
-
         model A {{
           id Int    @id
           a  String @db.VarChar(255)
@@ -722,15 +692,10 @@ fn removal_length_prefix_index(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb), preview_features("extendedIndexes"))]
+#[test_connector(exclude(Mysql56, Mysql57, Mariadb))]
 fn descending_compound_index(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int    @id
@@ -753,15 +718,10 @@ fn descending_compound_index(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb), preview_features("extendedIndexes"))]
+#[test_connector(exclude(Mysql56, Mysql57, Mariadb))]
 fn descending_compound_unique(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int    @id
@@ -784,15 +744,10 @@ fn descending_compound_unique(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb), preview_features("extendedIndexes"))]
+#[test_connector(exclude(Mysql56, Mysql57, Mariadb))]
 fn descending_unique(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id
@@ -811,15 +766,10 @@ fn descending_unique(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Mysql56, Mysql57, Mariadb), preview_features("extendedIndexes"))]
+#[test_connector(exclude(Mysql56, Mysql57, Mariadb))]
 fn removal_descending_unique(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id
@@ -839,11 +789,6 @@ fn removal_descending_unique(api: TestApi) {
 
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id
@@ -863,31 +808,6 @@ fn removal_descending_unique(api: TestApi) {
                 .assert_column("a", |attrs| attrs.assert_sort_order(SQLSortOrder::Asc))
         })
     });
-}
-
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
-fn index_algo_should_not_change_without_preview_feature(api: TestApi) {
-    let sql = indoc! {r#"
-        CREATE TABLE "A" (
-            id INT PRIMARY KEY,
-            a INT NOT NULL
-        );
-
-        CREATE INDEX "A_a_idx" ON "A" USING HASH (a);
-    "#};
-
-    api.raw_cmd(sql);
-
-    let dm = indoc! {r#"
-        model A {
-          id Int @id
-          a  Int
-
-          @@index([a])
-        }
-    "#};
-
-    api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
 #[test_connector(tags(Mysql8))]

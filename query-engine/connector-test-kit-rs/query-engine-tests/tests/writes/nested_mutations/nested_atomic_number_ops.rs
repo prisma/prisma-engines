@@ -16,7 +16,7 @@ mod atomic_number_ops {
             model RelatedModel {
              #id(id, Int, @id)
              field String
-             tm_id Int
+             tm_id Int @unique
              tm    TestModel @relation(fields: [tm_id], references: [id])
             }"#
         };
@@ -186,7 +186,7 @@ mod atomic_number_ops {
              #id(id, Int, @id)
              optInt   Int?
              optFloat Float?
-             tm_id    Int
+             tm_id    Int @unique
              tm       TestModel @relation(fields: [tm_id], references: [id])
             }"#
         };

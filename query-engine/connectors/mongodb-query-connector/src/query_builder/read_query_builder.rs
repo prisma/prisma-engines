@@ -1,4 +1,5 @@
 use super::group_by_builder::*;
+use crate::root_queries::metrics;
 use crate::{
     cursor::{CursorBuilder, CursorData},
     filter::{convert_filter, FilterPrefix},
@@ -50,9 +51,7 @@ impl PipelineQuery {
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
-        let cursor = on_collection
-            .aggregate_with_session(self.stages, opts, with_session)
-            .await?;
+        let cursor = metrics(|| on_collection.aggregate_with_session(self.stages, opts, with_session)).await?;
 
         vacuum_cursor(cursor, with_session).await
     }
@@ -69,9 +68,7 @@ impl FindQuery {
         on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
-        let cursor = on_collection
-            .find_with_session(self.filter, self.options, with_session)
-            .await?;
+        let cursor = metrics(|| on_collection.find_with_session(self.filter, self.options, with_session)).await?;
 
         vacuum_cursor(cursor, with_session).await
     }

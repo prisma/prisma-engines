@@ -1,22 +1,26 @@
 use crate::{error::ApiError, logger::Logger};
-use datamodel::{dml::Datamodel, ValidatedConfiguration};
+use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel, ValidatedConfiguration};
+use futures::FutureExt;
 use prisma_models::InternalDataModelBuilder;
 use query_core::{
     executor,
     schema::{QuerySchema, QuerySchemaRenderer},
-    schema_builder, QueryExecutor, TxId,
+    schema_builder, MetricFormat, MetricRegistry, QueryExecutor, TxId,
 };
 use request_handlers::{GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
     collections::{BTreeMap, HashMap},
+    future::Future,
+    panic::AssertUnwindSafe,
     path::PathBuf,
     sync::Arc,
 };
 use tokio::sync::RwLock;
 use tracing::instrument::WithSubscriber;
 use tracing_subscriber::filter::LevelFilter;
+use user_facing_errors::Error;
 
 use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsUnknown};
 use napi_derive::napi;
@@ -59,6 +63,7 @@ struct ConnectedEngine {
     executor: crate::Executor,
     config_dir: PathBuf,
     env: HashMap<String, String>,
+    metrics: Option<MetricRegistry>,
 }
 
 /// Returned from the `serverInfo` method in javascript.
@@ -68,6 +73,20 @@ struct ServerInfo {
     commit: String,
     version: String,
     primary_connector: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MetricOptions {
+    format: MetricFormat,
+    #[serde(default)]
+    global_labels: HashMap<String, String>,
+}
+
+impl MetricOptions {
+    fn is_json_format(&self) -> bool {
+        self.format == MetricFormat::Json
+    }
 }
 
 impl ConnectedEngine {
@@ -122,9 +141,6 @@ impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
     #[napi(constructor)]
     pub fn new(env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
-        // We want panics to be rendered as JSON
-        set_panic_hook();
-
         let mut log_callback = callback.create_threadsafe_function(0, |mut ctx: ThreadSafeCallContext<String>| {
             ctx.env.adjust_external_memory(ctx.value.len() as i64)?;
 
@@ -172,6 +188,7 @@ impl QueryEngine {
             .subject;
 
         let datamodel = EngineDatamodel { ast, raw: datamodel };
+        let enable_metrics = config.subject.preview_features().contains(PreviewFeature::Metrics);
 
         let builder = EngineBuilder {
             datamodel,
@@ -184,173 +201,220 @@ impl QueryEngine {
 
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
-            logger: Logger::new(log_queries, log_level, log_callback),
+            logger: Logger::new(log_queries, log_level, log_callback, enable_metrics),
         })
     }
 
     /// Connect to the database, allow queries to be run.
     #[napi]
     pub async fn connect(&self) -> napi::Result<()> {
-        let mut inner = self.inner.write().await;
-        let builder = inner.as_builder()?;
+        async_panic_to_js_error(async {
+            let mut inner = self.inner.write().await;
+            let builder = inner.as_builder()?;
 
-        let dispatcher = self.logger.dispatcher().await;
+            let dispatcher = self.logger.dispatcher();
 
-        let engine = async move {
-            // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
-            let data_source = builder
-                .config
-                .subject
-                .datasources
-                .first()
-                .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
+            let engine = async move {
+                // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
+                let data_source = builder
+                    .config
+                    .subject
+                    .datasources
+                    .first()
+                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-            let preview_features: Vec<_> = builder.config.subject.preview_features().iter().collect();
-            let url = data_source
-                .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
-                .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
+                let preview_features: Vec<_> = builder.config.subject.preview_features().iter().collect();
+                let url = data_source
+                    .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
+                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
 
-            let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
-            let connector = executor.primary_connector();
-            connector.get_connection().await?;
+                let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
+                let connector = executor.primary_connector();
+                connector.get_connection().await?;
 
-            // Build internal data model
-            let internal_data_model = InternalDataModelBuilder::from(&builder.datamodel.ast).build(db_name);
+                // Build internal data model
+                let internal_data_model = InternalDataModelBuilder::from(&builder.datamodel.ast).build(db_name);
 
-            let query_schema = schema_builder::build(
-                internal_data_model,
-                true, // enable raw queries
-                data_source.capabilities(),
-                preview_features,
-                data_source.referential_integrity(),
-            );
+                let query_schema = schema_builder::build(
+                    internal_data_model,
+                    true, // enable raw queries
+                    data_source.capabilities(),
+                    preview_features,
+                    data_source.referential_integrity(),
+                );
 
-            Ok(ConnectedEngine {
-                datamodel: builder.datamodel.clone(),
-                query_schema: Arc::new(query_schema),
-                executor,
-                config_dir: builder.config_dir.clone(),
-                env: builder.env.clone(),
-            }) as crate::Result<ConnectedEngine>
-        }
-        .with_subscriber(dispatcher)
-        .await?;
+                Ok(ConnectedEngine {
+                    datamodel: builder.datamodel.clone(),
+                    query_schema: Arc::new(query_schema),
+                    executor,
+                    config_dir: builder.config_dir.clone(),
+                    env: builder.env.clone(),
+                    metrics: self.logger.metrics(),
+                }) as crate::Result<ConnectedEngine>
+            }
+            .with_subscriber(dispatcher)
+            .await?;
 
-        *inner = Inner::Connected(engine);
+            *inner = Inner::Connected(engine);
 
-        Ok(())
+            Ok(())
+        })
+        .await
     }
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     #[napi]
     pub async fn disconnect(&self) -> napi::Result<()> {
-        let mut inner = self.inner.write().await;
-        let engine = inner.as_engine()?;
+        async_panic_to_js_error(async {
+            let mut inner = self.inner.write().await;
+            let engine = inner.as_engine()?;
 
-        let config = datamodel::parse_configuration(&engine.datamodel.raw)
-            .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
+            let config = datamodel::parse_configuration(&engine.datamodel.raw)
+                .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
 
-        let builder = EngineBuilder {
-            datamodel: engine.datamodel.clone(),
-            config,
-            config_dir: engine.config_dir.clone(),
-            env: engine.env.clone(),
-        };
+            let builder = EngineBuilder {
+                datamodel: engine.datamodel.clone(),
+                config,
+                config_dir: engine.config_dir.clone(),
+                env: engine.env.clone(),
+            };
 
-        *inner = Inner::Builder(builder);
+            *inner = Inner::Builder(builder);
 
-        Ok(())
+            Ok(())
+        })
+        .await
     }
 
     /// If connected, sends a query to the core and returns the response.
     #[napi]
     pub async fn query(&self, body: String, trace: String, tx_id: Option<String>) -> napi::Result<String> {
-        let inner = self.inner.read().await;
-        let engine = inner.as_engine()?;
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
 
-        let query = serde_json::from_str(&body)?;
-        let trace: HashMap<String, String> = serde_json::from_str(&trace)?;
+            let query = serde_json::from_str(&body)?;
+            let trace: HashMap<String, String> = serde_json::from_str(&trace)?;
 
-        let dispatcher = self.logger.dispatcher().await;
+            let dispatcher = self.logger.dispatcher();
 
-        async move {
-            let trace_id = trace.get("traceparent").map(String::from);
-            let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
+            async move {
+                let trace_id = trace.get("traceparent").map(String::from);
+                let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
 
-            let response = handler.handle(query, tx_id.map(TxId::from), trace_id).await;
+                let response = handler.handle(query, tx_id.map(TxId::from), trace_id).await;
 
-            Ok(serde_json::to_string(&response)?)
-        }
-        .with_subscriber(dispatcher)
+                Ok(serde_json::to_string(&response)?)
+            }
+            .with_subscriber(dispatcher)
+            .await
+        })
         .await
     }
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[napi]
     pub async fn start_transaction(&self, input: String) -> napi::Result<String> {
-        let inner = self.inner.read().await;
-        let engine = inner.as_engine()?;
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
 
-        let dispatcher = self.logger.dispatcher().await;
+            let dispatcher = self.logger.dispatcher();
 
-        async move {
-            let input: TxInput = serde_json::from_str(&input)?;
-            match engine
-                .executor()
-                .start_tx(engine.query_schema().clone(), input.max_wait, input.timeout)
-                .await
-            {
-                Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
-                Err(err) => Ok(map_known_error(err)?),
+            async move {
+                let input: TxInput = serde_json::from_str(&input)?;
+                match engine
+                    .executor()
+                    .start_tx(engine.query_schema().clone(), input.max_wait, input.timeout)
+                    .await
+                {
+                    Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
+                    Err(err) => Ok(map_known_error(err)?),
+                }
             }
-        }
-        .with_subscriber(dispatcher)
+            .with_subscriber(dispatcher)
+            .await
+        })
         .await
     }
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
     #[napi]
     pub async fn commit_transaction(&self, tx_id: String) -> napi::Result<String> {
-        let inner = self.inner.read().await;
-        let engine = inner.as_engine()?;
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
 
-        let dispatcher = self.logger.dispatcher().await;
+            let dispatcher = self.logger.dispatcher();
 
-        async move {
-            match engine.executor().commit_tx(TxId::from(tx_id)).await {
-                Ok(_) => Ok("{}".to_string()),
-                Err(err) => Ok(map_known_error(err)?),
+            async move {
+                match engine.executor().commit_tx(TxId::from(tx_id)).await {
+                    Ok(_) => Ok("{}".to_string()),
+                    Err(err) => Ok(map_known_error(err)?),
+                }
             }
-        }
-        .with_subscriber(dispatcher)
+            .with_subscriber(dispatcher)
+            .await
+        })
         .await
     }
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[napi]
     pub async fn rollback_transaction(&self, tx_id: String) -> napi::Result<String> {
-        let inner = self.inner.read().await;
-        let engine = inner.as_engine()?;
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
 
-        let dispatcher = self.logger.dispatcher().await;
+            let dispatcher = self.logger.dispatcher();
 
-        async move {
-            match engine.executor().rollback_tx(TxId::from(tx_id)).await {
-                Ok(_) => Ok("{}".to_string()),
-                Err(err) => Ok(map_known_error(err)?),
+            async move {
+                match engine.executor().rollback_tx(TxId::from(tx_id)).await {
+                    Ok(_) => Ok("{}".to_string()),
+                    Err(err) => Ok(map_known_error(err)?),
+                }
             }
-        }
-        .with_subscriber(dispatcher)
+            .with_subscriber(dispatcher)
+            .await
+        })
         .await
     }
 
     /// Loads the query schema. Only available when connected.
     #[napi]
     pub async fn sdl_schema(&self) -> napi::Result<String> {
-        let inner = self.inner.read().await;
-        let engine = inner.as_engine()?;
+        async_panic_to_js_error(async move {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
 
-        Ok(GraphQLSchemaRenderer::render(engine.query_schema().clone()))
+            Ok(GraphQLSchemaRenderer::render(engine.query_schema().clone()))
+        })
+        .await
+    }
+
+    #[napi]
+    pub async fn metrics(&self, json_options: String) -> napi::Result<String> {
+        async_panic_to_js_error(async move {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
+            let options: MetricOptions = serde_json::from_str(&json_options)?;
+
+            if let Some(metrics) = &engine.metrics {
+                if options.is_json_format() {
+                    let engine_metrics = metrics.to_json(options.global_labels);
+                    let res = serde_json::to_string(&engine_metrics)?;
+                    Ok(res)
+                } else {
+                    Ok(metrics.to_prometheus(options.global_labels))
+                }
+            } else {
+                Err(ApiError::Configuration(
+                    "Metrics is not enabled. First set it in the preview features.".to_string(),
+                )
+                .into())
+            }
+        })
+        .await
     }
 }
 
@@ -392,32 +456,15 @@ fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<Stri
     Err(ApiError::JsonDecode(msg.to_string()))
 }
 
-fn set_panic_hook() {
-    let original_hook = std::panic::take_hook();
-
-    std::panic::set_hook(Box::new(move |info| {
-        let payload = info
-            .payload()
-            .downcast_ref::<String>()
-            .map(Clone::clone)
-            .unwrap_or_else(|| info.payload().downcast_ref::<&str>().unwrap().to_string());
-
-        match info.location() {
-            Some(location) => {
-                tracing::event!(
-                    tracing::Level::ERROR,
-                    message = "PANIC",
-                    reason = payload.as_str(),
-                    file = location.file(),
-                    line = location.line(),
-                    column = location.column(),
-                );
-            }
-            None => {
-                tracing::event!(tracing::Level::ERROR, message = "PANIC", reason = payload.as_str());
-            }
-        }
-
-        original_hook(info)
-    }));
+async fn async_panic_to_js_error<F, R>(fut: F) -> napi::Result<R>
+where
+    F: Future<Output = napi::Result<R>>,
+{
+    match AssertUnwindSafe(fut).catch_unwind().await {
+        Ok(result) => result,
+        Err(err) => match Error::extract_panic_message(err) {
+            Some(message) => Err(napi::Error::from_reason(format!("PANIC: {}", message))),
+            None => Err(napi::Error::from_reason("PANIC: unknown panic".to_string())),
+        },
+    }
 }

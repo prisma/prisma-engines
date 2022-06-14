@@ -1,32 +1,6 @@
 use crate::{common::*, with_header, Provider};
 
 #[test]
-fn without_preview_feature() {
-    let dml = indoc! {r#"
-        model A {
-          id Int  @id
-          a  Int
-
-          @@index([a(ops: raw("whatever_ops"))], type: Brin)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": You must enable `extendedIndexes` preview feature to be able to define the index type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@index([a(ops: raw("whatever_ops"))], [1;91mtype: Brin[0m)
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn on_mysql() {
     let dml = indoc! {r#"
         model A {
@@ -37,7 +11,7 @@ fn on_mysql() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -63,7 +37,7 @@ fn with_raw_unsupported() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -91,7 +65,7 @@ fn with_unsupported_no_ops() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -120,7 +94,7 @@ fn bit_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -147,7 +121,7 @@ fn bit_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -175,7 +149,7 @@ fn bit_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -201,7 +175,7 @@ fn bit_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -229,7 +203,7 @@ fn varbit_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -256,7 +230,7 @@ fn varbit_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -284,7 +258,7 @@ fn varbit_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -310,7 +284,7 @@ fn varbit_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -338,7 +312,7 @@ fn date_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -365,7 +339,7 @@ fn date_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -393,7 +367,7 @@ fn date_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -419,7 +393,7 @@ fn date_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -447,7 +421,7 @@ fn date_minmaxmulti_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -473,7 +447,7 @@ fn date_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -501,7 +475,7 @@ fn date_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -529,7 +503,7 @@ fn real_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -556,7 +530,7 @@ fn real_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -584,7 +558,7 @@ fn real_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -610,7 +584,7 @@ fn real_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -638,7 +612,7 @@ fn real_minmaxmulti_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -664,7 +638,7 @@ fn real_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -692,7 +666,7 @@ fn real_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -720,7 +694,7 @@ fn prisma_float_all_defaults() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -747,7 +721,7 @@ fn double_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -774,7 +748,7 @@ fn double_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -802,7 +776,7 @@ fn double_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -830,7 +804,7 @@ fn double_minmaxmulti_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -858,7 +832,7 @@ fn double_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -886,7 +860,7 @@ fn double_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -912,7 +886,7 @@ fn double_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -940,7 +914,7 @@ fn double_minmaxmulti_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -966,7 +940,7 @@ fn double_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -994,7 +968,7 @@ fn double_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1022,7 +996,7 @@ fn inet_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -1049,7 +1023,7 @@ fn inet_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1077,7 +1051,7 @@ fn inet_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1103,7 +1077,7 @@ fn inet_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1129,7 +1103,7 @@ fn inet_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1157,7 +1131,7 @@ fn inet_minmaxmulti_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1183,7 +1157,7 @@ fn inet_minmaxmulti_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1209,7 +1183,7 @@ fn inet_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1237,7 +1211,7 @@ fn inet_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1263,7 +1237,7 @@ fn inet_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1289,7 +1263,7 @@ fn inet_inclusion_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1317,7 +1291,7 @@ fn inet_inclusion_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1343,7 +1317,7 @@ fn inet_inclusion_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1371,7 +1345,7 @@ fn int2_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -1398,7 +1372,7 @@ fn int2_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1426,7 +1400,7 @@ fn int2_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1452,7 +1426,7 @@ fn int2_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1478,7 +1452,7 @@ fn int2_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1506,7 +1480,7 @@ fn int2_minmaxmulti_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1532,7 +1506,7 @@ fn int2_minmaxmulti_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1558,7 +1532,7 @@ fn int2_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1586,7 +1560,7 @@ fn int2_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1612,7 +1586,7 @@ fn int2_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1640,7 +1614,7 @@ fn int4_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -1667,7 +1641,7 @@ fn int4_default_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -1694,7 +1668,7 @@ fn int4_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1722,7 +1696,7 @@ fn int4_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1748,7 +1722,7 @@ fn int4_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1776,7 +1750,7 @@ fn int4_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1804,7 +1778,7 @@ fn int4_minmaxmulti_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1830,7 +1804,7 @@ fn int4_minmaxmulti_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1858,7 +1832,7 @@ fn int4_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1886,7 +1860,7 @@ fn int4_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1912,7 +1886,7 @@ fn int4_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -1942,7 +1916,7 @@ fn int8_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -1969,7 +1943,7 @@ fn int8_default_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -1996,7 +1970,7 @@ fn int8_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2024,7 +1998,7 @@ fn int8_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2052,7 +2026,7 @@ fn int8_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2080,7 +2054,7 @@ fn int8_minmaxmulti_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2108,7 +2082,7 @@ fn int8_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2136,7 +2110,7 @@ fn int8_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2166,7 +2140,7 @@ fn prisma_decimal_all_defaults() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -2193,7 +2167,7 @@ fn decimal_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -2220,7 +2194,7 @@ fn decimal_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2248,7 +2222,7 @@ fn decimal_minmax_wrong_prisma_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -2274,7 +2248,7 @@ fn decimal_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2302,7 +2276,7 @@ fn decimal_minmaxmulti_wrong_prisma_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -2328,7 +2302,7 @@ fn decimal_minmaxmulti_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2356,7 +2330,7 @@ fn decimal_bloom_wrong_prisma_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -2382,7 +2356,7 @@ fn decimal_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2410,7 +2384,7 @@ fn decimal_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2438,7 +2412,7 @@ fn decimal_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2468,7 +2442,7 @@ fn oid_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -2495,7 +2469,7 @@ fn oid_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2523,7 +2497,7 @@ fn oid_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -2549,7 +2523,7 @@ fn oid_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2577,7 +2551,7 @@ fn oid_minmaxmulti_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -2603,7 +2577,7 @@ fn oid_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2631,7 +2605,7 @@ fn oid_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -2659,7 +2633,7 @@ fn char_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -2686,7 +2660,7 @@ fn char_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2714,7 +2688,7 @@ fn char_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -2740,7 +2714,7 @@ fn char_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2768,7 +2742,7 @@ fn char_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -2796,7 +2770,7 @@ fn prisma_text_all_defaults() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -2823,7 +2797,7 @@ fn text_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -2850,7 +2824,7 @@ fn varchar_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -2877,7 +2851,7 @@ fn text_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2905,7 +2879,7 @@ fn varchar_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2933,7 +2907,7 @@ fn text_minmax_wrong_prisma_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -2959,7 +2933,7 @@ fn text_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -2987,7 +2961,7 @@ fn text_bloom_wrong_prisma_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -3013,7 +2987,7 @@ fn text_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3041,7 +3015,7 @@ fn text_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3069,7 +3043,7 @@ fn varchar_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3097,7 +3071,7 @@ fn no_native_type_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3127,7 +3101,7 @@ fn prisma_datetime_all_defaults() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -3154,7 +3128,7 @@ fn timestamp_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -3181,7 +3155,7 @@ fn timestamp_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3209,7 +3183,7 @@ fn timestamp_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3237,7 +3211,7 @@ fn timestamp_minmaxmulti_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3265,7 +3239,7 @@ fn timestamp_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3293,7 +3267,7 @@ fn timestamp_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -3319,7 +3293,7 @@ fn timestamp_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3347,7 +3321,7 @@ fn timestamp_minmaxmulti_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -3373,7 +3347,7 @@ fn timestamp_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3401,7 +3375,7 @@ fn timestamp_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -3429,7 +3403,7 @@ fn timestamptz_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -3456,7 +3430,7 @@ fn timestamptz_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3484,7 +3458,7 @@ fn timestamptz_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -3510,7 +3484,7 @@ fn timestamptz_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3538,7 +3512,7 @@ fn timestamptz_minmaxmulti_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -3564,7 +3538,7 @@ fn timestamptz_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3592,7 +3566,7 @@ fn timestamptz_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -3620,7 +3594,7 @@ fn time_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -3647,7 +3621,7 @@ fn time_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3675,7 +3649,7 @@ fn time_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -3701,7 +3675,7 @@ fn time_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3729,7 +3703,7 @@ fn time_minmaxmulti_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -3755,7 +3729,7 @@ fn time_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3783,7 +3757,7 @@ fn time_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -3811,7 +3785,7 @@ fn timetz_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -3838,7 +3812,7 @@ fn timetz_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3866,7 +3840,7 @@ fn timetz_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -3892,7 +3866,7 @@ fn timetz_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3920,7 +3894,7 @@ fn timetz_minmaxmulti_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -3946,7 +3920,7 @@ fn timetz_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -3974,7 +3948,7 @@ fn timetz_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -4002,7 +3976,7 @@ fn uuid_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let field = IndexField::new_in_model("a");
@@ -4029,7 +4003,7 @@ fn uuid_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -4057,7 +4031,7 @@ fn uuid_minmax_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -4083,7 +4057,7 @@ fn uuid_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -4111,7 +4085,7 @@ fn uuid_minmaxmulti_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -4137,7 +4111,7 @@ fn uuid_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let schema = parse(&schema);
 
     let mut field = IndexField::new_in_model("a");
@@ -4165,7 +4139,7 @@ fn uuid_bloom_wrong_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["extendedIndexes"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"

@@ -3,11 +3,6 @@ datasource db {
   url      = "mongodb://"
 }
 
-generator js {
-  provider        = "prisma-client-js"
-  previewFeatures = ["extendedIndexes"]
-}
-
 type Address {
   number Int
 }

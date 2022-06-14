@@ -12,7 +12,7 @@ mod byoid {
                 #id(id, String, @id, @default(cuid()))
                 p        String  @unique
                 childOpt Child?  @relation(fields: [childId], references: [id])
-                childId  String?
+                childId  String?  @unique
             }
 
             model Child {
@@ -37,7 +37,7 @@ mod byoid {
                 #id(id, String, @id, @default(cuid()))
                 c         String  @unique
                 parentOpt Parent? @relation(fields: [parentId],references: [id])
-                parentId  String?
+                parentId  String?  @unique
             }"#
         };
 

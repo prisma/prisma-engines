@@ -1,47 +1,7 @@
 use crate::common::*;
 use bigdecimal::{BigDecimal, FromPrimitive};
-use datamodel::dml::{DefaultValue, PrismaValue, ScalarType, ValueGenerator};
+use datamodel::dml::{DefaultValue, PrismaValue, ValueGenerator};
 use native_types::{MySqlType, PostgresType};
-
-#[test]
-fn should_apply_a_custom_type() {
-    let dml = r#"
-    type ID = String @id @default(cuid())
-
-    model Model {
-        id ID
-    }
-    "#;
-
-    let datamodel = parse(dml);
-    let user_model = datamodel.assert_has_model("Model");
-    user_model
-        .assert_has_scalar_field("id")
-        .assert_is_id(user_model)
-        .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_cuid()));
-}
-
-#[test]
-fn should_recursively_apply_a_custom_type() {
-    let dml = r#"
-        type MyString = String
-        type MyStringWithDefault = MyString @default(cuid())
-        type ID = MyStringWithDefault @id
-
-        model Model {
-            id ID
-        }
-    "#;
-
-    let datamodel = parse(dml);
-    let user_model = datamodel.assert_has_model("Model");
-    user_model
-        .assert_has_scalar_field("id")
-        .assert_is_id(user_model)
-        .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_cuid()));
-}
 
 #[test]
 fn should_be_able_to_handle_native_type_combined_with_default_autoincrement_attribute() {
@@ -101,67 +61,6 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
     let mysql_type: MySqlType = sft.deserialize_native_type();
 
     assert_eq!(mysql_type, MySqlType::Decimal(Some((8, 2))));
-}
-
-#[test]
-fn should_be_able_to_handle_multiple_types() {
-    let dml = r#"
-    type ID = String @id @default(cuid())
-    type UniqueString = String @unique
-    type Cash = Int @default(0)
-
-    model User {
-        id       ID
-        email    UniqueString
-        balance  Cash
-    }
-    "#;
-
-    let datamodel = parse(dml);
-    let user_model = datamodel.assert_has_model("User");
-    user_model
-        .assert_has_scalar_field("id")
-        .assert_is_id(user_model)
-        .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_cuid()));
-
-    user_model
-        .assert_has_scalar_field("email")
-        .assert_base_type(&ScalarType::String);
-
-    assert!(user_model.field_is_unique("email"));
-
-    user_model
-        .assert_has_scalar_field("balance")
-        .assert_base_type(&ScalarType::Int)
-        .assert_default_value(DefaultValue::new_single(PrismaValue::Int(0)));
-}
-
-#[test]
-fn should_be_able_to_define_custom_enum_types() {
-    let dml = r#"
-    type RoleWithDefault = Role @default(USER)
-
-    model User {
-        id Int @id
-        role RoleWithDefault
-    }
-
-    enum Role {
-        ADMIN
-        USER
-        CEO
-    }
-    "#;
-
-    let datamodel = parse(dml);
-
-    let user_model = datamodel.assert_has_model("User");
-
-    user_model
-        .assert_has_scalar_field("role")
-        .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::new_single(PrismaValue::Enum(String::from("USER"))));
 }
 
 #[test]

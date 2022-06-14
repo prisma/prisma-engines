@@ -35,13 +35,15 @@ impl ConstraintNames {
         let suffix = "_pkey";
         let limit = connector.max_identifier_length();
 
-        let trimmed = if table_name.len() >= limit - 5 {
-            table_name.split_at(limit - 5).0
+        let table_name = if table_name.len() >= limit - 5 {
+            let split = floor_char_boundary(table_name, limit - 5);
+
+            table_name.split_at(split).0
         } else {
             table_name
         };
 
-        format!("{}{}", trimmed, suffix)
+        format!("{}{}", table_name, suffix)
     }
 
     pub fn unique_index_name(
@@ -85,7 +87,8 @@ impl ConstraintNames {
         out.push_str(&colnames);
 
         if out.len() >= limit - suffix.len() {
-            out.truncate(limit - suffix.len());
+            let split = floor_char_boundary(&out, limit - suffix.len());
+            out.truncate(split);
         };
 
         out.push_str(suffix);
@@ -95,15 +98,14 @@ impl ConstraintNames {
 
     pub fn default_name(table_name: &str, column_name: &str, connector: &dyn Connector) -> String {
         let limit = connector.max_identifier_length();
-        let joined = format!("{}_{}", table_name, column_name);
+        let mut joined = format!("{}_{}", table_name, column_name);
 
-        let trimmed = if joined.len() >= limit - 3 {
-            joined.split_at(limit - 3).0
-        } else {
-            joined.as_str()
-        };
+        if joined.len() >= limit - 3 {
+            let split = floor_char_boundary(&joined, limit - 3);
+            joined.truncate(split);
+        }
 
-        format!("{}_df", trimmed)
+        format!("{}_df", joined)
     }
 
     /// Params:
@@ -114,15 +116,14 @@ impl ConstraintNames {
         let fk_suffix = "_fkey";
         let limit = connector.max_identifier_length();
 
-        let joined = format!("{}_{}", table_name, column_names.join("_"));
+        let mut joined = format!("{}_{}", table_name, column_names.join("_"));
 
-        let trimmed = if joined.len() >= limit - 5 {
-            joined.split_at(limit - 5).0
-        } else {
-            joined.as_str()
-        };
+        if joined.len() >= limit - 5 {
+            let split = floor_char_boundary(&joined, limit - 5);
+            joined.truncate(split);
+        }
 
-        format!("{}{}", trimmed, fk_suffix)
+        format!("{}{}", joined, fk_suffix)
     }
 
     pub fn is_db_name_too_long(
@@ -144,5 +145,25 @@ impl ConstraintNames {
             }
         }
         None
+    }
+}
+
+/// Finds the closest `x` not exceeding `index` where
+/// `is_char_boundary(x) is `true.
+///
+/// This method can help you to truncate a string so that it's still
+/// valid UTF-8, but doesn't exceed a given number of bytes.
+///
+/// To be replaced with `std::str::floor_char_boundary` when it's
+/// stabilized.
+fn floor_char_boundary(s: &str, mut index: usize) -> usize {
+    if index >= s.len() {
+        s.len()
+    } else {
+        while !s.is_char_boundary(index) {
+            index -= 1;
+        }
+
+        index
     }
 }

@@ -324,3 +324,10 @@ pub struct MissingFieldsInModel {
     pub expected_type: String,
     pub found: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2033", message = "{details}")]
+
+pub struct ValueFitError {
+    pub details: String,
+}

@@ -2,7 +2,7 @@ use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
-#[test_connector(tags(Postgres), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres))]
 async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
@@ -28,7 +28,7 @@ async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres))]
 async fn a_table_with_descending_compound_unique(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
@@ -58,7 +58,7 @@ async fn a_table_with_descending_compound_unique(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres))]
 async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
@@ -88,7 +88,7 @@ async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn a_table_with_a_hash_index(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
@@ -108,34 +108,6 @@ async fn a_table_with_a_hash_index(api: &TestApi) -> TestResult {
           a  Int?
 
           @@index([a], type: Hash)
-        }
-    "#]];
-
-    expectation.assert_eq(&api.introspect_dml().await?);
-
-    Ok(())
-}
-
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn a_table_with_a_hash_index_no_preview(api: &TestApi) -> TestResult {
-    let setup = indoc! {r#"
-       CREATE TABLE "A" (
-           id INTEGER NOT NULL,
-           a  INTEGER,
-           CONSTRAINT A_pkey PRIMARY KEY (id)
-       );
-
-       CREATE INDEX "A_a_idx" ON "A" USING HASH (a);
-   "#};
-
-    api.raw_cmd(setup).await;
-
-    let expectation = expect![[r#"
-        model A {
-          id Int  @id(map: "a_pkey")
-          a  Int?
-
-          @@index([a])
         }
     "#]];
 

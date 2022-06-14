@@ -24,7 +24,7 @@ mod prisma_3078 {
               name       String?
               field_b    User?    @relation("UserfriendOf")
               field_a    User?    @relation("UserfriendOf", fields: [field_aId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-              field_aId  Int?
+              field_aId  Int? @unique
             }"#
         };
 
@@ -38,7 +38,7 @@ mod prisma_3078 {
             name       String?
             field_b    User?    @relation("UserfriendOf")
             field_z    User?    @relation("UserfriendOf", fields: [field_zId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-            field_zId  Int?
+            field_zId  Int? @unique
           }"#
         };
 

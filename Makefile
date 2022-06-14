@@ -189,7 +189,7 @@ validate:
 	cargo run --bin test-cli -- validate-datamodel dev_datamodel.prisma
 
 qe:
-	cargo run --bin query-engine -- --enable-playground --enable-raw-queries
+	cargo run --bin query-engine -- --enable-playground --enable-raw-queries --enable-metrics
 
 qe-dmmf:
 	cargo run --bin query-engine -- cli dmmf > dmmf.json
@@ -216,6 +216,9 @@ use-local-query-engine:
 	cargo build --release
 	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/runtime/
 	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/query-engine-darwin
+
+show-metrics:
+	docker-compose -f docker-compose.yml up -d --remove-orphans grafana prometheus
 
 
 ## OpenTelemetry

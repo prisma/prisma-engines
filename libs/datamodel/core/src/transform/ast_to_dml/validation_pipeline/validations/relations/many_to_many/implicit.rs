@@ -2,7 +2,9 @@ use datamodel_connector::{ConnectorCapability, DatamodelError};
 use itertools::Itertools;
 use parser_database::walkers::ImplicitManyToManyRelationWalker;
 
-use crate::transform::ast_to_dml::validation_pipeline::context::Context;
+use crate::transform::ast_to_dml::validation_pipeline::{
+    context::Context, validations::relations::RELATION_ATTRIBUTE_NAME,
+};
 
 /// Our weird many-to-many requirement.
 pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_>, ctx: &mut Context<'_>) {
@@ -75,5 +77,25 @@ pub(crate) fn supports_implicit_relations(relation: ImplicitManyToManyRelationWa
 
     for span in spans {
         ctx.push_error(DatamodelError::new_validation_error(msg.clone(), span));
+    }
+}
+
+pub(crate) fn cannot_define_references_argument(relation: ImplicitManyToManyRelationWalker<'_>, ctx: &mut Context<'_>) {
+    let msg = "Implicit many-to-many relation should not have references argument defined. Either remove it, or change the relation to one-to-many.";
+
+    if relation.field_a().referenced_fields().is_some() {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            msg,
+            RELATION_ATTRIBUTE_NAME,
+            relation.field_a().ast_field().span,
+        ));
+    }
+
+    if relation.field_b().referenced_fields().is_some() {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            msg,
+            RELATION_ATTRIBUTE_NAME,
+            relation.field_b().ast_field().span,
+        ));
     }
 }

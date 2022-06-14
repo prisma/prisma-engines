@@ -20,7 +20,7 @@ mod compound_pk_rel {
             r#"model Parent {
               name     String
               age      Int
-              child_id Int
+              child_id Int  @unique
 
               child Child  @relation(fields: [child_id], references: [id])
               @@id([name, child_id])
@@ -46,6 +46,7 @@ mod compound_pk_rel {
 
               child Child  @relation(fields: [child_id, child_ssn], references: [id, ssn])
               @@id([name, child_id, child_ssn])
+              @@unique([child_id, child_ssn])
             }
 
             model Child {

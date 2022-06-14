@@ -426,10 +426,10 @@ fn ambiguous_relations() {
 
             model Post {
                 id      Int  @id
-                blog1Id Int
-                blog2Id Int
-                blog1   Blog @relation(name: "Relation1", fields: blog1Id, references: id)
-                blog2   Blog @relation(name: "Relation2", fields: blog2Id, references: id)
+                blog1Id Int  @unique
+                blog2Id Int  @unique
+                blog1   Blog @relation(name: "Relation1", fields: [blog1Id], references: [id])
+                blog2   Blog @relation(name: "Relation2", fields: [blog2Id], references: [id])
             }
         "#,
     );

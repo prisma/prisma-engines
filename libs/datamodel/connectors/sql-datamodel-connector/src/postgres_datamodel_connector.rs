@@ -99,7 +99,6 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::JsonLists,
     ConnectorCapability::UpdateableId,
     ConnectorCapability::WritableAutoincField,
-    ConnectorCapability::UsingHashIndex,
     ConnectorCapability::ImplicitManyToManyRelation,
     ConnectorCapability::DecimalType,
 ];

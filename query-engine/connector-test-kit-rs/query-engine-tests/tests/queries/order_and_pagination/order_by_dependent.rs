@@ -9,7 +9,7 @@ mod order_by_dependent {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
-              b_id Int?
+              b_id Int? @unique
               b    ModelB? @relation(fields: [b_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
               c    ModelC?
             }
@@ -18,14 +18,14 @@ mod order_by_dependent {
               #id(id, Int, @id)
               a  ModelA?
 
-              c_id Int?
+              c_id Int? @unique
               c    ModelC? @relation(fields: [c_id], references: [id])
             }
 
             model ModelC {
               #id(id, Int, @id)
               b    ModelB?
-              a_id Int?
+              a_id Int? @unique
               a    ModelA? @relation(fields: [a_id], references: [id])
             }"#
         };
@@ -343,7 +343,7 @@ mod order_by_dependent {
           r#"
         model ModelA {
           #id(id, Int, @id)
-          b_id Int?
+          b_id Int? @unique
           b    ModelB? @relation(fields: [b_id], references: [id])
         }
 
@@ -351,7 +351,7 @@ mod order_by_dependent {
           #id(id, Int, @id)
           a  ModelA?
 
-          c_id Int?
+          c_id Int? @unique
           c    ModelC? @relation(fields: [c_id], references: [id])
         }
 

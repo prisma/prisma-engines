@@ -2,28 +2,6 @@ use migration_engine_tests::test_api::*;
 use sql_schema_describer::postgres::{SQLOperatorClassKind, SqlIndexAlgorithm};
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-fn brin_preview_disabled(api: TestApi) {
-    let schema_name = api.schema_name();
-    let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bit)",);
-    let create_idx =
-        format!("CREATE INDEX \"A_data_idx\" ON \"{schema_name}\".\"A\" USING BRIN (data bit_minmax_ops);",);
-
-    api.raw_cmd(&create_table);
-    api.raw_cmd(&create_idx);
-
-    let dm = r#"
-        model A {
-          id   Int     @id @default(autoincrement())
-          data String? @db.Bit(1)
-
-          @@index([data])
-        }
-    "#;
-
-    api.schema_push_w_datasource(dm).send().assert_no_steps();
-}
-
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
 fn brin_change_from_btree(api: TestApi) {
     let dm = r#"
         model A {
@@ -60,7 +38,7 @@ fn brin_change_from_btree(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_bit_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -85,7 +63,7 @@ fn brin_bit_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_bit_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -110,7 +88,7 @@ fn brin_bit_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_varbit_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -135,7 +113,7 @@ fn brin_varbit_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_varbit_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -160,7 +138,7 @@ fn brin_varbit_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_bpchar_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -185,7 +163,7 @@ fn brin_bpchar_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_bpchar_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -210,7 +188,7 @@ fn brin_bpchar_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_bpchar_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -235,7 +213,7 @@ fn brin_bpchar_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_bytea_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -260,7 +238,7 @@ fn brin_bytea_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_bytea_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -285,7 +263,7 @@ fn brin_bytea_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_bytea_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -310,7 +288,7 @@ fn brin_bytea_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_date_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -335,7 +313,7 @@ fn brin_date_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_date_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -360,7 +338,7 @@ fn brin_date_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_date_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -385,7 +363,7 @@ fn brin_date_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_date_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -412,7 +390,7 @@ fn brin_date_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_real_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -437,7 +415,7 @@ fn brin_real_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_real_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -462,7 +440,7 @@ fn brin_real_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_real_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -487,7 +465,7 @@ fn brin_real_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_real_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -514,7 +492,7 @@ fn brin_real_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_double_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -539,7 +517,7 @@ fn brin_double_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_double_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -564,7 +542,7 @@ fn brin_double_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_double_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -589,7 +567,7 @@ fn brin_double_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_double_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -616,7 +594,7 @@ fn brin_double_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_inet_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -641,7 +619,7 @@ fn brin_inet_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_inet_inclusion_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -666,7 +644,7 @@ fn brin_inet_inclusion_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_inet_inclusion_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -691,7 +669,7 @@ fn brin_inet_inclusion_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_inet_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -716,7 +694,7 @@ fn brin_inet_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_inet_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -743,7 +721,7 @@ fn brin_inet_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_int2_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -768,7 +746,7 @@ fn brin_int2_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_int2_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -793,7 +771,7 @@ fn brin_int2_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_int2_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -818,7 +796,7 @@ fn brin_int2_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_int2_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -845,7 +823,7 @@ fn brin_int2_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_int4_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -870,7 +848,7 @@ fn brin_int4_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_int4_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -895,7 +873,7 @@ fn brin_int4_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_int4_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -920,7 +898,7 @@ fn brin_int4_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_int4_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -947,7 +925,7 @@ fn brin_int4_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_int8_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -972,7 +950,7 @@ fn brin_int8_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_int8_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -997,7 +975,7 @@ fn brin_int8_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_int8_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1022,7 +1000,7 @@ fn brin_int8_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_int8_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1049,7 +1027,7 @@ fn brin_int8_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_numeric_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1074,7 +1052,7 @@ fn brin_numeric_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_numeric_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -1099,7 +1077,7 @@ fn brin_numeric_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_numeric_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1124,7 +1102,7 @@ fn brin_numeric_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_numeric_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1151,7 +1129,7 @@ fn brin_numeric_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_oid_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1176,7 +1154,7 @@ fn brin_oid_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_oid_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -1201,7 +1179,7 @@ fn brin_oid_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_oid_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1226,7 +1204,7 @@ fn brin_oid_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_oid_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1253,7 +1231,7 @@ fn brin_oid_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_text_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1278,7 +1256,7 @@ fn brin_text_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_text_minmax_ops_varchar(api: TestApi) {
     let dm = r#"
         model A {
@@ -1303,7 +1281,7 @@ fn brin_text_minmax_ops_varchar(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_text_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -1328,7 +1306,7 @@ fn brin_text_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_text_minmax_ops_default_varchar(api: TestApi) {
     let dm = r#"
         model A {
@@ -1353,7 +1331,7 @@ fn brin_text_minmax_ops_default_varchar(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_text_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1378,7 +1356,7 @@ fn brin_text_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_text_bloom_ops_varchar(api: TestApi) {
     let dm = r#"
         model A {
@@ -1403,7 +1381,7 @@ fn brin_text_bloom_ops_varchar(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_timestamp_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1430,7 +1408,7 @@ fn brin_timestamp_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_timestamp_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -1457,7 +1435,7 @@ fn brin_timestamp_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_timestamp_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1484,7 +1462,7 @@ fn brin_timestamp_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_timestamp_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1511,7 +1489,7 @@ fn brin_timestamp_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_timestamptz_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1538,7 +1516,7 @@ fn brin_timestamptz_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_timestamptz_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -1565,7 +1543,7 @@ fn brin_timestamptz_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_timestamptz_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1592,7 +1570,7 @@ fn brin_timestamptz_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_timestamptz_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1619,7 +1597,7 @@ fn brin_timestamptz_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_time_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1644,7 +1622,7 @@ fn brin_time_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_time_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -1669,7 +1647,7 @@ fn brin_time_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_time_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1694,7 +1672,7 @@ fn brin_time_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_time_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1721,7 +1699,7 @@ fn brin_time_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_timetz_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1746,7 +1724,7 @@ fn brin_timetz_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_timetz_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -1771,7 +1749,7 @@ fn brin_timetz_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_timetz_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1796,7 +1774,7 @@ fn brin_timetz_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_timetz_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1823,7 +1801,7 @@ fn brin_timetz_minmax_multi_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_uuid_minmax_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1848,7 +1826,7 @@ fn brin_uuid_minmax_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn brin_uuid_minmax_ops_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -1873,7 +1851,7 @@ fn brin_uuid_minmax_ops_default(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_uuid_bloom_ops(api: TestApi) {
     let dm = r#"
         model A {
@@ -1898,7 +1876,7 @@ fn brin_uuid_bloom_ops(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres14), exclude(CockroachDb), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn brin_uuid_minmax_multi_ops(api: TestApi) {
     let dm = r#"
         model A {

@@ -131,6 +131,7 @@ impl<'a> Default for &'a PostgresSchemaExt {
 }
 
 impl PostgresSchemaExt {
+    #[track_caller]
     pub fn index_algorithm(&self, index_id: IndexId) -> SqlIndexAlgorithm {
         match self.indexes.binary_search_by_key(&index_id, |(id, _)| *id) {
             Ok(i) => self.indexes[i].1,
@@ -1030,7 +1031,13 @@ impl<'a> SqlSchemaDescriber<'a> {
             let is_unique = row.get_expect_bool("is_unique");
             let is_primary_key = row.get_expect_bool("is_primary_key");
             let table_name = row.get_expect_string("table_name");
-            let table_id = table_ids[table_name.as_str()];
+            let index_algo = row.get_expect_string("index_algo");
+
+            let table_id: TableId = if let Some(id) = table_ids.get(table_name.as_str()) {
+                *id
+            } else {
+                continue; // skip indexes on tables we do not know about (permissions, etc.)
+            };
 
             let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
                 "ASC" => SQLSortOrder::Asc,
@@ -1042,12 +1049,12 @@ impl<'a> SqlSchemaDescriber<'a> {
             });
 
             let algorithm = if self.is_cockroach() {
-                match row.get_expect_string("index_algo").as_str() {
+                match index_algo.as_str() {
                     "inverted" => SqlIndexAlgorithm::Gin,
                     _ => SqlIndexAlgorithm::BTree,
                 }
             } else {
-                match row.get_expect_string("index_algo").as_str() {
+                match index_algo.as_str() {
                     "btree" => SqlIndexAlgorithm::BTree,
                     "hash" => SqlIndexAlgorithm::Hash,
                     "gist" => SqlIndexAlgorithm::Gist,
