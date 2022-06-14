@@ -267,10 +267,9 @@ fn full_scalar_filter_type(
                 json_equality_filters(ctx, mapped_scalar_type.clone(), nullable).collect();
 
             if ctx.capabilities.supports_any(&[
-                    ConnectorCapability::JsonFilteringJsonPath,
-                    ConnectorCapability::JsonFilteringArrayPath,
-                ])
-            {
+                ConnectorCapability::JsonFilteringJsonPath,
+                ConnectorCapability::JsonFilteringArrayPath,
+            ]) {
                 filters.extend(json_filters(ctx));
 
                 if ctx
