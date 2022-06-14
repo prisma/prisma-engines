@@ -80,7 +80,6 @@ pub const GENERATOR: FeatureMap = FeatureMap::new()
         FullTextSearch,
         FullTextIndex,
         Tracing,
-        ImprovedQueryRaw,
         Metrics,
     ])
     .with_deprecated(&[
@@ -104,6 +103,7 @@ pub const GENERATOR: FeatureMap = FeatureMap::new()
         OrderByRelation,
         ReferentialActions,
         NApi,
+        ImprovedQueryRaw,
         DataProxy,
     ]);
 
