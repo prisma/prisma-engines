@@ -11,7 +11,8 @@ mod default_value {
             }
             
             type Composite {
-               field String @default("foo")
+               field     String @default("foo")
+               field_opt String? @default("bar")
             }"#
         };
 
@@ -33,6 +34,26 @@ mod default_value {
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findUniqueTestModel(where: { id: 1 }) { composite { field } } }"#),
           @r###"{"data":{"findUniqueTestModel":{"composite":{"field":"foo"}}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn opt_fields_are_not_backfilled(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            run_command_raw(serde_json::json!({ "insert": "TestModel", "documents": [{ "_id": 1, "composite": {} }] }))
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyTestModel { composite { field_opt } } }"#),
+          @r###"{"data":{"findManyTestModel":[{"composite":{"field_opt":null}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findUniqueTestModel(where: { id: 1 }) { composite { field_opt } } }"#),
+          @r###"{"data":{"findUniqueTestModel":{"composite":{"field_opt":null}}}}"###
         );
 
         Ok(())
