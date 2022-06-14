@@ -54,93 +54,51 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
-<span id="52">52</span>
-<span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
-<span id="59">59</span>
-<span id="60">60</span>
-<span id="61">61</span>
-<span id="62">62</span>
-<span id="63">63</span>
-<span id="64">64</span>
-<span id="65">65</span>
-<span id="66">66</span>
-<span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoTypedJsonExtension</span> {
     <span class="comment">// Returns the type-name</span>
-    <span class="kw">fn</span> <span class="ident">type_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">backward_compatible</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">type_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span>;
     <span class="doccomment">/// Decorate all values with type-hints</span>
-    <span class="kw">fn</span> <span class="ident">as_typed_json</span>(<span class="self">self</span>, <span class="ident">backward_compatible</span>: <span class="ident">bool</span>) -&gt; <span class="ident">serde_json::Value</span>;
+    <span class="kw">fn</span> <span class="ident">as_typed_json</span>(<span class="self">self</span>) -&gt; <span class="ident">serde_json::Value</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoTypedJsonExtension</span> <span class="kw">for</span> <span class="ident">quaint::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">type_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">backward_compatible</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">type_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_null</span>() {
             <span class="kw">return</span> <span class="string">&quot;null&quot;</span>.<span class="ident">to_owned</span>();
         }
 
-        <span class="kw">let</span> <span class="ident">type_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">backward_compatible</span> {
-            <span class="kw">match</span> <span class="self">self</span> {
-                <span class="ident">quaint::Value::Boolean</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;bool&quot;</span>,
-                <span class="ident">quaint::Value::Int32</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;int&quot;</span>,
-                <span class="ident">quaint::Value::Int64</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;int&quot;</span>,
-                <span class="ident">quaint::Value::Float</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;float&quot;</span>,
-                <span class="ident">quaint::Value::Double</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;double&quot;</span>,
-                <span class="ident">quaint::Value::Json</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;json&quot;</span>,
-                <span class="ident">quaint::Value::Numeric</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;float&quot;</span>,
-                <span class="ident">quaint::Value::Array</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;array&quot;</span>,
-                <span class="kw">_</span> =&gt; <span class="string">&quot;string&quot;</span>,
-            }
-        } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="self">self</span> {
-                <span class="ident">quaint::Value::Int32</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;int&quot;</span>,
-                <span class="ident">quaint::Value::Int64</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;bigint&quot;</span>,
-                <span class="ident">quaint::Value::Float</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;float&quot;</span>,
-                <span class="ident">quaint::Value::Double</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;double&quot;</span>,
-                <span class="ident">quaint::Value::Text</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;string&quot;</span>,
-                <span class="ident">quaint::Value::Enum</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;enum&quot;</span>,
-                <span class="ident">quaint::Value::Bytes</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;bytes&quot;</span>,
-                <span class="ident">quaint::Value::Boolean</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;bool&quot;</span>,
-                <span class="ident">quaint::Value::Char</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;char&quot;</span>,
-                <span class="ident">quaint::Value::Numeric</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;decimal&quot;</span>,
-                <span class="ident">quaint::Value::Json</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;json&quot;</span>,
-                <span class="ident">quaint::Value::Xml</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;xml&quot;</span>,
-                <span class="ident">quaint::Value::Uuid</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;uuid&quot;</span>,
-                <span class="ident">quaint::Value::DateTime</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;datetime&quot;</span>,
-                <span class="ident">quaint::Value::Date</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;date&quot;</span>,
-                <span class="ident">quaint::Value::Time</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;time&quot;</span>,
-                <span class="ident">quaint::Value::Array</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;array&quot;</span>,
-            }
+        <span class="kw">let</span> <span class="ident">type_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">quaint::Value::Int32</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;int&quot;</span>,
+            <span class="ident">quaint::Value::Int64</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;bigint&quot;</span>,
+            <span class="ident">quaint::Value::Float</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;float&quot;</span>,
+            <span class="ident">quaint::Value::Double</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;double&quot;</span>,
+            <span class="ident">quaint::Value::Text</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;string&quot;</span>,
+            <span class="ident">quaint::Value::Enum</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;enum&quot;</span>,
+            <span class="ident">quaint::Value::Bytes</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;bytes&quot;</span>,
+            <span class="ident">quaint::Value::Boolean</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;bool&quot;</span>,
+            <span class="ident">quaint::Value::Char</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;char&quot;</span>,
+            <span class="ident">quaint::Value::Numeric</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;decimal&quot;</span>,
+            <span class="ident">quaint::Value::Json</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;json&quot;</span>,
+            <span class="ident">quaint::Value::Xml</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;xml&quot;</span>,
+            <span class="ident">quaint::Value::Uuid</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;uuid&quot;</span>,
+            <span class="ident">quaint::Value::DateTime</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;datetime&quot;</span>,
+            <span class="ident">quaint::Value::Date</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;date&quot;</span>,
+            <span class="ident">quaint::Value::Time</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;time&quot;</span>,
+            <span class="ident">quaint::Value::Array</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;array&quot;</span>,
         };
 
         <span class="ident">type_name</span>.<span class="ident">to_owned</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">as_typed_json</span>(<span class="self">self</span>, <span class="ident">backward_compatible</span>: <span class="ident">bool</span>) -&gt; <span class="ident">serde_json::Value</span> {
-        <span class="kw">let</span> <span class="ident">type_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">type_name</span>(<span class="ident">backward_compatible</span>);
+    <span class="kw">fn</span> <span class="ident">as_typed_json</span>(<span class="self">self</span>) -&gt; <span class="ident">serde_json::Value</span> {
+        <span class="kw">let</span> <span class="ident">type_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">type_name</span>();
 
         <span class="kw">let</span> <span class="ident">json_value</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">quaint::Value::Array</span>(<span class="prelude-val">Some</span>(<span class="ident">values</span>)) =&gt; <span class="ident">serde_json::Value::Array</span>(
-                <span class="ident">values</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">as_typed_json</span>(<span class="ident">backward_compatible</span>))
-                    .<span class="ident">collect</span>(),
-            ),
-            <span class="comment">// TODO: Remove backward_compatible checks for Prisma4</span>
-            <span class="ident">quaint::Value::Int64</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">backward_compatible</span> =&gt; <span class="ident">serde_json::Value::String</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()),
-            <span class="comment">// TODO: Remove backward_compatible checks for Prisma4</span>
-            <span class="ident">quaint::Value::Numeric</span>(<span class="prelude-val">Some</span>(<span class="ident">decimal</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">backward_compatible</span> =&gt; {
-                <span class="ident">serde_json::Value::String</span>(<span class="ident">decimal</span>.<span class="ident">normalized</span>().<span class="ident">to_string</span>())
+            <span class="ident">quaint::Value::Array</span>(<span class="prelude-val">Some</span>(<span class="ident">values</span>)) =&gt; {
+                <span class="ident">serde_json::Value::Array</span>(<span class="ident">values</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">as_typed_json</span>()).<span class="ident">collect</span>())
             }
+            <span class="ident">quaint::Value::Int64</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>)) =&gt; <span class="ident">serde_json::Value::String</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()),
+            <span class="ident">quaint::Value::Numeric</span>(<span class="prelude-val">Some</span>(<span class="ident">decimal</span>)) =&gt; <span class="ident">serde_json::Value::String</span>(<span class="ident">decimal</span>.<span class="ident">normalized</span>().<span class="ident">to_string</span>()),
             <span class="ident">x</span> =&gt; <span class="ident">serde_json::Value::from</span>(<span class="ident">x</span>),
         };
 
