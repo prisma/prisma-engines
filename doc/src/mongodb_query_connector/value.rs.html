@@ -458,6 +458,10 @@
 <span id="453">453</span>
 <span id="454">454</span>
 <span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">output_meta</span>::{<span class="ident">CompositeOutputMeta</span>, <span class="ident">OutputMeta</span>, <span class="ident">ScalarOutputMeta</span>},
     <span class="ident">IntoBson</span>, <span class="ident">MongoError</span>,
@@ -856,7 +860,11 @@
                         (<span class="prelude-val">None</span>, <span class="ident">OutputMeta::Composite</span>(<span class="ident">meta</span>)) <span class="kw">if</span> <span class="ident">meta</span>.<span class="ident">list</span> =&gt; {
                             <span class="ident">pairs</span>.<span class="ident">push</span>((<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">PrismaValue::List</span>(<span class="ident">Vec::new</span>())))
                         }
-                        <span class="comment">// Fill missing fields with nulls.</span>
+                        <span class="comment">// Coerce missing scalars with their default values</span>
+                        (<span class="prelude-val">None</span>, <span class="ident">OutputMeta::Scalar</span>(<span class="ident">meta</span>)) <span class="kw">if</span> <span class="ident">meta</span>.<span class="ident">default</span>.<span class="ident">is_some</span>() =&gt; {
+                            <span class="ident">pairs</span>.<span class="ident">push</span>((<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">meta</span>.<span class="ident">default</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>()))
+                        }
+                        <span class="comment">// Fill missing fields without default values with nulls.</span>
                         (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="ident">pairs</span>.<span class="ident">push</span>((<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">PrismaValue::Null</span>)),
                     }
                 }
