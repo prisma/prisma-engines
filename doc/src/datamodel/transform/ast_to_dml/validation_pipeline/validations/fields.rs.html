@@ -387,6 +387,10 @@
 <span id="382">382</span>
 <span id="383">383</span>
 <span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">constraint_namespace::ConstraintName</span>,
     <span class="ident">database_name::validate_db_name</span>,
@@ -493,6 +497,10 @@
     }
 
     <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">length</span>().<span class="ident">is_none</span>() {
+        <span class="kw">return</span>;
+    }
+
+    <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">as_index_field</span>().<span class="ident">scalar_field_type</span>().<span class="ident">is_unsupported</span>() {
         <span class="kw">return</span>;
     }
 
