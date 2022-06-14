@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), capabilities(ScalarLists, Json))]
+#[test_suite(schema(schema), capabilities(ScalarLists, Json, JsonLists))]
 mod json {
     use indoc::indoc;
     use query_engine_tests::run_query;

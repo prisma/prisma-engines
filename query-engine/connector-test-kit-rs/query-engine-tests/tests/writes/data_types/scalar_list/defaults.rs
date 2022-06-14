@@ -29,7 +29,7 @@ mod basic {
         schema.to_owned()
     }
 
-    #[connector_test]
+    #[connector_test(exclude(CockroachDb))]
     async fn basic_write(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -162,7 +162,7 @@ mod decimal {
     }
 }
 
-#[test_suite(schema(common), capabilities(ScalarLists, Json))]
+#[test_suite(schema(common), capabilities(ScalarLists, Json, JsonLists))]
 mod json {
     use indoc::indoc;
     use query_engine_tests::run_query;

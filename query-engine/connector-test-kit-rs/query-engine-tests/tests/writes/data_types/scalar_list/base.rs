@@ -28,6 +28,35 @@ mod basic_types {
         schema.to_owned()
     }
 
+    #[connector_test]
+    async fn set_base(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, format!(r#"mutation {{
+            createOneScalarModel(data: {{
+              id: 1,
+              strings:   {{ set: ["test{}"] }}
+              ints:      {{ set: [1337, 12] }}
+              floats:    {{ set: [1.234, 1.45] }}
+              booleans:  {{ set: [true, false] }}
+              enums:     {{ set: [A, A] }}
+              dateTimes: {{ set: ["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"] }}
+              bytes:     {{ set: ["dGVzdA==", "dA=="] }}
+            }}) {{
+              strings
+              ints
+              floats
+              booleans
+              enums
+              dateTimes
+              bytes
+            }}
+          }}"#, TROUBLE_CHARS)),
+          @r###"{"data":{"createOneScalarModel":{"strings":["test¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀"],"ints":[1337,12],"floats":[1.234,1.45],"booleans":[true,false],"enums":["A","A"],"dateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dA=="]}}}"###
+        );
+
+        Ok(())
+    }
+
     // "Scalar lists" should "be behave like regular values for create and update operations"
     // Skipped for CockroachDB as enum array concatenation is not supported (https://github.com/cockroachdb/cockroach/issues/71388).
     #[connector_test(exclude(CockroachDb))]
