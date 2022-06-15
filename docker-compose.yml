@@ -102,7 +102,7 @@ services:
       - databases
 
   postgres15:
-    image: postgres:15beta1
+    image: postgres:15beta2
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
