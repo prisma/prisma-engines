@@ -27,6 +27,10 @@ jobs:
             single_threaded: true
             connector: "vitess"
             version: "8.0"
+          - name: "postgres14"
+            single_threaded: false
+            connector: "postgres"
+            version: "14"
           - name: "postgres15"
             single_threaded: false
             connector: "postgres"
@@ -68,7 +72,7 @@ jobs:
         env:
           CLICOLOR_FORCE: 1
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=8
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
