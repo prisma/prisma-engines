@@ -443,11 +443,4 @@ fn array_column_defaults(api: TestApi) {
             PrismaValue::Boolean(false),
         ],
     );
-    // assert_default(
-    //     "datetime_defaults",
-    //     vec![
-    //         PrismaValue::Enum("2022-09-01 08:00:00+00".to_owned()),
-    //         PrismaValue::Enum("2021-09-01 08:00:00+00".to_owned()),
-    //     ],
-    // );
 }

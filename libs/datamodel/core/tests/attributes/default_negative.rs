@@ -1156,3 +1156,82 @@ fn nested_scalar_list_defaults_are_disallowed() {
 
     expect_error(schema, &expected);
 }
+
+#[test]
+fn scalar_list_default_on_connector_without_scalar_lists() {
+    let schema = r#"
+        datasource db {
+            provider = "sqlserver"
+            url = env("DBURL")
+        }
+
+        model Pizza {
+            id Int @id
+            toppings String[] @default(["reblochon cheese", "potato", "rosmarin", "onions"])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mField "toppings" in model "Pizza" can't be a list. The current connector does not support lists of primitive types.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m            id Int @id
+        [1;94m 9 | [0m            [1;91mtoppings String[] @default(["reblochon cheese", "potato", "rosmarin", "onions"])[0m
+        [1;94m10 | [0m        }
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expected);
+}
+
+#[test]
+fn scalar_list_default_on_non_list_field() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("DBURL")
+        }
+
+        model Pizza {
+            id Int @id
+            toppings String @default(["reblochon cheese", "potato", "rosmarin", "onions"])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The default value of a non-list field cannot be a list.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m            id Int @id
+        [1;94m 9 | [0m            toppings String @[1;91mdefault(["reblochon cheese", "potato", "rosmarin", "onions"])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expected);
+}
+
+#[test]
+fn dbgenerated_inside_scalar_list_default() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("DBURL")
+        }
+
+        model Pizza {
+            id Int @id
+            toppings String[] @default(["reblochon cheese", dbgenerated("potato"), "rosmarin", "onions"])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `dbgenerated("potato")`.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m            id Int @id
+        [1;94m 9 | [0m            toppings String[] @[1;91mdefault(["reblochon cheese", dbgenerated("potato"), "rosmarin", "onions"])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expected);
+}

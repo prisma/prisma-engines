@@ -264,7 +264,6 @@ fn column_for_model_enum_scalar_field(
     let r#enum = ctx.datamodel.db.walk_enum(enum_id);
     let value_for_name = |name: &str| -> PrismaValue {
         match r#enum.values().find(|v| v.name() == name).map(|v| v.database_name()) {
-            // Some(v) if v.chars().all(|c| c.is_ascii_digit() || c == '-') => PrismaValue::BigInt(v.parse().unwrap()),
             Some(v) => PrismaValue::Enum(v.to_owned()),
             None => panic!("Expected enum field default to reference existing value."),
         }

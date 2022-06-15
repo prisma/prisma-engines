@@ -67,7 +67,7 @@ impl<'a> Parser<'a> {
 }
 
 pub(super) fn get_default_value(default_string: &str, tpe: &ColumnType) -> Option<DefaultValue> {
-    if default_string.starts_with("NULL") {
+    if default_string.trim().starts_with("NULL") {
         return None;
     }
 
@@ -105,7 +105,6 @@ fn parse_unsupported(_parser: &mut Parser<'_>) -> Option<DefaultValue> {
 
 fn parse_datetime_default(parser: &mut Parser) -> Option<DefaultValue> {
     match parser.peek_token()? {
-        Token::StringLiteral | Token::CStyleStringLiteral => None,
         Token::Identifier => {
             let func_name = parser.expect(Token::Identifier)?;
             if let Some(Token::OpeningBrace) = parser.peek_token() {
@@ -204,7 +203,7 @@ fn parse_string_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
     Some(DefaultValue::value(out))
 }
 
-fn parse_identifier<'a>(parser: &mut Parser<'a>) -> Option<String> {
+fn parse_identifier(parser: &mut Parser<'_>) -> Option<String> {
     match parser.peek_token()? {
         Token::DoubleQuotedIdentifier => {
             let s = parser.expect(Token::DoubleQuotedIdentifier)?;
@@ -264,20 +263,19 @@ fn parse_int_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
                     // dot followed by a second identifier.
                     if let Some(Token::Dot) = parser.peek_token() {
                         parser.expect(Token::Dot)?;
-                        parse_identifier(&mut parser)?.to_owned()
+                        parse_identifier(&mut parser)?
                     } else {
-                        first_ident.to_owned()
+                        first_ident
                     }
                 };
 
                 loop {
-                    match parser.next_token()? {
-                        Token::ClosingBrace => break,
-                        _ => (),
+                    if let Token::ClosingBrace = parser.next_token()? {
+                        break;
                     }
                 }
 
-                return Some(DefaultValue::sequence(sequence_name));
+                Some(DefaultValue::sequence(sequence_name))
             } else {
                 None
             }
@@ -467,14 +465,12 @@ fn eat_cast(parser: &mut Parser) -> Option<()> {
     // Optional precision
     // TIMESTAMP WITH TIME ZONE (4)[]
     //                          ^^^
-    match parser.peek_token() {
-        Some(Token::OpeningBrace) => loop {
-            match parser.next_token()? {
-                Token::ClosingBrace => break,
-                _ => (),
+    if let Some(Token::OpeningBrace) = parser.peek_token() {
+        loop {
+            if let Token::ClosingBrace = parser.next_token()? {
+                break;
             }
-        },
-        _ => (),
+        }
     }
 
     // Optional array modifier
@@ -598,47 +594,34 @@ mod tests {
         expected.assert_debug_eq(&out);
     }
 
-    // #[test]
-    // fn postgres_is_sequence_works() {
-    //     let sequences = vec![
-    //         Sequence {
-    //             name: "first_sequence".to_string(),
-    //             ..Default::default()
-    //         },
-    //         Sequence {
-    //             name: "second_sequence".to_string(),
-    //             ..Default::default()
-    //         },
-    //         Sequence {
-    //             name: "third_Sequence".to_string(),
-    //             ..Default::default()
-    //         },
-    //         Sequence {
-    //             name: "fourth_Sequence".to_string(),
-    //             ..Default::default()
-    //         },
-    //         Sequence {
-    //             name: "fifth_sequence".to_string(),
-    //             ..Default::default()
-    //         },
-    //     ];
+    #[test]
+    fn postgres_is_sequence_works() {
+        let assert_is_sequence = |default_str: &str, expected_sequence: &str| {
+            let parsed_default = get_default_value(
+                default_str,
+                &ColumnType::pure(ColumnTypeFamily::Int, crate::ColumnArity::Required),
+            );
+            let known_default = parsed_default.unwrap();
+            assert_eq!(known_default.as_sequence().unwrap(), expected_sequence);
+        };
 
-    //     let first_autoincrement = r#"nextval('first_sequence'::regclass)"#;
-    //     assert!(is_sequence(first_autoincrement, &sequences).is_some());
+        assert_is_sequence(r#"nextval('first_sequence'::regclass)"#, "first_sequence");
 
-    //     let second_autoincrement = r#"nextval('schema_name.second_sequence'::regclass)"#;
-    //     assert!(is_sequence(second_autoincrement, &sequences).is_some());
+        assert_is_sequence(r#"nextval('schema_name.second_sequence'::regclass)"#, "second_sequence");
 
-    //     let third_autoincrement = r#"nextval('"third_Sequence"'::regclass)"#;
-    //     assert!(is_sequence(third_autoincrement, &sequences).is_some());
+        assert_is_sequence(r#"nextval('"third_Sequence"'::regclass)"#, "third_Sequence");
+        assert_is_sequence(
+            r#"nextval('"schema_Name"."fourth_Sequence"'::regclass)"#,
+            "fourth_Sequence",
+        );
 
-    //     let fourth_autoincrement = r#"nextval('"schema_Name"."fourth_Sequence"'::regclass)"#;
-    //     assert!(is_sequence(fourth_autoincrement, &sequences).is_some());
-
-    //     let fifth_autoincrement = r#"nextval(('fifth_sequence'::text)::regclass)"#;
-    //     assert!(is_sequence(fifth_autoincrement, &sequences).is_some());
-
-    //     let non_autoincrement = r#"string_default_named_seq"#;
-    //     assert!(is_sequence(non_autoincrement, &sequences).is_none());
-    // }
+        assert_is_sequence(r#"nextval(('fifth_sequence'::text)::regclass)"#, "fifth_sequence");
+        let non_autoincrement = r#"string_default_named_seq"#;
+        assert!(get_default_value(
+            non_autoincrement,
+            &ColumnType::pure(ColumnTypeFamily::Int, crate::ColumnArity::Required)
+        )
+        .unwrap()
+        .is_db_generated());
+    }
 }

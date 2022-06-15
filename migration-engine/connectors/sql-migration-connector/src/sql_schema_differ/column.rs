@@ -49,10 +49,6 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         prev_constraint == next_constraint
     };
 
-    if cols.previous.column_type_family().is_datetime() {
-        dbg!(prev, next);
-    }
-
     match defaults {
         (Some(DefaultKind::DbGenerated(_)), Some(DefaultKind::Value(PrismaValue::List(_))))
         | (Some(DefaultKind::Value(PrismaValue::List(_))), Some(DefaultKind::DbGenerated(_)))
@@ -129,31 +125,9 @@ fn list_defaults_match(prev: &[PrismaValue], next: &[PrismaValue], flavour: &dyn
     prev.iter()
         .zip(next.iter())
         .all(|(prev_value, next_value)| match (prev_value, next_value) {
-            (PrismaValue::Int(int_val), PrismaValue::Enum(enum_val))
-            | (PrismaValue::BigInt(int_val), PrismaValue::Enum(enum_val))
-            | (PrismaValue::Enum(enum_val), PrismaValue::Int(int_val))
-            | (PrismaValue::Enum(enum_val), PrismaValue::BigInt(int_val)) => {
-                i64::from_str_radix(enum_val, 10).ok() == Some(*int_val)
-            }
-            (PrismaValue::Int(int_val), PrismaValue::Float(big_decimal))
-            | (PrismaValue::BigInt(int_val), PrismaValue::Float(big_decimal))
-            | (PrismaValue::Float(big_decimal), PrismaValue::Int(int_val))
-            | (PrismaValue::Float(big_decimal), PrismaValue::BigInt(int_val)) => {
-                big_decimal.is_integer() && big_decimal.to_string() == int_val.to_string()
-            }
-
-            (PrismaValue::String(lit_val), PrismaValue::Json(json_val))
-            | (PrismaValue::Json(json_val), PrismaValue::String(lit_val))
-            | (PrismaValue::Enum(lit_val), PrismaValue::Json(json_val))
-            | (PrismaValue::Json(json_val), PrismaValue::Enum(lit_val)) => json_defaults_match(lit_val, json_val),
-            (PrismaValue::Int(int_val), PrismaValue::Json(json_val))
-            | (PrismaValue::BigInt(int_val), PrismaValue::Json(json_val))
-            | (PrismaValue::Json(json_val), PrismaValue::Int(int_val))
-            | (PrismaValue::Json(json_val), PrismaValue::BigInt(int_val)) => json_val.parse().ok() == Some(*int_val),
-
-            (PrismaValue::Float(float_val), PrismaValue::Json(json_val))
-            | (PrismaValue::Json(json_val), PrismaValue::Float(float_val)) => {
-                float_val.to_string().as_str() == json_val
+            (PrismaValue::String(string_val), PrismaValue::Json(json_val))
+            | (PrismaValue::Json(json_val), PrismaValue::String(string_val)) => {
+                json_defaults_match(string_val, json_val)
             }
 
             (PrismaValue::DateTime(_), _) | (_, PrismaValue::DateTime(_)) => true,

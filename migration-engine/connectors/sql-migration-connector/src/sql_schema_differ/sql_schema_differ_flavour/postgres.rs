@@ -211,8 +211,6 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             return false;
         }
 
-        dbg!("here");
-
         let string = &string[2..];
 
         bytes.iter().enumerate().all(|(idx, byte)| {

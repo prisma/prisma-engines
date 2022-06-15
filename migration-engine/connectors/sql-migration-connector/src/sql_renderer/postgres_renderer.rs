@@ -766,13 +766,10 @@ fn render_default<'a>(default: &'a DefaultValue, full_data_type: &str) -> Cow<'a
                 let mut out = String::new();
                 let mut values = values.iter().peekable();
 
-                out.push_str("array[");
+                out.push_str("ARRAY[");
 
                 while let Some(value) = values.next() {
-                    // Rules are different inside arrays literals.
-                    match value {
-                        _ => out.push_str(&render_constant_default(value, full_data_type).as_ref()),
-                    }
+                    out.push_str(render_constant_default(value, full_data_type).as_ref());
 
                     if values.peek().is_some() {
                         out.push_str(", ");

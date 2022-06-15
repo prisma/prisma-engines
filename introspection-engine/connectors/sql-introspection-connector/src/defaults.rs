@@ -67,17 +67,6 @@ pub(crate) fn calculate_default(
             dml::DefaultValue::new_expression(dml::ValueGenerator::new_dbgenerated(default_string.clone())),
             column,
         )),
-        (Some(sql::DefaultKind::Value(val)), sql::ColumnTypeFamily::Enum(_)) => {
-            let mut val = val.clone();
-            if let dml::PrismaValue::List(items) = &mut val {
-                for item in items {
-                    if let dml::PrismaValue::String(v) = item {
-                        *item = dml::PrismaValue::Enum(std::mem::take(v));
-                    }
-                }
-            }
-            Some(set_default(dml::DefaultValue::new_single(val), column))
-        }
         (Some(sql::DefaultKind::Value(val)), _) => {
             Some(set_default(dml::DefaultValue::new_single(val.clone()), column))
         }

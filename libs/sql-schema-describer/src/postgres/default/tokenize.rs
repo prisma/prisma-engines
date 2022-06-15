@@ -10,7 +10,6 @@ pub(super) enum Token {
     ClosingCurly,           // }
     Minus,                  // -
     Dot,                    // .
-    EscapedBackslash,       // \\
     CastOperator,           // ::
     DoubleQuotedIdentifier, // "
     StringLiteral,          // '...'
@@ -42,16 +41,6 @@ pub(super) fn tokenize(default_string: &str) -> Vec<(Token, u32)> {
                 Some((_, ':')) => {
                     char_indices.next();
                     out.push((Token::CastOperator, start))
-                }
-                None | Some(_) => {
-                    out.push((Token::BadToken, start));
-                    return out;
-                }
-            },
-            Some((start, '\\')) => match char_indices.peek() {
-                Some((_, '\\')) => {
-                    char_indices.next();
-                    out.push((Token::EscapedBackslash, start))
                 }
                 None | Some(_) => {
                     out.push((Token::BadToken, start));

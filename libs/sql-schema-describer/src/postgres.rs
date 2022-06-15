@@ -3,9 +3,8 @@
 mod default;
 
 use self::default::get_default_value;
-
 use super::*;
-use crate::{getters::Getter, parsers::Parser};
+use crate::getters::Getter;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use native_types::{CockroachType, NativeType, PostgresType};
@@ -517,23 +516,6 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     }
 }
 
-// Examples (postgres): 1, 1::INT, '1'::INT, -1::INT, '-1'::INT
-// Examples (CockroachDb)): 1:::INT, '1':::INT, (-1):::INT, ('-1'):::INT
-static PG_RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^\(?'?(-?\d+)'?\)?(:{2,3}.*)?$").expect("compile regex"));
-// Examples (postgres): 5.3, 5.3::FLOAT, -5.3, '-5.3'::FLOAT
-// Examples (CockroachDb)): 5.3:::FLOAT8, (-5.3):::FLOAT8
-static PG_RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^\(?'?([^:')]+)'?\)?(:{2,3}.*)?$").expect("compile regex"));
-
-impl Parser for SqlSchemaDescriber<'_> {
-    fn re_num() -> &'static Regex {
-        &PG_RE_NUM
-    }
-
-    fn re_float() -> &'static Regex {
-        &PG_RE_FLOAT
-    }
-}
-
 impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
     pub fn new(conn: &'a dyn Queryable, circumstances: BitFlags<Circumstances>) -> SqlSchemaDescriber<'a> {
@@ -688,7 +670,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.datetime_precision,
                 info.data_type,
                 info.udt_name as full_data_type,
-                -- info.column_default,
                 pg_get_expr(attdef.adbin, attdef.adrelid) AS column_default,
                 info.is_nullable,
                 info.is_identity,

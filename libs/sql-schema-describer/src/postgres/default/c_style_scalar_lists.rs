@@ -5,7 +5,7 @@ use super::{tokenize, Parser, Token};
 use crate::{ColumnType, ColumnTypeFamily};
 use prisma_value::PrismaValue;
 
-pub(super) fn parse_array_literal<'a>(input: &str, tpe: &ColumnType) -> Option<Vec<PrismaValue>> {
+pub(super) fn parse_array_literal(input: &str, tpe: &ColumnType) -> Option<Vec<PrismaValue>> {
     let mut values = Vec::new();
     let tokens = tokenize(input);
     let mut parser = Parser::new(input, &tokens);

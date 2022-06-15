@@ -595,7 +595,7 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
             "id" INTEGER NOT NULL,
             "mainColor" "Color" NOT NULL DEFAULT 'Grün',
             "secondaryColor" "Color" NOT NULL DEFAULT '0',
-            "colorOrdering" "Color"[] DEFAULT array['Blu', '0', 'Grün', '0', 'Blu', '0']::"Color"[],
+            "colorOrdering" "Color"[] DEFAULT ARRAY['Blu', '0', 'Grün', '0', 'Blu', '0']::"Color"[],
 
             CONSTRAINT "Test_pkey" PRIMARY KEY ("id")
         );

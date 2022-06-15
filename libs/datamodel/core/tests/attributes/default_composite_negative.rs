@@ -330,7 +330,7 @@ fn must_error_on_dbgenerated_default() {
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": Fields of composite types cannot have dbgenerated() defaults.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": Fields of composite types cannot have `dbgenerated()` as default.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m        type User {
@@ -490,6 +490,56 @@ fn nested_scalar_list_defaults_are_disallowed() {
         [1;94m   | [0m
         [1;94m 7 | [0m        type Pizza {
         [1;94m 8 | [0m            toppings String[] @[1;91mdefault(["reblochon cheese", ["potato", "with", "rosmarin"], "onions"])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expected);
+}
+
+#[test]
+fn scalar_list_default_on_non_list_field() {
+    let schema = r#"
+        datasource db {
+            provider = "mongodb"
+            url = env("DBURL")
+        }
+
+        type Pizza {
+            toppings String @default(["reblochon cheese", "potato", "rosmarin", "onions"])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The default value of a non-list field cannot be a list.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m        type Pizza {
+        [1;94m 8 | [0m            toppings String @[1;91mdefault(["reblochon cheese", "potato", "rosmarin", "onions"])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expected);
+}
+
+#[test]
+fn dbgenerated_inside_scalar_list_default() {
+    let schema = r#"
+        datasource db {
+            provider = "mongodb"
+            url = env("DBURL")
+        }
+
+        type Pizza {
+            toppings String[] @default(["reblochon cheese", dbgenerated("potato"), "rosmarin", "onions"])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `dbgenerated("potato")`.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m        type Pizza {
+        [1;94m 8 | [0m            toppings String[] @[1;91mdefault(["reblochon cheese", dbgenerated("potato"), "rosmarin", "onions"])[0m
         [1;94m   | [0m
     "#]];
 

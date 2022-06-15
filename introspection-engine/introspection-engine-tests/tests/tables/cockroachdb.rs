@@ -331,9 +331,10 @@ async fn a_table_with_non_id_autoincrement_cockroach(api: &TestApi) -> TestResul
 async fn introspecting_json_defaults_on_cockroach(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
-           id INTEGER NOT NULL Primary Key,
-           json Json Default '[]'::json,
-           jsonb JsonB Default '{}'::jsonb
+           id INTEGER NOT NULL PRIMARY KEY,
+           json JSON DEFAULT '[]'::json,
+           jsonb JSONB DEFAULT '{}'::jsonb,
+           jsonb_object JSONB DEFAULT '{"a": ["b"], "c": true, "d": null }'
          );
 
        "#};
@@ -341,9 +342,10 @@ async fn introspecting_json_defaults_on_cockroach(api: &TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         model A {
-          id    Int   @id
-          json  Json? @default("[]")
-          jsonb Json? @default("{}")
+          id           Int   @id
+          json         Json? @default("[]")
+          jsonb        Json? @default("{}")
+          jsonb_object Json? @default("{\"a\": [\"b\"], \"c\": true, \"d\": null}")
         }
     "#]];
 
