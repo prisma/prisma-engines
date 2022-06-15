@@ -91,8 +91,8 @@ impl IntoBson for (&ScalarFieldRef, PrismaValue) {
         match (mongo_type, &sf.type_identifier, value) {
             // We assume this is always valid if it arrives here.
             (_, _, PrismaValue::Null) => Ok(Bson::Null),
-            (Some(mt), _, value) => (mt, value).into_bson(),
-            (_, field_type, value) => (field_type, value).into_bson(),
+            (Some(mt), _, value) => dbg!((mt, value).into_bson()),
+            (_, field_type, value) => dbg!((field_type, value).into_bson()),
         }
     }
 }

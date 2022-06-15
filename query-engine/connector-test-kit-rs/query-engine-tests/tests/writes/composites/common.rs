@@ -200,6 +200,78 @@ mod common {
           @r###"{"data":{"createOneTestModel":{"allLists":{"str":["foo"],"bool":[true],"int":[123],"bInt":["9223372036854775807"],"float":[1.2345],"dt":["1969-01-01T10:33:59.000Z"],"json":["{\"a\":\"b\"}"],"bytes":["dGVzdA=="],"enum":["Foo"]}}}}"###
         );
 
+        // Push list
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+              updateOneTestModel(where: { id: 2 }, data: {
+                  allLists: {
+                    upsert: {
+                      set: {}
+                      update: {
+                        str: { push: ["foo"] },
+                        bool: { push: [true] },
+                        int: { push: [123] },
+                        bInt: { push: ["9223372036854775807"] },
+                        float: { push: [1.2345] },
+                        dt: { push: ["1969-01-01T10:33:59.000Z"] },
+                        json: { push: ["{\"a\":\"b\"}"] },
+                        bytes: { push: ["dGVzdA=="] },
+                        enum: { push: [Foo] }
+                      }
+                    }
+                  }
+              }) {
+                  allLists {
+                    str
+                    bool
+                    int
+                    bInt
+                    float
+                    dt
+                    json
+                    bytes
+                    enum
+                  }
+              }}"#),
+          @r###"{"data":{"updateOneTestModel":{"allLists":{"str":["foo","foo"],"bool":[true,true],"int":[123,123],"bInt":["9223372036854775807","9223372036854775807"],"float":[1.2345,1.2345],"dt":["1969-01-01T10:33:59.000Z","1969-01-01T10:33:59.000Z"],"json":["{\"a\":\"b\"}","{\"a\":\"b\"}"],"bytes":["dGVzdA==","dGVzdA=="],"enum":["Foo","Foo"]}}}}"###
+        );
+
+        // Push single
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+              updateOneTestModel(where: { id: 2 }, data: {
+                  allLists: {
+                    upsert: {
+                      set: {}
+                      update: {
+                        str: { push: "foo" },
+                        bool: { push: true },
+                        int: { push: 123 },
+                        bInt: { push: "9223372036854775807" },
+                        float: { push: 1.2345 },
+                        dt: { push: "1969-01-01T10:33:59.000Z" },
+                        json: { push: "{\"a\":\"b\"}" },
+                        bytes: { push: "dGVzdA==" },
+                        enum: { push: Foo }
+                      }
+                    }
+                  }
+              }) {
+                  allLists {
+                    str
+                    bool
+                    int
+                    bInt
+                    float
+                    dt
+                    json
+                    bytes
+                    enum
+                  }
+              }}"#),
+          @r###"{"data":{"updateOneTestModel":{"allLists":{"str":["foo","foo","foo"],"bool":[true,true,true],"int":[123,123,123],"bInt":["9223372036854775807","9223372036854775807","9223372036854775807"],"float":[1.2345,1.2345,1.2345],"dt":["1969-01-01T10:33:59.000Z","1969-01-01T10:33:59.000Z","1969-01-01T10:33:59.000Z"],"json":["{\"a\":\"b\"}","{\"a\":\"b\"}","{\"a\":\"b\"}"],"bytes":["dGVzdA==","dGVzdA==","dGVzdA=="],"enum":["Foo","Foo","Foo"]}}}}"###
+        );
+
         Ok(())
     }
 }

@@ -46,7 +46,7 @@ impl DefaultKind {
 
     pub fn unwrap_single(self) -> PrismaValue {
         match self {
-            DefaultKind::Single(_) => todo!(),
+            DefaultKind::Single(val) => val,
             _ => panic!("called DefaultValue::unwrap_single() on wrong variant"),
         }
     }

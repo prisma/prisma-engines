@@ -143,10 +143,9 @@ fn render_push_update_doc(rhs: PrismaValue, field: &Field, field_path: FieldPath
                 .map(|bson| {
                     // Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the
                     // conversion is set up with native types, we should clean that up at some point (move from traits to fns?).
-                    if let Bson::Array(mut inner) = bson {
-                        inner.pop().unwrap()
-                    } else {
-                        bson
+                    match bson {
+                        Bson::Array(mut inner) if field.is_composite() => inner.pop().unwrap(),
+                        _ => bson,
                     }
                 })
                 .collect();
