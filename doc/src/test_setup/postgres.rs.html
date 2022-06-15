@@ -84,6 +84,10 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">runtime::run_with_tokio</span>, <span class="ident">AnyError</span>, <span class="ident">Tags</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude::Queryable</span>, <span class="ident">single::Quaint</span>};
@@ -110,6 +114,10 @@
 
                 <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;14.&quot;</span>) {
                     <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Postgres14</span>;
+                }
+
+                <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;PostgreSQL 15&quot;</span>) {
+                    <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Postgres15</span>;
                 }
 
                 <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;CockroachDB&quot;</span>) {
