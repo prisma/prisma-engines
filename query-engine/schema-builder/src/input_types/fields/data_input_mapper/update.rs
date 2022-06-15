@@ -115,7 +115,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         let unchecked_part = if self.unchecked { "Unchecked" } else { "" };
         let ident = Identifier::new(
             format!(
-                "{}{}Update{}{}Input",
+                "{}{}Update{}{}NestedInput",
                 related_model.name, unchecked_part, arity_part, without_part
             ),
             PRISMA_NAMESPACE,

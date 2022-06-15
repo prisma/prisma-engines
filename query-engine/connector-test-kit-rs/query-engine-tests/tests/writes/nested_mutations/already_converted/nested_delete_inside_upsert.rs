@@ -278,7 +278,7 @@ mod delete_inside_upsert {
               }}
             }}"#, parent = parent),
             2009,
-            "`Mutation.upsertOneParent.update.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptInput.delete`: Field does not exist on enclosing type."
+            "`Mutation.upsertOneParent.update.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptNestedInput.delete`: Field does not exist on enclosing type."
         );
 
         Ok(())
