@@ -27,10 +27,6 @@ jobs:
             single_threaded: true
             connector: "vitess"
             version: "8.0"
-          - name: "postgres14"
-            single_threaded: false
-            connector: "postgres"
-            version: "14"
           - name: "postgres15"
             single_threaded: false
             connector: "postgres"
