@@ -74,7 +74,6 @@ features!(
 /// Generator preview features
 pub const GENERATOR: FeatureMap = FeatureMap::new()
     .with_active(&[
-        FilterJson,
         ReferentialIntegrity,
         InteractiveTransactions,
         FullTextSearch,
@@ -87,6 +86,7 @@ pub const GENERATOR: FeatureMap = FeatureMap::new()
         AggregateApi,
         Cockroachdb,
         ExtendedIndexes,
+        FilterJson,
         Middlewares,
         NamedConstraints,
         NativeTypes,
