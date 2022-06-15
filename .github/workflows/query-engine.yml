@@ -21,15 +21,29 @@ jobs:
         database:
           - name: "vitess_5_7"
             single_threaded: true
+            connector: "vitess"
+            version: "5.7"
           - name: "vitess_8_0"
             single_threaded: true
+            connector: "vitess"
+            version: "8.0"
+          - name: "postgres15"
+            single_threaded: false
+            connector: "postgres"
+            version: "15"
 
     env:
       LOG_LEVEL: "info"
       LOG_QUERIES: "y"
       RUST_LOG_FORMAT: "devel"
-      RUST_BACKTRACE: 1
-      CLICOLOR_FORCE: 1
+      RUST_BACKTRACE: "1"
+      CLICOLOR_FORCE: "1"
+      CLOSED_TX_CLEANUP: "2"
+      SIMPLE_TEST_MODE: "1"
+      QUERY_BATCH_SIZE: "10"
+      TEST_RUNNER: "direct"
+      TEST_CONNECTOR: ${{ matrix.database.connector }}
+      TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
 
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
@@ -43,7 +57,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: "Start ${{ matrix.database.name }}"
-        run: make dev-${{ matrix.database.name }}
+        run: make start-${{ matrix.database.name }}
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -55,7 +69,7 @@ jobs:
         env:
           CLICOLOR_FORCE: 1
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=8
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1

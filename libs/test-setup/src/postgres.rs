@@ -26,6 +26,10 @@ pub(crate) fn get_postgres_tags(database_url: &str) -> Result<BitFlags<Tags>, St
                     tags |= Tags::Postgres14;
                 }
 
+                if version.contains("PostgreSQL 15") {
+                    tags |= Tags::Postgres15;
+                }
+
                 if version.contains("CockroachDB") {
                     tags |= Tags::CockroachDb;
                 }

@@ -19,6 +19,7 @@ fn basic_create_migration_works(api: TestApi) {
     let is_sqlite = api.is_sqlite();
     let is_cockroach = api.is_cockroach();
     let is_mssql = api.is_mssql();
+
     api.create_migration("create-cats", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
@@ -1087,10 +1088,12 @@ fn alter_constraint_name(mut api: TestApi) {
     let is_mssql = api.is_mssql();
     let is_mysql = api.is_mysql();
     let is_postgres = api.is_postgres();
+    let is_postgres15 = api.is_postgres_15();
     let is_cockroach = api.is_cockroach();
     let is_mysql_5_6 = api.is_mysql_5_6();
     let is_mariadb = api.is_mariadb();
     let is_sqlite = api.is_sqlite();
+
     api.create_migration("custom", &custom_dm, &dir)
         .send_sync()
         .assert_migration_directories_count(2)
@@ -1157,6 +1160,30 @@ fn alter_constraint_name(mut api: TestApi) {
 
                     -- RenameIndex
                     ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
+                "#]]
+            } else if is_postgres15 {
+                expect![[
+                     r#"
+                -- AlterTable
+                ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
+
+                -- AlterTable
+                ALTER TABLE "B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
+
+                -- RenameForeignKey
+                ALTER TABLE "B" RENAME CONSTRAINT "B_aId_fkey" TO "CustomFK";
+
+                -- RenameIndex
+                ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
+
+                -- RenameIndex
+                ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
+
+                -- RenameIndex
+                ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
+
+                -- RenameIndex
+                ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
                 "#]]
             } else if is_postgres {
                 expect![[

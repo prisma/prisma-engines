@@ -42,6 +42,10 @@ impl ConnectorTagInterface for PostgresConnectorTag {
                 "postgresql://postgres:prisma@test-db-postgres-14:5432/db?schema={}",
                 database
             ),
+            Some(PostgresVersion::V15) if is_ci => format!(
+                "postgresql://postgres:prisma@test-db-postgres-15:5432/db?schema={}",
+                database
+            ),
             Some(PostgresVersion::PgBouncer) if is_ci => format!(
                 "postgresql://postgres:prisma@test-db-pgbouncer:6432/db?schema={}&pgbouncer=true",
                 database
@@ -53,6 +57,7 @@ impl ConnectorTagInterface for PostgresConnectorTag {
             Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}", database),
             Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5435/db?schema={}", database),
             Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/db?schema={}", database),
+            Some(PostgresVersion::V15) => format!("postgresql://postgres:prisma@127.0.0.1:5438/db?schema={}", database),
             Some(PostgresVersion::PgBouncer) => format!(
                 "postgresql://postgres:prisma@127.0.0.1:6432/db?schema={}&pgbouncer=true",
                 database
@@ -88,6 +93,7 @@ pub enum PostgresVersion {
     V12,
     V13,
     V14,
+    V15,
     PgBouncer,
 }
 
@@ -133,6 +139,10 @@ impl PostgresConnectorTag {
                 capabilities: capabilities.clone(),
             },
             Self {
+                version: Some(PostgresVersion::V15),
+                capabilities: capabilities.clone(),
+            },
+            Self {
                 version: Some(PostgresVersion::PgBouncer),
                 capabilities,
             },
@@ -165,6 +175,7 @@ impl TryFrom<&str> for PostgresVersion {
             "12" => Self::V12,
             "13" => Self::V13,
             "14" => Self::V14,
+            "15" => Self::V15,
             "pgbouncer" => Self::PgBouncer,
             _ => return Err(TestError::parse_error(format!("Unknown Postgres version `{}`", s))),
         };
@@ -182,6 +193,7 @@ impl ToString for PostgresVersion {
             PostgresVersion::V12 => "12",
             PostgresVersion::V13 => "13",
             PostgresVersion::V14 => "14",
+            PostgresVersion::V15 => "15",
             PostgresVersion::PgBouncer => "pgbouncer",
         }
         .to_owned()
