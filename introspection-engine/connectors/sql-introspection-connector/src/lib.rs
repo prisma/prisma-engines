@@ -3,9 +3,9 @@
 
 pub mod calculate_datamodel; // only exported to be able to unit test it
 
-mod defaults;
 mod calculate_datamodel_tests;
 mod commenting_out_guardrails;
+mod defaults;
 mod error;
 mod introspection;
 mod introspection_helpers;

@@ -207,7 +207,6 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 
     fn string_matches_bytes(&self, string: &str, bytes: &[u8]) -> bool {
-        dbg!(string, bytes, string.len(), bytes.len());
         if !string.starts_with("\\x") || string.len() - 2 != bytes.len() * 2 || !string.is_ascii() {
             return false;
         }

@@ -49,7 +49,18 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         prev_constraint == next_constraint
     };
 
+    if cols.previous.column_type_family().is_datetime() {
+        dbg!(prev, next);
+    }
+
     match defaults {
+        (Some(DefaultKind::DbGenerated(_)), Some(DefaultKind::Value(PrismaValue::List(_))))
+        | (Some(DefaultKind::Value(PrismaValue::List(_))), Some(DefaultKind::DbGenerated(_)))
+            if cols.previous.column_type_family().is_datetime() || cols.next.column_type_family().is_datetime() =>
+        {
+            true
+        }
+
         (Some(DefaultKind::Value(PrismaValue::List(prev))), Some(DefaultKind::Value(PrismaValue::List(next)))) => {
             list_defaults_match(prev, next, flavour)
         }
@@ -67,6 +78,10 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
             Some(DefaultKind::Value(PrismaValue::Json(prev_json))),
             Some(DefaultKind::Value(PrismaValue::String(next_json))),
         ) => json_defaults_match(prev_json, next_json) && names_match,
+
+        // Avoid naive string comparisons for datetime defaults.
+        (Some(DefaultKind::Value(PrismaValue::DateTime(_))), Some(_))
+        | (Some(_), Some(DefaultKind::Value(PrismaValue::DateTime(_)))) => true, // can't diff these in at present
 
         (Some(DefaultKind::Value(prev)), Some(DefaultKind::Value(next))) => (prev == next) && names_match,
         (Some(DefaultKind::Value(_)), Some(DefaultKind::Now)) => false,
@@ -111,8 +126,6 @@ fn list_defaults_match(prev: &[PrismaValue], next: &[PrismaValue], flavour: &dyn
         return false;
     }
 
-    dbg!(prev, next);
-
     prev.iter()
         .zip(next.iter())
         .all(|(prev_value, next_value)| match (prev_value, next_value) {
@@ -147,7 +160,7 @@ fn list_defaults_match(prev: &[PrismaValue], next: &[PrismaValue], flavour: &dyn
 
             (PrismaValue::Enum(enum_val), PrismaValue::Bytes(bytes_val))
             | (PrismaValue::Bytes(bytes_val), PrismaValue::Enum(enum_val)) => {
-                dbg!(flavour.string_matches_bytes(enum_val, bytes_val))
+                flavour.string_matches_bytes(enum_val, bytes_val)
             }
 
             _ => prev_value == next_value,

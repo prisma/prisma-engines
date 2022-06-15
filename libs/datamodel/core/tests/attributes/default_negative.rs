@@ -246,6 +246,33 @@ fn must_error_if_default_value_for_enum_is_not_valid() {
 }
 
 #[test]
+fn must_error_if_default_value_for_enum_list_is_not_valid() {
+    let dml = indoc! {r#"
+        model Model {
+          id Int @id
+          enm Color[] @default([green, blue, yellow, red])
+        }
+
+        enum Color {
+            red
+            green @map("grïn")
+            blue
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The defined default value `yellow` is not a valid value of the enum specified for the field.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  id Int @id
+        [1;94m 3 | [0m  enm Color[] @[1;91mdefault([green, blue, yellow, red])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(dml, &expectation);
+}
+
+#[test]
 fn must_error_if_using_non_id_auto_increment_on_sqlite() {
     let dml = indoc! {r#"
         datasource db1 {

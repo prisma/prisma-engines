@@ -47,7 +47,7 @@ fn database_level_json_defaults_can_be_defined(api: TestApi) {
                     ColumnTypeFamily::Json
                 })
                 .assert_default(if api.is_postgres() {
-                    Some(DefaultValue::value(PrismaValue::Json(
+                    Some(DefaultValue::value(PrismaValue::String(
                         "[\"sticks\", \"chimken\", 100, \"dog park\"]".into(),
                     )))
                 } else if api.is_mysql() {

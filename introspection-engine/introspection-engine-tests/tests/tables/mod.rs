@@ -576,33 +576,6 @@ async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: 
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("ints integer[] DEFAULT array[]::integer[]");
-                t.inject_custom("ints2 integer[] DEFAULT '{}'");
-            });
-        })
-        .await?;
-
-    let dm = indoc! {r#"
-        model User {
-            id      Int @id @default(autoincrement())
-            ints    Int[]
-            ints2   Int[]
-        }
-    "#};
-
-    let result = api.introspect().await?;
-
-    api.assert_eq_datamodels(dm, &result);
-
-    Ok(())
-}
-
 // MySQL doesn't have partial indices.
 #[test_connector(exclude(Mysql, CockroachDb))]
 async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestResult {

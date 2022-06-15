@@ -103,7 +103,7 @@ pub(super) fn visit_composite_field_default(
     // @default(dbgenerated(...)) is never valid on a composite type's fields.
     match value.value {
         ast::Expression::Function(name, ..) if name == FN_DBGENERATED => {
-            ctx.push_attribute_validation_error("Fields of composite types cannot have dbgenerated() defaults.");
+            ctx.push_attribute_validation_error("Fields of composite types cannot have `dbgenerated()` as default.");
             return;
         }
         _ => (),

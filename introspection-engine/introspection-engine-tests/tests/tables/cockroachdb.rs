@@ -190,39 +190,6 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("ints integer[] DEFAULT array[]::integer[]");
-                t.inject_custom("ints2 integer[] DEFAULT '{}'");
-            });
-        })
-        .await?;
-
-    let expected = expect![[r#"
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
-        model User {
-          id    BigInt @id @default(autoincrement())
-          ints  Int[]
-          ints2 Int[]
-        }
-    "#]];
-    api.expect_datamodel(&expected).await;
-
-    Ok(())
-}
-
-#[test_connector(tags(CockroachDb))]
 async fn default_values(api: &TestApi) -> TestResult {
     let sql = r#"
         CREATE TABLE "Test" (

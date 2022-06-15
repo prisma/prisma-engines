@@ -3,57 +3,49 @@ mod gin;
 mod gist;
 mod spgist;
 
-use indoc::{formatdoc, indoc};
+use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn sequences_should_work(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(move |migration| {
-            migration.inject_custom("CREATE SEQUENCE \"first_Sequence\"");
-            migration.inject_custom("CREATE SEQUENCE \"second_sequence\"");
-            migration.inject_custom("CREATE SEQUENCE \"third_Sequence\"");
+    let setup = r#"
+        CREATE SEQUENCE "first_Sequence";
+        CREATE SEQUENCE "second_sequence";
+        CREATE SEQUENCE "third_Sequence";
+ 
+        CREATE TABLE "Test" (
+            id INTEGER PRIMARY KEY,
+            serial Serial,
+            first BigInt NOT NULL DEFAULT nextval('"first_Sequence"'::regclass),
+            second  BigInt Default nextval('"second_sequence"'),
+            third  BigInt Not Null Default nextval('"third_Sequence"'::text)
+        );
+    "#;
 
-            migration.create_table("Test", move |t| {
-                t.inject_custom("id Integer Primary Key");
-                t.inject_custom("serial  Serial");
-                t.inject_custom("first   BigInt Not Null Default nextval('\"first_Sequence\"'::regclass)");
-                t.inject_custom("second  BigInt Default nextval('\"second_sequence\"')");
-                t.inject_custom("third  BigInt Not Null Default nextval('\"third_Sequence\"'::text)");
-            });
-        })
-        .await?;
+    api.raw_cmd(setup).await;
 
-    let dm = indoc! {r#"
-        model Test {
-          id     Int        @id
-          serial Int        @default(autoincrement())
-          first  BigInt     @default(autoincrement())
-          second BigInt?    @default(autoincrement())
-          third  BigInt     @default(autoincrement())
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
         }
-    "#};
 
-    let with_ds = formatdoc!(
-        r#"
-        datasource ds {{
-          provider = "postgres"
-          url = "postgres://"
-        }}
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
 
-        {}
-    "#,
-        dm
-    );
+        model Test {
+          id     Int     @id
+          serial Int     @default(autoincrement())
+          first  BigInt  @default(autoincrement())
+          second BigInt? @default(autoincrement())
+          third  BigInt  @default(autoincrement())
+        }
+    "#]];
 
-    let result = api.re_introspect(&with_ds).await?;
-
-    println!("EXPECTATION: \n {:#}", dm);
-    println!("RESULT: \n {:#}", result);
-
-    api.assert_eq_datamodels(dm, &result);
+    api.expect_datamodel(&expectation).await;
 
     Ok(())
 }
@@ -108,7 +100,7 @@ async fn pg_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn scalar_list_defaults_work(api: &TestApi) -> TestResult {
     let schema = r#"
         CREATE TYPE "color" AS ENUM ('RED', 'GREEN', 'BLUE');
@@ -128,7 +120,34 @@ async fn scalar_list_defaults_work(api: &TestApi) -> TestResult {
 
     api.raw_cmd(schema).await;
 
-    let expectation = expect![[]];
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model defaults {
+          id                String     @id
+          text_empty        String[]   @default([])
+          text              String[]   @default(["abc"])
+          text_c_escape     String[]   @default(["abc", "def"])
+          colors            color[]    @default([RED, GREEN])
+          int_defaults      Int[]      @default([9, 12999, -4, 0, 1249849])
+          float_defaults    Float[]    @default([0, 9.12, 3.14, 0.1242, 124949.124949])
+          bool_defaults     Boolean[]  @default([true, true, true, false])
+          datetime_defaults DateTime[] @default(dbgenerated("'{\"2022-09-01 08:00:00+00\",\"2021-09-01 08:00:00+00\"}'::timestamp with time zone[]")) @db.Timestamptz
+        }
+
+        enum color {
+          RED
+          GREEN
+          BLUE
+        }
+    "#]];
 
     api.expect_datamodel(&expectation).await;
 

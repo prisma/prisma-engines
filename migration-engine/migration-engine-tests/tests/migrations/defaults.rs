@@ -16,7 +16,7 @@ fn datetime_defaults_work(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_green();
 
     let expected_default = if api.is_cockroach() {
-        DefaultValue::db_generated("'2018-01-27 08:00:00':::TIMESTAMP")
+        DefaultValue::db_generated("'2018-01-27 08:00:00'::TIMESTAMP")
     } else if api.is_postgres() {
         DefaultValue::db_generated("'2018-01-27 08:00:00'::timestamp without time zone")
     } else if api.is_mssql() {
@@ -34,6 +34,8 @@ fn datetime_defaults_work(api: TestApi) {
     api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("birthday", |col| col.assert_default(Some(expected_default)))
     });
+
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
 #[test_connector(tags(Mysql8), exclude(Vitess))]
@@ -163,7 +165,7 @@ fn default_dbgenerated_with_type_definitions_should_work_cockroach(api: TestApi)
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_column("id", |col| {
-            col.assert_default(Some(DefaultValue::db_generated("now():::TIMESTAMPTZ::STRING")))
+            col.assert_default(Some(DefaultValue::db_generated("now()::STRING")))
         })
     });
 }
@@ -234,7 +236,7 @@ fn uuid_default_cockroach(api: TestApi) {
     api.assert_schema().assert_table("A", |table| {
         table.assert_column("uuid", |col| {
             col.assert_default(Some(DefaultValue::db_generated(
-                "'00000000-0000-0000-0016-000000000004':::UUID",
+                "'00000000-0000-0000-0016-000000000004'::UUID",
             )))
         })
     });

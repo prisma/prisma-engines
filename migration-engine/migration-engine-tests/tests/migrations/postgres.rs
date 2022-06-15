@@ -552,17 +552,17 @@ fn scalar_list_defaults_work(api: TestApi) {
         -- CreateTable
         CREATE TABLE "Model" (
             "id" INTEGER NOT NULL,
-            "int_empty" INTEGER[] DEFAULT E'{}',
-            "int" INTEGER[] DEFAULT E'{0, 1, 1, 2, 3, 5, 8, 13, 21}',
-            "float" DOUBLE PRECISION[] DEFAULT E'{3.20, 4.20, 3.14, 0, 9.9999999, 1000.7}',
-            "string" TEXT[] DEFAULT E'{E\'Arrabbiata\', E\'Carbonara\', E\'Al Ragù\'}',
-            "boolean" BOOLEAN[] DEFAULT E'{false, true, true, true}',
-            "dateTime" TIMESTAMP(3)[] DEFAULT E'{\'2019-06-17 14:20:57 +00:00\', \'2020-09-21 20:00:00 +02:00\'}',
-            "colors" "Color"[] DEFAULT E'{GREEN, BLUE}',
-            "colors_empty" "Color"[] DEFAULT E'{}',
-            "bytes" BYTEA[] DEFAULT E'{\'68656c6c6f20776f726c64\'}',
-            "json" JSONB[] DEFAULT E'{"{ \\"a\\": [\\"b\\"] }", "3"}',
-            "decimal" DECIMAL(65,30)[] DEFAULT E'{121.10299000124800000001, 0.4, 1.1, -68.0}',
+            "int_empty" INTEGER[] DEFAULT array[]::INTEGER[],
+            "int" INTEGER[] DEFAULT array[0, 1, 1, 2, 3, 5, 8, 13, 21]::INTEGER[],
+            "float" DOUBLE PRECISION[] DEFAULT array[3.20, 4.20, 3.14, 0, 9.9999999, 1000.7]::DOUBLE PRECISION[],
+            "string" TEXT[] DEFAULT array['Arrabbiata', 'Carbonara', 'Al Ragù']::TEXT[],
+            "boolean" BOOLEAN[] DEFAULT array[false, true, true, true]::BOOLEAN[],
+            "dateTime" TIMESTAMP(3)[] DEFAULT array['2019-06-17 14:20:57 +00:00', '2020-09-21 20:00:00 +02:00']::TIMESTAMP(3)[],
+            "colors" "Color"[] DEFAULT array['GREEN', 'BLUE']::"Color"[],
+            "colors_empty" "Color"[] DEFAULT array[]::"Color"[],
+            "bytes" BYTEA[] DEFAULT array['\x68656c6c6f20776f726c64']::BYTEA[],
+            "json" JSONB[] DEFAULT array['{ "a": ["b"] }', '3']::JSONB[],
+            "decimal" DECIMAL(65,30)[] DEFAULT array[121.10299000124800000001, 0.4, 1.1, -68.0]::DECIMAL(65,30)[],
 
             CONSTRAINT "Model_pkey" PRIMARY KEY ("id")
         );
@@ -616,7 +616,7 @@ fn scalar_list_default_diffing(api: TestApi) {
         model Model {
             id Int @id
             int_empty Int[] @default([])
-            int Int[] @default([0, 1, 1, 2, 3, 5, 8, 13, 21])
+            int Int[] @default([0, 1, 1, 2, 3, 5, 8, 13, 22])
             float Float[] @default([3.20, 4.20, 9.9999999, 1000.7])
             string String[] @default(["Arrabbiata", "Quattro Formaggi","Al Ragù"])
             boolean Boolean[] @default([true, true ,true, true])
@@ -633,13 +633,14 @@ fn scalar_list_default_diffing(api: TestApi) {
 
     let expected_migration = expect![[r#"
         -- AlterTable
-        ALTER TABLE "Model" ALTER COLUMN "float" SET DEFAULT E'{3.20, 4.20, 9.9999999, 1000.7}',
-        ALTER COLUMN "string" SET DEFAULT E'{E\'Arrabbiata\', E\'Quattro Formaggi\', E\'Al Ragù\'}',
-        ALTER COLUMN "boolean" SET DEFAULT E'{true, true, true, true}',
-        ALTER COLUMN "colors" SET DEFAULT E'{BLUE, GREEN}',
-        ALTER COLUMN "bytes" SET DEFAULT E'{\'68656c6c6f20776f726c64\', \'68656c6c6f20777ef26c64\'}',
-        ALTER COLUMN "json" SET DEFAULT E'{"{ \\"a\\": [\\"b\\"] }", "4"}',
-        ALTER COLUMN "decimal" SET DEFAULT E'{0.4, 1.1, -68.0}';
+        ALTER TABLE "Model" ALTER COLUMN "int" SET DEFAULT array[0, 1, 1, 2, 3, 5, 8, 13, 22]::INTEGER[],
+        ALTER COLUMN "float" SET DEFAULT array[3.20, 4.20, 9.9999999, 1000.7]::DOUBLE PRECISION[],
+        ALTER COLUMN "string" SET DEFAULT array['Arrabbiata', 'Quattro Formaggi', 'Al Ragù']::TEXT[],
+        ALTER COLUMN "boolean" SET DEFAULT array[true, true, true, true]::BOOLEAN[],
+        ALTER COLUMN "colors" SET DEFAULT array['BLUE', 'GREEN']::"Color"[],
+        ALTER COLUMN "bytes" SET DEFAULT array['\x68656c6c6f20776f726c64', '\x68656c6c6f20777ef26c64']::BYTEA[],
+        ALTER COLUMN "json" SET DEFAULT array['{ "a": ["b"] }', '4']::JSONB[],
+        ALTER COLUMN "decimal" SET DEFAULT array[0.4, 1.1, -68.0]::DECIMAL(65,30)[];
     "#]];
 
     expected_migration.assert_eq(&migration);

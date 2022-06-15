@@ -445,7 +445,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
         self.get_sequences(schema, &mut pg_ext).await?;
         let enums = self.get_enums(schema).await?;
-        let mut columns = self.get_columns(schema, &enums, &table_ids, &pg_ext.sequences).await?;
+        let mut columns = self.get_columns(schema, &enums, &table_ids).await?;
         let mut foreign_keys = self.get_foreign_keys(schema).await?;
 
         let mut indexes = self.get_indices(schema, &mut pg_ext, &table_ids).await?;
@@ -667,7 +667,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         schema: &str,
         enums: &[Enum],
         table_ids: &HashMap<String, TableId>,
-        sequences: &[Sequence],
     ) -> DescriberResult<BTreeMap<TableId, Vec<Column>>> {
         let mut columns: BTreeMap<TableId, Vec<Column>> = BTreeMap::new();
 
@@ -693,7 +692,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                 pg_get_expr(attdef.adbin, attdef.adrelid) AS column_default,
                 info.is_nullable,
                 info.is_identity,
-                info.data_type,
                 info.character_maximum_length
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
@@ -729,7 +727,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                 None => false,
             };
 
-            let data_type = col.get_expect_string("data_type");
             let tpe = if self.is_cockroach()
                 && !self
                     .circumstances

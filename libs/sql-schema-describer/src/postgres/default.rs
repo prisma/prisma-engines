@@ -1,173 +1,9 @@
+mod c_style_scalar_lists;
+mod tokenize;
+
 use crate::{ColumnType, ColumnTypeFamily, DefaultKind, DefaultValue};
 use prisma_value::PrismaValue;
-use std::iter::Peekable;
-
-#[derive(Debug, PartialEq, Clone, Copy)]
-#[repr(u8)]
-enum Token {
-    Comma,
-    OpeningBrace,         // (
-    ClosingBrace,         // )
-    OpeningSquareBracket, // [
-    ClosingSquareBracket, // ]
-    Minus,                // -
-    Dot,                  // .
-    EscapedDoubleQuote,   // \"
-    EscapedBackslash,     // \\
-    CastOperator,         // ::
-    DoubleQuote,          // "
-    StringLiteral,        // '...'
-    CStyleStringLiteral,  // E'...'
-    Digits,               // sequence of digits without dots or minus
-    Identifier,
-    UnterminatedStringLiteral,
-    Whitespace,
-    BadToken,
-}
-
-fn tokenize(default_string: &str) -> Vec<(Token, u32)> {
-    let mut char_indices = default_string.char_indices().map(|(idx, c)| (idx as u32, c)).peekable();
-    let mut out = Vec::new();
-
-    loop {
-        match char_indices.next() {
-            None => return out,
-            Some((start, ',')) => out.push((Token::Comma, start)),
-            Some((start, '"')) => out.push((Token::DoubleQuote, start)),
-            Some((start, '(')) => out.push((Token::OpeningBrace, start)),
-            Some((start, ')')) => out.push((Token::ClosingBrace, start)),
-            Some((start, '[')) => out.push((Token::OpeningSquareBracket, start)),
-            Some((start, ']')) => out.push((Token::ClosingSquareBracket, start)),
-            Some((start, '-')) => out.push((Token::Minus, start)),
-            Some((start, '.')) => out.push((Token::Dot, start)),
-            Some((start, ':')) => match char_indices.peek() {
-                Some((_, ':')) => {
-                    char_indices.next();
-                    out.push((Token::CastOperator, start))
-                }
-                None | Some(_) => {
-                    out.push((Token::BadToken, start));
-                    return out;
-                }
-            },
-            Some((start, '\\')) => match char_indices.peek() {
-                Some((_, '"')) => {
-                    char_indices.next();
-                    out.push((Token::EscapedDoubleQuote, start))
-                }
-                Some((_, '\\')) => {
-                    char_indices.next();
-                    out.push((Token::EscapedBackslash, start))
-                }
-                None | Some(_) => {
-                    out.push((Token::BadToken, start));
-                    return out;
-                }
-            },
-            Some((start, c)) if c.is_ascii_digit() => loop {
-                match char_indices.peek() {
-                    Some((_, c)) if c.is_ascii_digit() => {
-                        char_indices.next();
-                    }
-                    None | Some(_) => {
-                        out.push((Token::Digits, start));
-                        break;
-                    }
-                }
-            },
-            Some((start, c)) if c == 'E' || c == 'e' => match char_indices.peek() {
-                Some((_, '\'')) => {
-                    // C-style string.
-                    char_indices.next();
-
-                    loop {
-                        match char_indices.next() {
-                            Some((_, '\\')) => match char_indices.next() {
-                                None => {
-                                    out.push((Token::UnterminatedStringLiteral, start));
-                                    break;
-                                }
-                                Some(_) => {
-                                    // consume
-                                }
-                            },
-                            Some((_, '\'')) => {
-                                out.push((Token::CStyleStringLiteral, start));
-                                break;
-                            }
-                            Some(_) => {
-                                // consume
-                            }
-                            None => {
-                                out.push((Token::UnterminatedStringLiteral, start));
-                                break;
-                            }
-                        }
-                    }
-                }
-                Some((_, c)) if c.is_ascii_alphanumeric() => {
-                    char_indices.next();
-                    // identifier
-                    loop {
-                        match char_indices.peek() {
-                            Some((_, c)) if c.is_ascii_alphanumeric() || *c == '_' => {
-                                char_indices.next();
-                            }
-                            Some((_, _)) | None => {
-                                out.push((Token::Identifier, start));
-                                break;
-                            }
-                        }
-                    }
-                }
-                None | Some(_) => {
-                    out.push((Token::Identifier, start));
-                }
-            },
-            Some((start, '\'')) => loop {
-                match char_indices.next() {
-                    None => {
-                        out.push((Token::UnterminatedStringLiteral, start));
-                        return out;
-                    }
-                    Some((_, '\'')) => match char_indices.peek() {
-                        Some((_, '\'')) => {
-                            char_indices.next();
-                        }
-                        None | Some(_) => {
-                            out.push((Token::StringLiteral, start));
-                            break;
-                        }
-                    },
-                    Some((_, _)) => (),
-                }
-            },
-            Some((start, c)) if c.is_ascii_whitespace() => loop {
-                match char_indices.peek() {
-                    Some((_idx, c)) if c.is_ascii_whitespace() => {
-                        char_indices.next();
-                    }
-                    None | Some(_) => {
-                        out.push((Token::Whitespace, start));
-                        break;
-                    }
-                }
-            },
-            Some((start, c)) if c.is_ascii_alphabetic() => loop {
-                match char_indices.peek() {
-                    Some((_idx, c)) if c.is_ascii_alphanumeric() || *c == '_' => {
-                        char_indices.next();
-                    }
-                    None | Some(_) => {
-                        out.push((Token::Identifier, start));
-                        break;
-                    }
-                }
-            },
-            Some((start, _)) => out.push((Token::BadToken, start)),
-        }
-    }
-}
+use tokenize::{tokenize, Token};
 
 #[derive(Debug)]
 struct Parser<'a> {
@@ -194,58 +30,39 @@ impl<'a> Parser<'a> {
     }
 
     fn peek_token(&self) -> Option<Token> {
-        self.peek().map(|(t, _)| t)
+        self.next_non_whitespace().map(|(_, (tok, _))| tok)
     }
 
-    fn peek(&self) -> Option<(Token, &'a str)> {
+    fn next_token(&mut self) -> Option<Token> {
+        let (next_offset, (token, _)) = self.next_non_whitespace()?;
+        self.offset = next_offset + 1;
+        Some(token)
+    }
+
+    fn next_non_whitespace(&self) -> Option<(usize, (Token, u32))> {
         let mut offset = self.offset;
 
         loop {
-            match self.resolve_offset(offset)? {
+            match self.tokens.get(offset)? {
                 (Token::Whitespace, _) => {
                     offset += 1;
                 }
-                other => break Some(other),
+                other => break Some((offset, *other)),
             }
-        }
-    }
-
-    fn next(&mut self) -> Option<(Token, &'a str)> {
-        loop {
-            let token = self.resolve_offset(self.offset)?;
-            self.offset += 1;
-
-            if let Token::Whitespace = token.0 {
-                continue;
-            }
-
-            break Some(token);
         }
     }
 
     #[must_use]
     fn expect(&mut self, expected_token: Token) -> Option<&'a str> {
-        let (token, s) = self.resolve_offset(self.offset)?;
+        let (next_offset, (next_token, _start)) = self.next_non_whitespace()?;
 
-        if token != expected_token {
+        if next_token != expected_token {
             return None;
         }
 
-        self.offset += 1;
+        self.offset = next_offset + 1;
 
-        Some(s)
-    }
-
-    /// Expect all input to have been consumed. Ignores whitespace.
-    #[must_use]
-    fn expect_consumed(&mut self) -> Option<()> {
-        loop {
-            match self.next() {
-                Some((Token::Whitespace, _)) => (),
-                Some(_) => break None,
-                None => break Some(()),
-            }
-        }
+        Some(self.resolve_offset(next_offset)?.1)
     }
 }
 
@@ -258,71 +75,62 @@ pub(super) fn get_default_value(default_string: &str, tpe: &ColumnType) -> Optio
     let mut parser = Parser::new(default_string, &tokens);
 
     if tpe.arity.is_list() {
-        return get_list_default_value(&mut parser, tpe);
+        return Some(get_list_default_value(&mut parser, tpe));
     }
 
-    Some(match &tpe.family {
-        ColumnTypeFamily::Int | ColumnTypeFamily::BigInt => match parse_int_default(&mut parser) {
-            Some(default_value) => default_value,
-            None => {
-                // TODO: use the parser for sequence defaults too
-                // if let Some(seq) = is_sequence(&default_string, sequences) {
-                //     DefaultValue::sequence(seq)
-                // } else {
-                DefaultValue::db_generated(default_string)
-                // }
-            }
-        },
-        ColumnTypeFamily::Float | ColumnTypeFamily::Decimal => match parse_float_default(&mut parser) {
-            Some(float_value) => float_value,
-            None => DefaultValue::db_generated(default_string),
-        },
-        ColumnTypeFamily::Boolean => match parse_bool_default(&mut parser) {
-            Some(bool_value) => bool_value,
-            None => DefaultValue::db_generated(default_string),
-        },
-        ColumnTypeFamily::String | ColumnTypeFamily::Json => match parse_string_default(&mut parser) {
-            Some(string_default) => string_default,
-            None => DefaultValue::db_generated(default_string),
-        },
-        ColumnTypeFamily::DateTime => match parse_datetime_default(&mut parser) {
-            Some(default) => default,
-            None => DefaultValue::db_generated(default_string),
-        },
-        // // JSON/JSONB defaults come in the '{}'::jsonb form.
-        // ColumnTypeFamily::Json => unsuffix_default_literal(&default_string, &[data_type, &tpe.full_data_type])
-        //     .map(|default| DefaultValue::value(PrismaValue::Json(unquote_string(&default))))
-        //     .unwrap_or_else(move || DefaultValue::db_generated(default_string)),
-        ColumnTypeFamily::Enum(_enum_name) => match parse_enum_default(&mut parser) {
-            Some(default) => default,
-            None => DefaultValue::db_generated(default_string),
-        },
-        ColumnTypeFamily::Uuid | ColumnTypeFamily::Binary | ColumnTypeFamily::Unsupported(_) => {
-            DefaultValue::db_generated(default_string)
-        }
+    let parser_fn = parser_for_family(&tpe.family);
+
+    Some(match parser_fn(&mut parser) {
+        Some(default_value) => default_value,
+        None => DefaultValue::db_generated(default_string),
     })
 }
 
-fn parse_datetime_default(parser: &mut Parser) -> Option<DefaultValue> {
-    let func_name = parser.expect(Token::Identifier)?;
-    parser.expect(Token::OpeningBrace)?;
-    parser.expect(Token::ClosingBrace)?;
+fn parser_for_family(family: &ColumnTypeFamily) -> &'static dyn Fn(&mut Parser<'_>) -> Option<DefaultValue> {
+    match family {
+        ColumnTypeFamily::String | ColumnTypeFamily::Json => &parse_string_default,
+        ColumnTypeFamily::Int | ColumnTypeFamily::BigInt => &parse_int_default,
+        ColumnTypeFamily::Enum(_) => &parse_enum_default,
+        ColumnTypeFamily::Float | ColumnTypeFamily::Decimal => &parse_float_default,
+        ColumnTypeFamily::Boolean => &parse_bool_default,
+        ColumnTypeFamily::DateTime => &parse_datetime_default,
+        ColumnTypeFamily::Binary => &parse_binary_default,
+        ColumnTypeFamily::Unsupported(_) | ColumnTypeFamily::Uuid => &parse_unsupported,
+    }
+}
 
-    match func_name {
-        name if name.eq_ignore_ascii_case("now") || name.eq_ignore_ascii_case("current_timestamp") => {
-            Some(DefaultValue::now())
+fn parse_unsupported(_parser: &mut Parser<'_>) -> Option<DefaultValue> {
+    None
+}
+
+fn parse_datetime_default(parser: &mut Parser) -> Option<DefaultValue> {
+    match parser.peek_token()? {
+        Token::StringLiteral | Token::CStyleStringLiteral => None,
+        Token::Identifier => {
+            let func_name = parser.expect(Token::Identifier)?;
+            if let Some(Token::OpeningBrace) = parser.peek_token() {
+                parser.expect(Token::OpeningBrace)?;
+                parser.expect(Token::ClosingBrace)?;
+            }
+
+            match func_name {
+                name if name.eq_ignore_ascii_case("now") || name.eq_ignore_ascii_case("current_timestamp") => {
+                    Some(DefaultValue::now())
+                }
+                _ => None,
+            }
         }
         _ => None,
     }
 }
 
 fn parse_enum_default(parser: &mut Parser) -> Option<DefaultValue> {
-    match parser.peek()? {
-        (Token::Identifier, s) => {
-            parser.next(); // consume
+    match parser.peek_token()? {
+        Token::Identifier => {
+            let s = parser.expect(Token::Identifier)?;
             Some(DefaultValue::value(PrismaValue::Enum(s.to_owned())))
         }
-        (Token::StringLiteral, _) | (Token::CStyleStringLiteral, _) => {
+        Token::StringLiteral | Token::CStyleStringLiteral => {
             let value = parse_string_value(parser)?;
             Some(DefaultValue::value(PrismaValue::Enum(value)))
         }
@@ -331,8 +139,9 @@ fn parse_enum_default(parser: &mut Parser) -> Option<DefaultValue> {
 }
 
 fn parse_string_value(parser: &mut Parser<'_>) -> Option<String> {
-    match parser.next() {
-        Some((Token::StringLiteral, s)) => {
+    match parser.peek_token()? {
+        Token::StringLiteral => {
+            let s = parser.expect(Token::StringLiteral)?;
             let mut out = String::with_capacity(s.len() - 2); // exclude the quotes
             let mut chars = s[1..(s.len() - 1)].chars();
 
@@ -349,9 +158,12 @@ fn parse_string_value(parser: &mut Parser<'_>) -> Option<String> {
                 }
             }
 
+            eat_cast(parser);
+
             Some(out)
         }
-        Some((Token::CStyleStringLiteral, s)) => {
+        Token::CStyleStringLiteral => {
+            let s = parser.expect(Token::CStyleStringLiteral)?;
             let mut out = String::with_capacity(s.len() - 3); // exclude the quotes and E
             let mut chars = s[2..(s.len() - 1)].chars();
 
@@ -379,6 +191,8 @@ fn parse_string_value(parser: &mut Parser<'_>) -> Option<String> {
                 }
             }
 
+            eat_cast(parser);
+
             Some(out)
         }
         _ => None,
@@ -390,127 +204,181 @@ fn parse_string_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
     Some(DefaultValue::value(out))
 }
 
-fn parse_identifier<'a>(parser: &mut Parser<'a>) -> Option<&'a str> {
-    match parser.next()? {
-        (Token::DoubleQuote, _) => {
-            let s = parser.expect(Token::Identifier)?;
-            parser.expect(Token::DoubleQuote)?;
-            Some(s)
+fn parse_identifier<'a>(parser: &mut Parser<'a>) -> Option<String> {
+    match parser.peek_token()? {
+        Token::DoubleQuotedIdentifier => {
+            let s = parser.expect(Token::DoubleQuotedIdentifier)?;
+            Some(s[1..(s.len() - 1)].replace(r#"\""#, r#"""#))
         }
-        (Token::Identifier, s) => Some(s),
+        Token::Identifier => {
+            let s = parser.expect(Token::Identifier)?;
+            Some(s.to_owned())
+        }
         _ => None,
     }
 }
 
 fn parse_int_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
-    match parser.peek() {
-        Some((Token::Digits, s)) => {
-            parser.next()?; // consume
+    match parser.peek_token()? {
+        Token::Digits => {
+            let s = parser.expect(Token::Digits)?;
             let parsed: i64 = s.parse().ok()?;
             Some(DefaultValue::value(parsed))
         }
-        Some((Token::Minus, _)) => {
-            parser.next()?; // consume
+        Token::Minus => {
+            parser.expect(Token::Minus)?; // consume
             let s = parser.expect(Token::Digits)?;
             let parsed: i64 = s.parse().ok()?;
             Some(DefaultValue::value(-parsed))
         }
-        Some((Token::StringLiteral, _)) => {
+        Token::StringLiteral => {
             let contents = parse_string_value(parser)?;
             let parsed: i64 = contents.parse().ok()?;
             Some(DefaultValue::value(parsed))
         }
-        Some((Token::Identifier, s)) if s.eq_ignore_ascii_case("unique_rowid") => {
-            parser.next()?; // consume
-            parser.expect(Token::OpeningBrace)?;
-            parser.expect(Token::ClosingBrace)?;
-            return Some(DefaultValue::unique_rowid());
-        }
-        Some((Token::Identifier, s)) if s.eq_ignore_ascii_case("nextval") => {
-            parser.next()?; // consume
-            parser.expect(Token::OpeningBrace)?;
+        Token::Identifier => {
+            let s = parser.expect(Token::Identifier)?;
 
-            let sequence_name_string = match parser.peek() {
-                Some((Token::StringLiteral, _)) | Some((Token::CStyleStringLiteral, _)) => parse_string_value(parser)?,
-                _ => return None,
-            };
+            if s.eq_ignore_ascii_case("unique_rowid") {
+                parser.expect(Token::OpeningBrace)?;
+                parser.expect(Token::ClosingBrace)?;
+                Some(DefaultValue::unique_rowid())
+            } else if s.eq_ignore_ascii_case("nextval") {
+                parser.expect(Token::OpeningBrace)?;
 
-            let sequence_name = {
-                let tokens = tokenize(&sequence_name_string);
-                let mut parser = Parser::new(&sequence_name_string, &tokens);
-                parse_identifier(&mut parser)?.to_owned()
-            };
-
-            loop {
-                match parser.next()? {
-                    (Token::ClosingBrace, _) => break,
-                    _ => (),
+                // Example: nextval(('"third_Sequence"'::text)::regclass)
+                if let Some(Token::OpeningBrace) = parser.peek_token() {
+                    parser.expect(Token::OpeningBrace)?;
                 }
-            }
 
-            return Some(DefaultValue::sequence(sequence_name));
+                let sequence_name_string = match parser.peek_token() {
+                    Some(Token::StringLiteral) | Some(Token::CStyleStringLiteral) => parse_string_value(parser)?,
+                    _ => return None,
+                };
+
+                let sequence_name = {
+                    let tokens = tokenize(&sequence_name_string);
+                    let mut parser = Parser::new(&sequence_name_string, &tokens);
+                    let first_ident = parse_identifier(&mut parser)?;
+                    // Maybe the first identifier is the schema name, we have to see if there is a
+                    // dot followed by a second identifier.
+                    if let Some(Token::Dot) = parser.peek_token() {
+                        parser.expect(Token::Dot)?;
+                        parse_identifier(&mut parser)?.to_owned()
+                    } else {
+                        first_ident.to_owned()
+                    }
+                };
+
+                loop {
+                    match parser.next_token()? {
+                        Token::ClosingBrace => break,
+                        _ => (),
+                    }
+                }
+
+                return Some(DefaultValue::sequence(sequence_name));
+            } else {
+                None
+            }
         }
         _ => None,
     }
 }
 
-fn parse_float_default(parser: &mut Parser) -> Option<DefaultValue> {
-    let mut open_brace = false;
+fn parse_float_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
+    fn parse_float_default_inner(parser: &mut Parser<'_>) -> Option<DefaultValue> {
+        let mut open_brace = false;
 
-    if let Token::OpeningBrace = parser.peek_token()? {
-        open_brace = true;
-        parser.next()?;
+        match parser.peek_token()? {
+            Token::OpeningBrace => {
+                parser.expect(Token::OpeningBrace)?;
+                open_brace = true;
+            }
+            Token::StringLiteral | Token::CStyleStringLiteral => {
+                let parsed_string = parse_string_value(parser)?;
+                let tokens = tokenize(&parsed_string);
+                let mut string_parser = Parser::new(&parsed_string, &tokens);
+                return parse_float_default_inner(&mut string_parser);
+            }
+            _ => (),
+        }
+
+        let value: bigdecimal::BigDecimal = {
+            let sign = if let Token::Minus = parser.peek_token()? {
+                parser.expect(Token::Minus)?
+            } else {
+                ""
+            };
+            let integer_part = parser.expect(Token::Digits)?;
+
+            // The fractional part is optional
+            let (dot, fractional_part) = if let Some(Token::Dot) = parser.peek_token() {
+                parser.expect(Token::Dot)?;
+                let digits = parser.expect(Token::Digits)?;
+                (".", digits)
+            } else {
+                ("", "")
+            };
+
+            let complete = format!("{sign}{integer_part}{dot}{fractional_part}");
+            complete.parse().ok()?
+        };
+
+        if open_brace {
+            parser.expect(Token::ClosingBrace)?;
+        }
+
+        Some(DefaultValue::value(PrismaValue::Float(value)))
     }
 
-    let value = todo!();
-
-    if open_brace {
-        parser.expect(Token::ClosingBrace)?;
-    }
-
-    match parser.next() {
-        Some((Token::Digits, s)) => {
-            parser.expect(Token::Dot)?;
-            parser.expect(Token::Digits)?;
-            parser.expect_consumed()?;
-            let parsed: bigdecimal::BigDecimal = s.parse().ok()?;
-            todo!("wrong");
-            Some(DefaultValue::new(crate::DefaultKind::Value(PrismaValue::Float(parsed))))
-        }
-        Some((Token::Minus, _)) => {
-            let s = parser.expect(Token::Digits)?;
-            parser.expect(Token::Dot)?;
-            parser.expect(Token::Digits)?;
-            parser.expect_consumed()?;
-            let parsed: i64 = s.parse().ok()?;
-            todo!("wrong");
-            Some(DefaultValue::value(-parsed))
-        }
-        Some((Token::StringLiteral, s)) => {
-            let parsed: bigdecimal::BigDecimal = s[1..(s.len() - 2)].parse().ok()?;
-            Some(DefaultValue::new(crate::DefaultKind::Value(PrismaValue::Float(parsed))))
-        }
-        _ => None,
-    }
+    let value = parse_float_default_inner(parser)?;
+    eat_cast(parser)?;
+    Some(value)
 }
 
 fn parse_bool_default(parser: &mut Parser) -> Option<DefaultValue> {
     let s = parser.expect(Token::Identifier)?;
-    let b: bool = s.parse().ok()?;
-    Some(DefaultValue::value(b))
+
+    let bool_value = if s.eq_ignore_ascii_case("t") || s.eq_ignore_ascii_case("true") {
+        true
+    } else if s.eq_ignore_ascii_case("f") || s.eq_ignore_ascii_case("false") {
+        false
+    } else {
+        return None;
+    };
+
+    Some(DefaultValue::value(bool_value))
+}
+
+fn parse_binary_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
+    let value = parse_string_value(parser)?;
+    if !value.starts_with("\\x") || !value.is_ascii() {
+        return None;
+    }
+
+    let hex_bytes = &value[2..];
+    let mut bytes = hex_bytes.as_bytes().chunks_exact(2);
+    let mut decoded_bytes = Vec::with_capacity(value.len() / 2);
+
+    for nibbles in &mut bytes {
+        let high_nibble = &nibbles[0];
+        let low_nibble = &nibbles[1];
+        let high_nibble: u8 = u8::from_str_radix(std::str::from_utf8(&[*high_nibble]).unwrap(), 16).unwrap() << 4;
+        let low_nibble: u8 = u8::from_str_radix(std::str::from_utf8(&[*low_nibble]).unwrap(), 16).unwrap();
+        decoded_bytes.push(high_nibble | low_nibble);
+    }
+
+    if !bytes.remainder().is_empty() {
+        return None;
+    }
+
+    Some(DefaultValue::value(PrismaValue::Bytes(decoded_bytes)))
 }
 
 fn parse_array_constructor(parser: &mut Parser<'_>, tpe: &ColumnTypeFamily) -> Option<Vec<PrismaValue>> {
     let mut values = Vec::new();
-    let parse_fn: &dyn Fn(&mut Parser<'_>) -> Option<DefaultValue> = match tpe {
-        ColumnTypeFamily::String | ColumnTypeFamily::Json => &parse_string_default,
-        ColumnTypeFamily::Int | ColumnTypeFamily::BigInt => &parse_int_default,
-        ColumnTypeFamily::Enum(_) => &parse_enum_default,
-        ColumnTypeFamily::Float | ColumnTypeFamily::Decimal => &parse_float_default,
-        ColumnTypeFamily::Boolean => &parse_bool_default,
-        ColumnTypeFamily::DateTime => &parse_datetime_default,
-        ColumnTypeFamily::Unsupported(_) | ColumnTypeFamily::Binary | ColumnTypeFamily::Uuid => return None,
-    };
+    let parse_fn = parser_for_family(tpe);
 
     let kw = parser.expect(Token::Identifier)?;
     if !kw.eq_ignore_ascii_case("array") {
@@ -520,10 +388,10 @@ fn parse_array_constructor(parser: &mut Parser<'_>, tpe: &ColumnTypeFamily) -> O
     parser.expect(Token::OpeningSquareBracket)?;
 
     'outer: loop {
-        match parser.peek() {
+        match parser.peek_token() {
             None => return None, // missing closing bracket
-            Some((Token::ClosingSquareBracket, _)) => {
-                parser.next(); // consume
+            Some(Token::ClosingSquareBracket) => {
+                parser.expect(Token::ClosingSquareBracket)?;
                 break;
             }
             Some(_) => {
@@ -534,10 +402,10 @@ fn parse_array_constructor(parser: &mut Parser<'_>, tpe: &ColumnTypeFamily) -> O
         // Eat remaining tokens until the next comma.
         loop {
             // Now the comma between values
-            match parser.next() {
+            match parser.next_token() {
                 None => return None, // missing closing bracket
-                Some((Token::ClosingSquareBracket, _)) => break 'outer,
-                Some((Token::Comma, _)) => break,
+                Some(Token::ClosingSquareBracket) => break 'outer,
+                Some(Token::Comma) => break,
                 Some(_) => (),
             }
         }
@@ -555,258 +423,69 @@ fn parse_array_constructor(parser: &mut Parser<'_>, tpe: &ColumnTypeFamily) -> O
     Some(extracted_values)
 }
 
-fn eat_spaces(chars: &mut Peekable<impl Iterator<Item = (usize, char)>>) {
+fn get_list_default_value(parser: &mut Parser<'_>, tpe: &ColumnType) -> DefaultValue {
+    let values = match parser.peek_token() {
+        Some(Token::CStyleStringLiteral) | Some(Token::StringLiteral) => {
+            parse_string_value(parser).and_then(|value| c_style_scalar_lists::parse_array_literal(&value, tpe))
+        }
+        Some(Token::Identifier) => parse_array_constructor(parser, &tpe.family),
+        _ => None,
+    };
+
+    values
+        .map(|values| DefaultValue::value(PrismaValue::List(values)))
+        .unwrap_or_else(|| DefaultValue::db_generated(parser.input))
+}
+
+/// Some(()) on valid cast or absence of cast. None if we can't make sense of the input.
+fn eat_cast(parser: &mut Parser) -> Option<()> {
+    match parser.peek_token() {
+        Some(Token::CastOperator) => {
+            parser.expect(Token::CastOperator)?;
+        }
+        _ => return Some(()),
+    }
+
+    // One or more identifiers
+    //
+    // TIMESTAMP WITH TIME ZONE (4)[]
+    // ^^^^^^^^^^^^^^^^^^^^^^^^
     loop {
-        match chars.peek() {
-            Some((_, ' ')) => {
-                chars.next();
+        match parser.peek_token() {
+            Some(Token::Identifier) => {
+                parser.expect(Token::Identifier)?;
+            }
+            Some(Token::Dot) => {
+                // schema-qualified types
+                // e.g. my-schema.color
+                parser.expect(Token::Dot)?;
             }
             _ => break,
         }
     }
-}
 
-fn get_list_default_value(parser: &mut Parser<'_>, tpe: &ColumnType) -> Option<DefaultValue> {
-    match parse_array_literal(parser.input)
-        .map(|(values, _)| values)
-        .or_else(|| parse_array_constructor(parser, &tpe.family))
-    {
-        Some(values) => Some(DefaultValue::value(PrismaValue::List(values))),
-        None => Some(DefaultValue::db_generated(parser.input)),
-    }
-}
-
-// /// Returns the name of the sequence in the schema that the default value matches if it is drawn
-// /// from one of them.
-// fn is_sequence<'a>(value: &str, sequences: &'a [Sequence]) -> Option<&'a str> {
-//     static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
-//         Regex::new(
-//             r#"nextval\((\(?)'((.+)\.)?(("(?P<sequence>.+)")|(?P<sequence2>.+))'(::text\))?::(regclass|REGCLASS)\)"#,
-//         )
-//         .expect("compile autoincrement regex")
-//     });
-
-//     AUTOINCREMENT_REGEX.captures(value).and_then(|captures| {
-//         let sequence_name = captures.name("sequence").or_else(|| captures.name("sequence2"));
-
-//         sequence_name.and_then(|name| {
-//             sequences
-//                 .iter()
-//                 .find(|seq| seq.name == name.as_str())
-//                 .map(|seq| seq.name.as_str())
-//         })
-//     })
-// }
-
-/// Returns the unescaped string, as well as the remaining input after the string expression.
-fn parse_string_literal(input: &str) -> Option<(String, &str)> {
-    if input.len() < 2 {
-        return None;
+    // Optional precision
+    // TIMESTAMP WITH TIME ZONE (4)[]
+    //                          ^^^
+    match parser.peek_token() {
+        Some(Token::OpeningBrace) => loop {
+            match parser.next_token()? {
+                Token::ClosingBrace => break,
+                _ => (),
+            }
+        },
+        _ => (),
     }
 
-    let mut out = String::with_capacity(input.len() - 2);
-    let mut chars = input.char_indices().peekable();
-
-    match chars.next()?.1 {
-        '\'' => (),
-        'e' | 'E' => {
-            if chars.peek()?.1 == '\'' {
-                unreachable!("We expect postgres to convert default strings to sql-escaping. If you see this message, Prisma is making a false assumption, please report it as a bug.")
-            }
-        }
-        _ => return None,
+    // Optional array modifier
+    // TIMESTAMP WITH TIME ZONE (4)[]
+    //                             ^^
+    if let Some(Token::OpeningSquareBracket) = parser.peek_token() {
+        parser.expect(Token::OpeningSquareBracket)?;
+        parser.expect(Token::ClosingSquareBracket)?;
     }
 
-    let closing_quote_offset = loop {
-        match chars.next() {
-            Some((offset, '\'')) => match chars.peek() {
-                Some((_, '\'')) => {
-                    chars.next(); // consume it
-                    out.push('\'')
-                }
-                None | Some((_, _)) => break offset,
-            },
-            Some((_, other)) => out.push(other),
-            None => return None, // missing closing quote
-        }
-    };
-
-    Some((out, &input[(closing_quote_offset + 1)..]))
-}
-
-/// Returns the unescaped string, as well as the remaining input after the quoted expression (after
-/// the closing double quote).
-fn parse_double_quoted_value(input: &str) -> Option<(String, &str)> {
-    if input.len() < 2 {
-        return None;
-    }
-
-    let mut chars = input.char_indices().peekable();
-    let mut out = String::new();
-
-    match chars.next()?.1 {
-        '\"' => (),
-        _ => return None,
-    }
-
-    let closing_quote_offset = loop {
-        match chars.next() {
-            Some((offset, '"')) => break offset,
-            Some((_, '\\')) => match chars.peek()? {
-                c @ ((_, '"') | (_, '\\')) => {
-                    out.push(c.1);
-                    chars.next();
-                }
-                (_, other) => {
-                    out.push('\\');
-                    out.push(*other);
-                    chars.next();
-                }
-            },
-            Some((_, other)) => out.push(other),
-            None => return None, // missing closing quote
-        }
-    };
-
-    Some((out, &input[(closing_quote_offset + 1)..]))
-}
-
-fn parse_array_literal(input: &str) -> Option<(Vec<PrismaValue>, &str)> {
-    let mut values = Vec::new();
-
-    // Array literals are always inside string literals.
-    let (string_literal_contents, after_list_literal) = parse_string_literal(input)?;
-    let mut chars = string_literal_contents.char_indices().peekable();
-    let mut current_chars: &str = &string_literal_contents;
-
-    // Open the array literal
-    match chars.next()? {
-        (_, '{') => (),
-        _ => return None,
-    }
-
-    loop {
-        eat_spaces(&mut chars);
-
-        // Expect the array literal to have a next element preceded by a comma, or close.
-        match chars.peek()? {
-            (_, '}') => {
-                chars.next();
-                break;
-            }
-            (_, ',') => {
-                chars.next();
-                eat_spaces(&mut chars);
-            }
-            _ => (),
-        }
-
-        match chars.next()? {
-            // string literals
-            (offset, '\'') => {
-                let remaining_input = &current_chars[offset..];
-                let (string_lit, after_string_literal) = parse_string_literal(remaining_input)?;
-                values.push(PrismaValue::String(string_lit));
-                chars = after_string_literal.char_indices().peekable();
-                current_chars = after_string_literal;
-            }
-
-            // double-quoted string
-            (offset, '"') => {
-                let remaining_input = &current_chars[offset..];
-                let (inner_value, after_string_literal) = parse_double_quoted_value(remaining_input)?;
-
-                match parse_string_literal(&inner_value) {
-                    Some((string_lit, _)) => {
-                        values.push(PrismaValue::String(string_lit));
-                    }
-                    None => {
-                        values.push(PrismaValue::Enum(inner_value));
-                    }
-                }
-
-                chars = after_string_literal.char_indices().peekable();
-                current_chars = after_string_literal;
-            }
-
-            // numeric literals
-            (offset, other) if other == '-' || other.is_ascii_digit() => {
-                let remaining_input = &current_chars[offset..];
-                let (numeric, after_literal) = parse_number_literal(remaining_input)?;
-                values.push(numeric);
-                chars = after_literal.char_indices().peekable();
-                current_chars = after_literal;
-            }
-
-            // other (function calls, unquoted identifiers)
-            (_, other) => {
-                // assume an identifier
-                let mut value = String::new();
-                value.push(other);
-
-                loop {
-                    match chars.peek()?.1 {
-                        c if c.is_alphabetic() => {
-                            value.push(c);
-                            chars.next();
-                        }
-                        _ => {
-                            let value = match value.as_str() {
-                                "t" => PrismaValue::Boolean(true),
-                                "f" => PrismaValue::Boolean(false),
-                                _ => PrismaValue::Enum(value),
-                            };
-                            values.push(value);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // ignore the end of the default string
-
-    Some((values, after_list_literal))
-}
-
-fn parse_number_literal(input: &str) -> Option<(PrismaValue, &str)> {
-    let mut value = String::new();
-    let mut is_float = false;
-    let mut chars = input.char_indices().peekable();
-
-    loop {
-        match chars.peek() {
-            dot @ Some((_, '.')) => {
-                is_float = true;
-                value.push(dot.unwrap().1);
-                chars.next();
-            }
-            Some(other) if other.1 == '-' || other.1.is_ascii_digit() => {
-                value.push(other.1);
-                chars.next();
-            }
-            Some((offset, ' ')) | Some((offset, ',')) | Some((offset, '}')) => {
-                let value = if is_float {
-                    PrismaValue::Float(value.parse().unwrap())
-                } else {
-                    PrismaValue::Int(value.parse().unwrap())
-                };
-
-                return Some((value, &input[*offset..]));
-            }
-            None => {
-                let value = if is_float {
-                    PrismaValue::Float(value.parse().unwrap())
-                } else {
-                    PrismaValue::Int(value.parse().unwrap())
-                };
-
-                return Some((value, ""));
-            }
-            _ => return None,
-        }
-    }
+    Some(())
 }
 
 #[cfg(test)]
@@ -884,6 +563,34 @@ mod tests {
                 ),
                 Int(
                     1249849,
+                ),
+            ]
+        "#]];
+
+        expected.assert_debug_eq(&out);
+    }
+
+    #[test]
+    fn parse_decimal_array_default() {
+        let input = "ARRAY[121.10299000124800000001::numeric(65,30), 0.4::numeric(65,30), 1.1::numeric(65,30), '-68.0'::numeric(65,30)]";
+        let tokens = tokenize(input);
+        let mut parser = Parser::new(input, &tokens);
+
+        let out = parse_array_constructor(&mut parser, &ColumnTypeFamily::Decimal).unwrap();
+
+        let expected = expect![[r#"
+            [
+                Float(
+                    BigDecimal("121.10299000124800000001"),
+                ),
+                Float(
+                    BigDecimal("0.4"),
+                ),
+                Float(
+                    BigDecimal("1.1"),
+                ),
+                Float(
+                    BigDecimal("-68.0"),
                 ),
             ]
         "#]];

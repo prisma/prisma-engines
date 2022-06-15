@@ -564,7 +564,7 @@ fn enum_array_modification_should_work(api: TestApi) {
         .assert_applied_migrations(&[]);
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn mapped_enum_defaults_must_work(api: TestApi) {
     let schema = r#"
         datasource db {
