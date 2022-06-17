@@ -413,6 +413,34 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
 }
 
 #[test]
+fn diff_sqlite_migration_directories() {
+    let base_dir = tempfile::tempdir().unwrap();
+    let base_dir_2 = tempfile::tempdir().unwrap();
+    let base_dir_str = base_dir.path().to_str().unwrap();
+    let base_dir_str_2 = base_dir_2.path().to_str().unwrap();
+
+    let migrations_lock_path = base_dir.path().join("migration_lock.toml");
+    std::fs::write(&migrations_lock_path, &"provider = \"sqlite\"").unwrap();
+    let migrations_lock_path = base_dir_2.path().join("migration_lock.toml");
+    std::fs::write(&migrations_lock_path, &"provider = \"sqlite\"").unwrap();
+
+    let params = DiffParams {
+        exit_code: None,
+        from: DiffTarget::Migrations(PathContainer {
+            path: base_dir_str.to_owned(),
+        }),
+        script: true,
+        shadow_database_url: None,
+        to: DiffTarget::Migrations(PathContainer {
+            path: base_dir_str_2.to_owned(),
+        }),
+    };
+
+    tok(migration_core::migration_api(None, None).unwrap().diff(params)).unwrap();
+    // it's ok!
+}
+
+#[test]
 fn diffing_mongo_schemas_works() {
     let tempdir = tempfile::tempdir().unwrap();
 
