@@ -1949,3 +1949,39 @@ fn fulltext_index_pointing_to_non_existing_field_should_add_the_field() {
         "field": "age"
     }]));
 }
+
+#[test]
+fn composite_type_index_without_corresponding_data_should_not_crash() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection::<mongodb::bson::Document>("A");
+
+        let model = IndexModel::builder().keys(doc! { "foo": 1 }).build();
+
+        collection.create_index(model, None).await?;
+
+        let model = IndexModel::builder().keys(doc! { "foo.bar": 1 }).build();
+
+        collection.create_index(model, None).await?;
+
+        let model = IndexModel::builder().keys(doc! { "foo.baz.quux": 1 }).build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id  String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Field referred in an index, but found no data to define the type.
+          foo Json?
+
+          @@index([foo], map: "foo_1")
+          @@index([foo.bar], map: "foo.bar_1")
+          @@index([foo.baz.quux], map: "foo.baz.quux_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}

@@ -88,15 +88,21 @@ pub fn index_name_matches(
                 .iter()
                 .map(|field_def| match field_def {
                     (field_name, Some(type_name)) => {
-                        let ct = datamodel.find_composite_type(type_name).unwrap();
-                        let field = ct.find_field(field_name).unwrap();
+                        let field: &str = datamodel
+                            .find_composite_type(type_name)
+                            .and_then(|ct| ct.find_field(field_name))
+                            .and_then(|field| field.database_name.as_deref())
+                            .unwrap_or(field_name.as_str());
 
-                        (
-                            field.database_name.as_deref().unwrap_or(field_name.as_str()),
-                            Some(type_name.as_str()),
-                        )
+                        (field, Some(type_name.as_str()))
                     }
-                    (field_name, None) => (model.find_scalar_field(field_name).unwrap().final_database_name(), None),
+                    (field_name, None) => (
+                        model
+                            .find_scalar_field(field_name)
+                            .map(|field| field.final_database_name())
+                            .unwrap_or(field_name),
+                        None,
+                    ),
                 })
                 .collect::<Vec<_>>()
         })
