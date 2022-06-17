@@ -103,7 +103,7 @@ impl RpcImpl {
         force: bool,
         composite_type_depth: CompositeTypeDepth,
     ) -> RpcResult<IntrospectionResultOutput> {
-        let (config, url, connector) = RpcImpl::load_connector(&schema).await?;
+        let (config, _url, connector) = RpcImpl::load_connector(&schema).await?;
 
         let input_data_model = if !force {
             Self::parse_datamodel(&schema)?
@@ -122,7 +122,7 @@ impl RpcImpl {
         let result = match connector.introspect(&input_data_model, ctx).await {
             Ok(introspection_result) => {
                 if introspection_result.data_model.is_empty() {
-                    Err(Error::IntrospectionResultEmpty(url.to_string()))
+                    Err(Error::IntrospectionResultEmpty)
                 } else {
                     Ok(IntrospectionResultOutput {
                         datamodel: datamodel::render_datamodel_and_config_to_string(
