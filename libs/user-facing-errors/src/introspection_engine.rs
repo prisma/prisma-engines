@@ -12,7 +12,7 @@ pub struct IntrospectionFailed {
 }
 
 #[derive(Debug, SimpleUserFacingError)]
-#[user_facing(code = "P4001", message = "The introspected database was empty: {connection_string}")]
+#[user_facing(code = "P4001", message = "The introspected database was empty.")]
 pub struct IntrospectionResultEmpty;
 
 #[derive(Debug, UserFacingError, Serialize)]
