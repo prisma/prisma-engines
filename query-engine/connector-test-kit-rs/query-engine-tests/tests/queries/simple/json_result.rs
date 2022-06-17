@@ -6,7 +6,10 @@ mod json_as_result {
 
     #[connector_test]
     async fn test_when_distinct_result_is_json(runner: Runner) -> TestResult<()> {
-        runner.query(r#"mutation { createOneTestModel(data: {id: 101 json: "{\"foo\": 1}"}){id} }"#).await?.assert_success();
+        runner
+            .query(r#"mutation { createOneTestModel(data: {id: 101 json: "{\"foo\": 1}"}){id} }"#)
+            .await?
+            .assert_success();
 
         assert_query!(
             runner,
