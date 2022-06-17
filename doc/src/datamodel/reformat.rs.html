@@ -1053,6 +1053,12 @@
 <span id="1048">1048</span>
 <span id="1049">1049</span>
 <span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
+<span id="1053">1053</span>
+<span id="1054">1054</span>
+<span id="1055">1055</span>
+<span id="1056">1056</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">helpers</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Diagnostics</span>, <span class="ident">ParserDatabase</span>};
@@ -1504,6 +1510,8 @@
     }
 
     <span class="kw">fn</span> <span class="ident">reformat_field_type</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">assert!</span>(<span class="ident">token</span>.<span class="ident">as_rule</span>() <span class="op">==</span> <span class="ident">Rule::field_type</span>);
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">StringBuilder::new</span>();
 
         <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">token</span>.<span class="ident">clone</span>().<span class="ident">into_inner</span>() {
@@ -1512,14 +1520,18 @@
                     <span class="ident">builder</span>.<span class="ident">write</span>(<span class="ident"><span class="self">Self</span>::get_identifier</span>(<span class="ident">current</span>));
                     <span class="ident">builder</span>.<span class="ident">write</span>(<span class="string">&quot;?&quot;</span>);
                 }
-                <span class="ident">Rule::base_type</span> =&gt; {
+                <span class="ident">Rule::base_type</span> <span class="op">|</span> <span class="ident">Rule::legacy_required_type</span> =&gt; {
                     <span class="ident">builder</span>.<span class="ident">write</span>(<span class="ident"><span class="self">Self</span>::get_identifier</span>(<span class="ident">current</span>));
                 }
-                <span class="ident">Rule::list_type</span> =&gt; {
+                <span class="ident">Rule::list_type</span> <span class="op">|</span> <span class="ident">Rule::legacy_list_type</span> =&gt; {
                     <span class="ident">builder</span>.<span class="ident">write</span>(<span class="ident"><span class="self">Self</span>::get_identifier</span>(<span class="ident">current</span>));
                     <span class="ident">builder</span>.<span class="ident">write</span>(<span class="string">&quot;[]&quot;</span>);
                 }
-                <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::reformat_generic_token</span>(<span class="kw-2">&amp;mut</span> <span class="ident">builder</span>, <span class="kw-2">&amp;</span><span class="ident">current</span>),
+                <span class="ident">Rule::unsupported_optional_list_type</span> =&gt; {
+                    <span class="ident">builder</span>.<span class="ident">write</span>(<span class="ident"><span class="self">Self</span>::get_identifier</span>(<span class="ident">current</span>));
+                    <span class="ident">builder</span>.<span class="ident">write</span>(<span class="string">&quot;[]?&quot;</span>);
+                }
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
             }
         }
 
