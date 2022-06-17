@@ -36,6 +36,7 @@ pub struct SqlInfo {
 }
 
 impl SqlInfo {
+    #[allow(dead_code)]
     pub fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.capabilities.contains(capability)
     }

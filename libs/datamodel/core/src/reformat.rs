@@ -449,6 +449,8 @@ impl<'a> Reformatter<'a> {
     }
 
     fn reformat_field_type(token: &Token<'_>) -> String {
+        assert!(token.as_rule() == Rule::field_type);
+
         let mut builder = StringBuilder::new();
 
         for current in token.clone().into_inner() {
@@ -457,14 +459,18 @@ impl<'a> Reformatter<'a> {
                     builder.write(Self::get_identifier(current));
                     builder.write("?");
                 }
-                Rule::base_type => {
+                Rule::base_type | Rule::legacy_required_type => {
                     builder.write(Self::get_identifier(current));
                 }
-                Rule::list_type => {
+                Rule::list_type | Rule::legacy_list_type => {
                     builder.write(Self::get_identifier(current));
                     builder.write("[]");
                 }
-                _ => Self::reformat_generic_token(&mut builder, &current),
+                Rule::unsupported_optional_list_type => {
+                    builder.write(Self::get_identifier(current));
+                    builder.write("[]?");
+                }
+                _ => unreachable!(),
             }
         }
 

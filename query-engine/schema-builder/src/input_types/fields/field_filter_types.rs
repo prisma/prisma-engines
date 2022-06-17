@@ -266,12 +266,10 @@ fn full_scalar_filter_type(
             let mut filters: Vec<InputField> =
                 json_equality_filters(ctx, mapped_scalar_type.clone(), nullable).collect();
 
-            if ctx.has_feature(&PreviewFeature::FilterJson)
-                && ctx.capabilities.supports_any(&[
-                    ConnectorCapability::JsonFilteringJsonPath,
-                    ConnectorCapability::JsonFilteringArrayPath,
-                ])
-            {
+            if ctx.capabilities.supports_any(&[
+                ConnectorCapability::JsonFilteringJsonPath,
+                ConnectorCapability::JsonFilteringArrayPath,
+            ]) {
                 filters.extend(json_filters(ctx));
 
                 if ctx

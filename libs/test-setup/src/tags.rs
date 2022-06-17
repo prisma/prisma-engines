@@ -1,7 +1,7 @@
 /// Test-relevant connector tags.
 #[enumflags2::bitflags]
 #[derive(Copy, Clone, Debug, PartialEq)]
-#[repr(u16)]
+#[repr(u32)]
 pub enum Tags {
     LowerCasesTableNames = 1 << 0,
     Mysql = 1 << 1,
@@ -19,4 +19,5 @@ pub enum Tags {
     CockroachDb = 1 << 13,
     Postgres14 = 1 << 14,
     Postgres9 = 1 << 15,
+    Postgres15 = 1 << 16,
 }

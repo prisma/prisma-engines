@@ -101,6 +101,19 @@ services:
     networks:
       - databases
 
+  postgres15:
+    image: postgres:15beta1
+    restart: always
+    command: postgres -c 'max_connections=1000'
+    environment:
+      POSTGRES_PASSWORD: "prisma"
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+      POSTGRES_INITDB_ARGS: "--auth-host=md5"
+    ports:
+      - "5438:5432"
+    networks:
+      - databases
+
   mysql-5-6:
     image: mysql:5.6.50
     command: mysqld
