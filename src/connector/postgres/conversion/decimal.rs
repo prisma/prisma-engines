@@ -1,6 +1,6 @@
 use bigdecimal::{
     num_bigint::{BigInt, Sign},
-    BigDecimal, ToPrimitive, Zero,
+    BigDecimal, Zero,
 };
 use byteorder::{BigEndian, ReadBytesExt};
 use bytes::{BufMut, BytesMut};
@@ -69,42 +69,60 @@ fn to_postgres(decimal: &BigDecimal) -> crate::Result<PostgresDecimal<Vec<i16>>>
         });
     }
 
+    let base_10_to_10000 = |chunk: &[u8]| chunk.iter().fold(0i16, |a, &d| a * 10 + d as i16);
+
     // NOTE: this unfortunately copies the BigInt internally
     let (integer, exp) = decimal.as_bigint_and_exponent();
+
+    // this routine is specifically optimized for base-10
+    // FIXME: is there a way to iterate over the digits to avoid the Vec allocation
+    let (sign, base_10) = integer.to_radix_be(10);
+
+    // weight is positive power of 10000
+    // exp is the negative power of 10
+    let weight_10 = base_10.len() as i64 - exp;
 
     // scale is only nonzero when we have fractional digits
     // since `exp` is the _negative_ decimal exponent, it tells us
     // exactly what our scale should be
     let scale: u16 = cmp::max(0, exp).try_into()?;
 
-    let (sign, uint) = integer.into_parts();
-    let mut mantissa = uint.to_u128().unwrap();
-
-    // If our scale is not a multiple of 4, we need to go to the next
-    // multiple.
-    let groups_diff = scale % 4;
-    if groups_diff > 0 {
-        let remainder = 4 - groups_diff as u32;
-        let power = 10u32.pow(remainder as u32) as u128;
-
-        mantissa *= power;
+    // there's an implicit +1 offset in the interpretation
+    let weight: i16 = if weight_10 <= 0 {
+        weight_10 / 4 - 1
+    } else {
+        // the `-1` is a fix for an off by 1 error (4 digits should still be 0 weight)
+        (weight_10 - 1) / 4
     }
+    .try_into()?;
+
+    let digits_len = if base_10.len() % 4 != 0 {
+        base_10.len() / 4 + 1
+    } else {
+        base_10.len() / 4
+    };
+
+    let offset = weight_10.rem_euclid(4) as usize;
 
     // Array to store max mantissa of Decimal in Postgres decimal format.
-    let mut digits = Vec::with_capacity(8);
+    let mut digits = Vec::with_capacity(digits_len);
 
-    // Convert to base-10000.
-    while mantissa != 0 {
-        digits.push((mantissa % 10_000) as i16);
-        mantissa /= 10_000;
+    // Convert to base 10000
+    if let Some(first) = base_10.get(..offset) {
+        if !first.is_empty() {
+            digits.push(base_10_to_10000(first));
+        }
+    } else if offset != 0 {
+        digits.push(base_10_to_10000(&base_10) * 10i16.pow((offset - base_10.len()) as u32));
     }
 
-    // Change the endianness.
-    digits.reverse();
-
-    // Weight is number of digits on the left side of the decimal.
-    let digits_after_decimal = (scale + 3) as u16 / 4;
-    let weight = digits.len() as i16 - digits_after_decimal as i16 - 1;
+    // Convert to base 10000
+    if let Some(rest) = base_10.get(offset..) {
+        digits.extend(
+            rest.chunks(4)
+                .map(|chunk| base_10_to_10000(chunk) * 10i16.pow(4 - chunk.len() as u32)),
+        );
+    }
 
     // Remove non-significant zeroes.
     while let Some(&0) = digits.last() {

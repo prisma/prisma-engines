@@ -138,6 +138,13 @@ test_type!(numeric_35_1(
     )
 ));
 
+// Highest mantissa supported on SQL Server
+test_type!(numeric_38_6(
+    mssql,
+    "numeric(38, 6)",
+    Value::numeric(BigDecimal::from_str("9343234567898765456789043634999.345678")?),
+));
+
 test_type!(money(
     mssql,
     "money",
