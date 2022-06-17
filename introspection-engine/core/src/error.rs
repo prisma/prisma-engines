@@ -11,7 +11,7 @@ pub enum Error {
     Generic(String),
     InvalidDatabaseUrl(String),
     /// When there are no models or enums detected.
-    IntrospectionResultEmpty(String),
+    IntrospectionResultEmpty,
     /// Preview feature was not enabled
     PreviewFeatureNotEnabled(String),
 }
@@ -22,10 +22,7 @@ impl Display for Error {
             Error::ConnectorError(err) => write!(f, "Error in connector: {}", err),
             Error::DatamodelError(err) => write!(f, "Error in datamodel:\n{}", err),
             Error::InvalidDatabaseUrl(err) => f.write_str(err),
-            Error::IntrospectionResultEmpty(details) => {
-                f.write_str("The introspected database was empty: ")?;
-                f.write_str(details)
-            }
+            Error::IntrospectionResultEmpty => f.write_str("The introspected database was empty"),
             Error::Generic(err) => f.write_str(err),
             Error::PreviewFeatureNotEnabled(err) => f.write_str(err),
         }
@@ -38,7 +35,7 @@ impl std::error::Error for Error {
             Error::ConnectorError(err) => Some(err),
             Error::DatamodelError(_) => None,
             Error::InvalidDatabaseUrl(_) => None,
-            Error::IntrospectionResultEmpty(_) => None,
+            Error::IntrospectionResultEmpty => None,
             Error::Generic(_) => None,
             Error::PreviewFeatureNotEnabled(_) => None,
         }

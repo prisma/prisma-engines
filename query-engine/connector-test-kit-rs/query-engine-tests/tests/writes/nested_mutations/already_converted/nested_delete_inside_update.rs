@@ -320,7 +320,7 @@ mod delete_inside_update {
               }}
             }}"#, parent = parent),
             2009,
-            "`Mutation.updateOneParent.data.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptInput.delete`: Field does not exist on enclosing type."
+            "`Mutation.updateOneParent.data.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptNestedInput.delete`: Field does not exist on enclosing type."
         );
         Ok(())
     }

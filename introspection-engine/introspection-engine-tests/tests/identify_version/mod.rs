@@ -103,7 +103,7 @@ async fn introspect_postgres_prisma_1(api: &TestApi) -> TestResult {
                 t.inject_custom("id character varying(25) Not Null Primary Key");
                 t.inject_custom("createdAt timestamp(3)");
                 t.inject_custom("updatedAt timestamp(3)");
-                t.inject_custom("string text");
+                t.inject_custom("\"string\" text");
                 t.inject_custom("int Integer");
                 t.inject_custom("float Decimal(65,30)");
                 t.inject_custom("boolean boolean");
@@ -166,7 +166,7 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) -> TestResult {
             migration.create_table("Book", |t| {
                 t.inject_custom("id character varying(36) Not Null Primary Key");
                 t.inject_custom("date timestamp(3)");
-                t.inject_custom("string text");
+                t.inject_custom("\"string\" text");
                 t.inject_custom("int Integer");
                 t.inject_custom("float Decimal(65,30)");
                 t.inject_custom("boolean boolean");
@@ -174,7 +174,7 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) -> TestResult {
 
             migration.create_table("Page", |t| {
                 t.inject_custom("id character varying(36) Not Null Primary Key");
-                t.inject_custom("string text");
+                t.inject_custom("\"string\" text");
                 t.inject_custom("bookid character varying(36) REFERENCES \"Book\"(\"id\")");
             });
         })

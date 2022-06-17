@@ -11,9 +11,7 @@ pub fn render_error(crate_error: Error) -> UserFacingError {
             user_facing_error: Some(user_facing_error),
             ..
         }) => user_facing_error.into(),
-        Error::IntrospectionResultEmpty(connection_string) => {
-            KnownError::new(IntrospectionResultEmpty { connection_string }).into()
-        }
+        Error::IntrospectionResultEmpty => KnownError::new(IntrospectionResultEmpty).into(),
         Error::DatamodelError(full_error) => KnownError::new(SchemaParserError { full_error }).into(),
         _ => UserFacingError::from_dyn_error(&crate_error),
     }

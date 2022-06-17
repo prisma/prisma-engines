@@ -1336,3 +1336,43 @@ fn removes_legacy_colon_from_fields() {
 
     expected.assert_eq(&reformat(input));
 }
+
+#[test]
+fn rewrites_legacy_list_and_required_type_arities() {
+    let input = indoc! {r#"
+        model Site {
+          name String!
+          htmlTitles [String]
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model Site {
+          name       String
+          htmlTitles String[]
+        }
+    "#]];
+
+    expected.assert_eq(&reformat(input));
+}
+
+#[test]
+fn reformatting_optional_list_fields_works() {
+    let schema = r#"
+        model Pizza {
+            id Int @id
+            toppings String[]?
+            prices Int[]? @default([3, 6, 9])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        model Pizza {
+          id       Int       @id
+          toppings String[]?
+          prices   Int[]?    @default([3, 6, 9])
+        }
+    "#]];
+
+    expected.assert_eq(&reformat(schema));
+}

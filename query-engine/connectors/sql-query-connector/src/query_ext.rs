@@ -4,7 +4,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
-use datamodel::{common::preview_features::PreviewFeature, datamodel_connector::ConnectorCapability};
+use datamodel::common::preview_features::PreviewFeature;
 use futures::future::FutureExt;
 use itertools::Itertools;
 use opentelemetry::trace::TraceFlags;
@@ -71,23 +71,17 @@ pub trait QueryExt: Queryable + Send + Sync {
     /// JSON `Value` as a result.
     async fn raw_json<'a>(
         &'a self,
-        sql_info: SqlInfo,
-        features: &[PreviewFeature],
+        _sql_info: SqlInfo,
+        _features: &[PreviewFeature],
         mut inputs: HashMap<String, PrismaValue>,
     ) -> std::result::Result<Value, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
         let params = params.into_iter().map(convert_lossy).collect_vec();
-        let result_set = if features.contains(&PreviewFeature::ImprovedQueryRaw) {
-            AssertUnwindSafe(self.query_raw_typed(&query, &params))
-                .catch_unwind()
-                .await??
-        } else {
-            AssertUnwindSafe(self.query_raw(&query, &params))
-                .catch_unwind()
-                .await??
-        };
+        let result_set = AssertUnwindSafe(self.query_raw_typed(&query, &params))
+            .catch_unwind()
+            .await??;
 
         // `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
         let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();
@@ -98,11 +92,8 @@ pub trait QueryExt: Queryable + Send + Sync {
 
             for (idx, p_value) in row.into_iter().enumerate() {
                 let column_name = columns.get(idx).unwrap_or(&format!("f{}", idx)).clone();
-                // TODO: Remove backward_compatible checks for Prisma4
-                let backward_compatible = !features.contains(&PreviewFeature::ImprovedQueryRaw)
-                    || sql_info.has_capability(ConnectorCapability::BackwardCompatibleQueryRaw);
 
-                object.insert(column_name, p_value.as_typed_json(backward_compatible));
+                object.insert(column_name, p_value.as_typed_json());
             }
 
             result.push(Value::Object(object));
@@ -116,21 +107,15 @@ pub trait QueryExt: Queryable + Send + Sync {
     async fn raw_count<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
-        features: &[PreviewFeature],
+        _features: &[PreviewFeature],
     ) -> std::result::Result<usize, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
         let params = params.into_iter().map(convert_lossy).collect_vec();
-        let changes = if features.contains(&PreviewFeature::ImprovedQueryRaw) {
-            AssertUnwindSafe(self.execute_raw_typed(&query, &params))
-                .catch_unwind()
-                .await??
-        } else {
-            AssertUnwindSafe(self.execute_raw(&query, &params))
-                .catch_unwind()
-                .await??
-        };
+        let changes = AssertUnwindSafe(self.execute_raw_typed(&query, &params))
+            .catch_unwind()
+            .await??;
 
         Ok(changes as usize)
     }

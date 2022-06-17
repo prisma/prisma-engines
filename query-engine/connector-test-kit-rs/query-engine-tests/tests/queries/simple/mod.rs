@@ -1,3 +1,4 @@
+mod composite_default_value;
 mod find_first;
 mod find_many;
 mod find_unique;
