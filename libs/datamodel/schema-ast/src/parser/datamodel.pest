@@ -39,8 +39,8 @@ base_type = { unsupported_type | non_empty_identifier } // Called base type to n
 unsupported_optional_list_type = { base_type ~ "[]" ~ "?" }
 list_type = { base_type ~ "[]" }
 optional_type = { base_type ~ "?" }
-legacy_required_type = { non_empty_identifier ~ "!" }
-legacy_list_type = { "[" ~ non_empty_identifier ~ "]" }
+legacy_required_type = { base_type ~ "!" }
+legacy_list_type = { "[" ~ base_type ~ "]" }
 
 // ######################################
 // Type Alias
