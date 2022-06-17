@@ -179,6 +179,25 @@
 <span id="174">174</span>
 <span id="175">175</span>
 <span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>, <span class="ident">rust_2018_idioms</span>)]</span>
 <span class="kw">mod</span> <span class="ident">panic_hook</span>;
 
@@ -198,6 +217,25 @@
     <span class="kw">const</span> <span class="ident">ERROR_CODE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
 
     <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span>;
+}
+
+<span class="doccomment">/// A less dynamic type of user-facing errors. This is used in the introspection and migration</span>
+<span class="doccomment">/// engines for simpler, more robust and helpful error handling — extra details are attached</span>
+<span class="doccomment">/// opportunistically.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SimpleUserFacingError</span> {
+    <span class="kw">const</span> <span class="ident">ERROR_CODE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+    <span class="kw">const</span> <span class="ident">MESSAGE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">UserFacingError</span> <span class="kw">for</span> <span class="ident">T</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">SimpleUserFacingError</span> <span class="op">+</span> <span class="ident">Serialize</span>,
+{
+    <span class="kw">const</span> <span class="ident">ERROR_CODE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">SimpleUserFacingError</span><span class="op">&gt;</span><span class="ident">::ERROR_CODE</span>;
+
+    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
+        <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">SimpleUserFacingError</span><span class="op">&gt;</span><span class="ident">::MESSAGE</span>.<span class="ident">to_owned</span>()
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>

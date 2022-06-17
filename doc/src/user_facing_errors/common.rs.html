@@ -517,7 +517,7 @@ Context: {context}
     <span class="kw">pub</span> <span class="ident">actual</span>: <span class="ident">usize</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">SimpleUserFacingError</span>)]</span>
 <span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1017&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Server has closed the connection.&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionClosed</span>;
 

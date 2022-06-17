@@ -318,7 +318,7 @@
 }
 
 <span class="comment">// No longer used.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">SimpleUserFacingError</span>)]</span>
 <span class="attribute">#[<span class="ident">user_facing</span>(
     <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P3003&quot;</span>,
     <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The format of migrations changed, the saved migrations are no longer valid. To solve this problem, please follow the steps at: https://pris.ly/d/migrate&quot;</span>
@@ -334,7 +334,7 @@
     <span class="kw">pub</span> <span class="ident">database_name</span>: <span class="ident">String</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">SimpleUserFacingError</span>)]</span>
 <span class="attribute">#[<span class="ident">user_facing</span>(
     <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P3005&quot;</span>,
     <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The database schema is not empty. Read more about how to baseline an existing production database: https://pris.ly/d/migrate-baseline&quot;</span>
@@ -407,7 +407,7 @@
     <span class="kw">pub</span> <span class="ident">details</span>: <span class="ident">String</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">UserFacingError</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">SimpleUserFacingError</span>)]</span>
 <span class="attribute">#[<span class="ident">user_facing</span>(
     <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P3010&quot;</span>,
     <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The name of the migration is too long. It must not be longer than 200 characters (bytes).&quot;</span>
@@ -434,7 +434,7 @@
     <span class="kw">pub</span> <span class="ident">migration_name</span>: <span class="ident">String</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">UserFacingError</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">SimpleUserFacingError</span>)]</span>
 <span class="attribute">#[<span class="ident">user_facing</span>(
     <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P3013&quot;</span>,
     <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Datasource provider arrays are no longer supported in migrate. Please change your datasource to use a single provider. Read more at https://pris.ly/multi-provider-deprecation&quot;</span>
@@ -536,21 +536,21 @@
     <span class="kw">pub</span> <span class="ident">expected_provider</span>: <span class="ident">String</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">UserFacingError</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">SimpleUserFacingError</span>)]</span>
 <span class="attribute">#[<span class="ident">user_facing</span>(
     <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P3020&quot;</span>,
     <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The automatic creation of shadow databases is disabled on Azure SQL. Please set up a shadow database using the `shadowDatabaseUrl` datasource attribute.\nRead the docs page for more details: https://pris.ly/d/migrate-shadow&quot;</span>
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AzureMssqlShadowDb</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">UserFacingError</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">SimpleUserFacingError</span>)]</span>
 <span class="attribute">#[<span class="ident">user_facing</span>(
     <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P3021&quot;</span>,
     <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Foreign keys cannot be created on this database. Learn more how to handle this: https://pris.ly/d/migrate-no-foreign-keys&quot;</span>
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ForeignKeyCreationNotAllowed</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">UserFacingError</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">SimpleUserFacingError</span>)]</span>
 <span class="attribute">#[<span class="ident">user_facing</span>(
     <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P3022&quot;</span>,
     <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Direct execution of DDL (Data Definition Language) SQL statements is disabled on this database. Please read more here how to handle this: https://pris.ly/d/migrate-no-direct-ddl&quot;</span>

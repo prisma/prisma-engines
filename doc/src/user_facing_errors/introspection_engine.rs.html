@@ -29,9 +29,6 @@
 <span id="24">24</span>
 <span id="25">25</span>
 <span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">use</span> <span class="ident">user_facing_error_macros</span>::<span class="kw-2">*</span>;
 
@@ -45,12 +42,9 @@
     <span class="kw">pub</span> <span class="ident">introspection_error</span>: <span class="ident">String</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">SimpleUserFacingError</span>)]</span>
 <span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P4001&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The introspected database was empty: {connection_string}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntrospectionResultEmpty</span> {
-    <span class="doccomment">/// There were no models and no enums detected in the database.</span>
-    <span class="kw">pub</span> <span class="ident">connection_string</span>: <span class="ident">String</span>,
-}
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntrospectionResultEmpty</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">user_facing</span>(
