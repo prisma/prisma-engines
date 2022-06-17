@@ -43,7 +43,7 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">SimpleUserFacingError</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P4001&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The introspected database was empty: {connection_string}&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P4001&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The introspected database was empty.&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntrospectionResultEmpty</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
