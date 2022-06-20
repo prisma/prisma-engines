@@ -17,6 +17,12 @@ scenarios! {
     default_map_mssql
     empty_schema
     extended_indexes_basic
+    extended_indexes_types_postgres
+    extended_indexes_types_mysql
+    extended_indexes_types_sqlserver
+    extended_indexes_types_sqlite
+    extended_indexes_types_mongo
+    extended_indexes_types_cockroach
     language_tools_relation_directive
     no_default_map_on_postgres
     referential_actions_end_of_args_list

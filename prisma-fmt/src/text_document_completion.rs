@@ -126,6 +126,19 @@ fn push_ast_completions(
                 });
             }
         }
+        ast::SchemaPosition::Model(
+            _model_id,
+            ast::ModelPosition::Index(_, ast::AttributePosition::Argument("type")),
+        ) => {
+            for index_type in connector.supported_index_types() {
+                completion_list.items.push(CompletionItem {
+                    label: index_type.to_string(),
+                    kind: Some(CompletionItemKind::ENUM),
+                    detail: Some(index_type.documentation().to_owned()),
+                    ..Default::default()
+                });
+            }
+        }
         _ => (),
     }
 }
