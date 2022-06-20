@@ -218,7 +218,7 @@ async fn main() -> anyhow::Result<()> {
             .await
             .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
-            println!("{}", serde_json::to_string(&introspected).unwrap());
+            println!("{}", &introspected.datamodel);
         }
         Command::ValidateDatamodel(cmd) => {
             use std::io::Read as _;
