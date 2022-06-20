@@ -23,6 +23,7 @@ impl PrismaValueExtensions for PrismaValue {
             (val @ PrismaValue::Uuid(_), TypeIdentifier::UUID) => val,
             (val @ PrismaValue::BigInt(_), TypeIdentifier::BigInt) => val,
             (val @ PrismaValue::Bytes(_), TypeIdentifier::Bytes) => val,
+            (val @ PrismaValue::Json(_), TypeIdentifier::Json) => val,
 
             // Valid String coercions
             (PrismaValue::Int(i), TypeIdentifier::String) => PrismaValue::String(format!("{}", i)),
