@@ -73,6 +73,7 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
+<span id="71">71</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PrismaValue</span>, <span class="ident">TypeIdentifier</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DomainError</span>;
 <span class="kw">use</span> <span class="ident">bigdecimal::ToPrimitive</span>;
@@ -98,6 +99,7 @@
             (<span class="ident">val</span> @ <span class="ident">PrismaValue::Uuid</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::UUID</span>) =&gt; <span class="ident">val</span>,
             (<span class="ident">val</span> @ <span class="ident">PrismaValue::BigInt</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::BigInt</span>) =&gt; <span class="ident">val</span>,
             (<span class="ident">val</span> @ <span class="ident">PrismaValue::Bytes</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Bytes</span>) =&gt; <span class="ident">val</span>,
+            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Json</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Json</span>) =&gt; <span class="ident">val</span>,
 
             <span class="comment">// Valid String coercions</span>
             (<span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>), <span class="ident">TypeIdentifier::String</span>) =&gt; <span class="ident">PrismaValue::String</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">i</span>)),
