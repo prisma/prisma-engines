@@ -3238,7 +3238,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#6d2280582624f44d7d47417447d8914e2d94fd4a"
+source = "git+https://github.com/weakky/quaint?branch=fix/float-should-be-float-fork#e54ef424ed0effdddc1cc5c6b18494ebbc8f7a05"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
