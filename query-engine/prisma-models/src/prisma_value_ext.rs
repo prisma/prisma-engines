@@ -11,7 +11,6 @@ pub trait PrismaValueExtensions {
 impl PrismaValueExtensions for PrismaValue {
     // Todo this is not exhaustive for now.
     fn coerce(self, to_type: &TypeIdentifier) -> crate::Result<PrismaValue> {
-        dbg!(to_type);
         let coerced = match (self, to_type) {
             // Trivial cases
             (PrismaValue::Null, _) => PrismaValue::Null,
