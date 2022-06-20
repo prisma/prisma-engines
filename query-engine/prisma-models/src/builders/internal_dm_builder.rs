@@ -9,7 +9,6 @@ use crate::{
     RelationLinkManifestation, RelationSide, RelationTable, TypeIdentifier,
 };
 use datamodel::dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
-use itertools::Itertools;
 use once_cell::sync::OnceCell;
 use std::sync::Arc;
 
@@ -281,6 +280,7 @@ fn convert_enum_values(enm: &dml::Enum) -> Vec<InternalEnumValue> {
 /// Calculates placeholders that are used to compute builders dependent on some relation information being present already.
 fn relation_placeholders(datamodel: &dml::Datamodel) -> Vec<RelationPlaceholder> {
     let mut result = Vec::new();
+
     for model in datamodel.models().filter(|model| !model.is_ignored) {
         for field in model.relation_fields().filter(|field| !field.is_ignored) {
             let dml::RelationInfo {
@@ -373,21 +373,26 @@ fn relation_placeholders(datamodel: &dml::Datamodel) -> Vec<RelationPlaceholder>
                 },
             };
 
-            result.push(RelationPlaceholder {
+            let placeholder = RelationPlaceholder {
                 name: name.clone(),
                 model_a,
                 model_b,
                 field_a,
                 field_b,
                 manifestation,
-            })
+            };
+
+            // Skip duplicate placeholders
+            if !result.contains(&placeholder) {
+                result.push(placeholder);
+            }
         }
     }
 
-    result.into_iter().unique_by(|rel| rel.name()).collect()
+    result
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct RelationPlaceholder {
     pub name: String,
     pub model_a: dml::Model,
