@@ -443,6 +443,37 @@ fn ambiguous_relations() {
     post.assert_relation_field("blog2").assert_relation_name("Relation2");
 }
 
+// Regression test
+// https://github.com/prisma/prisma/issues/12986
+#[test]
+fn duplicate_relation_name() {
+    let schema = r#"
+        model Post {
+            id     String @unique
+            userId String
+            user   User   @relation("a", fields: [userId], references: [id])
+          }
+          
+          model User {
+            id       String    @unique
+            posts    Post[]    @relation("a")
+            comments Comment[] @relation("a")
+          }
+          
+          model Comment {
+            id     String @unique
+            userId String
+            user   User   @relation("a", fields: [userId], references: [id])
+          }
+          
+        "#;
+
+    let (_, dml) = datamodel::parse_schema(schema).unwrap();
+    let res = std::panic::catch_unwind(|| InternalDataModelBuilder::from(&dml));
+
+    assert!(res.is_ok());
+}
+
 #[test]
 fn implicit_many_to_many_relation() {
     let datamodel = convert(
