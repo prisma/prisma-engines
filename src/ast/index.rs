@@ -5,7 +5,7 @@ use super::{Column, Table};
 /// Used mainly for the transformation of a `INSERT` into a `MERGE`.
 #[derive(Debug, PartialEq, Clone)]
 pub enum IndexDefinition<'a> {
-    Single(Column<'a>),
+    Single(Box<Column<'a>>),
     Compound(Vec<Column<'a>>),
 }
 
@@ -22,7 +22,7 @@ impl<'a> IndexDefinition<'a> {
 
                 Self::Compound(cols)
             }
-            Self::Single(column) => Self::Single(column.table(table)),
+            Self::Single(column) => Self::Single(Box::new(column.table(table))),
         }
     }
 
@@ -38,7 +38,7 @@ impl<'a> IndexDefinition<'a> {
     /// True if the index definition contains the given column.
     pub fn contains(&self, column: &Column) -> bool {
         match self {
-            Self::Single(ref c) if c == column => true,
+            Self::Single(ref c) if c.as_ref() == column => true,
             Self::Compound(ref cols) if cols.iter().any(|c| c == column) => true,
             _ => false,
         }
@@ -50,7 +50,7 @@ where
     T: Into<Column<'a>>,
 {
     fn from(s: T) -> Self {
-        Self::Single(s.into())
+        Self::Single(Box::new(s.into()))
     }
 }
 

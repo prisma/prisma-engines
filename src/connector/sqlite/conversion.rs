@@ -22,7 +22,6 @@ impl TypeIdentifier for Column<'_> {
         match self.decl_type() {
             Some(n) if n.starts_with("DECIMAL") => true,
             Some(n) if n.starts_with("decimal") => true,
-            Some("NUMERIC") | Some("numeric") | Some("REAL") | Some("real") => true,
             _ => false,
         }
     }
@@ -34,7 +33,14 @@ impl TypeIdentifier for Column<'_> {
     fn is_double(&self) -> bool {
         matches!(
             self.decl_type(),
-            Some("DOUBLE") | Some("double") | Some("DOUBLE PRECISION") | Some("double precision")
+            Some("DOUBLE")
+                | Some("double")
+                | Some("DOUBLE PRECISION")
+                | Some("double precision")
+                | Some("numeric")
+                | Some("NUMERIC")
+                | Some("real")
+                | Some("REAL")
         )
     }
 

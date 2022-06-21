@@ -26,13 +26,7 @@ test_type!(big_int(
     Value::int64(i64::MAX),
 ));
 
-#[cfg(feature = "bigdecimal")]
-test_type!(real(
-    sqlite,
-    "REAL",
-    Value::Numeric(None),
-    Value::numeric(bigdecimal::BigDecimal::from_str("1.12345").unwrap())
-));
+test_type!(real(sqlite, "REAL", Value::Double(None), Value::double(1.12345)));
 
 #[cfg(feature = "bigdecimal")]
 test_type!(float_decimal(
