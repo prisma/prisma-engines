@@ -196,10 +196,6 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::ScalarLists)
     }
 
-    fn supports_relations_over_non_unique_criteria(&self) -> bool {
-        self.has_capability(ConnectorCapability::RelationsOverNonUniqueCriteria)
-    }
-
     fn supports_enums(&self) -> bool {
         self.has_capability(ConnectorCapability::Enums)
     }

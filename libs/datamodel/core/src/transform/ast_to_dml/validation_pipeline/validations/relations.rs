@@ -130,9 +130,7 @@ pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_>, ctx: 
         return;
     };
 
-    if relation_field.referenced_fields().map(|f| f.len() == 0).unwrap_or(true)
-        || !ctx.diagnostics.errors().is_empty()
-        || ctx.connector.supports_relations_over_non_unique_criteria()
+    if relation_field.referenced_fields().map(|f| f.len() == 0).unwrap_or(true) || !ctx.diagnostics.errors().is_empty()
     {
         return;
     }

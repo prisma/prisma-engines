@@ -361,33 +361,6 @@ fn relation_must_succeed_when_referenced_fields_are_a_unique_criteria() {
 }
 
 #[test]
-fn relation_must_not_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
-    // MySQL allows foreign key to references a non unique criteria
-    // https://stackoverflow.com/questions/588741/can-a-foreign-key-reference-a-non-unique-index
-    let dml = r#"
-    datasource db {
-        provider = "mysql"
-        url = "mysql://localhost:3306"
-    }
-
-    model User {
-        id        Int    @id
-        firstName String
-        posts     Post[]
-    }
-
-    model Post {
-        id       Int    @id
-        text     String
-        userName String
-        user     User   @relation(fields: [userName], references: [firstName])
-    }
-    "#;
-
-    let _ = parse(dml);
-}
-
-#[test]
 fn relation_must_error_when_referenced_fields_are_multiple_uniques() {
     let dml = r#"
     model User {

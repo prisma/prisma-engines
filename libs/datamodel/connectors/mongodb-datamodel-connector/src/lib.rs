@@ -11,7 +11,6 @@ use native_types::{MongoDbType, NativeType};
 use std::result::Result as StdResult;
 
 const CAPABILITIES: &[ConnectorCapability] = &[
-    ConnectorCapability::RelationsOverNonUniqueCriteria,
     ConnectorCapability::Json,
     ConnectorCapability::Enums,
     ConnectorCapability::EnumArrayPush,

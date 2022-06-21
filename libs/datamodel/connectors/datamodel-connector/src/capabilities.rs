@@ -43,7 +43,6 @@ macro_rules! capabilities {
 capabilities!(
     // General capabilities, not specific to any part of Prisma.
     ScalarLists,
-    RelationsOverNonUniqueCriteria,
     Enums,
     EnumArrayPush,
     Json,

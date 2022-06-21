@@ -1009,3 +1009,36 @@ fn should_fail_if_not_using_unique_constraint_with_compound_one_to_one() {
 
     expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
+
+#[test]
+fn should_fail_if_not_using_unique_constraint_with_single_one_to_many() {
+    let dml = indoc! {r#"
+        model A {
+          id         Int          @id @default(autoincrement())
+          custom_id  String
+          B          B[]
+
+          @@index([custom_id])
+        }
+
+        model B {
+          id        Int     @id @default(autoincrement())
+          a_id String
+          A         A @relation(fields: [a_id], references: [custom_id])
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError validating: The argument `references` must refer to a unique criteria in the related model `A`. But it is referencing the following fields that are not a unique criteria: custom_id[0m
+          [1;94m-->[0m  [4mschema.prisma:22[0m
+        [1;94m   | [0m
+        [1;94m21 | [0m  a_id String
+        [1;94m22 | [0m  [1;91mA         A @relation(fields: [a_id], references: [custom_id])[0m
+        [1;94m23 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    let dml = with_header(dml, Provider::Mysql, &[]);
+
+    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+}
