@@ -36,7 +36,10 @@
 <span id="31">31</span>
 <span id="32">32</span>
 <span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_connector::ConnectorError</span>;
+<span class="kw">use</span> <span class="ident">migration_core::TimingsLayer</span>;
 <span class="kw">use</span> <span class="ident">tracing_error::ErrorLayer</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">init_logger</span>() {
@@ -48,7 +51,8 @@
         .<span class="ident">with_timer</span>(<span class="ident">tracing_subscriber::fmt::time::UtcTime::rfc_3339</span>())
         .<span class="ident">with_writer</span>(<span class="ident">std::io::stderr</span>)
         .<span class="ident">finish</span>()
-        .<span class="ident">with</span>(<span class="ident">ErrorLayer::default</span>());
+        .<span class="ident">with</span>(<span class="ident">ErrorLayer::default</span>())
+        .<span class="ident">with</span>(<span class="ident">TimingsLayer::default</span>());
 
     <span class="ident">tracing::subscriber::set_global_default</span>(<span class="ident">subscriber</span>)
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">eprintln!</span>(<span class="string">&quot;Error initializing the global logger: {}&quot;</span>, <span class="ident">err</span>))

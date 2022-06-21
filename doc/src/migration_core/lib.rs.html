@@ -214,6 +214,7 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
+<span id="212">212</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_collect</span>)]</span> <span class="comment">// the implementation of that rule is way too eager, it rejects necessary collects</span>
 
@@ -229,8 +230,9 @@
 <span class="kw">mod</span> <span class="ident">core_error</span>;
 <span class="kw">mod</span> <span class="ident">rpc</span>;
 <span class="kw">mod</span> <span class="ident">state</span>;
+<span class="kw">mod</span> <span class="ident">timings</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{<span class="ident">api::GenericApi</span>, <span class="ident">core_error</span>::<span class="kw-2">*</span>, <span class="ident">rpc::rpc_api</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{<span class="ident">api::GenericApi</span>, <span class="ident">core_error</span>::<span class="kw-2">*</span>, <span class="ident">rpc::rpc_api</span>, <span class="ident">timings::TimingsLayer</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_connector</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel::ValidatedSchema</span>;
