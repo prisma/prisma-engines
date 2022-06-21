@@ -45,7 +45,7 @@ fn failing_migration_after_migration_dropping_data(api: TestApi) {
                      at migration-engine/connectors/sql-migration-connector/src/apply_migration.rs:104
            1: migration_core::commands::apply_migrations::Applying migration
                    with [3mmigration_name[0m[2m=[0m"  2"
-                     at migration-engine/core/src/commands/apply_migrations.rs:49"#]];
+                     at migration-engine/core/src/commands/apply_migrations.rs:91"#]];
     expectation.assert_eq(&err);
 }
 
@@ -92,7 +92,7 @@ fn failing_step_in_migration_dropping_data(api: TestApi) {
                      at migration-engine/connectors/sql-migration-connector/src/apply_migration.rs:104
            1: migration_core::commands::apply_migrations::Applying migration
                    with [3mmigration_name[0m[2m=[0m"  1"
-                     at migration-engine/core/src/commands/apply_migrations.rs:49"#]];
+                     at migration-engine/core/src/commands/apply_migrations.rs:91"#]];
     expectation.assert_eq(&err);
 }
 
@@ -205,7 +205,7 @@ fn syntax_errors_return_error_position(api: TestApi) {
                      at migration-engine/connectors/sql-migration-connector/src/apply_migration.rs:104
            1: migration_core::commands::apply_migrations::Applying migration
                    with [3mmigration_name[0m[2m=[0m"  0"
-                     at migration-engine/core/src/commands/apply_migrations.rs:49"#]];
+                     at migration-engine/core/src/commands/apply_migrations.rs:91"#]];
     expectation.assert_eq(&err);
 }
 

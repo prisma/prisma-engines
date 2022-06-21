@@ -216,7 +216,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(size as usize)
     }
 
-    #[tracing::instrument(skip(self, columns, indexes, foreign_keys))]
     fn get_table(
         &self,
         name: &str,

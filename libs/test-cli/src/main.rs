@@ -461,10 +461,11 @@ fn init_logger() {
 
     let subscriber = FmtSubscriber::builder()
         .with_env_filter(EnvFilter::from_default_env())
-        .with_ansi(false)
+        .with_ansi(true)
         .with_writer(std::io::stderr)
         .finish()
-        .with(ErrorLayer::default());
+        .with(ErrorLayer::default())
+        .with(migration_core::TimingsLayer::default());
 
     tracing::subscriber::set_global_default(subscriber)
         .map_err(|err| eprintln!("Error initializing the global logger: {}", err))

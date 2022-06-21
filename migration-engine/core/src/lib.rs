@@ -13,8 +13,9 @@ mod api;
 mod core_error;
 mod rpc;
 mod state;
+mod timings;
 
-pub use self::{api::GenericApi, core_error::*, rpc::rpc_api};
+pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
 pub use migration_connector;
 
 use datamodel::ValidatedSchema;
