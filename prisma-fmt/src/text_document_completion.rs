@@ -1,6 +1,7 @@
 use datamodel::{
-    datamodel_connector::{Connector, ReferentialIntegrity},
+    datamodel_connector::{Connector, Diagnostics, ReferentialIntegrity},
     parse_configuration, parse_schema_ast,
+    parser_database::ParserDatabase,
     schema_ast::ast,
 };
 use log::*;
@@ -44,7 +45,12 @@ pub(crate) fn completion(schema: &str, params: CompletionParams) -> CompletionLi
         items: Vec::new(),
     };
 
-    push_ast_completions(&mut list, connector, referential_integrity, &schema_ast, position);
+    let db = {
+        let mut diag = Diagnostics::new();
+        ParserDatabase::new(schema_ast, &mut diag)
+    };
+
+    push_ast_completions(&mut list, connector, referential_integrity, &db, position);
 
     list
 }
@@ -96,22 +102,10 @@ fn push_ast_completions(
     completion_list: &mut CompletionList,
     connector: &'static dyn Connector,
     referential_integrity: ReferentialIntegrity,
-    ast: &ast::SchemaAst,
+    db: &ParserDatabase,
     position: usize,
 ) {
-    match ast.find_at_position(position) {
-        ast::SchemaPosition::Model(
-            _model_id,
-            ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("default", _, None)),
-        ) => {
-            if connector.has_capability(datamodel::datamodel_connector::ConnectorCapability::NamedDefaultValues) {
-                completion_list.items.push(CompletionItem {
-                    label: "map: ".to_owned(),
-                    kind: Some(CompletionItemKind::PROPERTY),
-                    ..Default::default()
-                })
-            }
-        }
+    match db.ast().find_at_position(position) {
         ast::SchemaPosition::Model(
             _model_id,
             ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("relation", _, Some(attr_name))),
@@ -126,7 +120,7 @@ fn push_ast_completions(
                 });
             }
         }
-        _ => (),
+        position => connector.push_completions(db, position, completion_list),
     }
 }
 

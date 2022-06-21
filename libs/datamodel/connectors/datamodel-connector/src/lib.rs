@@ -22,12 +22,13 @@ pub use self::{
 };
 pub use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 pub use empty_connector::EmptyDatamodelConnector;
+use lsp_types::CompletionList;
 pub use native_type_constructor::NativeTypeConstructor;
 pub use parser_database::{self, ReferentialAction, ScalarType};
 pub use referential_integrity::ReferentialIntegrity;
 
 use enumflags2::BitFlags;
-use parser_database::IndexAlgorithm;
+use parser_database::{ast::SchemaPosition, IndexAlgorithm, ParserDatabase};
 use std::{borrow::Cow, collections::BTreeMap};
 
 /// The datamodel connector API.
@@ -252,6 +253,9 @@ pub trait Connector: Send + Sync {
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String>;
+
+    fn push_completions(&self, _db: &ParserDatabase, _position: SchemaPosition<'_>, _completions: &mut CompletionList) {
+    }
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd)]

@@ -1,0 +1,15 @@
+{
+  "isIncomplete": false,
+  "items": [
+    {
+      "label": "InetOps",
+      "kind": 13
+    },
+    {
+      "label": "raw",
+      "kind": 3,
+      "insertText": "raw(\"$0\")",
+      "insertTextFormat": 2
+    }
+  ]
+}

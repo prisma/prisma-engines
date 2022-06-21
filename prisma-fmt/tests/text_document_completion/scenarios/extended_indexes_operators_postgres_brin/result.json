@@ -1,0 +1,23 @@
+{
+  "isIncomplete": false,
+  "items": [
+    {
+      "label": "Float4BloomOps",
+      "kind": 13
+    },
+    {
+      "label": "Float4MinMaxOps",
+      "kind": 13
+    },
+    {
+      "label": "Float4MinMaxMultiOps",
+      "kind": 13
+    },
+    {
+      "label": "raw",
+      "kind": 3,
+      "insertText": "raw(\"$0\")",
+      "insertTextFormat": 2
+    }
+  ]
+}

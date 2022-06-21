@@ -1,0 +1,15 @@
+{
+  "isIncomplete": false,
+  "items": [
+    {
+      "label": "BTree",
+      "kind": 13,
+      "detail": "Can handle equality and range queries on data that can be sorted into some ordering (default)."
+    },
+    {
+      "label": "Gin",
+      "kind": 13,
+      "detail": "Generalized Inverted Index. Useful for indexing composite items, such as arrays or text."
+    }
+  ]
+}

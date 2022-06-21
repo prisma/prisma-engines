@@ -3,11 +3,12 @@ mod validations;
 use connection_string::JdbcString;
 use datamodel_connector::{
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    parser_database::{self, ScalarType},
+    parser_database::{self, ast, ParserDatabase, ScalarType},
     Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
     NativeTypeInstance, ReferentialAction, ReferentialIntegrity, Span,
 };
 use enumflags2::BitFlags;
+use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
 use once_cell::sync::Lazy;
 use std::borrow::Cow;
@@ -403,6 +404,25 @@ impl Connector for MsSqlDatamodelConnector {
         }
 
         Ok(())
+    }
+
+    fn push_completions(
+        &self,
+        _db: &ParserDatabase,
+        position: ast::SchemaPosition<'_>,
+        completions: &mut CompletionList,
+    ) {
+        if let ast::SchemaPosition::Model(
+            _model_id,
+            ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("default", _, None)),
+        ) = position
+        {
+            completions.items.push(CompletionItem {
+                label: "map: ".to_owned(),
+                kind: Some(CompletionItemKind::PROPERTY),
+                ..Default::default()
+            });
+        }
     }
 }
 

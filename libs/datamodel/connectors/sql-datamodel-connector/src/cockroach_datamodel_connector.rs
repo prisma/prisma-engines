@@ -2,11 +2,17 @@ mod validations;
 
 use datamodel_connector::{
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    parser_database::{self, ast, walkers::ModelWalker, IndexAlgorithm, ValueValidator},
+    parser_database::{
+        self,
+        ast::{self, SchemaPosition},
+        walkers::ModelWalker,
+        IndexAlgorithm, ParserDatabase, ValueValidator,
+    },
     Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
     NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
 };
 use enumflags2::BitFlags;
+use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use native_types::{CockroachType, NativeType};
 
 const BIT_TYPE_NAME: &str = "Bit";
@@ -331,6 +337,23 @@ impl Connector for CockroachDatamodelConnector {
         }
 
         Ok(())
+    }
+
+    fn push_completions(&self, _db: &ParserDatabase, position: SchemaPosition<'_>, completions: &mut CompletionList) {
+        if let ast::SchemaPosition::Model(
+            _,
+            ast::ModelPosition::ModelAttribute("index", _, ast::AttributePosition::Argument("type")),
+        ) = position
+        {
+            for index_type in self.supported_index_types() {
+                completions.items.push(CompletionItem {
+                    label: index_type.to_string(),
+                    kind: Some(CompletionItemKind::ENUM),
+                    detail: Some(index_type.documentation().to_owned()),
+                    ..Default::default()
+                });
+            }
+        }
     }
 }
 

@@ -262,7 +262,12 @@ impl fmt::Display for IndexAlgorithm {
 }
 
 impl IndexAlgorithm {
-    /// Is this a hash index?
+    /// Is this a B-Tree index?
+    pub fn is_btree(self) -> bool {
+        matches!(self, Self::BTree)
+    }
+
+    /// Hash?
     pub fn is_hash(self) -> bool {
         matches!(self, Self::Hash)
     }
@@ -310,6 +315,18 @@ impl IndexAlgorithm {
                     || r#type.is_bigint()
                     || r#type.is_decimal()
             }
+        }
+    }
+
+    /// Documentation for editor autocompletion.
+    pub fn documentation(self) -> &'static str {
+        match self {
+            IndexAlgorithm::BTree => "Can handle equality and range queries on data that can be sorted into some ordering (default).",
+            IndexAlgorithm::Hash => "Can handle simple equality queries, but no ordering. Faster than BTree, if ordering is not needed.",
+            IndexAlgorithm::Gist => "Generalized Search Tree. A framework for building specialized indices for custom data types.",
+            IndexAlgorithm::Gin => "Generalized Inverted Index. Useful for indexing composite items, such as arrays or text.",
+            IndexAlgorithm::SpGist => "Space-partitioned Generalized Search Tree. For implenting a wide range of different non-balanced data structures.",
+            IndexAlgorithm::Brin => "Block Range Index. If the data has some natural correlation with their physical location within the table, can compress very large amount of data into a small space.",
         }
     }
 }
