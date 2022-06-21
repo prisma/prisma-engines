@@ -28,7 +28,7 @@ fn must_error_if_default_value_for_relation_field() {
 }
 
 #[test]
-fn must_error_if_default_value_for_list() {
+fn must_error_on_list_default_value_for_singular() {
     let dml = indoc! {r#"
         datasource db {
           provider = "postgres"
@@ -37,22 +37,70 @@ fn must_error_if_default_value_for_list() {
 
         model Model {
           id Int @id
-          rel String[] @default(["hello"])
+          rel String @default(["hello"])
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": Cannot set a default value on list field.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": The default value of a non-list field cannot be a list.[0m
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id Int @id
-        [1;94m 8 | [0m  rel String[] @[1;91mdefault(["hello"])[0m
+        [1;94m 8 | [0m  rel String @[1;91mdefault(["hello"])[0m
         [1;94m   | [0m
     "#]];
+    expect_error(dml, &expectation);
+}
 
-    expectation.assert_eq(&error)
+#[test]
+fn must_error_on_singular_default_value_for_list() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "postgres"
+          url = "postgres://"
+        }
+
+        model Model {
+          id Int @id
+          rel String[] @default("hello")
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The default value of a list field must be a list.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m  id Int @id
+        [1;94m 8 | [0m  rel String[] @[1;91mdefault("hello")[0m
+        [1;94m   | [0m
+    "#]];
+    expect_error(dml, &expectation);
+}
+
+#[test]
+fn must_error_on_bad_value_inside_list_default() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "postgres"
+          url = "postgres://"
+        }
+
+        model Model {
+          id Int @id
+          rel String[] @default(["hello", 101, "dalmatians"])
+          dateTime DateTime[] @default(["2019-06-17T14:20:57Z", "2020-09-*1T20:00:00+02:00"])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `101`.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m  id Int @id
+        [1;94m 8 | [0m  rel String[] @[1;91mdefault(["hello", 101, "dalmatians"])[0m
+        [1;94m   | [0m
+    "#]];
+    expect_error(dml, &expectation);
 }
 
 #[test]
@@ -198,6 +246,33 @@ fn must_error_if_default_value_for_enum_is_not_valid() {
 }
 
 #[test]
+fn must_error_if_default_value_for_enum_list_is_not_valid() {
+    let dml = indoc! {r#"
+        model Model {
+          id Int @id
+          enm Color[] @default([green, blue, yellow, red])
+        }
+
+        enum Color {
+            red
+            green @map("grïn")
+            blue
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The defined default value `yellow` is not a valid value of the enum specified for the field.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  id Int @id
+        [1;94m 3 | [0m  enm Color[] @[1;91mdefault([green, blue, yellow, red])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(dml, &expectation);
+}
+
+#[test]
 fn must_error_if_using_non_id_auto_increment_on_sqlite() {
     let dml = indoc! {r#"
         datasource db1 {
@@ -326,7 +401,7 @@ fn must_error_if_scalar_default_on_unsupported() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": Only @default(dbgenerated()) can be used for Unsupported types.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": Only @default(dbgenerated("...")) can be used for Unsupported types.[0m
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id      Int @id
@@ -1044,8 +1119,6 @@ fn boolean_defaults_must_be_true_or_false() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
-
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": A boolean literal must be `true` or `false`.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
@@ -1055,5 +1128,110 @@ fn boolean_defaults_must_be_true_or_false() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&error)
+    expect_error(schema, &expected);
+}
+
+#[test]
+fn nested_scalar_list_defaults_are_disallowed() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("DBURL")
+        }
+
+        model Pizza {
+            id Int @id
+            toppings String[] @default(["reblochon cheese", ["potato", "with", "rosmarin"], "onions"])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `["potato","with","rosmarin"]`.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m            id Int @id
+        [1;94m 9 | [0m            toppings String[] @[1;91mdefault(["reblochon cheese", ["potato", "with", "rosmarin"], "onions"])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expected);
+}
+
+#[test]
+fn scalar_list_default_on_connector_without_scalar_lists() {
+    let schema = r#"
+        datasource db {
+            provider = "sqlserver"
+            url = env("DBURL")
+        }
+
+        model Pizza {
+            id Int @id
+            toppings String[] @default(["reblochon cheese", "potato", "rosmarin", "onions"])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mField "toppings" in model "Pizza" can't be a list. The current connector does not support lists of primitive types.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m            id Int @id
+        [1;94m 9 | [0m            [1;91mtoppings String[] @default(["reblochon cheese", "potato", "rosmarin", "onions"])[0m
+        [1;94m10 | [0m        }
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expected);
+}
+
+#[test]
+fn scalar_list_default_on_non_list_field() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("DBURL")
+        }
+
+        model Pizza {
+            id Int @id
+            toppings String @default(["reblochon cheese", "potato", "rosmarin", "onions"])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The default value of a non-list field cannot be a list.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m            id Int @id
+        [1;94m 9 | [0m            toppings String @[1;91mdefault(["reblochon cheese", "potato", "rosmarin", "onions"])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expected);
+}
+
+#[test]
+fn dbgenerated_inside_scalar_list_default() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("DBURL")
+        }
+
+        model Pizza {
+            id Int @id
+            toppings String[] @default(["reblochon cheese", dbgenerated("potato"), "rosmarin", "onions"])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `dbgenerated("potato")`.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m            id Int @id
+        [1;94m 9 | [0m            toppings String[] @[1;91mdefault(["reblochon cheese", dbgenerated("potato"), "rosmarin", "onions"])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expected);
 }

@@ -130,12 +130,66 @@ async fn dbgenerated_type_casts_should_work(api: &TestApi) -> TestResult {
 
     let dm = indoc! {r#"
         model A {
-          id String @id @default(dbgenerated("now():::TIMESTAMPTZ::STRING")) @db.String(30)
+          id String @id @default(dbgenerated("now()::STRING")) @db.String(30)
         }
     "#};
 
     let result = api.introspect().await?;
     api.assert_eq_datamodels(dm, &result);
+
+    Ok(())
+}
+
+#[test_connector(tags(CockroachDb))]
+async fn scalar_list_defaults_work(api: &TestApi) -> TestResult {
+    let schema = r#"
+        CREATE TYPE "color" AS ENUM ('RED', 'GREEN', 'BLUE');
+
+        CREATE TABLE "defaults" (
+            id TEXT PRIMARY KEY,
+            text_empty TEXT[] NOT NULL DEFAULT '{}',
+            text TEXT[] NOT NULL DEFAULT '{ ''abc'' }',
+            text_c_escape TEXT[] NOT NULL DEFAULT E'{ \'abc\', \'def\' }',
+            colors COLOR[] NOT NULL DEFAULT '{ RED, GREEN }',
+            int_defaults INT4[] NOT NULL DEFAULT '{ 9, 12999, -4, 0, 1249849 }',
+            float_defaults DOUBLE PRECISION[] NOT NULL DEFAULT '{ 0, 9.12, 3.14, 0.1242, 124949.124949 }',
+            bool_defaults BOOLEAN[] NOT NULL DEFAULT '{ true, true, true, false }',
+            datetime_defaults TIMESTAMPTZ[] NOT NULL DEFAULT '{ "2022-09-01T08:00Z","2021-09-01T08:00Z"}'
+        );
+    "#;
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "cockroachdb"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model defaults {
+          id                String     @id
+          text_empty        String[]   @default([])
+          text              String[]   @default(["abc"])
+          text_c_escape     String[]   @default(["abc", "def"])
+          colors            color[]    @default([RED, GREEN])
+          int_defaults      Int[]      @default([9, 12999, -4, 0, 1249849])
+          float_defaults    Float[]    @default([0.0, 9.12, 3.14, 0.1242, 124949.124949])
+          bool_defaults     Boolean[]  @default([true, true, true, false])
+          datetime_defaults DateTime[] @default(dbgenerated("'{\"''2022-09-01 08:00:00+00:00''::TIMESTAMPTZ\",\"''2021-09-01 08:00:00+00:00''::TIMESTAMPTZ\"}'::TIMESTAMPTZ[]")) @db.Timestamptz
+        }
+
+        enum color {
+          RED
+          GREEN
+          BLUE
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
 
     Ok(())
 }

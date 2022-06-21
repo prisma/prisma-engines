@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
 #[test_suite(schema(schema), capabilities(ScalarLists))]
-mod scalar_lists {
+mod basic_types {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query, TROUBLE_CHARS};
 
@@ -21,10 +21,40 @@ mod scalar_lists {
             enum MyEnum {
               A
               B
-            }"#
+            }
+          "#
         };
 
         schema.to_owned()
+    }
+
+    #[connector_test]
+    async fn set_base(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, format!(r#"mutation {{
+            createOneScalarModel(data: {{
+              id: 1,
+              strings:   {{ set: ["test{}"] }}
+              ints:      {{ set: [1337, 12] }}
+              floats:    {{ set: [1.234, 1.45] }}
+              booleans:  {{ set: [true, false] }}
+              enums:     {{ set: [A, A] }}
+              dateTimes: {{ set: ["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"] }}
+              bytes:     {{ set: ["dGVzdA==", "dA=="] }}
+            }}) {{
+              strings
+              ints
+              floats
+              booleans
+              enums
+              dateTimes
+              bytes
+            }}
+          }}"#, TROUBLE_CHARS)),
+          @r###"{"data":{"createOneScalarModel":{"strings":["test¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀"],"ints":[1337,12],"floats":[1.234,1.45],"booleans":[true,false],"enums":["A","A"],"dateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dA=="]}}}"###
+        );
+
+        Ok(())
     }
 
     // "Scalar lists" should "be behave like regular values for create and update operations"
@@ -289,151 +319,6 @@ mod scalar_lists {
             r#"mutation { updateOneScalarModel(where: { id: 1 }, data: { enums: { push: A }}) { id }}"#,
             2009,
             "`Mutation.updateOneScalarModel.data.ScalarModelUpdateInput.enums`: Unable to match input value to any allowed input type for the field."
-        );
-
-        Ok(())
-    }
-
-    async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
-        runner
-            .query(format!("mutation {{ createOneScalarModel(data: {}) {{ id }} }}", data))
-            .await?
-            .assert_success();
-        Ok(())
-    }
-}
-
-#[test_suite(schema(schema), capabilities(ScalarLists, DecimalType))]
-mod dec_scalar_lists {
-    use indoc::indoc;
-    use query_engine_tests::run_query;
-
-    fn schema() -> String {
-        let schema = indoc! {
-            r#"model ScalarModel {
-              #id(id, Int, @id)
-              decimals  Decimal[]
-            }"#
-        };
-
-        schema.to_owned()
-    }
-
-    // "Scalar lists" should "be behave like regular values for create and update operations"
-    // Skipped for CockroachDB, lools like this is concat is also broken.
-    #[connector_test(exclude(CockroachDb))]
-    async fn behave_like_regular_val_for_create_and_update(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
-            createOneScalarModel(data: {{
-              id: 1,
-              decimals:  {{ set: ["1.234", "1.45"] }}
-            }}) {{
-              decimals
-            }}
-          }}"#, )),
-          @r###"{"data":{"createOneScalarModel":{"decimals":["1.234","1.45"]}}}"###
-        );
-
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            updateOneScalarModel(where: { id: 1 }, data: {
-              decimals:  { set: ["1.2345678"] }
-            }) {
-              decimals
-            }
-          }"#),
-          @r###"{"data":{"updateOneScalarModel":{"decimals":["1.2345678"]}}}"###
-        );
-
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            updateOneScalarModel(where: { id: 1 }, data: {
-              decimals:  { push: "2" }
-            }) {
-              decimals
-            }
-          }"#),
-          @r###"{"data":{"updateOneScalarModel":{"decimals":["1.2345678","2"]}}}"###
-        );
-
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            updateOneScalarModel(where: { id: 1 }, data: {
-              decimals:  { push: ["3", "4"] }
-            }) {
-              decimals
-            }
-          }"#),
-          @r###"{"data":{"updateOneScalarModel":{"decimals":["1.2345678","2","3","4"]}}}"###
-        );
-
-        Ok(())
-    }
-
-    // "A Create Mutation" should "create and return items with list values with shorthand notation"
-    #[connector_test]
-    async fn create_mut_work_with_list_vals(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            createOneScalarModel(data: {
-              id: 1
-              decimals: ["1.234", "1.45"]
-            }) {
-              decimals
-            }
-          }"#),
-          @r###"{"data":{"createOneScalarModel":{"decimals":["1.234","1.45"]}}}"###
-        );
-
-        Ok(())
-    }
-
-    // "A Create Mutation" should "create and return items with empty list values"
-    #[connector_test]
-    async fn create_mut_return_items_with_empty_lists(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            createOneScalarModel(data: {
-              id: 1
-              decimals: []
-            }) {
-              decimals
-            }
-          }"#),
-          @r###"{"data":{"createOneScalarModel":{"decimals":[]}}}"###
-        );
-
-        Ok(())
-    }
-
-    // "An Update Mutation that pushes to some empty scalar lists" should "work"
-    // Skipped for CockroachDB as enum array concatenation is not supported (https://github.com/cockroachdb/cockroach/issues/71388).
-    #[connector_test(exclude(CockroachDb))]
-    async fn update_mut_push_empty_scalar_list(runner: Runner) -> TestResult<()> {
-        create_row(&runner, r#"{ id: 1 }"#).await?;
-        create_row(&runner, r#"{ id: 2 }"#).await?;
-
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            updateOneScalarModel(where: { id: 1 }, data: {
-              decimals:  { push: "2" }
-            }) {
-              decimals
-            }
-          }"#),
-          @r###"{"data":{"updateOneScalarModel":{"decimals":["2"]}}}"###
-        );
-
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            updateOneScalarModel(where: { id: 2 }, data: {
-              decimals:  { push: ["1", "2"] }
-            }) {
-              decimals
-            }
-          }"#),
-          @r###"{"data":{"updateOneScalarModel":{"decimals":["1","2"]}}}"###
         );
 
         Ok(())

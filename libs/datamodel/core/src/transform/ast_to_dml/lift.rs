@@ -652,6 +652,14 @@ fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarT
             }
             other => unreachable!("{:?}", other),
         },
+        ast::Expression::Array(values, _) => {
+            let values = values
+                .iter()
+                .map(|expr| dml_default_kind(expr, scalar_type).unwrap_single())
+                .collect();
+
+            DefaultKind::Single(PrismaValue::List(values))
+        }
         other => unreachable!("{:?}", other),
     }
 }

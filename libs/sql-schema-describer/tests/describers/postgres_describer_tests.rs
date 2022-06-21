@@ -5,6 +5,7 @@ use barrel::{types, Migration};
 use indoc::indoc;
 use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
+use prisma_value::PrismaValue;
 use sql_schema_describer::{postgres::PostgresSchemaExt, *};
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -826,18 +827,16 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
 
 #[test_connector(tags(Postgres))]
 fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
-    let create_table = format!(
-        r#"
-            CREATE TABLE "{0}"."string_defaults_test" (
-                id INTEGER PRIMARY KEY,
-                regular VARCHAR NOT NULL DEFAULT E'meow, says the cat',
-                escaped VARCHAR NOT NULL DEFAULT E'"That\'s a lot of fish!" - Godzilla, 1998'
-            );
-        "#,
-        api.schema_name()
-    );
+    let create_table = r#"
+        CREATE TABLE "string_defaults_test" (
+            id INTEGER PRIMARY KEY,
+            regular VARCHAR NOT NULL DEFAULT E'meow, says the cat',
+            escaped VARCHAR NOT NULL DEFAULT E'"That\'s a lot of fish!" - Godzilla, 1998',
+            escaped_no_e VARCHAR NOT NULL DEFAULT '"That''s a lot of fish!" - Godzilla, 1998'
+        );
+    "#;
 
-    api.raw_cmd(&create_table);
+    api.raw_cmd(create_table);
 
     let schema = api.describe();
 
@@ -868,6 +867,19 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
         .unwrap();
 
     assert_eq!(escaped_column_default, r#""That's a lot of fish!" - Godzilla, 1998"#);
+
+    let escaped_no_e = table
+        .column_bang("escaped_no_e")
+        .default
+        .as_ref()
+        .unwrap()
+        .as_value()
+        .unwrap()
+        .clone()
+        .into_string()
+        .unwrap();
+
+    assert_eq!(escaped_no_e, r#""That's a lot of fish!" - Godzilla, 1998"#);
 }
 
 #[test_connector(tags(Postgres))]
@@ -979,6 +991,165 @@ fn index_sort_order_composite_type_asc_desc_is_handled(api: TestApi) {
 
     assert_eq!(Some(SQLSortOrder::Asc), columns[0].sort_order());
     assert_eq!(Some(SQLSortOrder::Desc), columns[1].sort_order());
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn array_column_defaults(api: TestApi) {
+    let schema = r#"
+        CREATE TYPE "color" AS ENUM ('RED', 'GREEN', 'BLUE');
+
+        CREATE TABLE "defaults" (
+            text_empty TEXT[] NOT NULL DEFAULT '{}',
+            text TEXT[] NOT NULL DEFAULT '{ ''abc'' }',
+            text_c_escape TEXT[] NOT NULL DEFAULT E'{ \'abc\', \'def\' }',
+            colors COLOR[] NOT NULL DEFAULT '{ RED, GREEN }',
+            int_defaults INT4[] NOT NULL DEFAULT '{ 9, 12999, -4, 0, 1249849 }',
+            float_defaults DOUBLE PRECISION[] NOT NULL DEFAULT '{ 0, 9.12, 3.14, 0.1242, 124949.124949 }',
+            bool_defaults BOOLEAN[] NOT NULL DEFAULT '{ true, true, true, false }',
+            datetime_defaults TIMESTAMPTZ[] NOT NULL DEFAULT '{ ''2022-09-01T08:00Z'', "2021-09-01T08:00Z"}'
+        );
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+
+    let assert_default = |colname: &str, expected_default: Vec<PrismaValue>| {
+        let col = table.column(colname).unwrap();
+        let value = dbg!(col.default().unwrap()).as_value().unwrap();
+        assert_eq!(value, &PrismaValue::List(expected_default));
+    };
+
+    assert_default("text_empty", vec![]);
+    assert_default("text", vec![PrismaValue::String("abc".to_owned())]);
+    assert_default("text_c_escape", vec!["abc".into(), "def".into()]);
+    assert_default(
+        "colors",
+        vec![
+            PrismaValue::Enum("RED".to_owned()),
+            PrismaValue::Enum("GREEN".to_owned()),
+        ],
+    );
+    assert_default(
+        "int_defaults",
+        vec![
+            PrismaValue::Int(9),
+            PrismaValue::Int(12999),
+            PrismaValue::Int(-4),
+            PrismaValue::Int(0),
+            PrismaValue::Int(1249849),
+        ],
+    );
+    assert_default(
+        "float_defaults",
+        vec![
+            PrismaValue::Float("0.0".parse().unwrap()),
+            PrismaValue::Float("9.12".parse().unwrap()),
+            PrismaValue::Float("3.14".parse().unwrap()),
+            PrismaValue::Float("0.1242".parse().unwrap()),
+            PrismaValue::Float("124949.124949".parse().unwrap()),
+        ],
+    );
+    assert_default(
+        "bool_defaults",
+        vec![
+            PrismaValue::Boolean(true),
+            PrismaValue::Boolean(true),
+            PrismaValue::Boolean(true),
+            PrismaValue::Boolean(false),
+        ],
+    );
+    // assert_default(
+    //     "datetime_defaults",
+    //     vec![
+    //         PrismaValue::Enum("2022-09-01 08:00:00+00".to_owned()),
+    //         PrismaValue::Enum("2021-09-01 08:00:00+00".to_owned()),
+    //     ],
+    // );
+}
+
+#[test_connector(tags(Postgres))]
+fn array_column_defaults_with_array_constructor_syntax(api: TestApi) {
+    let schema = r#"
+        CREATE TYPE "color" AS ENUM ('RED', 'GREEN', 'BLUE');
+
+        CREATE TABLE "defaults" (
+            text_empty TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+            text TEXT[] NOT NULL DEFAULT ARRAY['abc']::TEXT[],
+            text_c_escape TEXT[] NOT NULL DEFAULT ARRAY[E'abc', E'def']::TEXT[],
+            colors COLOR[] NOT NULL DEFAULT ARRAY['RED', 'GREEN']::COLOR[],
+            int_defaults INT4[] NOT NULL DEFAULT ARRAY[9, 12999, -4, 0, 1249849]::INT4[],
+            float_defaults DOUBLE PRECISION[] NOT NULL DEFAULT ARRAY[0, 9.12, 3.14, 0.1242, 124949.124949]::DOUBLE PRECISION[],
+            bool_defaults BOOLEAN[] NOT NULL DEFAULT ARRAY[true, true, true, false]::BOOLEAN[],
+            datetime_defaults TIMESTAMPTZ[] NOT NULL DEFAULT ARRAY['2022-09-01T08:00Z','2021-09-01T08:00Z']::TIMESTAMP WITH TIME ZONE[]
+        );
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+
+    let assert_default = |colname: &str, expected_default: Vec<PrismaValue>| {
+        let col = table.column(dbg!(colname)).unwrap();
+        let value = dbg!(col.default().unwrap()).as_value().unwrap();
+        assert_eq!(value, &PrismaValue::List(expected_default));
+    };
+
+    assert_default("text_empty", vec![]);
+    assert_default("text", vec!["abc".into()]);
+    assert_default("text_c_escape", vec!["abc".into(), "def".into()]);
+    assert_default(
+        "colors",
+        vec![
+            PrismaValue::Enum("RED".to_owned()),
+            PrismaValue::Enum("GREEN".to_owned()),
+        ],
+    );
+    assert_default(
+        "int_defaults",
+        vec![
+            PrismaValue::Int(9),
+            PrismaValue::Int(12999),
+            PrismaValue::Int(-4),
+            PrismaValue::Int(0),
+            PrismaValue::Int(1249849),
+        ],
+    );
+    assert_default(
+        "float_defaults",
+        vec![
+            PrismaValue::Float("0".parse().unwrap()),
+            PrismaValue::Float("9.12".parse().unwrap()),
+            PrismaValue::Float("3.14".parse().unwrap()),
+            PrismaValue::Float("0.1242".parse().unwrap()),
+            PrismaValue::Float("124949.124949".parse().unwrap()),
+        ],
+    );
+    assert_default(
+        "bool_defaults",
+        vec![
+            PrismaValue::Boolean(true),
+            PrismaValue::Boolean(true),
+            PrismaValue::Boolean(true),
+            PrismaValue::Boolean(false),
+        ],
+    );
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn int_expressions_in_defaults(api: TestApi) {
+    let schema = r#"
+        CREATE TABLE "defaults" (
+            mysum INT8 NOT NULL DEFAULT 5 + 32
+        );
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+    let col = table.column("mysum").unwrap();
+    let value = col.default().unwrap();
+    assert!(value.is_db_generated());
 }
 
 fn extract_ext(schema: &SqlSchema) -> &PostgresSchemaExt {

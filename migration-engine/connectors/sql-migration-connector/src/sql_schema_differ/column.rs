@@ -50,6 +50,17 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
     };
 
     match defaults {
+        (Some(DefaultKind::DbGenerated(_)), Some(DefaultKind::Value(PrismaValue::List(_))))
+        | (Some(DefaultKind::Value(PrismaValue::List(_))), Some(DefaultKind::DbGenerated(_)))
+            if cols.previous.column_type_family().is_datetime() || cols.next.column_type_family().is_datetime() =>
+        {
+            true
+        }
+
+        (Some(DefaultKind::Value(PrismaValue::List(prev))), Some(DefaultKind::Value(PrismaValue::List(next)))) => {
+            list_defaults_match(prev, next, flavour)
+        }
+
         // Avoid naive string comparisons for JSON defaults.
         (
             Some(DefaultKind::Value(PrismaValue::Json(prev_json))),
@@ -63,6 +74,10 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
             Some(DefaultKind::Value(PrismaValue::Json(prev_json))),
             Some(DefaultKind::Value(PrismaValue::String(next_json))),
         ) => json_defaults_match(prev_json, next_json) && names_match,
+
+        // Avoid naive string comparisons for datetime defaults.
+        (Some(DefaultKind::Value(PrismaValue::DateTime(_))), Some(_))
+        | (Some(_), Some(DefaultKind::Value(PrismaValue::DateTime(_)))) => true, // can't diff these in at present
 
         (Some(DefaultKind::Value(prev)), Some(DefaultKind::Value(next))) => (prev == next) && names_match,
         (Some(DefaultKind::Value(_)), Some(DefaultKind::Now)) => false,
@@ -100,6 +115,30 @@ fn json_defaults_match(previous: &str, next: &str) -> bool {
         .and_then(|previous| serde_json::from_str::<serde_json::Value>(next).map(|next| (previous, next)))
         .map(|(previous, next)| previous == next)
         .unwrap_or(true)
+}
+
+fn list_defaults_match(prev: &[PrismaValue], next: &[PrismaValue], flavour: &dyn SqlFlavour) -> bool {
+    if prev.len() != next.len() {
+        return false;
+    }
+
+    prev.iter()
+        .zip(next.iter())
+        .all(|(prev_value, next_value)| match (prev_value, next_value) {
+            (PrismaValue::String(string_val), PrismaValue::Json(json_val))
+            | (PrismaValue::Json(json_val), PrismaValue::String(string_val)) => {
+                json_defaults_match(string_val, json_val)
+            }
+
+            (PrismaValue::DateTime(_), _) | (_, PrismaValue::DateTime(_)) => true,
+
+            (PrismaValue::Enum(enum_val), PrismaValue::Bytes(bytes_val))
+            | (PrismaValue::Bytes(bytes_val), PrismaValue::Enum(enum_val)) => {
+                flavour.string_matches_bytes(enum_val, bytes_val)
+            }
+
+            _ => prev_value == next_value,
+        })
 }
 
 #[enumflags2::bitflags]

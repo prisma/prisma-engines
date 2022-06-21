@@ -333,7 +333,11 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             Quoted::sqlite_string(escape_quotes(val)).to_string().into()
         }
-        DefaultKind::Value(PrismaValue::Bytes(b)) => Quoted::sqlite_string(format_hex(b)).to_string().into(),
+        DefaultKind::Value(PrismaValue::Bytes(b)) => {
+            let mut out = String::new();
+            format_hex(b, &mut out);
+            Quoted::sqlite_string(out).to_string().into()
+        }
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
         DefaultKind::Value(PrismaValue::DateTime(val)) => Quoted::sqlite_string(val).to_string().into(),
         DefaultKind::Value(val) => val.to_string().into(),

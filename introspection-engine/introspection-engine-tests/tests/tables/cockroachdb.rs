@@ -190,39 +190,6 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("ints integer[] DEFAULT array[]::integer[]");
-                t.inject_custom("ints2 integer[] DEFAULT '{}'");
-            });
-        })
-        .await?;
-
-    let expected = expect![[r#"
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "cockroachdb"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
-        model User {
-          id    BigInt @id @default(autoincrement())
-          ints  Int[]
-          ints2 Int[]
-        }
-    "#]];
-    api.expect_datamodel(&expected).await;
-
-    Ok(())
-}
-
-#[test_connector(tags(CockroachDb))]
 async fn default_values(api: &TestApi) -> TestResult {
     let sql = r#"
         CREATE TABLE "Test" (
@@ -356,6 +323,33 @@ async fn a_table_with_non_id_autoincrement_cockroach(api: &TestApi) -> TestResul
     "#};
 
     api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(CockroachDb))]
+async fn introspecting_json_defaults_on_cockroach(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+       CREATE TABLE "A" (
+           id INTEGER NOT NULL PRIMARY KEY,
+           json JSON DEFAULT '[]'::json,
+           jsonb JSONB DEFAULT '{}'::jsonb,
+           jsonb_object JSONB DEFAULT '{"a": ["b"], "c": true, "d": null }'
+         );
+
+       "#};
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        model A {
+          id           Int   @id
+          json         Json? @default("[]")
+          jsonb        Json? @default("{}")
+          jsonb_object Json? @default("{\"a\": [\"b\"], \"c\": true, \"d\": null}")
+        }
+    "#]];
+
+    expectation.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }

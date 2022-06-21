@@ -2,14 +2,13 @@ use crate::{calculate_datamodel::CalculateDatamodelContext as Context, Dedup, Sq
 use datamodel::{
     common::{preview_features::PreviewFeature, RelationNames},
     dml::{
-        Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, Model,
-        OperatorClass, PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType,
-        SortOrder, ValueGenerator as VG,
+        Datamodel, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, Model, OperatorClass,
+        PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder,
     },
 };
-use sql::{mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, IndexFieldId};
 use sql_schema_describer::{
-    self as sql, ColumnArity, ColumnTypeFamily, ForeignKey, ForeignKeyAction, IndexType, SQLSortOrder, SqlSchema, Table,
+    self as sql, mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, ColumnArity, ColumnTypeFamily, ForeignKey,
+    ForeignKeyAction, IndexFieldId, IndexType, SQLSortOrder, SqlSchema, Table,
 };
 use tracing::debug;
 
@@ -183,7 +182,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &sql::Column, ctx: &
         ColumnArity::List => FieldArity::List,
     };
 
-    let default_value = calculate_default(table, column, &arity, ctx);
+    let default_value = crate::defaults::calculate_default(table, column, ctx);
 
     ScalarField {
         name: column.name.clone(),
@@ -303,93 +302,11 @@ pub(crate) fn calculate_backrelation_field(
     }
 }
 
-pub(crate) fn calculate_default(
-    table: &sql::Table,
-    column: &sql::Column,
-    arity: &FieldArity,
-    ctx: &mut Context,
-) -> Option<DMLDef> {
-    match (column.default.as_ref().map(|d| d.kind()), &column.tpe.family) {
-        (_, _) if *arity == FieldArity::List => None,
-        (Some(sql::DefaultKind::Sequence(name)), _) if ctx.is_cockroach() => {
-            use prisma_value::PrismaValue;
-
-            let connector_data: &PostgresSchemaExt = ctx.schema.downcast_connector_data().unwrap_or_default();
-            let sequence_idx = connector_data
-                .sequences
-                .binary_search_by_key(&name, |s| &s.name)
-                .unwrap();
-            let sequence = &connector_data.sequences[sequence_idx];
-
-            let mut args = Vec::new();
-
-            if sequence.min_value != 1 {
-                args.push((Some("minValue".to_owned()), PrismaValue::Int(sequence.min_value)));
-            }
-
-            if sequence.max_value != i64::MAX {
-                args.push((Some("maxValue".to_owned()), PrismaValue::Int(sequence.max_value)));
-            }
-
-            if sequence.cache_size != 1 {
-                args.push((Some("cache".to_owned()), PrismaValue::Int(sequence.cache_size)));
-            }
-
-            if sequence.increment_by != 1 {
-                args.push((Some("increment".to_owned()), PrismaValue::Int(sequence.increment_by)));
-            }
-
-            if sequence.start_value != 1 {
-                args.push((Some("start".to_owned()), PrismaValue::Int(sequence.start_value)));
-            }
-
-            Some(DMLDef::new_expression(VG::new_sequence(args)))
-        }
-        (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::new_expression(VG::new_autoincrement())),
-        (_, ColumnTypeFamily::BigInt) if column.auto_increment => Some(DMLDef::new_expression(VG::new_autoincrement())),
-        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => {
-            Some(DMLDef::new_expression(VG::new_autoincrement()))
-        }
-        (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
-            Some(DMLDef::new_expression(VG::new_autoincrement()))
-        }
-        (Some(sql::DefaultKind::Sequence(_)), _) => Some(DMLDef::new_expression(VG::new_autoincrement())),
-        (Some(sql::DefaultKind::Now), ColumnTypeFamily::DateTime) => {
-            Some(set_default(DMLDef::new_expression(VG::new_now()), column))
-        }
-        (Some(sql::DefaultKind::DbGenerated(default_string)), _) => Some(set_default(
-            DMLDef::new_expression(VG::new_dbgenerated(default_string.clone())),
-            column,
-        )),
-        (Some(sql::DefaultKind::Value(val)), _) => Some(set_default(DMLDef::new_single(val.clone()), column)),
-        (Some(sql::DefaultKind::UniqueRowid), _) => Some(DMLDef::new_expression(VG::new_autoincrement())),
-        _ => None,
-    }
-}
-
-fn set_default(mut default: DMLDef, column: &sql::Column) -> DMLDef {
-    let db_name = column.default.as_ref().and_then(|df| df.constraint_name());
-
-    if let Some(name) = db_name {
-        default.set_db_name(name);
-    }
-
-    default
-}
-
 pub(crate) fn is_id(column: &sql::Column, table: &sql::Table) -> bool {
     table
         .primary_key
         .as_ref()
         .map(|pk| pk.is_single_primary_key(&column.name))
-        .unwrap_or(false)
-}
-
-pub(crate) fn is_sequence(column: &sql::Column, table: &sql::Table) -> bool {
-    table
-        .primary_key
-        .as_ref()
-        .map(|pk| pk.is_single_primary_key(&column.name) && matches!(&column.default, Some(d) if d.is_sequence()))
         .unwrap_or(false)
 }
 
