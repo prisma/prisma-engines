@@ -22,12 +22,13 @@ pub use self::{
 };
 pub use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 pub use empty_connector::EmptyDatamodelConnector;
+use lsp_types::CompletionList;
 pub use native_type_constructor::NativeTypeConstructor;
 pub use parser_database::{self, ReferentialAction, ScalarType};
 pub use referential_integrity::ReferentialIntegrity;
 
 use enumflags2::BitFlags;
-use parser_database::{walkers::ScalarFieldWalker, IndexAlgorithm, OperatorClass};
+use parser_database::{ast::SchemaPosition, IndexAlgorithm, ParserDatabase};
 use std::{borrow::Cow, collections::BTreeMap};
 
 /// The datamodel connector API.
@@ -243,10 +244,6 @@ pub trait Connector: Send + Sync {
         self.supported_index_types().contains(algo)
     }
 
-    fn supports_raw_index_operator_class(&self) -> bool {
-        false
-    }
-
     fn allows_relation_fields_in_arbitrary_order(&self) -> bool {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
@@ -255,15 +252,10 @@ pub trait Connector: Send + Sync {
         NativeTypeErrorFactory::new(instance.to_string(), self.name().to_owned())
     }
 
-    fn allowed_index_operator_classes(
-        &self,
-        _algo: IndexAlgorithm,
-        _field: ScalarFieldWalker<'_>,
-    ) -> Vec<OperatorClass> {
-        Vec::new()
-    }
-
     fn validate_url(&self, url: &str) -> Result<(), String>;
+
+    fn push_completions(&self, _db: &ParserDatabase, _position: SchemaPosition<'_>, _completions: &mut CompletionList) {
+    }
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd)]

@@ -108,18 +108,6 @@ fn push_ast_completions(
     match db.ast().find_at_position(position) {
         ast::SchemaPosition::Model(
             _model_id,
-            ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("default", _, None)),
-        ) => {
-            if connector.has_capability(datamodel::datamodel_connector::ConnectorCapability::NamedDefaultValues) {
-                completion_list.items.push(CompletionItem {
-                    label: "map: ".to_owned(),
-                    kind: Some(CompletionItemKind::PROPERTY),
-                    ..Default::default()
-                })
-            }
-        }
-        ast::SchemaPosition::Model(
-            _model_id,
             ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("relation", _, Some(attr_name))),
         ) if attr_name == "onDelete" || attr_name == "onUpdate" => {
             for referential_action in connector.referential_actions(&referential_integrity).iter() {
@@ -132,66 +120,7 @@ fn push_ast_completions(
                 });
             }
         }
-        ast::SchemaPosition::Model(
-            _model_id,
-            ast::ModelPosition::Index(_, ast::AttributePosition::Argument("type")),
-        ) => {
-            for index_type in connector.supported_index_types() {
-                completion_list.items.push(CompletionItem {
-                    label: index_type.to_string(),
-                    kind: Some(CompletionItemKind::ENUM),
-                    detail: Some(index_type.documentation().to_owned()),
-                    ..Default::default()
-                });
-            }
-        }
-        ast::SchemaPosition::Model(
-            model_id,
-            ast::ModelPosition::Index(attr_id, ast::AttributePosition::FunctionArgument(field_name, "ops")),
-        ) => {
-            // let's not care about composite field indices yet
-            if field_name.contains('.') {
-                return;
-            }
-
-            let index_field = db
-                .walk_models()
-                .find(|model| model.model_id() == model_id)
-                .and_then(|model| {
-                    model.indexes().find(|index| {
-                        index.attribute_id()
-                            == ast::AttributeId::new_in_container(ast::AttributeContainer::Model(model_id), attr_id)
-                    })
-                })
-                .and_then(|index| {
-                    index
-                        .fields()
-                        .find(|f| f.name() == field_name)
-                        .and_then(|f| f.as_scalar_field())
-                        .map(|field| (index, field))
-                });
-
-            if let Some((index, field)) = index_field {
-                let algo = index.algorithm().unwrap_or_default();
-
-                for operator in connector.allowed_index_operator_classes(algo, field) {
-                    completion_list.items.push(CompletionItem {
-                        label: operator.to_string(),
-                        kind: Some(CompletionItemKind::ENUM),
-                        ..Default::default()
-                    });
-                }
-
-                if connector.supports_raw_index_operator_class() {
-                    completion_list.items.push(CompletionItem {
-                        label: "raw".to_string(),
-                        kind: Some(CompletionItemKind::FUNCTION),
-                        ..Default::default()
-                    });
-                }
-            }
-        }
-        _ => (),
+        position => connector.push_completions(db, position, completion_list),
     }
 }
 

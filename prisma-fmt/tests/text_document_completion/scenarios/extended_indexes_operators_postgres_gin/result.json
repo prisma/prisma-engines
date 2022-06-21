@@ -7,7 +7,9 @@
     },
     {
       "label": "raw",
-      "kind": 3
+      "kind": 3,
+      "insertText": "raw(\"$0\")",
+      "insertTextFormat": 2
     }
   ]
 }

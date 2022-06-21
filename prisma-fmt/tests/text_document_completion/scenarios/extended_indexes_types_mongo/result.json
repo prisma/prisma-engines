@@ -1,10 +1,4 @@
 {
   "isIncomplete": false,
-  "items": [
-    {
-      "label": "BTree",
-      "kind": 13,
-      "detail": "Can handle equality and range queries on data that can be sorted into some ordering (default)."
-    }
-  ]
+  "items": []
 }

@@ -49,12 +49,10 @@ pub enum SchemaPosition<'ast> {
 pub enum ModelPosition<'ast> {
     /// In the model, but not somewhere more specific.
     Model,
-    /// In an attribute.
-    ModelAttribute(&'ast str, usize),
+    /// In an attribute (attr name, attr index, position).
+    ModelAttribute(&'ast str, usize, AttributePosition<'ast>),
     /// In a field.
     Field(ast::FieldId, FieldPosition<'ast>),
-    /// In an index attribute.
-    Index(usize, AttributePosition<'ast>),
 }
 
 impl<'ast> ModelPosition<'ast> {
@@ -67,11 +65,7 @@ impl<'ast> ModelPosition<'ast> {
 
         for (attr_id, attr) in model.attributes.iter().enumerate() {
             if attr.span().contains(position) {
-                if attr.name.name == "index" {
-                    return ModelPosition::Index(attr_id, AttributePosition::new(attr, position));
-                } else {
-                    return ModelPosition::ModelAttribute(&attr.name.name, attr_id);
-                }
+                return ModelPosition::ModelAttribute(&attr.name.name, attr_id, AttributePosition::new(attr, position));
             }
         }
 

@@ -748,6 +748,7 @@ version = "0.1.0"
 dependencies = [
  "diagnostics",
  "enumflags2",
+ "lsp-types",
  "parser-database",
  "serde_json",
  "url",
@@ -4193,6 +4194,7 @@ dependencies = [
  "datamodel-connector",
  "either",
  "enumflags2",
+ "lsp-types",
  "native-types",
  "once_cell",
  "regex",
