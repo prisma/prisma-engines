@@ -74,6 +74,7 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
+<span id="72">72</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PrismaValue</span>, <span class="ident">TypeIdentifier</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DomainError</span>;
 <span class="kw">use</span> <span class="ident">bigdecimal::ToPrimitive</span>;
@@ -93,6 +94,7 @@
             (<span class="ident">val</span> @ <span class="ident">PrismaValue::String</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::String</span>) =&gt; <span class="ident">val</span>,
             (<span class="ident">val</span> @ <span class="ident">PrismaValue::Int</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Int</span>) =&gt; <span class="ident">val</span>,
             (<span class="ident">val</span> @ <span class="ident">PrismaValue::Float</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Float</span>) =&gt; <span class="ident">val</span>,
+            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Float</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Decimal</span>) =&gt; <span class="ident">val</span>,
             (<span class="ident">val</span> @ <span class="ident">PrismaValue::Boolean</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Boolean</span>) =&gt; <span class="ident">val</span>,
             (<span class="ident">val</span> @ <span class="ident">PrismaValue::DateTime</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::DateTime</span>) =&gt; <span class="ident">val</span>,
             (<span class="ident">val</span> @ <span class="ident">PrismaValue::Enum</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>)) =&gt; <span class="ident">val</span>,
