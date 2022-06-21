@@ -2,7 +2,10 @@ mod validations;
 
 use datamodel_connector::{
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    parser_database::{walkers::ModelWalker, IndexAlgorithm},
+    parser_database::{
+        walkers::{ModelWalker, ScalarFieldWalker},
+        IndexAlgorithm, OperatorClass,
+    },
     Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
     NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
 };
@@ -247,6 +250,10 @@ impl Connector for PostgresDatamodelConnector {
         NATIVE_TYPE_CONSTRUCTORS
     }
 
+    fn supports_raw_index_operator_class(&self) -> bool {
+        true
+    }
+
     fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
         BitFlags::empty()
             | IndexAlgorithm::BTree
@@ -342,5 +349,127 @@ impl Connector for PostgresDatamodelConnector {
         }
 
         Ok(())
+    }
+
+    fn allowed_index_operator_classes(&self, algo: IndexAlgorithm, field: ScalarFieldWalker<'_>) -> Vec<OperatorClass> {
+        let scalar_type = field.scalar_type();
+        let native_type = field.raw_native_type().map(|t| t.1);
+
+        let mut classes = Vec::new();
+
+        match (algo, scalar_type, native_type) {
+            (IndexAlgorithm::Gist, _, Some("Inet")) => {
+                classes.push(OperatorClass::InetOps);
+            }
+
+            (IndexAlgorithm::Gin, _, _) if field.ast_field().arity.is_list() => {
+                classes.push(OperatorClass::ArrayOps);
+            }
+            (IndexAlgorithm::Gin, Some(ScalarType::Json), _) => {
+                classes.push(OperatorClass::JsonbOps);
+                classes.push(OperatorClass::JsonbPathOps);
+            }
+
+            (IndexAlgorithm::SpGist, _, Some("Inet")) => {
+                classes.push(OperatorClass::InetOps);
+            }
+            (IndexAlgorithm::SpGist, Some(ScalarType::String), None | Some("Text") | Some("VarChar")) => {
+                classes.push(OperatorClass::TextOps);
+            }
+
+            (IndexAlgorithm::Brin, _, Some("Bit")) => {
+                classes.push(OperatorClass::BitMinMaxOps);
+            }
+            (IndexAlgorithm::Brin, _, Some("VarBit")) => {
+                classes.push(OperatorClass::VarBitMinMaxOps);
+            }
+            (IndexAlgorithm::Brin, _, Some("Char")) => {
+                classes.push(OperatorClass::BpcharBloomOps);
+                classes.push(OperatorClass::BpcharMinMaxOps);
+            }
+            (IndexAlgorithm::Brin, _, Some("Date")) => {
+                classes.push(OperatorClass::DateBloomOps);
+                classes.push(OperatorClass::DateMinMaxOps);
+                classes.push(OperatorClass::DateMinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, _, Some("Real")) => {
+                classes.push(OperatorClass::Float4BloomOps);
+                classes.push(OperatorClass::Float4MinMaxOps);
+                classes.push(OperatorClass::Float4MinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, Some(ScalarType::Float), _) => {
+                classes.push(OperatorClass::Float8BloomOps);
+                classes.push(OperatorClass::Float8MinMaxOps);
+                classes.push(OperatorClass::Float8MinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, _, Some("Inet")) => {
+                classes.push(OperatorClass::InetBloomOps);
+                classes.push(OperatorClass::InetInclusionOps);
+                classes.push(OperatorClass::InetMinMaxOps);
+                classes.push(OperatorClass::InetMinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, _, Some("SmallInt")) => {
+                classes.push(OperatorClass::Int2BloomOps);
+                classes.push(OperatorClass::Int2MinMaxOps);
+                classes.push(OperatorClass::Int2MinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, Some(ScalarType::Int), None | Some("Integer")) => {
+                classes.push(OperatorClass::Int4BloomOps);
+                classes.push(OperatorClass::Int4MinMaxOps);
+                classes.push(OperatorClass::Int4MinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, Some(ScalarType::BigInt), _) => {
+                classes.push(OperatorClass::Int8BloomOps);
+                classes.push(OperatorClass::Int8MinMaxOps);
+                classes.push(OperatorClass::Int8MinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, Some(ScalarType::Decimal), _) => {
+                classes.push(OperatorClass::NumericBloomOps);
+                classes.push(OperatorClass::NumericMinMaxOps);
+                classes.push(OperatorClass::NumericMinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, _, Some("Oid")) => {
+                classes.push(OperatorClass::OidBloomOps);
+                classes.push(OperatorClass::OidMinMaxOps);
+                classes.push(OperatorClass::OidMinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, Some(ScalarType::Bytes), None | Some("ByteA")) => {
+                classes.push(OperatorClass::ByteaBloomOps);
+                classes.push(OperatorClass::ByteaMinMaxOps);
+            }
+            (IndexAlgorithm::Brin, Some(ScalarType::String), None | Some("Text") | Some("VarChar")) => {
+                classes.push(OperatorClass::TextBloomOps);
+                classes.push(OperatorClass::TextMinMaxOps);
+            }
+            (IndexAlgorithm::Brin, Some(ScalarType::DateTime), None | Some("Timestamp")) => {
+                classes.push(OperatorClass::TimestampBloomOps);
+                classes.push(OperatorClass::TimestampMinMaxOps);
+                classes.push(OperatorClass::TimestampMinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, _, Some("Timestamptz")) => {
+                classes.push(OperatorClass::TimestampTzBloomOps);
+                classes.push(OperatorClass::TimestampTzMinMaxOps);
+                classes.push(OperatorClass::TimestampTzMinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, _, Some("Time")) => {
+                classes.push(OperatorClass::TimeBloomOps);
+                classes.push(OperatorClass::TimeMinMaxOps);
+                classes.push(OperatorClass::TimeMinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, _, Some("Timetz")) => {
+                classes.push(OperatorClass::TimeTzBloomOps);
+                classes.push(OperatorClass::TimeTzMinMaxOps);
+                classes.push(OperatorClass::TimeTzMinMaxMultiOps);
+            }
+            (IndexAlgorithm::Brin, _, Some("Uuid")) => {
+                classes.push(OperatorClass::UuidBloomOps);
+                classes.push(OperatorClass::UuidMinMaxOps);
+                classes.push(OperatorClass::UuidMinMaxMultiOps);
+            }
+
+            _ => (),
+        }
+
+        classes
     }
 }

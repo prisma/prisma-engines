@@ -263,6 +263,11 @@ impl fmt::Display for IndexAlgorithm {
 
 impl IndexAlgorithm {
     /// Is this a hash index?
+    pub fn is_btree(self) -> bool {
+        matches!(self, Self::BTree)
+    }
+
+    /// Is this a hash index?
     pub fn is_hash(self) -> bool {
         matches!(self, Self::Hash)
     }
