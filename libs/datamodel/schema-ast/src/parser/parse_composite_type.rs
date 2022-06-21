@@ -18,7 +18,7 @@ pub(crate) fn parse_composite_type(token: &Token<'_>, diagnostics: &mut Diagnost
             Rule::TYPE_KEYWORD => (),
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::block_level_attribute => {
-                let attr = parse_attribute(&current);
+                let attr = parse_attribute(&current, diagnostics);
 
                 let err = match attr.name.name.as_str() {
                     "map" => {
@@ -67,7 +67,7 @@ pub(crate) fn parse_composite_type(token: &Token<'_>, diagnostics: &mut Diagnost
 
                 diagnostics.push_error(err);
             }
-            Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {
+            Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current, diagnostics) {
                 Ok(field) => {
                     for attr in field.attributes.iter() {
                         let error = match attr.name.name.as_str() {

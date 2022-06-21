@@ -8,7 +8,11 @@ use super::{
 use crate::ast::*;
 use diagnostics::DatamodelError;
 
-pub(crate) fn parse_field(model_name: &str, token: &Token<'_>) -> Result<Field, DatamodelError> {
+pub(crate) fn parse_field(
+    model_name: &str,
+    token: &Token<'_>,
+    diagnostics: &mut diagnostics::Diagnostics,
+) -> Result<Field, DatamodelError> {
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = Vec::new();
     let mut field_type: Option<(FieldArity, FieldType)> = None;
@@ -17,14 +21,14 @@ pub(crate) fn parse_field(model_name: &str, token: &Token<'_>) -> Result<Field, 
     for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::field_type => field_type = Some(parse_field_type(&current)?),
+            Rule::field_type => field_type = Some(parse_field_type(&current, diagnostics)?),
             Rule::LEGACY_COLON => {
                 return Err(DatamodelError::new_legacy_parser_error(
                     "Field declarations don't require a `:`.",
                     current.as_span().into(),
                 ))
             }
-            Rule::attribute => attributes.push(parse_attribute(&current)),
+            Rule::attribute => attributes.push(parse_attribute(&current, diagnostics)),
             Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
             Rule::doc_comment => comments.push(parse_doc_comment(&current)),
             _ => parsing_catch_all(&current, "field"),

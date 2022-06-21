@@ -18,8 +18,8 @@ pub(crate) fn parse_model(token: &Token<'_>, diagnostics: &mut Diagnostics) -> M
         match current.as_rule() {
             Rule::MODEL_KEYWORD => (),
             Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
-            Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {
+            Rule::block_level_attribute => attributes.push(parse_attribute(&current, diagnostics)),
+            Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current, diagnostics) {
                 Ok(field) => fields.push(field),
                 Err(err) => diagnostics.push_error(err),
             },

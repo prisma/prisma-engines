@@ -4,15 +4,15 @@ use super::{
 };
 use crate::{ast::*, parser::parse_arguments::parse_arguments_list};
 
-pub fn parse_attribute(token: &Token<'_>) -> Attribute {
+pub fn parse_attribute(token: &Token<'_>, diagnostics: &mut diagnostics::Diagnostics) -> Attribute {
     let mut name: Option<Identifier> = None;
     let mut arguments: ArgumentsList = ArgumentsList::default();
 
     for current in token.relevant_children() {
         match current.as_rule() {
-            Rule::attribute => return parse_attribute(&current),
+            Rule::attribute => return parse_attribute(&current, diagnostics),
             Rule::attribute_name => name = Some(current.to_id()),
-            Rule::arguments_list => parse_arguments_list(&current, &mut arguments),
+            Rule::arguments_list => parse_arguments_list(&current, &mut arguments, diagnostics),
             _ => parsing_catch_all(&current, "attribute"),
         }
     }

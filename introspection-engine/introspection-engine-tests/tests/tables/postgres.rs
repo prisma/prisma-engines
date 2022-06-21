@@ -3,8 +3,46 @@ use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Postgres))]
+async fn string_defaults_that_need_escaping(api: &TestApi) -> TestResult {
+    let setup = r#"
+        CREATE TABLE "stringstest" (
+            id INTEGER PRIMARY KEY,
+            needs_escaping TEXT NOT NULL DEFAULT $$
+abc def
+backspaces: \abcd\
+	(tab character)
+and "quotes" and a vertical tabulation here -><-
+
+$$
+        );
+    "#;
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model stringstest {
+          id             Int    @id
+          needs_escaping String @default("\nabc def\nbackspaces: \\abcd\\\n\t(tab character)\nand \"quotes\" and a vertical tabulation here ->\u0016<-\n\n")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres))]
 async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
-    let setup = indoc! {r#"
+    let setup = r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL,
            a  INTEGER NOT NULL,
@@ -12,7 +50,7 @@ async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
        );
 
        CREATE UNIQUE INDEX "A_a_key" ON "A" (a DESC);
-   "#};
+   "#;
 
     api.raw_cmd(setup).await;
 

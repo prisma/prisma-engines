@@ -1,3 +1,5 @@
+use diagnostics::Diagnostics;
+
 use super::{
     helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
     parse_expression::parse_expression,
@@ -5,16 +7,20 @@ use super::{
 };
 use crate::ast;
 
-pub(crate) fn parse_arguments_list(token: &Token<'_>, arguments: &mut ast::ArgumentsList) {
+pub(crate) fn parse_arguments_list(
+    token: &Token<'_>,
+    arguments: &mut ast::ArgumentsList,
+    diagnostics: &mut Diagnostics,
+) {
     debug_assert_eq!(token.as_rule(), Rule::arguments_list);
     for current in token.relevant_children() {
         match current.as_rule() {
             // This is a named arg.
-            Rule::named_argument => arguments.arguments.push(parse_named_arg(&current)),
+            Rule::named_argument => arguments.arguments.push(parse_named_arg(&current, diagnostics)),
             // This is an unnamed arg.
             Rule::expression => arguments.arguments.push(ast::Argument {
                 name: None,
-                value: parse_expression(&current),
+                value: parse_expression(&current, diagnostics),
                 span: ast::Span::from(current.as_span()),
             }),
             // This is an argument without a value.
@@ -36,7 +42,7 @@ pub(crate) fn parse_arguments_list(token: &Token<'_>, arguments: &mut ast::Argum
     }
 }
 
-fn parse_named_arg(token: &Token<'_>) -> ast::Argument {
+fn parse_named_arg(token: &Token<'_>, diagnostics: &mut Diagnostics) -> ast::Argument {
     debug_assert_eq!(token.as_rule(), Rule::named_argument);
     let mut name: Option<ast::Identifier> = None;
     let mut argument: Option<ast::Expression> = None;
@@ -44,7 +50,7 @@ fn parse_named_arg(token: &Token<'_>) -> ast::Argument {
     for current in token.relevant_children() {
         match current.as_rule() {
             Rule::argument_name => name = Some(current.to_id()),
-            Rule::expression => argument = Some(parse_expression(&current)),
+            Rule::expression => argument = Some(parse_expression(&current, diagnostics)),
             _ => parsing_catch_all(&current, "attribute argument"),
         }
     }

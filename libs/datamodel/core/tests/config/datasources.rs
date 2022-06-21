@@ -127,21 +127,17 @@ fn unescaped_windows_paths_give_a_good_error() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: This line is not a valid definition within a datasource. If the value is a windows-style path, `\` must be escaped as `\\`.[0m
+        [1;91merror[0m: [1mUnknown escape sequence. If the value is a windows-style path, `\` must be escaped as `\\`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "sqlite"
-        [1;94m 3 | [0m  [1;91murl = "file:c:\Windows32\data.db"[0m
-        [1;94m 4 | [0m}
+        [1;94m 3 | [0m  url = "file:c:[1;91m\W[0mindows32\data.db"
         [1;94m   | [0m
-        [1;91merror[0m: [1mArgument "url" is missing in data source block "ds".[0m
-          [1;94m-->[0m  [4mschema.prisma:1[0m
+        [1;91merror[0m: [1mUnknown escape sequence. If the value is a windows-style path, `\` must be escaped as `\\`.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
-        [1;94m   | [0m
-        [1;94m 1 | [0m[1;91mdatasource ds {[0m
         [1;94m 2 | [0m  provider = "sqlite"
-        [1;94m 3 | [0m  url = "file:c:\Windows32\data.db"
-        [1;94m 4 | [0m}
+        [1;94m 3 | [0m  url = "file:c:\Windows32[1;91m\d[0mata.db"
         [1;94m   | [0m
     "#]];
 

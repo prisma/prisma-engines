@@ -16,8 +16,9 @@ pub fn parse_enum(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Enum {
     for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
-            Rule::enum_value_declaration => match parse_enum_value(&name.as_ref().unwrap().name, &current) {
+            Rule::block_level_attribute => attributes.push(parse_attribute(&current, diagnostics)),
+            Rule::enum_value_declaration => match parse_enum_value(&name.as_ref().unwrap().name, &current, diagnostics)
+            {
                 Ok(enum_value) => values.push(enum_value),
                 Err(err) => diagnostics.push_error(err),
             },
@@ -45,7 +46,11 @@ pub fn parse_enum(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Enum {
     }
 }
 
-fn parse_enum_value(enum_name: &str, token: &Token<'_>) -> Result<EnumValue, DatamodelError> {
+fn parse_enum_value(
+    enum_name: &str,
+    token: &Token<'_>,
+    diagnostics: &mut Diagnostics,
+) -> Result<EnumValue, DatamodelError> {
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut comments: Vec<String> = vec![];
@@ -55,7 +60,7 @@ fn parse_enum_value(enum_name: &str, token: &Token<'_>) -> Result<EnumValue, Dat
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::maybe_empty_identifier => name = Some(current.to_id()),
-            Rule::attribute => attributes.push(parse_attribute(&current)),
+            Rule::attribute => attributes.push(parse_attribute(&current, diagnostics)),
             Rule::number => {
                 return Err(DatamodelError::new_enum_validation_error(
                     format!(
