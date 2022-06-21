@@ -84,6 +84,11 @@ impl<'db> ScalarFieldWalker<'db> {
         self.ast_field().arity.is_optional()
     }
 
+    /// Is the field required / not-nullable?
+    pub fn is_required(self) -> bool {
+        self.ast_field().arity.is_required()
+    }
+
     /// Is there an `@updateAt` attribute on the field?
     pub fn is_updated_at(self) -> bool {
         self.attributes().is_updated_at

@@ -222,6 +222,10 @@ impl Connector for CockroachDatamodelConnector {
         for index in model.indexes() {
             validations::inverted_index_validations(index, diagnostics);
         }
+
+        if let Some(pk) = model.primary_key() {
+            validations::id_columns_cannot_be_arrays(pk, diagnostics);
+        }
     }
 
     fn validate_scalar_field_unknown_default_functions(
