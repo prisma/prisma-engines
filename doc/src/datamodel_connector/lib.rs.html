@@ -312,10 +312,6 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 
 <span class="doccomment">//! The interface implemented by connectors for Prisma schema validation and interpretation.</span>
@@ -512,10 +508,6 @@
 
     <span class="kw">fn</span> <span class="ident">supports_scalar_lists</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::ScalarLists</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">supports_relations_over_non_unique_criteria</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::RelationsOverNonUniqueCriteria</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">supports_enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
