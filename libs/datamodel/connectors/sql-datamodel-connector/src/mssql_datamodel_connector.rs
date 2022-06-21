@@ -412,16 +412,16 @@ impl Connector for MsSqlDatamodelConnector {
         position: ast::SchemaPosition<'_>,
         completions: &mut CompletionList,
     ) {
-        match position {
-            ast::SchemaPosition::Model(
-                _model_id,
-                ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("default", _, None)),
-            ) => completions.items.push(CompletionItem {
+        if let ast::SchemaPosition::Model(
+            _model_id,
+            ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("default", _, None)),
+        ) = position
+        {
+            completions.items.push(CompletionItem {
                 label: "map: ".to_owned(),
                 kind: Some(CompletionItemKind::PROPERTY),
                 ..Default::default()
-            }),
-            _ => (),
+            });
         }
     }
 }

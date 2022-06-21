@@ -340,21 +340,19 @@ impl Connector for CockroachDatamodelConnector {
     }
 
     fn push_completions(&self, _db: &ParserDatabase, position: SchemaPosition<'_>, completions: &mut CompletionList) {
-        match position {
-            ast::SchemaPosition::Model(
-                _,
-                ast::ModelPosition::ModelAttribute("index", _, ast::AttributePosition::Argument("type")),
-            ) => {
-                for index_type in self.supported_index_types() {
-                    completions.items.push(CompletionItem {
-                        label: index_type.to_string(),
-                        kind: Some(CompletionItemKind::ENUM),
-                        detail: Some(index_type.documentation().to_owned()),
-                        ..Default::default()
-                    });
-                }
+        if let ast::SchemaPosition::Model(
+            _,
+            ast::ModelPosition::ModelAttribute("index", _, ast::AttributePosition::Argument("type")),
+        ) = position
+        {
+            for index_type in self.supported_index_types() {
+                completions.items.push(CompletionItem {
+                    label: index_type.to_string(),
+                    kind: Some(CompletionItemKind::ENUM),
+                    detail: Some(index_type.documentation().to_owned()),
+                    ..Default::default()
+                });
             }
-            _ => (),
         }
     }
 }
