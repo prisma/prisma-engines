@@ -187,7 +187,6 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
-<span id="185">185</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::operation</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="kw-2">*</span>;
 
@@ -333,10 +332,9 @@
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">bson</span><span class="op">|</span> {
                     <span class="comment">// Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the</span>
                     <span class="comment">// conversion is set up with native types, we should clean that up at some point (move from traits to fns?).</span>
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Bson::Array</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span> <span class="ident">bson</span> {
-                        <span class="ident">inner</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>()
-                    } <span class="kw">else</span> {
-                        <span class="ident">bson</span>
+                    <span class="kw">match</span> <span class="ident">bson</span> {
+                        <span class="ident">Bson::Array</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_composite</span>() =&gt; <span class="ident">inner</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>(),
+                        <span class="kw">_</span> =&gt; <span class="ident">bson</span>,
                     }
                 })
                 .<span class="ident">collect</span>();

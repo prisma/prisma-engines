@@ -165,8 +165,6 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">walkers::ColumnWalker</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span> <span class="kw">as</span> <span class="kw">_</span>};
 
@@ -246,16 +244,14 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">format_hex</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">String</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">format_hex</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
     <span class="kw">use</span> <span class="ident">std::fmt::Write</span> <span class="kw">as</span> <span class="kw">_</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>);
+    <span class="ident">out</span>.<span class="ident">reserve</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>);
 
     <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">bytes</span> {
         <span class="macro">write!</span>(<span class="ident">out</span>, <span class="string">&quot;{:02x}&quot;</span>, <span class="ident">byte</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to hex format a byte&quot;</span>);
     }
-
-    <span class="ident">out</span>
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">IteratorJoin</span> {

@@ -377,6 +377,98 @@
 <span id="372">372</span>
 <span id="373">373</span>
 <span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
     <span class="ident">context::Context</span>,
@@ -399,14 +491,10 @@
     <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>];
     <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast_model</span>[<span class="ident">field_id</span>];
 
-    <span class="kw">if</span> <span class="ident">ast_field</span>.<span class="ident">arity</span>.<span class="ident">is_list</span>() {
-        <span class="kw">return</span> <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;Cannot set a default value on list field.&quot;</span>);
-    }
-
     <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="ident">default_attribute_mapped_name</span>(<span class="ident">ctx</span>);
     <span class="kw">let</span> <span class="ident">default_attribute_id</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">current_attribute_id</span>();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">accept</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
+    <span class="kw">let</span> <span class="ident">accept</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">default_value</span> <span class="op">=</span> <span class="ident">DefaultAttribute</span> {
             <span class="ident">argument_idx</span>,
             <span class="ident">mapped_name</span>,
@@ -416,24 +504,25 @@
         <span class="ident">field_data</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">default_value</span>);
     };
 
+    <span class="comment">// @default(dbgenerated(...)) is always valid.</span>
+    <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+        <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="ident">funcargs</span>, <span class="ident">_span</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="ident">FN_DBGENERATED</span> =&gt; {
+            <span class="ident">validate_dbgenerated_args</span>(<span class="kw-2">&amp;</span><span class="ident">funcargs</span>.<span class="ident">arguments</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>);
+            <span class="kw">return</span>;
+        }
+        <span class="kw">_</span> =&gt; (),
+    }
+
     <span class="kw">match</span> <span class="ident">field_data</span>.<span class="ident">r#type</span> {
         <span class="ident">ScalarFieldType::CompositeType</span>(<span class="ident">ctid</span>) =&gt; {
             <span class="ident">validate_default_value_on_composite_type</span>(<span class="ident">ctid</span>, <span class="ident">ast_field</span>, <span class="ident">ctx</span>);
         }
         <span class="ident">ScalarFieldType::Enum</span>(<span class="ident">enum_id</span>) =&gt; {
-            <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-                <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">enum_value</span>, <span class="kw">_</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">enum_id</span>].<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">enum_value</span>) {
-                        <span class="ident">accept</span>()
-                    } <span class="kw">else</span> {
-                        <span class="ident">validate_invalid_default_enum_value</span>(<span class="ident">enum_value</span>, <span class="ident">ctx</span>);
-                    }
-                }
-                <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">funcargs</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="ident">FN_DBGENERATED</span> =&gt; {
-                    <span class="ident">validate_dbgenerated_args</span>(<span class="kw-2">&amp;</span><span class="ident">funcargs</span>.<span class="ident">arguments</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>);
-                }
-                <span class="ident">bad_value</span> =&gt; <span class="ident">validate_invalid_default_enum_expr</span>(<span class="ident">bad_value</span>, <span class="ident">ctx</span>),
-            };
+            <span class="kw">if</span> <span class="ident">ast_field</span>.<span class="ident">arity</span>.<span class="ident">is_list</span>() {
+                <span class="ident">validate_enum_list_default</span>(<span class="ident">value</span>.<span class="ident">value</span>, <span class="ident">enum_id</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>);
+            } <span class="kw">else</span> {
+                <span class="ident">validate_enum_default</span>(<span class="ident">value</span>.<span class="ident">value</span>, <span class="ident">enum_id</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>);
+            }
         }
         <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; <span class="ident">validate_model_builtin_scalar_type_default</span>(
             <span class="ident">scalar_type</span>,
@@ -443,12 +532,11 @@
             (<span class="ident">model_id</span>, <span class="ident">field_id</span>),
             <span class="ident">ctx</span>,
         ),
-        <span class="ident">ScalarFieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-            <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">funcargs</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="ident">FN_DBGENERATED</span> =&gt; {
-                <span class="ident">validate_dbgenerated_args</span>(<span class="kw-2">&amp;</span><span class="ident">funcargs</span>.<span class="ident">arguments</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>);
-            }
-            <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;Only @default(dbgenerated()) can be used for Unsupported types.&quot;</span>),
-        },
+        <span class="ident">ScalarFieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; {
+            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(
+                <span class="string">&quot;Only @default(dbgenerated(\&quot;...\&quot;)) can be used for Unsupported types.&quot;</span>,
+            );
+        }
     }
 }
 
@@ -467,17 +555,13 @@
     <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">ct_id</span>];
     <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast_model</span>[<span class="ident">field_id</span>];
 
-    <span class="kw">if</span> <span class="ident">ast_field</span>.<span class="ident">arity</span>.<span class="ident">is_list</span>() {
-        <span class="kw">return</span> <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;Cannot set a default value on list field.&quot;</span>);
-    }
-
     <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_arg</span>(<span class="string">&quot;map&quot;</span>).<span class="ident">is_some</span>() {
         <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;The `map` argument is not allowed on a composite type field.&quot;</span>);
     }
 
     <span class="kw">let</span> <span class="ident">default_attribute</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">current_attribute_id</span>();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">accept</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
+    <span class="kw">let</span> <span class="ident">accept</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">default_value</span> <span class="op">=</span> <span class="ident">DefaultAttribute</span> {
             <span class="ident">argument_idx</span>,
             <span class="ident">mapped_name</span>: <span class="prelude-val">None</span>,
@@ -487,6 +571,15 @@
         <span class="ident">field_data</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">default_value</span>);
     };
 
+    <span class="comment">// @default(dbgenerated(...)) is never valid on a composite type&#39;s fields.</span>
+    <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
+        <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, ..) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="ident">FN_DBGENERATED</span> =&gt; {
+            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;Fields of composite types cannot have `dbgenerated()` as default.&quot;</span>);
+            <span class="kw">return</span>;
+        }
+        <span class="kw">_</span> =&gt; (),
+    }
+
     <span class="comment">// Resolve the default to a DefaultValue. We must loop in order to</span>
     <span class="comment">// resolve type aliases.</span>
     <span class="kw">match</span> <span class="ident">field_data</span>.<span class="ident">r#type</span> {
@@ -494,19 +587,14 @@
             <span class="ident">validate_default_value_on_composite_type</span>(<span class="ident">ctid</span>, <span class="ident">ast_field</span>, <span class="ident">ctx</span>);
         }
         <span class="ident">ScalarFieldType::Enum</span>(<span class="ident">enum_id</span>) =&gt; {
-            <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">value</span> {
-                <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">enum_value</span>, <span class="kw">_</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">enum_id</span>].<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">enum_value</span>) {
-                        <span class="ident">accept</span>()
-                    } <span class="kw">else</span> {
-                        <span class="ident">validate_invalid_default_enum_value</span>(<span class="ident">enum_value</span>, <span class="ident">ctx</span>);
-                    }
-                }
-                <span class="ident">bad_value</span> =&gt; <span class="ident">validate_invalid_default_enum_expr</span>(<span class="ident">bad_value</span>, <span class="ident">ctx</span>),
-            };
+            <span class="kw">if</span> <span class="ident">ast_field</span>.<span class="ident">arity</span>.<span class="ident">is_list</span>() {
+                <span class="ident">validate_enum_list_default</span>(<span class="ident">value</span>.<span class="ident">value</span>, <span class="ident">enum_id</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>);
+            } <span class="kw">else</span> {
+                <span class="ident">validate_enum_default</span>(<span class="ident">value</span>.<span class="ident">value</span>, <span class="ident">enum_id</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>);
+            }
         }
         <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; {
-            <span class="ident">validate_composite_builtin_scalar_type_default</span>(<span class="ident">scalar_type</span>, <span class="ident">value</span>.<span class="ident">value</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>)
+            <span class="ident">validate_composite_builtin_scalar_type_default</span>(<span class="ident">scalar_type</span>, <span class="ident">value</span>.<span class="ident">value</span>, <span class="ident">accept</span>, <span class="ident">ast_field</span>.<span class="ident">arity</span>, <span class="ident">ctx</span>)
         }
         <span class="ident">ScalarFieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; {
             <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;Composite field of type `Unsupported` cannot have default values.&quot;</span>)
@@ -514,12 +602,23 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">validate_model_builtin_scalar_type_default</span>(
+<span class="kw">fn</span> <span class="ident">validate_singular_scalar_default_literal</span>(
     <span class="ident">scalar_type</span>: <span class="ident">ScalarType</span>,
     <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>,
-    <span class="ident">mapped_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StringId</span><span class="op">&gt;</span>,
+    <span class="ident">accept</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(),
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+) {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast::Expression::Array</span>(..) <span class="op">=</span> <span class="ident">value</span> {
+        <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;The default value of a non-list field cannot be a list.&quot;</span>)
+    } <span class="kw">else</span> {
+        <span class="ident">validate_scalar_default_literal</span>(<span class="ident">scalar_type</span>, <span class="ident">value</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>)
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">validate_scalar_default_literal</span>(
+    <span class="ident">scalar_type</span>: <span class="ident">ScalarType</span>,
+    <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>,
     <span class="kw-2">mut</span> <span class="ident">accept</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(),
-    <span class="ident">field_id</span>: (<span class="ident">ast::ModelId</span>, <span class="ident">ast::FieldId</span>),
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) {
     <span class="kw">match</span> (<span class="ident">scalar_type</span>, <span class="ident">value</span>) {
@@ -536,6 +635,23 @@
             <span class="ident">validate_default_bool_value</span>(<span class="ident">val</span>, <span class="kw-2">*</span><span class="ident">span</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>)
         }
 
+        <span class="comment">// Invalid scalar default.</span>
+        (<span class="ident">scalar_type</span>, <span class="ident">value</span>) =&gt; {
+            <span class="ident">validate_invalid_scalar_default</span>(<span class="ident">scalar_type</span>, <span class="ident">value</span>, <span class="ident">ctx</span>);
+        }
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">validate_model_builtin_scalar_type_default</span>(
+    <span class="ident">scalar_type</span>: <span class="ident">ScalarType</span>,
+    <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>,
+    <span class="ident">mapped_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StringId</span><span class="op">&gt;</span>,
+    <span class="kw-2">mut</span> <span class="ident">accept</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(),
+    <span class="ident">field_id</span>: (<span class="ident">ast::ModelId</span>, <span class="ident">ast::FieldId</span>),
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+) {
+    <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">field_id</span>.<span class="number">0</span>][<span class="ident">field_id</span>.<span class="number">1</span>].<span class="ident">arity</span>;
+    <span class="kw">match</span> (<span class="ident">scalar_type</span>, <span class="ident">value</span>) {
         <span class="comment">// Functions</span>
         (<span class="kw">_</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="kw">_</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="ident">FN_AUTOINCREMENT</span> <span class="op">&amp;&amp;</span> <span class="ident">mapped_name</span>.<span class="ident">is_some</span>() =&gt; {
             <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;Naming an autoincrement default value is not allowed.&quot;</span>)
@@ -559,10 +675,6 @@
             <span class="ident">validate_auto_args</span>(<span class="kw-2">&amp;</span><span class="ident">funcargs</span>.<span class="ident">arguments</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>)
         }
 
-        (<span class="kw">_</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">funcargs</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="ident">FN_DBGENERATED</span> =&gt; {
-            <span class="ident">validate_dbgenerated_args</span>(<span class="kw-2">&amp;</span><span class="ident">funcargs</span>.<span class="ident">arguments</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>)
-        }
-
         (<span class="kw">_</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="kw">_</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">KNOWN_FUNCTIONS</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">funcname</span>.<span class="ident">as_str</span>()) =&gt; {
             <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">unknown_function_defaults</span>.<span class="ident">push</span>(<span class="ident">field_id</span>);
             <span class="ident">accept</span>();
@@ -573,9 +685,13 @@
             <span class="ident">validate_invalid_function_default</span>(<span class="ident">funcname</span>, <span class="ident">scalar_type</span>, <span class="ident">ctx</span>);
         }
 
-        <span class="comment">// Invalid scalar default.</span>
+        <span class="comment">// Scalar default literal</span>
+        (<span class="ident">scalar_type</span>, <span class="ident">value</span>) <span class="kw">if</span> <span class="ident">arity</span>.<span class="ident">is_list</span>() =&gt; {
+            <span class="ident">validate_builtin_scalar_list_default</span>(<span class="ident">scalar_type</span>, <span class="ident">value</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>);
+        }
+
         (<span class="ident">scalar_type</span>, <span class="ident">value</span>) =&gt; {
-            <span class="ident">validate_invalid_scalar_default</span>(<span class="ident">scalar_type</span>, <span class="ident">value</span>, <span class="ident">ctx</span>);
+            <span class="ident">validate_singular_scalar_default_literal</span>(<span class="ident">scalar_type</span>, <span class="ident">value</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>);
         }
     }
 }
@@ -583,23 +699,11 @@
 <span class="kw">fn</span> <span class="ident">validate_composite_builtin_scalar_type_default</span>(
     <span class="ident">scalar_type</span>: <span class="ident">ScalarType</span>,
     <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>,
-    <span class="kw-2">mut</span> <span class="ident">accept</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(),
+    <span class="ident">accept</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(),
+    <span class="ident">field_arity</span>: <span class="ident">ast::FieldArity</span>,
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) {
     <span class="kw">match</span> (<span class="ident">scalar_type</span>, <span class="ident">value</span>) {
-        (<span class="ident">ScalarType::String</span>, <span class="ident">ast::Expression::StringValue</span>(<span class="kw">_</span>, <span class="kw">_</span>))
-        <span class="op">|</span> (<span class="ident">ScalarType::Json</span>, <span class="ident">ast::Expression::StringValue</span>(<span class="kw">_</span>, <span class="kw">_</span>))
-        <span class="op">|</span> (<span class="ident">ScalarType::Bytes</span>, <span class="ident">ast::Expression::StringValue</span>(<span class="kw">_</span>, <span class="kw">_</span>))
-        <span class="op">|</span> (<span class="ident">ScalarType::Int</span>, <span class="ident">ast::Expression::NumericValue</span>(<span class="kw">_</span>, <span class="kw">_</span>))
-        <span class="op">|</span> (<span class="ident">ScalarType::BigInt</span>, <span class="ident">ast::Expression::NumericValue</span>(<span class="kw">_</span>, <span class="kw">_</span>))
-        <span class="op">|</span> (<span class="ident">ScalarType::Float</span>, <span class="ident">ast::Expression::NumericValue</span>(<span class="kw">_</span>, <span class="kw">_</span>))
-        <span class="op">|</span> (<span class="ident">ScalarType::DateTime</span>, <span class="ident">ast::Expression::StringValue</span>(<span class="kw">_</span>, <span class="kw">_</span>))
-        <span class="op">|</span> (<span class="ident">ScalarType::Decimal</span>, <span class="ident">ast::Expression::NumericValue</span>(<span class="kw">_</span>, <span class="kw">_</span>))
-        <span class="op">|</span> (<span class="ident">ScalarType::Decimal</span>, <span class="ident">ast::Expression::StringValue</span>(<span class="kw">_</span>, <span class="kw">_</span>)) =&gt; <span class="ident">accept</span>(),
-
-        (<span class="ident">ScalarType::Boolean</span>, <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">val</span>, <span class="ident">span</span>)) =&gt; {
-            <span class="ident">validate_default_bool_value</span>(<span class="ident">val</span>, <span class="kw-2">*</span><span class="ident">span</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>)
-        }
         <span class="comment">// Functions</span>
         (<span class="ident">ScalarType::String</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">funcargs</span>, <span class="kw">_</span>))
             <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="ident">FN_UUID</span> <span class="op">|</span><span class="op">|</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="ident">FN_CUID</span> =&gt;
@@ -609,9 +713,7 @@
         (<span class="ident">ScalarType::DateTime</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">funcargs</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="ident">FN_NOW</span> =&gt; {
             <span class="ident">validate_empty_function_args</span>(<span class="ident">FN_NOW</span>, <span class="kw-2">&amp;</span><span class="ident">funcargs</span>.<span class="ident">arguments</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>)
         }
-        (<span class="kw">_</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="kw">_</span>, <span class="kw">_</span>))
-            <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="ident">FN_DBGENERATED</span> <span class="op">|</span><span class="op">|</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="ident">FN_AUTOINCREMENT</span> <span class="op">|</span><span class="op">|</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="ident">FN_AUTO</span> =&gt;
-        {
+        (<span class="kw">_</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="kw">_</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="ident">FN_AUTOINCREMENT</span> <span class="op">|</span><span class="op">|</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="ident">FN_AUTO</span> =&gt; {
             <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">&quot;The function `{funcname}()` is not supported on composite fields.&quot;</span>,
             ));
@@ -623,9 +725,14 @@
         (<span class="ident">scalar_type</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="kw">_</span>, <span class="kw">_</span>)) =&gt; {
             <span class="ident">validate_invalid_function_default</span>(<span class="ident">funcname</span>, <span class="ident">scalar_type</span>, <span class="ident">ctx</span>);
         }
-        <span class="comment">// Invalid scalar default.</span>
+
+        <span class="comment">// Literal default</span>
+        (<span class="ident">scalar_type</span>, <span class="ident">value</span>) <span class="kw">if</span> <span class="ident">field_arity</span>.<span class="ident">is_list</span>() =&gt; {
+            <span class="ident">validate_builtin_scalar_list_default</span>(<span class="ident">scalar_type</span>, <span class="ident">value</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>);
+        }
+
         (<span class="ident">scalar_type</span>, <span class="ident">value</span>) =&gt; {
-            <span class="ident">validate_invalid_scalar_default</span>(<span class="ident">scalar_type</span>, <span class="ident">value</span>, <span class="ident">ctx</span>);
+            <span class="ident">validate_singular_scalar_default_literal</span>(<span class="ident">scalar_type</span>, <span class="ident">value</span>, <span class="ident">accept</span>, <span class="ident">ctx</span>);
         }
     }
 }
@@ -710,7 +817,6 @@
 
     <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
         <span class="string">&quot;The `{fn_name}` function does not take any argument. Consider changing this default to `{fn_name}()`.&quot;</span>,
-        <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">fn_name</span>
     ));
 }
 
@@ -740,6 +846,84 @@
         }
         <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">ast::Expression::StringValue</span>(<span class="kw">_</span>, <span class="kw">_</span>)) =&gt; <span class="ident">accept</span>(),
         <span class="kw">_</span> =&gt; <span class="ident">bail</span>(),
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">validate_enum_default</span>(
+    <span class="ident">found_value</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>,
+    <span class="ident">enum_id</span>: <span class="ident">ast::EnumId</span>,
+    <span class="kw-2">mut</span> <span class="ident">accept</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(),
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+) {
+    <span class="kw">match</span> <span class="ident">found_value</span> {
+        <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">enum_value</span>, <span class="kw">_</span>) =&gt; {
+            <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">enum_id</span>].<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">enum_value</span>) {
+                <span class="ident">accept</span>()
+            } <span class="kw">else</span> {
+                <span class="ident">validate_invalid_default_enum_value</span>(<span class="ident">enum_value</span>, <span class="ident">ctx</span>);
+            }
+        }
+        <span class="ident">bad_value</span> =&gt; <span class="ident">validate_invalid_default_enum_expr</span>(<span class="ident">bad_value</span>, <span class="ident">ctx</span>),
+    };
+}
+
+<span class="kw">fn</span> <span class="ident">validate_enum_list_default</span>(
+    <span class="ident">found_value</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>,
+    <span class="ident">enum_id</span>: <span class="ident">ast::EnumId</span>,
+    <span class="kw-2">mut</span> <span class="ident">accept</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(),
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+) {
+    <span class="kw">match</span> <span class="ident">found_value</span> {
+        <span class="ident">ast::Expression::Array</span>(<span class="ident">values</span>, <span class="kw">_</span>) =&gt; {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">valid</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enum_values</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">iter</span>();
+            <span class="kw">while</span> <span class="kw">let</span> (<span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="ident">enum_value</span>)) <span class="op">=</span> (<span class="ident">valid</span>, <span class="ident">enum_values</span>.<span class="ident">next</span>()) {
+                <span class="ident">valid</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                <span class="ident">validate_enum_default</span>(
+                    <span class="ident">enum_value</span>,
+                    <span class="ident">enum_id</span>,
+                    <span class="op">|</span><span class="op">|</span> {
+                        <span class="ident">valid</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    },
+                    <span class="ident">ctx</span>,
+                );
+            }
+
+            <span class="kw">if</span> <span class="ident">valid</span> {
+                <span class="ident">accept</span>();
+            }
+        }
+        <span class="ident">bad_value</span> =&gt; <span class="ident">validate_invalid_default_enum_expr</span>(<span class="ident">bad_value</span>, <span class="ident">ctx</span>),
+    };
+}
+
+<span class="kw">fn</span> <span class="ident">validate_builtin_scalar_list_default</span>(
+    <span class="ident">scalar_type</span>: <span class="ident">ScalarType</span>,
+    <span class="ident">found_value</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>,
+    <span class="kw-2">mut</span> <span class="ident">accept</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(),
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+) {
+    <span class="kw">match</span> <span class="ident">found_value</span> {
+        <span class="ident">ast::Expression::Array</span>(<span class="ident">values</span>, <span class="kw">_</span>) =&gt; {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">valid</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">iter</span>();
+            <span class="kw">while</span> <span class="kw">let</span> (<span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="ident">value</span>)) <span class="op">=</span> (<span class="ident">valid</span>, <span class="ident">values</span>.<span class="ident">next</span>()) {
+                <span class="ident">valid</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                <span class="ident">validate_scalar_default_literal</span>(
+                    <span class="ident">scalar_type</span>,
+                    <span class="ident">value</span>,
+                    <span class="op">|</span><span class="op">|</span> {
+                        <span class="ident">valid</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    },
+                    <span class="ident">ctx</span>,
+                );
+            }
+
+            <span class="kw">if</span> <span class="ident">valid</span> {
+                <span class="ident">accept</span>()
+            }
+        }
+        <span class="ident">_bad_value</span> =&gt; <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;The default value of a list field must be a list.&quot;</span>),
     }
 }
 
