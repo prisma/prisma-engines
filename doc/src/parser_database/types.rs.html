@@ -928,6 +928,23 @@
 <span id="923">923</span>
 <span id="924">924</span>
 <span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::Context</span>, <span class="ident">interner::StringId</span>, <span class="ident">walkers::IndexFieldWalker</span>, <span class="ident">DatamodelError</span>};
 <span class="kw">use</span> <span class="ident">either::Either</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::bitflags</span>;
@@ -1192,7 +1209,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">IndexAlgorithm</span> {
-    <span class="doccomment">/// Is this a hash index?</span>
+    <span class="doccomment">/// Is this a B-Tree index?</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_btree</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::BTree</span>)
+    }
+
+    <span class="doccomment">/// Hash?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_hash</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Hash</span>)
     }
@@ -1240,6 +1262,18 @@
                     <span class="op">|</span><span class="op">|</span> <span class="ident">r#type</span>.<span class="ident">is_bigint</span>()
                     <span class="op">|</span><span class="op">|</span> <span class="ident">r#type</span>.<span class="ident">is_decimal</span>()
             }
+        }
+    }
+
+    <span class="doccomment">/// Documentation for editor autocompletion.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">IndexAlgorithm::BTree</span> =&gt; <span class="string">&quot;Can handle equality and range queries on data that can be sorted into some ordering (default).&quot;</span>,
+            <span class="ident">IndexAlgorithm::Hash</span> =&gt; <span class="string">&quot;Can handle simple equality queries, but no ordering. Faster than BTree, if ordering is not needed.&quot;</span>,
+            <span class="ident">IndexAlgorithm::Gist</span> =&gt; <span class="string">&quot;Generalized Search Tree. A framework for building specialized indices for custom data types.&quot;</span>,
+            <span class="ident">IndexAlgorithm::Gin</span> =&gt; <span class="string">&quot;Generalized Inverted Index. Useful for indexing composite items, such as arrays or text.&quot;</span>,
+            <span class="ident">IndexAlgorithm::SpGist</span> =&gt; <span class="string">&quot;Space-partitioned Generalized Search Tree. For implenting a wide range of different non-balanced data structures.&quot;</span>,
+            <span class="ident">IndexAlgorithm::Brin</span> =&gt; <span class="string">&quot;Block Range Index. If the data has some natural correlation with their physical location within the table, can compress very large amount of data into a small space.&quot;</span>,
         }
     }
 }
