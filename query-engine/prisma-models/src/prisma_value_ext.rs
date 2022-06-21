@@ -17,6 +17,7 @@ impl PrismaValueExtensions for PrismaValue {
             (val @ PrismaValue::String(_), TypeIdentifier::String) => val,
             (val @ PrismaValue::Int(_), TypeIdentifier::Int) => val,
             (val @ PrismaValue::Float(_), TypeIdentifier::Float) => val,
+            (val @ PrismaValue::Float(_), TypeIdentifier::Decimal) => val,
             (val @ PrismaValue::Boolean(_), TypeIdentifier::Boolean) => val,
             (val @ PrismaValue::DateTime(_), TypeIdentifier::DateTime) => val,
             (val @ PrismaValue::Enum(_), TypeIdentifier::Enum(_)) => val,
