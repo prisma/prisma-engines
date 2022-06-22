@@ -64,6 +64,11 @@ impl<'a> Parser<'a> {
 
         Some(self.resolve_offset(next_offset)?.1)
     }
+
+    /// `true` if all input tokens have been consumed.
+    fn is_finished(&self) -> bool {
+        self.offset >= self.tokens.len() - 1
+    }
 }
 
 pub(super) fn get_default_value(default_string: &str, tpe: &ColumnType) -> Option<DefaultValue> {
@@ -79,8 +84,9 @@ pub(super) fn get_default_value(default_string: &str, tpe: &ColumnType) -> Optio
     }
 
     let parser_fn = parser_for_family(&tpe.family);
+    let parsed_default = parser_fn(&mut parser).filter(|_| parser.is_finished());
 
-    Some(match parser_fn(&mut parser) {
+    Some(match parsed_default {
         Some(default_value) => default_value,
         None => DefaultValue::db_generated(default_string),
     })
@@ -104,13 +110,15 @@ fn parse_unsupported(_parser: &mut Parser<'_>) -> Option<DefaultValue> {
 }
 
 fn parse_datetime_default(parser: &mut Parser) -> Option<DefaultValue> {
-    match parser.peek_token()? {
+    let value = match parser.peek_token()? {
         Token::Identifier => {
             let func_name = parser.expect(Token::Identifier)?;
             if let Some(Token::OpeningBrace) = parser.peek_token() {
                 parser.expect(Token::OpeningBrace)?;
                 parser.expect(Token::ClosingBrace)?;
             }
+
+            eat_cast(parser)?;
 
             match func_name {
                 name if name.eq_ignore_ascii_case("now") || name.eq_ignore_ascii_case("current_timestamp") => {
@@ -120,17 +128,21 @@ fn parse_datetime_default(parser: &mut Parser) -> Option<DefaultValue> {
             }
         }
         _ => None,
-    }
+    };
+
+    value
 }
 
 fn parse_enum_default(parser: &mut Parser) -> Option<DefaultValue> {
     match parser.peek_token()? {
         Token::Identifier => {
             let s = parser.expect(Token::Identifier)?;
+            eat_cast(parser)?;
             Some(DefaultValue::value(PrismaValue::Enum(s.to_owned())))
         }
         Token::StringLiteral | Token::CStyleStringLiteral => {
             let value = parse_string_value(parser)?;
+            eat_cast(parser)?;
             Some(DefaultValue::value(PrismaValue::Enum(value)))
         }
         _ => None,
@@ -157,7 +169,7 @@ fn parse_string_value(parser: &mut Parser<'_>) -> Option<String> {
                 }
             }
 
-            eat_cast(parser);
+            eat_cast(parser)?;
 
             Some(out)
         }
@@ -228,7 +240,7 @@ fn parse_string_value(parser: &mut Parser<'_>) -> Option<String> {
                 }
             }
 
-            eat_cast(parser);
+            eat_cast(parser)?;
 
             Some(out)
         }
@@ -330,6 +342,14 @@ fn parse_int_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
                         break;
                     }
                 }
+
+                eat_cast(parser)?;
+
+                if let Some(Token::ClosingBrace) = parser.peek_token() {
+                    parser.expect(Token::ClosingBrace)?;
+                }
+
+                eat_cast(parser)?;
 
                 Some(DefaultValue::sequence(sequence_name))
             } else {
@@ -441,7 +461,7 @@ fn parse_array_constructor(parser: &mut Parser<'_>, tpe: &ColumnTypeFamily) -> O
 
     parser.expect(Token::OpeningSquareBracket)?;
 
-    'outer: loop {
+    loop {
         match parser.peek_token() {
             None => return None, // missing closing bracket
             Some(Token::ClosingSquareBracket) => {
@@ -453,15 +473,12 @@ fn parse_array_constructor(parser: &mut Parser<'_>, tpe: &ColumnTypeFamily) -> O
             }
         }
 
-        // Eat remaining tokens until the next comma.
-        loop {
-            // Now the comma between values
-            match parser.next_token() {
-                None => return None, // missing closing bracket
-                Some(Token::ClosingSquareBracket) => break 'outer,
-                Some(Token::Comma) => break,
-                Some(_) => (),
-            }
+        // Now the comma between values or the end of the array.
+        match parser.next_token() {
+            None => return None, // missing closing bracket
+            Some(Token::ClosingSquareBracket) => break,
+            Some(Token::Comma) => (), // continue
+            Some(_) => return None,   // unexpected token
         }
     }
 
@@ -492,6 +509,7 @@ fn get_list_default_value(parser: &mut Parser<'_>, tpe: &ColumnType) -> DefaultV
 }
 
 /// Some(()) on valid cast or absence of cast. None if we can't make sense of the input.
+#[must_use]
 fn eat_cast(parser: &mut Parser) -> Option<()> {
     match parser.peek_token() {
         Some(Token::CastOperator) => {
@@ -504,8 +522,15 @@ fn eat_cast(parser: &mut Parser) -> Option<()> {
     //
     // TIMESTAMP WITH TIME ZONE (4)[]
     // ^^^^^^^^^^^^^^^^^^^^^^^^
+    //
+    // or
+    //
+    // "color"
     loop {
         match parser.peek_token() {
+            Some(Token::DoubleQuotedIdentifier) => {
+                parser.expect(Token::DoubleQuotedIdentifier)?;
+            }
             Some(Token::Identifier) => {
                 parser.expect(Token::Identifier)?;
             }
@@ -572,6 +597,28 @@ mod tests {
     #[test]
     fn parse_enum_array_default() {
         let input = "ARRAY['RED'::color, 'GREEN'::color]";
+        let tokens = tokenize(input);
+        let mut parser = Parser::new(input, &tokens);
+
+        let out = parse_array_constructor(&mut parser, &ColumnTypeFamily::Enum(String::new())).unwrap();
+
+        let expected = expect![[r#"
+            [
+                Enum(
+                    "RED",
+                ),
+                Enum(
+                    "GREEN",
+                ),
+            ]
+        "#]];
+
+        expected.assert_debug_eq(&out);
+    }
+
+    #[test]
+    fn parse_enum_array_default_with_quotes() {
+        let input = r#"ARRAY['RED'::"color", 'GREEN'::"color"]"#;
         let tokens = tokenize(input);
         let mut parser = Parser::new(input, &tokens);
 

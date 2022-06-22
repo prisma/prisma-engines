@@ -393,3 +393,36 @@ $$
 
     Ok(())
 }
+
+#[test_connector(tags(CockroachDb))]
+async fn datetime_default_expressions_are_not_truncated(api: &TestApi) -> TestResult {
+    let setup = r#"
+        CREATE TABLE "Foo" (
+            "id" INTEGER NOT NULL,
+            trial_expires TIMESTAMPTZ(6) NOT NULL DEFAULT now():::TIMESTAMPTZ + '14 days':::INTERVAL,
+
+            CONSTRAINT "Foo_pkey" PRIMARY KEY ("id")
+        );
+    "#;
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "cockroachdb"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model Foo {
+          id            Int      @id
+          trial_expires DateTime @default(dbgenerated("now() + '14 days'::INTERVAL")) @db.Timestamptz(6)
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+    Ok(())
+}
