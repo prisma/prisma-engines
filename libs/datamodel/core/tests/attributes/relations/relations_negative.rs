@@ -966,7 +966,7 @@ fn should_fail_if_not_using_unique_constraint_with_singular_one_to_one() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A one-to-one relation must use unique fields on the defining side. Either add a unique constraint, or change the relation to one-to-many.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A one-to-one relation must use unique fields on the defining side. Either add an `@unique` attribute to the field `fk`, or change the relation to one-to-many.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m  fk Int?
@@ -998,7 +998,7 @@ fn should_fail_if_not_using_unique_constraint_with_compound_one_to_one() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A one-to-one relation must use unique fields on the defining side. Either add a unique constraint, or change the relation to one-to-many.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A one-to-one relation must use unique fields on the defining side. Either add an `@@unique([fk1, fk2])` attribute to the model, or change the relation to one-to-many.[0m
           [1;94m-->[0m  [4mschema.prisma:5[0m
         [1;94m   | [0m
         [1;94m 4 | [0m  fk2 Int?
@@ -1029,7 +1029,7 @@ fn should_fail_if_not_using_unique_constraint_with_single_one_to_many() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: The argument `references` must refer to a unique criteria in the related model `A`. But it is referencing the following fields that are not a unique criteria: custom_id[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `custom_id` in the model `A`.[0m
           [1;94m-->[0m  [4mschema.prisma:22[0m
         [1;94m   | [0m
         [1;94m21 | [0m  a_id String

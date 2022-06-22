@@ -326,12 +326,44 @@ fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `firstName` in the model `User`.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m        userName String
         [1;94m12 | [0m        [1;91muser     User   @relation(fields: [userName], references: [firstName])[0m
         [1;94m13 | [0m    }
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn relation_must_error_when_referenced_compound_fields_are_not_a_unique_criteria() {
+    let dml = indoc! {r#"
+        model User {
+          id        Int    @id
+          firstName String
+          lastName  String
+          posts     Post[]
+        }
+
+        model Post {
+          id       Int    @id
+          text     String
+          userName String
+          lastName String
+          user     User   @relation(fields: [userName, lastName], references: [firstName, lastName])
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@@unique([firstName, lastName])` attribute to the model `User`.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m  lastName String
+        [1;94m13 | [0m  [1;91muser     User   @relation(fields: [userName, lastName], references: [firstName, lastName])[0m
+        [1;94m14 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -380,7 +412,7 @@ fn relation_must_error_when_referenced_fields_are_multiple_uniques() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@@unique([id, firstName])` attribute to the model `User`.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m        // the relation is referencing two uniques. That is too much.

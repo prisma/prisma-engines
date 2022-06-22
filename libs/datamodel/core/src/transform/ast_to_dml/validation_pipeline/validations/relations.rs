@@ -149,13 +149,19 @@ pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_>, ctx: 
         return;
     }
 
-    ctx.push_error(DatamodelError::new_validation_error(
-        format!(
-            "The argument `references` must refer to a unique criteria in the related model `{}`. But it is referencing the following fields that are not a unique criteria: {}",
-            relation.referenced_model().name(),
-            relation.referenced_fields().map(|f| f.name()).join(", ")
-        ),
-        relation_field.ast_field().span
+    let fields: Vec<_> = relation.referenced_fields().map(|f| f.name()).collect();
+    let model = relation.referenced_model().name();
+
+    let message = if fields.len() == 1 {
+        format!("The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `{}` in the model `{}`.", fields.join(", "), model)
+    } else {
+        format!("The argument `references` must refer to a unique criteria in the related model. Consider adding an `@@unique([{}])` attribute to the model `{}`.", fields.join(", "), model)
+    };
+
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        &message,
+        RELATION_ATTRIBUTE_NAME,
+        relation_field.ast_field().span,
     ));
 }
 
