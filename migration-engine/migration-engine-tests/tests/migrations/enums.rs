@@ -576,6 +576,7 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
             Red @map("0")
             Green @map("Grün")
             Blue @map("Blu")
+            Annoyed @map("pfuh 🙄...")
         }
 
         model Test {
@@ -588,7 +589,7 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
 
     let expect = expect![[r#"
         -- CreateEnum
-        CREATE TYPE "Color" AS ENUM ('0', 'Grün', 'Blu');
+        CREATE TYPE "Color" AS ENUM ('0', 'Grün', 'Blu', 'pfuh 🙄...');
 
         -- CreateTable
         CREATE TABLE "Test" (

@@ -64,6 +64,11 @@ impl<'a> Parser<'a> {
 
         Some(self.resolve_offset(next_offset)?.1)
     }
+
+    /// `true` if all input tokens have been consumed.
+    fn is_finished(&self) -> bool {
+        self.offset >= self.tokens.len() - 1
+    }
 }
 
 pub(super) fn get_default_value(default_string: &str, tpe: &ColumnType) -> Option<DefaultValue> {
@@ -79,8 +84,9 @@ pub(super) fn get_default_value(default_string: &str, tpe: &ColumnType) -> Optio
     }
 
     let parser_fn = parser_for_family(&tpe.family);
+    let parsed_default = parser_fn(&mut parser).filter(|_| parser.is_finished());
 
-    Some(match parser_fn(&mut parser) {
+    Some(match parsed_default {
         Some(default_value) => default_value,
         None => DefaultValue::db_generated(default_string),
     })
@@ -104,13 +110,15 @@ fn parse_unsupported(_parser: &mut Parser<'_>) -> Option<DefaultValue> {
 }
 
 fn parse_datetime_default(parser: &mut Parser) -> Option<DefaultValue> {
-    match parser.peek_token()? {
+    let value = match parser.peek_token()? {
         Token::Identifier => {
             let func_name = parser.expect(Token::Identifier)?;
             if let Some(Token::OpeningBrace) = parser.peek_token() {
                 parser.expect(Token::OpeningBrace)?;
                 parser.expect(Token::ClosingBrace)?;
             }
+
+            eat_cast(parser)?;
 
             match func_name {
                 name if name.eq_ignore_ascii_case("now") || name.eq_ignore_ascii_case("current_timestamp") => {
@@ -120,17 +128,21 @@ fn parse_datetime_default(parser: &mut Parser) -> Option<DefaultValue> {
             }
         }
         _ => None,
-    }
+    };
+
+    value
 }
 
 fn parse_enum_default(parser: &mut Parser) -> Option<DefaultValue> {
     match parser.peek_token()? {
         Token::Identifier => {
             let s = parser.expect(Token::Identifier)?;
+            eat_cast(parser)?;
             Some(DefaultValue::value(PrismaValue::Enum(s.to_owned())))
         }
         Token::StringLiteral | Token::CStyleStringLiteral => {
             let value = parse_string_value(parser)?;
+            eat_cast(parser)?;
             Some(DefaultValue::value(PrismaValue::Enum(value)))
         }
         _ => None,
@@ -157,20 +169,36 @@ fn parse_string_value(parser: &mut Parser<'_>) -> Option<String> {
                 }
             }
 
-            eat_cast(parser);
+            eat_cast(parser)?;
 
             Some(out)
         }
         Token::CStyleStringLiteral => {
+            // Reference for CockroachDB: https://www.cockroachlabs.com/docs/stable/sql-constants.html#string-literals-with-character-escapes
+            // octal and hexadecimal escape sequences seem not to be returned by crdb in defaults,
+            // so we do not try parsing them.
             let s = parser.expect(Token::CStyleStringLiteral)?;
             let mut out = String::with_capacity(s.len() - 3); // exclude the quotes and E
-            let mut chars = s[2..(s.len() - 1)].chars();
+            let mut chars = s[2..(s.len() - 1)].chars().peekable();
 
             loop {
                 match chars.next() {
                     Some('\\') => {
                         let next_char = chars.next().expect("invariant");
+
                         match next_char {
+                            'a' => {
+                                out.push('\u{7}');
+                            }
+                            'b' => {
+                                out.push('\u{8}');
+                            }
+                            'v' => {
+                                out.push('\u{11}');
+                            }
+                            'f' => {
+                                out.push('\u{12}');
+                            }
                             'n' => {
                                 out.push('\n');
                             }
@@ -179,6 +207,28 @@ fn parse_string_value(parser: &mut Parser<'_>) -> Option<String> {
                             }
                             't' => {
                                 out.push('\t');
+                            }
+                            'u' => {
+                                // take 4
+                                let mut codepoint = 0u32;
+                                for i in 0..4 {
+                                    let nibble_offset = 3 - i;
+                                    // expect crdb to return valid codepoints
+                                    let next_digit = chars.next().unwrap().to_digit(16).unwrap();
+                                    codepoint += next_digit << (nibble_offset * 4);
+                                }
+                                out.push(char::from_u32(codepoint).unwrap()); // assume crdb returns valid codepoints
+                            }
+                            'U' => {
+                                // take 8
+                                let mut codepoint = 0u32;
+                                for i in 0..8 {
+                                    let nibble_offset = 7 - i;
+                                    // expect crdb to return valid codepoints
+                                    let next_digit = chars.next().unwrap().to_digit(16).unwrap();
+                                    codepoint += next_digit << (nibble_offset * 4);
+                                }
+                                out.push(char::from_u32(codepoint).unwrap()); // assume crdb returns valid codepoints
                             }
                             _ => out.push(next_char),
                         }
@@ -190,7 +240,7 @@ fn parse_string_value(parser: &mut Parser<'_>) -> Option<String> {
                 }
             }
 
-            eat_cast(parser);
+            eat_cast(parser)?;
 
             Some(out)
         }
@@ -207,7 +257,7 @@ fn parse_identifier(parser: &mut Parser<'_>) -> Option<String> {
     match parser.peek_token()? {
         Token::DoubleQuotedIdentifier => {
             let s = parser.expect(Token::DoubleQuotedIdentifier)?;
-            Some(s[1..(s.len() - 1)].replace(r#"\""#, r#"""#))
+            Some(parse_double_quoted_string_contents(s))
         }
         Token::Identifier => {
             let s = parser.expect(Token::Identifier)?;
@@ -215,6 +265,24 @@ fn parse_identifier(parser: &mut Parser<'_>) -> Option<String> {
         }
         _ => None,
     }
+}
+
+fn parse_double_quoted_string_contents(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    let mut chars = s[1..(s.len() - 1)].chars().peekable();
+
+    while let Some(c) = chars.next() {
+        match c {
+            '\\' => {
+                out.push(chars.next().unwrap());
+            }
+            other => {
+                out.push(other);
+            }
+        }
+    }
+
+    out
 }
 
 fn parse_int_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
@@ -274,6 +342,14 @@ fn parse_int_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
                         break;
                     }
                 }
+
+                eat_cast(parser)?;
+
+                if let Some(Token::ClosingBrace) = parser.peek_token() {
+                    parser.expect(Token::ClosingBrace)?;
+                }
+
+                eat_cast(parser)?;
 
                 Some(DefaultValue::sequence(sequence_name))
             } else {
@@ -385,7 +461,7 @@ fn parse_array_constructor(parser: &mut Parser<'_>, tpe: &ColumnTypeFamily) -> O
 
     parser.expect(Token::OpeningSquareBracket)?;
 
-    'outer: loop {
+    loop {
         match parser.peek_token() {
             None => return None, // missing closing bracket
             Some(Token::ClosingSquareBracket) => {
@@ -397,15 +473,12 @@ fn parse_array_constructor(parser: &mut Parser<'_>, tpe: &ColumnTypeFamily) -> O
             }
         }
 
-        // Eat remaining tokens until the next comma.
-        loop {
-            // Now the comma between values
-            match parser.next_token() {
-                None => return None, // missing closing bracket
-                Some(Token::ClosingSquareBracket) => break 'outer,
-                Some(Token::Comma) => break,
-                Some(_) => (),
-            }
+        // Now the comma between values or the end of the array.
+        match parser.next_token() {
+            None => return None, // missing closing bracket
+            Some(Token::ClosingSquareBracket) => break,
+            Some(Token::Comma) => (), // continue
+            Some(_) => return None,   // unexpected token
         }
     }
 
@@ -436,6 +509,7 @@ fn get_list_default_value(parser: &mut Parser<'_>, tpe: &ColumnType) -> DefaultV
 }
 
 /// Some(()) on valid cast or absence of cast. None if we can't make sense of the input.
+#[must_use]
 fn eat_cast(parser: &mut Parser) -> Option<()> {
     match parser.peek_token() {
         Some(Token::CastOperator) => {
@@ -448,8 +522,15 @@ fn eat_cast(parser: &mut Parser) -> Option<()> {
     //
     // TIMESTAMP WITH TIME ZONE (4)[]
     // ^^^^^^^^^^^^^^^^^^^^^^^^
+    //
+    // or
+    //
+    // "color"
     loop {
         match parser.peek_token() {
+            Some(Token::DoubleQuotedIdentifier) => {
+                parser.expect(Token::DoubleQuotedIdentifier)?;
+            }
             Some(Token::Identifier) => {
                 parser.expect(Token::Identifier)?;
             }
@@ -516,6 +597,28 @@ mod tests {
     #[test]
     fn parse_enum_array_default() {
         let input = "ARRAY['RED'::color, 'GREEN'::color]";
+        let tokens = tokenize(input);
+        let mut parser = Parser::new(input, &tokens);
+
+        let out = parse_array_constructor(&mut parser, &ColumnTypeFamily::Enum(String::new())).unwrap();
+
+        let expected = expect![[r#"
+            [
+                Enum(
+                    "RED",
+                ),
+                Enum(
+                    "GREEN",
+                ),
+            ]
+        "#]];
+
+        expected.assert_debug_eq(&out);
+    }
+
+    #[test]
+    fn parse_enum_array_default_with_quotes() {
+        let input = r#"ARRAY['RED'::"color", 'GREEN'::"color"]"#;
         let tokens = tokenize(input);
         let mut parser = Parser::new(input, &tokens);
 

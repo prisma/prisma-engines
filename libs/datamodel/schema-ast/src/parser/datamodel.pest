@@ -137,9 +137,9 @@ numeric_literal = @{ ("-")? ~ ASCII_DIGIT+ ~("." ~ ASCII_DIGIT+)? }
 // References:
 // - https://www.ietf.org/rfc/rfc4627.txt 
 // - https://www.json.org/json-en.html
-UNICODE_CONTROL_CHARACTER = _{ '\u{0000}'..'\u{001F}' }
+ASCII_CONTROL_CHARACTER = _{ '\u{0000}'..'\u{001F}' }
 string_escape = _{ "\\" ~ ANY }
-string_content = @{ (string_escape | !("\"" | UNICODE_CONTROL_CHARACTER) ~ ANY)* }
+string_content = @{ (string_escape | !("\"" | ASCII_CONTROL_CHARACTER) ~ ANY)* }
 string_literal = ${ "\"" ~ string_content ~ "\"" }
 
 constant_literal = @{ path_identifier }

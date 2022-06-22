@@ -1,11 +1,10 @@
-use diagnostics::Diagnostics;
-
 use super::{
     helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
     parse_expression::parse_expression,
     Rule,
 };
 use crate::ast;
+use diagnostics::Diagnostics;
 
 pub(crate) fn parse_arguments_list(
     token: &Token<'_>,

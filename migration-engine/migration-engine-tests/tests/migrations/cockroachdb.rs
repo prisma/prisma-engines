@@ -1144,47 +1144,51 @@ fn alter_sequence(api: TestApi) {
 }
 
 // https://github.com/prisma/prisma/issues/13842
-// #[test_connector(tags(CockroachDb))]
-// fn mapped_enum_defaults_must_work(api: TestApi) {
-//     let schema = r#"
-//         datasource db {
-//             provider = "postgres"
-//             url = "postgres://meowmeowmeow"
-//         }
+#[test_connector(tags(CockroachDb))]
+fn mapped_enum_defaults_must_work(api: TestApi) {
+    let schema = r#"
+        datasource db {
+            provider = "cockroachdb"
+            url = "postgres://meowmeowmeow"
+        }
 
-//         enum Color {
-//             Red @map("0")
-//             Green @map("Grün")
-//             Blue @map("Blu")
-//         }
+        enum Color {
+            Red @map("0")
+            Green @map("Grün")
+            Blue @map("Blu")
+            Annoyed @map("pfuh 🙄...")
+        }
 
-//         model Test {
-//             id Int @id
-//             mainColor Color @default(Green)
-//             secondaryColor Color @default(Red)
-//             colorOrdering Color[] @default([Blue, Red, Green, Red, Blue, Red])
-//         }
-//     "#;
+        model Test {
+            id Int @id
+            mainColor Color @default(Green)
+            secondaryColor Color @default(Red)
+            colorOrdering Color[] @default([Blue, Red, Green, Red, Blue, Annoyed, Red])
+        }
+    "#;
 
-//     let expect = expect![[r#"
-//         -- CreateEnum
-//         CREATE TYPE "Color" AS ENUM ('0', 'Grün', 'Blu');
+    let expect = expect![[r#"
+        -- CreateEnum
+        CREATE TYPE "Color" AS ENUM ('0', 'Grün', 'Blu', 'pfuh 🙄...');
 
-//         -- CreateTable
-//         CREATE TABLE "Test" (
-//             "id" INT4 NOT NULL,
-//             "mainColor" "Color" NOT NULL DEFAULT 'Grün',
-//             "secondaryColor" "Color" NOT NULL DEFAULT '0',
-//             "colorOrdering" "Color"[] DEFAULT array['Blu', '0', 'Grün', '0', 'Blu', '0']::"Color"[],
+        -- CreateTable
+        CREATE TABLE "Test" (
+            "id" INT4 NOT NULL,
+            "mainColor" "Color" NOT NULL DEFAULT 'Grün',
+            "secondaryColor" "Color" NOT NULL DEFAULT '0',
+            "colorOrdering" "Color"[] DEFAULT ARRAY['Blu', '0', 'Grün', '0', 'Blu', 'pfuh 🙄...', '0']::"Color"[],
 
-//             CONSTRAINT "Test_pkey" PRIMARY KEY ("id")
-//         );
-//     "#]];
-//     api.expect_sql_for_schema(schema, &expect);
+            CONSTRAINT "Test_pkey" PRIMARY KEY ("id")
+        );
+    "#]];
+    api.expect_sql_for_schema(schema, &expect);
 
-//     api.schema_push(schema).send().assert_green();
-//     api.schema_push(schema).send().assert_green().assert_no_steps();
-// }
+    api.schema_push(schema)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}
 
 // https://github.com/prisma/prisma/issues/12095
 #[test_connector(tags(CockroachDb))]
