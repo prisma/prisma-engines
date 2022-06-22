@@ -334,7 +334,8 @@ async fn introspecting_json_defaults_on_cockroach(api: &TestApi) -> TestResult {
            id INTEGER NOT NULL PRIMARY KEY,
            json JSON DEFAULT '[]'::json,
            jsonb JSONB DEFAULT '{}'::jsonb,
-           jsonb_object JSONB DEFAULT '{"a": ["b"], "c": true, "d": null }'
+           jsonb_string JSONB DEFAULT E'"ab\'c"',
+           jsonb_object JSONB DEFAULT '{"a": ["b''"], "c": true, "d": null }'
          );
 
        "#};
@@ -345,7 +346,8 @@ async fn introspecting_json_defaults_on_cockroach(api: &TestApi) -> TestResult {
           id           Int   @id
           json         Json? @default("[]")
           jsonb        Json? @default("{}")
-          jsonb_object Json? @default("{\"a\": [\"b\"], \"c\": true, \"d\": null}")
+          jsonb_string Json? @default("\"ab'c\"")
+          jsonb_object Json? @default("{\"a\": [\"b'\"], \"c\": true, \"d\": null}")
         }
     "#]];
 
