@@ -190,9 +190,7 @@ fn constraint_names() {
     "#]];
 
     let datamodel = parse(input);
-    let mut rendered = String::new();
-
-    datamodel::render_datamodel_to(&mut rendered, &datamodel, Some(&parse_configuration(input)));
+    let rendered = datamodel::render_datamodel_to_string(&datamodel, Some(&parse_configuration(input)));
 
     //todo can't be exactly the same since explicit default names will be suppressed when rerendering
     // the expected result after parsing and rendering is not exactly the same as the input.
