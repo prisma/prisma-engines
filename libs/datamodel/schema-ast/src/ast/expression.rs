@@ -92,6 +92,10 @@ impl Expression {
         }
     }
 
+    pub fn is_function(&self) -> bool {
+        matches!(self, Expression::Function(_, _, _))
+    }
+
     pub fn is_array(&self) -> bool {
         matches!(self, Expression::Array(_, _))
     }
