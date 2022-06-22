@@ -5,7 +5,7 @@ use crate::{
     ast, interner::StringInterner, names::Names, relations::Relations, types::Types, DatamodelError, Diagnostics,
     StringId, ValueValidator,
 };
-use schema_ast::ast::WithName;
+use schema_ast::ast::{Expression, WithName};
 use std::collections::{HashMap, HashSet};
 
 /// Validation context. This is an implementation detail of ParserDatabase. It
@@ -362,6 +362,28 @@ impl<'db> Context<'db> {
                         arg.name.span,
                     ));
                     is_reasonably_valid = false;
+                }
+
+                for arg in args.arguments.iter() {
+                    let exprs = match arg.value {
+                        Expression::Array(ref exprs, _) => exprs,
+                        _ => continue,
+                    };
+
+                    for expr in exprs {
+                        let args = match expr {
+                            Expression::Function(_, args, _) => args,
+                            _ => continue,
+                        };
+
+                        for arg in args.empty_arguments.iter() {
+                            self.push_error(DatamodelError::new_attribute_validation_error(
+                                &format!("The `{}` argument is missing a value.", arg.name.name),
+                                &format!("@@{}", attribute.name()),
+                                arg.name.span,
+                            ));
+                        }
+                    }
                 }
 
                 if let Some(span) = args.trailing_comma {
