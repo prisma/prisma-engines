@@ -224,7 +224,7 @@ fn load_sources(
 pub fn render_datamodel_to_string(datamodel: &dml::Datamodel, configuration: Option<&Configuration>) -> String {
     let mut writable_string = String::with_capacity(datamodel.models.len() * 20);
     render_datamodel_to(&mut writable_string, datamodel, configuration);
-    writable_string
+    reformat(&writable_string, 2).expect("Internal error: failed to reformat introspected schema")
 }
 
 /// Renders an AST to a string.
@@ -237,7 +237,7 @@ pub fn render_schema_ast_to_string(schema: &ast::SchemaAst) -> String {
 }
 
 /// Renders as a string into the stream.
-pub fn render_datamodel_to(
+fn render_datamodel_to(
     stream: &mut dyn std::fmt::Write,
     datamodel: &dml::Datamodel,
     configuration: Option<&Configuration>,
