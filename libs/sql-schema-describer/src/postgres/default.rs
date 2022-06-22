@@ -162,15 +162,31 @@ fn parse_string_value(parser: &mut Parser<'_>) -> Option<String> {
             Some(out)
         }
         Token::CStyleStringLiteral => {
+            // Reference for CockroachDB: https://www.cockroachlabs.com/docs/stable/sql-constants.html#string-literals-with-character-escapes
+            // octal and hexadecimal escape sequences seem not to be returned by crdb in defaults,
+            // so we do not try parsing them.
             let s = parser.expect(Token::CStyleStringLiteral)?;
             let mut out = String::with_capacity(s.len() - 3); // exclude the quotes and E
-            let mut chars = s[2..(s.len() - 1)].chars();
+            let mut chars = s[2..(s.len() - 1)].chars().peekable();
 
             loop {
                 match chars.next() {
                     Some('\\') => {
                         let next_char = chars.next().expect("invariant");
+
                         match next_char {
+                            'a' => {
+                                out.push('\u{7}');
+                            }
+                            'b' => {
+                                out.push('\u{8}');
+                            }
+                            'v' => {
+                                out.push('\u{11}');
+                            }
+                            'f' => {
+                                out.push('\u{12}');
+                            }
                             'n' => {
                                 out.push('\n');
                             }
@@ -179,6 +195,28 @@ fn parse_string_value(parser: &mut Parser<'_>) -> Option<String> {
                             }
                             't' => {
                                 out.push('\t');
+                            }
+                            'u' => {
+                                // take 4
+                                let mut codepoint = 0u32;
+                                for i in 0..4 {
+                                    let nibble_offset = 3 - i;
+                                    // expect crdb to return valid codepoints
+                                    let next_digit = chars.next().unwrap().to_digit(16).unwrap();
+                                    codepoint += next_digit << (nibble_offset * 4);
+                                }
+                                out.push(char::from_u32(codepoint).unwrap()); // assume crdb returns valid codepoints
+                            }
+                            'U' => {
+                                // take 8
+                                let mut codepoint = 0u32;
+                                for i in 0..8 {
+                                    let nibble_offset = 7 - i;
+                                    // expect crdb to return valid codepoints
+                                    let next_digit = chars.next().unwrap().to_digit(16).unwrap();
+                                    codepoint += next_digit << (nibble_offset * 4);
+                                }
+                                out.push(char::from_u32(codepoint).unwrap()); // assume crdb returns valid codepoints
                             }
                             _ => out.push(next_char),
                         }
@@ -207,7 +245,7 @@ fn parse_identifier(parser: &mut Parser<'_>) -> Option<String> {
     match parser.peek_token()? {
         Token::DoubleQuotedIdentifier => {
             let s = parser.expect(Token::DoubleQuotedIdentifier)?;
-            Some(s[1..(s.len() - 1)].replace(r#"\""#, r#"""#))
+            Some(parse_double_quoted_string_contents(s))
         }
         Token::Identifier => {
             let s = parser.expect(Token::Identifier)?;
@@ -215,6 +253,24 @@ fn parse_identifier(parser: &mut Parser<'_>) -> Option<String> {
         }
         _ => None,
     }
+}
+
+fn parse_double_quoted_string_contents(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    let mut chars = s[1..(s.len() - 1)].chars().peekable();
+
+    while let Some(c) = chars.next() {
+        match c {
+            '\\' => {
+                out.push(chars.next().unwrap());
+            }
+            other => {
+                out.push(other);
+            }
+        }
+    }
+
+    out
 }
 
 fn parse_int_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {

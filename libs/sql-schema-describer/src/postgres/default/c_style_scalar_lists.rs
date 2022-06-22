@@ -24,7 +24,7 @@ pub(super) fn parse_array_literal(input: &str, tpe: &ColumnType) -> Option<Vec<P
             }
             Token::DoubleQuotedIdentifier => {
                 let s = parser.expect(Token::DoubleQuotedIdentifier)?;
-                let unquoted = s.replace(r#"\""#, r#"""#);
+                let unquoted = super::parse_double_quoted_string_contents(s);
                 values.push(parse_literal(&unquoted, tpe)?);
             }
             Token::StringLiteral => {
@@ -75,7 +75,14 @@ fn parse_literal(s: &str, tpe: &ColumnType) -> Option<PrismaValue> {
             _ => None,
         },
         ColumnTypeFamily::Json => Some(PrismaValue::Json(s.to_owned())),
-        ColumnTypeFamily::Enum(_) => Some(PrismaValue::Enum(s.to_owned())),
+        ColumnTypeFamily::Enum(_) => {
+            let tokens = tokenize(s);
+            let mut parser = Parser::new(s, &tokens);
+            match super::parse_string_value(&mut parser) {
+                Some(string_contents) => Some(PrismaValue::Enum(string_contents)),
+                None => Some(PrismaValue::Enum(s.to_owned())),
+            }
+        }
         ColumnTypeFamily::DateTime
         | ColumnTypeFamily::Binary
         | ColumnTypeFamily::Uuid
