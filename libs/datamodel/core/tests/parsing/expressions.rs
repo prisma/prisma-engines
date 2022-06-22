@@ -57,7 +57,7 @@ fn empty_arguments_in_index_fields() {
     "#};
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The `ops` argument is missing a value.[0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": The `ops` argument is missing a value.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m

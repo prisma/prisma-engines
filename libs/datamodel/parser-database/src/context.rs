@@ -379,7 +379,7 @@ impl<'db> Context<'db> {
                         for arg in args.empty_arguments.iter() {
                             self.push_error(DatamodelError::new_attribute_validation_error(
                                 &format!("The `{}` argument is missing a value.", arg.name.name),
-                                &format!("@{}", attribute.name()),
+                                &format!("@@{}", attribute.name()),
                                 arg.name.span,
                             ));
                         }
