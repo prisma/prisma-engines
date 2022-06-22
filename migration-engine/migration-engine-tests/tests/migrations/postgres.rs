@@ -653,3 +653,37 @@ fn scalar_list_default_diffing(api: TestApi) {
         .assert_has_executed_steps();
     api.schema_push(schema_2).send().assert_green().assert_no_steps();
 }
+
+// https://github.com/prisma/prisma/issues/12095
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn json_defaults_with_escaped_quotes_work(api: TestApi) {
+    let schema = r#"
+        datasource db {
+          provider = "postgresql"
+          url      = env("DATABASE_URL")
+        }
+
+        model Foo {
+          id             Int   @id
+          bar Json? @default("{\"message\": \"This message includes a quote: Here''s it!\"}")
+        }
+    "#;
+
+    api.schema_push(schema)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+
+    let sql = expect![[r#"
+        -- CreateTable
+        CREATE TABLE "Foo" (
+            "id" INTEGER NOT NULL,
+            "bar" JSONB DEFAULT '{"message": "This message includes a quote: Here''''s it!"}',
+
+            CONSTRAINT "Foo_pkey" PRIMARY KEY ("id")
+        );
+    "#]];
+
+    api.expect_sql_for_schema(schema, &sql);
+}

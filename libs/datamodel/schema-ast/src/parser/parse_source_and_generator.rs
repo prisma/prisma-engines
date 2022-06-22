@@ -16,18 +16,14 @@ pub(crate) fn parse_config_block(token: &Token<'_>, diagnostics: &mut Diagnostic
     for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::key_value => properties.push(parse_key_value(&current)),
+            Rule::key_value => properties.push(parse_key_value(&current, diagnostics)),
             Rule::comment_block => comment = parse_comment_block(&current),
             Rule::DATASOURCE_KEYWORD | Rule::GENERATOR_KEYWORD => kw = Some(current.as_str()),
             Rule::BLOCK_LEVEL_CATCH_ALL => {
-                let mut msg = format!(
+                let msg = format!(
                     "This line is not a valid definition within a {}.",
                     kw.unwrap_or("configuration block")
                 );
-
-                if current.as_span().as_str().starts_with("url") {
-                    msg.push_str(r#" If the value is a windows-style path, `\` must be escaped as `\\`."#);
-                }
 
                 let err = DatamodelError::new_validation_error(msg, current.as_span().into());
                 diagnostics.push_error(err);
@@ -53,14 +49,14 @@ pub(crate) fn parse_config_block(token: &Token<'_>, diagnostics: &mut Diagnostic
     }
 }
 
-fn parse_key_value(token: &Token<'_>) -> ConfigBlockProperty {
+fn parse_key_value(token: &Token<'_>, diagnostics: &mut Diagnostics) -> ConfigBlockProperty {
     let mut name: Option<Identifier> = None;
     let mut value: Option<Expression> = None;
 
     for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::expression => value = Some(parse_expression(&current)),
+            Rule::expression => value = Some(parse_expression(&current, diagnostics)),
             _ => unreachable!(
                 "Encountered impossible source property declaration during parsing: {:?}",
                 current.tokens()

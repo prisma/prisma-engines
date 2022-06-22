@@ -133,12 +133,13 @@ number = @{ ASCII_DIGIT+ }
 
 numeric_literal = @{ ("-")? ~ ASCII_DIGIT+ ~("." ~ ASCII_DIGIT+)? }
 
-// String literals with support for escaped characters.
-string_escaped_predefined = { "n" | "r" | "t" | "\\" | "0" | "\"" | "'" | SPACE_SEPARATOR }
-string_escape = { "\\" ~ string_escaped_predefined }
-// This is only used to escape in the parser. The string above is still treated as atomic.
-string_raw = { (!("\\" | "\"" | NEWLINE ) ~ ANY)+ }
-string_content = ${ (string_raw | string_escape )* }
-string_literal = { "\"" ~ string_content ~ "\"" }
+// String literals. We follow exactly the same grammar as JSON strings
+// References:
+// - https://www.ietf.org/rfc/rfc4627.txt 
+// - https://www.json.org/json-en.html
+UNICODE_CONTROL_CHARACTER = _{ '\u{0000}'..'\u{001F}' }
+string_escape = _{ "\\" ~ ANY }
+string_content = @{ (string_escape | !("\"" | UNICODE_CONTROL_CHARACTER) ~ ANY)* }
+string_literal = ${ "\"" ~ string_content ~ "\"" }
 
 constant_literal = @{ path_identifier }

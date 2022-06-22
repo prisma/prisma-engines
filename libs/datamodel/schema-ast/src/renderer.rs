@@ -412,9 +412,26 @@ impl<'a> Renderer<'a> {
         target.write("]");
     }
 
+    // https://datatracker.ietf.org/doc/html/rfc8259#section-7
     fn render_str(target: &mut dyn LineWriteable, param: &str) {
         target.write("\"");
-        target.write(&param.replace('\\', r#"\\"#).replace('"', r#"\""#).replace('\n', "\\n"));
+        for c in param.char_indices() {
+            match c {
+                (_, '\t') => target.write("\\t"),
+                (_, '\n') => target.write("\\n"),
+                (_, '"') => target.write("\\\""),
+                (_, '\r') => target.write("\\r"),
+                (_, '\\') => target.write("\\\\"),
+                // Control characters
+                (_, c) if c.is_ascii_control() => {
+                    let mut b = [0];
+                    c.encode_utf8(&mut b);
+                    let formatted = format!("\\u{:04x}", b[0]);
+                    target.write(&formatted)
+                }
+                (start, other) => target.write(&param[start..(start + other.len_utf8())]),
+            }
+        }
         target.write("\"");
     }
 }

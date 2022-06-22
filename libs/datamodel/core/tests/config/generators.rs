@@ -145,11 +145,12 @@ fn hidden_preview_features_setting_must_work() {
 
     expected.assert_eq(&rendered);
 }
+
 #[test]
 fn back_slashes_in_providers_must_work() {
     let schema = indoc! {r#"
         generator mygen {
-          provider = "../folder\ with\\ space/my\ generator.js"
+          provider = "../folder\twith\ttabs/my\tgenerator.js"
         }
     "#};
 
@@ -159,7 +160,7 @@ fn back_slashes_in_providers_must_work() {
             "name": "mygen",
             "provider": {
               "fromEnvVar": null,
-              "value": "../folder with\\ space/my generator.js"
+              "value": "../folder\twith\ttabs/my\tgenerator.js"
             },
             "output": null,
             "config": {},

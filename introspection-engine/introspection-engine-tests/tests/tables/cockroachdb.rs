@@ -334,7 +334,8 @@ async fn introspecting_json_defaults_on_cockroach(api: &TestApi) -> TestResult {
            id INTEGER NOT NULL PRIMARY KEY,
            json JSON DEFAULT '[]'::json,
            jsonb JSONB DEFAULT '{}'::jsonb,
-           jsonb_object JSONB DEFAULT '{"a": ["b"], "c": true, "d": null }'
+           jsonb_string JSONB DEFAULT E'"ab\'c"',
+           jsonb_object JSONB DEFAULT '{"a": ["b''"], "c": true, "d": null }'
          );
 
        "#};
@@ -345,11 +346,50 @@ async fn introspecting_json_defaults_on_cockroach(api: &TestApi) -> TestResult {
           id           Int   @id
           json         Json? @default("[]")
           jsonb        Json? @default("{}")
-          jsonb_object Json? @default("{\"a\": [\"b\"], \"c\": true, \"d\": null}")
+          jsonb_string Json? @default("\"ab'c\"")
+          jsonb_object Json? @default("{\"a\": [\"b'\"], \"c\": true, \"d\": null}")
         }
     "#]];
 
     expectation.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(CockroachDb))]
+async fn string_defaults_that_need_escaping(api: &TestApi) -> TestResult {
+    let setup = r#"
+        CREATE TABLE "stringstest" (
+            id INTEGER PRIMARY KEY,
+            needs_escaping TEXT NOT NULL DEFAULT $$
+abc def
+backspaces: \abcd\
+	(tab character)
+and "quotes" and a vertical tabulation here -><-
+
+$$
+        );
+    "#;
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "cockroachdb"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model stringstest {
+          id             Int    @id
+          needs_escaping String @default("\nabc def\nbackspaces: \\abcd\\\n\t(tab character)\nand \"quotes\" and a vertical tabulation here ->x16<-\n\n")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
 
     Ok(())
 }
