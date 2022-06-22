@@ -258,39 +258,6 @@
 <span id="253">253</span>
 <span id="254">254</span>
 <span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This crate is responsible for parsing, rendering and formatting a Prisma Schema.</span>
 <span class="doccomment">//! A Prisma Schema consists out of two parts:</span>
 <span class="doccomment">//! 1. The `Datamodel` part refers to the model and enum definitions.</span>
@@ -513,52 +480,18 @@
 <span class="comment">//  ************** RENDERING FUNCTIONS **************</span>
 <span class="comment">//</span>
 
-<span class="doccomment">/// Renders to a return string.</span>
+<span class="doccomment">/// Renders the datamodel _without configuration blocks_.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_datamodel_to_string</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>, <span class="ident">configuration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Configuration</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable_string</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">datamodel</span>.<span class="ident">models</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">20</span>);
-    <span class="ident">render_datamodel_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable_string</span>, <span class="ident">datamodel</span>, <span class="ident">configuration</span>);
-    <span class="ident">reformat</span>(<span class="kw-2">&amp;</span><span class="ident">writable_string</span>, <span class="number">2</span>).<span class="ident">expect</span>(<span class="string">&quot;Internal error: failed to reformat introspected schema&quot;</span>)
-}
-
-<span class="doccomment">/// Renders an AST to a string.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_schema_ast_to_string</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable_string</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">schema</span>.<span class="ident">tops</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">20</span>);
-
-    <span class="ident">render_schema_ast_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable_string</span>, <span class="ident">schema</span>, <span class="number">2</span>);
-
-    <span class="ident">writable_string</span>
-}
-
-<span class="doccomment">/// Renders as a string into the stream.</span>
-<span class="kw">fn</span> <span class="ident">render_datamodel_to</span>(
-    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">std::fmt::Write</span>,
-    <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>,
-    <span class="ident">configuration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Configuration</span><span class="op">&gt;</span>,
-) {
     <span class="kw">let</span> <span class="ident">datasource</span> <span class="op">=</span> <span class="ident">configuration</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">datasources</span>.<span class="ident">first</span>());
     <span class="kw">let</span> <span class="ident">lowered</span> <span class="op">=</span> <span class="ident">lower</span>(<span class="ident">LowerParams</span> { <span class="ident">datasource</span>, <span class="ident">datamodel</span> });
-
-    <span class="ident">render_schema_ast_to</span>(<span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="ident">lowered</span>, <span class="number">2</span>);
+    <span class="ident">render_schema_ast</span>(<span class="kw-2">&amp;</span><span class="ident">lowered</span>, <span class="number">2</span>)
 }
 
-<span class="doccomment">/// Renders a datamodel, sources and generators to a string.</span>
+<span class="doccomment">/// Renders a datamodel, sources and generators.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_datamodel_and_config_to_string</span>(
     <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>,
     <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">configuration::Configuration</span>,
 ) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable_string</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">datamodel</span>.<span class="ident">models</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">20</span>);
-
-    <span class="ident">render_datamodel_and_config_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable_string</span>, <span class="ident">datamodel</span>, <span class="ident">config</span>);
-
-    <span class="ident">writable_string</span>
-}
-
-<span class="doccomment">/// Renders a datamodel, generators and sources to a stream as a string.</span>
-<span class="kw">fn</span> <span class="ident">render_datamodel_and_config_to</span>(
-    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">std::fmt::Write</span>,
-    <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>,
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">configuration::Configuration</span>,
-) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lowered</span> <span class="op">=</span> <span class="ident">lower</span>(<span class="ident">LowerParams</span> {
         <span class="ident">datasource</span>: <span class="ident">config</span>.<span class="ident">datasources</span>.<span class="ident">first</span>(),
         <span class="ident">datamodel</span>,
@@ -566,14 +499,15 @@
 
     <span class="ident">dml_to_ast::add_sources_to_ast</span>(<span class="ident">config</span>, <span class="kw-2">&amp;mut</span> <span class="ident">lowered</span>);
     <span class="ident">GeneratorSerializer::add_generators_to_ast</span>(<span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">generators</span>, <span class="kw-2">&amp;mut</span> <span class="ident">lowered</span>);
-
-    <span class="ident">render_schema_ast_to</span>(<span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="ident">lowered</span>, <span class="number">2</span>);
+    <span class="ident">render_schema_ast</span>(<span class="kw-2">&amp;</span><span class="ident">lowered</span>, <span class="number">2</span>)
 }
 
 <span class="doccomment">/// Renders as a string into the stream.</span>
-<span class="kw">fn</span> <span class="ident">render_schema_ast_to</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">std::fmt::Write</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span>, <span class="ident">ident_width</span>: <span class="ident">usize</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">renderer</span> <span class="op">=</span> <span class="ident">schema_ast::renderer::Renderer::new</span>(<span class="ident">stream</span>, <span class="ident">ident_width</span>);
+<span class="kw">fn</span> <span class="ident">render_schema_ast</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span>, <span class="ident">ident_width</span>: <span class="ident">usize</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">schema</span>.<span class="ident">tops</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">20</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">renderer</span> <span class="op">=</span> <span class="ident">schema_ast::renderer::Renderer::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">out</span>, <span class="ident">ident_width</span>);
     <span class="ident">renderer</span>.<span class="ident">render</span>(<span class="ident">schema</span>);
+    <span class="ident">reformat</span>(<span class="kw-2">&amp;</span><span class="ident">out</span>, <span class="number">2</span>).<span class="ident">expect</span>(<span class="string">&quot;Internal error: failed to reformat introspected schema&quot;</span>)
 }
 
 <span class="kw">fn</span> <span class="ident">preview_features</span>(<span class="ident">generators</span>: <span class="kw-2">&amp;</span>[<span class="ident">Generator</span>]) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span> {
