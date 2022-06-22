@@ -37,15 +37,15 @@
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>::<span class="kw-2">*</span>, <span class="ident">parser::parse_arguments::parse_arguments_list</span>};
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_attribute</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Attribute</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_attribute</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics::Diagnostics</span>) -&gt; <span class="ident">Attribute</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Identifier</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arguments</span>: <span class="ident">ArgumentsList</span> <span class="op">=</span> <span class="ident">ArgumentsList::default</span>();
 
     <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">token</span>.<span class="ident">relevant_children</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::attribute</span> =&gt; <span class="kw">return</span> <span class="ident">parse_attribute</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
+            <span class="ident">Rule::attribute</span> =&gt; <span class="kw">return</span> <span class="ident">parse_attribute</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="ident">diagnostics</span>),
             <span class="ident">Rule::attribute_name</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">to_id</span>()),
-            <span class="ident">Rule::arguments_list</span> =&gt; <span class="ident">parse_arguments_list</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">arguments</span>),
+            <span class="ident">Rule::arguments_list</span> =&gt; <span class="ident">parse_arguments_list</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">arguments</span>, <span class="ident">diagnostics</span>),
             <span class="kw">_</span> =&gt; <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="string">&quot;attribute&quot;</span>),
         }
     }

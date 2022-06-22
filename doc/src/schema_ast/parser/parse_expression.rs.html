@@ -90,22 +90,138 @@
 <span id="85">85</span>
 <span id="86">86</span>
 <span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Token</span>, <span class="ident">TokenExtensions</span>},
     <span class="ident">parse_arguments::parse_arguments_list</span>,
     <span class="ident">Rule</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_expression</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Expression</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_expression</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics::Diagnostics</span>) -&gt; <span class="ident">Expression</span> {
     <span class="kw">let</span> <span class="ident">first_child</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">first_relevant_child</span>();
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::from</span>(<span class="ident">first_child</span>.<span class="ident">as_span</span>());
     <span class="kw">match</span> <span class="ident">first_child</span>.<span class="ident">as_rule</span>() {
         <span class="ident">Rule::numeric_literal</span> =&gt; <span class="ident">Expression::NumericValue</span>(<span class="ident">first_child</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>(), <span class="ident">span</span>),
-        <span class="ident">Rule::string_literal</span> =&gt; <span class="ident">Expression::StringValue</span>(<span class="ident">parse_string_literal</span>(<span class="kw-2">&amp;</span><span class="ident">first_child</span>), <span class="ident">span</span>),
+        <span class="ident">Rule::string_literal</span> =&gt; <span class="ident">Expression::StringValue</span>(<span class="ident">parse_string_literal</span>(<span class="kw-2">&amp;</span><span class="ident">first_child</span>, <span class="ident">diagnostics</span>), <span class="ident">span</span>),
         <span class="ident">Rule::constant_literal</span> =&gt; <span class="ident">Expression::ConstantValue</span>(<span class="ident">first_child</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>(), <span class="ident">span</span>),
-        <span class="ident">Rule::function</span> =&gt; <span class="ident">parse_function</span>(<span class="kw-2">&amp;</span><span class="ident">first_child</span>),
-        <span class="ident">Rule::array_expression</span> =&gt; <span class="ident">parse_array</span>(<span class="kw-2">&amp;</span><span class="ident">first_child</span>),
+        <span class="ident">Rule::function</span> =&gt; <span class="ident">parse_function</span>(<span class="kw-2">&amp;</span><span class="ident">first_child</span>, <span class="ident">diagnostics</span>),
+        <span class="ident">Rule::array_expression</span> =&gt; <span class="ident">parse_array</span>(<span class="kw-2">&amp;</span><span class="ident">first_child</span>, <span class="ident">diagnostics</span>),
         <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(
             <span class="string">&quot;Encountered impossible literal during parsing: {:?}&quot;</span>,
             <span class="ident">first_child</span>.<span class="ident">tokens</span>()
@@ -113,14 +229,14 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_function</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Expression</span> {
+<span class="kw">fn</span> <span class="ident">parse_function</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">Expression</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arguments</span> <span class="op">=</span> <span class="ident">ArgumentsList::default</span>();
 
     <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">token</span>.<span class="ident">relevant_children</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
             <span class="ident">Rule::function_name</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>()),
-            <span class="ident">Rule::arguments_list</span> =&gt; <span class="ident">parse_arguments_list</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">arguments</span>),
+            <span class="ident">Rule::arguments_list</span> =&gt; <span class="ident">parse_arguments_list</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">arguments</span>, <span class="ident">diagnostics</span>),
             <span class="kw">_</span> =&gt; <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="string">&quot;function&quot;</span>),
         }
     }
@@ -131,12 +247,12 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_array</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Expression</span> {
+<span class="kw">fn</span> <span class="ident">parse_array</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">Expression</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">elements</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
     <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">token</span>.<span class="ident">relevant_children</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::expression</span> =&gt; <span class="ident">elements</span>.<span class="ident">push</span>(<span class="ident">parse_expression</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>)),
+            <span class="ident">Rule::expression</span> =&gt; <span class="ident">elements</span>.<span class="ident">push</span>(<span class="ident">parse_expression</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="ident">diagnostics</span>)),
             <span class="kw">_</span> =&gt; <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="string">&quot;array&quot;</span>),
         }
     }
@@ -144,38 +260,152 @@
     <span class="ident">Expression::Array</span>(<span class="ident">elements</span>, <span class="ident">Span::from</span>(<span class="ident">token</span>.<span class="ident">as_span</span>()))
 }
 
-<span class="kw">fn</span> <span class="ident">parse_string_literal</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">current</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">first_relevant_child</span>();
-    <span class="macro">assert!</span>(<span class="ident">current</span>.<span class="ident">as_rule</span>() <span class="op">==</span> <span class="ident">Rule::string_content</span>);
+<span class="kw">fn</span> <span class="ident">parse_string_literal</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">String</span> {
+    <span class="macro">assert!</span>(<span class="ident">token</span>.<span class="ident">as_rule</span>() <span class="op">==</span> <span class="ident">Rule::string_literal</span>);
+    <span class="kw">let</span> <span class="ident">contents</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">clone</span>().<span class="ident">into_inner</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">contents_str</span> <span class="op">=</span> <span class="ident">contents</span>.<span class="ident">as_str</span>();
 
-    <span class="comment">// this will overallocate a bit for strings with escaped characters, but it</span>
+    <span class="comment">// This will overallocate a bit for strings with escaped characters, but it</span>
     <span class="comment">// shouldn&#39;t make a dramatic difference.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">current</span>.<span class="ident">as_str</span>().<span class="ident">len</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">contents_str</span>.<span class="ident">len</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">contents_str</span>.<span class="ident">char_indices</span>();
 
-    <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">current</span>.<span class="ident">into_inner</span>() {
-        <span class="kw">match</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::string_raw</span> =&gt; {
-                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">pair</span>.<span class="ident">as_str</span>());
-            }
-            <span class="ident">Rule::string_escape</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">escaped</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
-                <span class="macro">assert!</span>(<span class="ident">escaped</span>.<span class="ident">as_rule</span>() <span class="op">==</span> <span class="ident">Rule::string_escaped_predefined</span>);
+    <span class="comment">// https://datatracker.ietf.org/doc/html/rfc8259#section-7</span>
+    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">start</span>, <span class="ident">c</span>)) <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
+        <span class="kw">match</span> <span class="ident">c</span> {
+            <span class="string">&#39;\\&#39;</span> =&gt; <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>() {
+                (<span class="kw">_</span>, <span class="string">&#39;&quot;&#39;</span>) =&gt; {
+                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;&quot;&#39;</span>);
+                }
+                (<span class="kw">_</span>, <span class="string">&#39;\\&#39;</span>) =&gt; {
+                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\\&#39;</span>);
+                }
+                (<span class="kw">_</span>, <span class="string">&#39;/&#39;</span>) =&gt; {
+                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;/&#39;</span>);
+                }
+                (<span class="kw">_</span>, <span class="string">&#39;b&#39;</span>) =&gt; {
+                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\u{0008}&#39;</span>);
+                }
+                (<span class="kw">_</span>, <span class="string">&#39;f&#39;</span>) =&gt; {
+                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\u{000C}&#39;</span>);
+                }
+                (<span class="kw">_</span>, <span class="string">&#39;n&#39;</span>) =&gt; {
+                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+                }
+                (<span class="kw">_</span>, <span class="string">&#39;r&#39;</span>) =&gt; {
+                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\r&#39;</span>);
+                }
+                (<span class="kw">_</span>, <span class="string">&#39;t&#39;</span>) =&gt; {
+                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\t&#39;</span>);
+                }
+                (<span class="kw">_</span>, <span class="string">&#39;u&#39;</span>) =&gt; {
+                    <span class="kw">let</span> (<span class="ident">advance</span>, <span class="ident">char</span>) <span class="op">=</span> <span class="ident">try_parse_unicode_codepoint</span>(
+                        <span class="kw-2">&amp;</span><span class="ident">contents_str</span>[<span class="ident">start</span>..],
+                        <span class="ident">contents</span>.<span class="ident">as_span</span>().<span class="ident">start</span>() <span class="op">+</span> <span class="ident">start</span>,
+                        <span class="ident">diagnostics</span>,
+                    );
 
-                <span class="kw">let</span> <span class="ident">unescaped</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">escaped</span>.<span class="ident">as_str</span>() {
-                    <span class="string">&quot;n&quot;</span> =&gt; <span class="string">&quot;\n&quot;</span>,
-                    <span class="string">&quot;r&quot;</span> =&gt; <span class="string">&quot;\r&quot;</span>,
-                    <span class="string">&quot;t&quot;</span> =&gt; <span class="string">&quot;\t&quot;</span>,
-                    <span class="string">&quot;0&quot;</span> =&gt; <span class="string">&quot;\0&quot;</span>,
-                    <span class="ident">other</span> =&gt; <span class="ident">other</span>,
-                };
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">char</span>) <span class="op">=</span> <span class="ident">char</span> {
+                        <span class="ident">out</span>.<span class="ident">push</span>(<span class="ident">char</span>);
+                    }
 
-                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">unescaped</span>);
-            }
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Encountered impossible string content during parsing: {:?}&quot;</span>, <span class="ident">pair</span>),
+                    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">advance</span>.<span class="ident">saturating_sub</span>(<span class="number">2</span>) {
+                        <span class="ident">chars</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
+                    }
+                }
+                (<span class="kw">_</span>, <span class="ident">c</span>) =&gt; {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">final_span</span>: <span class="ident"><span class="kw">crate</span>::ast::Span</span> <span class="op">=</span> <span class="ident">contents</span>.<span class="ident">as_span</span>().<span class="ident">into</span>();
+                    <span class="ident">final_span</span>.<span class="ident">start</span> <span class="op">+</span><span class="op">=</span> <span class="ident">start</span>;
+                    <span class="ident">final_span</span>.<span class="ident">end</span> <span class="op">=</span> <span class="ident">final_span</span>.<span class="ident">start</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">c</span>.<span class="ident">len_utf8</span>();
+                    <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new</span>(
+                        <span class="string">r#&quot;Unknown escape sequence. If the value is a windows-style path, `\` must be escaped as `\\`.&quot;#</span>.<span class="ident">into</span>(),
+                        <span class="ident">final_span</span>
+                    ));
+                }
+            },
+            <span class="ident">other</span> =&gt; <span class="ident">out</span>.<span class="ident">push</span>(<span class="ident">other</span>),
         }
     }
 
     <span class="ident">out</span>
+}
+
+<span class="doccomment">/// https://datatracker.ietf.org/doc/html/rfc8259#section-7</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Returns the parsed character and how much input (in bytes) was consumed.</span>
+<span class="kw">fn</span> <span class="ident">try_parse_unicode_codepoint</span>(
+    <span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+    <span class="ident">slice_offset</span>: <span class="ident">usize</span>,
+    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span>) {
+    <span class="kw">let</span> <span class="ident">unicode_sequence_error</span> <span class="op">=</span> <span class="op">|</span><span class="ident">consumed</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::ast::Span</span> {
+            <span class="ident">start</span>: <span class="ident">slice_offset</span>,
+            <span class="ident">end</span>: (<span class="ident">slice_offset</span> <span class="op">+</span> <span class="ident">slice</span>.<span class="ident">len</span>()).<span class="ident">min</span>(<span class="ident">slice_offset</span> <span class="op">+</span> <span class="ident">consumed</span>),
+        };
+        <span class="ident">DatamodelError::new</span>(<span class="string">&quot;Invalid unicode escape sequence.&quot;</span>.<span class="ident">into</span>(), <span class="ident">span</span>)
+    };
+
+    <span class="kw">match</span> <span class="ident">parse_codepoint</span>(<span class="ident">slice</span>) {
+        (<span class="ident">consumed</span>, <span class="prelude-val">None</span>) =&gt; {
+            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">unicode_sequence_error</span>(<span class="ident">consumed</span>.<span class="ident">max</span>(<span class="number">2</span>)));
+            (<span class="ident">consumed</span>, <span class="prelude-val">None</span>)
+        }
+        (<span class="ident">consumed_first_codepoint</span>, <span class="prelude-val">Some</span>(<span class="ident">first_codepoint</span>)) =&gt; {
+            <span class="comment">// Check if the first codepoint is a valid UTF-8 codepoint. UTF-16 surrogate sequences</span>
+            <span class="comment">// are not valid UTF-8, so we can do this safely.</span>
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">char::from_u32</span>(<span class="ident">first_codepoint</span>.<span class="ident">into</span>()) {
+                <span class="kw">return</span> (<span class="number">6</span>, <span class="prelude-val">Some</span>(<span class="ident">c</span>));
+            }
+
+            <span class="comment">// If that doesn&#39;t work, try parsing a second codepoint, and treat the first one as a</span>
+            <span class="comment">// UTF-16 surrogate pair.</span>
+            <span class="kw">match</span> <span class="ident">parse_codepoint</span>(<span class="kw-2">&amp;</span><span class="ident">slice</span>[<span class="number">6</span>..]) {
+                (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; {
+                    <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">unicode_sequence_error</span>(<span class="ident">consumed_first_codepoint</span>));
+                    (<span class="ident">consumed_first_codepoint</span>, <span class="prelude-val">None</span>)
+                }
+                (<span class="ident">consumed_second_codepoint</span>, <span class="prelude-val">Some</span>(<span class="ident">second_codepoint</span>)) =&gt; {
+                    <span class="comment">// UTF-16 surrogate with</span>
+                    <span class="kw">let</span> <span class="ident">char</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">char::decode_utf16</span>([<span class="ident">first_codepoint</span> <span class="kw">as</span> <span class="ident">u16</span>, <span class="ident">second_codepoint</span> <span class="kw">as</span> <span class="ident">u16</span>].<span class="ident">into_iter</span>())
+                        .<span class="ident">next</span>()
+                    {
+                        <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">c</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">c</span>),
+                        <span class="kw">_</span> =&gt; {
+                            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">unicode_sequence_error</span>(
+                                <span class="ident">consumed_first_codepoint</span> <span class="op">+</span> <span class="ident">consumed_second_codepoint</span>,
+                            ));
+                            <span class="prelude-val">None</span>
+                        }
+                    };
+
+                    (<span class="ident">consumed_first_codepoint</span> <span class="op">*</span> <span class="number">2</span>, <span class="ident">char</span>)
+                }
+            }
+        }
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">parse_codepoint</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="ident">slice</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">slice</span>.<span class="ident">starts_with</span>(<span class="string">&quot;\\u&quot;</span>) {
+        <span class="kw">return</span> (<span class="number">0</span>, <span class="prelude-val">None</span>);
+    }
+
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">slice</span>[<span class="number">2</span>..].<span class="ident">chars</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">codepoint</span> <span class="op">=</span> <span class="number">0u16</span>;
+
+    <span class="comment">// four nibbles (4 bit integers)</span>
+    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0u8</span>..<span class="number">4</span> {
+        <span class="kw">let</span> <span class="ident">nibble_offset</span> <span class="op">=</span> <span class="number">3</span> <span class="op">-</span> <span class="ident">i</span>;
+        <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">to_digit</span>(<span class="number">16</span>)) {
+            <span class="prelude-val">Some</span>(<span class="ident">nibble</span>) =&gt; {
+                <span class="ident">codepoint</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">nibble</span> <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">nibble_offset</span> <span class="op">*</span> <span class="number">4</span>);
+            }
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> (<span class="number">2</span> <span class="op">+</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="prelude-val">None</span>),
+        }
+    }
+
+    (<span class="number">6</span>, <span class="prelude-val">Some</span>(<span class="ident">codepoint</span>))
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
