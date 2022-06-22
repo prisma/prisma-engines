@@ -298,10 +298,19 @@ pub(crate) fn fields_must_be_a_unique_constraint(relation: InlineRelationWalker<
         return;
     }
 
-    let message = "A one-to-one relation must use unique fields on the defining side. Either add a unique constraint, or change the relation to one-to-many.";
+    let fields: Vec<_> = match relation.referencing_fields() {
+        ReferencingFields::Concrete(fields) => fields.map(|f| f.name()).collect(),
+        _ => unreachable!(),
+    };
+
+    let message = if fields.len() == 1 {
+        format!("A one-to-one relation must use unique fields on the defining side. Either add an `@unique` attribute to the field `{}`, or change the relation to one-to-many.", fields.join(", "))
+    } else {
+        format!("A one-to-one relation must use unique fields on the defining side. Either add an `@@unique([{}])` attribute to the model, or change the relation to one-to-many.", fields.join(", "))
+    };
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
-        message,
+        &message,
         RELATION_ATTRIBUTE_NAME,
         forward.ast_field().span,
     ));
