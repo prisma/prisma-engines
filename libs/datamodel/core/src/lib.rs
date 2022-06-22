@@ -220,52 +220,18 @@ fn load_sources(
 //  ************** RENDERING FUNCTIONS **************
 //
 
-/// Renders to a return string.
+/// Renders the datamodel _without configuration blocks_.
 pub fn render_datamodel_to_string(datamodel: &dml::Datamodel, configuration: Option<&Configuration>) -> String {
-    let mut writable_string = String::with_capacity(datamodel.models.len() * 20);
-    render_datamodel_to(&mut writable_string, datamodel, configuration);
-    reformat(&writable_string, 2).expect("Internal error: failed to reformat introspected schema")
-}
-
-/// Renders an AST to a string.
-pub fn render_schema_ast_to_string(schema: &ast::SchemaAst) -> String {
-    let mut writable_string = String::with_capacity(schema.tops.len() * 20);
-
-    render_schema_ast_to(&mut writable_string, schema, 2);
-
-    writable_string
-}
-
-/// Renders as a string into the stream.
-fn render_datamodel_to(
-    stream: &mut dyn std::fmt::Write,
-    datamodel: &dml::Datamodel,
-    configuration: Option<&Configuration>,
-) {
     let datasource = configuration.and_then(|c| c.datasources.first());
     let lowered = lower(LowerParams { datasource, datamodel });
-
-    render_schema_ast_to(stream, &lowered, 2);
+    render_schema_ast(&lowered, 2)
 }
 
-/// Renders a datamodel, sources and generators to a string.
+/// Renders a datamodel, sources and generators.
 pub fn render_datamodel_and_config_to_string(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) -> String {
-    let mut writable_string = String::with_capacity(datamodel.models.len() * 20);
-
-    render_datamodel_and_config_to(&mut writable_string, datamodel, config);
-
-    writable_string
-}
-
-/// Renders a datamodel, generators and sources to a stream as a string.
-fn render_datamodel_and_config_to(
-    stream: &mut dyn std::fmt::Write,
-    datamodel: &dml::Datamodel,
-    config: &configuration::Configuration,
-) {
     let mut lowered = lower(LowerParams {
         datasource: config.datasources.first(),
         datamodel,
@@ -273,14 +239,15 @@ fn render_datamodel_and_config_to(
 
     dml_to_ast::add_sources_to_ast(config, &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
-
-    render_schema_ast_to(stream, &lowered, 2);
+    render_schema_ast(&lowered, 2)
 }
 
 /// Renders as a string into the stream.
-fn render_schema_ast_to(stream: &mut dyn std::fmt::Write, schema: &ast::SchemaAst, ident_width: usize) {
-    let mut renderer = schema_ast::renderer::Renderer::new(stream, ident_width);
+fn render_schema_ast(schema: &ast::SchemaAst, ident_width: usize) -> String {
+    let mut out = String::with_capacity(schema.tops.len() * 20);
+    let mut renderer = schema_ast::renderer::Renderer::new(&mut out, ident_width);
     renderer.render(schema);
+    reformat(&out, 2).expect("Internal error: failed to reformat introspected schema")
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {
