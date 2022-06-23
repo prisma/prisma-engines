@@ -1,9 +1,10 @@
 use crate::{Column, Enum, SqlSchema, Table};
-use std::ops::Index;
+use serde::*;
+use std::ops::{Index, IndexMut};
 
 /// The identifier for a table in a SqlSchema. Use it with the indexing syntax:
 /// `let table = schema[table_id];`
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct TableId(pub u32);
 
 impl Index<TableId> for SqlSchema {
@@ -11,6 +12,12 @@ impl Index<TableId> for SqlSchema {
 
     fn index(&self, index: TableId) -> &Self::Output {
         &self.tables[index.0 as usize]
+    }
+}
+
+impl IndexMut<TableId> for SqlSchema {
+    fn index_mut(&mut self, index: TableId) -> &mut Self::Output {
+        &mut self.tables[index.0 as usize]
     }
 }
 
@@ -30,11 +37,17 @@ impl Index<EnumId> for SqlSchema {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ColumnId(pub u32);
 
-impl Index<ColumnId> for Table {
-    type Output = Column;
+impl Index<ColumnId> for SqlSchema {
+    type Output = (TableId, Column);
 
     fn index(&self, index: ColumnId) -> &Self::Output {
         &self.columns[index.0 as usize]
+    }
+}
+
+impl IndexMut<ColumnId> for SqlSchema {
+    fn index_mut(&mut self, index: ColumnId) -> &mut Self::Output {
+        &mut self.columns[index.0 as usize]
     }
 }
 
@@ -59,5 +72,23 @@ impl Index<IndexFieldId> for SqlSchema {
 
     fn index(&self, index: IndexFieldId) -> &Self::Output {
         &self[index.0].columns[index.1 as usize]
+    }
+}
+
+/// The identifier for a ForeignKey in the schema.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct ForeignKeyId(pub(crate) u32);
+
+impl Index<ForeignKeyId> for SqlSchema {
+    type Output = (TableId, crate::ForeignKey);
+
+    fn index(&self, index: ForeignKeyId) -> &Self::Output {
+        &self.foreign_keys[index.0 as usize]
+    }
+}
+
+impl IndexMut<ForeignKeyId> for SqlSchema {
+    fn index_mut(&mut self, index: ForeignKeyId) -> &mut Self::Output {
+        &mut self.foreign_keys[index.0 as usize]
     }
 }

@@ -173,6 +173,7 @@ fn alter_constraint_name_push(api: TestApi) {
            @@unique([a, b])
            @@index([a])
          }
+
          model B {
            a   String
            b   String

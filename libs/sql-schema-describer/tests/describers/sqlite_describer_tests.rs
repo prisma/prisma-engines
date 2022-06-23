@@ -4,25 +4,51 @@ use indoc::indoc;
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
-pub const SCHEMA: &str = "DatabaseInspector-Test";
+#[test_connector(tags(Sqlite))]
+fn multi_column_foreign_keys_must_work(api: TestApi) {
+    let sql_family = api.sql_family();
 
-async fn describe_sqlite(sql: &str) -> SqlSchema {
-    let conn = Quaint::new_in_memory().unwrap();
+    api.execute_barrel(|migration| {
+        migration.create_table("City", move |t| {
+            t.add_column("id", types::primary());
+            t.add_column("name", types::varchar(255));
+        });
+        migration.create_table("User", move |t| {
+            t.add_column("city", types::integer());
+            t.add_column("city_name", types::varchar(255));
 
-    conn.raw_cmd(sql).await.unwrap();
+            t.inject_custom("FOREIGN KEY(city_name, city) REFERENCES \"City\"(name, id)");
+        });
+    });
 
-    sqlite::SqlSchemaDescriber::new(&conn).describe(SCHEMA).await.unwrap()
+    let schema = api.describe();
+
+    schema.assert_table("User", |t| {
+        let t = t
+            .assert_column("city", |c| c.assert_type_is_int_or_bigint())
+            .assert_column("city_name", |c| c.assert_type_is_string())
+            .assert_foreign_key_on_columns(&["city_name", "city"], |fk| {
+                fk.assert_references("City", &["name", "id"])
+            });
+
+        if sql_family.is_mysql() {
+            t.assert_index_on_columns(&["city_name", "city"], |idx| idx.assert_name("city_name"))
+        } else {
+            t
+        }
+    });
 }
 
-#[tokio::test]
-async fn views_can_be_described() {
+#[test_connector(tags(Sqlite))]
+fn views_can_be_described(api: TestApi) {
     let full_sql = r#"
         CREATE TABLE a (a_id int);
         CREATE TABLE b (b_id int);
         CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
-        "#;
+    "#;
 
-    let result = describe_sqlite(full_sql).await;
+    api.raw_cmd(full_sql);
+    let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
     let expected_sql = "CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b";
@@ -31,8 +57,8 @@ async fn views_can_be_described() {
     assert_eq!(expected_sql, &view.definition.unwrap());
 }
 
-#[tokio::test]
-async fn sqlite_column_types_must_work() {
+#[test_connector(tags(Sqlite))]
+fn sqlite_column_types_must_work(api: TestApi) {
     let mut migration = Migration::new();
     migration.create_table("User", move |t| {
         t.inject_custom("int_col int not null");
@@ -44,94 +70,138 @@ async fn sqlite_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::Sqlite>();
-    let result = describe_sqlite(&full_sql).await;
-    let table = result.get_table("User").expect("couldn't get User table");
-    let expected_columns = vec![
-        Column {
-            name: "int_col".to_string(),
-            tpe: ColumnType {
-                full_data_type: "int".to_string(),
-                family: ColumnTypeFamily::Int,
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "int4_col".to_string(),
-            tpe: ColumnType {
-                full_data_type: "INTEGER".to_string(),
-                family: ColumnTypeFamily::Int,
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "text_col".to_string(),
-            tpe: ColumnType {
-                full_data_type: "TEXT".to_string(),
-                family: ColumnTypeFamily::String,
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "real_col".to_string(),
-            tpe: ColumnType {
-                full_data_type: "REAL".to_string(),
-                family: ColumnTypeFamily::Float,
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "primary_col".to_string(),
-            tpe: ColumnType {
-                full_data_type: "INTEGER".to_string(),
-                family: ColumnTypeFamily::Int,
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: true,
-        },
-        Column {
-            name: "decimal_col".to_string(),
-            tpe: ColumnType {
-                full_data_type: "decimal (5, 3)".to_string(),
-                family: ColumnTypeFamily::Decimal,
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-    ];
-
-    assert_eq!(
-        table,
-        &Table {
-            name: "User".to_string(),
-            columns: expected_columns,
-            indices: vec![],
-            primary_key: Some(PrimaryKey {
-                columns: vec![PrimaryKeyColumn::new("primary_col")],
-                constraint_name: None,
-            }),
-            foreign_keys: vec![],
+    api.raw_cmd(&full_sql);
+    let expectation = expect![[r#"
+        SqlSchema {
+            tables: [
+                Table {
+                    name: "User",
+                    indices: [],
+                    primary_key: Some(
+                        PrimaryKey {
+                            columns: [
+                                PrimaryKeyColumn {
+                                    name: "primary_col",
+                                    length: None,
+                                    sort_order: None,
+                                },
+                            ],
+                            constraint_name: None,
+                        },
+                    ),
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "int_col",
+                        tpe: ColumnType {
+                            full_data_type: "int",
+                            family: Int,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "int4_col",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "text_col",
+                        tpe: ColumnType {
+                            full_data_type: "TEXT",
+                            family: String,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "real_col",
+                        tpe: ColumnType {
+                            full_data_type: "REAL",
+                            family: Float,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "primary_col",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "decimal_col",
+                        tpe: ColumnType {
+                            full_data_type: "decimal (5, 3)",
+                            family: Decimal,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
         }
-    );
+    "#]];
+    api.expect_schema(expectation);
 }
 
-#[tokio::test]
-async fn sqlite_foreign_key_on_delete_must_be_handled() {
+#[test_connector(tags(Sqlite))]
+fn sqlite_foreign_key_on_delete_must_be_handled(api: TestApi) {
     let sql = "
         CREATE TABLE City (id INTEGER NOT NULL PRIMARY KEY);
         CREATE TABLE User (
@@ -142,135 +212,267 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
             city_set_default INTEGER REFERENCES City(id) ON DELETE SET DEFAULT,
             city_set_null INTEGER REFERENCES City(id) ON DELETE SET NULL
         )";
-    let mut schema = describe_sqlite(sql).await;
-    let table = schema.tables.iter_mut().find(|t| t.name == "User").unwrap();
-    table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
-    assert_eq!(
-        table,
-        &Table {
-            name: "User".to_string(),
-            columns: vec![
-                Column {
-                    name: "id".to_string(),
-                    tpe: ColumnType {
-                        full_data_type: "INTEGER".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Required,
-                        native_type: None,
-                    },
-                    default: None,
-                    auto_increment: true,
+    api.raw_cmd(sql);
+    let expectation = expect![[r#"
+        SqlSchema {
+            tables: [
+                Table {
+                    name: "City",
+                    indices: [],
+                    primary_key: Some(
+                        PrimaryKey {
+                            columns: [
+                                PrimaryKeyColumn {
+                                    name: "id",
+                                    length: None,
+                                    sort_order: None,
+                                },
+                            ],
+                            constraint_name: None,
+                        },
+                    ),
                 },
-                Column {
-                    name: "city".to_string(),
-                    tpe: ColumnType {
-                        full_data_type: "INTEGER".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: None,
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_cascade".to_string(),
-                    tpe: ColumnType {
-                        full_data_type: "INTEGER".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: None,
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_restrict".to_string(),
-                    tpe: ColumnType {
-                        full_data_type: "INTEGER".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: None,
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_set_default".to_string(),
-                    tpe: ColumnType {
-                        full_data_type: "INTEGER".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: None,
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_set_null".to_string(),
-                    tpe: ColumnType {
-                        full_data_type: "INTEGER".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: None,
-                    },
-                    default: None,
-                    auto_increment: false,
+                Table {
+                    name: "User",
+                    indices: [],
+                    primary_key: Some(
+                        PrimaryKey {
+                            columns: [
+                                PrimaryKeyColumn {
+                                    name: "id",
+                                    length: None,
+                                    sort_order: None,
+                                },
+                            ],
+                            constraint_name: None,
+                        },
+                    ),
                 },
             ],
-            indices: vec![],
-            primary_key: Some(PrimaryKey {
-                columns: vec![PrimaryKeyColumn::new("id")],
-                constraint_name: None,
-            }),
-            foreign_keys: vec![
-                ForeignKey {
-                    constraint_name: None,
-                    columns: vec!["city".to_string()],
-                    referenced_columns: vec!["id".to_string()],
-                    referenced_table: "City".to_string(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::NoAction,
-                },
-                ForeignKey {
-                    constraint_name: None,
-                    columns: vec!["city_cascade".to_string()],
-                    referenced_columns: vec!["id".to_string()],
-                    referenced_table: "City".to_string(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::Cascade,
-                },
-                ForeignKey {
-                    constraint_name: None,
-                    columns: vec!["city_restrict".to_string()],
-                    referenced_columns: vec!["id".to_string()],
-                    referenced_table: "City".to_string(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::Restrict,
-                },
-                ForeignKey {
-                    constraint_name: None,
-                    columns: vec!["city_set_default".to_string()],
-                    referenced_columns: vec!["id".to_string()],
-                    referenced_table: "City".to_string(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::SetDefault,
-                },
-                ForeignKey {
-                    constraint_name: None,
-                    columns: vec!["city_set_null".to_string()],
-                    referenced_columns: vec!["id".to_string()],
-                    referenced_table: "City".to_string(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::SetNull,
-                },
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "id",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "city",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "city_cascade",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "city_restrict",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "city_set_default",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "city_set_null",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
             ],
+            foreign_keys: [
+                (
+                    TableId(
+                        1,
+                    ),
+                    ForeignKey {
+                        constraint_name: None,
+                        columns: [
+                            "city",
+                        ],
+                        referenced_table: TableId(
+                            0,
+                        ),
+                        referenced_columns: [
+                            "id",
+                        ],
+                        on_delete_action: NoAction,
+                        on_update_action: NoAction,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    ForeignKey {
+                        constraint_name: None,
+                        columns: [
+                            "city_cascade",
+                        ],
+                        referenced_table: TableId(
+                            0,
+                        ),
+                        referenced_columns: [
+                            "id",
+                        ],
+                        on_delete_action: Cascade,
+                        on_update_action: NoAction,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    ForeignKey {
+                        constraint_name: None,
+                        columns: [
+                            "city_restrict",
+                        ],
+                        referenced_table: TableId(
+                            0,
+                        ),
+                        referenced_columns: [
+                            "id",
+                        ],
+                        on_delete_action: Restrict,
+                        on_update_action: NoAction,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    ForeignKey {
+                        constraint_name: None,
+                        columns: [
+                            "city_set_default",
+                        ],
+                        referenced_table: TableId(
+                            0,
+                        ),
+                        referenced_columns: [
+                            "id",
+                        ],
+                        on_delete_action: SetDefault,
+                        on_update_action: NoAction,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    ForeignKey {
+                        constraint_name: None,
+                        columns: [
+                            "city_set_null",
+                        ],
+                        referenced_table: TableId(
+                            0,
+                        ),
+                        referenced_columns: [
+                            "id",
+                        ],
+                        on_delete_action: SetNull,
+                        on_update_action: NoAction,
+                    },
+                ),
+            ],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
         }
-    );
+    "#]];
+    api.expect_schema(expectation);
 }
 
-#[tokio::test]
-async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexes() {
+#[test_connector(tags(Sqlite))]
+fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexes(api: TestApi) {
     let mut migration = Migration::new();
     migration.create_table("User", move |t| {
         t.add_column("int4_col", types::integer());
@@ -282,10 +484,11 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
         t.inject_custom("PRIMARY KEY (\"primary_col\")");
     });
     let full_sql = migration.make::<barrel::backend::Sqlite>();
+    api.raw_cmd(&full_sql);
 
-    let result = describe_sqlite(&full_sql).await;
+    let result = api.describe();
 
-    let table = result.get_table("User").expect("couldn't get User table");
+    let (_, table) = result.table_bang("User");
 
     assert!(table.indices.is_empty());
 
@@ -300,80 +503,142 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
 
 #[test_connector(tags(Sqlite))]
 fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
-    let create_table = format!(
-        r#"
-            CREATE TABLE "{0}"."string_defaults_test" (
-                id INTEGER PRIMARY KEY,
-                regular VARCHAR NOT NULL DEFAULT 'meow, says the cat',
-                escaped VARCHAR NOT NULL DEFAULT '"That''s a lot of fish!"
+    let create_table = r#"
+        CREATE TABLE "string_defaults_test" (
+            regular VARCHAR NOT NULL DEFAULT 'meow, says the cat',
+            escaped VARCHAR NOT NULL DEFAULT '"That''s a lot of fish!"
 - Godzilla, 1998'
-            );
-        "#,
-        api.schema_name()
-    );
+        );
+    "#;
 
-    api.raw_cmd(&create_table);
-
-    let schema = api.describe();
-
-    let table = schema.table_bang("string_defaults_test");
-
-    let regular_column_default = table
-        .column_bang("regular")
-        .default
-        .as_ref()
-        .unwrap()
-        .as_value()
-        .unwrap()
-        .clone()
-        .into_string()
-        .unwrap();
-
-    assert_eq!(regular_column_default, "meow, says the cat");
-
-    let escaped_column_default = table
-        .column_bang("escaped")
-        .default
-        .as_ref()
-        .unwrap()
-        .as_value()
-        .unwrap()
-        .clone()
-        .into_string()
-        .unwrap();
-
-    assert_eq!(escaped_column_default, "\"That's a lot of fish!\"\n- Godzilla, 1998");
+    api.raw_cmd(create_table);
+    let expectation = expect![[r#"
+        SqlSchema {
+            tables: [
+                Table {
+                    name: "string_defaults_test",
+                    indices: [],
+                    primary_key: None,
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "regular",
+                        tpe: ColumnType {
+                            full_data_type: "VARCHAR",
+                            family: String,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Value(
+                                    String(
+                                        "meow, says the cat",
+                                    ),
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "escaped",
+                        tpe: ColumnType {
+                            full_data_type: "VARCHAR",
+                            family: String,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Value(
+                                    String(
+                                        "\"That's a lot of fish!\"\n- Godzilla, 1998",
+                                    ),
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+    api.expect_schema(expectation);
 }
 
 #[test_connector(tags(Sqlite))]
-fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
-    let create_table = format!(
-        r#"
-            CREATE TABLE "{0}"."test" (
-                model_name_space VARCHAR(255) NOT NULL DEFAULT 'xyz\Datasource\Model'
-            );
-        "#,
-        api.schema_name()
-    );
+fn backslashes_in_string_literals(api: TestApi) {
+    let create_table = r#"
+        CREATE TABLE "test" (
+            model_name_space VARCHAR(255) NOT NULL DEFAULT 'xyz\Datasource\Model'
+        );
+    "#;
 
-    api.raw_cmd(&create_table);
+    api.raw_cmd(create_table);
 
-    let schema = api.describe();
-
-    let table = schema.table_bang("test");
-
-    let default = table
-        .column_bang("model_name_space")
-        .default
-        .as_ref()
-        .unwrap()
-        .as_value()
-        .unwrap()
-        .clone()
-        .into_string()
-        .unwrap();
-
-    assert_eq!(default, "xyz\\Datasource\\Model");
+    let expectation = expect![[r#"
+        SqlSchema {
+            tables: [
+                Table {
+                    name: "test",
+                    indices: [],
+                    primary_key: None,
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "model_name_space",
+                        tpe: ColumnType {
+                            full_data_type: "VARCHAR(255)",
+                            family: String,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Value(
+                                    String(
+                                        "xyz\\Datasource\\Model",
+                                    ),
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+    api.expect_schema(expectation);
 }
 
 #[test_connector(tags(Sqlite))]
@@ -397,14 +662,154 @@ fn broken_relations_are_filtered_out(api: TestApi) {
 
     api.raw_cmd(setup);
 
-    let schema = api.describe();
-    let table = schema.table_bang("dog");
-
-    assert!(
-        matches!(table.foreign_keys.as_slice(), [fk] if fk.referenced_table == "platypus"),
-        "{:#?}",
-        table.foreign_keys
-    );
+    // the relation to platypus should be the only foreign key on dog
+    let expectation = expect![[r#"
+        SqlSchema {
+            tables: [
+                Table {
+                    name: "dog",
+                    indices: [],
+                    primary_key: Some(
+                        PrimaryKey {
+                            columns: [
+                                PrimaryKeyColumn {
+                                    name: "id",
+                                    length: None,
+                                    sort_order: None,
+                                },
+                            ],
+                            constraint_name: None,
+                        },
+                    ),
+                },
+                Table {
+                    name: "platypus",
+                    indices: [],
+                    primary_key: Some(
+                        PrimaryKey {
+                            columns: [
+                                PrimaryKeyColumn {
+                                    name: "id",
+                                    length: None,
+                                    sort_order: None,
+                                },
+                            ],
+                            constraint_name: None,
+                        },
+                    ),
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "bestFriendId",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "realBestFriendId",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "otherBestFriendId",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "id",
+                        tpe: ColumnType {
+                            full_data_type: "INTEGER",
+                            family: Int,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: true,
+                    },
+                ),
+            ],
+            foreign_keys: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    ForeignKey {
+                        constraint_name: None,
+                        columns: [
+                            "realBestFriendId",
+                        ],
+                        referenced_table: TableId(
+                            1,
+                        ),
+                        referenced_columns: [
+                            "id",
+                        ],
+                        on_delete_action: NoAction,
+                        on_update_action: NoAction,
+                    },
+                ),
+            ],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+    api.expect_schema(expectation);
 }
 
 #[test_connector(tags(Sqlite))]
@@ -423,7 +828,7 @@ fn index_sort_order_is_handled(api: TestApi) {
 
     let schema = api.describe();
     let table = schema.table_walkers().next().unwrap();
-    let index = table.index_at(0);
+    let index = table.indexes().next().unwrap();
 
     let columns = index.columns().collect::<Vec<_>>();
 

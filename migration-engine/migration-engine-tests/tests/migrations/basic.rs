@@ -242,7 +242,7 @@ fn removing_a_scalar_field_must_work(api: TestApi) {
     api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema()
-        .assert_table("Test", |table| table.assert_column_count(1));
+        .assert_table("Test", |table| table.assert_columns_count(1));
 }
 
 #[test_connector]

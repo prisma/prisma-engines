@@ -1,7 +1,7 @@
 use super::{differ_database::DifferDatabase, foreign_keys_match};
 use crate::{flavour::SqlFlavour, pair::Pair};
 use sql_schema_describer::{
-    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
+    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker},
     PrimaryKey, TableId,
 };
 
@@ -13,8 +13,8 @@ pub(crate) struct TableDiffer<'a, 'b> {
 impl<'schema, 'b> TableDiffer<'schema, 'b> {
     pub(crate) fn column_pairs(&self) -> impl Iterator<Item = Pair<ColumnWalker<'schema>>> + '_ {
         self.db
-            .column_pairs(self.tables.map(|t| t.table_id()))
-            .map(move |colids| self.tables.columns(&colids))
+            .column_pairs(self.tables.map(|t| t.id))
+            .map(move |colids| self.db.schemas().columns(colids))
     }
 
     pub(crate) fn any_column_changed(&self) -> bool {
@@ -24,14 +24,14 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 
     pub(crate) fn dropped_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
         self.db
-            .dropped_columns(self.tables.map(|t| t.table_id()))
-            .map(move |idx| self.tables.previous().column_at(idx))
+            .dropped_columns(self.tables.map(|t| t.id))
+            .map(move |colid| self.tables.previous.schema.walk_column(colid))
     }
 
     pub(crate) fn added_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
         self.db
-            .created_columns(self.tables.map(|t| t.table_id()))
-            .map(move |idx| self.tables.next().column_at(idx))
+            .created_columns(self.tables.map(|t| t.id))
+            .map(move |colid| self.tables.next.schema.walk_column(colid))
     }
 
     pub(crate) fn created_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
@@ -54,7 +54,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         self.next_indexes().filter(move |next_index| {
             !self
                 .previous_indexes()
-                .any(move |previous_index| indexes_match(&previous_index, next_index, self.db.flavour))
+                .any(move |previous_index| indexes_match(previous_index, *next_index, self.db.flavour))
         })
     }
 
@@ -62,7 +62,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         self.previous_indexes().filter(move |previous_index| {
             !self
                 .next_indexes()
-                .any(|next_index| indexes_match(previous_index, &next_index, self.db.flavour))
+                .any(|next_index| indexes_match(*previous_index, next_index, self.db.flavour))
         })
     }
 
@@ -93,7 +93,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 
         singular_indexes.filter_map(move |previous_index| {
             self.next_indexes()
-                .find(|next_index| indexes_match(&previous_index, next_index, self.db.flavour))
+                .find(|next_index| indexes_match(previous_index, *next_index, self.db.flavour))
                 .map(|renamed_index| Pair::new(previous_index, renamed_index))
         })
     }
@@ -159,21 +159,21 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         self.next().indexes()
     }
 
-    pub(super) fn previous(&self) -> &TableWalker<'schema> {
-        self.tables.previous()
+    pub(super) fn previous(&self) -> TableWalker<'schema> {
+        self.tables.previous
     }
 
-    pub(super) fn next(&self) -> &TableWalker<'schema> {
-        self.tables.next()
+    pub(super) fn next(&self) -> TableWalker<'schema> {
+        self.tables.next
     }
 
     pub(super) fn table_ids(&self) -> Pair<TableId> {
-        self.tables.map(|t| t.table_id())
+        self.tables.map(|t| t.id)
     }
 }
 
 /// Compare two SQL indexes and return whether they only differ by name.
-fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>, flavour: &dyn SqlFlavour) -> bool {
+fn indexes_match(first: IndexWalker<'_>, second: IndexWalker<'_>, flavour: &dyn SqlFlavour) -> bool {
     let left_cols = first.columns();
     let right_cols = second.columns();
 
@@ -186,5 +186,5 @@ fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>, flavour: &dy
             names_match && lengths_match && orders_match
         })
         && first.index_type() == second.index_type()
-        && flavour.indexes_match(*first, *second)
+        && flavour.indexes_match(first, second)
 }

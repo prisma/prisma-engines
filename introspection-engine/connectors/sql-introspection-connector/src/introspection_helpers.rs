@@ -1,4 +1,4 @@
-use crate::{calculate_datamodel::CalculateDatamodelContext as Context, Dedup, SqlError, SqlFamilyTrait};
+use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlError, SqlFamilyTrait};
 use datamodel::{
     common::{preview_features::PreviewFeature, RelationNames},
     dml::{
@@ -6,65 +6,69 @@ use datamodel::{
         PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder,
     },
 };
+use sql::walkers::{ColumnWalker, ForeignKeyWalker, TableWalker};
 use sql_schema_describer::{
-    self as sql, mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, ColumnArity, ColumnTypeFamily, ForeignKey,
-    ForeignKeyAction, IndexFieldId, IndexType, SQLSortOrder, SqlSchema, Table,
+    self as sql, mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, ColumnArity, ColumnTypeFamily, ForeignKeyAction,
+    IndexFieldId, IndexType, SQLSortOrder, SqlSchema,
 };
+use std::collections::HashSet;
 use tracing::debug;
 
 //checks
-pub fn is_old_migration_table(table: &Table) -> bool {
-    table.name == "_Migration"
-        && table.columns.iter().any(|c| c.name == "revision")
-        && table.columns.iter().any(|c| c.name == "name")
-        && table.columns.iter().any(|c| c.name == "datamodel")
-        && table.columns.iter().any(|c| c.name == "status")
-        && table.columns.iter().any(|c| c.name == "applied")
-        && table.columns.iter().any(|c| c.name == "rolled_back")
-        && table.columns.iter().any(|c| c.name == "datamodel_steps")
-        && table.columns.iter().any(|c| c.name == "database_migration")
-        && table.columns.iter().any(|c| c.name == "errors")
-        && table.columns.iter().any(|c| c.name == "started_at")
-        && table.columns.iter().any(|c| c.name == "finished_at")
+pub fn is_old_migration_table(table: TableWalker<'_>) -> bool {
+    table.name() == "_Migration"
+        && table.columns().any(|c| c.name() == "revision")
+        && table.columns().any(|c| c.name() == "name")
+        && table.columns().any(|c| c.name() == "datamodel")
+        && table.columns().any(|c| c.name() == "status")
+        && table.columns().any(|c| c.name() == "applied")
+        && table.columns().any(|c| c.name() == "rolled_back")
+        && table.columns().any(|c| c.name() == "datamodel_steps")
+        && table.columns().any(|c| c.name() == "database_migration")
+        && table.columns().any(|c| c.name() == "errors")
+        && table.columns().any(|c| c.name() == "started_at")
+        && table.columns().any(|c| c.name() == "finished_at")
 }
 
-pub fn is_new_migration_table(table: &Table) -> bool {
-    table.name == "_prisma_migrations"
-        && table.columns.iter().any(|c| c.name == "id")
-        && table.columns.iter().any(|c| c.name == "checksum")
-        && table.columns.iter().any(|c| c.name == "finished_at")
-        && table.columns.iter().any(|c| c.name == "migration_name")
-        && table.columns.iter().any(|c| c.name == "logs")
-        && table.columns.iter().any(|c| c.name == "rolled_back_at")
-        && table.columns.iter().any(|c| c.name == "started_at")
-        && table.columns.iter().any(|c| c.name == "applied_steps_count")
+pub fn is_new_migration_table(table: TableWalker<'_>) -> bool {
+    table.name() == "_prisma_migrations"
+        && table.columns().any(|c| c.name() == "id")
+        && table.columns().any(|c| c.name() == "checksum")
+        && table.columns().any(|c| c.name() == "finished_at")
+        && table.columns().any(|c| c.name() == "migration_name")
+        && table.columns().any(|c| c.name() == "logs")
+        && table.columns().any(|c| c.name() == "rolled_back_at")
+        && table.columns().any(|c| c.name() == "started_at")
+        && table.columns().any(|c| c.name() == "applied_steps_count")
 }
 
-pub(crate) fn is_relay_table(table: &Table) -> bool {
-    table.name == "_RelayId"
-        && table.columns[0].name == "id"
-        && table.columns[1].name.to_lowercase() == "stablemodelidentifier"
+pub(crate) fn is_relay_table(table: TableWalker<'_>) -> bool {
+    table.name() == "_RelayId"
+        && table.column("id").is_some()
+        && table
+            .columns()
+            .any(|col| col.name().eq_ignore_ascii_case("stablemodelidentifier"))
 }
 
-pub(crate) fn is_prisma_1_or_11_list_table(table: &Table) -> bool {
-    table.columns.len() == 3
-        && table.columns[0].name.to_lowercase() == "nodeid"
-        && table.columns[1].name == "position"
-        && table.columns[2].name == "value"
+pub(crate) fn is_prisma_1_or_11_list_table(table: TableWalker<'_>) -> bool {
+    table.columns().len() == 3
+        && table.columns().any(|col| col.name().eq_ignore_ascii_case("nodeid"))
+        && table.column("position").is_some()
+        && table.column("value").is_some()
 }
 
-pub(crate) fn is_prisma_1_point_1_or_2_join_table(table: &Table) -> bool {
-    table.columns.len() == 2 && table.indices.len() >= 2 && common_prisma_m_to_n_relation_conditions(table)
+pub(crate) fn is_prisma_1_point_1_or_2_join_table(table: TableWalker<'_>) -> bool {
+    table.columns().len() == 2 && table.indexes().len() >= 2 && common_prisma_m_to_n_relation_conditions(table)
 }
 
-pub(crate) fn is_prisma_1_point_0_join_table(table: &Table) -> bool {
-    table.columns.len() == 3
-        && table.indices.len() >= 2
-        && table.columns.iter().any(|c| c.name == "id")
+pub(crate) fn is_prisma_1_point_0_join_table(table: TableWalker<'_>) -> bool {
+    table.columns().len() == 3
+        && table.indexes().len() >= 2
+        && table.columns().any(|c| c.name() == "id")
         && common_prisma_m_to_n_relation_conditions(table)
 }
 
-fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
+fn common_prisma_m_to_n_relation_conditions(table: TableWalker<'_>) -> bool {
     fn is_a(column: &str) -> bool {
         column.to_lowercase() == "a"
     }
@@ -73,34 +77,36 @@ fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
         column.to_lowercase() == "b"
     }
 
-    table.name.starts_with('_')
+    let mut fks = table.foreign_keys();
+    let first_fk = fks.next();
+    let second_fk = fks.next();
+    table.name().starts_with('_')
         //UNIQUE INDEX [A,B]
-        && table.indices.iter().any(|i| {
-            i.columns.len() == 2
-                && is_a(i.columns[0].name())
-                && is_b(i.columns[1].name())
-                && i.is_unique()
+        && table.indexes().any(|i| {
+            i.columns().len() == 2
+                && is_a(i.columns().next().unwrap().as_column().name())
+                && is_b(i.columns().nth(1).unwrap().as_column().name())
+                && i.index_type().is_unique()
         })
         //INDEX [B]
         && table
-            .indices
-            .iter()
-            .any(|i| i.columns.len() == 1 && is_b(i.columns[0].name()) && i.tpe == IndexType::Normal)
+            .indexes()
+            .any(|i| i.columns().len() == 1 && is_b(i.columns().next().unwrap().as_column().name()) && i.index_type() == IndexType::Normal)
 
         // 2 FKs
-        && table.foreign_keys.len() == 2
+        && table.foreign_key_count() == 2
         // Lexicographically lower model referenced by A
-        && if table.foreign_keys[0].referenced_table <= table.foreign_keys[1].referenced_table {
-            is_a(&table.foreign_keys[0].columns[0]) && is_b(&table.foreign_keys[1].columns[0])
+        && if first_fk.unwrap().referenced_table_name() <= second_fk.unwrap().referenced_table_name() {
+            is_a(&first_fk.unwrap().constrained_column_names()[0]) && is_b(&second_fk.unwrap().constrained_column_names()[0])
         } else {
-            is_b(&table.foreign_keys[0].columns[0]) && is_a(&table.foreign_keys[1].columns[0])
+            is_b(&first_fk.unwrap().constrained_column_names()[0]) && is_a(&second_fk.unwrap().constrained_column_names()[0])
         }
 }
 
 //calculators
 
 pub fn calculate_many_to_many_field(
-    opposite_foreign_key: &ForeignKey,
+    opposite_foreign_key: ForeignKeyWalker<'_>,
     relation_name: String,
     is_self_relation: bool,
 ) -> RelationField {
@@ -108,17 +114,17 @@ pub fn calculate_many_to_many_field(
         name: relation_name,
         fk_name: None,
         fields: vec![],
-        to: opposite_foreign_key.referenced_table.clone(),
-        references: opposite_foreign_key.referenced_columns.clone(),
+        to: opposite_foreign_key.referenced_table_name().to_owned(),
+        references: opposite_foreign_key.referenced_column_names().to_owned(),
         on_delete: None,
         on_update: None,
     };
 
-    let basename = opposite_foreign_key.referenced_table.clone();
+    let basename = opposite_foreign_key.referenced_table_name();
 
     let name = match is_self_relation {
-        true => format!("{}_{}", basename, opposite_foreign_key.columns[0]),
-        false => basename,
+        true => format!("{}_{}", basename, &opposite_foreign_key.constrained_column_names()[0]),
+        false => basename.to_owned(),
     };
 
     RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
@@ -151,8 +157,8 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Co
                     SQLSortOrder::Desc => SortOrder::Desc,
                 });
 
-                let index_field_id = IndexFieldId(index.index_id(), i as u32);
-                let operator_class = get_opclass(index_field_id, index.schema(), ctx);
+                let index_field_id = IndexFieldId(index.id, i as u32);
+                let operator_class = get_opclass(index_field_id, index.schema, ctx);
 
                 IndexField {
                     path: vec![(c.as_column().name().to_owned(), None)],
@@ -165,27 +171,27 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Co
         tpe,
         defined_on_field: index.columns().len() == 1,
         algorithm: index_algorithm(index, ctx),
-        clustered: index_is_clustered(index.index_id(), index.schema(), ctx),
+        clustered: index_is_clustered(index.id, index.schema, ctx),
     }
 }
 
-pub(crate) fn calculate_scalar_field(table: &Table, column: &sql::Column, ctx: &mut Context) -> ScalarField {
+pub(crate) fn calculate_scalar_field(column: ColumnWalker<'_>, ctx: &mut Context) -> ScalarField {
     debug!("Handling column {:?}", column);
 
-    let field_type = calculate_scalar_field_type_with_native_types(column, ctx);
+    let field_type = calculate_scalar_field_type_with_native_types(column.column(), ctx);
 
-    let is_id = is_id(column, table);
-    let arity = match column.tpe.arity {
-        _ if is_id && column.auto_increment => FieldArity::Required,
+    let is_id = column.is_single_primary_key();
+    let arity = match column.column_type().arity {
+        _ if is_id && column.is_autoincrement() => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
         ColumnArity::Nullable => FieldArity::Optional,
         ColumnArity::List => FieldArity::List,
     };
 
-    let default_value = crate::defaults::calculate_default(table, column, ctx);
+    let default_value = crate::defaults::calculate_default(column.table().table(), column.column(), ctx);
 
     ScalarField {
-        name: column.name.clone(),
+        name: column.name().to_owned(),
         arity,
         field_type,
         database_name: None,
@@ -199,11 +205,10 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &sql::Column, ctx: &
 }
 
 pub(crate) fn calculate_relation_field(
-    schema: &SqlSchema,
-    table: &Table,
-    foreign_key: &ForeignKey,
+    foreign_key: ForeignKeyWalker<'_>,
     m2m_table_names: &[String],
-) -> Result<RelationField, SqlError> {
+    duplicated_foreign_keys: &HashSet<sql::ForeignKeyId>,
+) -> RelationField {
     debug!("Handling foreign key  {:?}", foreign_key);
 
     let map_action = |action: ForeignKeyAction| match action {
@@ -215,37 +220,31 @@ pub(crate) fn calculate_relation_field(
     };
 
     let relation_info = RelationInfo {
-        name: calculate_relation_name(schema, foreign_key, table, m2m_table_names)?,
-        fk_name: foreign_key.constraint_name.clone(),
-        fields: foreign_key.columns.clone(),
-        to: foreign_key.referenced_table.clone(),
-        references: foreign_key.referenced_columns.clone(),
-        on_delete: Some(map_action(foreign_key.on_delete_action)),
-        on_update: Some(map_action(foreign_key.on_update_action)),
+        name: calculate_relation_name(foreign_key, m2m_table_names, duplicated_foreign_keys),
+        fk_name: foreign_key.constraint_name().map(String::from),
+        fields: foreign_key.constrained_column_names().to_owned(),
+        to: foreign_key.referenced_table().name().to_owned(),
+        references: foreign_key.referenced_column_names().to_owned(),
+        on_delete: Some(map_action(*foreign_key.on_delete_action())),
+        on_update: Some(map_action(*foreign_key.on_update_action())),
     };
 
-    let columns: Vec<&sql::Column> = foreign_key
-        .columns
-        .iter()
-        .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
-        .collect();
-
-    let arity = match columns.iter().any(|c| !c.is_required()) {
+    let arity = match foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
         true => FieldArity::Optional,
         false => FieldArity::Required,
     };
 
-    let calculated_arity = match columns.iter().any(|c| c.is_required()) {
+    let calculated_arity = match foreign_key.constrained_columns().any(|c| c.arity().is_required()) {
         true => FieldArity::Required,
         false => arity,
     };
 
-    Ok(RelationField::new(
-        &foreign_key.referenced_table,
+    RelationField::new(
+        foreign_key.referenced_table().name(),
         arity,
         calculated_arity,
         relation_info,
-    ))
+    )
 }
 
 pub(crate) fn calculate_backrelation_field(
@@ -255,11 +254,11 @@ pub(crate) fn calculate_backrelation_field(
     relation_field: &RelationField,
     relation_info: &RelationInfo,
 ) -> Result<RelationField, SqlError> {
-    match schema.table(&model.name) {
-        Err(table_name) => Err(SqlError::SchemaInconsistent {
-            explanation: format!("Table {} not found.", table_name),
+    match schema.table_walkers().find(|t| t.name() == model.name) {
+        None => Err(SqlError::SchemaInconsistent {
+            explanation: format!("Table {} not found.", &model.name),
         }),
-        Ok(table) => {
+        Some(table) => {
             let new_relation_info = RelationInfo {
                 name: relation_info.name.clone(),
                 fk_name: None,
@@ -271,15 +270,17 @@ pub(crate) fn calculate_backrelation_field(
             };
 
             // unique or id
-            let other_is_unique = table.indices.iter().any(|i| {
+            let other_is_unique = table.indexes().any(|i| {
                 columns_match(
-                    &i.columns.iter().map(|c| c.name().to_string()).collect::<Vec<_>>(),
+                    &i.columns()
+                        .map(|c| c.as_column().name().to_string())
+                        .collect::<Vec<_>>(),
                     &relation_info.fields,
-                ) && i.is_unique()
+                ) && i.index_type().is_unique()
             }) || columns_match(
                 &table
                     .primary_key_columns()
-                    .map(|c| c.name().to_string())
+                    .map(|c| c.as_column().name().to_owned())
                     .collect::<Vec<_>>(),
                 &relation_info.fields,
             );
@@ -302,58 +303,33 @@ pub(crate) fn calculate_backrelation_field(
     }
 }
 
-pub(crate) fn is_id(column: &sql::Column, table: &sql::Table) -> bool {
-    table
-        .primary_key
-        .as_ref()
-        .map(|pk| pk.is_single_primary_key(&column.name))
-        .unwrap_or(false)
-}
-
-pub(crate) fn calculate_relation_name(
-    schema: &SqlSchema,
-    fk: &ForeignKey,
-    table: &Table,
+// This is not called for prisma many to many relations. For them the name is just the name of the join table.
+fn calculate_relation_name(
+    fk: ForeignKeyWalker<'_>,
     m2m_table_names: &[String],
-) -> Result<String, SqlError> {
-    // This is not called for prisma many to many relations. For them the name is just the name of the join table.
-    let referenced_model = &fk.referenced_table;
-    let model_with_fk = &table.name;
-    let fk_column_name = fk.columns.join("_");
+    duplicated_foreign_keys: &HashSet<sql::ForeignKeyId>,
+) -> String {
+    let referenced_model = fk.referenced_table().name();
+    let model_with_fk = fk.table().name();
+    let fk_column_name = fk.constrained_column_names().join("_");
+    let name_is_ambiguous = {
+        let mut both_ids = [fk.referenced_table().id, fk.table().id];
+        both_ids.sort();
+        fk.schema.walk_foreign_keys().any(|other_fk| {
+            let mut other_ids = [other_fk.referenced_table().id, other_fk.table().id];
+            other_ids.sort();
 
-    let mut fk_to_same_model: Vec<ForeignKey> = table
-        .foreign_keys
-        .clone()
-        .into_iter()
-        .filter(|fk| &fk.referenced_table == referenced_model)
-        .collect();
+            other_fk.id != fk.id && both_ids == other_ids && !duplicated_foreign_keys.contains(&other_fk.id)
+        })
+    };
 
-    fk_to_same_model.clear_duplicates();
+    let unambiguous_name = RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model);
 
-    match schema.table(referenced_model) {
-        Err(table_name) => Err(SqlError::SchemaInconsistent {
-            explanation: format!("Table {} not found.", table_name),
-        }),
-        Ok(other_table) => {
-            let fk_from_other_model_to_this_exist = other_table
-                .foreign_keys
-                .iter()
-                .any(|fk| &fk.referenced_table == model_with_fk);
-
-            let unambiguous_name = RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model);
-
-            // this needs to know whether there are m2m relations and then use ambiguous name path
-            let name = if fk_to_same_model.len() < 2
-                && !fk_from_other_model_to_this_exist
-                && !m2m_table_names.contains(&unambiguous_name)
-            {
-                unambiguous_name
-            } else {
-                RelationNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
-            };
-
-            Ok(name)
-        }
+    // this needs to know whether there are m2m relations and then use ambiguous name path
+    if name_is_ambiguous || m2m_table_names.contains(&unambiguous_name) {
+        RelationNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
+    } else {
+        unambiguous_name
     }
 }
 
@@ -469,9 +445,9 @@ fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &mut Context) -> O
         return None;
     }
 
-    let data: &PostgresSchemaExt = index.schema().downcast_connector_data().unwrap_or_default();
+    let data: &PostgresSchemaExt = index.schema.downcast_connector_data().unwrap_or_default();
 
-    Some(match data.index_algorithm(index.index_id()) {
+    Some(match data.index_algorithm(index.id) {
         sql::postgres::SqlIndexAlgorithm::BTree => IndexAlgorithm::BTree,
         sql::postgres::SqlIndexAlgorithm::Hash => IndexAlgorithm::Hash,
         sql::postgres::SqlIndexAlgorithm::Gist => IndexAlgorithm::Gist,

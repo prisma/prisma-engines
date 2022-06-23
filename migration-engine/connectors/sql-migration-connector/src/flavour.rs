@@ -208,7 +208,7 @@ fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<P
     fn filter_fulltext_capabilities(schema: &mut SqlSchema) {
         let indices = schema
             .iter_tables_mut()
-            .flat_map(|(_, t)| t.indices.iter_mut().filter(|i| i.is_fulltext()));
+            .flat_map(|(_, t)| t.indices.iter_mut().filter(|i| i.tpe.is_fulltext()));
 
         for index in indices {
             index.tpe = IndexType::Normal;

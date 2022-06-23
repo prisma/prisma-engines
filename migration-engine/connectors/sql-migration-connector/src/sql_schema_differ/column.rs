@@ -37,10 +37,10 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         return true;
     }
 
-    let prev = cols.previous().default();
-    let next = cols.next().default();
+    let prev = cols.previous.default();
+    let next = cols.next.default();
 
-    let defaults = (&prev.as_ref().map(|d| d.kind()), &next.as_ref().map(|d| d.kind()));
+    let defaults = (prev.map(|d| d.kind()), next.map(|d| d.kind()));
 
     let names_match = {
         let prev_constraint = prev.and_then(|v| v.constraint_name());

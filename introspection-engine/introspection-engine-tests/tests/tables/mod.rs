@@ -728,7 +728,16 @@ async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
         model ADDRESS {
           ADDRESSID Int @id
         }
@@ -740,10 +749,9 @@ async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
         model address {
           addressid Int @id
         }
-    "##};
+    "#]];
 
-    let result = &api.introspect().await?;
-    api.assert_eq_datamodels(dm, result);
+    api.expect_datamodel(&expectation).await;
 
     Ok(())
 }

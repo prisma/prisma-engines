@@ -1321,12 +1321,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "hashbrown"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db0d4cf898abf0081f964436dc980e96670a0f36863e4b83aaacdb65c9d7ccc3"
+
+[[package]]
 name = "hashlink"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7249a3129cbc1ffccd74857f81464a323a152173cdb134e0fd81bc803b29facf"
 dependencies = [
- "hashbrown",
+ "hashbrown 0.11.2",
 ]
 
 [[package]]
@@ -1501,12 +1507,12 @@ dependencies = [
 
 [[package]]
 name = "indexmap"
-version = "1.8.2"
+version = "1.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6012d540c5baa3589337a98ce73408de9b5a25ec9fc2c6fd6be8f0d39e0ca5a"
+checksum = "10a35a97730320ffe8e2d410b5d3b69279b98d2c14bdb8b70ea89ecf7888d41e"
 dependencies = [
  "autocfg",
- "hashbrown",
+ "hashbrown 0.12.1",
  "serde",
 ]
 
@@ -1854,11 +1860,11 @@ dependencies = [
 
 [[package]]
 name = "lru"
-version = "0.7.6"
+version = "0.7.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8015d95cb7b2ddd3c0d32ca38283ceb1eea09b4713ee380bceb942d85a244228"
+checksum = "c84e6fe5655adc6ce00787cf7dcaf8dc4f998a0565d23eafc207a8b08ca3349a"
 dependencies = [
- "hashbrown",
+ "hashbrown 0.11.2",
 ]
 
 [[package]]
@@ -2014,7 +2020,7 @@ dependencies = [
  "atomic-shim",
  "crossbeam-epoch",
  "crossbeam-utils 0.8.8",
- "hashbrown",
+ "hashbrown 0.11.2",
  "indexmap",
  "metrics 0.18.1",
  "num_cpus",
@@ -2034,7 +2040,7 @@ dependencies = [
  "atomic-shim",
  "crossbeam-epoch",
  "crossbeam-utils 0.8.8",
- "hashbrown",
+ "hashbrown 0.11.2",
  "metrics 0.19.0",
  "num_cpus",
  "parking_lot 0.11.2",
@@ -4295,6 +4301,7 @@ dependencies = [
  "bigdecimal 0.2.2",
  "enumflags2",
  "expect-test",
+ "indexmap",
  "indoc",
  "native-types",
  "once_cell",

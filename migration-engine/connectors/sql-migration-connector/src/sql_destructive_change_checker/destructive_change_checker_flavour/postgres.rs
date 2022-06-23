@@ -26,21 +26,21 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             type_change,
         } = alter_column;
 
-        if changes.arity_changed() && columns.previous().arity().is_nullable() && columns.next().arity().is_required() {
+        if changes.arity_changed() && columns.previous.arity().is_nullable() && columns.next.arity().is_required() {
             plan.push_unexecutable(
                 UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
         }
 
-        if changes.arity_changed() && !columns.previous().arity().is_list() && columns.next().arity().is_list() {
+        if changes.arity_changed() && !columns.previous.arity().is_list() && columns.next.arity().is_list() {
             plan.push_unexecutable(
                 UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
-                    table: columns.previous().table().name().to_owned(),
-                    column: columns.previous().name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
                 },
                 step_index,
             )
@@ -54,8 +54,8 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             Some(ColumnTypeChange::RiskyCast) => {
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
-                        table: columns.previous().table().name().to_owned(),
-                        column: columns.previous().name().to_owned(),
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
                     },
@@ -65,8 +65,8 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             Some(ColumnTypeChange::NotCastable) => {
                 plan.push_warning(
                     SqlMigrationWarningCheck::NotCastable {
-                        table: columns.previous().table().name().to_owned(),
-                        column: columns.previous().name().to_owned(),
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
                     },
@@ -85,22 +85,22 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
     ) {
         // Unexecutable drop and recreate.
         if changes.arity_changed()
-            && columns.previous().arity().is_nullable()
-            && columns.next().arity().is_required()
-            && columns.next().default().is_none()
+            && columns.previous.arity().is_nullable()
+            && columns.next.arity().is_required()
+            && columns.next.default().is_none()
         {
             plan.push_unexecutable(
                 UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
-        } else if columns.next().arity().is_required() && columns.next().default().is_none() {
+        } else if columns.next.arity().is_required() && columns.next.default().is_none() {
             plan.push_unexecutable(
                 UnexecutableStepCheck::DropAndRecreateRequiredColumn {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
@@ -108,8 +108,8 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             // todo this is probably due to a not castable type change. we should give that info in the warning
             plan.push_warning(
                 SqlMigrationWarningCheck::DropAndRecreateColumn {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )

@@ -25,30 +25,6 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
           "tables": [
             {
               "name": "Blog",
-              "columns": [
-                {
-                  "name": "id",
-                  "tpe": {
-                    "full_data_type": "int(11)",
-                    "family": "Int",
-                    "arity": "Required",
-                    "native_type": "Int"
-                  },
-                  "default": null,
-                  "auto_increment": true
-                },
-                {
-                  "name": "string",
-                  "tpe": {
-                    "full_data_type": "text",
-                    "family": "String",
-                    "arity": "Required",
-                    "native_type": "Text"
-                  },
-                  "default": null,
-                  "auto_increment": false
-                }
-              ],
               "indices": [],
               "primary_key": {
                 "columns": [
@@ -59,11 +35,41 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
                   }
                 ],
                 "constraint_name": null
-              },
-              "foreign_keys": []
+              }
             }
           ],
           "enums": [],
+          "columns": [
+            [
+              0,
+              {
+                "name": "id",
+                "tpe": {
+                  "full_data_type": "int(11)",
+                  "family": "Int",
+                  "arity": "Required",
+                  "native_type": "Int"
+                },
+                "default": null,
+                "auto_increment": true
+              }
+            ],
+            [
+              0,
+              {
+                "name": "string",
+                "tpe": {
+                  "full_data_type": "text",
+                  "family": "String",
+                  "arity": "Required",
+                  "native_type": "Text"
+                },
+                "default": null,
+                "auto_increment": false
+              }
+            ]
+          ],
+          "foreign_keys": [],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
@@ -84,30 +90,6 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
           "tables": [
             {
               "name": "Blog",
-              "columns": [
-                {
-                  "name": "id",
-                  "tpe": {
-                    "full_data_type": "int",
-                    "family": "Int",
-                    "arity": "Required",
-                    "native_type": "Int"
-                  },
-                  "default": null,
-                  "auto_increment": true
-                },
-                {
-                  "name": "string",
-                  "tpe": {
-                    "full_data_type": "text",
-                    "family": "String",
-                    "arity": "Required",
-                    "native_type": "Text"
-                  },
-                  "default": null,
-                  "auto_increment": false
-                }
-              ],
               "indices": [],
               "primary_key": {
                 "columns": [
@@ -118,11 +100,41 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
                   }
                 ],
                 "constraint_name": null
-              },
-              "foreign_keys": []
+              }
             }
           ],
           "enums": [],
+          "columns": [
+            [
+              0,
+              {
+                "name": "id",
+                "tpe": {
+                  "full_data_type": "int",
+                  "family": "Int",
+                  "arity": "Required",
+                  "native_type": "Int"
+                },
+                "default": null,
+                "auto_increment": true
+              }
+            ],
+            [
+              0,
+              {
+                "name": "string",
+                "tpe": {
+                  "full_data_type": "text",
+                  "family": "String",
+                  "arity": "Required",
+                  "native_type": "Text"
+                },
+                "default": null,
+                "auto_increment": false
+              }
+            ]
+          ],
+          "foreign_keys": [],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
@@ -143,35 +155,6 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
           "tables": [
             {
               "name": "Blog",
-              "columns": [
-                {
-                  "name": "id",
-                  "tpe": {
-                    "full_data_type": "int4",
-                    "family": "Int",
-                    "arity": "Required",
-                    "native_type": "Integer"
-                  },
-                  "default": {
-                    "kind": {
-                      "Sequence": "Blog_id_seq"
-                    },
-                    "constraint_name": null
-                  },
-                  "auto_increment": true
-                },
-                {
-                  "name": "string",
-                  "tpe": {
-                    "full_data_type": "text",
-                    "family": "String",
-                    "arity": "Required",
-                    "native_type": "Text"
-                  },
-                  "default": null,
-                  "auto_increment": false
-                }
-              ],
               "indices": [],
               "primary_key": {
                 "columns": [
@@ -182,11 +165,46 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
                   }
                 ],
                 "constraint_name": "Blog_pkey"
-              },
-              "foreign_keys": []
+              }
             }
           ],
           "enums": [],
+          "columns": [
+            [
+              0,
+              {
+                "name": "id",
+                "tpe": {
+                  "full_data_type": "int4",
+                  "family": "Int",
+                  "arity": "Required",
+                  "native_type": "Integer"
+                },
+                "default": {
+                  "kind": {
+                    "Sequence": "Blog_id_seq"
+                  },
+                  "constraint_name": null
+                },
+                "auto_increment": true
+              }
+            ],
+            [
+              0,
+              {
+                "name": "string",
+                "tpe": {
+                  "full_data_type": "text",
+                  "family": "String",
+                  "arity": "Required",
+                  "native_type": "Text"
+                },
+                "default": null,
+                "auto_increment": false
+              }
+            ]
+          ],
+          "foreign_keys": [],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
@@ -207,30 +225,6 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
           "tables": [
             {
               "name": "Blog",
-              "columns": [
-                {
-                  "name": "id",
-                  "tpe": {
-                    "full_data_type": "INTEGER",
-                    "family": "Int",
-                    "arity": "Required",
-                    "native_type": null
-                  },
-                  "default": null,
-                  "auto_increment": true
-                },
-                {
-                  "name": "string",
-                  "tpe": {
-                    "full_data_type": "TEXT",
-                    "family": "String",
-                    "arity": "Required",
-                    "native_type": null
-                  },
-                  "default": null,
-                  "auto_increment": false
-                }
-              ],
               "indices": [],
               "primary_key": {
                 "columns": [
@@ -241,11 +235,41 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
                   }
                 ],
                 "constraint_name": null
-              },
-              "foreign_keys": []
+              }
             }
           ],
           "enums": [],
+          "columns": [
+            [
+              0,
+              {
+                "name": "id",
+                "tpe": {
+                  "full_data_type": "INTEGER",
+                  "family": "Int",
+                  "arity": "Required",
+                  "native_type": null
+                },
+                "default": null,
+                "auto_increment": true
+              }
+            ],
+            [
+              0,
+              {
+                "name": "string",
+                "tpe": {
+                  "full_data_type": "TEXT",
+                  "family": "String",
+                  "arity": "Required",
+                  "native_type": null
+                },
+                "default": null,
+                "auto_increment": false
+              }
+            ]
+          ],
+          "foreign_keys": [],
           "views": [],
           "procedures": [],
           "user_defined_types": [],

@@ -3,7 +3,6 @@ mod cockroach_describer_tests;
 use crate::test_api::*;
 use barrel::{types, Migration};
 use indoc::indoc;
-use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{postgres::PostgresSchemaExt, *};
@@ -78,513 +77,945 @@ fn all_postgres_column_types_must_work(api: TestApi) {
 
     let full_sql = migration.make::<barrel::backend::Pg>();
     api.raw_cmd(&full_sql);
-    let mut result = api.describe();
-    let table = result.tables.iter_mut().find(|t| t.name == "User").unwrap();
-    // Ensure columns are sorted as expected when comparing
-    table.columns.sort_unstable_by(|a, b| a.name.cmp(&b.name));
-    let mut expected_columns = vec![
-        Column {
-            name: "array_bin_col".into(),
-            tpe: ColumnType {
-                full_data_type: "_bytea".into(),
-                family: ColumnTypeFamily::Binary,
-                arity: ColumnArity::List,
-                native_type: Some(PostgresType::ByteA.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "array_bool_col".into(),
-            tpe: ColumnType {
-                full_data_type: "_bool".into(),
-                family: ColumnTypeFamily::Boolean,
-                arity: ColumnArity::List,
-                native_type: Some(PostgresType::Boolean.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "array_date_col".into(),
-            tpe: ColumnType {
-                full_data_type: "_date".into(),
-                family: ColumnTypeFamily::DateTime,
-                arity: ColumnArity::List,
-                native_type: Some(PostgresType::Date.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "array_double_col".into(),
-            tpe: ColumnType {
-                full_data_type: "_float8".into(),
-                family: ColumnTypeFamily::Float,
-                arity: ColumnArity::List,
-                native_type: Some(PostgresType::DoublePrecision.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "array_float_col".into(),
-            tpe: ColumnType {
-                full_data_type: "_float8".into(),
-                family: ColumnTypeFamily::Float,
-                arity: ColumnArity::List,
-                native_type: Some(PostgresType::DoublePrecision.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "array_int_col".into(),
-            tpe: ColumnType {
-                full_data_type: "_int4".into(),
-                family: ColumnTypeFamily::Int,
-                arity: ColumnArity::List,
-                native_type: Some(PostgresType::Integer.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "array_text_col".into(),
-            tpe: ColumnType {
-                full_data_type: "_text".into(),
-                family: ColumnTypeFamily::String,
-                arity: ColumnArity::List,
-                native_type: Some(PostgresType::Text.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "array_varchar_col".into(),
-            tpe: ColumnType {
-                full_data_type: "_varchar".into(),
-                family: ColumnTypeFamily::String,
-                arity: ColumnArity::List,
-                native_type: Some(PostgresType::VarChar(Some(255)).to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "binary_col".into(),
-            tpe: ColumnType {
-                full_data_type: "bytea".into(),
-                family: ColumnTypeFamily::Binary,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::ByteA.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "boolean_col".into(),
-            tpe: ColumnType {
-                full_data_type: "bool".into(),
-                family: ColumnTypeFamily::Boolean,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Boolean.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "date_time_col".into(),
-            tpe: ColumnType {
-                full_data_type: "date".into(),
-                family: ColumnTypeFamily::DateTime,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Date.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "double_col".into(),
-            tpe: ColumnType {
-                full_data_type: "float8".into(),
-                family: ColumnTypeFamily::Float,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::DoublePrecision.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "float_col".into(),
-            tpe: ColumnType {
-                full_data_type: "float8".into(),
-                family: ColumnTypeFamily::Float,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::DoublePrecision.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "int_col".into(),
-            tpe: ColumnType {
-                full_data_type: "int4".into(),
-                family: ColumnTypeFamily::Int,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Integer.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "primary_col".into(),
-            tpe: ColumnType {
-                full_data_type: "int4".into(),
-                family: ColumnTypeFamily::Int,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Integer.to_json()),
-            },
-            default: Some(DefaultValue::sequence("User_primary_col_seq".to_string())),
-            auto_increment: true,
-        },
-        Column {
-            name: "string1_col".into(),
-            tpe: ColumnType {
-                full_data_type: "text".into(),
-                family: ColumnTypeFamily::String,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Text.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "string2_col".into(),
-            tpe: ColumnType {
-                full_data_type: "varchar".into(),
-                family: ColumnTypeFamily::String,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::VarChar(Some(1)).to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "bigint_col".into(),
-            tpe: ColumnType {
-                full_data_type: "int8".into(),
-                family: ColumnTypeFamily::BigInt,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::BigInt.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "bigserial_col".into(),
-            tpe: ColumnType {
-                full_data_type: "int8".into(),
-                family: ColumnTypeFamily::BigInt,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::BigInt.to_json()),
-            },
-            default: Some(DefaultValue::sequence("User_bigserial_col_seq".to_string())),
-            auto_increment: true,
-        },
-        Column {
-            name: "bit_col".into(),
-            tpe: ColumnType {
-                full_data_type: "bit".into(),
-                family: ColumnTypeFamily::String,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Bit(Some(1)).to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "bit_varying_col".into(),
-            tpe: ColumnType {
-                full_data_type: "varbit".into(),
-                family: ColumnTypeFamily::String,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::VarBit(Some(1)).to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "box_col".into(),
-            tpe: ColumnType {
-                full_data_type: "box".into(),
-                family: ColumnTypeFamily::Unsupported("box".into()),
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "char_col".into(),
-            tpe: ColumnType {
-                full_data_type: "bpchar".into(),
-                family: ColumnTypeFamily::String,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Char(Some(1)).to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "circle_col".into(),
-            tpe: ColumnType {
-                full_data_type: "circle".into(),
-                family: ColumnTypeFamily::Unsupported("circle".into()),
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "line_col".into(),
-            tpe: ColumnType {
-                full_data_type: "line".into(),
-                family: ColumnTypeFamily::Unsupported("line".into()),
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "time_col".into(),
-            tpe: ColumnType {
-                full_data_type: "time".into(),
-                family: ColumnTypeFamily::DateTime,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Time(Some(6)).to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "timetz_col".into(),
-            tpe: ColumnType {
-                full_data_type: "timetz".into(),
-                family: ColumnTypeFamily::DateTime,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Timetz(Some(6)).to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "timestamp_col".into(),
-            tpe: ColumnType {
-                full_data_type: "timestamp".into(),
-                family: ColumnTypeFamily::DateTime,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Timestamp(Some(6)).to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "timestamptz_col".into(),
-            tpe: ColumnType {
-                full_data_type: "timestamptz".into(),
-                family: ColumnTypeFamily::DateTime,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Timestamptz(Some(6)).to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "lseg_col".into(),
-            tpe: ColumnType {
-                full_data_type: "lseg".into(),
-                family: ColumnTypeFamily::Unsupported("lseg".into()),
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "numeric_col".into(),
-            tpe: ColumnType {
-                full_data_type: "numeric".into(),
-                family: ColumnTypeFamily::Decimal,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Decimal(None).to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "path_col".into(),
-            tpe: ColumnType {
-                full_data_type: "path".into(),
-                family: ColumnTypeFamily::Unsupported("path".into()),
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "pg_lsn_col".into(),
-            tpe: ColumnType {
-                full_data_type: "pg_lsn".into(),
-                family: ColumnTypeFamily::Unsupported("pg_lsn".into()),
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "polygon_col".into(),
-            tpe: ColumnType {
-                full_data_type: "polygon".into(),
-                family: ColumnTypeFamily::Unsupported("polygon".into()),
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "smallint_col".into(),
-            tpe: ColumnType {
-                full_data_type: "int2".into(),
-                family: ColumnTypeFamily::Int,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::SmallInt.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "smallserial_col".into(),
-            tpe: ColumnType {
-                full_data_type: "int2".into(),
-                family: ColumnTypeFamily::Int,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::SmallInt.to_json()),
-            },
-            default: Some(DefaultValue::sequence("User_smallserial_col_seq".to_string())),
-            auto_increment: true,
-        },
-        Column {
-            name: "serial_col".into(),
-            tpe: ColumnType {
-                full_data_type: "int4".into(),
-                family: ColumnTypeFamily::Int,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Integer.to_json()),
-            },
-            default: Some(DefaultValue::sequence("User_serial_col_seq".to_string())),
-            auto_increment: true,
-        },
-        Column {
-            name: "tsquery_col".into(),
-            tpe: ColumnType {
-                full_data_type: "tsquery".into(),
-                family: ColumnTypeFamily::Unsupported("tsquery".into()),
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "tsvector_col".into(),
-            tpe: ColumnType {
-                full_data_type: "tsvector".into(),
-                family: ColumnTypeFamily::Unsupported("tsvector".into()),
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "txid_col".into(),
-            tpe: ColumnType {
-                full_data_type: "txid_snapshot".into(),
-                family: ColumnTypeFamily::Unsupported("txid_snapshot".into()),
-                arity: ColumnArity::Required,
-                native_type: None,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "json_col".into(),
-            tpe: ColumnType {
-                full_data_type: "json".into(),
-                family: ColumnTypeFamily::Json,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Json.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "jsonb_col".into(),
-            tpe: ColumnType {
-                full_data_type: "jsonb".into(),
-                family: ColumnTypeFamily::Json,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::JsonB.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "uuid_col".into(),
-            tpe: ColumnType {
-                full_data_type: "uuid".into(),
-                family: ColumnTypeFamily::Uuid,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Uuid.to_json()),
-            },
-            default: None,
-            auto_increment: false,
-        },
-    ];
-    expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
-
-    assert_eq!(
-        table,
-        &Table {
-            name: "User".into(),
-            columns: expected_columns,
-            indices: vec![Index {
-                name: "User_uuid_col_key".into(),
-                columns: vec![IndexColumn {
-                    name: "uuid_col".to_string(),
-                    sort_order: Some(SQLSortOrder::Asc),
-                    length: None,
-                }],
-                tpe: IndexType::Unique,
-            },],
-            primary_key: Some(PrimaryKey {
-                columns: vec![PrimaryKeyColumn::new("primary_col")],
-                constraint_name: Some("User_pkey".into()),
-            }),
-            foreign_keys: vec![],
+    let expectation = expect![[r#"
+        SqlSchema {
+            tables: [
+                Table {
+                    name: "User",
+                    indices: [
+                        Index {
+                            name: "User_uuid_col_key",
+                            columns: [
+                                IndexColumn {
+                                    name: "uuid_col",
+                                    sort_order: Some(
+                                        Asc,
+                                    ),
+                                    length: None,
+                                },
+                            ],
+                            tpe: Unique,
+                        },
+                    ],
+                    primary_key: Some(
+                        PrimaryKey {
+                            columns: [
+                                PrimaryKeyColumn {
+                                    name: "primary_col",
+                                    length: None,
+                                    sort_order: None,
+                                },
+                            ],
+                            constraint_name: Some(
+                                "User_pkey",
+                            ),
+                        },
+                    ),
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "array_bin_col",
+                        tpe: ColumnType {
+                            full_data_type: "_bytea",
+                            family: Binary,
+                            arity: List,
+                            native_type: Some(
+                                String(
+                                    "ByteA",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "array_bool_col",
+                        tpe: ColumnType {
+                            full_data_type: "_bool",
+                            family: Boolean,
+                            arity: List,
+                            native_type: Some(
+                                String(
+                                    "Boolean",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "array_date_col",
+                        tpe: ColumnType {
+                            full_data_type: "_date",
+                            family: DateTime,
+                            arity: List,
+                            native_type: Some(
+                                String(
+                                    "Date",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "array_double_col",
+                        tpe: ColumnType {
+                            full_data_type: "_float8",
+                            family: Float,
+                            arity: List,
+                            native_type: Some(
+                                String(
+                                    "DoublePrecision",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "array_float_col",
+                        tpe: ColumnType {
+                            full_data_type: "_float8",
+                            family: Float,
+                            arity: List,
+                            native_type: Some(
+                                String(
+                                    "DoublePrecision",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "array_int_col",
+                        tpe: ColumnType {
+                            full_data_type: "_int4",
+                            family: Int,
+                            arity: List,
+                            native_type: Some(
+                                String(
+                                    "Integer",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "array_text_col",
+                        tpe: ColumnType {
+                            full_data_type: "_text",
+                            family: String,
+                            arity: List,
+                            native_type: Some(
+                                String(
+                                    "Text",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "array_varchar_col",
+                        tpe: ColumnType {
+                            full_data_type: "_varchar",
+                            family: String,
+                            arity: List,
+                            native_type: Some(
+                                Object({
+                                    "VarChar": Number(
+                                        255,
+                                    ),
+                                }),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "bigint_col",
+                        tpe: ColumnType {
+                            full_data_type: "int8",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "BigInt",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "bigserial_col",
+                        tpe: ColumnType {
+                            full_data_type: "int8",
+                            family: BigInt,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "BigInt",
+                                ),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "User_bigserial_col_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "bit_col",
+                        tpe: ColumnType {
+                            full_data_type: "bit",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "Bit": Number(
+                                        1,
+                                    ),
+                                }),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "bit_varying_col",
+                        tpe: ColumnType {
+                            full_data_type: "varbit",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "VarBit": Number(
+                                        1,
+                                    ),
+                                }),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "binary_col",
+                        tpe: ColumnType {
+                            full_data_type: "bytea",
+                            family: Binary,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "ByteA",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "boolean_col",
+                        tpe: ColumnType {
+                            full_data_type: "bool",
+                            family: Boolean,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Boolean",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "box_col",
+                        tpe: ColumnType {
+                            full_data_type: "box",
+                            family: Unsupported(
+                                "box",
+                            ),
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "char_col",
+                        tpe: ColumnType {
+                            full_data_type: "bpchar",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "Char": Number(
+                                        1,
+                                    ),
+                                }),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "circle_col",
+                        tpe: ColumnType {
+                            full_data_type: "circle",
+                            family: Unsupported(
+                                "circle",
+                            ),
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "date_time_col",
+                        tpe: ColumnType {
+                            full_data_type: "date",
+                            family: DateTime,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Date",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "double_col",
+                        tpe: ColumnType {
+                            full_data_type: "float8",
+                            family: Float,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "DoublePrecision",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "float_col",
+                        tpe: ColumnType {
+                            full_data_type: "float8",
+                            family: Float,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "DoublePrecision",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "int_col",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Integer",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "line_col",
+                        tpe: ColumnType {
+                            full_data_type: "line",
+                            family: Unsupported(
+                                "line",
+                            ),
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "lseg_col",
+                        tpe: ColumnType {
+                            full_data_type: "lseg",
+                            family: Unsupported(
+                                "lseg",
+                            ),
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "numeric_col",
+                        tpe: ColumnType {
+                            full_data_type: "numeric",
+                            family: Decimal,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "Decimal": Null,
+                                }),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "path_col",
+                        tpe: ColumnType {
+                            full_data_type: "path",
+                            family: Unsupported(
+                                "path",
+                            ),
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "pg_lsn_col",
+                        tpe: ColumnType {
+                            full_data_type: "pg_lsn",
+                            family: Unsupported(
+                                "pg_lsn",
+                            ),
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "polygon_col",
+                        tpe: ColumnType {
+                            full_data_type: "polygon",
+                            family: Unsupported(
+                                "polygon",
+                            ),
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "smallint_col",
+                        tpe: ColumnType {
+                            full_data_type: "int2",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "SmallInt",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "smallserial_col",
+                        tpe: ColumnType {
+                            full_data_type: "int2",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "SmallInt",
+                                ),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "User_smallserial_col_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "serial_col",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Integer",
+                                ),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "User_serial_col_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "primary_col",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Integer",
+                                ),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "User_primary_col_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "string1_col",
+                        tpe: ColumnType {
+                            full_data_type: "text",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Text",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "string2_col",
+                        tpe: ColumnType {
+                            full_data_type: "varchar",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "VarChar": Number(
+                                        1,
+                                    ),
+                                }),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "time_col",
+                        tpe: ColumnType {
+                            full_data_type: "time",
+                            family: DateTime,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "Time": Number(
+                                        6,
+                                    ),
+                                }),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "timetz_col",
+                        tpe: ColumnType {
+                            full_data_type: "timetz",
+                            family: DateTime,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "Timetz": Number(
+                                        6,
+                                    ),
+                                }),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "timestamp_col",
+                        tpe: ColumnType {
+                            full_data_type: "timestamp",
+                            family: DateTime,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "Timestamp": Number(
+                                        6,
+                                    ),
+                                }),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "timestamptz_col",
+                        tpe: ColumnType {
+                            full_data_type: "timestamptz",
+                            family: DateTime,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "Timestamptz": Number(
+                                        6,
+                                    ),
+                                }),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "tsquery_col",
+                        tpe: ColumnType {
+                            full_data_type: "tsquery",
+                            family: Unsupported(
+                                "tsquery",
+                            ),
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "tsvector_col",
+                        tpe: ColumnType {
+                            full_data_type: "tsvector",
+                            family: Unsupported(
+                                "tsvector",
+                            ),
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "txid_col",
+                        tpe: ColumnType {
+                            full_data_type: "txid_snapshot",
+                            family: Unsupported(
+                                "txid_snapshot",
+                            ),
+                            arity: Required,
+                            native_type: None,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "json_col",
+                        tpe: ColumnType {
+                            full_data_type: "json",
+                            family: Json,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Json",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "jsonb_col",
+                        tpe: ColumnType {
+                            full_data_type: "jsonb",
+                            family: Json,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "JsonB",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "uuid_col",
+                        tpe: ColumnType {
+                            full_data_type: "uuid",
+                            family: Uuid,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Uuid",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
         }
-    );
+    "#]];
+    api.expect_schema(expectation);
 
     if api.connector_tags().contains(Tags::Postgres9) {
         return; // sequence max values work differently on postgres 9
     }
 
+    let result = api.describe();
     let ext = extract_ext(&result);
     let expected_ext = expect![[r#"
         PostgresSchemaExt {
@@ -648,7 +1079,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres))]
-fn postgres_cross_schema_references_are_not_allowed(api: TestApi) {
+fn cross_schema_references_are_not_allowed(api: TestApi) {
     let schema2 = format!("{}_2", api.schema_name());
 
     let sql = format!(
@@ -782,50 +1213,143 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
         schema_name = api.schema_name()
     );
     api.raw_cmd(&schema);
-
-    let schema = api.describe();
-
-    let table = schema.table_bang("indexes_test");
-    let index = &table.indices.iter().find(|i| i.name == "my_idx").unwrap();
-
-    assert_eq!(
-        &index.columns,
-        &[
-            IndexColumn {
-                name: "name".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None,
-            },
-            IndexColumn {
-                name: "age".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None,
-            },
-        ]
-    );
-    assert!(index.tpe.is_unique());
-
-    let index = &table.indices.iter().find(|i| i.name == "my_idx2").unwrap();
-
-    assert!(!index.tpe.is_unique());
-    assert_eq!(
-        &index.columns,
-        &[
-            IndexColumn {
-                name: "age".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None,
-            },
-            IndexColumn {
-                name: "name".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None,
-            },
-        ]
-    );
+    let expectation = expect![[r#"
+        SqlSchema {
+            tables: [
+                Table {
+                    name: "indexes_test",
+                    indices: [
+                        Index {
+                            name: "my_idx",
+                            columns: [
+                                IndexColumn {
+                                    name: "name",
+                                    sort_order: Some(
+                                        Asc,
+                                    ),
+                                    length: None,
+                                },
+                                IndexColumn {
+                                    name: "age",
+                                    sort_order: Some(
+                                        Asc,
+                                    ),
+                                    length: None,
+                                },
+                            ],
+                            tpe: Unique,
+                        },
+                        Index {
+                            name: "my_idx2",
+                            columns: [
+                                IndexColumn {
+                                    name: "age",
+                                    sort_order: Some(
+                                        Asc,
+                                    ),
+                                    length: None,
+                                },
+                                IndexColumn {
+                                    name: "name",
+                                    sort_order: Some(
+                                        Asc,
+                                    ),
+                                    length: None,
+                                },
+                            ],
+                            tpe: Normal,
+                        },
+                    ],
+                    primary_key: Some(
+                        PrimaryKey {
+                            columns: [
+                                PrimaryKeyColumn {
+                                    name: "id",
+                                    length: None,
+                                    sort_order: None,
+                                },
+                            ],
+                            constraint_name: Some(
+                                "indexes_test_pkey",
+                            ),
+                        },
+                    ),
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id",
+                        tpe: ColumnType {
+                            full_data_type: "text",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Text",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "name",
+                        tpe: ColumnType {
+                            full_data_type: "text",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Text",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "age",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Integer",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+    api.expect_schema(expectation);
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     let create_table = r#"
         CREATE TABLE "string_defaults_test" (
@@ -837,53 +1361,150 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     "#;
 
     api.raw_cmd(create_table);
-
-    let schema = api.describe();
-
-    let table = schema.table_bang("string_defaults_test");
-
-    let regular_column_default = table
-        .column_bang("regular")
-        .default
-        .as_ref()
-        .unwrap()
-        .as_value()
-        .unwrap()
-        .clone()
-        .into_string()
-        .unwrap();
-
-    assert_eq!(regular_column_default, "meow, says the cat");
-
-    let escaped_column_default = table
-        .column_bang("escaped")
-        .default
-        .as_ref()
-        .unwrap()
-        .as_value()
-        .unwrap()
-        .clone()
-        .into_string()
-        .unwrap();
-
-    assert_eq!(escaped_column_default, r#""That's a lot of fish!" - Godzilla, 1998"#);
-
-    let escaped_no_e = table
-        .column_bang("escaped_no_e")
-        .default
-        .as_ref()
-        .unwrap()
-        .as_value()
-        .unwrap()
-        .clone()
-        .into_string()
-        .unwrap();
-
-    assert_eq!(escaped_no_e, r#""That's a lot of fish!" - Godzilla, 1998"#);
+    let expectation = expect![[r#"
+        SqlSchema {
+            tables: [
+                Table {
+                    name: "string_defaults_test",
+                    indices: [],
+                    primary_key: Some(
+                        PrimaryKey {
+                            columns: [
+                                PrimaryKeyColumn {
+                                    name: "id",
+                                    length: None,
+                                    sort_order: None,
+                                },
+                            ],
+                            constraint_name: Some(
+                                "string_defaults_test_pkey",
+                            ),
+                        },
+                    ),
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Integer",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "regular",
+                        tpe: ColumnType {
+                            full_data_type: "varchar",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "VarChar": Null,
+                                }),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Value(
+                                    String(
+                                        "meow, says the cat",
+                                    ),
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "escaped",
+                        tpe: ColumnType {
+                            full_data_type: "varchar",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "VarChar": Null,
+                                }),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Value(
+                                    String(
+                                        "\"That's a lot of fish!\" - Godzilla, 1998",
+                                    ),
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "escaped_no_e",
+                        tpe: ColumnType {
+                            full_data_type: "varchar",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "VarChar": Null,
+                                }),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Value(
+                                    String(
+                                        "\"That's a lot of fish!\" - Godzilla, 1998",
+                                    ),
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+    api.expect_schema(expectation);
 }
 
-#[test_connector(tags(Postgres))]
-fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: TestApi) {
     // https://www.postgresql.org/docs/current/sql-syntax-lexical.html
     let create_table = r#"
         CREATE TABLE test (
@@ -892,23 +1513,57 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
     "#;
 
     api.raw_cmd(create_table);
-
-    let schema = api.describe();
-
-    let table = schema.table_bang("test");
-
-    let default = table
-        .column_bang("model_name_space")
-        .default
-        .as_ref()
-        .unwrap()
-        .as_value()
-        .unwrap()
-        .clone()
-        .into_string()
-        .unwrap();
-
-    assert_eq!(default, r#"xyz\Datasource\Model"#);
+    let expectation = expect![[r#"
+        SqlSchema {
+            tables: [
+                Table {
+                    name: "test",
+                    indices: [],
+                    primary_key: None,
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "model_name_space",
+                        tpe: ColumnType {
+                            full_data_type: "varchar",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "VarChar": Number(
+                                        255,
+                                    ),
+                                }),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Value(
+                                    String(
+                                        "xyz\\Datasource\\Model",
+                                    ),
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+    api.expect_schema(expectation);
 }
 
 #[test_connector(tags(Postgres))]
@@ -926,7 +1581,7 @@ fn index_sort_order_is_handled(api: TestApi) {
 
     let schema = api.describe();
     let table = schema.table_walkers().next().unwrap();
-    let index = table.index_at(0);
+    let index = table.indexes().next().unwrap();
 
     let columns = index.columns().collect::<Vec<_>>();
 
@@ -951,7 +1606,7 @@ fn index_sort_order_composite_type_desc_desc_is_handled(api: TestApi) {
 
     let schema = api.describe();
     let table = schema.table_walkers().next().unwrap();
-    let index = table.index_at(0);
+    let index = table.indexes().next().unwrap();
 
     let columns = index.columns().collect::<Vec<_>>();
 
@@ -980,7 +1635,7 @@ fn index_sort_order_composite_type_asc_desc_is_handled(api: TestApi) {
 
     let schema = api.describe();
     let table = schema.table_walkers().next().unwrap();
-    let index = table.index_at(0);
+    let index = table.indexes().next().unwrap();
 
     let columns = index.columns().collect::<Vec<_>>();
 
@@ -1016,7 +1671,7 @@ fn array_column_defaults(api: TestApi) {
 
     let assert_default = |colname: &str, expected_default: Vec<PrismaValue>| {
         let col = table.column(colname).unwrap();
-        let value = dbg!(col.default().unwrap()).as_value().unwrap();
+        let value = col.default().unwrap().as_value().unwrap();
         assert_eq!(value, &PrismaValue::List(expected_default));
     };
 
@@ -1090,8 +1745,8 @@ fn array_column_defaults_with_array_constructor_syntax(api: TestApi) {
     let table = schema.table_walkers().next().unwrap();
 
     let assert_default = |colname: &str, expected_default: Vec<PrismaValue>| {
-        let col = table.column(dbg!(colname)).unwrap();
-        let value = dbg!(col.default().unwrap()).as_value().unwrap();
+        let col = table.column(colname).unwrap();
+        let value = col.default().unwrap().as_value().unwrap();
         assert_eq!(value, &PrismaValue::List(expected_default));
     };
 

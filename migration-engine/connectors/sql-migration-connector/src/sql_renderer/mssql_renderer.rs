@@ -41,7 +41,7 @@ impl MssqlFlavour {
         }
     }
 
-    fn render_column(&self, column: &ColumnWalker<'_>) -> String {
+    fn render_column(&self, column: ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
 
         let r#type = render_column_type(column);
@@ -72,7 +72,7 @@ impl MssqlFlavour {
         format!("{} {}{}{}", column_name, r#type, nullability, default)
     }
 
-    fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
+    fn render_references(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
         let cols = foreign_key
             .referenced_column_names()
             .iter()
@@ -94,41 +94,37 @@ impl SqlRenderer for MssqlFlavour {
         Quoted::mssql_ident(name)
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let AlterTable {
-            table_ids: table_index,
-            changes,
-        } = alter_table;
-        let tables = schemas.tables(table_index);
-
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: Pair<&SqlSchema>) -> Vec<String> {
+        let AlterTable { table_ids, changes } = alter_table;
+        let tables = schemas.tables(*table_ids);
         alter_table::create_statements(self, tables, changes)
     }
 
-    fn render_alter_enum(&self, _: &AlterEnum, _: &Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_enum(&self, _: &AlterEnum, _: Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_enum on Microsoft SQL Server")
     }
 
-    fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
         let index_with_table = format!(
             "{}.{}.{}",
             self.schema_name(),
-            indexes.previous().table().name(),
-            indexes.previous().name()
+            indexes.previous.table().name(),
+            indexes.previous.name()
         );
 
         vec![format!(
             "EXEC SP_RENAME N'{index_with_table}', N'{index_new_name}', N'INDEX'",
             index_with_table = index_with_table,
-            index_new_name = indexes.next().name(),
+            index_new_name = indexes.next.name(),
         )]
     }
 
-    fn render_create_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
+    fn render_create_enum(&self, _: EnumWalker<'_>) -> Vec<String> {
         unreachable!("render_create_enum on Microsoft SQL Server")
     }
 
-    fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
-        let mssql_schema_ext: &MssqlSchemaExt = index.schema().downcast_connector_data().unwrap_or_default();
+    fn render_create_index(&self, index: IndexWalker<'_>) -> String {
+        let mssql_schema_ext: &MssqlSchemaExt = index.schema.downcast_connector_data().unwrap_or_default();
         let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
@@ -149,7 +145,7 @@ impl SqlRenderer for MssqlFlavour {
             rendered
         });
 
-        let clustering = if mssql_schema_ext.index_is_clustered(index.index_id()) {
+        let clustering = if mssql_schema_ext.index_is_clustered(index.id) {
             "CLUSTERED "
         } else {
             "NONCLUSTERED "
@@ -160,12 +156,9 @@ impl SqlRenderer for MssqlFlavour {
         format!("CREATE {index_type}{clustering}INDEX {index_name} ON {table_reference}({columns})",)
     }
 
-    fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
-        let columns: String = table
-            .columns()
-            .map(|column| self.render_column(&column))
-            .join(",\n    ");
-        let mssql_schema_ext: &MssqlSchemaExt = table.schema().downcast_connector_data().unwrap_or_default();
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: &str) -> String {
+        let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n    ");
+        let mssql_schema_ext: &MssqlSchemaExt = table.schema.downcast_connector_data().unwrap_or_default();
 
         let primary_key = if let Some(pk) = table.primary_key() {
             let column_names = pk
@@ -183,7 +176,7 @@ impl SqlRenderer for MssqlFlavour {
                 })
                 .join(",");
 
-            let clustering = if mssql_schema_ext.pk_is_clustered(table.table_id()) {
+            let clustering = if mssql_schema_ext.pk_is_clustered(table.id) {
                 " CLUSTERED"
             } else {
                 " NONCLUSTERED"
@@ -219,7 +212,7 @@ impl SqlRenderer for MssqlFlavour {
                     let constraint_name = self.quote(index.name());
                     let column_names = columns.join(",");
 
-                    let clustering = if mssql_schema_ext.index_is_clustered(index.index_id()) {
+                    let clustering = if mssql_schema_ext.index_is_clustered(index.id) {
                         " CLUSTERED"
                     } else {
                         " NONCLUSTERED"
@@ -246,11 +239,11 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
+    fn render_drop_enum(&self, _: EnumWalker<'_>) -> Vec<String> {
         unreachable!("render_drop_enum on MSSQL")
     }
 
-    fn render_drop_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
+    fn render_drop_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
             table = self.quote_with_schema(foreign_key.table().name()),
@@ -258,7 +251,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_drop_index(&self, index: &IndexWalker<'_>) -> String {
+    fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
         match index.index_type() {
             IndexType::Normal => format!(
                 "DROP INDEX {} ON {}",
@@ -274,32 +267,32 @@ impl SqlRenderer for MssqlFlavour {
         }
     }
 
-    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: &Pair<&SqlSchema>) -> Vec<String> {
+    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: Pair<&SqlSchema>) -> Vec<String> {
         // All needs to be inside a transaction.
         let mut result = vec!["BEGIN TRANSACTION".to_string()];
 
         for redefine_table in tables {
-            let tables = schemas.tables(&redefine_table.table_ids);
+            let tables = schemas.tables(redefine_table.table_ids);
             // This is a copy of our new modified table.
-            let temporary_table_name = format!("_prisma_new_{}", &tables.next().name());
+            let temporary_table_name = format!("_prisma_new_{}", &tables.next.name());
 
             // If any of the columns is an identity, we should know about it.
             let needs_autoincrement = redefine_table
                 .column_pairs
                 .iter()
-                .any(|(column_indexes, _, _)| tables.columns(column_indexes).next().is_autoincrement());
+                .any(|(column_indexes, _, _)| schemas.columns(*column_indexes).next.is_autoincrement());
 
             // Let's make the [columns] nicely rendered.
             let columns: Vec<_> = redefine_table
                 .column_pairs
                 .iter()
-                .map(|(column_indexes, _, _)| tables.columns(column_indexes).next().name())
+                .map(|(column_indexes, _, _)| schemas.columns(*column_indexes).next.name())
                 .map(|c| self.quote(c).to_string())
                 .collect();
 
             // Drop the indexes on the table.
-            for index in tables.previous().indexes() {
-                result.push(self.render_drop_index(&index));
+            for index in tables.previous.indexes() {
+                result.push(self.render_drop_index(index));
             }
 
             // Remove all constraints from our original table. This will allow
@@ -318,10 +311,10 @@ impl SqlRenderer for MssqlFlavour {
                     AND OBJECT_NAME(PARENT_OBJECT_ID) = '{table}'
                     AND SCHEMA_NAME(SCHEMA_ID) = '{schema}'
                 EXEC sp_executesql @SQL
-            "#, table = tables.previous().name(), schema = self.schema_name()});
+            "#, table = tables.previous.name(), schema = self.schema_name()});
 
             // Create the new table.
-            result.push(self.render_create_table_as(tables.next(), &temporary_table_name));
+            result.push(self.render_create_table_as(tables.next, &temporary_table_name));
 
             // We cannot insert into autoincrement columns by default. If we
             // have `IDENTITY` in any of the columns, we'll allow inserting
@@ -338,7 +331,7 @@ impl SqlRenderer for MssqlFlavour {
                 IF EXISTS(SELECT * FROM {table})
                     EXEC('INSERT INTO {tmp_table} ({columns}) SELECT {columns} FROM {table} WITH (holdlock tablockx)')"#,
                                     columns = columns.join(","),
-                                    table = self.quote_with_schema(tables.previous().name()),
+                                    table = self.quote_with_schema(tables.previous.name()),
                                     tmp_table = self.quote_with_schema(&temporary_table_name),
             });
 
@@ -351,14 +344,14 @@ impl SqlRenderer for MssqlFlavour {
             }
 
             // Drop the old, now empty table.
-            result.extend(self.render_drop_table(tables.previous().name()));
+            result.extend(self.render_drop_table(tables.previous.name()));
 
             // Rename the temporary table with the name defined in the migration.
-            result.push(self.render_rename_table(&temporary_table_name, tables.next().name()));
+            result.push(self.render_rename_table(&temporary_table_name, tables.next.name()));
 
             // Recreate the indexes.
-            for index in tables.next().indexes().filter(|i| !i.index_type().is_unique()) {
-                result.push(self.render_create_index(&index));
+            for index in tables.next.indexes().filter(|i| !i.index_type().is_unique()) {
+                result.push(self.render_create_index(index));
             }
         }
 
@@ -377,7 +370,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_add_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
+    fn render_add_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
         let mut add_constraint = String::with_capacity(120);
 
         write!(
@@ -419,7 +412,7 @@ impl SqlRenderer for MssqlFlavour {
         vec![format!("DROP TABLE {}", self.quote_with_schema(table_name))]
     }
 
-    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
+    fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
         format!("DROP VIEW {}", self.quote_with_schema(view.name()))
     }
 
@@ -456,17 +449,17 @@ impl SqlRenderer for MssqlFlavour {
         Some(sql)
     }
 
-    fn render_rename_foreign_key(&self, fks: &Pair<ForeignKeyWalker<'_>>) -> String {
+    fn render_rename_foreign_key(&self, fks: Pair<ForeignKeyWalker<'_>>) -> String {
         format!(
             r#"EXEC sp_rename '{schema}.{previous}', '{next}', 'OBJECT'"#,
             schema = self.schema_name(),
-            previous = fks.previous().constraint_name().unwrap(),
-            next = fks.next().constraint_name().unwrap(),
+            previous = fks.previous.constraint_name().unwrap(),
+            next = fks.next.constraint_name().unwrap(),
         )
     }
 }
 
-fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type(column: ColumnWalker<'_>) -> Cow<'static, str> {
     fn format_u32_arg(arg: Option<u32>) -> String {
         match arg {
             None => "".to_string(),

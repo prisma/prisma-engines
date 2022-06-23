@@ -12,14 +12,15 @@ use regex::Regex;
 use sql_ddl::{mysql as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
     walkers::{
-        ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
+        ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker, UserDefinedTypeWalker,
+        ViewWalker,
     },
     ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
 };
 use std::borrow::Cow;
 
 impl MysqlFlavour {
-    fn render_column<'a>(&self, col: &ColumnWalker<'a>) -> ddl::Column<'a> {
+    fn render_column<'a>(&self, col: ColumnWalker<'a>) -> ddl::Column<'a> {
         ddl::Column {
             column_name: col.name().into(),
             not_null: col.arity().is_required(),
@@ -47,7 +48,7 @@ impl SqlRenderer for MysqlFlavour {
         Quoted::Backticks(name)
     }
 
-    fn render_add_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
+    fn render_add_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
         ddl::AlterTable {
             table_name: foreign_key.table().name().into(),
             changes: vec![ddl::AlterTableClause::AddForeignKey(ddl::ForeignKey {
@@ -83,31 +84,31 @@ impl SqlRenderer for MysqlFlavour {
         .to_string()
     }
 
-    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_enum on MySQL")
     }
 
-    fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&ddl::AlterTable {
-                    table_name: indexes.previous().table().name().into(),
+                    table_name: indexes.previous.table().name().into(),
                     changes: vec![sql_ddl::mysql::AlterTableClause::RenameIndex {
-                        previous_name: indexes.previous().name().into(),
-                        next_name: indexes.next().name().into(),
+                        previous_name: indexes.previous.name().into(),
+                        next_name: indexes.next.name().into(),
                     }],
                 })
             })
         })
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: Pair<&SqlSchema>) -> Vec<String> {
         let AlterTable {
             table_ids: table_index,
             changes,
         } = alter_table;
 
-        let tables = schemas.tables(table_index);
+        let tables = schemas.tables(*table_index);
 
         let mut lines = Vec::new();
 
@@ -118,7 +119,7 @@ impl SqlRenderer for MysqlFlavour {
                 TableChange::AddPrimaryKey => lines.push(format!(
                     "ADD PRIMARY KEY ({})",
                     tables
-                        .next()
+                        .next
                         .primary_key_columns()
                         .map(|c| {
                             let mut rendered = format!("{}", self.quote(c.as_column().name()));
@@ -140,14 +141,14 @@ impl SqlRenderer for MysqlFlavour {
                     column_id,
                     has_virtual_default: _,
                 } => {
-                    let column = tables.next().column_at(*column_id);
-                    let col_sql = self.render_column(&column);
+                    let column = tables.next.schema.walk_column(*column_id);
+                    let col_sql = self.render_column(column);
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
                 TableChange::DropColumn { column_id } => lines.push(
                     sql_ddl::mysql::AlterTableClause::DropColumn {
-                        column_name: tables.previous().column_at(*column_id).name().into(),
+                        column_name: tables.previous.schema.walk_column(*column_id).name().into(),
                     }
                     .to_string(),
                 ),
@@ -156,23 +157,23 @@ impl SqlRenderer for MysqlFlavour {
                     column_id,
                     type_change: _,
                 }) => {
-                    let columns = tables.columns(column_id);
-                    let expanded = MysqlAlterColumn::new(&columns, *changes);
+                    let columns = schemas.columns(*column_id);
+                    let expanded = MysqlAlterColumn::new(columns, *changes);
 
                     match expanded {
                         MysqlAlterColumn::DropDefault => lines.push(format!(
                             "ALTER COLUMN {column} DROP DEFAULT",
-                            column = Quoted::mysql_ident(columns.previous().name())
+                            column = Quoted::mysql_ident(columns.previous.name())
                         )),
                         MysqlAlterColumn::Modify { new_default, changes } => {
-                            lines.push(render_mysql_modify(&changes, new_default.as_ref(), columns.next()))
+                            lines.push(render_mysql_modify(&changes, new_default.as_ref(), columns.next))
                         }
                     };
                 }
                 TableChange::DropAndRecreateColumn { column_id, changes: _ } => {
-                    let columns = tables.columns(column_id);
-                    lines.push(format!("DROP COLUMN `{}`", columns.previous().name()));
-                    lines.push(format!("ADD COLUMN {}", self.render_column(columns.next())));
+                    let columns = schemas.columns(*column_id);
+                    lines.push(format!("DROP COLUMN `{}`", columns.previous.name()));
+                    lines.push(format!("ADD COLUMN {}", self.render_column(columns.next)));
                 }
             };
         }
@@ -183,18 +184,18 @@ impl SqlRenderer for MysqlFlavour {
 
         vec![format!(
             "ALTER TABLE {} {}",
-            self.quote(tables.previous().name()),
+            self.quote(tables.previous.name()),
             lines.join(",\n    ")
         )]
     }
 
-    fn render_create_enum(&self, _create_enum: &EnumWalker<'_>) -> Vec<String> {
+    fn render_create_enum(&self, _create_enum: EnumWalker<'_>) -> Vec<String> {
         unreachable!(
             "Unreachable render_create_enum() on MySQL. enums are defined on each column that uses them on MySQL"
         )
     }
 
-    fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+    fn render_create_index(&self, index: IndexWalker<'_>) -> String {
         ddl::CreateIndex {
             r#type: match index.index_type() {
                 sql_schema_describer::IndexType::Unique => ddl::IndexType::Unique,
@@ -221,10 +222,10 @@ impl SqlRenderer for MysqlFlavour {
         .to_string()
     }
 
-    fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: &str) -> String {
         ddl::CreateTable {
             table_name: table_name.into(),
-            columns: table.columns().map(|col| self.render_column(&col)).collect(),
+            columns: table.columns().map(|col| self.render_column(col)).collect(),
             indexes: table
                 .indexes()
                 .map(move |index| ddl::IndexClause {
@@ -266,25 +267,25 @@ impl SqlRenderer for MysqlFlavour {
         .to_string()
     }
 
-    fn render_drop_and_recreate_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_drop_and_recreate_index(&self, indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
         // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
         vec![
-            self.render_create_index(indexes.next()),
+            self.render_create_index(indexes.next),
             sql_ddl::mysql::DropIndex {
-                index_name: indexes.previous().name().into(),
-                table_name: indexes.previous().table().name().into(),
+                index_name: indexes.previous.name().into(),
+                table_name: indexes.previous.table().name().into(),
             }
             .to_string(),
         ]
     }
 
-    fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
+    fn render_drop_enum(&self, _: EnumWalker<'_>) -> Vec<String> {
         unreachable!(
             "Unreachable render_drop_enum() on MySQL. enums are defined on each column that uses them on MySQL"
         )
     }
 
-    fn render_drop_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
+    fn render_drop_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
         format!(
             "ALTER TABLE {table} DROP FOREIGN KEY {constraint_name}",
             table = self.quote(foreign_key.table().name()),
@@ -292,7 +293,7 @@ impl SqlRenderer for MysqlFlavour {
         )
     }
 
-    fn render_drop_index(&self, index: &IndexWalker<'_>) -> String {
+    fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
         sql_ddl::mysql::DropIndex {
             table_name: index.table().name().into(),
             index_name: index.name().into(),
@@ -310,7 +311,7 @@ impl SqlRenderer for MysqlFlavour {
         })
     }
 
-    fn render_redefine_tables(&self, _names: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {
+    fn render_redefine_tables(&self, _names: &[RedefineTable], _schemas: Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_redefine_table on MySQL")
     }
 
@@ -324,11 +325,11 @@ impl SqlRenderer for MysqlFlavour {
         .to_string()
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
+    fn render_create_table(&self, table: TableWalker<'_>) -> String {
         self.render_create_table_as(table, table.name())
     }
 
-    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
+    fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
         format!("DROP VIEW {}", Quoted::mysql_ident(view.name()))
     }
 
@@ -336,7 +337,7 @@ impl SqlRenderer for MysqlFlavour {
         unreachable!("render_drop_user_defined_type on MySQL")
     }
 
-    fn render_rename_foreign_key(&self, _fks: &Pair<ForeignKeyWalker<'_>>) -> String {
+    fn render_rename_foreign_key(&self, _fks: Pair<ForeignKeyWalker<'_>>) -> String {
         unreachable!("render RenameForeignKey on MySQL")
     }
 }
@@ -344,7 +345,7 @@ impl SqlRenderer for MysqlFlavour {
 fn render_mysql_modify(
     changes: &ColumnChanges,
     new_default: Option<&sql_schema_describer::DefaultValue>,
-    next_column: &ColumnWalker<'_>,
+    next_column: ColumnWalker<'_>,
 ) -> String {
     let column_type: Option<String> = if changes.type_changed() {
         Some(next_column.column_type().full_data_type.clone()).filter(|r| !r.is_empty() || r.contains("datetime"))
@@ -381,12 +382,12 @@ fn render_mysql_modify(
     )
 }
 
-fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type(column: ColumnWalker<'_>) -> Cow<'static, str> {
     if let ColumnTypeFamily::Enum(enum_name) = column.column_type_family() {
         let r#enum = column
-            .schema()
+            .schema
             .get_enum(enum_name)
-            .unwrap_or_else(|| panic!("Could not render the variants of enum `{}`", enum_name));
+            .unwrap_or_else(|| panic!("Could not render the variants of enum `{enum_name}`"));
 
         let variants: String = r#enum.values.iter().map(Quoted::mysql_string).join(", ");
 
@@ -472,14 +473,14 @@ enum MysqlAlterColumn {
 }
 
 impl MysqlAlterColumn {
-    fn new(columns: &Pair<ColumnWalker<'_>>, changes: ColumnChanges) -> Self {
-        if changes.only_default_changed() && columns.next().default().is_none() {
+    fn new(columns: Pair<ColumnWalker<'_>>, changes: ColumnChanges) -> Self {
+        if changes.only_default_changed() && columns.next.default().is_none() {
             return MysqlAlterColumn::DropDefault;
         }
 
         let defaults = (
-            columns.previous().default().as_ref().map(|d| d.kind()),
-            columns.next().default().as_ref().map(|d| d.kind()),
+            columns.previous.default().as_ref().map(|d| d.kind()),
+            columns.next.default().as_ref().map(|d| d.kind()),
         );
 
         // @default(dbgenerated()) does not give us the information in the prisma schema, so we have to
@@ -490,14 +491,14 @@ impl MysqlAlterColumn {
             {
                 Some(DefaultValue::db_generated(previous.clone()))
             }
-            _ => columns.next().default().cloned(),
+            _ => columns.next.default().cloned(),
         };
 
         MysqlAlterColumn::Modify { changes, new_default }
     }
 }
 
-fn render_default<'a>(column: &ColumnWalker<'a>, default: &'a DefaultValue) -> Cow<'a, str> {
+fn render_default<'a>(column: ColumnWalker<'a>, default: &'a DefaultValue) -> Cow<'a, str> {
     match default.kind() {
         DefaultKind::DbGenerated(val) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {

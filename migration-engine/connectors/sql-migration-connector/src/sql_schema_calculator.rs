@@ -6,14 +6,13 @@ use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
 use datamodel::{
     datamodel_connector::{walker_ext_traits::*, ReferentialAction, ScalarType},
     dml::{prisma_value, PrismaValue},
-    parser_database::{
-        walkers::{ModelWalker, ScalarFieldWalker},
-        IndexType, ScalarFieldType, SortOrder,
-    },
+    parser_database::{walkers::ScalarFieldWalker, IndexType, ScalarFieldType, SortOrder},
     schema_ast::ast::{self, FieldArity},
     ValidatedSchema,
 };
+use sql::walkers::SqlSchemaExt;
 use sql_schema_describer as sql;
+use std::collections::HashMap;
 
 pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
     let mut schema = SqlDatabaseSchema::default();
@@ -24,10 +23,16 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
         datamodel,
         schema: &mut schema,
         flavour,
+        model_id_to_table_id: HashMap::with_capacity(datamodel.db.models_count()),
     };
 
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     push_model_tables(&mut context);
+
+    if context.datamodel.referential_integrity().uses_foreign_keys() {
+        push_inline_relations(&mut context);
+    }
+
     push_relation_tables(&mut context);
     flavour.push_connector_data(&mut context);
 
@@ -35,14 +40,12 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
 }
 
 fn push_model_tables(ctx: &mut Context<'_>) {
-    for (model_idx, model) in ctx.datamodel.db.walk_models().enumerate() {
-        let columns = model
-            .scalar_fields()
-            .enumerate()
-            .map(|(field_idx, field)| column_for_scalar_field(field, (model_idx, field_idx), ctx))
-            .collect();
+    for model in ctx.datamodel.db.walk_models() {
+        let table_id = ctx.schema.describer_schema.push_table(model.database_name().to_owned());
+        ctx.model_id_to_table_id.insert(model.model_id(), table_id);
+        let table = &mut ctx.schema.describer_schema[table_id];
 
-        let primary_key = model.primary_key().map(|pk| sql::PrimaryKey {
+        table.primary_key = model.primary_key().map(|pk| sql::PrimaryKey {
             columns: pk
                 .scalar_field_attributes()
                 .map(|field| sql::PrimaryKeyColumn {
@@ -59,7 +62,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
                 .map(|c| c.into_owned()),
         });
 
-        let indices = model
+        table.indices = model
             .indexes()
             .map(|index| {
                 let columns = index
@@ -88,26 +91,14 @@ fn push_model_tables(ctx: &mut Context<'_>) {
             })
             .collect();
 
-        let mut table = sql::Table {
-            name: model.database_name().to_owned(),
-            columns,
-            indices,
-            primary_key,
-            foreign_keys: Vec::new(),
-        };
-
-        if ctx.datamodel.referential_integrity().uses_foreign_keys() {
-            push_inline_relations(model, &mut table, ctx);
+        for field in model.scalar_fields() {
+            push_column_for_scalar_field(field, table_id, ctx);
         }
-
-        ctx.schema.describer_schema.tables.push(table);
     }
 }
 
-fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table, ctx: &mut Context<'_>) {
-    let relations = model.relations_from().filter_map(|r| r.refine().as_inline());
-
-    for relation in relations {
+fn push_inline_relations(ctx: &mut Context<'_>) {
+    for relation in ctx.datamodel.db.walk_relations().filter_map(|r| r.refine().as_inline()) {
         let relation_field = relation
             .forward_relation_field()
             .expect("Expecting a complete relation in sql_schmea_calculator");
@@ -123,21 +114,24 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table, ctx: &m
             )
         });
 
-        table.foreign_keys.push(sql::ForeignKey {
-            constraint_name: Some(relation.constraint_name(ctx.flavour.datamodel_connector()).into_owned()),
-            columns: fk_columns,
-            referenced_table: relation.referenced_model().database_name().to_owned(),
-            referenced_columns: relation_field
-                .referenced_fields()
-                .expect("Expected references to be defined on relation field")
-                .map(|f| f.database_name().to_owned())
-                .collect(),
-            on_update_action: relation_field
-                .explicit_on_update()
-                .map(convert_referential_action)
-                .unwrap_or_else(|| sql::ForeignKeyAction::Cascade),
-            on_delete_action: convert_referential_action(on_delete_action),
-        });
+        ctx.schema.describer_schema.foreign_keys.push((
+            ctx.model_id_to_table_id[&relation_field.model().model_id()],
+            sql::ForeignKey {
+                constraint_name: Some(relation.constraint_name(ctx.flavour.datamodel_connector()).into_owned()),
+                columns: fk_columns,
+                referenced_table: ctx.model_id_to_table_id[&relation.referenced_model().model_id()],
+                referenced_columns: relation_field
+                    .referenced_fields()
+                    .expect("Expected references to be defined on relation field")
+                    .map(|f| f.database_name().to_owned())
+                    .collect(),
+                on_update_action: relation_field
+                    .explicit_on_update()
+                    .map(convert_referential_action)
+                    .unwrap_or_else(|| sql::ForeignKeyAction::Cascade),
+                on_delete_action: convert_referential_action(on_delete_action),
+            },
+        ));
     }
 }
 
@@ -151,6 +145,10 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
 
     for m2m in m2m_relations {
         let table_name = format!("_{}", m2m.relation_name());
+        let table_name = table_name
+            .chars()
+            .take(datamodel.configuration.max_identifier_length())
+            .collect::<String>();
         let model_a = m2m.model_a();
         let model_b = m2m.model_b();
         let model_a_column = "A";
@@ -174,93 +172,100 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
             format!("{table_name}_B{fk_suffix}")
         };
 
-        let foreign_keys = if ctx.datamodel.referential_integrity().uses_foreign_keys() {
-            vec![
+        let table_id = ctx.schema.describer_schema.push_table(table_name);
+        {
+            let mut table = &mut ctx.schema.describer_schema[table_id];
+            table.indices = vec![
+                sql::Index {
+                    name: format!(
+                        "{}_AB_unique",
+                        table.name.chars().take(max_identifier_length - 10).collect::<String>()
+                    ),
+                    columns: vec![
+                        sql::IndexColumn::new(model_a_column),
+                        sql::IndexColumn::new(model_b_column),
+                    ],
+                    tpe: sql::IndexType::Unique,
+                },
+                sql::Index {
+                    name: format!(
+                        "{}_B_index",
+                        table.name.chars().take(max_identifier_length - 8).collect::<String>()
+                    ),
+                    columns: vec![sql::IndexColumn::new(model_b_column)],
+                    tpe: sql::IndexType::Normal,
+                },
+            ];
+        }
+
+        if ctx.datamodel.referential_integrity().uses_foreign_keys() {
+            ctx.schema.describer_schema.foreign_keys.push((
+                table_id,
                 sql::ForeignKey {
                     constraint_name: Some(model_a_fk_name),
                     columns: vec![model_a_column.into()],
-                    referenced_table: model_a.database_name().into(),
+                    referenced_table: ctx.model_id_to_table_id[&model_a.model_id()],
                     referenced_columns: vec![model_a_id.database_name().into()],
                     on_update_action: flavour.m2m_foreign_key_action(model_a, model_b),
                     on_delete_action: flavour.m2m_foreign_key_action(model_a, model_b),
                 },
+            ));
+
+            ctx.schema.describer_schema.foreign_keys.push((
+                table_id,
                 sql::ForeignKey {
                     constraint_name: Some(model_b_fk_name),
                     columns: vec![model_b_column.into()],
-                    referenced_table: model_b.database_name().into(),
+                    referenced_table: ctx.model_id_to_table_id[&model_b.model_id()],
                     referenced_columns: vec![model_b_id.database_name().into()],
                     on_update_action: flavour.m2m_foreign_key_action(model_a, model_b),
                     on_delete_action: flavour.m2m_foreign_key_action(model_a, model_b),
                 },
-            ]
-        } else {
-            Vec::new()
-        };
+            ));
+        }
 
-        let indexes = vec![
-            sql::Index {
-                name: format!(
-                    "{}_AB_unique",
-                    table_name.chars().take(max_identifier_length - 10).collect::<String>()
-                ),
-                columns: vec![
-                    sql::IndexColumn::new(model_a_column),
-                    sql::IndexColumn::new(model_b_column),
-                ],
-                tpe: sql::IndexType::Unique,
-            },
-            sql::Index {
-                name: format!(
-                    "{}_B_index",
-                    table_name.chars().take(max_identifier_length - 8).collect::<String>()
-                ),
-                columns: vec![sql::IndexColumn::new(model_b_column)],
-                tpe: sql::IndexType::Normal,
-            },
-        ];
-
-        let columns = vec![
-            sql::Column {
-                name: model_a_column.into(),
-                tpe: column_for_scalar_field(model_a_id, (0, 0), ctx).tpe,
-                default: None,
-                auto_increment: false,
-            },
-            sql::Column {
-                name: model_b_column.into(),
-                tpe: column_for_scalar_field(model_b_id, (0, 0), ctx).tpe,
-                default: None,
-                auto_increment: false,
-            },
-        ];
-
-        ctx.schema.describer_schema.tables.push(sql::Table {
-            name: table_name
-                .chars()
-                .take(datamodel.configuration.max_identifier_length())
-                .collect::<String>(),
-            columns,
-            indices: indexes,
-            primary_key: None,
-            foreign_keys,
-        });
+        for (column_name, model, id) in [
+            (model_a_column, model_a, model_a_id),
+            (model_b_column, model_b, model_b_id),
+        ] {
+            ctx.schema.describer_schema.push_column(
+                table_id,
+                sql::Column {
+                    name: column_name.into(),
+                    tpe: ctx
+                        .schema
+                        .table_walker_at(ctx.model_id_to_table_id[&model.model_id()])
+                        .column(id.database_name())
+                        .unwrap()
+                        .column_type()
+                        .clone(),
+                    default: None,
+                    auto_increment: false,
+                },
+            );
+        }
     }
 }
 
-fn column_for_scalar_field(field: ScalarFieldWalker<'_>, idx: (usize, usize), ctx: &mut Context<'_>) -> sql::Column {
+fn push_column_for_scalar_field(field: ScalarFieldWalker<'_>, table_id: sql::TableId, ctx: &mut Context<'_>) {
     match field.scalar_field_type() {
-        ScalarFieldType::Enum(enum_id) => column_for_model_enum_scalar_field(field, enum_id, ctx),
-        ScalarFieldType::CompositeType(_) => column_for_builtin_scalar_type(field, ScalarType::Json, idx, ctx),
-        ScalarFieldType::BuiltInScalar(scalar_type) => column_for_builtin_scalar_type(field, scalar_type, idx, ctx),
-        ScalarFieldType::Unsupported(_) => column_for_model_unsupported_scalar_field(field, ctx),
+        ScalarFieldType::Enum(enum_id) => push_column_for_model_enum_scalar_field(field, enum_id, table_id, ctx),
+        ScalarFieldType::CompositeType(_) => {
+            push_column_for_builtin_scalar_type(field, ScalarType::Json, table_id, ctx)
+        }
+        ScalarFieldType::BuiltInScalar(scalar_type) => {
+            push_column_for_builtin_scalar_type(field, scalar_type, table_id, ctx)
+        }
+        ScalarFieldType::Unsupported(_) => push_column_for_model_unsupported_scalar_field(field, table_id, ctx),
     }
 }
 
-fn column_for_model_enum_scalar_field(
+fn push_column_for_model_enum_scalar_field(
     field: ScalarFieldWalker<'_>,
     enum_id: ast::EnumId,
+    table_id: sql::TableId,
     ctx: &mut Context<'_>,
-) -> sql::Column {
+) {
     let r#enum = ctx.datamodel.db.walk_enum(enum_id);
     let value_for_name = |name: &str| -> PrismaValue {
         match r#enum.values().find(|v| v.name() == name).map(|v| v.database_name()) {
@@ -293,42 +298,52 @@ fn column_for_model_enum_scalar_field(
             sql::DefaultValue::db_generated(value).with_constraint_name(ctx.flavour.default_constraint_name(def))
         }),
     });
-    sql::Column {
-        name: field.database_name().to_owned(),
-        tpe: ctx.flavour.enum_column_type(field, r#enum.database_name()),
-        default,
-        auto_increment: false,
-    }
+    ctx.schema.describer_schema.push_column(
+        table_id,
+        sql::Column {
+            name: field.database_name().to_owned(),
+            tpe: ctx.flavour.enum_column_type(field, r#enum.database_name()),
+            default,
+            auto_increment: false,
+        },
+    );
 }
 
-fn column_for_model_unsupported_scalar_field(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) -> sql::Column {
-    sql::Column {
-        name: field.database_name().to_owned(),
-        tpe: ctx.flavour.column_type_for_unsupported_type(
-            field,
-            field.ast_field().field_type.as_unsupported().unwrap().0.to_owned(),
-        ),
-        default: field.default_value().and_then(|def| {
-            // This is validated as @default(dbgenerated("...")), we can unwrap.
-            let dbgenerated_contents = unwrap_dbgenerated(def.value());
-            if let Some(value) = dbgenerated_contents {
-                let default = sql::DefaultValue::db_generated(value)
-                    .with_constraint_name(ctx.flavour.default_constraint_name(def));
-                Some(default)
-            } else {
-                None
-            }
-        }),
-        auto_increment: false,
-    }
+fn push_column_for_model_unsupported_scalar_field(
+    field: ScalarFieldWalker<'_>,
+    table_id: sql::TableId,
+    ctx: &mut Context<'_>,
+) {
+    ctx.schema.describer_schema.push_column(
+        table_id,
+        sql::Column {
+            name: field.database_name().to_owned(),
+            tpe: ctx.flavour.column_type_for_unsupported_type(
+                field,
+                field.ast_field().field_type.as_unsupported().unwrap().0.to_owned(),
+            ),
+            default: field.default_value().and_then(|def| {
+                // This is validated as @default(dbgenerated("...")), we can unwrap.
+                let dbgenerated_contents = unwrap_dbgenerated(def.value());
+                if let Some(value) = dbgenerated_contents {
+                    let default = sql::DefaultValue::db_generated(value)
+                        .with_constraint_name(ctx.flavour.default_constraint_name(def));
+                    Some(default)
+                } else {
+                    None
+                }
+            }),
+            auto_increment: false,
+        },
+    );
 }
 
-fn column_for_builtin_scalar_type(
+fn push_column_for_builtin_scalar_type(
     field: ScalarFieldWalker<'_>,
     scalar_type: ScalarType,
-    idx: (usize, usize),
+    table_id: sql::TableId,
     ctx: &mut Context<'_>,
-) -> sql::Column {
+) {
     let connector = ctx.flavour.datamodel_connector();
     let family = match scalar_type {
         ScalarType::Int => sql::ColumnTypeFamily::Int,
@@ -347,14 +362,22 @@ fn column_for_builtin_scalar_type(
         .map(|instance| instance.serialized_native_type)
         .unwrap_or_else(|| connector.default_native_type_for_scalar_type(&scalar_type));
 
-    let tpe = sql::ColumnType {
-        family,
-        full_data_type: String::new(),
-        arity: column_arity(field.ast_field().arity),
-        native_type: Some(native_type),
-    };
+    let column_id = ctx.schema.describer_schema.push_column(
+        table_id,
+        sql::Column {
+            name: field.database_name().to_owned(),
+            default: None,
+            tpe: sql::ColumnType {
+                family,
+                full_data_type: String::new(),
+                arity: column_arity(field.ast_field().arity),
+                native_type: Some(native_type),
+            },
+            auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
+        },
+    );
 
-    let default = field.default_value().and_then(|v| {
+    if let Some(v) = field.default_value() {
         let default_value = {
             if v.is_dbgenerated() {
                 unwrap_dbgenerated(v.value()).map(|v| sql::DefaultValue::new(sql::DefaultKind::DbGenerated(v)))
@@ -365,14 +388,15 @@ fn column_for_builtin_scalar_type(
             } else if v.is_sequence() {
                 Some(sql::DefaultValue::new(sql::DefaultKind::Sequence(format!(
                     "prisma_sequence_{}_{}",
-                    idx.0, idx.1
+                    field.model().database_name(),
+                    field.database_name()
                 ))))
             } else {
                 match v.value() {
                     ast::Expression::Function(_, _, _) => {
                         // prisma-generated
-                        ctx.schema.prisma_level_defaults.push((idx.0 as u32, idx.1 as u32));
-                        return None;
+                        ctx.schema.prisma_level_defaults.push(column_id);
+                        return;
                     }
                     constant => Some(sql::DefaultValue::new(sql::DefaultKind::Value(
                         constant_expression_to_sql_default(constant, scalar_type),
@@ -381,14 +405,8 @@ fn column_for_builtin_scalar_type(
             }
         };
 
-        default_value.map(|df| df.with_constraint_name(ctx.flavour.default_constraint_name(v)))
-    });
-
-    sql::Column {
-        name: field.database_name().to_owned(),
-        tpe,
-        default,
-        auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
+        let (_, column) = &mut ctx.schema.describer_schema[column_id];
+        column.default = default_value.map(|df| df.with_constraint_name(ctx.flavour.default_constraint_name(v)));
     }
 }
 
@@ -439,6 +457,7 @@ pub(crate) struct Context<'a> {
     datamodel: &'a ValidatedSchema,
     schema: &'a mut SqlDatabaseSchema,
     flavour: &'a dyn SqlFlavour,
+    model_id_to_table_id: HashMap<ast::ModelId, sql::TableId>,
 }
 
 fn convert_referential_action(action: ReferentialAction) -> sql::ForeignKeyAction {

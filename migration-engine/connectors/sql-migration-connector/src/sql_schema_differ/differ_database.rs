@@ -20,7 +20,7 @@ pub(crate) struct DifferDatabase<'a> {
     /// queries (-> all the columns in a table).
     columns: BTreeMap<(Pair<TableId>, &'a str), Pair<Option<ColumnId>>>,
     /// (table_idx, column_idx) -> ColumnChanges
-    column_changes: HashMap<(Pair<TableId>, Pair<ColumnId>), column::ColumnChanges>,
+    column_changes: HashMap<Pair<ColumnId>, column::ColumnChanges>,
     /// Tables that will need to be completely redefined (dropped and recreated) for the migration
     /// to succeed. It needs to be crate public because it is set from the flavour.
     pub(crate) tables_to_redefine: BTreeSet<Pair<TableId>>,
@@ -28,7 +28,10 @@ pub(crate) struct DifferDatabase<'a> {
 
 impl<'a> DifferDatabase<'a> {
     pub(crate) fn new(schemas: Pair<&'a SqlDatabaseSchema>, flavour: &'a dyn SqlFlavour) -> Self {
-        let table_count_lb = std::cmp::max(schemas.previous.tables().len(), schemas.next.tables().len());
+        let table_count_lb = std::cmp::max(
+            schemas.previous.describer_schema.tables_count(),
+            schemas.next.describer_schema.tables_count(),
+        );
         let mut db = DifferDatabase {
             flavour,
             schemas,
@@ -54,7 +57,7 @@ impl<'a> DifferDatabase<'a> {
             } else {
                 Cow::Borrowed(table.name())
             };
-            db.tables.insert(table_name, Pair::new(Some(table.table_id()), None));
+            db.tables.insert(table_name, Pair::new(Some(table.id), None));
         }
 
         // Then insert all tables from the next schema. Since we have all the
@@ -71,7 +74,7 @@ impl<'a> DifferDatabase<'a> {
                 Cow::Borrowed(table.name())
             };
             let entry = db.tables.entry(table_name).or_default();
-            *entry.next_mut() = Some(table.table_id());
+            entry.next = Some(table.id);
 
             // Deal with tables that are both in the previous and the next
             // schema: we are going to look at heir columns.
@@ -81,13 +84,13 @@ impl<'a> DifferDatabase<'a> {
                 columns_cache.clear();
 
                 // Same as for tables, walk the previous columns first.
-                for column in tables.previous().columns() {
-                    columns_cache.insert(column.name(), Pair::new(Some(column.column_id()), None));
+                for column in tables.previous.columns() {
+                    columns_cache.insert(column.name(), Pair::new(Some(column.id), None));
                 }
 
-                for column in tables.next().columns() {
+                for column in tables.next.columns() {
                     let entry = columns_cache.entry(column.name()).or_default();
-                    *entry.next_mut() = Some(column.column_id());
+                    entry.next = Some(column.id);
                 }
 
                 // Special treatment for columns that are in both previous and
@@ -96,9 +99,9 @@ impl<'a> DifferDatabase<'a> {
                     db.columns.insert((table_pair, column_name), *column_ids);
 
                     if let Some(column_ids) = column_ids.transpose() {
-                        let column_walkers = tables.columns(&column_ids);
+                        let column_walkers = schemas.columns(column_ids);
                         let changes = column::all_changes(column_walkers, flavour);
-                        db.column_changes.insert((table_pair, column_ids), changes);
+                        db.column_changes.insert(column_ids, changes);
                     }
                 }
             }
@@ -119,39 +122,39 @@ impl<'a> DifferDatabase<'a> {
         self.range_columns(table).filter_map(|(_k, v)| v.transpose())
     }
 
-    pub(crate) fn column_changes(&self, table: Pair<TableId>, column: Pair<ColumnId>) -> column::ColumnChanges {
-        self.column_changes[&(table, column)]
+    pub(crate) fn column_changes(&self, column: Pair<ColumnId>) -> column::ColumnChanges {
+        self.column_changes[&column]
     }
 
     pub(crate) fn column_changes_for_walkers(&self, walkers: Pair<ColumnWalker<'_>>) -> column::ColumnChanges {
-        self.column_changes(walkers.map(|c| c.table().table_id()), walkers.map(|c| c.column_id()))
+        self.column_changes(walkers.map(|c| c.id))
     }
 
     pub(crate) fn created_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = ColumnId> + '_ {
         self.range_columns(table)
-            .filter(|(_k, v)| v.previous().is_none())
-            .filter_map(|(_k, v)| *v.next())
+            .filter(|(_k, v)| v.previous.is_none())
+            .filter_map(|(_k, v)| v.next)
     }
 
     pub(crate) fn created_tables(&self) -> impl Iterator<Item = TableWalker<'_>> + '_ {
         self.tables
             .values()
-            .filter(|p| p.previous().is_none())
-            .filter_map(|p| *p.next())
-            .map(move |table_id| self.schemas.next().table_walker_at(table_id))
+            .filter(|p| p.previous.is_none())
+            .filter_map(|p| p.next)
+            .map(move |table_id| self.schemas.next.table_walker_at(table_id))
     }
 
     pub(crate) fn dropped_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = ColumnId> + '_ {
         self.range_columns(table)
-            .filter(|(_k, v)| v.next().is_none())
-            .filter_map(|(_k, v)| *v.previous())
+            .filter(|(_k, v)| v.next.is_none())
+            .filter_map(|(_k, v)| v.previous)
     }
 
     pub(crate) fn dropped_tables(&self) -> impl Iterator<Item = TableWalker<'a>> + '_ {
         self.tables
             .values()
-            .filter(|p| p.next().is_none())
-            .filter_map(|p| *p.previous())
+            .filter(|p| p.next.is_none())
+            .filter_map(|p| p.previous)
             .map(move |table_id| self.schemas.previous.table_walker_at(table_id))
     }
 
@@ -210,14 +213,14 @@ impl<'a> DifferDatabase<'a> {
     }
 
     fn previous_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
-        self.schemas.previous().describer_schema.enum_walkers()
+        self.schemas.previous.describer_schema.enum_walkers()
     }
 
     fn next_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
-        self.schemas.next().describer_schema.enum_walkers()
+        self.schemas.next.describer_schema.enum_walkers()
     }
 
-    pub(crate) fn schemas(&self) -> Pair<&SqlDatabaseSchema> {
+    pub(crate) fn schemas(&self) -> Pair<&'a SqlDatabaseSchema> {
         self.schemas
     }
 }

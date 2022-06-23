@@ -64,7 +64,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     fn push_enum_steps(&self, steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
         for enum_differ in db.enum_pairs() {
             let mut alter_enum = AlterEnum {
-                id: enum_differ.enums.as_ref().map(|e| e.enum_id()),
+                id: enum_differ.enums.map(|e| e.id),
                 created_variants: enum_differ.created_values().map(String::from).collect(),
                 dropped_variants: enum_differ.dropped_values().map(String::from).collect(),
                 previous_usages_as_default: Vec::new(), // this gets filled in later
@@ -79,11 +79,11 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         }
 
         for enm in db.created_enums() {
-            steps.push(SqlMigrationStep::CreateEnum(enm.enum_id()))
+            steps.push(SqlMigrationStep::CreateEnum(enm.id))
         }
 
         for enm in db.dropped_enums() {
-            steps.push(SqlMigrationStep::DropEnum(enm.enum_id()))
+            steps.push(SqlMigrationStep::DropEnum(enm.id))
         }
     }
 
@@ -102,9 +102,9 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         let sequence_pairs = db
             .all_column_pairs()
             .map(|cols| {
-                schemas.combine(cols).map(|((schema, ext), (table_id, column_id))| {
-                    (schema.table_walker_at(table_id).column_at(column_id), ext)
-                })
+                schemas
+                    .combine(cols)
+                    .map(|((schema, ext), (_table_id, column_id))| (schema.walk_column(column_id), ext))
             })
             .filter_map(|cols| {
                 cols.map(|(col, ext)| {
@@ -153,11 +153,11 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         let columns_previous = a.columns();
         let columns_next = b.columns();
 
-        let pg_ext_previous: &PostgresSchemaExt = a.schema().downcast_connector_data().unwrap_or_default();
-        let pg_ext_next: &PostgresSchemaExt = b.schema().downcast_connector_data().unwrap_or_default();
+        let pg_ext_previous: &PostgresSchemaExt = a.schema.downcast_connector_data().unwrap_or_default();
+        let pg_ext_next: &PostgresSchemaExt = b.schema.downcast_connector_data().unwrap_or_default();
 
-        let previous_algo = pg_ext_previous.index_algorithm(a.index_id());
-        let next_algo = pg_ext_next.index_algorithm(b.index_id());
+        let previous_algo = pg_ext_previous.index_algorithm(a.id);
+        let next_algo = pg_ext_next.index_algorithm(b.id);
 
         columns_previous.len() == columns_next.len()
             && previous_algo == next_algo
@@ -179,9 +179,9 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         true
     }
 
-    fn index_should_be_renamed(&self, pair: &Pair<IndexWalker<'_>>) -> bool {
+    fn index_should_be_renamed(&self, pair: Pair<IndexWalker<'_>>) -> bool {
         // Implements correct comparison for truncated index names.
-        let (previous_name, next_name) = pair.as_ref().map(|idx| idx.name()).into_tuple();
+        let (previous_name, next_name) = pair.map(|idx| idx.name()).into_tuple();
 
         previous_name != next_name
     }
@@ -614,39 +614,36 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
 }
 
 fn push_alter_enum_previous_usages_as_default(db: &DifferDatabase<'_>, alter_enum: &mut AlterEnum) {
-    let mut previous_usages_as_default = Vec::new();
+    let mut previous_usages_as_default: Vec<(_, Option<_>)> = Vec::new();
 
     let enum_names = db.schemas().enums(alter_enum.id).map(|enm| enm.name());
 
     for table in db.dropped_tables() {
         for column in table
             .columns()
-            .filter(|col| col.column_type_is_enum(enum_names.previous()) && col.default().is_some())
+            .filter(|col| col.column_type_is_enum(enum_names.previous) && col.default().is_some())
         {
-            previous_usages_as_default.push(((column.table().table_id(), column.column_id()), None));
+            previous_usages_as_default.push((column.id, None));
         }
     }
 
     for tables in db.table_pairs() {
         for column in tables
             .dropped_columns()
-            .filter(|col| col.column_type_is_enum(enum_names.previous()) && col.default().is_some())
+            .filter(|col| col.column_type_is_enum(enum_names.previous) && col.default().is_some())
         {
-            previous_usages_as_default.push(((column.table().table_id(), column.column_id()), None));
+            previous_usages_as_default.push((column.id, None));
         }
 
         for columns in tables
             .column_pairs()
-            .filter(|col| col.previous.column_type_is_enum(enum_names.previous()) && col.previous.default().is_some())
+            .filter(|col| col.previous.column_type_is_enum(enum_names.previous) && col.previous.default().is_some())
         {
             let next_usage_as_default = Some(&columns.next)
-                .filter(|col| col.column_type_is_enum(enum_names.next()) && col.default().is_some())
-                .map(|col| (col.table().table_id(), col.column_id()));
+                .filter(|col| col.column_type_is_enum(enum_names.next) && col.default().is_some())
+                .map(|col| col.id);
 
-            previous_usages_as_default.push((
-                (columns.previous.table().table_id(), columns.previous.column_id()),
-                next_usage_as_default,
-            ));
+            previous_usages_as_default.push((columns.previous.id, next_usage_as_default));
         }
     }
 

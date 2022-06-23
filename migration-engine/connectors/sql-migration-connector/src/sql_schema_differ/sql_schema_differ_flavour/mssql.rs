@@ -18,13 +18,13 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     }
 
     fn indexes_match(&self, a: IndexWalker<'_>, b: IndexWalker<'_>) -> bool {
-        let mssql_ext_previous: &MssqlSchemaExt = a.schema().downcast_connector_data().unwrap_or_default();
-        let mssql_ext_next: &MssqlSchemaExt = b.schema().downcast_connector_data().unwrap_or_default();
+        let mssql_ext_previous: &MssqlSchemaExt = a.schema.downcast_connector_data().unwrap_or_default();
+        let mssql_ext_next: &MssqlSchemaExt = b.schema.downcast_connector_data().unwrap_or_default();
 
-        mssql_ext_previous.index_is_clustered(a.index_id()) == mssql_ext_next.index_is_clustered(b.index_id())
+        mssql_ext_previous.index_is_clustered(a.id) == mssql_ext_next.index_is_clustered(b.id)
     }
 
-    fn should_skip_index_for_new_table(&self, index: &IndexWalker<'_>) -> bool {
+    fn should_skip_index_for_new_table(&self, index: IndexWalker<'_>) -> bool {
         index.index_type().is_unique()
     }
 
@@ -70,10 +70,10 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     }
 
     fn primary_key_changed(&self, tables: Pair<sql_schema_describer::walkers::TableWalker<'_>>) -> bool {
-        let previous_ext: &MssqlSchemaExt = tables.previous().schema().downcast_connector_data().unwrap_or_default();
-        let next_ext: &MssqlSchemaExt = tables.next().schema().downcast_connector_data().unwrap_or_default();
+        let previous_ext: &MssqlSchemaExt = tables.previous.schema.downcast_connector_data().unwrap_or_default();
+        let next_ext: &MssqlSchemaExt = tables.next.schema.downcast_connector_data().unwrap_or_default();
 
-        previous_ext.pk_is_clustered(tables.previous().table_id()) != next_ext.pk_is_clustered(tables.next().table_id())
+        previous_ext.pk_is_clustered(tables.previous.id) != next_ext.pk_is_clustered(tables.next.id)
     }
 
     fn push_index_changes_for_column_changes(
@@ -88,24 +88,23 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
         }
 
         for dropped_index in table.index_pairs().filter(|pair| {
-            pair.previous()
+            pair.previous
                 .columns()
-                .any(|col| col.as_column().column_id() == *column_id.previous())
+                .any(|col| col.as_column().id == column_id.previous)
         }) {
             steps.push(SqlMigrationStep::DropIndex {
-                table_id: table.previous().table_id(),
-                index_index: dropped_index.previous().index(),
+                table_id: table.previous().id,
+                index_id: dropped_index.previous.id,
             })
         }
 
-        for created_index in table.index_pairs().filter(|pair| {
-            pair.next()
-                .columns()
-                .any(|col| col.as_column().column_id() == *column_id.next())
-        }) {
+        for created_index in table
+            .index_pairs()
+            .filter(|pair| pair.next.columns().any(|col| col.as_column().id == column_id.next))
+        {
             steps.push(SqlMigrationStep::CreateIndex {
-                table_id: (None, table.next().table_id()),
-                index_index: created_index.next().index(),
+                table_id: (None, table.next().id),
+                index_id: created_index.next.id,
                 from_drop_and_recreate: false,
             })
         }

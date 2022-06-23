@@ -8,8 +8,6 @@ pub mod postgres;
 pub mod sqlite;
 pub mod walkers;
 
-pub(crate) mod common;
-
 mod connector_data;
 mod error;
 mod getters;
@@ -29,7 +27,7 @@ use std::{
     any::Any,
     fmt::{self, Debug},
 };
-use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
+use walkers::{EnumWalker, ForeignKeyWalker, SqlSchemaExt, TableWalker, UserDefinedTypeWalker, ViewWalker};
 
 /// A database description connector.
 #[async_trait::async_trait]
@@ -56,9 +54,13 @@ pub struct SqlMetadata {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct SqlSchema {
     /// The schema's tables.
-    pub tables: Vec<Table>,
+    tables: Vec<Table>,
     /// The schema's enums.
     pub enums: Vec<Enum>,
+    /// The schema's columns.
+    columns: Vec<(TableId, Column)>,
+    /// All foreign keys.
+    pub foreign_keys: Vec<(TableId, ForeignKey)>,
     /// The schema's views,
     views: Vec<View>,
     /// The stored procedures.
@@ -89,9 +91,21 @@ impl SqlSchema {
         self.connector_data.data = Some(data);
     }
 
-    /// Get a table.
-    pub fn get_table(&self, name: &str) -> Option<&Table> {
-        self.tables.iter().find(|x| x.name == name)
+    /// Find a column by table and name. Prefer `walk_column()` if possible.
+    pub fn find_column<'a>(&'a self, table_id: TableId, name: &str) -> Option<(ColumnId, &'a Column)> {
+        self.table_walker_at(table_id)
+            .columns()
+            .find(|col| col.name() == name)
+            .map(|col| (col.id, col.column()))
+    }
+
+    /// Find a column or panic. For tests.
+    pub fn column_bang(&self, table_id: TableId, name: &str) -> &Column {
+        self.table_walker_at(table_id)
+            .columns()
+            .find(|col| col.name() == name)
+            .map(|col| col.column())
+            .unwrap()
     }
 
     /// Get a view.
@@ -123,8 +137,10 @@ impl SqlSchema {
                 views,
                 procedures,
                 user_defined_types,
-                ..
-            } if tables.is_empty() && enums.is_empty() && views.is_empty() && procedures.is_empty() && user_defined_types.is_empty()
+                columns,
+                foreign_keys,
+                connector_data: _,
+            } if tables.is_empty() && enums.is_empty() && views.is_empty() && procedures.is_empty() && user_defined_types.is_empty() && columns.is_empty() && foreign_keys.is_empty()
         )
     }
 
@@ -142,19 +158,35 @@ impl SqlSchema {
             .map(|(table_index, table)| (TableId(table_index as u32), table))
     }
 
-    pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
-        match self.tables.iter().find(|t| t.name == name) {
-            Some(t) => Ok(t),
-            None => Err(name.to_string()),
-        }
+    pub fn push_column(&mut self, table_id: TableId, column: Column) -> ColumnId {
+        let id = ColumnId(self.columns.len() as u32);
+        self.columns.push((table_id, column));
+        id
     }
 
-    pub fn table_bang(&self, name: &str) -> &Table {
-        self.table(name).unwrap()
+    pub fn push_table(&mut self, name: String) -> TableId {
+        let id = TableId(self.tables.len() as u32);
+        self.tables.push(Table {
+            name,
+            ..Default::default()
+        });
+        id
+    }
+
+    #[track_caller]
+    pub fn table_bang(&self, name: &str) -> (TableId, &Table) {
+        self.iter_tables().find(|(_, t)| t.name == name).unwrap()
+    }
+
+    pub fn tables_count(&self) -> usize {
+        self.tables.len()
     }
 
     pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
-        (0..self.tables.len()).map(move |table_index| TableWalker::new(self, TableId(table_index as u32)))
+        (0..self.tables.len()).map(move |table_index| TableWalker {
+            schema: self,
+            id: TableId(table_index as u32),
+        })
     }
 
     pub fn view_walkers(&self) -> impl Iterator<Item = ViewWalker<'_>> {
@@ -168,7 +200,18 @@ impl SqlSchema {
     pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
         (0..self.enums.len()).map(move |enum_index| EnumWalker {
             schema: self,
-            enum_id: EnumId(enum_index as u32),
+            id: EnumId(enum_index as u32),
+        })
+    }
+
+    pub fn walk_foreign_key(&self, id: ForeignKeyId) -> ForeignKeyWalker<'_> {
+        ForeignKeyWalker { schema: self, id }
+    }
+
+    pub fn walk_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'_>> {
+        (0..self.foreign_keys.len()).map(move |fk_idx| ForeignKeyWalker {
+            schema: self,
+            id: ForeignKeyId(fk_idx as u32),
         })
     }
 }
@@ -178,66 +221,10 @@ impl SqlSchema {
 pub struct Table {
     /// The table's name.
     pub name: String,
-    /// The table's columns.
-    pub columns: Vec<Column>,
     /// The table's indices.
     pub indices: Vec<Index>,
     /// The table's primary key, if there is one.
     pub primary_key: Option<PrimaryKey>,
-    /// The table's foreign keys.
-    pub foreign_keys: Vec<ForeignKey>,
-}
-
-impl Table {
-    pub fn column_bang(&self, name: &str) -> &Column {
-        self.column(name)
-            .unwrap_or_else(|| panic!("Column {} not found in Table {}", name, self.name))
-    }
-
-    pub fn column<'a>(&'a self, name: &str) -> Option<&'a Column> {
-        self.columns.iter().find(|c| c.name == name)
-    }
-
-    pub fn has_column(&self, name: &str) -> bool {
-        self.column(name).is_some()
-    }
-
-    pub fn is_part_of_foreign_key(&self, column: &str) -> bool {
-        self.foreign_key_for_column(column).is_some()
-    }
-
-    pub fn foreign_key_for_column(&self, column: &str) -> Option<&ForeignKey> {
-        self.foreign_keys
-            .iter()
-            .find(|fk| fk.columns.contains(&column.to_string()))
-    }
-
-    pub fn is_part_of_primary_key(&self, column: &str) -> bool {
-        match &self.primary_key {
-            Some(pk) => pk.columns.iter().any(|c| c.name() == column),
-            None => false,
-        }
-    }
-
-    pub fn primary_key_columns(&self) -> impl Iterator<Item = &PrimaryKeyColumn> + '_ {
-        match &self.primary_key {
-            Some(pk) => pk.columns.iter(),
-            None => [].iter(),
-        }
-    }
-
-    pub fn is_column_unique(&self, column_name: &str) -> bool {
-        self.indices.iter().any(|index| {
-            index.is_unique() && index.columns.len() == 1 && index.columns.iter().any(|c| c.name() == column_name)
-        })
-    }
-
-    pub fn is_column_primary_key(&self, column_name: &str) -> bool {
-        match &self.primary_key {
-            None => false,
-            Some(key) => key.is_single_primary_key(column_name),
-        }
-    }
 }
 
 /// The type of an index.
@@ -252,8 +239,12 @@ pub enum IndexType {
 }
 
 impl IndexType {
-    pub fn is_unique(&self) -> bool {
+    pub fn is_unique(self) -> bool {
         matches!(self, IndexType::Unique)
+    }
+
+    pub fn is_fulltext(self) -> bool {
+        matches!(self, IndexType::Fulltext)
     }
 }
 
@@ -310,7 +301,7 @@ impl IndexColumn {
 }
 
 /// An index of a table.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Index {
     /// Index name.
     pub name: String,
@@ -318,20 +309,6 @@ pub struct Index {
     pub columns: Vec<IndexColumn>,
     /// Type of index.
     pub tpe: IndexType,
-}
-
-impl Index {
-    pub fn is_unique(&self) -> bool {
-        self.tpe == IndexType::Unique
-    }
-
-    pub fn is_fulltext(&self) -> bool {
-        self.tpe == IndexType::Fulltext
-    }
-
-    pub fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {
-        self.columns.iter().map(|c| c.name())
-    }
 }
 
 /// A stored procedure (like, the function inside your database).
@@ -425,7 +402,7 @@ impl Column {
 }
 
 /// The type of a column.
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct ColumnType {
     /// The full SQL data type, the sql string necessary to recreate the column, drawn directly from the db, used when there is no native type.
     pub full_data_type: String,
@@ -458,7 +435,7 @@ impl ColumnType {
 }
 
 /// Enumeration of column type families.
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 // TODO: this name feels weird.
 pub enum ColumnTypeFamily {
     /// Integer types.
@@ -525,7 +502,7 @@ impl ColumnTypeFamily {
 }
 
 /// A column's arity.
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub enum ColumnArity {
     /// Required column.
     Required,
@@ -580,14 +557,14 @@ impl ForeignKeyAction {
 }
 
 /// A foreign key.
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ForeignKey {
     /// The database name of the foreign key constraint, when available.
     pub constraint_name: Option<String>,
     /// Column names.
     pub columns: Vec<String>,
     /// Referenced table.
-    pub referenced_table: String,
+    pub referenced_table: TableId,
     /// Referenced columns.
     pub referenced_columns: Vec<String>,
     /// Action on deletion.

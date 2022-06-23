@@ -67,8 +67,8 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Return whether an index should be renamed by the migration.
-    fn index_should_be_renamed(&self, indexes: &Pair<IndexWalker<'_>>) -> bool {
-        indexes.previous().name() != indexes.next().name()
+    fn index_should_be_renamed(&self, indexes: Pair<IndexWalker<'_>>) -> bool {
+        indexes.previous.name() != indexes.next.name()
     }
 
     fn lower_cases_table_names(&self) -> bool {
@@ -124,7 +124,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Whether a specific index should *not* be produced.
-    fn should_skip_index_for_new_table(&self, _index: &IndexWalker<'_>) -> bool {
+    fn should_skip_index_for_new_table(&self, _index: IndexWalker<'_>) -> bool {
         false
     }
 
@@ -140,7 +140,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     fn table_names_match(&self, names: Pair<&str>) -> bool {
-        names.previous() == names.next()
+        names.previous == names.next
     }
 
     /// Return the tables that cannot be migrated without being redefined. This

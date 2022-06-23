@@ -1,20 +1,16 @@
 use migration_connector::DatabaseSchema;
-use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema, Table};
+use sql_schema_describer::{self as sql, walkers::SqlSchemaExt, SqlSchema};
 
 #[derive(Default, Debug)]
 pub(crate) struct SqlDatabaseSchema {
     pub(crate) describer_schema: SqlSchema,
-    /// A **sorted** array of (table_idx, column_idx) with prisma-level defaults.
-    pub(crate) prisma_level_defaults: Vec<(u32, u32)>,
+    /// A _sorted_ array of column ids with prisma-level defaults.
+    pub(crate) prisma_level_defaults: Vec<sql::ColumnId>,
 }
 
 impl SqlDatabaseSchema {
     pub(crate) fn from_erased(erased: DatabaseSchema) -> Box<Self> {
         erased.downcast()
-    }
-
-    pub(crate) fn tables(&self) -> &[Table] {
-        &self.describer_schema.tables
     }
 }
 
@@ -53,7 +49,11 @@ impl SqlSchemaExt for SqlDatabaseSchema {
         self.describer_schema.udt_walker_at(index)
     }
 
-    fn walk_enum(&self, enum_id: sql_schema_describer::EnumId) -> sql_schema_describer::walkers::EnumWalker<'_> {
+    fn walk_column(&self, column_id: sql::ColumnId) -> sql::walkers::ColumnWalker<'_> {
+        self.describer_schema.walk_column(column_id)
+    }
+
+    fn walk_enum(&self, enum_id: sql::EnumId) -> sql_schema_describer::walkers::EnumWalker<'_> {
         self.describer_schema.walk_enum(enum_id)
     }
 }

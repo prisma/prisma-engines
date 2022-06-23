@@ -7,7 +7,10 @@ use datamodel::dml::{Datamodel, Model};
 use introspection_connector::{IntrospectionContext, Version, Warning};
 use native_types::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;
-use sql_schema_describer::{Column, ForeignKey, ForeignKeyAction, PrimaryKey, SqlSchema, Table};
+use sql_schema_describer::{
+    walkers::{ColumnWalker, TableWalker},
+    ForeignKey, ForeignKeyAction, PrimaryKey, SqlSchema,
+};
 use tracing::debug;
 
 #[derive(Debug)]
@@ -55,10 +58,10 @@ impl VersionChecker {
         VersionChecker {
             sql_family: ctx.sql_family(),
             is_cockroachdb: ctx.source.active_provider == "cockroachdb",
-            has_migration_table: schema.tables.iter().any(is_old_migration_table),
-            has_relay_table: schema.tables.iter().any(is_relay_table),
-            has_prisma_1_join_table: schema.tables.iter().any(is_prisma_1_point_0_join_table),
-            has_prisma_1_1_or_2_join_table: schema.tables.iter().any(is_prisma_1_point_1_or_2_join_table),
+            has_migration_table: schema.table_walkers().any(is_old_migration_table),
+            has_relay_table: schema.table_walkers().any(is_relay_table),
+            has_prisma_1_join_table: schema.table_walkers().any(is_prisma_1_point_0_join_table),
+            has_prisma_1_1_or_2_join_table: schema.table_walkers().any(is_prisma_1_point_1_or_2_join_table),
             uses_on_delete: false,
             uses_default_values: false,
             always_has_created_at_updated_at: true,
@@ -68,13 +71,13 @@ impl VersionChecker {
         }
     }
 
-    pub fn check_column_for_type_and_default_value(&mut self, column: &Column) {
+    pub fn check_column_for_type_and_default_value(&mut self, column: ColumnWalker<'_>) {
         match self.sql_family {
             SqlFamily::Postgres if self.is_cockroachdb => {
                 self.uses_non_prisma_types = true; // we can be sure it's not prisma 1
             }
             SqlFamily::Postgres => {
-                if let Some(native_type) = &column.tpe.native_type {
+                if let Some(native_type) = &column.column_type().native_type {
                     let native_type: PostgresType = serde_json::from_value(native_type.clone()).unwrap();
 
                     if !POSTGRES_TYPES.contains(&native_type) {
@@ -83,7 +86,7 @@ impl VersionChecker {
                 }
             }
             SqlFamily::Mysql => {
-                if let Some(native_type) = &column.tpe.native_type {
+                if let Some(native_type) = &column.column_type().native_type {
                     let native_type: MySqlType = serde_json::from_value(native_type.clone()).unwrap();
 
                     if !MYSQL_TYPES.contains(&native_type) {
@@ -91,25 +94,25 @@ impl VersionChecker {
                     }
                 }
             }
-            SqlFamily::Sqlite if !SQLITE_TYPES.contains(&&*column.tpe.full_data_type) => {
+            SqlFamily::Sqlite if !SQLITE_TYPES.contains(&&*column.column_type().full_data_type) => {
                 self.uses_non_prisma_types = true
             }
             _ => (),
         }
 
-        if !column.auto_increment && column.default.is_some() {
+        if !column.is_autoincrement() && column.default().is_some() {
             self.uses_default_values = true;
         };
     }
 
-    pub fn has_inline_relations(&mut self, table: &Table) {
+    pub fn has_inline_relations(&mut self, table: TableWalker<'_>) {
         if !is_prisma_1_or_11_list_table(table) {
             self.has_inline_relations = true;
         }
     }
 
     #[allow(clippy::nonminimal_bool)] // more readable this way
-    pub fn uses_on_delete(&mut self, fk: &ForeignKey, table: &Table) {
+    pub fn uses_on_delete(&mut self, fk: &ForeignKey, table: TableWalker<'_>) {
         if !(fk.on_delete_action == ForeignKeyAction::NoAction || fk.on_delete_action == ForeignKeyAction::SetNull)
             && !is_prisma_1_or_11_list_table(table)
             && fk.on_delete_action != ForeignKeyAction::Cascade
@@ -118,22 +121,23 @@ impl VersionChecker {
         }
     }
 
-    pub fn always_has_created_at_updated_at(&mut self, table: &Table, model: &Model) {
+    pub fn always_has_created_at_updated_at(&mut self, table: TableWalker<'_>, model: &Model) {
         if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) && !model.has_created_at_and_updated_at() {
             self.always_has_created_at_updated_at = false
         }
     }
 
-    pub fn has_p1_compatible_primary_key_column(&mut self, table: &Table) {
+    pub fn has_p1_compatible_primary_key_column(&mut self, table: TableWalker<'_>) {
         if self.is_cockroachdb {
             // we rule out crdb + P1
             return;
         }
 
         if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) {
-            if let Some(PrimaryKey { columns, .. }) = &table.primary_key {
+            if let Some(PrimaryKey { columns, .. }) = table.primary_key() {
                 if columns.len() == 1 {
-                    let tpe = &table.column_bang(columns.first().unwrap().name()).tpe;
+                    let col = table.column(columns.first().unwrap().name()).unwrap();
+                    let tpe = col.column_type();
 
                     if self.sql_family == SqlFamily::Postgres {
                         if let Some(native_type) = &tpe.native_type {

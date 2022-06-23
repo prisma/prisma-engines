@@ -38,26 +38,26 @@ impl TestResult {
 
     #[track_caller]
     pub fn assert_warning_code(&self, code: i16) {
-        dbg!(&self.warnings);
-        assert!(self.warnings.iter().any(|w| w.code == code))
+        assert!(self.warnings.iter().any(|w| w.code == code), "{:#?}", self.warnings)
     }
 
     #[track_caller]
     pub fn assert_warning(&self, warning: &str) {
-        dbg!(&self.warnings);
-        assert!(self.warnings.iter().any(|w| w.message == warning))
+        assert!(
+            self.warnings.iter().any(|w| w.message == warning),
+            "{:#?}",
+            self.warnings
+        )
     }
 
     #[track_caller]
     pub fn assert_no_warnings(&self) {
-        dbg!(&self.warnings);
-        assert!(self.warnings.is_empty())
+        assert!(self.warnings.is_empty(), "{:#?}", self.warnings)
     }
 
     #[track_caller]
     pub fn assert_warning_affected(&self, affected: &serde_json::Value) {
-        dbg!(&self.warnings);
-        assert!(&self.warnings[0].affected == affected);
+        assert!(&self.warnings[0].affected == affected, "{:#?}", self.warnings);
     }
 }
 
