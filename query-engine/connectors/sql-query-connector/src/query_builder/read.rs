@@ -1,8 +1,8 @@
 use crate::{
-    cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations,
-    ordering::OrderByBuilder, sql_trace::SqlTraceComment,
+    cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations, nested_read,
+    ordering, sql_trace::SqlTraceComment,
 };
-use connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
+use connector_interface::{filter::Filter, AggregationSelection, NestedRead, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
@@ -12,6 +12,7 @@ pub trait SelectDefinition {
     fn into_select(
         self,
         _: &ModelRef,
+        nested_reads: &[NestedRead],
         aggr_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
     ) -> (Select<'static>, Vec<Expression<'static>>);
@@ -21,11 +22,12 @@ impl SelectDefinition for Filter {
     fn into_select(
         self,
         model: &ModelRef,
+        nested_reads: &[NestedRead],
         aggr_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let args = QueryArguments::from((model.clone(), self));
-        args.into_select(model, aggr_selections, trace_id)
+        args.into_select(model, nested_reads, aggr_selections, trace_id)
     }
 }
 
@@ -33,10 +35,11 @@ impl SelectDefinition for &Filter {
     fn into_select(
         self,
         model: &ModelRef,
+        nested_reads: &[NestedRead],
         aggr_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
-        self.clone().into_select(model, aggr_selections, trace_id)
+        self.clone().into_select(model, nested_reads, aggr_selections, trace_id)
     }
 }
 
@@ -44,6 +47,7 @@ impl SelectDefinition for Select<'static> {
     fn into_select(
         self,
         _: &ModelRef,
+        _: &[NestedRead],
         _: &[RelAggregationSelection],
         _trace_id: Option<String>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
@@ -55,12 +59,14 @@ impl SelectDefinition for QueryArguments {
     fn into_select(
         self,
         model: &ModelRef,
+        nested_reads: &[NestedRead],
         aggr_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let order_by_definitions = OrderByBuilder::default().build(&self);
         let (table_opt, cursor_condition) = cursor_condition::build(&self, &model, &order_by_definitions);
         let aggregation_joins = nested_aggregations::build(aggr_selections);
+        let nested_read_joins = nested_read::build_joins(nested_reads);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
         let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
@@ -88,6 +94,11 @@ impl SelectDefinition for QueryArguments {
             .into_iter()
             .fold(joined_table, |acc, join| acc.left_join(join.data));
 
+        let joined_table = nested_read_joins
+            .joins
+            .into_iter()
+            .fold(joined_table, |acc, join| acc.left_join(join.data));
+
         let select_ast = Select::from_table(joined_table)
             .so_that(conditions)
             .offset(skip as usize)
@@ -104,9 +115,15 @@ impl SelectDefinition for QueryArguments {
             .iter()
             .fold(select_ast, |acc, o| acc.order_by(o.order_definition.clone()));
 
+        let additional_selection_set = aggregation_joins
+            .columns
+            .into_iter()
+            .chain(nested_read_joins.columns)
+            .collect_vec();
+
         match limit {
-            Some(limit) => (select_ast.limit(limit as usize), aggregation_joins.columns),
-            None => (select_ast, aggregation_joins.columns),
+            Some(limit) => (select_ast.limit(limit as usize), additional_selection_set),
+            None => (select_ast, additional_selection_set),
         }
     }
 }
@@ -116,12 +133,13 @@ pub fn get_records<T>(
     columns: impl Iterator<Item = Column<'static>>,
     aggr_selections: &[RelAggregationSelection],
     query: T,
+    nested_reads: &[NestedRead],
     trace_id: Option<String>,
 ) -> Select<'static>
 where
     T: SelectDefinition,
 {
-    let (select, additional_selection_set) = query.into_select(model, aggr_selections, trace_id.clone());
+    let (select, additional_selection_set) = query.into_select(model, nested_reads, aggr_selections, trace_id.clone());
     let select = columns.fold(select, |acc, col| acc.column(col));
 
     let select = select.append_trace(&Span::current()).add_trace_id(trace_id);
@@ -164,7 +182,7 @@ pub fn aggregate(
     trace_id: Option<String>,
 ) -> Select<'static> {
     let columns = extract_columns(model, &selections);
-    let sub_query = get_records(model, columns.into_iter(), &[], args, trace_id.clone());
+    let sub_query = get_records(model, columns.into_iter(), &[], args, &[], trace_id.clone());
     let sub_table = Table::from(sub_query).alias("sub");
 
     selections.iter().fold(
@@ -213,7 +231,7 @@ pub fn group_by_aggregate(
     having: Option<Filter>,
     trace_id: Option<String>,
 ) -> Select<'static> {
-    let (base_query, _) = args.into_select(model, &[], trace_id.clone());
+    let (base_query, _) = args.into_select(model, &[], &[], trace_id.clone());
 
     let select_query = selections.iter().fold(base_query, |select, next_op| match next_op {
         AggregationSelection::Field(field) => select.column(field.as_column()),

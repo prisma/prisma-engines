@@ -1,7 +1,7 @@
 use super::{catch, transaction::SqlConnectorTransaction};
 use crate::{database::operations::*, sql_info::SqlInfo, QueryExt, SqlError};
 use async_trait::async_trait;
-use connector::{ConnectionLike, RelAggregationSelection};
+use connector::{ConnectionLike, NestedRead, RelAggregationSelection};
 use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, Connection, QueryArguments,
     ReadOperations, RecordFilter, Transaction, WriteArgs, WriteOperations,
@@ -108,6 +108,7 @@ where
         model: &ModelRef,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
+        nested_reads: &[NestedRead],
         aggr_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
     ) -> connector::Result<ManyRecords> {
@@ -117,6 +118,7 @@ where
                 model,
                 query_arguments,
                 &selected_fields.into(),
+                nested_reads,
                 aggr_selections,
                 SqlInfo::from(&self.connection_info),
                 trace_id,

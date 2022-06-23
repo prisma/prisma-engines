@@ -22,6 +22,10 @@ impl FieldSelection {
         self.selections
     }
 
+    pub fn inner(&self) -> &Vec<SelectedField> {
+        &self.selections
+    }
+
     /// Returns `true` if self contains (at least) all fields specified in `other`. `false` otherwise.
     /// Recurses into composite selections and ensures that composite selections are supersets as well.
     pub fn is_superset_of(&self, other: &Self) -> bool {
@@ -168,6 +172,13 @@ impl SelectedField {
     pub fn as_composite(&self) -> Option<&CompositeSelection> {
         match self {
             SelectedField::Composite(ref cs) => Some(cs),
+            _ => None,
+        }
+    }
+
+    pub fn as_scalar(&self) -> Option<&ScalarFieldRef> {
+        match self {
+            SelectedField::Scalar(ref sf) => Some(sf),
             _ => None,
         }
     }

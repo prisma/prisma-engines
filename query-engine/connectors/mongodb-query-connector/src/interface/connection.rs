@@ -6,8 +6,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector_interface::{
-    Connection, ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteArgs,
-    WriteOperations,
+    Connection, ConnectionLike, NestedRead, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteArgs, WriteOperations,
 };
 use mongodb::{ClientSession, Database};
 use prisma_models::{prelude::*, SelectionResult};
@@ -190,6 +189,7 @@ impl ReadOperations for MongoDbConnection {
         model: &ModelRef,
         query_arguments: connector_interface::QueryArguments,
         selected_fields: &FieldSelection,
+        nested_reads: &[NestedRead],
         aggregation_selections: &[RelAggregationSelection],
         _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
@@ -200,6 +200,7 @@ impl ReadOperations for MongoDbConnection {
                 model,
                 query_arguments,
                 selected_fields,
+                nested_reads,
                 aggregation_selections,
             )
             .await

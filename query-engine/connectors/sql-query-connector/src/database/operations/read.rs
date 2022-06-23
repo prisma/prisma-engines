@@ -24,6 +24,7 @@ pub async fn get_single_record(
         selected_fields.as_columns(),
         aggr_selections,
         filter,
+        &[],
         trace_id.clone(),
     );
 
@@ -59,6 +60,7 @@ pub async fn get_many_records(
     model: &ModelRef,
     mut query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
+    nested_reads: &[NestedRead],
     aggr_selections: &[RelAggregationSelection],
     sql_info: SqlInfo,
     trace_id: Option<String>,
@@ -67,17 +69,23 @@ pub async fn get_many_records(
 
     let mut field_names: Vec<_> = selected_fields.db_names().collect();
     let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
+    let mut nested_read_field_names: Vec<_> = nested_reads.iter().flat_map(|read| read.db_aliases()).collect();
 
     field_names.append(&mut aggr_field_names);
+    field_names.append(&mut nested_read_field_names);
 
+    let mut idents = selected_fields.type_identifiers_with_arities();
     let mut aggr_idents = aggr_selections
         .iter()
         .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
         .collect();
-
-    let mut idents = selected_fields.type_identifiers_with_arities();
+    let mut nested_read_idents: Vec<(_, _)> = nested_reads
+        .iter()
+        .flat_map(|read| read.type_identifier_with_arities())
+        .collect();
 
     idents.append(&mut aggr_idents);
+    idents.append(&mut nested_read_idents);
 
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
     let mut records = ManyRecords::new(field_names.clone());
@@ -117,6 +125,7 @@ pub async fn get_many_records(
                     selected_fields.as_columns(),
                     aggr_selections,
                     args,
+                    nested_reads,
                     trace_id.clone(),
                 );
 
@@ -139,6 +148,7 @@ pub async fn get_many_records(
                 selected_fields.as_columns(),
                 aggr_selections,
                 query_arguments,
+                nested_reads,
                 trace_id.clone(),
             );
 

@@ -5,6 +5,7 @@ mod postgresql;
 mod sqlite;
 mod transaction;
 
+pub mod nested_read;
 pub(crate) mod operations;
 
 use async_trait::async_trait;

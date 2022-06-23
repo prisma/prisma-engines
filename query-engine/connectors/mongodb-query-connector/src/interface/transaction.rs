@@ -4,7 +4,7 @@ use crate::{
     root_queries::{aggregate, read, write},
 };
 use connector_interface::{
-    ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteOperations,
+    ConnectionLike, NestedRead, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteOperations
 };
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 use prisma_models::SelectionResult;
@@ -256,6 +256,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         model: &ModelRef,
         query_arguments: connector_interface::QueryArguments,
         selected_fields: &FieldSelection,
+        nested_reads: &[NestedRead],
         aggregation_selections: &[RelAggregationSelection],
         _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
@@ -266,6 +267,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
                 model,
                 query_arguments,
                 selected_fields,
+                nested_reads,
                 aggregation_selections,
             )
             .await

@@ -3,7 +3,7 @@ use crate::{
     error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
     vacuum_cursor, IntoBson,
 };
-use connector_interface::{Filter, QueryArguments, RelAggregationSelection};
+use connector_interface::{Filter, NestedRead, QueryArguments, RelAggregationSelection};
 use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
 use prisma_models::*;
 use tracing::{info_span, Instrument};
@@ -61,6 +61,7 @@ pub async fn get_many_records<'conn>(
     model: &ModelRef,
     query_arguments: QueryArguments,
     selected_fields: &FieldSelection,
+    nested_reads: &[NestedRead],
     aggregation_selections: &[RelAggregationSelection],
 ) -> crate::Result<ManyRecords> {
     let coll = database.collection(model.db_name());

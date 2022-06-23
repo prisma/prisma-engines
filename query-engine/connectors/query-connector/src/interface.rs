@@ -1,6 +1,7 @@
 use crate::{coerce_null_to_zero_value, Filter, QueryArguments, WriteArgs};
 use async_trait::async_trait;
 use dml::FieldArity;
+use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
@@ -214,6 +215,66 @@ impl RelAggregationSelection {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct NestedRead {
+    pub name: String,
+    pub alias: Option<String>,
+    pub parent_field: RelationFieldRef,
+    pub args: QueryArguments,
+    pub selected_fields: FieldSelection,
+    pub nested: Vec<NestedRead>,
+    pub selection_order: Vec<String>,
+    pub aggregation_selections: Vec<RelAggregationSelection>,
+
+    /// Fields and values of the parent to satisfy the relation query without
+    /// relying on the parent result passed by the interpreter.
+    pub parent_results: Option<Vec<SelectionResult>>,
+}
+
+impl NestedRead {
+    pub fn db_alias(&self, i: usize) -> String {
+        let selected_field = self.selected_fields.inner().get(i).unwrap();
+
+        format!(
+            "__prisma_nested_read__{}_{}",
+            self.parent_field.relation_name,
+            selected_field.db_name()
+        )
+    }
+
+    pub fn db_aliases(&self) -> Vec<String> {
+        let mut aliases = self
+            .selected_fields
+            .selections()
+            .enumerate()
+            .map(|(i, _)| self.db_alias(i))
+            .collect_vec();
+
+        for read in &self.nested {
+            aliases.extend(read.db_aliases());
+        }
+
+        aliases
+    }
+
+    pub fn type_identifier_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+        let mut result = self
+            .selected_fields
+            .selections()
+            .map(|field| match field {
+                SelectedField::Scalar(sf) => sf.type_identifier_with_arity(),
+                SelectedField::Composite(_) => unreachable!(),
+            })
+            .collect_vec();
+
+        for read in &self.nested {
+            result.extend(read.type_identifier_with_arities());
+        }
+
+        result
+    }
+}
+
 #[async_trait]
 pub trait ReadOperations {
     /// Gets a single record or `None` back from the database.
@@ -242,6 +303,7 @@ pub trait ReadOperations {
         model: &ModelRef,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
+        nested: &[NestedRead],
         aggregation_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
     ) -> crate::Result<ManyRecords>;

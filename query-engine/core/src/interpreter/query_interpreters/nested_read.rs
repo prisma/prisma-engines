@@ -71,6 +71,8 @@ pub async fn m2m(
                 &query.parent_field.related_model(),
                 args,
                 &query.selected_fields,
+                // TODO: support nested_reads here
+                &[],
                 &query.aggregation_selections,
                 trace_id.clone(),
             )
@@ -205,6 +207,8 @@ pub async fn one2m(
             &parent_field.related_model(),
             args,
             selected_fields,
+            // TODO: support nested reads here
+            &[],
             &aggr_selections,
             trace_id,
         )
