@@ -29,26 +29,38 @@ mod created_at {
 
     #[connector_test]
     async fn created_at_should_stay_consistent(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
-            createOneTestModel(data: {
-              id: 1,
-              children: {
-                createMany: {
-                  data: [{id: 1}, {id: 2}, {id: 3}, {id: 4}]
+        let res = run_query_json!(
+            runner,
+            r#"mutation {
+              createOneTestModel(data: {
+                id: 1,
+                children: {
+                  createMany: {
+                    data: [{id: 1}, {id: 2}, {id: 3}, {id: 4}]
+                  }
+                }
+              }) {
+                created_dt
+                updated_dt,
+                children {
+                  created_dt
+                  updated_dt
                 }
               }
-            }) {
-              created_dt
-              updated_dt,
-              children {
-                created_dt
-                updated_dt
-              }
-            }
-          }"#),
-          @r###"{"data":{"createOneTestModel":{"created_dt":"2022-06-23T14:56:00.304Z","updated_dt":"2022-06-23T14:56:00.304Z","children":[{"created_dt":"2022-06-23T14:56:00.304Z","updated_dt":"2022-06-23T14:56:00.304Z"},{"created_dt":"2022-06-23T14:56:00.304Z","updated_dt":"2022-06-23T14:56:00.304Z"},{"created_dt":"2022-06-23T14:56:00.304Z","updated_dt":"2022-06-23T14:56:00.304Z"},{"created_dt":"2022-06-23T14:56:00.304Z","updated_dt":"2022-06-23T14:56:00.304Z"}]}}}"###
+            }"#,
+            &["data", "createOneTestModel"]
         );
+
+        let created_dt = res["created_dt"].to_string();
+
+        assert_eq!(res["updated_dt"].to_string(), created_dt);
+
+        let children = res["children"].as_array().unwrap();
+
+        for child in children {
+            assert_eq!(child["created_dt"].to_string(), created_dt);
+            assert_eq!(*child["updated_dt"].to_string(), created_dt);
+        }
 
         Ok(())
     }
