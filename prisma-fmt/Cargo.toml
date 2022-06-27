@@ -11,6 +11,7 @@ serde_json = { version = "1.0", features = ["float_roundtrip"] }
 serde = { version = "1.0.90", features = ["derive"] }
 lsp-types = "0.91.1"
 log = "0.4.14"
+indoc = "1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 structopt = "0.3"
@@ -19,7 +20,6 @@ structopt = "0.3"
 dissimilar = "1.0.3"
 once_cell = "1.9.0"
 expect-test = "1"
-indoc = "1"
 
 [features]
 # sigh please don't ask :(

@@ -1,4 +1,9 @@
-use crate::{ast, types::FieldWithArgs, walkers::IndexFieldWalker, ParserDatabase};
+use crate::{
+    ast,
+    types::FieldWithArgs,
+    walkers::{IndexFieldWalker, ScalarFieldWalker},
+    ParserDatabase,
+};
 
 use super::ModelWalker;
 
@@ -35,6 +40,16 @@ impl<'db> UniqueCriteriaWalker<'db> {
 
     pub(crate) fn has_optional_fields(self) -> bool {
         self.fields().any(|field| field.is_optional())
+    }
+
+    pub fn contains_exactly_fields(self, fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>) -> bool {
+        if self.fields().len() != fields.len() {
+            return false;
+        }
+
+        self.fields()
+            .zip(fields)
+            .all(|(left, right)| left.field_id() == right.field_id())
     }
 
     pub fn has_unsupported_fields(self) -> bool {
