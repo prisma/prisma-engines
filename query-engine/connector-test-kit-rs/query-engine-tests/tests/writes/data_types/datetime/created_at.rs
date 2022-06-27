@@ -57,7 +57,7 @@ mod created_at {
 
         for child in children {
             assert_eq!(child["created_dt"].to_string(), created_dt);
-            assert_eq!(*child["updated_dt"].to_string(), created_dt);
+            assert_eq!(child["updated_dt"].to_string(), created_dt);
         }
 
         Ok(())
