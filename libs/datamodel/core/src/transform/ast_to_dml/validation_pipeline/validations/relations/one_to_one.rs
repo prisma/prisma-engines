@@ -284,14 +284,7 @@ pub(crate) fn fields_must_be_a_unique_constraint(relation: InlineRelationWalker<
             _ => return true,
         };
 
-        let lengths_match = c.fields().len() == fields.len();
-
-        let fields_match = c.fields().zip(fields).all(|(a, b)| match a.as_scalar_field() {
-            Some(a) => a == b,
-            None => false,
-        });
-
-        lengths_match && fields_match
+        c.contains_exactly_fields(fields)
     });
 
     if is_unique {
