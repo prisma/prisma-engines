@@ -137,7 +137,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
 
                 relations::references_unique_fields(relation, ctx);
                 relations::same_length_in_referencing_and_referenced(relation, ctx);
-                relations::referencing_fields_in_correct_order(relation, ctx);
                 relations::field_arity(relation, ctx);
                 relations::referencing_scalar_field_types(relation, ctx);
                 relations::has_a_unique_constraint_name(&names, relation, ctx);
@@ -148,8 +147,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
                     relations::one_to_one::fields_and_references_defined_on_one_side_only(relation, ctx);
                     relations::one_to_one::referential_actions(relation, ctx);
                     relations::one_to_one::fields_must_be_a_unique_constraint(relation, ctx);
-
-                    // Run these validations last to prevent validation spam.
                     relations::one_to_one::fields_references_mixups(relation, ctx);
                     relations::one_to_one::back_relation_arity_is_optional(relation, ctx);
                     relations::one_to_one::fields_and_references_on_wrong_side(relation, ctx);

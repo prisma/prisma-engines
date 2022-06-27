@@ -130,12 +130,11 @@ pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_>, ctx: 
         return;
     };
 
-    if relation_field.referenced_fields().map(|f| f.len() == 0).unwrap_or(true) || !ctx.diagnostics.errors().is_empty()
-    {
+    if relation_field.referenced_fields().map(|f| f.len() == 0).unwrap_or(true) {
         return;
     }
 
-    let references_unique_criteria = relation.referenced_model().unique_criterias().any(|criteria| {
+    let references_unique_criterion = relation.referenced_model().unique_criterias().any(|criteria| {
         let mut criteria_field_names: Vec<_> = criteria.fields().map(|f| f.name()).collect();
         criteria_field_names.sort_unstable();
 
@@ -145,7 +144,8 @@ pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_>, ctx: 
         criteria_field_names == references_sorted
     });
 
-    if references_unique_criteria {
+    if references_unique_criterion {
+        referencing_fields_in_correct_order(relation, ctx);
         return;
     }
 
@@ -165,8 +165,8 @@ pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_>, ctx: 
     ));
 }
 
-/// Some connectors want the fields and references in the same order.
-pub(super) fn referencing_fields_in_correct_order(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
+/// Most connectors want the fields and references in the same order.
+fn referencing_fields_in_correct_order(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     let relation_field = if let Some(rf) = relation.forward_relation_field() {
         rf
     } else {
@@ -177,7 +177,6 @@ pub(super) fn referencing_fields_in_correct_order(relation: InlineRelationWalker
         .referenced_fields()
         .map(|fields| fields.len() <= 1)
         .unwrap_or(true)
-        || !ctx.diagnostics.errors().is_empty()
     {
         return;
     }
