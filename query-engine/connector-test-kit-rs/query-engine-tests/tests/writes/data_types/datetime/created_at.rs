@@ -35,9 +35,7 @@ mod created_at {
               createOneTestModel(data: {
                 id: 1,
                 children: {
-                  createMany: {
-                    data: [{id: 1}, {id: 2}, {id: 3}, {id: 4}]
-                  }
+                  create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}]
                 }
               }) {
                 created_dt
