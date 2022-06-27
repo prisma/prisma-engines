@@ -4,6 +4,7 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use datamodel::dml::{ValueGenerator, ValueGeneratorFn};
 use indexmap::IndexMap;
+use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
@@ -12,13 +13,13 @@ use uuid::Uuid;
 
 pub struct QueryDocumentParser {
     /// NOW() default value that's reused for all NOW() defaults on a single query
-    default_now: PrismaValue,
+    default_now: Lazy<PrismaValue>,
 }
 
 impl Default for QueryDocumentParser {
     fn default() -> Self {
         Self {
-            default_now: ValueGenerator::new_now().generate().unwrap(),
+            default_now: Lazy::new(|| ValueGenerator::new_now().generate().unwrap()),
         }
     }
 }
