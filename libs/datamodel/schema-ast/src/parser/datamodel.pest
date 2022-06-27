@@ -129,7 +129,6 @@ expression = { function | array_expression | numeric_literal | string_literal | 
 // ######################################
 // Literals / Values
 // ######################################
-number = @{ ASCII_DIGIT+ }
 
 numeric_literal = @{ ("-")? ~ ASCII_DIGIT+ ~("." ~ ASCII_DIGIT+)? }
 

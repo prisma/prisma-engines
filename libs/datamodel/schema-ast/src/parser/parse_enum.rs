@@ -17,8 +17,7 @@ pub fn parse_enum(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Enum {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::block_level_attribute => attributes.push(parse_attribute(&current, diagnostics)),
-            Rule::enum_value_declaration => match parse_enum_value(&name.as_ref().unwrap().name, &current, diagnostics)
-            {
+            Rule::enum_value_declaration => match parse_enum_value(&current, diagnostics) {
                 Ok(enum_value) => values.push(enum_value),
                 Err(err) => diagnostics.push_error(err),
             },
@@ -46,11 +45,7 @@ pub fn parse_enum(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Enum {
     }
 }
 
-fn parse_enum_value(
-    enum_name: &str,
-    token: &Token<'_>,
-    diagnostics: &mut Diagnostics,
-) -> Result<EnumValue, DatamodelError> {
+fn parse_enum_value(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Result<EnumValue, DatamodelError> {
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut comments: Vec<String> = vec![];
@@ -61,16 +56,6 @@ fn parse_enum_value(
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::maybe_empty_identifier => name = Some(current.to_id()),
             Rule::attribute => attributes.push(parse_attribute(&current, diagnostics)),
-            Rule::number => {
-                return Err(DatamodelError::new_enum_validation_error(
-                    format!(
-                        "The enum value `{}` is not valid. Enum values must not start with a number.",
-                        current.as_str()
-                    ),
-                    enum_name.to_owned(),
-                    token.as_span().into(),
-                ));
-            }
             Rule::doc_comment => {
                 comments.push(parse_doc_comment(&current));
             }
