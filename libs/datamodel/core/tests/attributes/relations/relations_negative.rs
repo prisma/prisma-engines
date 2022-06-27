@@ -1042,3 +1042,66 @@ fn should_fail_if_not_using_unique_constraint_with_single_one_to_many() {
 
     expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
 }
+
+#[test]
+fn multiple_relation_validation_errors_do_not_prevent_each_other_across_models() {
+    let schema = r#"
+        generator client {
+          provider      = "prisma-client-js"
+          binaryTargets = ["darwin"]
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model Post {
+          POST_ID            Int  @id @db.UnsignedInt
+          USER_NON_UNIQUE_ID Int  @db.UnsignedInt
+          User               User @relation(fields: [USER_NON_UNIQUE_ID], references: [USER_NON_UNIQUE_ID], onUpdate: Restrict, map: "FK_USER_NON_UNIQUE_ID")
+
+          @@index([USER_NON_UNIQUE_ID], map: "FK_USER_NON_UNIQUE_ID")
+        }
+
+        model User {
+          USER_ID            Int    @id @default(autoincrement()) @db.UnsignedInt
+          USER_NON_UNIQUE_ID Int    @db.UnsignedInt
+          Post               Post[]
+
+          @@index([USER_NON_UNIQUE_ID], map: "index_name")
+        }
+
+        model stock {
+          STOCK_ID            Int           @id @default(autoincrement()) @db.UnsignedInt
+          STOCK_NON_UNIQUE_ID Int           @db.UnsignedInt
+          stock_detail        stock_detail?
+
+          @@index([STOCK_NON_UNIQUE_ID], map: "index_name")
+        }
+
+        model stock_detail {
+          STOCK_ID Int   @id @db.UnsignedInt
+          stock    stock @relation(fields: [STOCK_ID], references: [STOCK_NON_UNIQUE_ID], onUpdate: Restrict, map: "FK_STOCK_NON_UNIQUE_ID")
+        }
+    "#;
+
+    let expected_error = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `USER_NON_UNIQUE_ID` in the model `User`.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m          USER_NON_UNIQUE_ID Int  @db.UnsignedInt
+        [1;94m15 | [0m          [1;91mUser               User @relation(fields: [USER_NON_UNIQUE_ID], references: [USER_NON_UNIQUE_ID], onUpdate: Restrict, map: "FK_USER_NON_UNIQUE_ID")[0m
+        [1;94m16 | [0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `STOCK_NON_UNIQUE_ID` in the model `stock`.[0m
+          [1;94m-->[0m  [4mschema.prisma:38[0m
+        [1;94m   | [0m
+        [1;94m37 | [0m          STOCK_ID Int   @id @db.UnsignedInt
+        [1;94m38 | [0m          [1;91mstock    stock @relation(fields: [STOCK_ID], references: [STOCK_NON_UNIQUE_ID], onUpdate: Restrict, map: "FK_STOCK_NON_UNIQUE_ID")[0m
+        [1;94m39 | [0m        }
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expected_error)
+}
