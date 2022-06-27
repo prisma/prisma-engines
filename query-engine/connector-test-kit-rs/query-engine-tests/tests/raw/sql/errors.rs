@@ -43,7 +43,7 @@ mod raw_errors {
                 vec![RawParam::array(vec![1])],
             ),
             2010,
-            r#"column "id" is of type integer but expression is of type bigint[]"#
+            r#"column "id" is of type integer but expression is of type integer[]"#
         );
 
         Ok(())
