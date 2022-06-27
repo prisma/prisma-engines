@@ -542,7 +542,6 @@
 <span id="537">537</span>
 <span id="538">538</span>
 <span id="539">539</span>
-<span id="540">540</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">many_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_one</span>;
@@ -675,12 +674,11 @@
         <span class="kw">return</span>;
     };
 
-    <span class="kw">if</span> <span class="ident">relation_field</span>.<span class="ident">referenced_fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>) <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">diagnostics</span>.<span class="ident">errors</span>().<span class="ident">is_empty</span>()
-    {
+    <span class="kw">if</span> <span class="ident">relation_field</span>.<span class="ident">referenced_fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">references_unique_criteria</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">unique_criterias</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">criteria</span><span class="op">|</span> {
+    <span class="kw">let</span> <span class="ident">references_unique_criterion</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">unique_criterias</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">criteria</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">criteria_field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">criteria</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>();
         <span class="ident">criteria_field_names</span>.<span class="ident">sort_unstable</span>();
 
@@ -690,7 +688,8 @@
         <span class="ident">criteria_field_names</span> <span class="op">==</span> <span class="ident">references_sorted</span>
     });
 
-    <span class="kw">if</span> <span class="ident">references_unique_criteria</span> {
+    <span class="kw">if</span> <span class="ident">references_unique_criterion</span> {
+        <span class="ident">referencing_fields_in_correct_order</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
         <span class="kw">return</span>;
     }
 
@@ -710,8 +709,8 @@
     ));
 }
 
-<span class="doccomment">/// Some connectors want the fields and references in the same order.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">referencing_fields_in_correct_order</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="doccomment">/// Most connectors want the fields and references in the same order.</span>
+<span class="kw">fn</span> <span class="ident">referencing_fields_in_correct_order</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rf</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>() {
         <span class="ident">rf</span>
     } <span class="kw">else</span> {
@@ -722,7 +721,6 @@
         .<span class="ident">referenced_fields</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>)
         .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
-        <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">diagnostics</span>.<span class="ident">errors</span>().<span class="ident">is_empty</span>()
     {
         <span class="kw">return</span>;
     }
