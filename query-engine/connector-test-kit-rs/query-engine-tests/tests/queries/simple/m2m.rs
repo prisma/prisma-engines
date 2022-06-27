@@ -28,12 +28,12 @@ mod m2m {
     fn m2m_sharing_same_row_schema() -> String {
         let schema = indoc! {
             r#"model User {
-                userId BigInt @id
+                #id(userId, BigInt, @id)
                 #m2m(tags, Tag[], tagId, String)
               }
               
               model Tag {
-                tagId String @id @default(uuid())
+                #id(tagId, String, @id, @default(uuid()))
                 name  String
                 #m2m(users, User[], userId, BigInt)
               }"#
