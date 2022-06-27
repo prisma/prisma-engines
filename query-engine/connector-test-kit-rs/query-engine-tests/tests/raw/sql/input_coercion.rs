@@ -61,4 +61,26 @@ mod input_coercion {
 
         Ok(())
     }
+
+    #[connector_test]
+    async fn int32_input_correctly_coerced(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            fmt_execute_raw(
+                r#"
+                    CREATE FUNCTION my_fn(x integer) RETURNS integer AS $$
+                        SELECT x;
+                    $$ LANGUAGE SQL;
+                "#,
+                vec![]
+            )
+        );
+
+        insta::assert_snapshot!(
+            run_query!(&runner, fmt_query_raw(r#"SELECT my_fn($1);"#, vec![RawParam::from(1)])),
+            @r###"{"data":{"queryRaw":[{"my_fn":{"prisma__type":"int","prisma__value":1}}]}}"###
+        );
+
+        Ok(())
+    }
 }

@@ -51,7 +51,13 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::Boolean(b) => b.into(),
         PrismaValue::DateTime(d) => d.with_timezone(&Utc).into(),
         PrismaValue::Enum(e) => e.into(),
-        PrismaValue::Int(i) => (i as i64).into(),
+        PrismaValue::Int(i) => {
+            if i32::try_from(i).is_ok() {
+                Value::int32(i as i32)
+            } else {
+                Value::int64(i)
+            }
+        }
         PrismaValue::BigInt(i) => (i as i64).into(),
         PrismaValue::Uuid(u) => u.to_string().into(),
         PrismaValue::List(l) => Value::Array(Some(l.into_iter().map(convert_lossy).collect())),
