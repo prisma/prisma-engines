@@ -5,6 +5,10 @@ pub use indoc::{formatdoc, indoc};
 use datamodel::{diagnostics::*, Configuration, StringFromEnvVar};
 use pretty_assertions::assert_eq;
 
+pub(crate) fn reformat(input: &str) -> String {
+    datamodel::reformat(input, 2).unwrap_or_else(|| input.to_owned())
+}
+
 pub(crate) trait DatasourceAsserts {
     fn assert_name(&self, name: &str) -> &Self;
     fn assert_url(&self, url: StringFromEnvVar) -> &Self;

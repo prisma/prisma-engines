@@ -1,8 +1,8 @@
 use schema_ast::{parser::Rule, renderer::LineWriteable};
 
-pub type Token<'a> = pest::iterators::Pair<'a, Rule>;
+pub(super) type Token<'a> = pest::iterators::Pair<'a, Rule>;
 
-pub trait TokenExtensions {
+pub(super) trait TokenExtensions {
     fn is_top_level_element(&self) -> bool;
 }
 
@@ -19,7 +19,7 @@ impl TokenExtensions for Token<'_> {
     }
 }
 
-pub fn comment(target: &mut dyn LineWriteable, comment_text: &str) {
+pub(super) fn comment(target: &mut dyn LineWriteable, comment_text: &str) {
     let trimmed = strip_new_line(comment_text);
     let trimmed = trimmed.trim();
 
@@ -27,7 +27,7 @@ pub fn comment(target: &mut dyn LineWriteable, comment_text: &str) {
     target.end_line();
 }
 
-pub fn strip_new_line(str: &str) -> &str {
+pub(super) fn strip_new_line(str: &str) -> &str {
     if str.ends_with('\n') {
         &str[0..str.len() - 1] // slice away line break.
     } else {

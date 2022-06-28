@@ -57,7 +57,7 @@ pub fn format(schema: &str, params: &str) -> String {
         }
     };
 
-    datamodel::reformat(schema, params.options.tab_size as usize).unwrap_or_else(|err| err.to_owned())
+    datamodel::reformat(schema, params.options.tab_size as usize).unwrap_or_else(|| schema.to_owned())
 }
 
 pub fn lint(schema: String) -> String {
