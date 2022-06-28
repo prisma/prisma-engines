@@ -50,7 +50,27 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">types::FieldWithArgs</span>, <span class="ident">walkers::IndexFieldWalker</span>, <span class="ident">ParserDatabase</span>};
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">ast</span>,
+    <span class="ident">types::FieldWithArgs</span>,
+    <span class="ident">walkers</span>::{<span class="ident">IndexFieldWalker</span>, <span class="ident">ScalarFieldWalker</span>},
+    <span class="ident">ParserDatabase</span>,
+};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ModelWalker</span>;
 
@@ -87,6 +107,16 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_optional_fields</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">fields</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">is_optional</span>())
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_exactly_fields</span>(<span class="self">self</span>, <span class="ident">fields</span>: <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">fields</span>.<span class="ident">len</span>() {
+            <span class="kw">return</span> <span class="bool-val">false</span>;
+        }
+
+        <span class="self">self</span>.<span class="ident">fields</span>()
+            .<span class="ident">zip</span>(<span class="ident">fields</span>)
+            .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">left</span>, <span class="ident">right</span>)<span class="op">|</span> <span class="ident">left</span>.<span class="ident">field_id</span>() <span class="op">==</span> <span class="ident">right</span>.<span class="ident">field_id</span>())
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_unsupported_fields</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
