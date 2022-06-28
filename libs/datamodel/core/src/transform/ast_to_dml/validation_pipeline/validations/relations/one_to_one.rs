@@ -279,9 +279,10 @@ pub(crate) fn fields_must_be_a_unique_constraint(relation: InlineRelationWalker<
     let model = relation.referencing_model();
 
     let is_unique = model.unique_criterias().any(|c| {
-        let fields = match relation.referencing_fields() {
-            ReferencingFields::Concrete(fields) => fields,
-            _ => return true,
+        let fields = if let Some(fields) = relation.referencing_fields() {
+            fields
+        } else {
+            return true;
         };
 
         let lengths_match = c.fields().len() == fields.len();
@@ -298,9 +299,10 @@ pub(crate) fn fields_must_be_a_unique_constraint(relation: InlineRelationWalker<
         return;
     }
 
-    let fields: Vec<_> = match relation.referencing_fields() {
-        ReferencingFields::Concrete(fields) => fields.map(|f| f.name()).collect(),
-        _ => unreachable!(),
+    let fields = if let Some(fields) = relation.referencing_fields() {
+        fields.map(|f| f.name()).collect::<Vec<_>>()
+    } else {
+        return;
     };
 
     let message = if fields.len() == 1 {

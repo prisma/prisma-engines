@@ -2,14 +2,11 @@ mod complete;
 
 pub use complete::CompleteInlineRelationWalker;
 
-use schema_ast::ast;
-
+use super::RelationWalker;
 use crate::{
     relations::{OneToManyRelationFields, OneToOneRelationFields, Relation, RelationAttributes},
     walkers::{ModelWalker, RelationFieldWalker, RelationName, ScalarFieldWalker},
 };
-
-use super::{camel_case, pascal_case, InferredField, ReferencingFields, RelationWalker};
 
 /// An explicitly defined 1:1 or 1:n relation. The walker has the referencing side defined, but
 /// might miss the back relation in the AST.
@@ -54,52 +51,12 @@ impl<'db> InlineRelationWalker<'db> {
         }
     }
 
-    /// Should only be used for lifting. The referencing fields (including possibly inferred ones).
-    pub fn referencing_fields(self) -> ReferencingFields<'db> {
-        self.forward_relation_field()
-            .and_then(|rf| rf.fields())
-            .map(|fields| ReferencingFields::Concrete(Box::new(fields)))
-            .unwrap_or_else(|| match self.referenced_model().unique_criterias().next() {
-                Some(first_unique_criteria) => {
-                    let fields = first_unique_criteria
-                        .fields()
-                        .map(|field| {
-                            let name = format!(
-                                "{}{}",
-                                camel_case(self.referenced_model().name()),
-                                pascal_case(field.name())
-                            );
-
-                            // we cannot have composite fields in a relation for now.
-                            let field = field.as_scalar_field().unwrap();
-
-                            if let Some(existing_field) =
-                                self.referencing_model().scalar_fields().find(|sf| sf.name() == name)
-                            {
-                                InferredField {
-                                    name,
-                                    arity: existing_field.ast_field().arity,
-                                    tpe: existing_field.scalar_field_type(),
-                                    blueprint: field,
-                                }
-                            } else {
-                                InferredField {
-                                    name,
-                                    arity: ast::FieldArity::Optional,
-                                    tpe: field.scalar_field_type(),
-                                    blueprint: field,
-                                }
-                            }
-                        })
-                        .collect();
-
-                    ReferencingFields::Inferred(fields)
-                }
-                None => ReferencingFields::NA,
-            })
+    /// The referencing fields, from the forward relation field.
+    pub fn referencing_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
+        self.forward_relation_field().and_then(|rf| rf.fields())
     }
 
-    /// Should only be used for lifting. The referenced fields. Inferred or specified.
+    /// The referenced fields. Inferred or specified.
     pub fn referenced_fields(self) -> Box<dyn Iterator<Item = ScalarFieldWalker<'db>> + 'db> {
         self.forward_relation_field()
             .and_then(
@@ -133,24 +90,6 @@ impl<'db> InlineRelationWalker<'db> {
             RelationAttributes::ImplicitManyToMany { field_a: _, field_b: _ } => unreachable!(),
             RelationAttributes::TwoWayEmbeddedManyToMany { field_a: _, field_b: _ } => unreachable!(),
         }
-    }
-
-    /// The arity of the forward relation field.
-    pub fn forward_relation_field_arity(self) -> ast::FieldArity {
-        self.forward_relation_field()
-            .map(|rf| rf.ast_field().arity)
-            .unwrap_or_else(|| {
-                let is_required = match self.referencing_fields() {
-                    ReferencingFields::Concrete(mut fields) => fields.all(|f| f.ast_field().arity.is_required()),
-                    ReferencingFields::Inferred(fields) => fields.iter().all(|f| f.arity.is_required()),
-                    ReferencingFields::NA => todo!(),
-                };
-                if is_required {
-                    ast::FieldArity::Required
-                } else {
-                    ast::FieldArity::Optional
-                }
-            })
     }
 
     /// The contents of the `map: ...` argument of the `@relation` attribute.

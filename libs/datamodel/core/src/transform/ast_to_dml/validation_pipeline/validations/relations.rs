@@ -9,7 +9,7 @@ use crate::{
     diagnostics::DatamodelError,
     transform::ast_to_dml::{
         db::{
-            walkers::{CompleteInlineRelationWalker, InlineRelationWalker, ReferencingFields},
+            walkers::{CompleteInlineRelationWalker, InlineRelationWalker},
             ScalarFieldType,
         },
         validation_pipeline::context::Context,
@@ -78,20 +78,14 @@ pub(super) fn field_arity(relation: InlineRelationWalker<'_>, ctx: &mut Context<
     }
 
     match relation.referencing_fields() {
-        ReferencingFields::Concrete(mut fields) => {
-            if fields.any(|field| field.is_optional()) {
-                fields
-            } else {
+        Some(mut fields) => {
+            if fields.all(|field| !field.is_optional()) {
                 return;
             }
         }
         _ => return,
-    };
-
-    let scalar_field_names: Vec<&str> = match relation.referencing_fields() {
-        ReferencingFields::Concrete(fields) => fields.map(|f| f.name()).collect(),
-        _ => unreachable!(),
-    };
+    }
+    let scalar_field_names: Vec<&str> = relation.referencing_fields().unwrap().map(|f| f.name()).collect();
 
     ctx.push_error(DatamodelError::new_validation_error(
         format!(
@@ -499,9 +493,10 @@ fn cascade_error_with_default_values(
 
 /// The types of the referencing and referenced scalar fields in a relation must be compatible.
 pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
-    let referencing_fields = match relation.referencing_fields() {
-        ReferencingFields::Concrete(fields) => fields,
-        _ => return,
+    let referencing_fields = if let Some(fields) = relation.referencing_fields() {
+        fields
+    } else {
+        return;
     };
 
     for (referencing, referenced) in referencing_fields.zip(relation.referenced_fields()) {
