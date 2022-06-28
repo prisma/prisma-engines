@@ -29,7 +29,7 @@ use napi_derive::napi;
 #[napi]
 pub struct QueryEngine {
     inner: RwLock<Inner>,
-    logger: Logger,
+    logger: Option<Logger>,
 }
 
 /// The state of the engine.
@@ -201,7 +201,7 @@ impl QueryEngine {
 
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
-            logger: Logger::new(log_queries, log_level, log_callback, enable_metrics),
+            logger: Some(Logger::new(log_queries, log_level, log_callback, enable_metrics)),
         })
     }
 
@@ -212,7 +212,7 @@ impl QueryEngine {
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
 
-            let dispatcher = self.logger.dispatcher();
+            let dispatcher = self.logger.as_ref().unwrap().dispatcher();
 
             let engine = async move {
                 // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
@@ -249,7 +249,7 @@ impl QueryEngine {
                     executor,
                     config_dir: builder.config_dir.clone(),
                     env: builder.env.clone(),
-                    metrics: self.logger.metrics(),
+                    metrics: self.logger.as_ref().unwrap().metrics(),
                 }) as crate::Result<ConnectedEngine>
             }
             .with_subscriber(dispatcher)
@@ -296,7 +296,7 @@ impl QueryEngine {
             let query = serde_json::from_str(&body)?;
             let trace: HashMap<String, String> = serde_json::from_str(&trace)?;
 
-            let dispatcher = self.logger.dispatcher();
+            let dispatcher = self.logger.as_ref().unwrap().dispatcher();
 
             async move {
                 let trace_id = trace.get("traceparent").map(String::from);
@@ -319,7 +319,7 @@ impl QueryEngine {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
-            let dispatcher = self.logger.dispatcher();
+            let dispatcher = self.logger.as_ref().unwrap().dispatcher();
 
             async move {
                 let input: TxInput = serde_json::from_str(&input)?;
@@ -345,7 +345,7 @@ impl QueryEngine {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
-            let dispatcher = self.logger.dispatcher();
+            let dispatcher = self.logger.as_ref().unwrap().dispatcher();
 
             async move {
                 match engine.executor().commit_tx(TxId::from(tx_id)).await {
@@ -366,7 +366,7 @@ impl QueryEngine {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
-            let dispatcher = self.logger.dispatcher();
+            let dispatcher = self.logger.as_ref().unwrap().dispatcher();
 
             async move {
                 match engine.executor().rollback_tx(TxId::from(tx_id)).await {
@@ -415,6 +415,11 @@ impl QueryEngine {
             }
         })
         .await
+    }
+
+    #[napi]
+    pub fn drop_logger(&mut self) {
+        self.logger = None
     }
 }
 
