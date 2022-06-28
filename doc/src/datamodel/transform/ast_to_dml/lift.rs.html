@@ -699,45 +699,6 @@
 <span id="694">694</span>
 <span id="695">695</span>
 <span id="696">696</span>
-<span id="697">697</span>
-<span id="698">698</span>
-<span id="699">699</span>
-<span id="700">700</span>
-<span id="701">701</span>
-<span id="702">702</span>
-<span id="703">703</span>
-<span id="704">704</span>
-<span id="705">705</span>
-<span id="706">706</span>
-<span id="707">707</span>
-<span id="708">708</span>
-<span id="709">709</span>
-<span id="710">710</span>
-<span id="711">711</span>
-<span id="712">712</span>
-<span id="713">713</span>
-<span id="714">714</span>
-<span id="715">715</span>
-<span id="716">716</span>
-<span id="717">717</span>
-<span id="718">718</span>
-<span id="719">719</span>
-<span id="720">720</span>
-<span id="721">721</span>
-<span id="722">722</span>
-<span id="723">723</span>
-<span id="724">724</span>
-<span id="725">725</span>
-<span id="726">726</span>
-<span id="727">727</span>
-<span id="728">728</span>
-<span id="729">729</span>
-<span id="730">730</span>
-<span id="731">731</span>
-<span id="732">732</span>
-<span id="733">733</span>
-<span id="734">734</span>
-<span id="735">735</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">IndexField</span>, <span class="ident">PrimaryKeyField</span>},
@@ -865,39 +826,25 @@
                         }
 
                         <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">dml::RelationInfo::new</span>(<span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">name</span>());
-                        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">find_model_mut</span>(<span class="ident">relation</span>.<span class="ident">referencing_model</span>().<span class="ident">name</span>());
 
-                        <span class="comment">// reformatted/virtual/inferred extra scalar fields for reformatted relations.</span>
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inferred_scalar_fields</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+                        <span class="kw">let</span> <span class="ident">forward_field_walker</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>().<span class="ident">unwrap</span>();
+                        <span class="comment">// Construct a relation field in the DML for an existing relation field in the source.</span>
+                        <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_arity</span>(<span class="kw-2">&amp;</span><span class="ident">forward_field_walker</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>);
+                        <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_arity</span>(<span class="kw-2">&amp;</span><span class="ident">forward_field_walker</span>.<span class="ident">referential_arity</span>());
+                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="ident">dml::RelationField::new</span>(
+                            <span class="ident">forward_field_walker</span>.<span class="ident">name</span>(),
+                            <span class="ident">arity</span>,
+                            <span class="ident">referential_arity</span>,
+                            <span class="ident">relation_info</span>,
+                        );
 
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation_field</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>() {
-                            <span class="comment">// Construct a relation field in the DML for an existing relation field in the source.</span>
-                            <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>);
-                            <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">referential_arity</span>());
-                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span>
-                                <span class="ident">dml::RelationField::new</span>(<span class="ident">relation_field</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">referential_arity</span>, <span class="ident">relation_info</span>);
-
-                            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">fk_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">relation</span>.<span class="ident">constraint_name</span>(<span class="ident">active_connector</span>).<span class="ident">into_owned</span>());
-                            <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;mut</span> <span class="ident">field</span>, <span class="ident">relation_field</span>);
-                            <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>(
-                                (<span class="ident">relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">relation_field</span>.<span class="ident">name</span>()),
-                                <span class="ident">relation_field</span>.<span class="ident">field_id</span>(),
-                            );
-
-                            <span class="ident">field</span>
-                        } <span class="kw">else</span> {
-                            <span class="comment">// Construct a relation field in the DML without corresponding relation field in the source.</span>
-                            <span class="comment">//</span>
-                            <span class="comment">// This is part of magic reformatting.</span>
-                            <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation</span>.<span class="ident">forward_relation_field_arity</span>());
-                            <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="ident">arity</span>;
-                            <span class="ident">dml::RelationField::new</span>(
-                                <span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">name</span>(),
-                                <span class="ident">arity</span>,
-                                <span class="ident">referential_arity</span>,
-                                <span class="ident">relation_info</span>,
-                            )
-                        };
+                        <span class="ident">relation_field</span>.<span class="ident">relation_info</span>.<span class="ident">fk_name</span> <span class="op">=</span>
+                            <span class="prelude-val">Some</span>(<span class="ident">relation</span>.<span class="ident">constraint_name</span>(<span class="ident">active_connector</span>).<span class="ident">into_owned</span>());
+                        <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;mut</span> <span class="ident">relation_field</span>, <span class="ident">forward_field_walker</span>);
+                        <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>(
+                            (<span class="ident">forward_field_walker</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">forward_field_walker</span>.<span class="ident">name</span>()),
+                            <span class="ident">forward_field_walker</span>.<span class="ident">field_id</span>(),
+                        );
 
                         <span class="ident">relation_field</span>.<span class="ident">relation_info</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">relation_name</span>().<span class="ident">to_string</span>();
 
@@ -906,39 +853,14 @@
                             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
                             .<span class="ident">collect</span>();
 
-                        <span class="ident">relation_field</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">referencing_fields</span>() {
-                            <span class="ident">ReferencingFields::Concrete</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>()).<span class="ident">collect</span>(),
-                            <span class="ident">ReferencingFields::Inferred</span>(<span class="ident">fields</span>) =&gt; {
-                                <span class="comment">// In this branch, we are creating the underlying scalar fields</span>
-                                <span class="comment">// from thin air.  This is part of reformatting.</span>
-                                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">fields</span>.<span class="ident">len</span>());
+                        <span class="ident">relation_field</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span> <span class="op">=</span> <span class="ident">relation</span>
+                            .<span class="ident">referencing_fields</span>()
+                            .<span class="ident">unwrap</span>()
+                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
+                            .<span class="ident">collect</span>();
 
-                                <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                                    <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_scalar_field_type</span>(
-                                        <span class="ident">field</span>.<span class="ident">blueprint</span>.<span class="ident">ast_field</span>(),
-                                        <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">tpe</span>,
-                                        <span class="ident">field</span>.<span class="ident">blueprint</span>,
-                                    );
-                                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scalar_field</span> <span class="op">=</span> <span class="ident">dml::ScalarField::new_generated</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>, <span class="ident">field_type</span>);
-                                    <span class="ident">scalar_field</span>.<span class="ident">arity</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">relation_field</span>.<span class="ident">arity</span>.<span class="ident">is_required</span>() {
-                                        <span class="ident">dml::FieldArity::Required</span>
-                                    } <span class="kw">else</span> {
-                                        <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">arity</span>)
-                                    };
-                                    <span class="ident">inferred_scalar_fields</span>.<span class="ident">push</span>(<span class="ident">dml::Field::ScalarField</span>(<span class="ident">scalar_field</span>));
-
-                                    <span class="ident">field_names</span>.<span class="ident">push</span>(<span class="ident">field</span>.<span class="ident">name</span>);
-                                }
-
-                                <span class="ident">field_names</span>
-                            }
-                            <span class="ident">ReferencingFields::NA</span> =&gt; <span class="ident">Vec::new</span>(),
-                        };
+                        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">find_model_mut</span>(<span class="ident">relation</span>.<span class="ident">referencing_model</span>().<span class="ident">name</span>());
                         <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">dml::Field::RelationField</span>(<span class="ident">relation_field</span>));
-
-                        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">inferred_scalar_fields</span> {
-                            <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">field</span>)
-                        }
                     };
 
                     <span class="comment">// Back field</span>
@@ -948,8 +870,8 @@
 
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation_field</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">back_relation_field</span>() {
                             <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">ast_field</span>();
-                            <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">arity</span>);
-                            <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">referential_arity</span>());
+                            <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_arity</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">arity</span>);
+                            <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">referential_arity</span>());
                             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span>
                                 <span class="ident">dml::RelationField::new</span>(<span class="ident">relation_field</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">referential_arity</span>, <span class="ident">relation_info</span>);
 
@@ -982,9 +904,9 @@
                 <span class="ident">RefinedRelationWalker::ImplicitManyToMany</span>(<span class="ident">relation</span>) =&gt; {
                     <span class="kw">for</span> <span class="ident">relation_field</span> <span class="kw">in</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()] {
                         <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">ast_field</span>();
-                        <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">arity</span>);
+                        <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_arity</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">arity</span>);
                         <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">dml::RelationInfo::new</span>(<span class="ident">relation_field</span>.<span class="ident">related_model</span>().<span class="ident">name</span>());
-                        <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">referential_arity</span>());
+                        <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">referential_arity</span>());
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span>
                             <span class="ident">dml::RelationField::new</span>(<span class="ident">relation_field</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">referential_arity</span>, <span class="ident">relation_info</span>);
 
@@ -1012,9 +934,9 @@
                 <span class="ident">RefinedRelationWalker::TwoWayEmbeddedManyToMany</span>(<span class="ident">relation</span>) =&gt; {
                     <span class="kw">for</span> <span class="ident">relation_field</span> <span class="kw">in</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()] {
                         <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">ast_field</span>();
-                        <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">arity</span>);
+                        <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_arity</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">arity</span>);
                         <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">dml::RelationInfo::new</span>(<span class="ident">relation_field</span>.<span class="ident">related_model</span>().<span class="ident">name</span>());
-                        <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">referential_arity</span>());
+                        <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">referential_arity</span>());
 
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span>
                             <span class="ident">dml::RelationField::new</span>(<span class="ident">relation_field</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">referential_arity</span>, <span class="ident">relation_info</span>);
@@ -1054,7 +976,7 @@
             <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeTypeField</span> {
                 <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
                 <span class="ident">r#type</span>: <span class="self">self</span>.<span class="ident">lift_composite_type_field_type</span>(<span class="ident">field</span>, <span class="ident">field</span>.<span class="ident">r#type</span>()),
-                <span class="ident">arity</span>: <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">arity</span>()),
+                <span class="ident">arity</span>: <span class="self">self</span>.<span class="ident">lift_arity</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">arity</span>()),
                 <span class="ident">database_name</span>: <span class="ident">field</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
                 <span class="ident">documentation</span>: <span class="ident">field</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>),
                 <span class="ident">default_value</span>: <span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">dml::DefaultValue</span> {
@@ -1163,7 +1085,7 @@
         <span class="kw">for</span> <span class="ident">scalar_field</span> <span class="kw">in</span> <span class="ident">walker</span>.<span class="ident">scalar_fields</span>() {
             <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">field_id</span>();
             <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast_model</span>[<span class="ident">field_id</span>];
-            <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">arity</span>);
+            <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_arity</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">arity</span>);
 
             <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>((<span class="kw-2">&amp;</span><span class="ident">ast_model</span>.<span class="ident">name</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">name</span>.<span class="ident">name</span>), <span class="ident">field_id</span>);
 
@@ -1223,7 +1145,7 @@
     }
 
     <span class="doccomment">/// Internal: Lift a field&#39;s arity.</span>
-    <span class="kw">fn</span> <span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field_arity</span>: <span class="kw-2">&amp;</span><span class="ident">ast::FieldArity</span>) -&gt; <span class="ident">dml::FieldArity</span> {
+    <span class="kw">fn</span> <span class="ident">lift_arity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field_arity</span>: <span class="kw-2">&amp;</span><span class="ident">ast::FieldArity</span>) -&gt; <span class="ident">dml::FieldArity</span> {
         <span class="kw">match</span> <span class="ident">field_arity</span> {
             <span class="ident">ast::FieldArity::Required</span> =&gt; <span class="ident">dml::FieldArity::Required</span>,
             <span class="ident">ast::FieldArity::Optional</span> =&gt; <span class="ident">dml::FieldArity::Optional</span>,
