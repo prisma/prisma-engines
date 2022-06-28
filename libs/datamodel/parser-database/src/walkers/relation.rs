@@ -6,7 +6,7 @@ pub use implicit_many_to_many::ImplicitManyToManyRelationWalker;
 pub use inline::{CompleteInlineRelationWalker, InlineRelationWalker};
 pub use two_way_embedded_many_to_many::TwoWayEmbeddedManyToManyRelationWalker;
 
-use crate::{ast, relations::*, walkers::*, ScalarFieldType};
+use crate::{ast, relations::*, walkers::*};
 
 /// A relation that has the minimal amount of information for us to create one. Useful for
 /// validation purposes. Holds all possible relation types.
@@ -60,40 +60,5 @@ impl<'db> RefinedRelationWalker<'db> {
             RefinedRelationWalker::ImplicitManyToMany(m2m) => Some(*m2m),
             _ => None,
         }
-    }
-}
-
-/// A scalar inferred by loose/magic reformatting.
-#[allow(missing_docs)]
-pub struct InferredField<'db> {
-    pub name: String,
-    pub arity: ast::FieldArity,
-    pub tpe: ScalarFieldType,
-    pub blueprint: ScalarFieldWalker<'db>,
-}
-
-/// The scalar fields on the concrete side of the relation.
-pub enum ReferencingFields<'db> {
-    /// Existing scalar fields
-    Concrete(Box<dyn ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db>),
-    /// Inferred scalar fields
-    Inferred(Vec<InferredField<'db>>),
-    /// Error
-    NA,
-}
-
-fn pascal_case(input: &str) -> String {
-    let mut c = input.chars();
-    match c.next() {
-        None => String::new(),
-        Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
-    }
-}
-
-fn camel_case(input: &str) -> String {
-    let mut c = input.chars();
-    match c.next() {
-        None => String::new(),
-        Some(f) => f.to_lowercase().collect::<String>() + c.as_str(),
     }
 }

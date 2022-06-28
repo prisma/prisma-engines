@@ -492,9 +492,12 @@ pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
     }
 }
 
+#[track_caller]
 pub(crate) fn expect_error(schema: &str, expectation: &expect_test::Expect) {
-    let err = parse_and_render_error(schema);
-    expectation.assert_eq(&err)
+    match datamodel::parse_schema_parserdb(schema) {
+        Ok(_) => panic!("Expected a validation error, but the schema is valid."),
+        Err(err) => expectation.assert_eq(&err),
+    }
 }
 
 pub(crate) fn parse_and_render_error(schema: &str) -> String {

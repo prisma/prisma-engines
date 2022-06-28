@@ -98,15 +98,10 @@ impl<'db> InlineRelationWalkerExt<'db> for InlineRelationWalker<'db> {
     fn constraint_name(self, connector: &dyn Connector) -> Cow<'db, str> {
         self.mapped_name().map(Cow::Borrowed).unwrap_or_else(|| {
             let model_database_name = self.referencing_model().database_name();
-            let field_names: Vec<&str> = match self.referencing_fields() {
-                ReferencingFields::Concrete(fields) => fields.map(|f| f.database_name()).collect(),
-                ReferencingFields::Inferred(fields) => {
-                    let field_names: Vec<_> = fields.iter().map(|f| f.name.as_str()).collect();
-                    return ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector)
-                        .into();
-                }
-                ReferencingFields::NA => Vec::new(),
-            };
+            let field_names: Vec<&str> = self
+                .referencing_fields()
+                .map(|fields| fields.map(|f| f.database_name()).collect())
+                .unwrap_or_default();
             ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector).into()
         })
     }

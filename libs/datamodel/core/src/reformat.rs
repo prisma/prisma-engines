@@ -791,9 +791,9 @@ fn push_inline_relation_missing_arguments(
     if let Some(forward) = inline_relation.forward_relation_field() {
         // the `fields: [...]` argument.
         match inline_relation.referencing_fields() {
-            walkers::ReferencingFields::Concrete(_) => (),
-            walkers::ReferencingFields::NA => (), // error somewhere else
-            walkers::ReferencingFields::Inferred(fields) => {
+            Some(_) => (),
+            None => {
+                let fields: Vec<InferredScalarField<'_>> = infer_missing_referencing_scalar_fields(inline_relation);
                 let missing_arg = MissingRelationAttributeArg {
                     model: forward.model().name().to_owned(),
                     field: forward.ast_field().name.name.to_owned(),
@@ -857,21 +857,22 @@ fn push_missing_relation_attribute(
 
         // the `fields: [...]` argument.
         let fields: Option<ast::Argument> = match inline_relation.referencing_fields() {
-            walkers::ReferencingFields::Concrete(_) => None,
-            walkers::ReferencingFields::NA => None, // error somewhere else
-            walkers::ReferencingFields::Inferred(fields) => Some(ast::Argument {
-                name: Some(ast::Identifier::new("fields")),
-                value: ast::Expression::Array(
-                    fields
-                        .into_iter()
-                        .map(|f| ast::Expression::ConstantValue(f.name, Span::empty()))
-                        .collect(),
-                    Span::empty(),
-                ),
-                span: Span::empty(),
-            }),
+            Some(_) => None,
+            None => {
+                let fields = infer_missing_referencing_scalar_fields(inline_relation);
+                Some(ast::Argument {
+                    name: Some(ast::Identifier::new("fields")),
+                    value: ast::Expression::Array(
+                        fields
+                            .into_iter()
+                            .map(|f| ast::Expression::ConstantValue(f.name, Span::empty()))
+                            .collect(),
+                        Span::empty(),
+                    ),
+                    span: Span::empty(),
+                })
+            }
         };
-
         // the `references: [...]` argument
         let references: Option<ast::Argument> = if forward.referenced_fields().is_none() {
             Some(ast::Argument {
@@ -957,7 +958,7 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, missi
             field: ast::Field {
                 field_type: ast::FieldType::Supported(ast::Identifier::new(inline.referenced_model().name())),
                 name: ast::Identifier::new(inline.referenced_model().name()),
-                arity: inline.forward_relation_field_arity(),
+                arity: forward_relation_field_arity(inline),
                 attributes: vec![ast::Attribute {
                     name: ast::Identifier::new("relation"),
                     arguments: ast::ArgumentsList {
@@ -965,16 +966,10 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, missi
                             ast::Argument {
                                 name: Some(ast::Identifier::new("fields")),
                                 value: ast::Expression::Array(
-                                    match inline.referencing_fields() {
-                                        walkers::ReferencingFields::Concrete(fields) => fields
-                                            .map(|f| ast::Expression::ConstantValue(f.name().to_owned(), Span::empty()))
-                                            .collect(),
-                                        walkers::ReferencingFields::Inferred(fields) => fields
-                                            .into_iter()
-                                            .map(|f| ast::Expression::ConstantValue(f.name, Span::empty()))
-                                            .collect(),
-                                        walkers::ReferencingFields::NA => Vec::new(),
-                                    },
+                                    infer_missing_referencing_scalar_fields(inline)
+                                        .into_iter()
+                                        .map(|f| ast::Expression::ConstantValue(f.name, Span::empty()))
+                                        .collect(),
                                     Span::empty(),
                                 ),
                                 span: Span::empty(),
@@ -1005,9 +1000,9 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, missi
 }
 
 fn push_missing_scalar_fields(inline: walkers::InlineRelationWalker<'_>, missing_fields: &mut Vec<MissingField>) {
-    let missing_scalar_fields = match inline.referencing_fields() {
-        walkers::ReferencingFields::Inferred(inferred_fields) => inferred_fields,
-        _ => return,
+    let missing_scalar_fields: Vec<InferredScalarField<'_>> = match inline.referencing_fields() {
+        Some(_) => return,
+        None => infer_missing_referencing_scalar_fields(inline),
     };
 
     // Filter out duplicate fields
@@ -1045,7 +1040,7 @@ fn push_missing_scalar_fields(inline: walkers::InlineRelationWalker<'_>, missing
             field: ast::Field {
                 field_type: ast::FieldType::Supported(ast::Identifier::new(field_type.as_str())),
                 name: ast::Identifier::new(&field.name),
-                arity: inline.forward_relation_field_arity(),
+                arity: field.arity,
                 attributes,
                 documentation: None,
                 span: Span::empty(),
@@ -1053,4 +1048,90 @@ fn push_missing_scalar_fields(inline: walkers::InlineRelationWalker<'_>, missing
             },
         })
     }
+}
+
+/// A scalar inferred by magic reformatting.
+#[derive(Debug)]
+struct InferredScalarField<'db> {
+    name: String,
+    arity: ast::FieldArity,
+    tpe: parser_database::ScalarFieldType,
+    blueprint: walkers::ScalarFieldWalker<'db>,
+}
+
+fn infer_missing_referencing_scalar_fields(inline: walkers::InlineRelationWalker<'_>) -> Vec<InferredScalarField<'_>> {
+    match inline.referenced_model().unique_criterias().next() {
+        Some(first_unique_criteria) => {
+            first_unique_criteria
+                .fields()
+                .map(|field| {
+                    let name = format!(
+                        "{}{}",
+                        camel_case(inline.referenced_model().name()),
+                        pascal_case(field.name())
+                    );
+
+                    // we cannot have composite fields in a relation for now.
+                    let field = field.as_scalar_field().unwrap();
+
+                    if let Some(existing_field) =
+                        inline.referencing_model().scalar_fields().find(|sf| sf.name() == name)
+                    {
+                        InferredScalarField {
+                            name,
+                            arity: existing_field.ast_field().arity,
+                            tpe: existing_field.scalar_field_type(),
+                            blueprint: field,
+                        }
+                    } else {
+                        InferredScalarField {
+                            name,
+                            arity: inline
+                                .forward_relation_field()
+                                .map(|f| f.ast_field().arity)
+                                .unwrap_or(ast::FieldArity::Optional),
+                            tpe: field.scalar_field_type(),
+                            blueprint: field,
+                        }
+                    }
+                })
+                .collect()
+        }
+        None => Vec::new(),
+    }
+}
+
+fn pascal_case(input: &str) -> String {
+    let mut c = input.chars();
+    match c.next() {
+        None => String::new(),
+        Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+    }
+}
+
+fn camel_case(input: &str) -> String {
+    let mut c = input.chars();
+    match c.next() {
+        None => String::new(),
+        Some(f) => f.to_lowercase().collect::<String>() + c.as_str(),
+    }
+}
+
+/// The arity of the forward relation field. Works even without forward relation field.
+fn forward_relation_field_arity(inline: walkers::InlineRelationWalker<'_>) -> ast::FieldArity {
+    inline
+        // First use the relation field itself if it exists.
+        .forward_relation_field()
+        .map(|rf| rf.ast_field().arity)
+        // Otherwise, if we have fields that look right on the model, use these.
+        .unwrap_or_else(|| {
+            if infer_missing_referencing_scalar_fields(inline)
+                .into_iter()
+                .any(|f| f.arity.is_optional())
+            {
+                ast::FieldArity::Optional
+            } else {
+                ast::FieldArity::Required
+            }
+        })
 }
