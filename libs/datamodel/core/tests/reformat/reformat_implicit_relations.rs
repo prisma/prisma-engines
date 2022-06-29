@@ -1,9 +1,4 @@
-use expect_test::expect;
-use indoc::indoc;
-
-fn reformat(input: &str) -> String {
-    datamodel::reformat(input, 2).unwrap_or_else(|_| input.to_owned())
-}
+use crate::common::*;
 
 #[test]
 fn native_types_in_missing_back_relation_fields() {

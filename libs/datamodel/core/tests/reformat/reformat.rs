@@ -2,7 +2,7 @@ use crate::common::*;
 use indoc::indoc;
 
 fn reformat(input: &str) -> String {
-    datamodel::reformat(input, 2).unwrap_or_else(|_| input.to_owned())
+    datamodel::reformat(input, 2).unwrap_or_else(|| input.to_owned())
 }
 
 #[test]
@@ -1375,4 +1375,78 @@ fn reformatting_optional_list_fields_works() {
     "#]];
 
     expected.assert_eq(&reformat(schema));
+}
+
+#[test]
+fn attribute_arguments_reformatting_is_idempotent() {
+    let schema = r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = "mongodb"
+        }
+
+        datasource db {
+          provider = "mongodb"
+          url      = "m...ty"
+        }
+
+        model Foo {
+          id       String   @id @default(auto()) @map("_id") @db.ObjectId
+          name     String   @unique
+          json     Json
+          bar      Bar
+          bars     Bar[]
+          baz      Baz      @relation(fields: [bazId], references: [id])
+          bazId    String   @db.ObjectId
+          list     String[]
+          jsonList Json[]
+        }
+
+        type Bar {
+          label  String
+          number Int
+        }
+
+        model Baz {
+          id  String @id @default(auto()) @map("_id") @db.ObjectId
+          foo Foo?
+        }
+    "#;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = "mongodb"
+        }
+
+        datasource db {
+          provider = "mongodb"
+          url      = "m...ty"
+        }
+
+        model Foo {
+          id       String   @id @default(auto()) @map("_id") @db.ObjectId
+          name     String   @unique
+          json     Json
+          bar      Bar
+          bars     Bar[]
+          baz      Baz      @relation(fields: [bazId], references: [id])
+          bazId    String   @db.ObjectId
+          list     String[]
+          jsonList Json[]
+        }
+
+        type Bar {
+          label  String
+          number Int
+        }
+
+        model Baz {
+          id  String @id @default(auto()) @map("_id") @db.ObjectId
+          foo Foo?
+        }
+    "#]];
+    let reformatted = reformat(schema);
+    expected.assert_eq(&reformatted);
+    assert_eq!(reformatted, reformat(&reformatted)); // it's idempotent
 }
