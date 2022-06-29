@@ -125,12 +125,6 @@ impl SqlRenderer for MssqlFlavour {
 
     fn render_create_index(&self, index: IndexWalker<'_>) -> String {
         let mssql_schema_ext: &MssqlSchemaExt = index.schema.downcast_connector_data().unwrap_or_default();
-        let index_type = match index.index_type() {
-            IndexType::Unique => "UNIQUE ",
-            IndexType::Normal => "",
-            IndexType::Fulltext => unreachable!("Fulltext index on SQL Server"),
-        };
-
         let index_name = self.quote(index.name());
         let table_reference = self.quote_with_schema(index.table().name()).to_string();
 
@@ -153,7 +147,17 @@ impl SqlRenderer for MssqlFlavour {
 
         let columns = columns.join(", ");
 
-        format!("CREATE {index_type}{clustering}INDEX {index_name} ON {table_reference}({columns})",)
+        match index.index_type() {
+            IndexType::Unique => {
+                let constraint_name = self.quote(index.name());
+
+                format!("ALTER TABLE {table_reference} ADD CONSTRAINT {constraint_name} UNIQUE {clustering}({columns})")
+            }
+            IndexType::Normal => {
+                format!("CREATE {clustering}INDEX {index_name} ON {table_reference}({columns})",)
+            }
+            IndexType::Fulltext => todo!("SQL Server full-text indices..."),
+        }
     }
 
     fn render_create_table_as(&self, table: TableWalker<'_>, table_name: &str) -> String {
