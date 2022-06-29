@@ -1,4 +1,4 @@
-use indoc::formatdoc;
+use indoc::{formatdoc, indoc};
 use migration_engine_tests::test_api::*;
 
 #[test_connector(tags(Mssql))]
@@ -183,4 +183,83 @@ fn clustered_to_non_clustered_index(api: TestApi) {
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["og"], |index| index.assert_non_clustered())
     });
+}
+
+#[test_connector(tags(Mssql))]
+fn creating_and_dropping_unique_constraint_works(api: TestApi) {
+    let dm1 = indoc! {r#"
+        model Logbook {
+          id         Int      @id
+          categoryId String?  @db.UniqueIdentifier
+          date       DateTime @db.Date()
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("Logbook", |cat| cat.assert_indexes_count(0));
+
+    let dm1 = indoc! {r#"
+        model Logbook {
+          id         Int      @id
+          categoryId String?  @db.UniqueIdentifier
+          date       DateTime @db.Date()
+
+          @@unique([categoryId, date])
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm1).force(true).send();
+
+    api.assert_schema().assert_table("Logbook", |cat| {
+        cat.assert_indexes_count(1)
+            .assert_index_on_columns(&["categoryId", "date"], |idx| idx.assert_is_unique())
+    });
+
+    let dm2 = indoc! {r#"
+        model Logbook {
+          id         Int      @id
+          categoryId String?  @db.UniqueIdentifier
+          date       DateTime @db.Date()
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("Logbook", |cat| cat.assert_indexes_count(0));
+}
+
+#[test_connector(tags(Mssql))]
+fn dropping_unique_constraint_works(api: TestApi) {
+    let dm1 = indoc! {r#"
+        model Logbook {
+          id         Int      @id
+          categoryId String?  @db.UniqueIdentifier
+          date       DateTime @db.Date()
+
+          @@unique([categoryId, date])
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm1).force(true).send();
+
+    api.assert_schema().assert_table("Logbook", |cat| {
+        cat.assert_indexes_count(1)
+            .assert_index_on_columns(&["categoryId", "date"], |idx| idx.assert_is_unique())
+    });
+
+    let dm2 = indoc! {r#"
+        model Logbook {
+          id         Int      @id
+          categoryId String?  @db.UniqueIdentifier
+          date       DateTime @db.Date()
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("Logbook", |cat| cat.assert_indexes_count(0));
 }
