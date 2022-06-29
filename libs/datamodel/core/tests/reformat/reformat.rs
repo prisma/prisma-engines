@@ -1,8 +1,11 @@
+use std::borrow::Cow;
+
 use crate::common::*;
 use indoc::indoc;
 
-fn reformat(input: &str) -> String {
-    datamodel::reformat(input, 2).unwrap_or_else(|| input.to_owned())
+fn reformat(input: impl Into<Cow<'static, str>>) -> String {
+    let input = input.into();
+    datamodel::reformat(input.to_owned(), 2).unwrap_or_else(|| input.to_string())
 }
 
 #[test]
@@ -399,7 +402,7 @@ fn test_reformat_tabs() {
         }
     "#]];
 
-    expected.assert_eq(&reformat(&input.replace("\\t", "\t")));
+    expected.assert_eq(&reformat(input.replace("\\t", "\t")));
 }
 
 #[test]
@@ -1448,5 +1451,5 @@ fn attribute_arguments_reformatting_is_idempotent() {
     "#]];
     let reformatted = reformat(schema);
     expected.assert_eq(&reformatted);
-    assert_eq!(reformatted, reformat(&reformatted)); // it's idempotent
+    assert_eq!(reformatted, reformat(reformatted.clone())); // it's idempotent
 }

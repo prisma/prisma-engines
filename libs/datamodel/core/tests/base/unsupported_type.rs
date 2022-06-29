@@ -21,7 +21,7 @@ fn parse_unsupported_types() {
         dml
     );
 
-    let schema = parse(&dml_with_generator);
+    let schema = parse(dml_with_generator);
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_scalar_field("point")

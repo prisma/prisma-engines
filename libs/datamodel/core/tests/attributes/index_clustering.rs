@@ -9,7 +9,7 @@ fn non_boolean_clustering() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mExpected a boolean value, but received literal value `meow`.[0m
@@ -35,7 +35,7 @@ fn clustered_index_works_on_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
 
     schema.assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
@@ -58,7 +58,7 @@ fn clustered_unique_index_works_on_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
     let model = schema.assert_has_model("A");
 
     model.assert_has_index(IndexDefinition {
@@ -85,7 +85,7 @@ fn clustered_compound_unique_index_works_on_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
     let model = schema.assert_has_model("A");
 
     model.assert_has_index(IndexDefinition {
@@ -108,7 +108,7 @@ fn non_clustered_id_works_on_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
     let model = schema.assert_has_model("A");
 
     model.assert_has_pk(PrimaryKeyDefinition {
@@ -132,7 +132,7 @@ fn non_clustered_compound_id_works_on_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
     let model = schema.assert_has_model("A");
 
     model.assert_has_pk(PrimaryKeyDefinition {
@@ -156,7 +156,7 @@ fn clustered_index_allowed_only_in_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": Defining clustering is not supported in the current connector.[0m
@@ -180,7 +180,7 @@ fn clustered_unique_allowed_only_in_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@unique": Defining clustering is not supported in the current connector.[0m
@@ -207,7 +207,7 @@ fn clustered_compound_unique_allowed_only_in_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@unique": Defining clustering is not supported in the current connector.[0m
@@ -230,7 +230,7 @@ fn non_clustered_id_allowed_only_in_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": Defining clustering is not supported in the current connector.[0m
@@ -256,7 +256,7 @@ fn non_clustered_compound_id_allowed_only_in_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@id": Defining clustering is not supported in the current connector.[0m
@@ -282,7 +282,7 @@ fn id_and_index_clustering_together_not_allowed() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": A model can only hold one clustered index or id.[0m
@@ -312,7 +312,7 @@ fn id_and_unique_clustering_together_not_allowed() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": A model can only hold one clustered index or id.[0m
@@ -347,7 +347,7 @@ fn do_not_render_id_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let dml = datamodel::parse_datamodel(&schema).unwrap().subject;
+    let dml = datamodel::parse_datamodel(schema).unwrap().subject;
     let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     expected.assert_eq(&rendered);
@@ -368,7 +368,7 @@ fn render_id_non_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = datamodel::parse_schema(&schema).unwrap();
+    let (config, dml) = datamodel::parse_schema(schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
     expected.assert_eq(&rendered);
@@ -395,7 +395,7 @@ fn do_not_render_compound_id_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = datamodel::parse_schema(&schema).unwrap();
+    let (config, dml) = datamodel::parse_schema(schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
     expected.assert_eq(&rendered);
@@ -422,7 +422,7 @@ fn render_compound_id_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = datamodel::parse_schema(&schema).unwrap();
+    let (config, dml) = datamodel::parse_schema(schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
     expected.assert_eq(&rendered);
@@ -449,7 +449,7 @@ fn do_not_render_index_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = datamodel::parse_schema(&schema).unwrap();
+    let (config, dml) = datamodel::parse_schema(schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
     expected.assert_eq(&rendered);
@@ -476,7 +476,7 @@ fn render_index_non_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = datamodel::parse_schema(&schema).unwrap();
+    let (config, dml) = datamodel::parse_schema(schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
     expected.assert_eq(&rendered);
@@ -499,7 +499,7 @@ fn do_not_render_unique_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = datamodel::parse_schema(&schema).unwrap();
+    let (config, dml) = datamodel::parse_schema(schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
     expected.assert_eq(&rendered);
@@ -522,7 +522,7 @@ fn render_unique_non_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = datamodel::parse_schema(&schema).unwrap();
+    let (config, dml) = datamodel::parse_schema(schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
     expected.assert_eq(&rendered);
@@ -551,7 +551,7 @@ fn do_not_render_compound_unique_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = datamodel::parse_schema(&schema).unwrap();
+    let (config, dml) = datamodel::parse_schema(schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
     expected.assert_eq(&rendered);
@@ -580,7 +580,7 @@ fn render_compound_unique_non_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = datamodel::parse_schema(&schema).unwrap();
+    let (config, dml) = datamodel::parse_schema(schema).unwrap();
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&config));
 
     expected.assert_eq(&rendered);

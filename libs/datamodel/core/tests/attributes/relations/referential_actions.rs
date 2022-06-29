@@ -25,7 +25,7 @@ fn on_delete_actions() {
             action
         );
 
-        parse(&dml)
+        parse(dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_delete_strategy(*action);
@@ -53,7 +53,7 @@ fn on_update_actions() {
             action
         );
 
-        parse(&dml)
+        parse(dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_update_strategy(*action);
@@ -86,7 +86,7 @@ fn actions_on_mongo() {
             action = action
         );
 
-        parse(&dml)
+        parse(dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_delete_strategy(*action);
@@ -125,7 +125,7 @@ fn on_delete_actions_should_work_on_prisma_referential_integrity() {
             action = action
         );
 
-        parse(&dml)
+        parse(dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_delete_strategy(*action);

@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 pub use datamodel::{dml, dml::*};
 pub use expect_test::expect;
 pub use indoc::{formatdoc, indoc};
@@ -5,8 +7,9 @@ pub use indoc::{formatdoc, indoc};
 use datamodel::{diagnostics::*, Configuration, StringFromEnvVar};
 use pretty_assertions::assert_eq;
 
-pub(crate) fn reformat(input: &str) -> String {
-    datamodel::reformat(input, 2).unwrap_or_else(|| input.to_owned())
+pub(crate) fn reformat(input: impl Into<Cow<'static, str>>) -> String {
+    let input = input.into();
+    datamodel::reformat(input.clone(), 2).unwrap_or_else(|| input.to_string())
 }
 
 pub(crate) trait DatasourceAsserts {
@@ -472,14 +475,11 @@ impl ErrorAsserts for Diagnostics {
     }
 }
 
-pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
+pub(crate) fn parse(datamodel_string: impl Into<Cow<'static, str>>) -> Datamodel {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(s) => s.subject,
         Err(errs) => {
-            panic!(
-                "Datamodel parsing failed\n\n{}",
-                errs.to_pretty_string("", datamodel_string)
-            )
+            panic!("Datamodel parsing failed\n\n{errs}")
         }
     }
 }
@@ -497,18 +497,18 @@ pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
 }
 
 #[track_caller]
-pub(crate) fn expect_error(schema: &str, expectation: &expect_test::Expect) {
+pub(crate) fn expect_error(schema: impl Into<Cow<'static, str>>, expectation: &expect_test::Expect) {
     match datamodel::parse_schema_parserdb(schema) {
         Ok(_) => panic!("Expected a validation error, but the schema is valid."),
         Err(err) => expectation.assert_eq(&err),
     }
 }
 
-pub(crate) fn parse_and_render_error(schema: &str) -> String {
-    parse_error(schema).to_pretty_string("schema.prisma", schema)
+pub(crate) fn parse_and_render_error(schema: impl Into<Cow<'static, str>>) -> String {
+    parse_error(schema)
 }
 
-pub(crate) fn parse_error(datamodel_string: &str) -> Diagnostics {
+pub(crate) fn parse_error(datamodel_string: impl Into<Cow<'static, str>>) -> String {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(_) => panic!("Expected an error when parsing schema."),
         Err(errs) => errs,
@@ -516,7 +516,7 @@ pub(crate) fn parse_error(datamodel_string: &str) -> Diagnostics {
 }
 
 #[track_caller]
-pub(crate) fn assert_valid(schema: &str) {
+pub(crate) fn assert_valid(schema: impl Into<Cow<'static, str>>) {
     match datamodel::parse_schema_parserdb(schema) {
         Ok(_) => (),
         Err(err) => panic!("{err}"),
@@ -541,19 +541,5 @@ pub(crate) const MYSQL_SOURCE: &str = r#"
     datasource db {
         provider = "mysql"
         url      = "mysql://localhost:3306"
-    }
-"#;
-
-pub(crate) const MSSQL_SOURCE: &str = r#"
-    datasource db {
-        provider = "sqlserver"
-        url      = "sqlserver://localhost:1433"
-    }
-"#;
-
-pub(crate) const COCKROACHDB_SOURCE: &str = r#"
-    datasource db {
-        provider = "cockroachdb"
-        url      = "postgresql://localhost:5432"
     }
 "#;

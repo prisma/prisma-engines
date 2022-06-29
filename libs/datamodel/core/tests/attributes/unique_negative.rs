@@ -365,7 +365,7 @@ fn naming_unique_to_a_field_name_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The custom name `used` specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.[0m
@@ -397,7 +397,7 @@ fn naming_field_level_unique_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNo such argument.[0m
@@ -425,7 +425,7 @@ fn duplicate_implicit_names_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `User_used_key` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
@@ -469,7 +469,7 @@ fn duplicate_custom_names_on_same_model_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@unique": The given custom name `foo` has to be unique on the model. Please provide a different name for the `name` argument.[0m

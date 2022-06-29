@@ -174,9 +174,8 @@ fn index_attributes_must_serialize_to_valid_dml() {
             @@index([firstName,lastName], name: "customName")
         }
     "#;
-    let schema = parse(dml);
 
-    assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema, None)).is_ok());
+    assert!(datamodel::parse_datamodel(render_datamodel_to_string(&parse(dml), None)).is_ok());
 }
 
 #[test]
@@ -200,7 +199,7 @@ fn index_accepts_three_different_notations() {
         &[],
     );
 
-    let schema = parse(&dml);
+    let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
 
     user_model.assert_has_index(IndexDefinition {
@@ -251,9 +250,9 @@ fn mysql_allows_unique_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &[]);
-    let schema = parse(&schema);
+    let schema = parse(with_header(dml, Provider::Mysql, &[]));
     let user_model = schema.assert_has_model("A");
+
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("A_id_key".to_string()),
@@ -281,7 +280,7 @@ fn mysql_allows_compound_unique_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -296,7 +295,7 @@ fn mysql_allows_index_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -311,7 +310,7 @@ fn mysql_allows_index_length_prefix_on_unsupported_field() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -323,7 +322,7 @@ fn mysql_allows_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -335,7 +334,7 @@ fn sqlite_allows_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Sqlite, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -347,7 +346,7 @@ fn sqlserver_allows_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -361,7 +360,7 @@ fn mysql_allows_compound_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -375,7 +374,7 @@ fn sqlite_allows_compound_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Sqlite, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -389,7 +388,7 @@ fn sqlserver_allows_compound_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -404,7 +403,7 @@ fn mysql_allows_index_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -419,7 +418,7 @@ fn sqlserver_allows_index_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -436,7 +435,7 @@ fn mysql_fulltext_index() {
 
     let dml = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
 
-    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+    parse(dml).assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("A_a_b_idx".to_string()),
         fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
@@ -461,7 +460,7 @@ fn mysql_fulltext_index_map() {
 
     let dml = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
 
-    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+    parse(dml).assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("my_text_index".to_string()),
         fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
@@ -486,7 +485,7 @@ fn fulltext_index_mongodb() {
 
     let dml = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
 
-    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+    parse(dml).assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("A_a_b_idx".to_string()),
         fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
@@ -510,8 +509,9 @@ fn duplicate_index_different_sort_order_mongodb() {
     "#};
 
     let dml = with_header(dml, Provider::Mongo, &[]);
+    let parsed = parse(dml);
 
-    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+    parsed.assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("aaa".to_string()),
         fields: vec![IndexField {
@@ -526,7 +526,7 @@ fn duplicate_index_different_sort_order_mongodb() {
         clustered: None,
     });
 
-    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+    parsed.assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("bbb".to_string()),
         fields: vec![IndexField {
@@ -556,7 +556,7 @@ fn fulltext_index_sort_mongodb() {
 
     let dml = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
 
-    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+    parse(dml).assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("A_a_b_idx".to_string()),
         fields: vec![
@@ -592,7 +592,7 @@ fn multiple_fulltext_indexes_allowed_per_model_in_mysql() {
 
     let schema = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
 
-    parse(&schema)
+    parse(schema)
         .assert_has_model("A")
         .assert_has_index(IndexDefinition {
             name: None,

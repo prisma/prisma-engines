@@ -13,17 +13,20 @@ use std::borrow::Cow;
 
 /// Returns either the reformatted schema, or the original input if we can't reformat. This happens
 /// if and only if the source does not parse to a well formed AST.
-pub fn reformat(source: &str, indent_width: usize) -> Option<String> {
-    let db = crate::parse_schema_ast(source).ok().and_then(|ast| {
+pub fn reformat(source: impl Into<Cow<'static, str>>, indent_width: usize) -> Option<String> {
+    let source = source.into();
+
+    let db = crate::parse_schema_ast(&source).ok().and_then(|ast| {
         let mut diagnostics = diagnostics::Diagnostics::new();
-        let db = parser_database::ParserDatabase::new(ast, &mut diagnostics);
+        let db = parser_database::ParserDatabase::new(source.clone(), ast, &mut diagnostics);
         diagnostics.to_result().ok().map(move |_| db)
     });
+
     let source_to_reformat: Cow<'_, str> = match db {
         Some(db) => {
             let mut missing_bits = Vec::new();
             let mut ctx = MagicReformatCtx {
-                original_schema: source,
+                original_schema: db.source(),
                 missing_bits: &mut missing_bits,
                 db: &db,
             };
@@ -32,13 +35,15 @@ pub fn reformat(source: &str, indent_width: usize) -> Option<String> {
             push_missing_relation_attribute_args(&mut ctx);
             missing_bits.sort_by_key(|bit| bit.position);
 
+            let source = db.into_source();
+
             if missing_bits.is_empty() {
-                Cow::Borrowed(source)
+                source
             } else {
-                Cow::Owned(enrich(source, &missing_bits))
+                Cow::Owned(enrich(&source, &missing_bits))
             }
         }
-        None => Cow::Borrowed(source),
+        None => source,
     };
 
     Reformatter::new(&source_to_reformat).reformat_internal(indent_width)

@@ -38,7 +38,7 @@ fn mongodb_field_mapping_cannot_start_with_a_dollar_sign() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@map": The field name cannot start with a `$` character[0m
@@ -62,7 +62,7 @@ fn mongodb_field_mapping_cannot_contain_periods() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@map": The field name cannot contain a `.` character[0m

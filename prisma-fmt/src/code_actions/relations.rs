@@ -6,6 +6,8 @@ use lsp_types::{
     WorkspaceEdit,
 };
 
+use super::IndentationOptions;
+
 /// If the referencing side of the one-to-one relation does not point
 /// to a unique constraint, the action adds the attribute.
 ///
@@ -68,22 +70,13 @@ pub(super) fn add_referencing_side_unique(
 
     let mut fields = relation.referencing_fields();
 
-    let (new_text, start, end, diagnostic) = if fields.len() == 1 {
+    let (new_text, start, end) = if fields.len() == 1 {
         let new_text = String::from(" @unique");
-
-        let diagnostic = {
-            Diagnostic {
-                message: String::from("The field has to be unique due to a relation"),
-                range: crate::span_to_range(relation.referencing_field().ast_field().span, schema),
-                severity: Some(DiagnosticSeverity::ERROR),
-                ..Default::default()
-            }
-        };
 
         let field = fields.next().unwrap();
         let range = crate::span_to_range(field.ast_field().span, schema);
 
-        (new_text, range.end, range.end, diagnostic)
+        (new_text, range.end, range.end)
     } else {
         let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
         let model = relation.referencing_model();
@@ -92,19 +85,10 @@ pub(super) fn add_referencing_side_unique(
           @@unique([{fields}])
         }}"#};
 
-        let diagnostic = {
-            Diagnostic {
-                message: format!("The model needs a unique constraint (fields: {fields}) due to a relation"),
-                range: crate::span_to_range(relation.referencing_field().ast_field().span, schema),
-                severity: Some(DiagnosticSeverity::ERROR),
-                ..Default::default()
-            }
-        };
-
         let start = crate::offset_to_position(model.ast_model().span.end - 1, schema).unwrap();
         let end = crate::offset_to_position(model.ast_model().span.end, schema).unwrap();
 
-        (new_text, start, end, diagnostic)
+        (new_text, start, end)
     };
 
     let text = TextEdit {
@@ -120,11 +104,17 @@ pub(super) fn add_referencing_side_unique(
         ..Default::default()
     };
 
+    let diagnostics = super::diagnostics_for_span(
+        schema,
+        &params.context.diagnostics,
+        relation.referencing_field().ast_field().span,
+    );
+
     let action = CodeAction {
         title: String::from("Make referencing fields unique"),
         kind: Some(CodeActionKind::QUICKFIX),
         edit: Some(edit),
-        diagnostics: Some(vec![diagnostic]),
+        diagnostics,
         ..Default::default()
     };
 
@@ -190,22 +180,13 @@ pub(super) fn add_referenced_side_unique(
 
     let mut fields = relation.referenced_fields();
 
-    let (new_text, start, end, diagnostic) = if fields.len() == 1 {
+    let (new_text, start, end) = if fields.len() == 1 {
         let new_text = String::from(" @unique");
-
-        let diagnostic = {
-            Diagnostic {
-                message: String::from("The field has to be unique due to a relation"),
-                range: crate::span_to_range(relation.referencing_field().ast_field().span, schema),
-                severity: Some(DiagnosticSeverity::ERROR),
-                ..Default::default()
-            }
-        };
 
         let field = fields.next().unwrap();
         let start = crate::offset_to_position(field.ast_field().span.end - 1, schema).unwrap();
 
-        (new_text, start, start, diagnostic)
+        (new_text, start, start)
     } else {
         let model = relation.referenced_model();
         let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
@@ -214,19 +195,10 @@ pub(super) fn add_referenced_side_unique(
           @@unique([{fields}])
         }}"#};
 
-        let diagnostic = {
-            Diagnostic {
-                message: format!("The model needs a unique constraint (for fields: {fields}) due to a relation"),
-                range: crate::span_to_range(relation.referencing_field().ast_field().span, schema),
-                severity: Some(DiagnosticSeverity::ERROR),
-                ..Default::default()
-            }
-        };
-
         let start = crate::offset_to_position(model.ast_model().span.end - 1, schema).unwrap();
         let end = crate::offset_to_position(model.ast_model().span.end, schema).unwrap();
 
-        (new_text, start, end, diagnostic)
+        (new_text, start, end)
     };
 
     let text = TextEdit {
@@ -242,11 +214,17 @@ pub(super) fn add_referenced_side_unique(
         ..Default::default()
     };
 
+    let diagnostics = super::diagnostics_for_span(
+        schema,
+        &params.context.diagnostics,
+        relation.referencing_field().ast_field().span,
+    );
+
     let action = CodeAction {
         title: String::from("Make referenced field(s) unique"),
         kind: Some(CodeActionKind::QUICKFIX),
         edit: Some(edit),
-        diagnostics: Some(vec![diagnostic]),
+        diagnostics,
         ..Default::default()
     };
 

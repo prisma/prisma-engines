@@ -888,9 +888,9 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
 
     for dm in &[dm1, dm2, dm3] {
         assert!(
-            datamodel::parse_datamodel(dm).is_ok(),
+            datamodel::parse_datamodel(*dm).is_ok(),
             "{:?}",
-            datamodel::parse_datamodel(dm).unwrap_err()
+            datamodel::parse_datamodel(*dm).unwrap_err()
         );
     }
 }

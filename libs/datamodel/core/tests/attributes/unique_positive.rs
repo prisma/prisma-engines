@@ -294,7 +294,7 @@ fn unique_attributes_must_serialize_to_valid_dml() {
     "#;
     let schema = parse(dml);
 
-    assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema, None)).is_ok());
+    assert!(datamodel::parse_datamodel(render_datamodel_to_string(&schema, None)).is_ok());
 }
 
 #[test]
@@ -312,7 +312,7 @@ fn named_multi_field_unique_must_work() {
         &[],
     );
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: Some("ClientName".to_string()),
@@ -339,7 +339,7 @@ fn mapped_multi_field_unique_must_work() {
         &[],
     );
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
@@ -368,7 +368,7 @@ fn mapped_singular_unique_must_work() {
         &[],
     );
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let model = datamodel.assert_has_model("Model");
     model.assert_has_index(IndexDefinition {
         name: None,
@@ -406,7 +406,7 @@ fn named_and_mapped_multi_field_unique_must_work() {
         &[],
     );
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let model = datamodel.assert_has_model("Model");
     model.assert_has_index(IndexDefinition {
         name: Some("compoundId".to_string()),
@@ -433,7 +433,7 @@ fn implicit_names_must_work() {
         &[],
     );
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let model = datamodel.assert_has_model("Model");
     model.assert_has_index(IndexDefinition {
         name: None,
@@ -470,7 +470,7 @@ fn defined_on_field_must_work() {
         &[],
     );
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let model = datamodel.assert_has_model("Model");
     model.assert_has_index(IndexDefinition {
         name: None,

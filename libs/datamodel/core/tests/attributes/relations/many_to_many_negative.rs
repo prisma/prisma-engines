@@ -95,7 +95,7 @@ fn embedded_many_to_many_relation_fields_with_referential_actions() {
     "#]];
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -132,7 +132,7 @@ fn embedded_many_to_many_relation_fields_with_referential_actions_postgres() {
     "#]];
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -161,7 +161,7 @@ fn embedded_many_to_many_must_define_references_on_both_sides() {
     "#]];
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 
     let dml = indoc! {r#"
         model A {
@@ -187,7 +187,7 @@ fn embedded_many_to_many_must_define_references_on_both_sides() {
     "#]];
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 
     let dml = indoc! {r#"
         model A {
@@ -219,7 +219,7 @@ fn embedded_many_to_many_must_define_references_on_both_sides() {
     "#]];
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -256,7 +256,7 @@ fn embedded_many_to_many_must_define_references_on_both_sides_postgres() {
     "#]];
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 
     let dml = indoc! {r#"
         model A {
@@ -290,7 +290,7 @@ fn embedded_many_to_many_must_define_references_on_both_sides_postgres() {
     "#]];
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 
     let dml = indoc! {r#"
         model A {
@@ -324,7 +324,7 @@ fn embedded_many_to_many_must_define_references_on_both_sides_postgres() {
     "#]];
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -353,7 +353,7 @@ fn embedded_many_to_many_must_define_fields_on_both_sides() {
     "#]];
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 
     let dml = indoc! {r#"
         model A {
@@ -379,7 +379,7 @@ fn embedded_many_to_many_must_define_fields_on_both_sides() {
     "#]];
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -416,7 +416,7 @@ fn embedded_many_to_many_must_define_fields_on_both_sides_postgres() {
     "#]];
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 
     let dml = indoc! {r#"
         model A {
@@ -450,7 +450,7 @@ fn embedded_many_to_many_must_define_fields_on_both_sides_postgres() {
     "#]];
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -487,7 +487,7 @@ fn embedded_many_to_many_relations_do_not_work_on_postgresql() {
     "#]];
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -524,7 +524,7 @@ fn embedded_many_to_many_relations_do_not_work_on_postgresql_with_mongo_preview_
     "#]];
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -561,7 +561,7 @@ fn embedded_many_to_many_relations_must_refer_an_id_from_both_sides() {
     "#]];
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -600,7 +600,7 @@ fn embedded_many_to_many_relations_must_refer_an_id_from_both_sides_postgres() {
     "#]];
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -635,7 +635,7 @@ fn implicit_many_to_many_relations_do_not_work_on_mongo() {
     "#]];
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -664,7 +664,7 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_type() {
     "#]];
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -701,7 +701,7 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_type_postgres() {
     "#]];
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -730,7 +730,7 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_native_type() {
     "#]];
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -767,7 +767,7 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_native_type_postgres
     "#]];
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -804,5 +804,5 @@ fn embedded_many_to_many_fields_must_be_an_array_postgres() {
     "#]];
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }

@@ -1,6 +1,8 @@
 mod context;
 mod validations;
 
+use std::borrow::Cow;
+
 use crate::{ast, common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics};
 use datamodel_connector::{Connector, EmptyDatamodelConnector, ReferentialIntegrity};
 use enumflags2::BitFlags;
@@ -23,6 +25,7 @@ pub struct ValidateOutput {
 /// * ...
 /// * Validate the schema
 pub(crate) fn validate(
+    src: impl Into<Cow<'static, str>>,
     ast_schema: ast::SchemaAst,
     sources: &[configuration::Datasource],
     preview_features: BitFlags<PreviewFeature>,
@@ -33,7 +36,7 @@ pub(crate) fn validate(
     let referential_integrity = source.map(|s| s.referential_integrity()).unwrap_or_default();
 
     // Make sense of the AST.
-    let db = ParserDatabase::new(ast_schema, &mut diagnostics);
+    let db = ParserDatabase::new(src, ast_schema, &mut diagnostics);
 
     let mut output = ValidateOutput {
         db,

@@ -21,6 +21,11 @@ impl Span {
         position >= self.start && position <= self.end
     }
 
+    /// Is the given span overlapping with the current span.
+    pub fn overlaps(self, other: Span) -> bool {
+        self.contains(other.start) || self.contains(other.end)
+    }
+
     /// Adds an offset to a span.
     pub fn lift_span(&self, offset: usize) -> Span {
         Span {

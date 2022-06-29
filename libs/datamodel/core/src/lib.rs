@@ -58,6 +58,8 @@ mod configuration;
 mod reformat;
 mod transform;
 
+use std::borrow::Cow;
+
 pub use crate::{
     configuration::{Configuration, Datasource, Generator, StringFromEnvVar},
     reformat::reformat,
@@ -87,10 +89,10 @@ pub type ValidatedDatamodel = Validated<dml::Datamodel>;
 pub type ValidatedConfiguration = Validated<Configuration>;
 
 /// Parse and validate the whole schema
-pub fn parse_schema(schema_str: &str) -> Result<(Configuration, dml::Datamodel), String> {
-    parse_datamodel_internal(schema_str)
-        .map_err(|err| err.to_pretty_string("schema.prisma", schema_str))
-        .map(|v| v.subject)
+pub fn parse_schema(schema_str: impl Into<Cow<'static, str>>) -> Result<(Configuration, dml::Datamodel), String> {
+    let schema_str = schema_str.into();
+
+    parse_datamodel_internal(schema_str).map(|v| v.subject)
 }
 
 pub struct ValidatedSchema {
@@ -106,26 +108,28 @@ impl ValidatedSchema {
 }
 
 /// Parse and validate the whole schema.
-pub fn parse_schema_parserdb(src: &str) -> Result<ValidatedSchema, String> {
+pub fn parse_schema_parserdb(src: impl Into<Cow<'static, str>>) -> Result<ValidatedSchema, String> {
+    let src = src.into();
     let mut diagnostics = Diagnostics::new();
+
     diagnostics
         .to_result()
-        .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
+        .map_err(|err| err.to_pretty_string("schema.prisma", &src))?;
 
-    let ast = schema_ast::parser::parse_schema(src, &mut diagnostics);
+    let ast = schema_ast::parser::parse_schema(&src, &mut diagnostics);
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
     let datasources = load_sources(&ast, preview_features, &mut diagnostics);
 
     diagnostics
         .to_result()
-        .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
+        .map_err(|err| err.to_pretty_string("schema.prisma", &src))?;
 
-    let out = validate(ast, &datasources, preview_features, diagnostics);
+    let out = validate(src, ast, &datasources, preview_features, diagnostics);
 
     out.diagnostics
         .to_result()
-        .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
+        .map_err(|err| err.to_pretty_string("schema.prisma", out.db.source()))?;
 
     Ok(ValidatedSchema {
         configuration: Configuration {
@@ -138,7 +142,7 @@ pub fn parse_schema_parserdb(src: &str) -> Result<ValidatedSchema, String> {
 }
 
 /// Parses and validates a datamodel string, using core attributes only.
-pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
+pub fn parse_datamodel(datamodel_string: impl Into<Cow<'static, str>>) -> Result<ValidatedDatamodel, String> {
     parse_datamodel_internal(datamodel_string).map(|validated| Validated {
         subject: validated.subject.1,
         warnings: validated.warnings,
@@ -146,21 +150,24 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, dia
 }
 
 fn parse_datamodel_internal(
-    datamodel_string: &str,
-) -> Result<Validated<(Configuration, dml::Datamodel)>, diagnostics::Diagnostics> {
+    datamodel_string: impl Into<Cow<'static, str>>,
+) -> Result<Validated<(Configuration, dml::Datamodel)>, String> {
+    let datamodel_string = datamodel_string.into();
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let ast = schema_ast::parser::parse_schema(datamodel_string, &mut diagnostics);
+    let ast = schema_ast::parser::parse_schema(&datamodel_string, &mut diagnostics);
 
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
     let datasources = load_sources(&ast, preview_features, &mut diagnostics);
 
-    diagnostics.to_result()?;
+    diagnostics
+        .to_result()
+        .map_err(|e| e.to_pretty_string("schema.prisma", &datamodel_string))?;
 
-    let out = validate(ast, &datasources, preview_features, diagnostics);
+    let out = validate(datamodel_string, ast, &datasources, preview_features, diagnostics);
 
     if !out.diagnostics.errors().is_empty() {
-        return Err(out.diagnostics);
+        return Err(out.diagnostics.to_pretty_string("schema.prisma", out.db.source()));
     }
 
     let datamodel = transform::ast_to_dml::LiftAstToDml::new(&out.db, out.connector, out.referential_integrity).lift();
@@ -247,7 +254,7 @@ fn render_schema_ast(schema: &ast::SchemaAst, ident_width: usize) -> String {
     let mut out = String::with_capacity(schema.tops.len() * 20);
     let mut renderer = schema_ast::renderer::Renderer::new(&mut out, ident_width);
     renderer.render(schema);
-    reformat(&out, 2).expect("Internal error: failed to reformat introspected schema")
+    reformat(out, 2).expect("Internal error: failed to reformat introspected schema")
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {

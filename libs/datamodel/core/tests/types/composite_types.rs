@@ -505,7 +505,7 @@ fn composite_types_must_have_at_least_one_visible_field() {
         [1;94m   | [0m
     "#]];
 
-    let error = datamodel::parse_schema(&datamodel).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(datamodel).map(drop).unwrap_err();
 
     expected.assert_eq(&error);
 }
@@ -651,7 +651,7 @@ fn unsupported_should_work() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let (_, datamodel) = parse_schema(&dml).unwrap();
+    let (_, datamodel) = parse_schema(dml).unwrap();
 
     datamodel
         .assert_has_composite_type("A")
@@ -674,7 +674,7 @@ fn block_level_map_not_allowed() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: The name of a composite type is not persisted in the database, therefore it does not need a mapped database name.[0m
@@ -705,7 +705,7 @@ fn block_level_unique_not_allowed() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: A unique constraint should be defined in the model containing the embed.[0m
@@ -736,7 +736,7 @@ fn block_level_index_not_allowed() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: An index should be defined in the model containing the embed.[0m
@@ -767,7 +767,7 @@ fn block_level_fulltext_not_allowed() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: A fulltext index should be defined in the model containing the embed.[0m
@@ -798,7 +798,7 @@ fn block_level_id_not_allowed() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: A composite type cannot define an id.[0m
@@ -827,7 +827,7 @@ fn id_field_attribute_not_allowed() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: Defining `@id` attribute for a field in a composite type is not allowed.[0m
@@ -856,7 +856,7 @@ fn unique_field_attribute_not_allowed() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: Defining `@unique` attribute for a field in a composite type is not allowed.[0m
@@ -889,7 +889,7 @@ fn realation_field_attribute_not_allowed() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: Defining `@relation` attribute for a field in a composite type is not allowed.[0m

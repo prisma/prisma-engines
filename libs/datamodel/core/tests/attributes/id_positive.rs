@@ -174,7 +174,7 @@ fn unnamed_and_unmapped_multi_field_ids_must_work() {
         &[],
     );
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model.assert_has_id_fields(&["a", "b"]);
     user_model.assert_has_named_pk("Model_pkey");
@@ -192,7 +192,7 @@ fn unmapped_singular_id_must_work() {
         &[],
     );
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let model = datamodel.assert_has_model("Model");
     model.assert_has_id_fields(&["a"]);
     model.assert_has_named_pk("Model_pkey");
@@ -212,7 +212,7 @@ fn named_multi_field_ids_must_work() {
         &[],
     );
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model.assert_has_id_fields(&["a", "b"]);
     user_model.assert_has_named_pk("Model_pkey");
@@ -232,7 +232,7 @@ fn mapped_multi_field_ids_must_work() {
         &[],
     );
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model.assert_has_id_fields(&["a", "b"]);
     user_model.assert_has_named_pk("dbname");
@@ -254,7 +254,7 @@ fn mapped_singular_id_must_work() {
         &[],
     );
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let model = datamodel.assert_has_model("Model");
     model.assert_has_id_fields(&["a"]);
     model.assert_has_named_pk("test");
@@ -278,7 +278,7 @@ fn named_and_mapped_multi_field_ids_must_work() {
         &[],
     );
 
-    let datamodel = parse(&dml);
+    let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model.assert_has_id_fields(&["a", "b"]);
     user_model.assert_has_named_pk("dbname");
@@ -304,7 +304,7 @@ fn id_accepts_length_arg_on_mysql() {
         &[],
     );
 
-    let schema = parse(&dml);
+    let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     let blog_model = schema.assert_has_model("Blog");
 
@@ -365,7 +365,7 @@ fn id_accepts_sort_arg_on_sqlserver() {
         &[],
     );
 
-    let schema = parse(&dml);
+    let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     let blog_model = schema.assert_has_model("Blog");
 
@@ -414,7 +414,7 @@ fn mysql_allows_id_length_prefix() {
         }
     "#};
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -429,7 +429,7 @@ fn mysql_allows_compound_id_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -441,7 +441,7 @@ fn mssql_allows_id_sort_argument() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -456,7 +456,7 @@ fn mssql_allows_compound_id_sort_argument() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }
 
 #[test]
@@ -471,5 +471,5 @@ fn mongodb_compound_unique_can_have_id_as_part_of_it() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert!(datamodel::parse_schema(schema).is_ok());
 }

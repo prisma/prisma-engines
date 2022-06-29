@@ -235,7 +235,7 @@ fn allow_explicit_fk_name_definition() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
+    let schema = parse(with_header(dml, Provider::Postgres, &[]));
 
     schema
         .assert_has_model("User")
@@ -264,7 +264,7 @@ fn allow_implicit_fk_name_definition() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
+    let schema = parse(with_header(dml, Provider::Postgres, &[]));
 
     schema
         .assert_has_model("User")
@@ -296,7 +296,7 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
+    let schema = parse(with_header(dml, Provider::Postgres, &[]));
 
     schema
         .assert_has_model("User")
@@ -329,7 +329,7 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields_other_order() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
+    let schema = parse(with_header(dml, Provider::Postgres, &[]));
 
     schema
         .assert_has_model("User")
@@ -362,7 +362,7 @@ fn implicit_unique_constraint_on_one_to_one() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
+    let schema = parse(with_header(dml, Provider::Postgres, &[]));
 
     schema
         .assert_has_model("User")
@@ -407,7 +407,7 @@ fn implicit_unique_constraint_on_compound_one_to_one() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
+    let schema = parse(with_header(dml, Provider::Postgres, &[]));
 
     schema
         .assert_has_model("User")
@@ -448,7 +448,7 @@ fn no_unique_constraint_if_referring_the_pk() {
         }
     "#};
 
-    let dml = render_datamodel_to_string(&parse(&with_header(dml, Provider::Postgres, &[])), None);
+    let dml = render_datamodel_to_string(&parse(with_header(dml, Provider::Postgres, &[])), None);
 
     let expected = expect![[r#"
         model Cat {
@@ -501,7 +501,7 @@ fn embedded_many_to_many_relations_work_on_mongodb() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Mongo, &[]));
+    let schema = parse(with_header(dml, Provider::Mongo, &[]));
 
     schema
         .assert_has_model("A")
@@ -530,7 +530,7 @@ fn implicit_many_to_many_relations_work_on_postgresql() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
+    let schema = parse(with_header(dml, Provider::Postgres, &[]));
     schema.assert_has_model("A").assert_has_relation_field("bs");
     schema.assert_has_model("B").assert_has_relation_field("as");
 }
@@ -549,7 +549,7 @@ fn implicit_many_to_many_relations_work_on_mysql() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Mysql, &[]));
+    let schema = parse(with_header(dml, Provider::Mysql, &[]));
     schema.assert_has_model("A").assert_has_relation_field("bs");
     schema.assert_has_model("B").assert_has_relation_field("as");
 }
@@ -568,7 +568,7 @@ fn implicit_many_to_many_relations_work_on_sql_server() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::SqlServer, &[]));
+    let schema = parse(with_header(dml, Provider::SqlServer, &[]));
     schema.assert_has_model("A").assert_has_relation_field("bs");
     schema.assert_has_model("B").assert_has_relation_field("as");
 }
@@ -587,7 +587,7 @@ fn implicit_many_to_many_relations_work_on_sqlite() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Sqlite, &[]));
+    let schema = parse(with_header(dml, Provider::Sqlite, &[]));
     schema.assert_has_model("A").assert_has_relation_field("bs");
     schema.assert_has_model("B").assert_has_relation_field("as");
 }
@@ -606,7 +606,7 @@ fn implicit_many_to_many_relations_work_on_cockroach() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Cockroach, &["cockroachDb"]));
+    let schema = parse(with_header(dml, Provider::Cockroach, &["cockroachDb"]));
     schema.assert_has_model("A").assert_has_relation_field("bs");
     schema.assert_has_model("B").assert_has_relation_field("as");
 }

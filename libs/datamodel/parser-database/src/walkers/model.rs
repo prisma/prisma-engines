@@ -272,4 +272,9 @@ impl<'db> ModelWalker<'db> {
         self.inline_relations_from()
             .filter_map(|relation| relation.as_complete())
     }
+
+    /// How the model block is indented.
+    pub fn indentation_type(self) -> ast::IndentationType {
+        Default::default()
+    }
 }

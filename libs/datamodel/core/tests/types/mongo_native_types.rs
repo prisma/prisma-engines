@@ -14,7 +14,7 @@ fn valid_json_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let (_, datamodel) = datamodel::parse_schema(&schema).unwrap();
+    let (_, datamodel) = datamodel::parse_schema(schema).unwrap();
 
     let model = datamodel.assert_has_model("A");
 
@@ -34,7 +34,7 @@ fn valid_object_id_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let (_, datamodel) = datamodel::parse_schema(&schema).unwrap();
+    let (_, datamodel) = datamodel::parse_schema(schema).unwrap();
 
     let model = datamodel.assert_has_model("A");
 
@@ -58,7 +58,7 @@ fn valid_long_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let (_, datamodel) = datamodel::parse_schema(&schema).unwrap();
+    let (_, datamodel) = datamodel::parse_schema(schema).unwrap();
 
     let model = datamodel.assert_has_model("A");
 
@@ -85,7 +85,7 @@ fn invalid_string_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type String is not compatible with declared field type Int, expected field type String.[0m
@@ -141,7 +141,7 @@ fn invalid_string_usage_in_type() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type String is not compatible with declared field type Int, expected field type String.[0m
@@ -194,7 +194,7 @@ fn invalid_double_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Double is not compatible with declared field type Int, expected field type Float.[0m
@@ -257,7 +257,7 @@ fn invalid_double_usage_in_type() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Double is not compatible with declared field type Int, expected field type Float.[0m
@@ -315,7 +315,7 @@ fn invalid_long_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Long is not compatible with declared field type Float, expected field type Int or BigInt.[0m
@@ -371,7 +371,7 @@ fn invalid_long_usage_in_type() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Long is not compatible with declared field type Float, expected field type Int or BigInt.[0m
@@ -424,7 +424,7 @@ fn invalid_int_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Int is not compatible with declared field type BigInt, expected field type Int.[0m
@@ -487,7 +487,7 @@ fn invalid_int_usage_in_type() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Int is not compatible with declared field type BigInt, expected field type Int.[0m
@@ -546,7 +546,7 @@ fn invalid_bindata_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type BinData is not compatible with declared field type BigInt, expected field type Bytes.[0m
@@ -609,7 +609,7 @@ fn invalid_bindata_usage_in_type() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type BinData is not compatible with declared field type BigInt, expected field type Bytes.[0m
@@ -667,7 +667,7 @@ fn invalid_object_id_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type ObjectID is not supported for mongodb connector.[0m
@@ -723,7 +723,7 @@ fn invalid_object_id_usage_in_type() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type ObjectId is not compatible with declared field type BigInt, expected field type String or Bytes.[0m
@@ -776,7 +776,7 @@ fn invalid_bool_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Bool is not compatible with declared field type BigInt, expected field type Boolean.[0m
@@ -839,7 +839,7 @@ fn invalid_bool_usage_in_type() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Bool is not compatible with declared field type BigInt, expected field type Boolean.[0m
@@ -898,7 +898,7 @@ fn invalid_date_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Date is not compatible with declared field type BigInt, expected field type DateTime.[0m
@@ -961,7 +961,7 @@ fn invalid_date_usage_in_type() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Date is not compatible with declared field type BigInt, expected field type DateTime.[0m
@@ -1020,7 +1020,7 @@ fn invalid_timestamp_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Timestamp is not compatible with declared field type BigInt, expected field type DateTime.[0m
@@ -1083,7 +1083,7 @@ fn invalid_timestamp_usage_in_type() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Timestamp is not compatible with declared field type BigInt, expected field type DateTime.[0m
@@ -1142,7 +1142,7 @@ fn invalid_json_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Json is not compatible with declared field type Int, expected field type Json.[0m
@@ -1212,7 +1212,7 @@ fn invalid_json_usage_in_type() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mNative type Json is not compatible with declared field type Int, expected field type Json.[0m

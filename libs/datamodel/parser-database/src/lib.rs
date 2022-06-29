@@ -35,6 +35,8 @@ mod relations;
 mod types;
 mod value_validator;
 
+use std::borrow::Cow;
+
 pub use names::is_reserved_type_name;
 pub use relations::ReferentialAction;
 pub use schema_ast::ast;
@@ -65,6 +67,7 @@ use names::Names;
 /// - Global validations are then performed on the mostly validated schema.
 ///   Currently only index name collisions.
 pub struct ParserDatabase {
+    src: Cow<'static, str>,
     ast: ast::SchemaAst,
     interner: interner::StringInterner,
     _names: Names,
@@ -74,7 +77,9 @@ pub struct ParserDatabase {
 
 impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(ast: ast::SchemaAst, diagnostics: &mut Diagnostics) -> Self {
+    pub fn new(src: impl Into<Cow<'static, str>>, ast: ast::SchemaAst, diagnostics: &mut Diagnostics) -> Self {
+        let src = src.into();
+
         let mut interner = Default::default();
         let mut names = Default::default();
         let mut types = Default::default();
@@ -87,6 +92,7 @@ impl ParserDatabase {
         // Return early on name resolution errors.
         if ctx.diagnostics.has_errors() {
             return ParserDatabase {
+                src,
                 ast,
                 interner,
                 _names: names,
@@ -101,6 +107,7 @@ impl ParserDatabase {
         // Return early on type resolution errors.
         if ctx.diagnostics.has_errors() {
             return ParserDatabase {
+                src,
                 ast,
                 interner,
                 _names: names,
@@ -118,6 +125,7 @@ impl ParserDatabase {
         relations::infer_relations(&mut ctx);
 
         ParserDatabase {
+            src,
             ast,
             interner,
             _names: names,
@@ -134,6 +142,16 @@ impl ParserDatabase {
     /// The total number of models.
     pub fn models_count(&self) -> usize {
         self.types.model_attributes.len()
+    }
+
+    /// The Prisma Schema Language input string.
+    pub fn source(&self) -> &str {
+        &self.src
+    }
+
+    /// Take the PSL input string out from the database.
+    pub fn into_source(self) -> Cow<'static, str> {
+        self.src
     }
 }
 

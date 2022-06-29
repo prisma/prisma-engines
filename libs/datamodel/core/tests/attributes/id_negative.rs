@@ -224,7 +224,7 @@ fn invalid_name_for_compound_id_must_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The `name` property within the `@@id` attribute only allows for the following characters: `_a-zA-Z0-9`.[0m
@@ -348,7 +348,7 @@ fn naming_id_to_a_field_name_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The custom name `used` specified for the `@@id` attribute is already used as a name for a field. Please choose a different name.[0m
@@ -388,7 +388,7 @@ fn mapping_id_with_a_name_that_is_too_long_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@@id` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
@@ -420,7 +420,7 @@ fn name_on_field_level_id_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNo such argument.[0m
@@ -514,7 +514,7 @@ fn mysql_does_not_allow_id_sort_argument() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
@@ -540,7 +540,7 @@ fn mysql_does_not_allow_compound_id_sort_argument() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@id": The sort argument is not supported in the primary key with the current connector[0m
@@ -563,7 +563,7 @@ fn postgresql_does_not_allow_id_sort_argument() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
@@ -589,7 +589,7 @@ fn postgresql_does_not_allow_compound_id_sort_argument() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@id": The sort argument is not supported in the primary key with the current connector[0m
@@ -612,7 +612,7 @@ fn sqlite_does_not_allow_id_sort_argument() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
@@ -635,7 +635,7 @@ fn mongodb_does_not_allow_id_sort_argument() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
@@ -661,7 +661,7 @@ fn sqlite_does_not_allow_compound_id_sort_argument() {
     "#};
 
     let schema = with_header(dml, Provider::Sqlite, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@id": The sort argument is not supported in the primary key with the current connector[0m
@@ -684,7 +684,7 @@ fn postgresql_does_not_allow_id_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
@@ -710,7 +710,7 @@ fn postgresql_does_not_allow_compound_id_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@id": The length argument is not supported in the primary key with the current connector[0m
@@ -733,7 +733,7 @@ fn sqlserver_does_not_allow_id_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
@@ -759,7 +759,7 @@ fn sqlserver_does_not_allow_compound_id_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@id": The length argument is not supported in the primary key with the current connector[0m
@@ -782,7 +782,7 @@ fn sqlite_does_not_allow_id_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::Sqlite, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
@@ -805,7 +805,7 @@ fn mongodb_does_not_allow_id_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
@@ -831,7 +831,7 @@ fn sqlite_does_not_allow_compound_id_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::Sqlite, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@id": The length argument is not supported in the primary key with the current connector[0m
@@ -854,7 +854,7 @@ fn length_argument_does_not_work_with_decimal() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -877,7 +877,7 @@ fn length_argument_does_not_work_with_json() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -900,7 +900,7 @@ fn length_argument_does_not_work_with_datetime() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -923,7 +923,7 @@ fn length_argument_does_not_work_with_boolean() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -946,7 +946,7 @@ fn length_argument_does_not_work_with_float() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -969,7 +969,7 @@ fn length_argument_does_not_work_with_bigint() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -992,7 +992,7 @@ fn length_argument_does_not_work_with_int() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -1049,7 +1049,7 @@ fn mongodb_must_be_id_if_using_auto() {
     "#};
 
     let dml = with_header(schema, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `id` in model `A`: MongoDB `@default(auto())` fields must have the `@id` attribute.[0m
@@ -1076,7 +1076,7 @@ fn compound_ids_are_not_allowed_on_mongo() {
     "#};
 
     let dml = with_header(schema, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "A": The current connector does not support compound ids.[0m
@@ -1099,7 +1099,7 @@ fn mongodb_no_unique_index_for_id() {
     "#};
 
     let dml = with_header(schema, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@unique": The same field cannot be an id and unique on MongoDB.[0m
@@ -1124,7 +1124,7 @@ fn mongodb_no_unique_index_for_id_model_attribute() {
     "#};
 
     let dml = with_header(schema, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@unique": The same field cannot be an id and unique on MongoDB.[0m

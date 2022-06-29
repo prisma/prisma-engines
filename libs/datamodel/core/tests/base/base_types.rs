@@ -180,7 +180,7 @@ fn json_type_must_work_for_some_connectors() {
         .assert_has_scalar_field("json")
         .assert_base_type(&ScalarType::Json);
 
-    let error = datamodel::parse_schema(&format!("{}\n{}", SQLITE_SOURCE, dml))
+    let error = datamodel::parse_schema(format!("{}\n{}", SQLITE_SOURCE, dml))
         .map(drop)
         .unwrap_err();
 
@@ -197,13 +197,13 @@ fn json_type_must_work_for_some_connectors() {
     expectation.assert_eq(&error);
 
     // Postgres does support it
-    parse(&format!("{}\n{}", POSTGRES_SOURCE, dml))
+    parse(format!("{}\n{}", POSTGRES_SOURCE, dml))
         .assert_has_model("User")
         .assert_has_scalar_field("json")
         .assert_base_type(&ScalarType::Json);
 
     // MySQL does support it
-    parse(&format!("{}\n{}", MYSQL_SOURCE, dml))
+    parse(format!("{}\n{}", MYSQL_SOURCE, dml))
         .assert_has_model("User")
         .assert_has_scalar_field("json")
         .assert_base_type(&ScalarType::Json);
@@ -249,7 +249,7 @@ fn json_list_type_must_work_for_some_connectors() {
 
     let schema = with_header(dml, Provider::Cockroach, &["cockroachdb"]);
 
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating field `json_list` in model `User`: Field `json_list` in model `User` can't be of type Json[]. The current connector does not support the Json List type.[0m
@@ -265,7 +265,7 @@ fn json_list_type_must_work_for_some_connectors() {
 
     let schema = with_header(dml, Provider::Postgres, &[]);
     // Postgres does support it
-    parse(&schema)
+    parse(schema)
         .assert_has_model("User")
         .assert_has_scalar_field("json_list")
         .assert_base_type(&ScalarType::Json);

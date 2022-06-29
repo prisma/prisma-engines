@@ -12,7 +12,7 @@ fn on_mysql() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
@@ -38,7 +38,7 @@ fn with_raw_unsupported() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
 
     let mut field = IndexField::new_in_model("a");
     field.operator_class = Some(OperatorClass::raw("poly_ops"));
@@ -66,7 +66,7 @@ fn with_unsupported_no_ops() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
 
     let field = IndexField::new_in_model("a");
 
@@ -94,7 +94,7 @@ fn only_single_column_allowed() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": SpGist does not support multi-column indices.[0m
@@ -122,7 +122,7 @@ fn no_ops_inet_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
 
     let field = IndexField::new_in_model("a");
 
@@ -149,7 +149,7 @@ fn inet_type_inet_ops() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
 
     let mut field = IndexField::new_in_model("a");
     field.operator_class = Some(OperatorClass::InetOps);
@@ -177,7 +177,7 @@ fn inet_ops_with_wrong_prisma_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetOps` expects the field `a` to define a valid native type.[0m
@@ -203,7 +203,7 @@ fn inet_ops_with_wrong_index_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetOps` is not supported with the `Gin` index type.[0m
@@ -231,7 +231,7 @@ fn no_ops_char_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
 
     let field = IndexField::new_in_model("a");
 
@@ -258,7 +258,7 @@ fn no_ops_varchar_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
 
     let field = IndexField::new_in_model("a");
 
@@ -285,7 +285,7 @@ fn no_ops_text_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
 
     let field = IndexField::new_in_model("a");
 
@@ -312,7 +312,7 @@ fn text_type_text_ops() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
 
     let mut field = IndexField::new_in_model("a");
     field.operator_class = Some(OperatorClass::TextOps);
@@ -340,7 +340,7 @@ fn no_native_type_text_ops() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
+    let schema = parse(schema);
 
     let mut field = IndexField::new_in_model("a");
     field.operator_class = Some(OperatorClass::TextOps);
@@ -368,7 +368,7 @@ fn text_ops_with_wrong_prisma_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TextOps` points to the field `a` that is not of String type.[0m
@@ -394,7 +394,7 @@ fn no_ops_weird_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The SpGist index type does not support the type of the field `a`.[0m
@@ -420,7 +420,7 @@ fn text_ops_with_wrong_index_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TextOps` is not supported with the `Gist` index type.[0m

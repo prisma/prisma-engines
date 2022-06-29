@@ -67,5 +67,5 @@ fn empty_arguments_in_index_fields() {
 
     let input = with_header(input, Provider::Postgres, &[]);
 
-    expected.assert_eq(&datamodel::parse_schema(&input).map(drop).unwrap_err());
+    expected.assert_eq(&datamodel::parse_schema(input).map(drop).unwrap_err());
 }

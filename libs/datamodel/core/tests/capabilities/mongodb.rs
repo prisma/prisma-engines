@@ -13,7 +13,7 @@ fn mongodb_supports_composite_types() {
     "#;
 
     let dml = with_header(schema, Provider::Mongo, &[]);
-    assert!(parse_schema(&dml).is_ok());
+    assert!(parse_schema(dml).is_ok());
 }
 
 #[test]
@@ -25,7 +25,7 @@ fn mongodb_does_not_support_autoincrement() {
     "#};
 
     let dml = with_header(schema, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used with a datasource that does not support it.[0m

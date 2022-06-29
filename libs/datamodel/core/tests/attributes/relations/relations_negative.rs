@@ -777,7 +777,7 @@ fn mapping_foreign_keys_with_a_name_that_is_too_long_should_error() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -1040,7 +1040,7 @@ fn should_fail_if_not_using_unique_constraint_with_single_one_to_many() {
 
     let dml = with_header(dml, Provider::Mysql, &[]);
 
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
