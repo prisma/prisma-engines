@@ -268,7 +268,7 @@
         }
     };
 
-    <span class="ident">datamodel::reformat</span>(<span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">options</span>.<span class="ident">tab_size</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">to_owned</span>())
+    <span class="ident">datamodel::reformat</span>(<span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">options</span>.<span class="ident">tab_size</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">schema</span>.<span class="ident">to_owned</span>())
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lint</span>(<span class="ident">schema</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
