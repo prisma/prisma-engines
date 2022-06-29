@@ -1,10 +1,11 @@
 //! SQLite description.
+
 use crate::{
-    common::purge_dangling_foreign_keys, getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType,
-    ColumnTypeFamily, DefaultValue, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType, Lazy,
-    PrimaryKey, PrimaryKeyColumn, PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend,
-    Table, View,
+    getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
+    DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType, Lazy, PrimaryKey, PrimaryKeyColumn,
+    PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend, Table, View,
 };
+use indexmap::IndexMap;
 use quaint::{ast::Value, prelude::Queryable};
 use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug, path::Path};
 use tracing::trace;
@@ -25,8 +26,9 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         Ok(self.get_databases().await?)
     }
 
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let table_count = self.get_table_names(schema).await?.len();
+    async fn get_metadata(&self, _schema: &str) -> DescriberResult<SqlMetadata> {
+        let mut sql_schema = SqlSchema::default();
+        let table_count = self.get_table_names(&mut sql_schema).await?.len();
         let size_in_bytes = self.get_size().await?;
 
         Ok(SqlMetadata {
@@ -35,43 +37,43 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         })
     }
 
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
-        let table_names: Vec<String> = self.get_table_names(schema).await?;
+    async fn describe(&self, _schema: &str) -> DescriberResult<SqlSchema> {
+        let mut schema = SqlSchema::default();
+        let table_ids = self.get_table_names(&mut schema).await?;
 
-        let mut tables = Vec::with_capacity(table_names.len());
-
-        for table_name in table_names.iter().filter(|table| !is_system_table(table)) {
-            tables.push(self.get_table(schema, table_name).await?)
+        for (table_name, table_id) in &table_ids {
+            self.get_table(table_name, *table_id, &table_ids, &mut schema).await?
         }
 
-        // Since referential integrity is optional on SQLite, we remove foreign keys
-        // not pointing to an existing table ex post.
-        purge_dangling_foreign_keys(&mut tables);
+        // SQLite allows foreign key definitions without specifying the referenced columns, it then
+        // assumes the pk is used.
+        let foreign_keys_without_referenced_columns: Vec<(ForeignKeyId, Vec<String>)> = schema
+            .walk_foreign_keys()
+            .filter(|fk| fk.referenced_columns_count() == 0)
+            .map(|fk| {
+                (
+                    fk.id,
+                    fk.referenced_table()
+                        .primary_key()
+                        .unwrap()
+                        .column_names()
+                        .map(|name| name.to_owned())
+                        .collect(),
+                )
+            })
+            .collect();
 
-        // SQLite allows foreign key definitions without specifying the referenced columns, it then assumes the pk is used.
-        let mut foreign_keys_without_referenced_columns = vec![];
-        for (table_index, table) in tables.iter().enumerate() {
-            for (fk_index, foreign_key) in table.foreign_keys.iter().enumerate() {
-                if foreign_key.referenced_columns.is_empty() {
-                    let referenced_table = tables.iter().find(|t| t.name == foreign_key.referenced_table).unwrap();
-                    let referenced_pk = referenced_table.primary_key.as_ref().unwrap();
-                    foreign_keys_without_referenced_columns.push((table_index, fk_index, referenced_pk.columns.clone()))
-                }
-            }
+        for (foreign_key_id, columns) in foreign_keys_without_referenced_columns {
+            schema[foreign_key_id].1.referenced_columns = columns;
         }
 
-        for (table_index, fk_index, columns) in foreign_keys_without_referenced_columns {
-            tables[table_index].foreign_keys[fk_index].referenced_columns =
-                columns.into_iter().map(|c| c.name).collect()
-        }
+        schema.views = self.get_views().await?;
 
-        let views = self.get_views().await?;
+        schema
+            .foreign_keys
+            .sort_by_cached_key(|(id, fk)| (*id, fk.columns.to_owned()));
 
-        Ok(SqlSchema {
-            tables,
-            views,
-            ..Default::default()
-        })
+        Ok(schema)
     }
 
     async fn version(&self, _schema: &str) -> DescriberResult<Option<String>> {
@@ -109,21 +111,25 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(names)
     }
 
-    async fn get_table_names(&self, _schema: &str) -> DescriberResult<Vec<String>> {
+    async fn get_table_names(&self, schema: &mut SqlSchema) -> DescriberResult<IndexMap<String, TableId>> {
         let sql = r#"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name ASC"#;
-        trace!("describing table names with query: '{}'", sql);
 
         let result_set = self.conn.query_raw(sql, &[]).await?;
 
         let names = result_set
             .into_iter()
             .map(|row| row.get("name").and_then(|x| x.to_string()).unwrap())
-            .filter(|n| n != "sqlite_sequence")
-            .collect();
+            .filter(|table_name| !is_system_table(table_name));
 
-        trace!("Found table names: {:?}", names);
+        let mut map = IndexMap::default();
 
-        Ok(names)
+        for name in names {
+            let cloned_name = name.clone();
+            let id = schema.push_table(name);
+            map.insert(cloned_name, id);
+        }
+
+        Ok(map)
     }
 
     async fn get_size(&self) -> DescriberResult<usize> {
@@ -137,18 +143,29 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(size.try_into().unwrap())
     }
 
-    async fn get_table(&self, _schema: &str, name: &str) -> DescriberResult<Table> {
-        let (columns, primary_key) = self.get_columns(name).await?;
-        let foreign_keys = self.get_foreign_keys(name).await?;
+    async fn get_table(
+        &self,
+        name: &str,
+        table_id: TableId,
+        table_ids: &IndexMap<String, TableId>,
+        schema: &mut SqlSchema,
+    ) -> DescriberResult<()> {
+        let (table_columns, primary_key) = self.get_columns(name).await?;
         let indices = self.get_indices(name).await?;
 
-        Ok(Table {
-            name: name.to_string(),
-            columns,
+        schema[table_id] = Table {
+            name: name.to_owned(),
             indices,
             primary_key,
-            foreign_keys,
-        })
+        };
+
+        for col in table_columns {
+            schema.columns.push((table_id, col));
+        }
+
+        self.push_foreign_keys(name, table_id, table_ids, schema).await?;
+
+        Ok(())
     }
 
     async fn get_views(&self) -> DescriberResult<Vec<View>> {
@@ -303,16 +320,22 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok((cols, primary_key))
     }
 
-    async fn get_foreign_keys(&self, table: &str) -> DescriberResult<Vec<ForeignKey>> {
+    async fn push_foreign_keys(
+        &self,
+        table_name: &str,
+        table_id: TableId,
+        table_ids: &IndexMap<String, TableId>,
+        schema: &mut SqlSchema,
+    ) -> DescriberResult<()> {
         struct IntermediateForeignKey {
             pub columns: BTreeMap<i64, String>,
-            pub referenced_table: String,
+            pub referenced_table: TableId,
             pub referenced_columns: BTreeMap<i64, String>,
             pub on_delete_action: ForeignKeyAction,
             pub on_update_action: ForeignKeyAction,
         }
 
-        let sql = format!(r#"PRAGMA foreign_key_list("{}");"#, table);
+        let sql = format!(r#"PRAGMA foreign_key_list("{}");"#, table_name);
         trace!("describing table foreign keys, SQL: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for foreign keys");
 
@@ -328,6 +351,11 @@ impl<'a> SqlSchemaDescriber<'a> {
             // this can be null if the primary key and shortened fk syntax was used
             let referenced_column = row.get("to").and_then(|x| x.to_string());
             let referenced_table = row.get("table").and_then(|x| x.to_string()).expect("table");
+            let referenced_table_id = if let Some(id) = table_ids.get(&referenced_table) {
+                *id
+            } else {
+                continue;
+            };
             match intermediate_fks.get_mut(&id) {
                 Some(fk) => {
                     fk.columns.insert(seq, column);
@@ -373,7 +401,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                     };
                     let fk = IntermediateForeignKey {
                         columns,
-                        referenced_table,
+                        referenced_table: referenced_table_id,
                         referenced_columns,
                         on_delete_action,
                         on_update_action,
@@ -383,46 +411,38 @@ impl<'a> SqlSchemaDescriber<'a> {
             };
         }
 
-        let mut fks: Vec<ForeignKey> = intermediate_fks
-            .values()
-            .map(|intermediate_fk| {
-                let mut column_keys: Vec<&i64> = intermediate_fk.columns.keys().collect();
-                column_keys.sort();
-                let mut columns: Vec<String> = vec![];
-                columns.reserve(column_keys.len());
-                for i in column_keys {
-                    columns.push(intermediate_fk.columns[i].to_owned());
-                }
+        for (_, intermediate_fk) in intermediate_fks {
+            let mut column_keys: Vec<&i64> = intermediate_fk.columns.keys().collect();
+            column_keys.sort();
+            let mut columns: Vec<String> = vec![];
+            columns.reserve(column_keys.len());
+            for i in column_keys {
+                columns.push(intermediate_fk.columns[i].to_owned());
+            }
 
-                let mut referenced_column_keys: Vec<&i64> = intermediate_fk.referenced_columns.keys().collect();
-                referenced_column_keys.sort();
-                let mut referenced_columns: Vec<String> = vec![];
-                referenced_columns.reserve(referenced_column_keys.len());
-                for i in referenced_column_keys {
-                    referenced_columns.push(intermediate_fk.referenced_columns[i].to_owned());
-                }
+            let mut referenced_column_keys: Vec<&i64> = intermediate_fk.referenced_columns.keys().collect();
+            referenced_column_keys.sort();
+            let mut referenced_columns: Vec<String> = vec![];
+            referenced_columns.reserve(referenced_column_keys.len());
+            for i in referenced_column_keys {
+                referenced_columns.push(intermediate_fk.referenced_columns[i].clone());
+            }
 
-                let fk = ForeignKey {
-                    columns,
-                    referenced_table: intermediate_fk.referenced_table.to_owned(),
-                    referenced_columns,
-                    on_delete_action: intermediate_fk.on_delete_action.to_owned(),
-                    on_update_action: intermediate_fk.on_update_action.to_owned(),
+            let fk = ForeignKey {
+                columns,
+                referenced_table: intermediate_fk.referenced_table,
+                referenced_columns,
+                on_delete_action: intermediate_fk.on_delete_action,
+                on_update_action: intermediate_fk.on_update_action,
 
-                    // Not relevant in SQLite since we cannot ALTER or DROP foreign keys by
-                    // constraint name.
-                    constraint_name: None,
-                };
+                // Not relevant in SQLite since we cannot ALTER or DROP foreign keys by
+                // constraint name.
+                constraint_name: None,
+            };
+            schema.foreign_keys.push((table_id, fk));
+        }
 
-                trace!("Detected foreign key {:?}", fk);
-
-                fk
-            })
-            .collect();
-
-        fks.sort_unstable_by_key(|fk| fk.columns.clone());
-
-        Ok(fks)
+        Ok(())
     }
 
     async fn get_indices(&self, table: &str) -> DescriberResult<Vec<Index>> {

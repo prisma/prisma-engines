@@ -59,7 +59,7 @@ where
     }
 }
 
-pub(crate) fn render_nullability(column: &ColumnWalker<'_>) -> &'static str {
+pub(crate) fn render_nullability(column: ColumnWalker<'_>) -> &'static str {
     if column.arity().is_required() {
         " NOT NULL"
     } else {

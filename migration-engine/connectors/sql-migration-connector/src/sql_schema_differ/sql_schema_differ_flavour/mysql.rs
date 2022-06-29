@@ -69,7 +69,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         None
     }
 
-    fn index_should_be_renamed(&self, indexes: &Pair<IndexWalker<'_>>) -> bool {
+    fn index_should_be_renamed(&self, indexes: Pair<IndexWalker<'_>>) -> bool {
         // Implements correct comparison for truncated index names.
         let (previous_name, next_name) = indexes.as_ref().map(|idx| idx.name()).into_tuple();
 
@@ -94,9 +94,9 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
 
     fn table_names_match(&self, names: Pair<&str>) -> bool {
         if self.lower_cases_table_names() {
-            names.previous().eq_ignore_ascii_case(names.next())
+            names.previous.eq_ignore_ascii_case(names.next)
         } else {
-            names.previous() == names.next()
+            names.previous == names.next
         }
     }
 }
@@ -114,9 +114,9 @@ fn safe() -> ColumnTypeChange {
 }
 
 fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
-    let next = types.next();
+    let next = &types.next;
 
-    Some(match types.previous() {
+    Some(match &types.previous {
         MySqlType::BigInt => match next {
             MySqlType::BigInt => return None,
 

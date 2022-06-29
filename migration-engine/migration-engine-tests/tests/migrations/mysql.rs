@@ -495,3 +495,111 @@ fn dropping_m2m_relation_from_datamodel_works() {
     "#]];
     expected.assert_eq(&diff);
 }
+
+#[cfg_attr(not(target_os = "windows"), test_connector(tags(Mysql), exclude(Vitess)))]
+fn alter_constraint_name(mut api: TestApi) {
+    let plain_dm = api.datamodel_with_provider(
+        r#"
+         model A {
+           id   Int    @id
+           name String @unique
+           a    String
+           b    String
+           B    B[]    @relation("AtoB")
+           @@unique([a, b])
+           @@index([a])
+         }
+         model B {
+           a   String
+           b   String
+           aId Int
+           A   A      @relation("AtoB", fields: [aId], references: [id])
+           @@index([a,b])
+           @@id([a, b])
+         }
+     "#,
+    );
+
+    let dir = api.create_migrations_directory();
+    api.create_migration("plain", &plain_dm, &dir).send_sync();
+
+    let custom_dm = api.datamodel_with_provider(
+        r#"
+         model A {
+           id   Int    @id
+           name String @unique(map: "CustomUnique")
+           a    String
+           b    String
+           B    B[]    @relation("AtoB")
+           @@unique([a, b], name: "compound", map:"CustomCompoundUnique")
+           @@index([a], map: "CustomIndex")
+         }
+
+         model B {
+           a   String
+           b   String
+           aId Int
+           A   A      @relation("AtoB", map: "CustomFK", fields: [aId], references: [id])
+           @@index([a,b], map: "AnotherCustomIndex")
+           @@id([a, b])
+         }
+     "#,
+    );
+
+    let is_mysql_5_6 = api.is_mysql_5_6();
+    let is_mariadb = api.is_mariadb();
+
+    api.create_migration("custom", &custom_dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(2)
+        .assert_migration("custom",move |migration| {
+            let expected_script = if is_mysql_5_6 || is_mariadb {
+                expect![[
+                     r#"
+                 -- DropForeignKey
+                 ALTER TABLE `B` DROP FOREIGN KEY `B_aId_fkey`;
+
+                 -- AddForeignKey
+                 ALTER TABLE `B` ADD CONSTRAINT `CustomFK` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+                 -- RedefineIndex
+                 CREATE UNIQUE INDEX `CustomCompoundUnique` ON `A`(`a`, `b`);
+                 DROP INDEX `A_a_b_key` ON `A`;
+
+                 -- RedefineIndex
+                 CREATE INDEX `CustomIndex` ON `A`(`a`);
+                 DROP INDEX `A_a_idx` ON `A`;
+
+                 -- RedefineIndex
+                 CREATE UNIQUE INDEX `CustomUnique` ON `A`(`name`);
+                 DROP INDEX `A_name_key` ON `A`;
+
+                 -- RedefineIndex
+                 CREATE INDEX `AnotherCustomIndex` ON `B`(`a`, `b`);
+                 DROP INDEX `B_a_b_idx` ON `B`;
+                 "#]]
+            } else {
+                expect![[r#"
+                 -- DropForeignKey
+                 ALTER TABLE `B` DROP FOREIGN KEY `B_aId_fkey`;
+
+                 -- AddForeignKey
+                 ALTER TABLE `B` ADD CONSTRAINT `CustomFK` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+                 -- RenameIndex
+                 ALTER TABLE `A` RENAME INDEX `A_a_b_key` TO `CustomCompoundUnique`;
+
+                 -- RenameIndex
+                 ALTER TABLE `A` RENAME INDEX `A_a_idx` TO `CustomIndex`;
+
+                 -- RenameIndex
+                 ALTER TABLE `A` RENAME INDEX `A_name_key` TO `CustomUnique`;
+
+                 -- RenameIndex
+                 ALTER TABLE `B` RENAME INDEX `B_a_b_idx` TO `AnotherCustomIndex`;
+                 "#]]
+            };
+
+            migration.expect_contents(expected_script)
+        });
+}

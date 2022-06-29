@@ -1,7 +1,7 @@
 pub use expect_test::expect;
 pub use quaint::{prelude::Queryable, single::Quaint};
 pub use test_macros::test_connector;
-pub use test_setup::{BitFlags, Capabilities, Tags};
+pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
 
 use barrel::Migration;
 use quaint::prelude::SqlFamily;
@@ -17,20 +17,18 @@ pub struct TestApi {
     db_name: &'static str,
     database: Quaint,
     tags: BitFlags<Tags>,
-    rt: tokio::runtime::Runtime,
 }
 
 impl TestApi {
     pub(crate) fn new(args: TestApiArgs) -> Self {
-        let rt = test_setup::runtime::test_tokio_runtime();
         let tags = args.tags();
         let (db_name, conn) = if tags.contains(Tags::Mysql) {
-            let (db_name, cs) = rt.block_on(args.create_mysql_database());
-            (db_name, rt.block_on(Quaint::new(&cs)).unwrap())
+            let (db_name, cs) = tok(args.create_mysql_database());
+            (db_name, tok(Quaint::new(&cs)).unwrap())
         } else if tags.contains(Tags::Postgres) {
-            let (db_name, q, _) = rt.block_on(args.create_postgres_database());
+            let (db_name, q, _) = tok(args.create_postgres_database());
             if tags.contains(Tags::CockroachDb) {
-                rt.block_on(q.raw_cmd(
+                tok(q.raw_cmd(
                     r#"
                     SET default_int_size = 4;
                     SET serial_normalization = 'sql_sequence';
@@ -40,11 +38,10 @@ impl TestApi {
             }
             (db_name, q)
         } else if tags.contains(Tags::Mssql) {
-            let (q, _cs) = rt.block_on(args.create_mssql_database());
+            let (q, _cs) = tok(args.create_mssql_database());
             (args.test_function_name(), q)
         } else if tags.contains(Tags::Sqlite) {
-            let url = sqlite_test_url(args.test_function_name());
-            (args.test_function_name(), rt.block_on(Quaint::new(&url)).unwrap())
+            (args.test_function_name(), Quaint::new_in_memory().unwrap())
         } else {
             unreachable!()
         };
@@ -53,12 +50,16 @@ impl TestApi {
             db_name,
             tags: args.tags(),
             database: conn,
-            rt,
         }
     }
 
+    pub(crate) fn expect_schema(&self, expected_schema: expect_test::Expect) {
+        let schema = self.describe();
+        expected_schema.assert_debug_eq(&schema);
+    }
+
     pub(crate) fn block_on<O>(&self, f: impl Future<Output = O>) -> O {
-        self.rt.block_on(f)
+        tok(f)
     }
 
     pub(crate) fn connector_tags(&self) -> BitFlags<Tags> {
@@ -70,15 +71,11 @@ impl TestApi {
     }
 
     pub(crate) fn describe_with_schema(&self, schema: &str) -> SqlSchema {
-        self.rt
-            .block_on(self.describer(&self.database).describe(schema))
-            .unwrap()
+        tok(self.describer(&self.database).describe(schema)).unwrap()
     }
 
     pub(crate) fn describe_error(&self) -> DescriberError {
-        self.rt
-            .block_on(self.describer(&self.database).describe(self.schema_name()))
-            .unwrap_err()
+        tok(self.describer(&self.database).describe(self.schema_name())).unwrap_err()
     }
 
     fn describer<'a>(&self, connection: &'a dyn Queryable) -> Box<dyn SqlSchemaDescriberBackend + 'a> {
@@ -115,19 +112,7 @@ impl TestApi {
             SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
             SqlFamily::Mssql => barrel::SqlVariant::Mssql,
         });
-        self.rt.block_on(self.database.raw_cmd(&full_sql)).unwrap();
-    }
-
-    pub(crate) fn is_mariadb(&self) -> bool {
-        self.tags.contains(Tags::Mariadb)
-    }
-
-    pub(crate) fn is_mssql(&self) -> bool {
-        self.tags.contains(Tags::Mssql)
-    }
-
-    pub(crate) fn is_cockroach(&self) -> bool {
-        self.tags.contains(Tags::CockroachDb)
+        tok(self.database.raw_cmd(&full_sql)).unwrap();
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -141,7 +126,7 @@ impl TestApi {
 
     #[track_caller]
     pub(crate) fn raw_cmd(&self, sql: &str) {
-        self.rt.block_on(self.database.raw_cmd(sql)).unwrap()
+        tok(self.database.raw_cmd(sql)).unwrap()
     }
 
     pub(crate) fn sql_family(&self) -> SqlFamily {
@@ -196,11 +181,6 @@ impl TableAssertion<'_> {
         self
     }
 
-    pub fn assert_foreign_keys_count(&self, expected_count: usize) -> &Self {
-        assert_eq!(self.table.foreign_key_count(), expected_count);
-        self
-    }
-
     pub fn assert_foreign_key_on_columns(
         &self,
         cols: &[&str],
@@ -219,6 +199,7 @@ impl TableAssertion<'_> {
         self
     }
 
+    #[track_caller]
     pub fn assert_index_on_columns(
         &self,
         columns: &[&str],
@@ -237,11 +218,6 @@ impl TableAssertion<'_> {
 
         assertions(&IndexAssertion { index });
 
-        self
-    }
-
-    pub fn assert_indexes_count(&self, expected_count: usize) -> &Self {
-        assert_eq!(self.table.indexes_count(), expected_count);
         self
     }
 
@@ -266,11 +242,6 @@ pub struct ColumnAssertion<'a> {
 }
 
 impl ColumnAssertion<'_> {
-    pub fn assert_auto_increment(&self, expected: bool) -> &Self {
-        assert_eq!(self.column.is_autoincrement(), expected);
-        self
-    }
-
     pub fn assert_column_type_family(&self, fam: ColumnTypeFamily) -> &Self {
         assert_eq!(self.column.column_type_family(), &fam);
         self
@@ -288,11 +259,6 @@ impl ColumnAssertion<'_> {
 
     pub fn assert_is_list(&self) -> &Self {
         assert!(self.column.arity().is_list());
-        self
-    }
-
-    pub fn assert_no_default(&self) -> &Self {
-        assert!(self.column.default().is_none());
         self
     }
 

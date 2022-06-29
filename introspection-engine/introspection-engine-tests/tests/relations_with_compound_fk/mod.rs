@@ -1,3 +1,4 @@
+mod cockroachdb;
 mod mssql;
 mod mysql;
 mod postgres;
@@ -134,8 +135,8 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> Tes
           age          Int
           partner_id   Int
           partner_age  Int
-          Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction, map: "Person_pid_page_fkey")
-          other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
+          Person       Person   @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction, map: "Person_pid_page_fkey")
+          other_Person Person[] @relation("PersonToPerson")
 
           @@unique([id, age], map: "post_user_unique")
         }
@@ -172,46 +173,8 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
           age          Int
           partner_id   Int?
           partner_age  Int?
-          Person       Person?  @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction, map: "Person_fkey")
-          other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
-
-          @@unique([id, age], map: "post_user_unique")
-        }
-    "#]];
-
-    expected.assert_eq(&api.introspect_dml().await?);
-
-    Ok(())
-}
-
-#[test_connector(exclude(Mysql, Sqlite, Mssql, CockroachDb))]
-async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(move |migration| {
-            migration.create_table("Person", move |t| {
-                t.add_column("id", types::integer().increments(true));
-                t.add_column("age", types::integer());
-                t.add_column("partner_id", types::integer().default(0));
-                t.add_column("partner_age", types::integer().default(0));
-
-                t.add_constraint("post_user_unique", types::unique_constraint(vec!["id", "age"]));
-                t.add_constraint(
-                    "Person_partner_id_partner_age_fkey",
-                    types::foreign_constraint(&["partner_id", "partner_age"], "Person", &["id", "age"], None, None),
-                );
-                t.add_constraint("Person_pkey", types::primary_constraint(&["id"]));
-            });
-        })
-        .await?;
-
-    let expected = expect![[r#"
-        model Person {
-          id           Int      @id @default(autoincrement())
-          age          Int
-          partner_id   Int      @default(0)
-          partner_age  Int      @default(0)
-          Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
-          other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
+          Person       Person?  @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction, map: "Person_fkey")
+          other_Person Person[] @relation("PersonToPerson")
 
           @@unique([id, age], map: "post_user_unique")
         }

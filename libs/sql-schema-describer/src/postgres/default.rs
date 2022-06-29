@@ -175,6 +175,7 @@ fn parse_string_value(parser: &mut Parser<'_>) -> Option<String> {
         }
         Token::CStyleStringLiteral => {
             // Reference for CockroachDB: https://www.cockroachlabs.com/docs/stable/sql-constants.html#string-literals-with-character-escapes
+            // Reference for Postgres: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS
             // octal and hexadecimal escape sequences seem not to be returned by crdb in defaults,
             // so we do not try parsing them.
             let s = parser.expect(Token::CStyleStringLiteral)?;

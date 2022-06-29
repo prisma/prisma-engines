@@ -1024,7 +1024,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
         });
 }
 
-#[cfg_attr(not(target_os = "windows"), test_connector(exclude(Vitess)))]
+#[cfg_attr(not(target_os = "windows"), test_connector(exclude(Mysql)))]
 fn alter_constraint_name(mut api: TestApi) {
     let plain_dm = api.datamodel_with_provider(
         r#"
@@ -1072,11 +1072,7 @@ fn alter_constraint_name(mut api: TestApi) {
            @@id([a, b]{})
          }}
      "#,
-        if api.is_sqlite() || api.is_mysql() {
-            ""
-        } else {
-            r#"(map: "CustomId")"#
-        },
+        if api.is_sqlite() { "" } else { r#"(map: "CustomId")"# },
         if api.is_sqlite() { "" } else { r#", map: "CustomFK""# },
         if api.is_sqlite() || api.is_mysql() {
             ""
@@ -1086,18 +1082,15 @@ fn alter_constraint_name(mut api: TestApi) {
     ));
 
     let is_mssql = api.is_mssql();
-    let is_mysql = api.is_mysql();
     let is_postgres = api.is_postgres();
     let is_postgres15 = api.is_postgres_15();
     let is_cockroach = api.is_cockroach();
-    let is_mysql_5_6 = api.is_mysql_5_6();
-    let is_mariadb = api.is_mariadb();
     let is_sqlite = api.is_sqlite();
 
     api.create_migration("custom", &custom_dm, &dir)
         .send_sync()
         .assert_migration_directories_count(2)
-        .assert_migration("custom",move |migration| {
+        .assert_migration("custom", move |migration| {
             let expected_script = if is_mssql {
                 expect![[r#"
                     BEGIN TRY
@@ -1150,10 +1143,10 @@ fn alter_constraint_name(mut api: TestApi) {
                     ALTER TABLE "B" RENAME CONSTRAINT "B_aId_fkey" TO "CustomFK";
 
                     -- RenameIndex
-                    ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
+                    ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
 
                     -- RenameIndex
-                    ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
+                    ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
 
                     -- RenameIndex
                     ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
@@ -1162,32 +1155,30 @@ fn alter_constraint_name(mut api: TestApi) {
                     ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
                 "#]]
             } else if is_postgres15 {
-                expect![[
-                     r#"
-                -- AlterTable
-                ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
+                expect![[r#"
+                    -- AlterTable
+                    ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
 
-                -- AlterTable
-                ALTER TABLE "B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
+                    -- AlterTable
+                    ALTER TABLE "B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
 
-                -- RenameForeignKey
-                ALTER TABLE "B" RENAME CONSTRAINT "B_aId_fkey" TO "CustomFK";
+                    -- RenameForeignKey
+                    ALTER TABLE "B" RENAME CONSTRAINT "B_aId_fkey" TO "CustomFK";
 
-                -- RenameIndex
-                ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
+                    -- RenameIndex
+                    ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
 
-                -- RenameIndex
-                ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
+                    -- RenameIndex
+                    ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
 
-                -- RenameIndex
-                ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
+                    -- RenameIndex
+                    ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
 
-                -- RenameIndex
-                ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
+                    -- RenameIndex
+                    ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
                 "#]]
             } else if is_postgres {
-                expect![[
-                     r#"
+                expect![[r#"
                 -- AlterTable
                 ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
 
@@ -1209,51 +1200,6 @@ fn alter_constraint_name(mut api: TestApi) {
                 -- RenameIndex
                 ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
                 "#]]
-            } else if is_mysql_5_6 || is_mariadb {
-                expect![[
-                     r#"
-                 -- DropForeignKey
-                 ALTER TABLE `B` DROP FOREIGN KEY `B_aId_fkey`;
-
-                 -- AddForeignKey
-                 ALTER TABLE `B` ADD CONSTRAINT `CustomFK` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
-                 -- RedefineIndex
-                 CREATE UNIQUE INDEX `CustomCompoundUnique` ON `A`(`a`, `b`);
-                 DROP INDEX `A_a_b_key` ON `A`;
-
-                 -- RedefineIndex
-                 CREATE INDEX `CustomIndex` ON `A`(`a`);
-                 DROP INDEX `A_a_idx` ON `A`;
-
-                 -- RedefineIndex
-                 CREATE UNIQUE INDEX `CustomUnique` ON `A`(`name`);
-                 DROP INDEX `A_name_key` ON `A`;
-
-                 -- RedefineIndex
-                 CREATE INDEX `AnotherCustomIndex` ON `B`(`a`, `b`);
-                 DROP INDEX `B_a_b_idx` ON `B`;
-                 "#]]
-            } else if is_mysql{
-                expect![[r#"
-                 -- DropForeignKey
-                 ALTER TABLE `B` DROP FOREIGN KEY `B_aId_fkey`;
-
-                 -- AddForeignKey
-                 ALTER TABLE `B` ADD CONSTRAINT `CustomFK` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
-                 -- RenameIndex
-                 ALTER TABLE `A` RENAME INDEX `A_a_b_key` TO `CustomCompoundUnique`;
-
-                 -- RenameIndex
-                 ALTER TABLE `A` RENAME INDEX `A_a_idx` TO `CustomIndex`;
-
-                 -- RenameIndex
-                 ALTER TABLE `A` RENAME INDEX `A_name_key` TO `CustomUnique`;
-
-                 -- RenameIndex
-                 ALTER TABLE `B` RENAME INDEX `B_a_b_idx` TO `AnotherCustomIndex`;
-                 "#]]
             } else if is_sqlite {
                 expect![[r#"
                  -- RedefineIndex

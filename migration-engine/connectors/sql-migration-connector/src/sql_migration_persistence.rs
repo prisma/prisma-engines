@@ -15,9 +15,8 @@ impl MigrationPersistence for SqlMigrationConnector {
             let schema = self.flavour.describe_schema().await?;
 
             if schema
-                .tables
-                .iter()
-                .any(|table| table.name == self.flavour().migrations_table_name())
+                .table_walkers()
+                .any(|table| table.name() == self.flavour().migrations_table_name())
             {
                 return Ok(());
             }

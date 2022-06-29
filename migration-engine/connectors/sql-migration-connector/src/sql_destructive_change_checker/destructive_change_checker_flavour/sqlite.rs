@@ -20,7 +20,7 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {
-        let arity_change_is_safe = match (columns.previous().arity(), columns.next().arity()) {
+        let arity_change_is_safe = match (columns.previous.arity(), columns.next.arity()) {
             // column became required
             (ColumnArity::Nullable, ColumnArity::Required) => false,
             // column became nullable
@@ -36,13 +36,13 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
         }
 
         if alter_column.changes.arity_changed()
-            && columns.next().arity().is_required()
-            && columns.next().default().is_none()
+            && columns.next.arity().is_required()
+            && columns.next.default().is_none()
         {
             plan.push_unexecutable(
                 UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    table: columns.previous().table().name().to_owned(),
-                    column: columns.previous().name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
                 },
                 step_index,
             );
@@ -53,10 +53,10 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
             Some(ColumnTypeChange::RiskyCast) => {
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
-                        table: columns.previous().table().name().to_owned(),
-                        column: columns.previous().name().to_owned(),
-                        previous_type: format!("{:?}", columns.previous().column_type_family()),
-                        next_type: format!("{:?}", columns.next().column_type_family()),
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.previous.name().to_owned(),
+                        previous_type: format!("{:?}", columns.previous.column_type_family()),
+                        next_type: format!("{:?}", columns.next.column_type_family()),
                     },
                     step_index,
                 );

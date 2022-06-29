@@ -6,61 +6,71 @@ use crate::{
         is_prisma_1_point_1_or_2_join_table, is_relay_table, primary_key_is_clustered,
     },
     version_checker::VersionChecker,
-    Dedup, SqlError, SqlFamilyTrait,
+    SqlError, SqlFamilyTrait,
 };
 use datamodel::dml::{self, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder};
-use sql_schema_describer::{SQLSortOrder, Table};
+use sql_schema_describer::{walkers::TableWalker, ForeignKeyId, SQLSortOrder};
+use std::collections::HashSet;
 use tracing::debug;
 
 pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) -> Result<(), SqlError> {
     let schema = ctx.schema;
     // collect m2m table names
     let m2m_tables: Vec<String> = schema
-        .tables
-        .iter()
-        .filter(|table| is_prisma_1_point_1_or_2_join_table(table) || is_prisma_1_point_0_join_table(table))
-        .map(|table| table.name[1..].to_string())
+        .table_walkers()
+        .filter(|table| is_prisma_1_point_1_or_2_join_table(*table) || is_prisma_1_point_0_join_table(*table))
+        .map(|table| table.name()[1..].to_string())
         .collect();
 
     for table in schema
-        .tables
-        .iter()
-        .filter(|table| !is_old_migration_table(table))
-        .filter(|table| !is_new_migration_table(table))
-        .filter(|table| !is_prisma_1_point_1_or_2_join_table(table))
-        .filter(|table| !is_prisma_1_point_0_join_table(table))
-        .filter(|table| !is_relay_table(table))
+        .table_walkers()
+        .filter(|table| !is_old_migration_table(*table))
+        .filter(|table| !is_new_migration_table(*table))
+        .filter(|table| !is_prisma_1_point_1_or_2_join_table(*table))
+        .filter(|table| !is_prisma_1_point_0_join_table(*table))
+        .filter(|table| !is_relay_table(*table))
     {
-        let walker = schema.table_walkers().find(|t| t.name() == table.name).unwrap();
-        debug!("Calculating model: {}", table.name);
-        let mut model = Model::new(table.name.clone(), None);
+        debug!("Calculating model: {}", table.name());
+        let mut model = Model::new(table.name().to_owned(), None);
 
-        for column in &table.columns {
+        for column in table.columns() {
             version_check.check_column_for_type_and_default_value(column);
-            let field = calculate_scalar_field(table, column, ctx);
+            let field = calculate_scalar_field(column, ctx);
             model.add_field(Field::ScalarField(field));
         }
 
-        let mut foreign_keys_copy = table.foreign_keys.clone();
-        foreign_keys_copy.clear_duplicates();
-
-        for foreign_key in &foreign_keys_copy {
+        let duplicated_foreign_keys: HashSet<ForeignKeyId> = table
+            .foreign_keys()
+            .enumerate()
+            .filter(|(idx, left)| {
+                let mut already_visited = table.foreign_keys().take(*idx);
+                already_visited.any(|right| {
+                    left.referenced_table().id == right.referenced_table().id
+                        && left.constrained_column_names() == right.constrained_column_names()
+                })
+            })
+            .map(|(_, fk)| fk.id)
+            .collect();
+        for foreign_key in table
+            .foreign_keys()
+            .filter(|fk| !duplicated_foreign_keys.contains(&fk.id))
+        {
             version_check.has_inline_relations(table);
-            version_check.uses_on_delete(foreign_key, table);
+            version_check.uses_on_delete(foreign_key.foreign_key(), table);
 
-            let mut relation_field = calculate_relation_field(schema, table, foreign_key, &m2m_tables)?;
+            let mut relation_field = calculate_relation_field(foreign_key, &m2m_tables, &duplicated_foreign_keys);
 
             relation_field.supports_restrict_action(!ctx.sql_family().is_mssql());
 
             model.add_field(Field::RelationField(relation_field));
         }
 
-        for index in walker.indexes() {
+        for index in table.indexes() {
             model.add_index(calculate_index(index, ctx));
         }
 
-        if let Some(pk) = &table.primary_key {
-            let clustered = primary_key_is_clustered(walker.table_id(), ctx);
+        if let Some(pk) = table.primary_key() {
+            let clustered = primary_key_is_clustered(table.id, ctx);
 
             model.primary_key = Some(PrimaryKeyDefinition {
                 name: None,
@@ -118,9 +128,8 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
 
     // add prisma many to many relation fields
     for table in schema
-        .tables
-        .iter()
-        .filter(|table| is_prisma_1_point_1_or_2_join_table(table) || is_prisma_1_point_0_join_table(table))
+        .table_walkers()
+        .filter(|table| is_prisma_1_point_1_or_2_join_table(*table) || is_prisma_1_point_0_join_table(*table))
     {
         calculate_fields_for_prisma_join_table(table, &mut fields_to_be_added, ctx)
     }
@@ -135,19 +144,20 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
 }
 
 fn calculate_fields_for_prisma_join_table(
-    join_table: &Table,
+    join_table: TableWalker<'_>,
     fields_to_be_added: &mut Vec<(String, RelationField)>,
     ctx: &mut Context,
 ) {
-    if let (Some(fk_a), Some(fk_b)) = (join_table.foreign_keys.get(0), join_table.foreign_keys.get(1)) {
-        let is_self_relation = fk_a.referenced_table == fk_b.referenced_table;
+    let mut foreign_keys = join_table.foreign_keys();
+    if let (Some(fk_a), Some(fk_b)) = (foreign_keys.next(), foreign_keys.next()) {
+        let is_self_relation = fk_a.referenced_table().id == fk_b.referenced_table().id;
 
         for (fk, opposite_fk) in &[(fk_a, fk_b), (fk_b, fk_a)] {
-            let referenced_model = dml::find_model_by_db_name(ctx.datamodel, &fk.referenced_table)
+            let referenced_model = dml::find_model_by_db_name(ctx.datamodel, fk.referenced_table().name())
                 .expect("Could not find model referenced in relation table.");
 
-            let relation_name = join_table.name[1..].to_string();
-            let field = calculate_many_to_many_field(opposite_fk, relation_name, is_self_relation);
+            let relation_name = join_table.name()[1..].to_owned();
+            let field = calculate_many_to_many_field(*opposite_fk, relation_name, is_self_relation);
 
             fields_to_be_added.push((referenced_model.name.clone(), field));
         }

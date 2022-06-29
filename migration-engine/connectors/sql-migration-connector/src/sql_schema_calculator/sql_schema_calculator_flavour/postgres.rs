@@ -80,7 +80,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             }
 
             // Add sequences for the fields with a default sequence in the model.
-            for (field_idx, field) in model.scalar_fields().enumerate() {
+            for field in model.scalar_fields() {
                 let field_default = if let Some(d) = field.default_value() {
                     d
                 } else {
@@ -92,7 +92,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                 }
 
                 let mut sequence = sql::postgres::Sequence {
-                    name: format!("prisma_sequence_{}_{}", table_idx, field_idx),
+                    name: format!("prisma_sequence_{}_{}", model.database_name(), field.database_name()),
                     ..Default::default()
                 };
                 let sequence_fn = field_default.ast_attribute().arguments.arguments[0]
@@ -131,7 +131,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
 
         // Add index algorithms for implicit m2m relation tables
         let models_count = db.models_count();
-        let tables_count = context.schema.describer_schema.tables.len();
+        let tables_count = context.schema.describer_schema.tables_count();
         for table_idx in models_count..tables_count {
             postgres_ext.indexes.push((
                 sql::IndexId(sql::TableId(table_idx as u32), 0),

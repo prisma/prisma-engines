@@ -16,7 +16,7 @@ use sql_schema_describer::{
 use std::borrow::Cow;
 
 impl PostgresFlavour {
-    fn render_column(&self, column: &ColumnWalker<'_>) -> String {
+    fn render_column(&self, column: ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
         let tpe_str = render_column_type(column, self);
         let nullability_str = render_nullability(column);
@@ -27,7 +27,7 @@ impl PostgresFlavour {
             .map(|default| format!(" DEFAULT {}", default))
             .unwrap_or_else(String::new);
 
-        let identity_str = render_column_identity_str(self, column);
+        let identity_str = render_column_identity_str(column, self);
 
         format!("{SQL_INDENTATION}{column_name} {tpe_str}{nullability_str}{default_str}{identity_str}",)
     }
@@ -82,7 +82,7 @@ impl SqlRenderer for PostgresFlavour {
         Quoted::postgres_ident(name)
     }
 
-    fn render_add_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
+    fn render_add_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
         ddl::AlterTable {
             table_name: ddl::PostgresIdentifier::Simple(foreign_key.table().name().into()),
             clauses: vec![ddl::AlterTableClause::AddForeignKey(ddl::ForeignKey {
@@ -109,7 +109,7 @@ impl SqlRenderer for PostgresFlavour {
         .to_string()
     }
 
-    fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>) -> Vec<String> {
         // ALTER TYPE is much more limited on postgres than on cockroachdb.
         //
         // On Postgres:
@@ -131,7 +131,7 @@ impl SqlRenderer for PostgresFlavour {
                 stmt.push_display(&Quoted::postgres_ident(tables.previous.name()));
                 stmt.push_str(" ALTER PRIMARY KEY USING COLUMNS (");
                 let column_names = tables
-                    .next()
+                    .next
                     .primary_key()
                     .unwrap() // safe because there is a primary key to alter
                     .column_names()
@@ -142,7 +142,7 @@ impl SqlRenderer for PostgresFlavour {
         })
     }
 
-    fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_str("ALTER INDEX ");
@@ -153,17 +153,12 @@ impl SqlRenderer for PostgresFlavour {
         })
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let AlterTable {
-            changes,
-            table_ids: table_index,
-        } = alter_table;
-
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: Pair<&SqlSchema>) -> Vec<String> {
+        let AlterTable { changes, table_ids } = alter_table;
         let mut lines = Vec::new();
         let mut before_statements = Vec::new();
         let mut after_statements = Vec::new();
-
-        let tables = schemas.tables(table_index);
+        let tables = schemas.tables(*table_ids);
 
         for change in changes {
             match change {
@@ -171,7 +166,7 @@ impl SqlRenderer for PostgresFlavour {
                     "DROP CONSTRAINT {}",
                     Quoted::postgres_ident(
                         tables
-                            .previous()
+                            .previous
                             .primary_key()
                             .and_then(|pk| pk.constraint_name.as_ref())
                             .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
@@ -181,21 +176,21 @@ impl SqlRenderer for PostgresFlavour {
                     "RENAME CONSTRAINT {} TO {}",
                     Quoted::postgres_ident(
                         tables
-                            .previous()
+                            .previous
                             .primary_key()
                             .and_then(|pk| pk.constraint_name.as_ref())
                             .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
                     ),
                     Quoted::postgres_ident(
                         tables
-                            .next()
+                            .next
                             .primary_key()
                             .and_then(|pk| pk.constraint_name.as_ref())
                             .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
                     )
                 )),
                 TableChange::AddPrimaryKey => lines.push({
-                    let named = match tables.next().primary_key().and_then(|pk| pk.constraint_name.as_ref()) {
+                    let named = match tables.next.primary_key().and_then(|pk| pk.constraint_name.as_ref()) {
                         Some(name) => format!("CONSTRAINT {} ", self.quote(name)),
                         None => "".into(),
                     };
@@ -204,7 +199,7 @@ impl SqlRenderer for PostgresFlavour {
                         "ADD {}PRIMARY KEY ({})",
                         named,
                         tables
-                            .next()
+                            .next
                             .primary_key_column_names()
                             .unwrap()
                             .iter()
@@ -216,13 +211,13 @@ impl SqlRenderer for PostgresFlavour {
                     column_id,
                     has_virtual_default: _,
                 } => {
-                    let column = tables.next().column_at(*column_id);
-                    let col_sql = self.render_column(&column);
+                    let column = schemas.next.walk_column(*column_id);
+                    let col_sql = self.render_column(column);
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
                 TableChange::DropColumn { column_id } => {
-                    let name = self.quote(tables.previous().column_at(*column_id).name());
+                    let name = self.quote(schemas.previous.walk_column(*column_id).name());
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::AlterColumn(AlterColumn {
@@ -230,10 +225,10 @@ impl SqlRenderer for PostgresFlavour {
                     changes,
                     type_change: _,
                 }) => {
-                    let columns = tables.columns(column_id);
+                    let columns = schemas.columns(*column_id);
 
                     render_alter_column(
-                        &columns,
+                        columns,
                         changes,
                         &mut before_statements,
                         &mut lines,
@@ -242,12 +237,12 @@ impl SqlRenderer for PostgresFlavour {
                     );
                 }
                 TableChange::DropAndRecreateColumn { column_id, changes: _ } => {
-                    let columns = tables.columns(column_id);
-                    let name = self.quote(columns.previous().name());
+                    let columns = schemas.columns(*column_id);
+                    let name = self.quote(columns.previous.name());
 
                     lines.push(format!("DROP COLUMN {}", name));
 
-                    let col_sql = self.render_column(columns.next());
+                    let col_sql = self.render_column(columns.next);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
             };
@@ -261,14 +256,14 @@ impl SqlRenderer for PostgresFlavour {
             let mut out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
             out.extend(before_statements.into_iter());
             for line in lines {
-                out.push(format!("ALTER TABLE \"{}\" {}", tables.previous().name(), line))
+                out.push(format!("ALTER TABLE \"{}\" {}", tables.previous.name(), line))
             }
             out.extend(after_statements.into_iter());
             out
         } else {
             let alter_table = format!(
                 "ALTER TABLE {} {}",
-                self.quote(tables.previous().name()),
+                self.quote(tables.previous.name()),
                 lines.join(",\n")
             );
 
@@ -280,7 +275,7 @@ impl SqlRenderer for PostgresFlavour {
         }
     }
 
-    fn render_create_enum(&self, enm: &EnumWalker<'_>) -> Vec<String> {
+    fn render_create_enum(&self, enm: EnumWalker<'_>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&ddl::CreateEnum {
@@ -291,14 +286,14 @@ impl SqlRenderer for PostgresFlavour {
         })
     }
 
-    fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
-        let pg_ext: &PostgresSchemaExt = index.schema().downcast_connector_data().unwrap_or_default();
+    fn render_create_index(&self, index: IndexWalker<'_>) -> String {
+        let pg_ext: &PostgresSchemaExt = index.schema.downcast_connector_data().unwrap_or_default();
 
         ddl::CreateIndex {
             index_name: index.name().into(),
             is_unique: index.index_type().is_unique(),
             table_reference: index.table().name().into(),
-            using: Some(match pg_ext.index_algorithm(index.index_id()) {
+            using: Some(match pg_ext.index_algorithm(index.id) {
                 SqlIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
                 SqlIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,
                 SqlIndexAlgorithm::Gist => ddl::IndexAlgorithm::Gist,
@@ -322,8 +317,8 @@ impl SqlRenderer for PostgresFlavour {
         .to_string()
     }
 
-    fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
-        let columns: String = table.columns().map(|column| self.render_column(&column)).join(",\n");
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: &str) -> String {
+        let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
         let pk = if let Some(pk) = table.primary_key() {
             let named_constraint = match &pk.constraint_name {
@@ -349,7 +344,7 @@ impl SqlRenderer for PostgresFlavour {
         )
     }
 
-    fn render_drop_enum(&self, dropped_enum: &EnumWalker<'_>) -> Vec<String> {
+    fn render_drop_enum(&self, dropped_enum: EnumWalker<'_>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&ddl::DropType {
@@ -359,7 +354,7 @@ impl SqlRenderer for PostgresFlavour {
         })
     }
 
-    fn render_drop_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
+    fn render_drop_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
             table = self.quote(foreign_key.table().name()),
@@ -367,7 +362,7 @@ impl SqlRenderer for PostgresFlavour {
         )
     }
 
-    fn render_drop_index(&self, index: &IndexWalker<'_>) -> String {
+    fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
         ddl::DropIndex {
             index_name: index.name().into(),
         }
@@ -385,32 +380,32 @@ impl SqlRenderer for PostgresFlavour {
         })
     }
 
-    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
+    fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
         ddl::DropView {
             view_name: view.name().into(),
         }
         .to_string()
     }
 
-    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: &Pair<&SqlSchema>) -> Vec<String> {
+    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: Pair<&SqlSchema>) -> Vec<String> {
         let mut result = Vec::new();
 
         for redefine_table in tables {
-            let tables = schemas.tables(&redefine_table.table_ids);
-            let temporary_table_name = format!("_prisma_new_{}", &tables.next().name());
-            result.push(self.render_create_table_as(tables.next(), &temporary_table_name));
+            let tables = schemas.tables(redefine_table.table_ids);
+            let temporary_table_name = format!("_prisma_new_{}", &tables.next.name());
+            result.push(self.render_create_table_as(tables.next, &temporary_table_name));
 
             let columns: Vec<_> = redefine_table
                 .column_pairs
                 .iter()
-                .map(|(column_indexes, _, _)| tables.columns(column_indexes).next().name())
+                .map(|(column_ids, _, _)| schemas.columns(*column_ids).next.name())
                 .map(|c| self.quote(c).to_string())
                 .collect();
 
-            let table = tables.previous().name();
+            let table = tables.previous.name();
 
-            for index in tables.previous().indexes() {
-                result.push(self.render_drop_index(&index));
+            for index in tables.previous.indexes() {
+                result.push(self.render_drop_index(index));
             }
 
             if !columns.is_empty() {
@@ -422,20 +417,20 @@ impl SqlRenderer for PostgresFlavour {
 
             result.push(
                 ddl::DropTable {
-                    table_name: tables.previous().name().into(),
+                    table_name: tables.previous.name().into(),
                     cascade: true,
                 }
                 .to_string(),
             );
 
-            result.push(self.render_rename_table(&temporary_table_name, tables.next().name()));
+            result.push(self.render_rename_table(&temporary_table_name, tables.next.name()));
 
-            for index in tables.next().indexes() {
-                result.push(self.render_create_index(&index));
+            for index in tables.next.indexes() {
+                result.push(self.render_create_index(index));
             }
 
-            for fk in tables.next().foreign_keys() {
-                result.push(self.render_add_foreign_key(&fk));
+            for fk in tables.next.foreign_keys() {
+                result.push(self.render_add_foreign_key(fk));
             }
         }
 
@@ -454,17 +449,17 @@ impl SqlRenderer for PostgresFlavour {
         unreachable!("render_drop_user_defined_type on PostgreSQL")
     }
 
-    fn render_rename_foreign_key(&self, fks: &Pair<ForeignKeyWalker<'_>>) -> String {
+    fn render_rename_foreign_key(&self, fks: Pair<ForeignKeyWalker<'_>>) -> String {
         format!(
             r#"ALTER TABLE "{table}" RENAME CONSTRAINT "{previous}" TO "{next}""#,
-            table = fks.previous().table().name(),
-            previous = fks.previous().constraint_name().unwrap(),
-            next = fks.next().constraint_name().unwrap(),
+            table = fks.previous.table().name(),
+            previous = fks.previous.constraint_name().unwrap(),
+            next = fks.next.constraint_name().unwrap(),
         )
     }
 }
 
-fn render_column_type(col: &ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'static, str> {
+fn render_column_type(col: ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'static, str> {
     let t = col.column_type();
     if let ColumnTypeFamily::Enum(name) = &t.family {
         return format!("\"{}\"{}", name, if t.arity.is_list() { "[]" } else { "" }).into();
@@ -481,7 +476,7 @@ fn render_column_type(col: &ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<
     }
 }
 
-fn render_column_type_postgres(col: &ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type_postgres(col: ColumnWalker<'_>) -> Cow<'static, str> {
     let t = col.column_type();
     let is_autoincrement = col.is_autoincrement();
 
@@ -528,7 +523,7 @@ fn render_column_type_postgres(col: &ColumnWalker<'_>) -> Cow<'static, str> {
     }
 }
 
-fn render_column_type_cockroachdb(col: &ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type_cockroachdb(col: ColumnWalker<'_>) -> Cow<'static, str> {
     let t = col.column_type();
     let native_type = col
         .column_native_type()
@@ -611,7 +606,7 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
 }
 
 fn render_alter_column(
-    columns: &Pair<ColumnWalker<'_>>,
+    columns: Pair<ColumnWalker<'_>>,
     column_changes: &ColumnChanges,
     before_statements: &mut Vec<String>,
     clauses: &mut Vec<String>,
@@ -619,8 +614,8 @@ fn render_alter_column(
     flavour: &PostgresFlavour,
 ) {
     let steps = expand_alter_column(columns, column_changes);
-    let table_name = Quoted::postgres_ident(columns.previous().table().name());
-    let column_name = Quoted::postgres_ident(columns.previous().name());
+    let table_name = Quoted::postgres_ident(columns.previous.table().name());
+    let column_name = Quoted::postgres_ident(columns.previous.name());
 
     let alter_column_prefix = format!("ALTER COLUMN {}", column_name);
 
@@ -630,8 +625,8 @@ fn render_alter_column(
                 clauses.push(format!("{} DROP DEFAULT", &alter_column_prefix));
 
                 // We also need to drop the sequence, in case it isn't used by any other column.
-                if let Some(DefaultKind::Sequence(sequence_name)) = columns.previous().default().map(|d| d.kind()) {
-                    let sequence_is_still_used = walk_columns(columns.next().schema()).any(|column| matches!(column.default().map(|d| d.kind()), Some(DefaultKind::Sequence(other_sequence)) if other_sequence == sequence_name) && !column.is_same_column(columns.next()));
+                if let Some(DefaultKind::Sequence(sequence_name)) = columns.previous.default().map(|d| d.kind()) {
+                    let sequence_is_still_used = walk_columns(columns.next.schema).any(|column| matches!(column.default().map(|d| d.kind()), Some(DefaultKind::Sequence(other_sequence)) if other_sequence == sequence_name) && !column.is_same_column(columns.next));
 
                     if !sequence_is_still_used {
                         after_statements.push(format!("DROP SEQUENCE {}", Quoted::postgres_ident(sequence_name)));
@@ -641,14 +636,14 @@ fn render_alter_column(
             PostgresAlterColumn::SetDefault(new_default) => clauses.push(format!(
                 "{} SET DEFAULT {}",
                 &alter_column_prefix,
-                render_default(&new_default, &render_column_type(columns.next(), flavour))
+                render_default(&new_default, &render_column_type(columns.next, flavour))
             )),
             PostgresAlterColumn::DropNotNull => clauses.push(format!("{} DROP NOT NULL", &alter_column_prefix)),
             PostgresAlterColumn::SetNotNull => clauses.push(format!("{} SET NOT NULL", &alter_column_prefix)),
             PostgresAlterColumn::SetType => clauses.push(format!(
                 "{} SET DATA TYPE {}",
                 &alter_column_prefix,
-                render_column_type(columns.next(), flavour)
+                render_column_type(columns.next, flavour)
             )),
             PostgresAlterColumn::AddSequence => {
                 // We imitate the sequence that would be automatically created on a `SERIAL` column.
@@ -657,8 +652,8 @@ fn render_alter_column(
                 // https://www.postgresql.org/docs/12/datatype-numeric.html#DATATYPE-SERIAL
                 let sequence_name = format!(
                     "{table_name}_{column_name}_seq",
-                    table_name = columns.next().table().name(),
-                    column_name = columns.next().name()
+                    table_name = columns.next.table().name(),
+                    column_name = columns.next.name()
                 )
                 .to_lowercase();
 
@@ -681,17 +676,17 @@ fn render_alter_column(
     }
 }
 
-fn expand_alter_column(columns: &Pair<ColumnWalker<'_>>, column_changes: &ColumnChanges) -> Vec<PostgresAlterColumn> {
+fn expand_alter_column(columns: Pair<ColumnWalker<'_>>, column_changes: &ColumnChanges) -> Vec<PostgresAlterColumn> {
     let mut changes = Vec::new();
     let mut set_type = false;
 
     for change in column_changes.iter() {
         match change {
-            ColumnChange::Default => match (columns.previous().default(), columns.next().default()) {
+            ColumnChange::Default => match (columns.previous.default(), columns.next.default()) {
                 (_, Some(next_default)) => changes.push(PostgresAlterColumn::SetDefault((*next_default).clone())),
                 (_, None) => changes.push(PostgresAlterColumn::DropDefault),
             },
-            ColumnChange::Arity => match (columns.previous().arity(), columns.next().arity()) {
+            ColumnChange::Arity => match (columns.previous.arity(), columns.next.arity()) {
                 (ColumnArity::Required, ColumnArity::Nullable) => changes.push(PostgresAlterColumn::DropNotNull),
                 (ColumnArity::Nullable, ColumnArity::Required) => changes.push(PostgresAlterColumn::SetNotNull),
                 (ColumnArity::List, ColumnArity::Nullable) => {
@@ -711,7 +706,7 @@ fn expand_alter_column(columns: &Pair<ColumnWalker<'_>>, column_changes: &Column
             },
             ColumnChange::TypeChanged => set_type = true,
             ColumnChange::Autoincrement => {
-                if columns.previous().is_autoincrement() {
+                if columns.previous.is_autoincrement() {
                     // The sequence should be dropped.
                     changes.push(PostgresAlterColumn::DropDefault)
                 } else {
@@ -798,7 +793,7 @@ fn render_default<'a>(default: &'a DefaultValue, full_data_type: &str) -> Cow<'a
     }
 }
 
-fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>) -> Vec<String> {
     if alter_enum.dropped_variants.is_empty() {
         let mut stmts: Vec<String> = alter_enum
             .created_variants
@@ -806,7 +801,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
             .map(|created_value| {
                 format!(
                     "ALTER TYPE {enum_name} ADD VALUE {value}",
-                    enum_name = Quoted::postgres_ident(schemas.enums(alter_enum.id).previous().name()),
+                    enum_name = Quoted::postgres_ident(schemas.enums(alter_enum.id).previous.name()),
                     value = Quoted::postgres_string(created_value)
                 )
             })
@@ -833,8 +828,8 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
 
     let mut stmts = Vec::with_capacity(10);
 
-    let tmp_name = format!("{}_new", &enums.next().name());
-    let tmp_old_name = format!("{}_old", &enums.previous().name());
+    let tmp_name = format!("{}_new", &enums.next.name());
+    let tmp_old_name = format!("{}_old", &enums.previous.name());
 
     stmts.push("BEGIN".to_string());
 
@@ -843,7 +838,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
         let create_new_enum = format!(
             "CREATE TYPE {enum_name} AS ENUM ({variants})",
             enum_name = Quoted::postgres_ident(&tmp_name),
-            variants = enums.next().values().iter().map(Quoted::postgres_string).join(", ")
+            variants = enums.next.values().iter().map(Quoted::postgres_string).join(", ")
         );
 
         stmts.push(create_new_enum);
@@ -851,13 +846,13 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
 
     // Find all usages as a default and drop them
     {
-        for ((table_idx, colidx), _) in &alter_enum.previous_usages_as_default {
-            let table = schemas.previous().table_walker_at(*table_idx);
+        for (colid, _) in &alter_enum.previous_usages_as_default {
+            let column = schemas.previous.walk_column(*colid);
 
             let drop_default = format!(
                 r#"ALTER TABLE "{table_name}" ALTER COLUMN "{column_name}" DROP DEFAULT"#,
-                table_name = table.name(),
-                column_name = table.column_at(*colidx).name(),
+                table_name = column.table().name(),
+                column_name = column.name(),
             );
 
             stmts.push(drop_default);
@@ -866,7 +861,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
 
     // Alter type of the current columns to new, with a cast
     {
-        let affected_columns = walk_columns(schemas.next()).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == enums.next().name()));
+        let affected_columns = walk_columns(schemas.next).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == enums.next.name()));
 
         for column in affected_columns {
             let array = if column.arity().is_list() { "[]" } else { "" };
@@ -889,7 +884,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
     {
         let sql = format!(
             "ALTER TYPE {enum_name} RENAME TO {tmp_old_name}",
-            enum_name = Quoted::postgres_ident(enums.previous().name()),
+            enum_name = Quoted::postgres_ident(enums.previous.name()),
             tmp_old_name = Quoted::postgres_ident(&tmp_old_name)
         );
 
@@ -901,7 +896,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
         let sql = format!(
             "ALTER TYPE {tmp_name} RENAME TO {enum_name}",
             tmp_name = Quoted::postgres_ident(&tmp_name),
-            enum_name = Quoted::postgres_ident(enums.next().name())
+            enum_name = Quoted::postgres_ident(enums.next.name())
         );
 
         stmts.push(sql)
@@ -919,19 +914,16 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
 
     // Reinstall dropped defaults that need to be reinstalled
     {
-        for ((prev_tblidx, prev_colidx), (next_tblidx, next_colidx)) in alter_enum
+        for (prev_colidx, next_colidx) in alter_enum
             .previous_usages_as_default
             .iter()
             .filter_map(|(prev, next)| next.map(|next| (prev, next)))
         {
-            let columns = schemas
-                .tables(&Pair::new(*prev_tblidx, next_tblidx))
-                .columns(&Pair::new(*prev_colidx, next_colidx));
-
-            let table_name = columns.previous().table().name();
-            let column_name = columns.previous().name();
+            let columns = schemas.columns(Pair::new(*prev_colidx, next_colidx));
+            let table_name = columns.previous.table().name();
+            let column_name = columns.previous.name();
             let default_str = columns
-                    .next()
+                    .next
                     .default()
                     .and_then(|default| default.as_value())
                     .and_then(|value| value.as_enum_value())
@@ -953,7 +945,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
     stmts
 }
 
-fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>, renderer: &mut StepRenderer) {
+fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>, renderer: &mut StepRenderer) {
     let enums = schemas.enums(alter_enum.id);
     let mut prefix = String::new();
     prefix.push_str("ALTER TYPE \"");
@@ -964,8 +956,8 @@ fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema
     let defaults_to_drop = alter_enum
         .previous_usages_as_default
         .iter()
-        .filter_map(|((prev_tblidx, prev_colidx), _)| {
-            let col = schemas.previous.table_walker_at(*prev_tblidx).column_at(*prev_colidx);
+        .filter_map(|(prev_colidx, _)| {
+            let col = schemas.previous.walk_column(*prev_colidx);
             col.default()
                 .and_then(|d| d.as_value())
                 .and_then(|v| v.as_enum_value())
@@ -1002,13 +994,13 @@ fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema
     }
 }
 
-fn render_column_identity_str(flavour: &PostgresFlavour, column: &ColumnWalker<'_>) -> String {
+fn render_column_identity_str(column: ColumnWalker<'_>, flavour: &PostgresFlavour) -> String {
     if !flavour.is_cockroachdb() {
         return String::new();
     }
 
     let sequence = if let Some(seq_name) = column.default().and_then(|d| d.as_sequence()) {
-        let connector_data: &PostgresSchemaExt = column.schema().downcast_connector_data().unwrap_or_default();
+        let connector_data: &PostgresSchemaExt = column.schema.downcast_connector_data().unwrap_or_default();
         connector_data
             .sequences
             .iter()

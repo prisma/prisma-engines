@@ -1,7 +1,6 @@
-use super::*;
-use crate::{getters::Getter, parsers::Parser};
+use crate::{getters::Getter, parsers::Parser, *};
 use bigdecimal::ToPrimitive;
-use common::purge_dangling_foreign_keys;
+use indexmap::IndexMap;
 use indoc::indoc;
 use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, Value};
@@ -51,7 +50,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let table_count = self.get_table_names(schema).await?.len();
+        let mut sql_schema = SqlSchema::default();
+        let table_count = self.get_table_names(schema, &mut sql_schema).await?.len();
         let size_in_bytes = self.get_size(schema).await?;
 
         Ok(SqlMetadata {
@@ -62,44 +62,43 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
 
     #[tracing::instrument(skip(self))]
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+        let mut sql_schema = SqlSchema::default();
         let version = self.conn.version().await.ok().flatten();
         let flavour = version
             .as_ref()
             .map(|s| Flavour::from_version(s))
             .unwrap_or(Flavour::Mysql);
 
-        let table_names = self.get_table_names(schema).await?;
-        let mut tables = Vec::with_capacity(table_names.len());
-        let mut columns = Self::get_all_columns(self.conn, schema, &flavour).await?;
-        let mut indexes = self.get_all_indexes(schema).await?;
-        let mut fks = Self::get_foreign_keys(self.conn, schema).await?;
+        let table_names = self.get_table_names(schema, &mut sql_schema).await?;
+        sql_schema.tables.reserve(table_names.len());
+        sql_schema.columns.reserve(table_names.len());
 
-        let mut enums = vec![];
-        for table_name in &table_names {
-            let (table, enms) = self.get_table(table_name, &mut columns, &mut indexes, &mut fks);
+        Self::get_all_columns(&table_names, self.conn, schema, &mut sql_schema, &flavour).await?;
+        let mut indexes = self.get_all_indexes(&table_names, schema).await?;
+        Self::get_foreign_keys(self.conn, schema, &table_names, &mut sql_schema).await?;
 
-            // If we cannot query any of the columns, do not add the table to
-            // the data model...
-            if table.columns.is_empty() {
-                continue;
-            }
-
-            tables.push(table);
-            enums.extend(enms.into_iter());
+        // In certain cases we cannot query any columns, but we can still list
+        // indices. This leads to a very broken result, so we instead just take
+        // these indices out from the data model.
+        for (table_id, (indexes, _)) in &mut indexes {
+            indexes.retain(|_, index| {
+                index.columns.iter().all(|left| {
+                    sql_schema
+                        .table_walker_at(*table_id)
+                        .columns()
+                        .any(|col| col.name() == left.name)
+                })
+            });
         }
 
-        purge_dangling_foreign_keys(&mut tables);
+        for (table_name, table_id) in table_names {
+            self.get_table(table_name, table_id, &mut indexes, &mut sql_schema);
+        }
 
-        let views = self.get_views(schema).await?;
-        let procedures = self.get_procedures(schema).await?;
+        sql_schema.views = self.get_views(schema).await?;
+        sql_schema.procedures = self.get_procedures(schema).await?;
 
-        Ok(SqlSchema {
-            tables,
-            enums,
-            views,
-            procedures,
-            ..Default::default()
-        })
+        Ok(sql_schema)
     }
 
     #[tracing::instrument(skip(self))]
@@ -175,21 +174,37 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_table_names(&self, schema: &str) -> DescriberResult<Vec<String>> {
-        let sql = "SELECT table_name as table_name FROM information_schema.tables
-            WHERE table_schema = ?
-            -- Views are not supported yet
-            AND table_type = 'BASE TABLE'
-            ORDER BY Binary table_name";
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| row.get_expect_string("table_name"))
-            .collect();
+    async fn get_table_names(
+        &self,
+        schema: &str,
+        sql_schema: &mut SqlSchema,
+    ) -> DescriberResult<IndexMap<String, TableId>> {
+        // Only consider tables for which we can read at least one column.
+        let sql = r#"
+            SELECT DISTINCT BINARY table_info.table_name AS table_name
+            FROM information_schema.tables AS table_info
+            JOIN information_schema.columns AS column_info
+                ON BINARY column_info.table_name = BINARY table_info.table_name
+            WHERE
+                table_info.table_schema = ?
+                AND column_info.table_schema = ?
+                -- Exclude views.
+                AND table_info.table_type = 'BASE TABLE'
+            ORDER BY BINARY table_info.table_name"#;
+        let rows = self.conn.query_raw(sql, &[schema.into(), schema.into()]).await?;
+        let names = rows.into_iter().map(|row| row.get_expect_string("table_name"));
 
-        trace!("Found table names: {:?}", names);
+        let mut map = IndexMap::default();
 
-        Ok(names)
+        for name in names {
+            let cloned_name = name.clone();
+            let id = sql_schema.push_table(name);
+            map.insert(cloned_name, id);
+        }
+
+        trace!("Found table names: {:?}", map);
+
+        Ok(map)
     }
 
     #[tracing::instrument(skip(self))]
@@ -218,43 +233,27 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     fn get_table(
         &self,
-        name: &str,
-        columns: &mut BTreeMap<String, (Vec<Column>, Vec<Enum>)>,
-        indexes: &mut BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
-        foreign_keys: &mut BTreeMap<String, Vec<ForeignKey>>,
-    ) -> (Table, Vec<Enum>) {
-        let (columns, enums) = columns.remove(name).unwrap_or((vec![], vec![]));
-        let (mut indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
+        name: String,
+        id: TableId,
+        indexes: &mut BTreeMap<TableId, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
+        sql_schema: &mut SqlSchema,
+    ) {
+        let (indices, primary_key) = indexes.remove(&id).unwrap_or_else(|| (BTreeMap::new(), None));
 
-        let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
-
-        // In certain cases we cannot query any columns, but we can still list
-        // indices. This leads to a very broken result, so we instead just take
-        // these indices out from the data model.
-        indices.retain(|_, index| {
-            index
-                .columns
-                .iter()
-                .all(|left| columns.iter().any(|right| right.name == left.name))
-        });
-
-        (
-            Table {
-                name: name.to_string(),
-                columns,
-                foreign_keys,
-                indices: indices.into_iter().map(|(_k, v)| v).collect(),
-                primary_key,
-            },
-            enums,
-        )
+        sql_schema[id] = Table {
+            name,
+            indices: indices.into_iter().map(|(_k, v)| v).collect(),
+            primary_key,
+        };
     }
 
     async fn get_all_columns(
+        table_ids: &IndexMap<String, TableId>,
         conn: &dyn Queryable,
         schema_name: &str,
+        sql_schema: &mut SqlSchema,
         flavour: &Flavour,
-    ) -> DescriberResult<BTreeMap<String, (Vec<Column>, Vec<Enum>)>> {
+    ) -> DescriberResult<()> {
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
         // the result values by column name below to fail.
@@ -276,13 +275,16 @@ impl<'a> SqlSchemaDescriber<'a> {
             ORDER BY ordinal_position
         ";
 
-        let mut map = BTreeMap::new();
-
         let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
 
         for col in rows {
             trace!("Got column: {:?}", col);
             let table_name = col.get_expect_string("table_name");
+            let table_id = if let Some(id) = table_ids.get(table_name.as_str()) {
+                *id
+            } else {
+                continue;
+            };
             let name = col.get_expect_string("column_name");
             let data_type = col.get_expect_string("data_type");
             let full_data_type = col.get_expect_string("full_data_type");
@@ -326,10 +328,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             let extra = col.get_expect_string("extra").to_lowercase();
             let auto_increment = matches!(extra.as_str(), "auto_increment");
 
-            let entry = map.entry(table_name).or_insert((Vec::new(), Vec::new()));
-
             if let Some(enm) = enum_option {
-                entry.1.push(enm);
+                sql_schema.enums.push(enm);
             }
 
             let default = match default_value {
@@ -431,10 +431,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                 auto_increment,
             };
 
-            entry.0.push(col);
+            sql_schema.columns.push((table_id, col));
         }
 
-        Ok(map)
+        sql_schema.columns.sort_by_key(|(table_id, _)| *table_id);
+
+        Ok(())
     }
 
     fn dbgenerated_expression(default_string: &str) -> DefaultValue {
@@ -451,10 +453,11 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     async fn get_all_indexes(
         &self,
+        table_ids: &IndexMap<String, TableId>,
         schema_name: &str,
-    ) -> DescriberResult<BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
-        let mut map = BTreeMap::new();
-        let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
+    ) -> DescriberResult<BTreeMap<TableId, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
+        let mut map = BTreeMap::<TableId, _>::new();
+        let mut indexes_with_expressions: HashSet<(TableId, String)> = HashSet::new();
 
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
@@ -479,6 +482,11 @@ impl<'a> SqlSchemaDescriber<'a> {
         for row in rows {
             trace!("Got index row: {:#?}", row);
             let table_name = row.get_expect_string("table_name");
+            let table_id = if let Some(id) = table_ids.get(table_name.as_str()) {
+                id
+            } else {
+                continue;
+            };
             let index_name = row.get_expect_string("index_name");
             let length = row.get_u32("partial");
 
@@ -496,9 +504,8 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                     // Multi-column indices will return more than one row (with different column_name values).
                     // We cannot assume that one row corresponds to one index.
-                    let (ref mut indexes_map, ref mut primary_key): &mut (_, Option<PrimaryKey>) = map
-                        .entry(table_name)
-                        .or_insert((BTreeMap::<String, Index>::new(), None));
+                    let (ref mut indexes_map, ref mut primary_key): &mut (_, Option<PrimaryKey>) =
+                        map.entry(*table_id).or_insert((BTreeMap::<String, Index>::new(), None));
 
                     let is_pk = index_name.to_lowercase() == "primary";
                     if is_pk {
@@ -561,7 +568,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                     }
                 }
                 None => {
-                    indexes_with_expressions.insert((table_name, index_name));
+                    indexes_with_expressions.insert((*table_id, index_name));
                 }
             }
         }
@@ -580,10 +587,14 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_foreign_keys(
         conn: &dyn Queryable,
         schema_name: &str,
-    ) -> DescriberResult<BTreeMap<String, Vec<ForeignKey>>> {
+        table_ids: &IndexMap<String, TableId>,
+        sql_schema: &mut SqlSchema,
+    ) -> DescriberResult<()> {
         // Foreign keys covering multiple columns will return multiple rows, which we need to
         // merge.
-        let mut map: BTreeMap<String, BTreeMap<String, ForeignKey>> = BTreeMap::new();
+        //
+        // (constrained_table_id, constraint_name) -> ForeignKey
+        let mut map: BTreeMap<(TableId, String), ForeignKey> = BTreeMap::new();
 
         // XXX: Is constraint_name unique? Need a way to uniquely associate rows with foreign keys
         // One should think it's unique since it's used to join information_schema.key_column_usage
@@ -618,9 +629,19 @@ impl<'a> SqlSchemaDescriber<'a> {
         for row in result_set.into_iter() {
             trace!("Got description FK row {:#?}", row);
             let table_name = row.get_expect_string("table_name");
+            let table_id = if let Some(id) = table_ids.get(table_name.as_str()) {
+                *id
+            } else {
+                continue;
+            };
             let constraint_name = row.get_expect_string("constraint_name");
             let column = row.get_expect_string("column_name");
             let referenced_table = row.get_expect_string("referenced_table_name");
+            let referenced_table_id = if let Some(id) = table_ids.get(&referenced_table) {
+                *id
+            } else {
+                continue;
+            };
             let referenced_column = row.get_expect_string("referenced_column_name");
             let ord_pos = row.get_expect_i64("ordinal_position");
             let on_delete_action = match row.get_expect_string("delete_rule").to_lowercase().as_str() {
@@ -640,46 +661,33 @@ impl<'a> SqlSchemaDescriber<'a> {
                 s => panic!("Unrecognized on update action '{}'", s),
             };
 
-            let intermediate_fks = map.entry(table_name).or_default();
+            let fk = map
+                .entry((table_id, constraint_name.clone()))
+                .or_insert_with(move || ForeignKey {
+                    constraint_name: Some(constraint_name.clone()),
+                    columns: Vec::new(),
+                    referenced_table: referenced_table_id,
+                    referenced_columns: Vec::new(),
+                    on_delete_action,
+                    on_update_action,
+                });
 
-            match intermediate_fks.get_mut(&constraint_name) {
-                Some(fk) => {
-                    let pos = ord_pos as usize - 1;
-                    if fk.columns.len() <= pos {
-                        fk.columns.resize(pos + 1, "".to_string());
-                    }
-                    fk.columns[pos] = column;
-                    if fk.referenced_columns.len() <= pos {
-                        fk.referenced_columns.resize(pos + 1, "".to_string());
-                    }
-                    fk.referenced_columns[pos] = referenced_column;
-                }
-                None => {
-                    let fk = ForeignKey {
-                        constraint_name: Some(constraint_name.clone()),
-                        columns: vec![column],
-                        referenced_table,
-                        referenced_columns: vec![referenced_column],
-                        on_delete_action,
-                        on_update_action,
-                    };
-                    intermediate_fks.insert(constraint_name, fk);
-                }
-            };
+            let pos = ord_pos as usize - 1;
+            if fk.columns.len() <= pos {
+                fk.columns.resize(pos + 1, "".to_string());
+            }
+            fk.columns[pos] = column;
+            if fk.referenced_columns.len() <= pos {
+                fk.referenced_columns.resize(pos + 1, "".to_string());
+            }
+            fk.referenced_columns[pos] = referenced_column;
         }
 
-        let fks = map
-            .into_iter()
-            .map(|(k, v)| {
-                let mut fks: Vec<ForeignKey> = v.into_iter().map(|(_k, v)| v).collect();
+        for ((table_id, _), fk) in map {
+            sql_schema.foreign_keys.push((table_id, fk));
+        }
 
-                fks.sort_unstable_by(|this, other| this.columns.cmp(&other.columns));
-
-                (k, fks)
-            })
-            .collect();
-
-        Ok(fks)
+        Ok(())
     }
 
     fn get_column_type_and_enum(

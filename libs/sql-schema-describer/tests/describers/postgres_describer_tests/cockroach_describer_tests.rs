@@ -1,6 +1,6 @@
 use crate::test_api::*;
 use prisma_value::PrismaValue;
-use sql_schema_describer::{postgres::PostgresSchemaExt, ColumnTypeFamily, IndexColumn, SQLSortOrder};
+use sql_schema_describer::{postgres::PostgresSchemaExt, ColumnTypeFamily};
 
 #[test_connector(tags(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
@@ -215,7 +215,7 @@ fn all_cockroach_column_types_must_work(api: TestApi) {
 }
 
 #[test_connector(tags(CockroachDb))]
-fn cockroach_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
+fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     let schema = format!(
         r##"
             CREATE TABLE "{schema_name}"."indexes_test" (
@@ -230,47 +230,140 @@ fn cockroach_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestAp
         schema_name = api.schema_name()
     );
     api.raw_cmd(&schema);
-
-    let schema = api.describe();
-
-    let table = schema.table_bang("indexes_test");
-    let index = &table.indices[1];
-
-    assert_eq!(
-        &index.columns,
-        &[
-            IndexColumn {
-                name: "name".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None,
-            },
-            IndexColumn {
-                name: "age".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None,
-            },
-        ]
-    );
-    assert!(index.tpe.is_unique());
-
-    let index = &table.indices[0];
-
-    assert!(!index.tpe.is_unique());
-    assert_eq!(
-        &index.columns,
-        &[
-            IndexColumn {
-                name: "age".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None,
-            },
-            IndexColumn {
-                name: "name".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None,
-            },
-        ]
-    );
+    let expectation = expect![[r#"
+        SqlSchema {
+            tables: [
+                Table {
+                    name: "indexes_test",
+                    indices: [
+                        Index {
+                            name: "my_idx",
+                            columns: [
+                                IndexColumn {
+                                    name: "name",
+                                    sort_order: Some(
+                                        Asc,
+                                    ),
+                                    length: None,
+                                },
+                                IndexColumn {
+                                    name: "age",
+                                    sort_order: Some(
+                                        Asc,
+                                    ),
+                                    length: None,
+                                },
+                            ],
+                            tpe: Unique,
+                        },
+                        Index {
+                            name: "my_idx2",
+                            columns: [
+                                IndexColumn {
+                                    name: "age",
+                                    sort_order: Some(
+                                        Asc,
+                                    ),
+                                    length: None,
+                                },
+                                IndexColumn {
+                                    name: "name",
+                                    sort_order: Some(
+                                        Asc,
+                                    ),
+                                    length: None,
+                                },
+                            ],
+                            tpe: Normal,
+                        },
+                    ],
+                    primary_key: Some(
+                        PrimaryKey {
+                            columns: [
+                                PrimaryKeyColumn {
+                                    name: "id",
+                                    length: None,
+                                    sort_order: None,
+                                },
+                            ],
+                            constraint_name: Some(
+                                "indexes_test_pkey",
+                            ),
+                        },
+                    ),
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id",
+                        tpe: ColumnType {
+                            full_data_type: "text",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "String": Null,
+                                }),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "name",
+                        tpe: ColumnType {
+                            full_data_type: "text",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                Object({
+                                    "String": Null,
+                                }),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "age",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String(
+                                    "Int4",
+                                ),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+    api.expect_schema(expectation);
 }
 
 #[test_connector(tags(CockroachDb))]
@@ -286,10 +379,10 @@ fn escaped_characters_in_string_defaults(api: TestApi) {
     "#;
     api.raw_cmd(init);
     let schema = api.describe();
-    let table = schema.table_bang("Fruit");
+    let (table_id, _table) = schema.table_bang("Fruit");
 
     let expect_col = |name: &str, expected: &str| {
-        let col = table.column_bang(name);
+        let col = schema.column_bang(table_id, name);
         let default = col.default.as_ref().unwrap().as_value().unwrap().as_string().unwrap();
         assert_eq!(default, expected);
     };
@@ -400,7 +493,7 @@ fn array_column_defaults(api: TestApi) {
 
     let assert_default = |colname: &str, expected_default: Vec<PrismaValue>| {
         let col = table.column(colname).unwrap();
-        let value = dbg!(col.default().unwrap()).as_value().unwrap();
+        let value = col.default().unwrap().as_value().unwrap();
         assert_eq!(value, &PrismaValue::List(expected_default));
     };
 

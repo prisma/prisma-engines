@@ -17,11 +17,11 @@ impl SqlRenderer for SqliteFlavour {
         Quoted::Double(name)
     }
 
-    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _schemas: &Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _schemas: Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_enum on sqlite")
     }
 
-    fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+    fn render_create_index(&self, index: IndexWalker<'_>) -> String {
         let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
@@ -62,17 +62,17 @@ impl SqlRenderer for SqliteFlavour {
         }
     }
 
-    fn render_add_foreign_key(&self, _foreign_key: &ForeignKeyWalker<'_>) -> String {
+    fn render_add_foreign_key(&self, _foreign_key: ForeignKeyWalker<'_>) -> String {
         unreachable!("AddForeignKey on SQLite")
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: Pair<&SqlSchema>) -> Vec<String> {
         let AlterTable {
             changes,
             table_ids: table_index,
         } = alter_table;
 
-        let tables = schemas.tables(table_index);
+        let tables = schemas.tables(*table_index);
 
         let mut statements = Vec::new();
 
@@ -85,12 +85,12 @@ impl SqlRenderer for SqliteFlavour {
                     column_id,
                     has_virtual_default: _,
                 } => {
-                    let column = tables.next().column_at(*column_id);
+                    let column = schemas.next.walk_column(*column_id);
                     let col_sql = render_column(&column);
 
                     statements.push(format!(
                         "ALTER TABLE {table_name} ADD COLUMN {column_definition}",
-                        table_name = self.quote(tables.previous().name()),
+                        table_name = self.quote(tables.previous.name()),
                         column_definition = col_sql,
                     ));
                 }
@@ -106,11 +106,11 @@ impl SqlRenderer for SqliteFlavour {
         statements
     }
 
-    fn render_create_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
+    fn render_create_enum(&self, _: EnumWalker<'_>) -> Vec<String> {
         unreachable!("Unreachable render_create_enum() on SQLite. SQLite does not have enums.")
     }
 
-    fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: &str) -> String {
         let mut create_table = sql_ddl::sqlite::CreateTable {
             table_name: table_name.into(),
             columns: table.columns().map(|col| render_column(&col)).collect(),
@@ -151,22 +151,22 @@ impl SqlRenderer for SqliteFlavour {
         create_table.to_string()
     }
 
-    fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
+    fn render_drop_enum(&self, _: EnumWalker<'_>) -> Vec<String> {
         unreachable!("Unreachable render_drop_enum() on SQLite. SQLite does not have enums.")
     }
 
-    fn render_drop_foreign_key(&self, _foreign_key: &ForeignKeyWalker<'_>) -> String {
+    fn render_drop_foreign_key(&self, _foreign_key: ForeignKeyWalker<'_>) -> String {
         unreachable!("render_drop_foreign_key on SQLite")
     }
 
-    fn render_drop_index(&self, index: &IndexWalker<'_>) -> String {
+    fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
         format!("DROP INDEX {}", self.quote(index.name()))
     }
 
-    fn render_drop_and_recreate_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_drop_and_recreate_index(&self, indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
         vec![
-            self.render_drop_index(*indexes.previous()),
-            self.render_create_index(*indexes.next()),
+            self.render_drop_index(indexes.previous),
+            self.render_create_index(indexes.next),
         ]
     }
 
@@ -189,28 +189,28 @@ impl SqlRenderer for SqliteFlavour {
         })
     }
 
-    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: &Pair<&SqlSchema>) -> Vec<String> {
+    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: Pair<&SqlSchema>) -> Vec<String> {
         // Based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
         let mut result = vec!["PRAGMA foreign_keys=OFF".to_string()];
 
         for redefine_table in tables {
-            let tables = schemas.tables(&redefine_table.table_ids);
-            let temporary_table_name = format!("new_{}", &tables.next().name());
+            let tables = schemas.tables(redefine_table.table_ids);
+            let temporary_table_name = format!("new_{}", &tables.next.name());
 
-            result.push(self.render_create_table_as(tables.next(), &temporary_table_name));
+            result.push(self.render_create_table_as(tables.next, &temporary_table_name));
 
-            copy_current_table_into_new_table(&mut result, redefine_table, &tables, &temporary_table_name);
+            copy_current_table_into_new_table(&mut result, redefine_table, tables, &temporary_table_name);
 
-            result.push(format!(r#"DROP TABLE "{}""#, tables.previous().name()));
+            result.push(format!(r#"DROP TABLE "{}""#, tables.previous.name()));
 
             result.push(format!(
                 r#"ALTER TABLE "{old_name}" RENAME TO "{new_name}""#,
                 old_name = temporary_table_name,
-                new_name = tables.next().name(),
+                new_name = tables.next.name(),
             ));
 
-            for index in tables.next().indexes() {
-                result.push(self.render_create_index(&index));
+            for index in tables.next.indexes() {
+                result.push(self.render_create_index(index));
             }
         }
 
@@ -224,7 +224,7 @@ impl SqlRenderer for SqliteFlavour {
         format!(r#"ALTER TABLE "{}" RENAME TO "{}""#, name, new_name)
     }
 
-    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
+    fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
         format!(r#"DROP VIEW "{}""#, view.name())
     }
 
@@ -232,7 +232,7 @@ impl SqlRenderer for SqliteFlavour {
         unreachable!("render_drop_user_defined_type on SQLite")
     }
 
-    fn render_rename_foreign_key(&self, _fks: &Pair<ForeignKeyWalker<'_>>) -> String {
+    fn render_rename_foreign_key(&self, _fks: Pair<ForeignKeyWalker<'_>>) -> String {
         unreachable!("render RenameForeignKey on SQLite")
     }
 }
@@ -268,7 +268,7 @@ fn escape_quotes(s: &str) -> Cow<'_, str> {
 fn copy_current_table_into_new_table(
     steps: &mut Vec<String>,
     redefine_table: &RedefineTable,
-    tables: &Pair<TableWalker<'_>>,
+    tables: Pair<TableWalker<'_>>,
     temporary_table_name: &str,
 ) {
     if redefine_table.column_pairs.is_empty() {
@@ -278,27 +278,23 @@ fn copy_current_table_into_new_table(
     let destination_columns = redefine_table
         .column_pairs
         .iter()
-        .map(|(column_ides, _, _)| tables.next().column_at(*column_ides.next()).name());
+        .map(|(column_ids, _, _)| tables.next.schema.walk_column(column_ids.next).name());
 
     let source_columns = redefine_table.column_pairs.iter().map(|(column_ides, changes, _)| {
-        let columns = tables.columns(column_ides);
+        let columns = tables.map(|t| t.schema).columns(*column_ides);
 
         let col_became_required_with_a_default =
-            changes.arity_changed() && columns.next().arity().is_required() && columns.next().default().is_some();
+            changes.arity_changed() && columns.next.arity().is_required() && columns.next.default().is_some();
 
         if col_became_required_with_a_default {
             format!(
                 "coalesce({column_name}, {default_value}) AS {column_name}",
-                column_name = Quoted::sqlite_ident(columns.previous().name()),
-                default_value = render_default(
-                    columns
-                        .next()
-                        .default()
-                        .expect("default on required column with default"),
-                )
+                column_name = Quoted::sqlite_ident(columns.previous.name()),
+                default_value =
+                    render_default(columns.next.default().expect("default on required column with default"),)
             )
         } else {
-            Quoted::sqlite_ident(columns.previous().name()).to_string()
+            Quoted::sqlite_ident(columns.previous.name()).to_string()
         }
     });
 
@@ -307,7 +303,7 @@ fn copy_current_table_into_new_table(
         temporary_table_name = temporary_table_name,
         destination_columns = destination_columns.map(Quoted::sqlite_ident).join(", "),
         source_columns = source_columns.join(", "),
-        previous_table_name = tables.previous().name(),
+        previous_table_name = tables.previous.name(),
     );
 
     steps.push(query)

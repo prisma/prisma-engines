@@ -34,11 +34,11 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
         // Otherwise, case by case.
         // Column went from optional to required. This is unexecutable unless the table is
         // empty or the column has no existing NULLs.
-        if changes.arity_changed() && columns.next().arity().is_required() {
+        if changes.arity_changed() && columns.next.arity().is_required() {
             plan.push_unexecutable(
                 UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             );
@@ -58,8 +58,8 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
             Some(ColumnTypeChange::RiskyCast) => {
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
-                        table: columns.previous().table().name().to_owned(),
-                        column: columns.previous().name().to_owned(),
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
                     },
@@ -69,8 +69,8 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
             Some(ColumnTypeChange::NotCastable) => {
                 plan.push_warning(
                     SqlMigrationWarningCheck::NotCastable {
-                        table: columns.previous().table().name().to_owned(),
-                        column: columns.previous().name().to_owned(),
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
                     },
@@ -89,22 +89,22 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
     ) {
         // Unexecutable drop and recreate.
         if changes.arity_changed()
-            && columns.previous().arity().is_nullable()
-            && columns.next().arity().is_required()
-            && columns.next().default().is_none()
+            && columns.previous.arity().is_nullable()
+            && columns.next.arity().is_required()
+            && columns.next.default().is_none()
         {
             plan.push_unexecutable(
                 UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
-        } else if columns.next().arity().is_required() && columns.next().default().is_none() {
+        } else if columns.next.arity().is_required() && columns.next.default().is_none() {
             plan.push_unexecutable(
                 UnexecutableStepCheck::DropAndRecreateRequiredColumn {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
@@ -112,8 +112,8 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
             //todo this is probably due to a not castable type change. we should give that info in the warning
             plan.push_warning(
                 SqlMigrationWarningCheck::DropAndRecreateColumn {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
@@ -143,8 +143,8 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
 /// If the type change is an enum change, diagnose it, and return whether it _was_ an enum change.
 fn is_safe_enum_change(columns: &Pair<ColumnWalker<'_>>, plan: &mut DestructiveCheckPlan, step_index: usize) -> bool {
     if let (Some(previous_enum), Some(next_enum)) = (
-        columns.previous().column_type_family_as_enum(),
-        columns.next().column_type_family_as_enum(),
+        columns.previous.column_type_family_as_enum(),
+        columns.next.column_type_family_as_enum(),
     ) {
         let removed_values: Vec<String> = previous_enum
             .values
