@@ -207,7 +207,6 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
-<span id="205">205</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlMigrationConnector</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
     <span class="ident">BoxFuture</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">MigrationPersistence</span>, <span class="ident">MigrationRecord</span>, <span class="ident">PersistenceNotInitializedError</span>,
@@ -225,9 +224,8 @@
             <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">describe_schema</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="kw">if</span> <span class="ident">schema</span>
-                .<span class="ident">tables</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table_name</span>())
+                .<span class="ident">table_walkers</span>()
+                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table_name</span>())
             {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }

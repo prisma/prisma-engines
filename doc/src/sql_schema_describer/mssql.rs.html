@@ -817,26 +817,19 @@
 <span id="812">812</span>
 <span id="813">813</span>
 <span id="814">814</span>
-<span id="815">815</span>
-<span id="816">816</span>
-<span id="817">817</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">getters::Getter</span>, <span class="ident">ids</span>::<span class="kw-2">*</span>, <span class="ident">parsers::Parser</span>, <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultValue</span>,
     <span class="ident">DescriberError</span>, <span class="ident">DescriberErrorKind</span>, <span class="ident">DescriberResult</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">Index</span>, <span class="ident">IndexColumn</span>, <span class="ident">IndexType</span>,
-    <span class="ident">PrimaryKey</span>, <span class="ident">PrimaryKeyColumn</span>, <span class="ident">Procedure</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlMetadata</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>, <span class="ident">UserDefinedType</span>, <span class="ident">View</span>,
+    <span class="ident">PrimaryKey</span>, <span class="ident">PrimaryKeyColumn</span>, <span class="ident">Procedure</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlMetadata</span>, <span class="ident">SqlSchema</span>, <span class="ident">UserDefinedType</span>, <span class="ident">View</span>,
 };
+<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 <span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MsSqlType</span>, <span class="ident">MsSqlTypeParameter</span>, <span class="ident">NativeType</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">quaint::prelude::Queryable</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">any::type_name</span>,
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>},
-    <span class="ident">convert::TryInto</span>,
-};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">any::type_name</span>, <span class="ident">borrow::Cow</span>, <span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryInto</span>};
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
 
 <span class="doccomment">/// Matches a default value in the schema, that is not a string.</span>
@@ -927,7 +920,8 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">SqlMetadata</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">table_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_table_names</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">len</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql_schema</span> <span class="op">=</span> <span class="ident">SqlSchema::default</span>();
+        <span class="kw">let</span> <span class="ident">table_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_table_names</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">size_in_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_size</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">SqlMetadata</span> {
@@ -937,39 +931,29 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tables</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_table_names</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">table_ids</span> <span class="op">=</span> <span class="ident">tables</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="ident">t</span>)<span class="op">|</span> (<span class="ident">t</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">TableId</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">u32</span>)))
-            .<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql_schema</span> <span class="op">=</span> <span class="ident">SqlSchema::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mssql_ext</span> <span class="op">=</span> <span class="ident">MssqlSchemaExt::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_all_columns</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">get_all_indices</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">mssql_ext</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tables</span>, <span class="kw-2">&amp;</span><span class="ident">table_ids</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">foreign_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_foreign_keys</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
+        <span class="kw">let</span> <span class="ident">table_names</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_table_names</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="ident">sql_schema</span>.<span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_all_columns</span>(<span class="kw-2">&amp;</span><span class="ident">table_names</span>, <span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">get_all_indices</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">mssql_ext</span>, <span class="kw-2">&amp;</span><span class="ident">table_names</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>)
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="ident">sql_schema</span>.<span class="ident">foreign_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_foreign_keys</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">table_names</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="comment">// Sort the vectors we will use for binary search.</span>
+        <span class="ident">sql_schema</span>.<span class="ident">foreign_keys</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="ident">table_id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">table_id</span>);
         <span class="ident">mssql_ext</span>.<span class="ident">clustered_indexes</span>.<span class="ident">sort</span>();
         <span class="ident">mssql_ext</span>.<span class="ident">nonclustered_primary_keys</span>.<span class="ident">sort</span>();
 
-        <span class="kw">for</span> <span class="ident">table</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">tables</span> {
-            <span class="self">self</span>.<span class="ident">get_table</span>(<span class="ident">table</span>, <span class="kw-2">&amp;mut</span> <span class="ident">columns</span>, <span class="kw-2">&amp;mut</span> <span class="ident">foreign_keys</span>);
-        }
+        <span class="ident">sql_schema</span>.<span class="ident">views</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_views</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="ident">sql_schema</span>.<span class="ident">procedures</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_procedures</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="ident">sql_schema</span>.<span class="ident">user_defined_types</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_user_defined_types</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="ident">sql_schema</span>.<span class="ident">connector_data</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::connector_data::ConnectorData</span> {
+            <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">mssql_ext</span>)),
+        };
 
-        <span class="kw">let</span> <span class="ident">views</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_views</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">procedures</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_procedures</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">user_defined_types</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_user_defined_types</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(<span class="ident">SqlSchema</span> {
-            <span class="ident">tables</span>,
-            <span class="ident">views</span>,
-            <span class="ident">procedures</span>,
-            <span class="ident">user_defined_types</span>,
-            <span class="ident">connector_data</span>: <span class="ident"><span class="kw">crate</span>::connector_data::ConnectorData</span> {
-                <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">mssql_ext</span>)),
-            },
-            ..<span class="ident">Default::default</span>()
-        })
+        <span class="prelude-val">Ok</span>(<span class="ident">sql_schema</span>)
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -1017,7 +1001,11 @@
         <span class="prelude-val">Ok</span>(<span class="ident">procedures</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_table_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_table_names</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>,
+    ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="string">r#&quot;
             SELECT t.name AS table_name
             FROM sys.tables t
@@ -1028,19 +1016,18 @@
         &quot;#</span>;
 
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">select</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">IndexMap::new</span>();
 
-        <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">rows</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">Table</span> {
-                <span class="ident">name</span>,
-                ..<span class="ident">Default::default</span>()
-            })
-            .<span class="ident">collect</span>();
+        <span class="kw">for</span> <span class="ident">name</span> <span class="kw">in</span> <span class="ident">names</span> {
+            <span class="kw">let</span> <span class="ident">cloned_name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">clone</span>();
+            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">push_table</span>(<span class="ident">name</span>);
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">cloned_name</span>, <span class="ident">id</span>);
+        }
 
-        <span class="macro">trace!</span>(<span class="string">&quot;Found table names: {:?}&quot;</span>, <span class="ident">names</span>);
+        <span class="macro">trace!</span>(<span class="string">&quot;Found table names: {:?}&quot;</span>, <span class="ident">map</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">names</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">map</span>)
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
@@ -1073,17 +1060,11 @@
             .<span class="ident">expect</span>(<span class="string">&quot;Invariant violation: size is not a valid usize value.&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">get_table</span>(
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_all_columns</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Table</span>,
-        <span class="ident">columns</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">foreign_keys</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ForeignKey</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) {
-        <span class="ident">table</span>.<span class="ident">foreign_keys</span> <span class="op">=</span> <span class="ident">foreign_keys</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">table</span>.<span class="ident">name</span>).<span class="ident">unwrap_or_default</span>();
-        <span class="ident">table</span>.<span class="ident">columns</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">table</span>.<span class="ident">name</span>).<span class="ident">unwrap_or_default</span>();
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_all_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span>,
+        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+    ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TableId</span>, <span class="ident">Column</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">r#&quot;
             SELECT c.name                                                       AS column_name,
                 CASE typ.is_assembly_type
@@ -1110,13 +1091,18 @@
             ORDER BY COLUMNPROPERTY(c.object_id, c.name, &#39;ordinal&#39;);
         &quot;#</span>};
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">for</span> <span class="ident">col</span> <span class="kw">in</span> <span class="ident">rows</span> {
             <span class="macro">debug!</span>(<span class="string">&quot;Got column: {:?}&quot;</span>, <span class="ident">col</span>);
 
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
+            <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">table_id</span>) <span class="op">=</span> <span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">table_name</span>) {
+                <span class="kw-2">*</span><span class="ident">table_id</span>
+            } <span class="kw">else</span> {
+                <span class="kw">continue</span>;
+            };
 
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;column_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">data_type</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;data_type&quot;</span>);
@@ -1141,7 +1127,6 @@
             );
 
             <span class="kw">let</span> <span class="ident">auto_increment</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;is_identity&quot;</span>);
-            <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">entry</span>(<span class="ident">table_name</span>).<span class="ident">or_insert_with</span>(<span class="ident">Vec::new</span>);
 
             <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">col</span>.<span class="ident">get</span>(<span class="string">&quot;column_default&quot;</span>) {
                 <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
@@ -1203,23 +1188,28 @@
                 },
             };
 
-            <span class="ident">entry</span>.<span class="ident">push</span>(<span class="ident">Column</span> {
-                <span class="ident">name</span>,
-                <span class="ident">tpe</span>,
-                <span class="ident">default</span>,
-                <span class="ident">auto_increment</span>,
-            });
+            <span class="ident">columns</span>.<span class="ident">push</span>((
+                <span class="ident">table_id</span>,
+                <span class="ident">Column</span> {
+                    <span class="ident">name</span>,
+                    <span class="ident">tpe</span>,
+                    <span class="ident">default</span>,
+                    <span class="ident">auto_increment</span>,
+                },
+            ));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">map</span>)
+        <span class="ident">columns</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="ident">table_id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">table_id</span>);
+
+        <span class="prelude-val">Ok</span>(<span class="ident">columns</span>)
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_all_indices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">mssql_ext</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MssqlSchemaExt</span>,
-        <span class="ident">tables</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Table</span>],
-        <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span>,
+        <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span>,
+        <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>,
     ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">r#&quot;
             SELECT DISTINCT
@@ -1259,7 +1249,7 @@
 
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="ident">table_ids</span>[<span class="ident">table_name</span>.<span class="ident">as_str</span>()];
-            <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">tables</span>[<span class="ident">table_id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>];
+            <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>[<span class="ident">table_id</span>];
             <span class="kw">let</span> <span class="ident">index_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;index_name&quot;</span>);
 
             <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;is_descending&quot;</span>) {
@@ -1422,10 +1412,14 @@
         <span class="prelude-val">Ok</span>(<span class="ident">types</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ForeignKey</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_foreign_keys</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TableId</span>, <span class="ident">ForeignKey</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Foreign keys covering multiple columns will return multiple rows, which we need to</span>
         <span class="comment">// merge.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ForeignKey</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span>(<span class="ident">TableId</span>, <span class="ident">String</span>), <span class="ident">ForeignKey</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
 
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">r#&quot;
             SELECT OBJECT_NAME(fkc.constraint_object_id) AS constraint_name,
@@ -1463,12 +1457,16 @@
             <span class="macro">debug!</span>(<span class="string">&quot;Got description FK row {:#?}&quot;</span>, <span class="ident">row</span>);
 
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
+            <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">table_id</span>) <span class="op">=</span> <span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">table_name</span>) {
+                <span class="kw-2">*</span><span class="ident">table_id</span>
+            } <span class="kw">else</span> {
+                <span class="kw">continue</span>;
+            };
             <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;constraint_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;column_name&quot;</span>);
-            <span class="kw">let</span> <span class="ident">referenced_table</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;referenced_table_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">referenced_schema_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;referenced_schema_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">referenced_column</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;referenced_column_name&quot;</span>);
-            <span class="kw">let</span> <span class="ident">ord_pos</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;ordinal_position&quot;</span>);
+            <span class="kw">let</span> <span class="ident">referenced_table</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;referenced_table_name&quot;</span>);
 
             <span class="kw">if</span> <span class="ident">schema</span> <span class="op">!</span><span class="op">=</span> <span class="ident">referenced_schema_name</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DescriberError::from</span>(<span class="ident">DescriberErrorKind::CrossSchemaReference</span> {
@@ -1477,6 +1475,13 @@
                     <span class="ident">constraint</span>: <span class="ident">constraint_name</span>,
                 }));
             }
+
+            <span class="kw">let</span> <span class="ident">referenced_table_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">referenced_table</span>) {
+                <span class="kw-2">*</span><span class="ident">id</span>
+            } <span class="kw">else</span> {
+                <span class="kw">continue</span>;
+            };
+            <span class="kw">let</span> <span class="ident">ord_pos</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;ordinal_position&quot;</span>);
 
             <span class="kw">let</span> <span class="ident">on_delete_action</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;delete_referential_action&quot;</span>) {
                 <span class="number">0</span> =&gt; <span class="ident">ForeignKeyAction::NoAction</span>,
@@ -1494,49 +1499,38 @@
                 <span class="ident">s</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unrecognized on delete action &#39;{}&#39;&quot;</span>, <span class="ident">s</span>),
             };
 
-            <span class="kw">let</span> <span class="ident">intermediate_fks</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">entry</span>(<span class="ident">table_name</span>).<span class="ident">or_default</span>();
+            <span class="kw">let</span> <span class="ident">fk</span> <span class="op">=</span> <span class="ident">map</span>
+                .<span class="ident">entry</span>((<span class="ident">table_id</span>, <span class="ident">constraint_name</span>.<span class="ident">clone</span>()))
+                .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ForeignKey</span> {
+                    <span class="ident">constraint_name</span>: <span class="prelude-val">Some</span>(<span class="ident">constraint_name</span>.<span class="ident">clone</span>()),
+                    <span class="ident">columns</span>: <span class="ident">Vec::new</span>(),
+                    <span class="ident">referenced_table</span>: <span class="ident">referenced_table_id</span>,
+                    <span class="ident">referenced_columns</span>: <span class="ident">Vec::new</span>(),
+                    <span class="ident">on_delete_action</span>,
+                    <span class="ident">on_update_action</span>,
+                });
 
-            <span class="kw">match</span> <span class="ident">intermediate_fks</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">constraint_name</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">fk</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">ord_pos</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>;
+            <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">ord_pos</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>;
 
-                    <span class="kw">if</span> <span class="ident">fk</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">pos</span> {
-                        <span class="ident">fk</span>.<span class="ident">columns</span>.<span class="ident">resize</span>(<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>, <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>());
-                    }
+            <span class="kw">if</span> <span class="ident">fk</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">pos</span> {
+                <span class="ident">fk</span>.<span class="ident">columns</span>.<span class="ident">resize</span>(<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>, <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>());
+            }
 
-                    <span class="ident">fk</span>.<span class="ident">columns</span>[<span class="ident">pos</span>] <span class="op">=</span> <span class="ident">column</span>;
+            <span class="ident">fk</span>.<span class="ident">columns</span>[<span class="ident">pos</span>] <span class="op">=</span> <span class="ident">column</span>;
 
-                    <span class="kw">if</span> <span class="ident">fk</span>.<span class="ident">referenced_columns</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">pos</span> {
-                        <span class="ident">fk</span>.<span class="ident">referenced_columns</span>.<span class="ident">resize</span>(<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>, <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>());
-                    }
+            <span class="kw">if</span> <span class="ident">fk</span>.<span class="ident">referenced_columns</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">pos</span> {
+                <span class="ident">fk</span>.<span class="ident">referenced_columns</span>.<span class="ident">resize</span>(<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>, <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>());
+            }
 
-                    <span class="ident">fk</span>.<span class="ident">referenced_columns</span>[<span class="ident">pos</span>] <span class="op">=</span> <span class="ident">referenced_column</span>;
-                }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">fk</span> <span class="op">=</span> <span class="ident">ForeignKey</span> {
-                        <span class="ident">constraint_name</span>: <span class="prelude-val">Some</span>(<span class="ident">constraint_name</span>.<span class="ident">clone</span>()),
-                        <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">column</span>],
-                        <span class="ident">referenced_table</span>,
-                        <span class="ident">referenced_columns</span>: <span class="macro">vec!</span>[<span class="ident">referenced_column</span>],
-                        <span class="ident">on_delete_action</span>,
-                        <span class="ident">on_update_action</span>,
-                    };
-
-                    <span class="ident">intermediate_fks</span>.<span class="ident">insert</span>(<span class="ident">constraint_name</span>, <span class="ident">fk</span>);
-                }
-            };
+            <span class="ident">fk</span>.<span class="ident">referenced_columns</span>[<span class="ident">pos</span>] <span class="op">=</span> <span class="ident">referenced_column</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">fks</span> <span class="op">=</span> <span class="ident">map</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">map</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ForeignKey</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">_k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>).<span class="ident">collect</span>();
-
-                <span class="ident">fks</span>.<span class="ident">sort_unstable_by</span>(<span class="op">|</span><span class="ident">this</span>, <span class="ident">other</span><span class="op">|</span> <span class="ident">this</span>.<span class="ident">columns</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">columns</span>));
-
-                (<span class="ident">k</span>, <span class="ident">fks</span>)
-            })
+            .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">table_id</span>, <span class="ident">_constraint_name</span>), <span class="ident">fk</span>)<span class="op">|</span> (<span class="ident">table_id</span>, <span class="ident">fk</span>))
             .<span class="ident">collect</span>();
+
+        <span class="ident">fks</span>.<span class="ident">sort_by_cached_key</span>(<span class="op">|</span>(<span class="ident">table_id</span>, <span class="ident">fk</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">table_id</span>, <span class="ident">fk</span>.<span class="ident">columns</span>.<span class="ident">to_owned</span>()));
 
         <span class="prelude-val">Ok</span>(<span class="ident">fks</span>)
     }

@@ -1047,14 +1047,6 @@
 <span id="1042">1042</span>
 <span id="1043">1043</span>
 <span id="1044">1044</span>
-<span id="1045">1045</span>
-<span id="1046">1046</span>
-<span id="1047">1047</span>
-<span id="1048">1048</span>
-<span id="1049">1049</span>
-<span id="1050">1050</span>
-<span id="1051">1051</span>
-<span id="1052">1052</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">common</span>::<span class="kw-2">*</span>, <span class="ident">SqlRenderer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::PostgresFlavour</span>,
@@ -1073,7 +1065,7 @@
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">impl</span> <span class="ident">PostgresFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">render_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">column</span>.<span class="ident">name</span>());
         <span class="kw">let</span> <span class="ident">tpe_str</span> <span class="op">=</span> <span class="ident">render_column_type</span>(<span class="ident">column</span>, <span class="self">self</span>);
         <span class="kw">let</span> <span class="ident">nullability_str</span> <span class="op">=</span> <span class="ident">render_nullability</span>(<span class="ident">column</span>);
@@ -1084,7 +1076,7 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, <span class="ident">default</span>))
             .<span class="ident">unwrap_or_else</span>(<span class="ident">String::new</span>);
 
-        <span class="kw">let</span> <span class="ident">identity_str</span> <span class="op">=</span> <span class="ident">render_column_identity_str</span>(<span class="self">self</span>, <span class="ident">column</span>);
+        <span class="kw">let</span> <span class="ident">identity_str</span> <span class="op">=</span> <span class="ident">render_column_identity_str</span>(<span class="ident">column</span>, <span class="self">self</span>);
 
         <span class="macro">format!</span>(<span class="string">&quot;{SQL_INDENTATION}{column_name} {tpe_str}{nullability_str}{default_str}{identity_str}&quot;</span>,)
     }
@@ -1139,7 +1131,7 @@
         <span class="ident">Quoted::postgres_ident</span>(<span class="ident">name</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_add_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="kw-2">&amp;</span><span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_add_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="ident">ddl::AlterTable</span> {
             <span class="ident">table_name</span>: <span class="ident">ddl::PostgresIdentifier::Simple</span>(<span class="ident">foreign_key</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">into</span>()),
             <span class="ident">clauses</span>: <span class="macro">vec!</span>[<span class="ident">ddl::AlterTableClause::AddForeignKey</span>(<span class="ident">ddl::ForeignKey</span> {
@@ -1166,7 +1158,7 @@
         .<span class="ident">to_string</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">render_alter_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">alter_enum</span>: <span class="kw-2">&amp;</span><span class="ident">AlterEnum</span>, <span class="ident">schemas</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">render_alter_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">alter_enum</span>: <span class="kw-2">&amp;</span><span class="ident">AlterEnum</span>, <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// ALTER TYPE is much more limited on postgres than on cockroachdb.</span>
         <span class="comment">//</span>
         <span class="comment">// On Postgres:</span>
@@ -1188,7 +1180,7 @@
                 <span class="ident">stmt</span>.<span class="ident">push_display</span>(<span class="kw-2">&amp;</span><span class="ident">Quoted::postgres_ident</span>(<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>()));
                 <span class="ident">stmt</span>.<span class="ident">push_str</span>(<span class="string">&quot; ALTER PRIMARY KEY USING COLUMNS (&quot;</span>);
                 <span class="kw">let</span> <span class="ident">column_names</span> <span class="op">=</span> <span class="ident">tables</span>
-                    .<span class="ident">next</span>()
+                    .<span class="ident">next</span>
                     .<span class="ident">primary_key</span>()
                     .<span class="ident">unwrap</span>() <span class="comment">// safe because there is a primary key to alter</span>
                     .<span class="ident">column_names</span>()
@@ -1199,7 +1191,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">render_rename_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">indexes</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">render_rename_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">indexes</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="ident">render_step</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">step</span><span class="op">|</span> {
             <span class="ident">step</span>.<span class="ident">render_statement</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> {
                 <span class="ident">stmt</span>.<span class="ident">push_str</span>(<span class="string">&quot;ALTER INDEX &quot;</span>);
@@ -1210,17 +1202,12 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">render_alter_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">alter_table</span>: <span class="kw-2">&amp;</span><span class="ident">AlterTable</span>, <span class="ident">schemas</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">AlterTable</span> {
-            <span class="ident">changes</span>,
-            <span class="ident">table_ids</span>: <span class="ident">table_index</span>,
-        } <span class="op">=</span> <span class="ident">alter_table</span>;
-
+    <span class="kw">fn</span> <span class="ident">render_alter_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">alter_table</span>: <span class="kw-2">&amp;</span><span class="ident">AlterTable</span>, <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">AlterTable</span> { <span class="ident">changes</span>, <span class="ident">table_ids</span> } <span class="op">=</span> <span class="ident">alter_table</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lines</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">before_statements</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">after_statements</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-
-        <span class="kw">let</span> <span class="ident">tables</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">tables</span>(<span class="ident">table_index</span>);
+        <span class="kw">let</span> <span class="ident">tables</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">tables</span>(<span class="kw-2">*</span><span class="ident">table_ids</span>);
 
         <span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="ident">changes</span> {
             <span class="kw">match</span> <span class="ident">change</span> {
@@ -1228,7 +1215,7 @@
                     <span class="string">&quot;DROP CONSTRAINT {}&quot;</span>,
                     <span class="ident">Quoted::postgres_ident</span>(
                         <span class="ident">tables</span>
-                            .<span class="ident">previous</span>()
+                            .<span class="ident">previous</span>
                             .<span class="ident">primary_key</span>()
                             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">constraint_name</span>.<span class="ident">as_ref</span>())
                             .<span class="ident">expect</span>(<span class="string">&quot;Missing constraint name for DROP CONSTRAINT on Postgres.&quot;</span>)
@@ -1238,21 +1225,21 @@
                     <span class="string">&quot;RENAME CONSTRAINT {} TO {}&quot;</span>,
                     <span class="ident">Quoted::postgres_ident</span>(
                         <span class="ident">tables</span>
-                            .<span class="ident">previous</span>()
+                            .<span class="ident">previous</span>
                             .<span class="ident">primary_key</span>()
                             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">constraint_name</span>.<span class="ident">as_ref</span>())
                             .<span class="ident">expect</span>(<span class="string">&quot;Missing constraint name for DROP CONSTRAINT on Postgres.&quot;</span>)
                     ),
                     <span class="ident">Quoted::postgres_ident</span>(
                         <span class="ident">tables</span>
-                            .<span class="ident">next</span>()
+                            .<span class="ident">next</span>
                             .<span class="ident">primary_key</span>()
                             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">constraint_name</span>.<span class="ident">as_ref</span>())
                             .<span class="ident">expect</span>(<span class="string">&quot;Missing constraint name for DROP CONSTRAINT on Postgres.&quot;</span>)
                     )
                 )),
                 <span class="ident">TableChange::AddPrimaryKey</span> =&gt; <span class="ident">lines</span>.<span class="ident">push</span>({
-                    <span class="kw">let</span> <span class="ident">named</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">primary_key</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">constraint_name</span>.<span class="ident">as_ref</span>()) {
+                    <span class="kw">let</span> <span class="ident">named</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">primary_key</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">constraint_name</span>.<span class="ident">as_ref</span>()) {
                         <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;CONSTRAINT {} &quot;</span>, <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">name</span>)),
                         <span class="prelude-val">None</span> =&gt; <span class="string">&quot;&quot;</span>.<span class="ident">into</span>(),
                     };
@@ -1261,7 +1248,7 @@
                         <span class="string">&quot;ADD {}PRIMARY KEY ({})&quot;</span>,
                         <span class="ident">named</span>,
                         <span class="ident">tables</span>
-                            .<span class="ident">next</span>()
+                            .<span class="ident">next</span>
                             .<span class="ident">primary_key_column_names</span>()
                             .<span class="ident">unwrap</span>()
                             .<span class="ident">iter</span>()
@@ -1273,13 +1260,13 @@
                     <span class="ident">column_id</span>,
                     <span class="ident">has_virtual_default</span>: <span class="kw">_</span>,
                 } =&gt; {
-                    <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">column_at</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
-                    <span class="kw">let</span> <span class="ident">col_sql</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">render_column</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>);
+                    <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">walk_column</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
+                    <span class="kw">let</span> <span class="ident">col_sql</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">render_column</span>(<span class="ident">column</span>);
 
                     <span class="ident">lines</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;ADD COLUMN {}&quot;</span>, <span class="ident">col_sql</span>));
                 }
                 <span class="ident">TableChange::DropColumn</span> { <span class="ident">column_id</span> } =&gt; {
-                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">tables</span>.<span class="ident">previous</span>().<span class="ident">column_at</span>(<span class="kw-2">*</span><span class="ident">column_id</span>).<span class="ident">name</span>());
+                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">walk_column</span>(<span class="kw-2">*</span><span class="ident">column_id</span>).<span class="ident">name</span>());
                     <span class="ident">lines</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;DROP COLUMN {}&quot;</span>, <span class="ident">name</span>));
                 }
                 <span class="ident">TableChange::AlterColumn</span>(<span class="ident">AlterColumn</span> {
@@ -1287,10 +1274,10 @@
                     <span class="ident">changes</span>,
                     <span class="ident">type_change</span>: <span class="kw">_</span>,
                 }) =&gt; {
-                    <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">columns</span>(<span class="ident">column_id</span>);
+                    <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">columns</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
 
                     <span class="ident">render_alter_column</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">columns</span>,
+                        <span class="ident">columns</span>,
                         <span class="ident">changes</span>,
                         <span class="kw-2">&amp;mut</span> <span class="ident">before_statements</span>,
                         <span class="kw-2">&amp;mut</span> <span class="ident">lines</span>,
@@ -1299,12 +1286,12 @@
                     );
                 }
                 <span class="ident">TableChange::DropAndRecreateColumn</span> { <span class="ident">column_id</span>, <span class="ident">changes</span>: <span class="kw">_</span> } =&gt; {
-                    <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">columns</span>(<span class="ident">column_id</span>);
-                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">name</span>());
+                    <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">columns</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
+                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>());
 
                     <span class="ident">lines</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;DROP COLUMN {}&quot;</span>, <span class="ident">name</span>));
 
-                    <span class="kw">let</span> <span class="ident">col_sql</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">render_column</span>(<span class="ident">columns</span>.<span class="ident">next</span>());
+                    <span class="kw">let</span> <span class="ident">col_sql</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">render_column</span>(<span class="ident">columns</span>.<span class="ident">next</span>);
                     <span class="ident">lines</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;ADD COLUMN {}&quot;</span>, <span class="ident">col_sql</span>));
                 }
             };
@@ -1318,14 +1305,14 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">before_statements</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">after_statements</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">lines</span>.<span class="ident">len</span>());
             <span class="ident">out</span>.<span class="ident">extend</span>(<span class="ident">before_statements</span>.<span class="ident">into_iter</span>());
             <span class="kw">for</span> <span class="ident">line</span> <span class="kw">in</span> <span class="ident">lines</span> {
-                <span class="ident">out</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;ALTER TABLE \&quot;{}\&quot; {}&quot;</span>, <span class="ident">tables</span>.<span class="ident">previous</span>().<span class="ident">name</span>(), <span class="ident">line</span>))
+                <span class="ident">out</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;ALTER TABLE \&quot;{}\&quot; {}&quot;</span>, <span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>(), <span class="ident">line</span>))
             }
             <span class="ident">out</span>.<span class="ident">extend</span>(<span class="ident">after_statements</span>.<span class="ident">into_iter</span>());
             <span class="ident">out</span>
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">alter_table</span> <span class="op">=</span> <span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {} {}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">tables</span>.<span class="ident">previous</span>().<span class="ident">name</span>()),
+                <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>()),
                 <span class="ident">lines</span>.<span class="ident">join</span>(<span class="string">&quot;,\n&quot;</span>)
             );
 
@@ -1337,7 +1324,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">enm</span>: <span class="kw-2">&amp;</span><span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">render_create_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">enm</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="ident">render_step</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">step</span><span class="op">|</span> {
             <span class="ident">step</span>.<span class="ident">render_statement</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> {
                 <span class="ident">stmt</span>.<span class="ident">push_display</span>(<span class="kw-2">&amp;</span><span class="ident">ddl::CreateEnum</span> {
@@ -1348,14 +1335,14 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">pg_ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">schema</span>().<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
+    <span class="kw">fn</span> <span class="ident">render_create_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+        <span class="kw">let</span> <span class="ident">pg_ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
 
         <span class="ident">ddl::CreateIndex</span> {
             <span class="ident">index_name</span>: <span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
             <span class="ident">is_unique</span>: <span class="ident">index</span>.<span class="ident">index_type</span>().<span class="ident">is_unique</span>(),
             <span class="ident">table_reference</span>: <span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
-            <span class="ident">using</span>: <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">pg_ext</span>.<span class="ident">index_algorithm</span>(<span class="ident">index</span>.<span class="ident">index_id</span>()) {
+            <span class="ident">using</span>: <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">pg_ext</span>.<span class="ident">index_algorithm</span>(<span class="ident">index</span>.<span class="ident">id</span>) {
                 <span class="ident">SqlIndexAlgorithm::BTree</span> =&gt; <span class="ident">ddl::IndexAlgorithm::BTree</span>,
                 <span class="ident">SqlIndexAlgorithm::Hash</span> =&gt; <span class="ident">ddl::IndexAlgorithm::Hash</span>,
                 <span class="ident">SqlIndexAlgorithm::Gist</span> =&gt; <span class="ident">ddl::IndexAlgorithm::Gist</span>,
@@ -1379,8 +1366,8 @@
         .<span class="ident">to_string</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_table_as</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">render_column</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>)).<span class="ident">join</span>(<span class="string">&quot;,\n&quot;</span>);
+    <span class="kw">fn</span> <span class="ident">render_create_table_as</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
+        <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">render_column</span>(<span class="ident">column</span>)).<span class="ident">join</span>(<span class="string">&quot;,\n&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">pk</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">table</span>.<span class="ident">primary_key</span>() {
             <span class="kw">let</span> <span class="ident">named_constraint</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">pk</span>.<span class="ident">constraint_name</span> {
@@ -1406,7 +1393,7 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dropped_enum</span>: <span class="kw-2">&amp;</span><span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">render_drop_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dropped_enum</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="ident">render_step</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">step</span><span class="op">|</span> {
             <span class="ident">step</span>.<span class="ident">render_statement</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> {
                 <span class="ident">stmt</span>.<span class="ident">push_display</span>(<span class="kw-2">&amp;</span><span class="ident">ddl::DropType</span> {
@@ -1416,7 +1403,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="kw-2">&amp;</span><span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_drop_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(
             <span class="string">&quot;ALTER TABLE {table} DROP CONSTRAINT {constraint_name}&quot;</span>,
             <span class="ident">table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">foreign_key</span>.<span class="ident">table</span>().<span class="ident">name</span>()),
@@ -1424,7 +1411,7 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_drop_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="ident">ddl::DropIndex</span> {
             <span class="ident">index_name</span>: <span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
         }
@@ -1442,32 +1429,32 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_view</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">view</span>: <span class="kw-2">&amp;</span><span class="ident">ViewWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_drop_view</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">view</span>: <span class="ident">ViewWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="ident">ddl::DropView</span> {
             <span class="ident">view_name</span>: <span class="ident">view</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
         }
         .<span class="ident">to_string</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">render_redefine_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tables</span>: <span class="kw-2">&amp;</span>[<span class="ident">RedefineTable</span>], <span class="ident">schemas</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">render_redefine_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tables</span>: <span class="kw-2">&amp;</span>[<span class="ident">RedefineTable</span>], <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">for</span> <span class="ident">redefine_table</span> <span class="kw">in</span> <span class="ident">tables</span> {
-            <span class="kw">let</span> <span class="ident">tables</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">tables</span>(<span class="kw-2">&amp;</span><span class="ident">redefine_table</span>.<span class="ident">table_ids</span>);
-            <span class="kw">let</span> <span class="ident">temporary_table_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;_prisma_new_{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">name</span>());
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_create_table_as</span>(<span class="ident">tables</span>.<span class="ident">next</span>(), <span class="kw-2">&amp;</span><span class="ident">temporary_table_name</span>));
+            <span class="kw">let</span> <span class="ident">tables</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">tables</span>(<span class="ident">redefine_table</span>.<span class="ident">table_ids</span>);
+            <span class="kw">let</span> <span class="ident">temporary_table_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;_prisma_new_{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">name</span>());
+            <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_create_table_as</span>(<span class="ident">tables</span>.<span class="ident">next</span>, <span class="kw-2">&amp;</span><span class="ident">temporary_table_name</span>));
 
             <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">redefine_table</span>
                 .<span class="ident">column_pairs</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">column_indexes</span>, <span class="kw">_</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">tables</span>.<span class="ident">columns</span>(<span class="ident">column_indexes</span>).<span class="ident">next</span>().<span class="ident">name</span>())
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">column_ids</span>, <span class="kw">_</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">schemas</span>.<span class="ident">columns</span>(<span class="kw-2">*</span><span class="ident">column_ids</span>).<span class="ident">next</span>.<span class="ident">name</span>())
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">c</span>).<span class="ident">to_string</span>())
                 .<span class="ident">collect</span>();
 
-            <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">previous</span>().<span class="ident">name</span>();
+            <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>();
 
-            <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">tables</span>.<span class="ident">previous</span>().<span class="ident">indexes</span>() {
-                <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_drop_index</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>));
+            <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">indexes</span>() {
+                <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_drop_index</span>(<span class="ident">index</span>));
             }
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">columns</span>.<span class="ident">is_empty</span>() {
@@ -1479,20 +1466,20 @@
 
             <span class="ident">result</span>.<span class="ident">push</span>(
                 <span class="ident">ddl::DropTable</span> {
-                    <span class="ident">table_name</span>: <span class="ident">tables</span>.<span class="ident">previous</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
+                    <span class="ident">table_name</span>: <span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
                     <span class="ident">cascade</span>: <span class="bool-val">true</span>,
                 }
                 .<span class="ident">to_string</span>(),
             );
 
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_rename_table</span>(<span class="kw-2">&amp;</span><span class="ident">temporary_table_name</span>, <span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">name</span>()));
+            <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_rename_table</span>(<span class="kw-2">&amp;</span><span class="ident">temporary_table_name</span>, <span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">name</span>()));
 
-            <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">indexes</span>() {
-                <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_create_index</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>));
+            <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">indexes</span>() {
+                <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_create_index</span>(<span class="ident">index</span>));
             }
 
-            <span class="kw">for</span> <span class="ident">fk</span> <span class="kw">in</span> <span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">foreign_keys</span>() {
-                <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_add_foreign_key</span>(<span class="kw-2">&amp;</span><span class="ident">fk</span>));
+            <span class="kw">for</span> <span class="ident">fk</span> <span class="kw">in</span> <span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">foreign_keys</span>() {
+                <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_add_foreign_key</span>(<span class="ident">fk</span>));
             }
         }
 
@@ -1511,17 +1498,17 @@
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_drop_user_defined_type on PostgreSQL&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_rename_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fks</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_rename_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fks</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(
             <span class="string">r#&quot;ALTER TABLE &quot;{table}&quot; RENAME CONSTRAINT &quot;{previous}&quot; TO &quot;{next}&quot;&quot;#</span>,
-            <span class="ident">table</span> <span class="op">=</span> <span class="ident">fks</span>.<span class="ident">previous</span>().<span class="ident">table</span>().<span class="ident">name</span>(),
-            <span class="ident">previous</span> <span class="op">=</span> <span class="ident">fks</span>.<span class="ident">previous</span>().<span class="ident">constraint_name</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">next</span> <span class="op">=</span> <span class="ident">fks</span>.<span class="ident">next</span>().<span class="ident">constraint_name</span>().<span class="ident">unwrap</span>(),
+            <span class="ident">table</span> <span class="op">=</span> <span class="ident">fks</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>(),
+            <span class="ident">previous</span> <span class="op">=</span> <span class="ident">fks</span>.<span class="ident">previous</span>.<span class="ident">constraint_name</span>().<span class="ident">unwrap</span>(),
+            <span class="ident">next</span> <span class="op">=</span> <span class="ident">fks</span>.<span class="ident">next</span>.<span class="ident">constraint_name</span>().<span class="ident">unwrap</span>(),
         )
     }
 }
 
-<span class="kw">fn</span> <span class="ident">render_column_type</span>(<span class="ident">col</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresFlavour</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">render_column_type</span>(<span class="ident">col</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresFlavour</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">column_type</span>();
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">family</span> {
         <span class="kw">return</span> <span class="macro">format!</span>(<span class="string">&quot;\&quot;{}\&quot;{}&quot;</span>, <span class="ident">name</span>, <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">arity</span>.<span class="ident">is_list</span>() { <span class="string">&quot;[]&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> }).<span class="ident">into</span>();
@@ -1538,7 +1525,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">render_column_type_postgres</span>(<span class="ident">col</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">render_column_type_postgres</span>(<span class="ident">col</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">column_type</span>();
     <span class="kw">let</span> <span class="ident">is_autoincrement</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">is_autoincrement</span>();
 
@@ -1585,7 +1572,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">render_column_type_cockroachdb</span>(<span class="ident">col</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">render_column_type_cockroachdb</span>(<span class="ident">col</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">column_type</span>();
     <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">col</span>
         .<span class="ident">column_native_type</span>()
@@ -1668,7 +1655,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">render_alter_column</span>(
-    <span class="ident">columns</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">column_changes</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnChanges</span>,
     <span class="ident">before_statements</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">clauses</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -1676,8 +1663,8 @@
     <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresFlavour</span>,
 ) {
     <span class="kw">let</span> <span class="ident">steps</span> <span class="op">=</span> <span class="ident">expand_alter_column</span>(<span class="ident">columns</span>, <span class="ident">column_changes</span>);
-    <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">table</span>().<span class="ident">name</span>());
-    <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">name</span>());
+    <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>());
+    <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>());
 
     <span class="kw">let</span> <span class="ident">alter_column_prefix</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;ALTER COLUMN {}&quot;</span>, <span class="ident">column_name</span>);
 
@@ -1687,8 +1674,8 @@
                 <span class="ident">clauses</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;{} DROP DEFAULT&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">alter_column_prefix</span>));
 
                 <span class="comment">// We also need to drop the sequence, in case it isn&#39;t used by any other column.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Sequence</span>(<span class="ident">sequence_name</span>)) <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()) {
-                    <span class="kw">let</span> <span class="ident">sequence_is_still_used</span> <span class="op">=</span> <span class="ident">walk_columns</span>(<span class="ident">columns</span>.<span class="ident">next</span>().<span class="ident">schema</span>()).<span class="ident">any</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Sequence</span>(<span class="ident">other_sequence</span>)) <span class="kw">if</span> <span class="ident">other_sequence</span> <span class="op">==</span> <span class="ident">sequence_name</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">column</span>.<span class="ident">is_same_column</span>(<span class="ident">columns</span>.<span class="ident">next</span>()));
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Sequence</span>(<span class="ident">sequence_name</span>)) <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()) {
+                    <span class="kw">let</span> <span class="ident">sequence_is_still_used</span> <span class="op">=</span> <span class="ident">walk_columns</span>(<span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">schema</span>).<span class="ident">any</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Sequence</span>(<span class="ident">other_sequence</span>)) <span class="kw">if</span> <span class="ident">other_sequence</span> <span class="op">==</span> <span class="ident">sequence_name</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">column</span>.<span class="ident">is_same_column</span>(<span class="ident">columns</span>.<span class="ident">next</span>));
 
                     <span class="kw">if</span> <span class="op">!</span><span class="ident">sequence_is_still_used</span> {
                         <span class="ident">after_statements</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;DROP SEQUENCE {}&quot;</span>, <span class="ident">Quoted::postgres_ident</span>(<span class="ident">sequence_name</span>)));
@@ -1698,14 +1685,14 @@
             <span class="ident">PostgresAlterColumn::SetDefault</span>(<span class="ident">new_default</span>) =&gt; <span class="ident">clauses</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;{} SET DEFAULT {}&quot;</span>,
                 <span class="kw-2">&amp;</span><span class="ident">alter_column_prefix</span>,
-                <span class="ident">render_default</span>(<span class="kw-2">&amp;</span><span class="ident">new_default</span>, <span class="kw-2">&amp;</span><span class="ident">render_column_type</span>(<span class="ident">columns</span>.<span class="ident">next</span>(), <span class="ident">flavour</span>))
+                <span class="ident">render_default</span>(<span class="kw-2">&amp;</span><span class="ident">new_default</span>, <span class="kw-2">&amp;</span><span class="ident">render_column_type</span>(<span class="ident">columns</span>.<span class="ident">next</span>, <span class="ident">flavour</span>))
             )),
             <span class="ident">PostgresAlterColumn::DropNotNull</span> =&gt; <span class="ident">clauses</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;{} DROP NOT NULL&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">alter_column_prefix</span>)),
             <span class="ident">PostgresAlterColumn::SetNotNull</span> =&gt; <span class="ident">clauses</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;{} SET NOT NULL&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">alter_column_prefix</span>)),
             <span class="ident">PostgresAlterColumn::SetType</span> =&gt; <span class="ident">clauses</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;{} SET DATA TYPE {}&quot;</span>,
                 <span class="kw-2">&amp;</span><span class="ident">alter_column_prefix</span>,
-                <span class="ident">render_column_type</span>(<span class="ident">columns</span>.<span class="ident">next</span>(), <span class="ident">flavour</span>)
+                <span class="ident">render_column_type</span>(<span class="ident">columns</span>.<span class="ident">next</span>, <span class="ident">flavour</span>)
             )),
             <span class="ident">PostgresAlterColumn::AddSequence</span> =&gt; {
                 <span class="comment">// We imitate the sequence that would be automatically created on a `SERIAL` column.</span>
@@ -1714,8 +1701,8 @@
                 <span class="comment">// https://www.postgresql.org/docs/12/datatype-numeric.html#DATATYPE-SERIAL</span>
                 <span class="kw">let</span> <span class="ident">sequence_name</span> <span class="op">=</span> <span class="macro">format!</span>(
                     <span class="string">&quot;{table_name}_{column_name}_seq&quot;</span>,
-                    <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>().<span class="ident">table</span>().<span class="ident">name</span>(),
-                    <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>().<span class="ident">name</span>()
+                    <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">table</span>().<span class="ident">name</span>(),
+                    <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">name</span>()
                 )
                 .<span class="ident">to_lowercase</span>();
 
@@ -1738,17 +1725,17 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">expand_alter_column</span>(<span class="ident">columns</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">column_changes</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnChanges</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PostgresAlterColumn</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">expand_alter_column</span>(<span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">column_changes</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnChanges</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PostgresAlterColumn</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set_type</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
     <span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="ident">column_changes</span>.<span class="ident">iter</span>() {
         <span class="kw">match</span> <span class="ident">change</span> {
-            <span class="ident">ColumnChange::Default</span> =&gt; <span class="kw">match</span> (<span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">default</span>(), <span class="ident">columns</span>.<span class="ident">next</span>().<span class="ident">default</span>()) {
+            <span class="ident">ColumnChange::Default</span> =&gt; <span class="kw">match</span> (<span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">default</span>(), <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">default</span>()) {
                 (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">next_default</span>)) =&gt; <span class="ident">changes</span>.<span class="ident">push</span>(<span class="ident">PostgresAlterColumn::SetDefault</span>((<span class="kw-2">*</span><span class="ident">next_default</span>).<span class="ident">clone</span>())),
                 (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">changes</span>.<span class="ident">push</span>(<span class="ident">PostgresAlterColumn::DropDefault</span>),
             },
-            <span class="ident">ColumnChange::Arity</span> =&gt; <span class="kw">match</span> (<span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">arity</span>(), <span class="ident">columns</span>.<span class="ident">next</span>().<span class="ident">arity</span>()) {
+            <span class="ident">ColumnChange::Arity</span> =&gt; <span class="kw">match</span> (<span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>(), <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>()) {
                 (<span class="ident">ColumnArity::Required</span>, <span class="ident">ColumnArity::Nullable</span>) =&gt; <span class="ident">changes</span>.<span class="ident">push</span>(<span class="ident">PostgresAlterColumn::DropNotNull</span>),
                 (<span class="ident">ColumnArity::Nullable</span>, <span class="ident">ColumnArity::Required</span>) =&gt; <span class="ident">changes</span>.<span class="ident">push</span>(<span class="ident">PostgresAlterColumn::SetNotNull</span>),
                 (<span class="ident">ColumnArity::List</span>, <span class="ident">ColumnArity::Nullable</span>) =&gt; {
@@ -1768,7 +1755,7 @@
             },
             <span class="ident">ColumnChange::TypeChanged</span> =&gt; <span class="ident">set_type</span> <span class="op">=</span> <span class="bool-val">true</span>,
             <span class="ident">ColumnChange::Autoincrement</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">is_autoincrement</span>() {
+                <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">is_autoincrement</span>() {
                     <span class="comment">// The sequence should be dropped.</span>
                     <span class="ident">changes</span>.<span class="ident">push</span>(<span class="ident">PostgresAlterColumn::DropDefault</span>)
                 } <span class="kw">else</span> {
@@ -1855,7 +1842,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">render_postgres_alter_enum</span>(<span class="ident">alter_enum</span>: <span class="kw-2">&amp;</span><span class="ident">AlterEnum</span>, <span class="ident">schemas</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">render_postgres_alter_enum</span>(<span class="ident">alter_enum</span>: <span class="kw-2">&amp;</span><span class="ident">AlterEnum</span>, <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">alter_enum</span>.<span class="ident">dropped_variants</span>.<span class="ident">is_empty</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">alter_enum</span>
             .<span class="ident">created_variants</span>
@@ -1863,7 +1850,7 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">created_value</span><span class="op">|</span> {
                 <span class="macro">format!</span>(
                     <span class="string">&quot;ALTER TYPE {enum_name} ADD VALUE {value}&quot;</span>,
-                    <span class="ident">enum_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="ident">schemas</span>.<span class="ident">enums</span>(<span class="ident">alter_enum</span>.<span class="ident">id</span>).<span class="ident">previous</span>().<span class="ident">name</span>()),
+                    <span class="ident">enum_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="ident">schemas</span>.<span class="ident">enums</span>(<span class="ident">alter_enum</span>.<span class="ident">id</span>).<span class="ident">previous</span>.<span class="ident">name</span>()),
                     <span class="ident">value</span> <span class="op">=</span> <span class="ident">Quoted::postgres_string</span>(<span class="ident">created_value</span>)
                 )
             })
@@ -1890,8 +1877,8 @@
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmts</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">10</span>);
 
-    <span class="kw">let</span> <span class="ident">tmp_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_new&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">enums</span>.<span class="ident">next</span>().<span class="ident">name</span>());
-    <span class="kw">let</span> <span class="ident">tmp_old_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_old&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">enums</span>.<span class="ident">previous</span>().<span class="ident">name</span>());
+    <span class="kw">let</span> <span class="ident">tmp_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_new&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">enums</span>.<span class="ident">next</span>.<span class="ident">name</span>());
+    <span class="kw">let</span> <span class="ident">tmp_old_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_old&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">enums</span>.<span class="ident">previous</span>.<span class="ident">name</span>());
 
     <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="string">&quot;BEGIN&quot;</span>.<span class="ident">to_string</span>());
 
@@ -1900,7 +1887,7 @@
         <span class="kw">let</span> <span class="ident">create_new_enum</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;CREATE TYPE {enum_name} AS ENUM ({variants})&quot;</span>,
             <span class="ident">enum_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="kw-2">&amp;</span><span class="ident">tmp_name</span>),
-            <span class="ident">variants</span> <span class="op">=</span> <span class="ident">enums</span>.<span class="ident">next</span>().<span class="ident">values</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Quoted::postgres_string</span>).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
+            <span class="ident">variants</span> <span class="op">=</span> <span class="ident">enums</span>.<span class="ident">next</span>.<span class="ident">values</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Quoted::postgres_string</span>).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
         );
 
         <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">create_new_enum</span>);
@@ -1908,13 +1895,13 @@
 
     <span class="comment">// Find all usages as a default and drop them</span>
     {
-        <span class="kw">for</span> ((<span class="ident">table_idx</span>, <span class="ident">colidx</span>), <span class="kw">_</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">alter_enum</span>.<span class="ident">previous_usages_as_default</span> {
-            <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">previous</span>().<span class="ident">table_walker_at</span>(<span class="kw-2">*</span><span class="ident">table_idx</span>);
+        <span class="kw">for</span> (<span class="ident">colid</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">alter_enum</span>.<span class="ident">previous_usages_as_default</span> {
+            <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">walk_column</span>(<span class="kw-2">*</span><span class="ident">colid</span>);
 
             <span class="kw">let</span> <span class="ident">drop_default</span> <span class="op">=</span> <span class="macro">format!</span>(
                 <span class="string">r#&quot;ALTER TABLE &quot;{table_name}&quot; ALTER COLUMN &quot;{column_name}&quot; DROP DEFAULT&quot;#</span>,
-                <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">name</span>(),
-                <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">column_at</span>(<span class="kw-2">*</span><span class="ident">colidx</span>).<span class="ident">name</span>(),
+                <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">table</span>().<span class="ident">name</span>(),
+                <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">name</span>(),
             );
 
             <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">drop_default</span>);
@@ -1923,7 +1910,7 @@
 
     <span class="comment">// Alter type of the current columns to new, with a cast</span>
     {
-        <span class="kw">let</span> <span class="ident">affected_columns</span> <span class="op">=</span> <span class="ident">walk_columns</span>(<span class="ident">schemas</span>.<span class="ident">next</span>()).<span class="ident">filter</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">family</span>, <span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">name</span>) <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="ident">enums</span>.<span class="ident">next</span>().<span class="ident">name</span>()));
+        <span class="kw">let</span> <span class="ident">affected_columns</span> <span class="op">=</span> <span class="ident">walk_columns</span>(<span class="ident">schemas</span>.<span class="ident">next</span>).<span class="ident">filter</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">family</span>, <span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">name</span>) <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="ident">enums</span>.<span class="ident">next</span>.<span class="ident">name</span>()));
 
         <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">affected_columns</span> {
             <span class="kw">let</span> <span class="ident">array</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>() { <span class="string">&quot;[]&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> };
@@ -1946,7 +1933,7 @@
     {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;ALTER TYPE {enum_name} RENAME TO {tmp_old_name}&quot;</span>,
-            <span class="ident">enum_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="ident">enums</span>.<span class="ident">previous</span>().<span class="ident">name</span>()),
+            <span class="ident">enum_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="ident">enums</span>.<span class="ident">previous</span>.<span class="ident">name</span>()),
             <span class="ident">tmp_old_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="kw-2">&amp;</span><span class="ident">tmp_old_name</span>)
         );
 
@@ -1958,7 +1945,7 @@
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;ALTER TYPE {tmp_name} RENAME TO {enum_name}&quot;</span>,
             <span class="ident">tmp_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="kw-2">&amp;</span><span class="ident">tmp_name</span>),
-            <span class="ident">enum_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="ident">enums</span>.<span class="ident">next</span>().<span class="ident">name</span>())
+            <span class="ident">enum_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="ident">enums</span>.<span class="ident">next</span>.<span class="ident">name</span>())
         );
 
         <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">sql</span>)
@@ -1976,19 +1963,16 @@
 
     <span class="comment">// Reinstall dropped defaults that need to be reinstalled</span>
     {
-        <span class="kw">for</span> ((<span class="ident">prev_tblidx</span>, <span class="ident">prev_colidx</span>), (<span class="ident">next_tblidx</span>, <span class="ident">next_colidx</span>)) <span class="kw">in</span> <span class="ident">alter_enum</span>
+        <span class="kw">for</span> (<span class="ident">prev_colidx</span>, <span class="ident">next_colidx</span>) <span class="kw">in</span> <span class="ident">alter_enum</span>
             .<span class="ident">previous_usages_as_default</span>
             .<span class="ident">iter</span>()
             .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">prev</span>, <span class="ident">next</span>)<span class="op">|</span> <span class="ident">next</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> (<span class="ident">prev</span>, <span class="ident">next</span>)))
         {
-            <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">schemas</span>
-                .<span class="ident">tables</span>(<span class="kw-2">&amp;</span><span class="ident">Pair::new</span>(<span class="kw-2">*</span><span class="ident">prev_tblidx</span>, <span class="ident">next_tblidx</span>))
-                .<span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="ident">Pair::new</span>(<span class="kw-2">*</span><span class="ident">prev_colidx</span>, <span class="ident">next_colidx</span>));
-
-            <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">table</span>().<span class="ident">name</span>();
-            <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">name</span>();
+            <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">columns</span>(<span class="ident">Pair::new</span>(<span class="kw-2">*</span><span class="ident">prev_colidx</span>, <span class="ident">next_colidx</span>));
+            <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>();
+            <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>();
             <span class="kw">let</span> <span class="ident">default_str</span> <span class="op">=</span> <span class="ident">columns</span>
-                    .<span class="ident">next</span>()
+                    .<span class="ident">next</span>
                     .<span class="ident">default</span>()
                     .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="ident">default</span>.<span class="ident">as_value</span>())
                     .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">as_enum_value</span>())
@@ -2010,7 +1994,7 @@
     <span class="ident">stmts</span>
 }
 
-<span class="kw">fn</span> <span class="ident">render_cockroach_alter_enum</span>(<span class="ident">alter_enum</span>: <span class="kw-2">&amp;</span><span class="ident">AlterEnum</span>, <span class="ident">schemas</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>, <span class="ident">renderer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StepRenderer</span>) {
+<span class="kw">fn</span> <span class="ident">render_cockroach_alter_enum</span>(<span class="ident">alter_enum</span>: <span class="kw-2">&amp;</span><span class="ident">AlterEnum</span>, <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>, <span class="ident">renderer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StepRenderer</span>) {
     <span class="kw">let</span> <span class="ident">enums</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">enums</span>(<span class="ident">alter_enum</span>.<span class="ident">id</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="ident">prefix</span>.<span class="ident">push_str</span>(<span class="string">&quot;ALTER TYPE \&quot;&quot;</span>);
@@ -2021,8 +2005,8 @@
     <span class="kw">let</span> <span class="ident">defaults_to_drop</span> <span class="op">=</span> <span class="ident">alter_enum</span>
         .<span class="ident">previous_usages_as_default</span>
         .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span>((<span class="ident">prev_tblidx</span>, <span class="ident">prev_colidx</span>), <span class="kw">_</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">col</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">table_walker_at</span>(<span class="kw-2">*</span><span class="ident">prev_tblidx</span>).<span class="ident">column_at</span>(<span class="kw-2">*</span><span class="ident">prev_colidx</span>);
+        .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">prev_colidx</span>, <span class="kw">_</span>)<span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">col</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">walk_column</span>(<span class="kw-2">*</span><span class="ident">prev_colidx</span>);
             <span class="ident">col</span>.<span class="ident">default</span>()
                 .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_value</span>())
                 .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_enum_value</span>())
@@ -2059,13 +2043,13 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">render_column_identity_str</span>(<span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresFlavour</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">render_column_identity_str</span>(<span class="ident">column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresFlavour</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">flavour</span>.<span class="ident">is_cockroachdb</span>() {
         <span class="kw">return</span> <span class="ident">String::new</span>();
     }
 
     <span class="kw">let</span> <span class="ident">sequence</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">seq_name</span>) <span class="op">=</span> <span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_sequence</span>()) {
-        <span class="kw">let</span> <span class="ident">connector_data</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">schema</span>().<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
+        <span class="kw">let</span> <span class="ident">connector_data</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
         <span class="ident">connector_data</span>
             .<span class="ident">sequences</span>
             .<span class="ident">iter</span>()

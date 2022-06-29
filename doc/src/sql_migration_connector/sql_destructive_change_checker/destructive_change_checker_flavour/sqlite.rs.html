@@ -121,7 +121,7 @@
         <span class="ident">plan</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DestructiveCheckPlan</span>,
         <span class="ident">step_index</span>: <span class="ident">usize</span>,
     ) {
-        <span class="kw">let</span> <span class="ident">arity_change_is_safe</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">arity</span>(), <span class="ident">columns</span>.<span class="ident">next</span>().<span class="ident">arity</span>()) {
+        <span class="kw">let</span> <span class="ident">arity_change_is_safe</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>(), <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>()) {
             <span class="comment">// column became required</span>
             (<span class="ident">ColumnArity::Nullable</span>, <span class="ident">ColumnArity::Required</span>) =&gt; <span class="bool-val">false</span>,
             <span class="comment">// column became nullable</span>
@@ -137,13 +137,13 @@
         }
 
         <span class="kw">if</span> <span class="ident">alter_column</span>.<span class="ident">changes</span>.<span class="ident">arity_changed</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>().<span class="ident">arity</span>().<span class="ident">is_required</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>().<span class="ident">default</span>().<span class="ident">is_none</span>()
+            <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>()
+            <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">default</span>().<span class="ident">is_none</span>()
         {
             <span class="ident">plan</span>.<span class="ident">push_unexecutable</span>(
                 <span class="ident">UnexecutableStepCheck::MadeOptionalFieldRequired</span> {
-                    <span class="ident">table</span>: <span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                    <span class="ident">column</span>: <span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                    <span class="ident">table</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                    <span class="ident">column</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
                 },
                 <span class="ident">step_index</span>,
             );
@@ -154,10 +154,10 @@
             <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::RiskyCast</span>) =&gt; {
                 <span class="ident">plan</span>.<span class="ident">push_warning</span>(
                     <span class="ident">SqlMigrationWarningCheck::RiskyCast</span> {
-                        <span class="ident">table</span>: <span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">column</span>: <span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">previous_type</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">column_type_family</span>()),
-                        <span class="ident">next_type</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">columns</span>.<span class="ident">next</span>().<span class="ident">column_type_family</span>()),
+                        <span class="ident">table</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                        <span class="ident">column</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                        <span class="ident">previous_type</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_type_family</span>()),
+                        <span class="ident">next_type</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">column_type_family</span>()),
                     },
                     <span class="ident">step_index</span>,
                 );

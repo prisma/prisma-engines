@@ -198,30 +198,11 @@
 <span id="193">193</span>
 <span id="194">194</span>
 <span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::vec_init_then_push</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span> <span class="comment">// remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">calculate_datamodel</span>; <span class="comment">// only exported to be able to unit test it</span>
 
-<span class="kw">mod</span> <span class="ident">calculate_datamodel_tests</span>;
 <span class="kw">mod</span> <span class="ident">commenting_out_guardrails</span>;
 <span class="kw">mod</span> <span class="ident">defaults</span>;
 <span class="kw">mod</span> <span class="ident">error</span>;
@@ -387,23 +368,6 @@
         <span class="macro">tracing::debug!</span>(<span class="string">&quot;Calculating datamodel is done: {:?}&quot;</span>, <span class="ident">introspection_result</span>.<span class="ident">data_model</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">introspection_result</span>)
-    }
-}
-
-<span class="kw">trait</span> <span class="ident">Dedup</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clear_duplicates</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Dedup</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clear_duplicates</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">already_seen</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="self">self</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">already_seen</span>.<span class="ident">contains</span>(<span class="ident">item</span>) {
-            <span class="bool-val">true</span> =&gt; <span class="bool-val">false</span>,
-            <span class="kw">_</span> =&gt; {
-                <span class="ident">already_seen</span>.<span class="ident">push</span>(<span class="ident">item</span>.<span class="ident">clone</span>());
-                <span class="bool-val">true</span>
-            }
-        })
     }
 }
 

@@ -465,7 +465,7 @@
             }
 
             <span class="comment">// Add sequences for the fields with a default sequence in the model.</span>
-            <span class="kw">for</span> (<span class="ident">field_idx</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>().<span class="ident">enumerate</span>() {
+            <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>() {
                 <span class="kw">let</span> <span class="ident">field_default</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_value</span>() {
                     <span class="ident">d</span>
                 } <span class="kw">else</span> {
@@ -477,7 +477,7 @@
                 }
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sequence</span> <span class="op">=</span> <span class="ident">sql::postgres::Sequence</span> {
-                    <span class="ident">name</span>: <span class="macro">format!</span>(<span class="string">&quot;prisma_sequence_{}_{}&quot;</span>, <span class="ident">table_idx</span>, <span class="ident">field_idx</span>),
+                    <span class="ident">name</span>: <span class="macro">format!</span>(<span class="string">&quot;prisma_sequence_{}_{}&quot;</span>, <span class="ident">model</span>.<span class="ident">database_name</span>(), <span class="ident">field</span>.<span class="ident">database_name</span>()),
                     ..<span class="ident">Default::default</span>()
                 };
                 <span class="kw">let</span> <span class="ident">sequence_fn</span> <span class="op">=</span> <span class="ident">field_default</span>.<span class="ident">ast_attribute</span>().<span class="ident">arguments</span>.<span class="ident">arguments</span>[<span class="number">0</span>]
@@ -516,7 +516,7 @@
 
         <span class="comment">// Add index algorithms for implicit m2m relation tables</span>
         <span class="kw">let</span> <span class="ident">models_count</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">models_count</span>();
-        <span class="kw">let</span> <span class="ident">tables_count</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">tables</span>.<span class="ident">len</span>();
+        <span class="kw">let</span> <span class="ident">tables_count</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">tables_count</span>();
         <span class="kw">for</span> <span class="ident">table_idx</span> <span class="kw">in</span> <span class="ident">models_count</span>..<span class="ident">tables_count</span> {
             <span class="ident">postgres_ext</span>.<span class="ident">indexes</span>.<span class="ident">push</span>((
                 <span class="ident">sql::IndexId</span>(<span class="ident">sql::TableId</span>(<span class="ident">table_idx</span> <span class="kw">as</span> <span class="ident">u32</span>), <span class="number">0</span>),

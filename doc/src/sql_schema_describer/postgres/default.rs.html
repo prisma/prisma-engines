@@ -733,6 +733,7 @@
 <span id="728">728</span>
 <span id="729">729</span>
 <span id="730">730</span>
+<span id="731">731</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">c_style_scalar_lists</span>;
 <span class="kw">mod</span> <span class="ident">tokenize</span>;
 
@@ -910,6 +911,7 @@
         }
         <span class="ident">Token::CStyleStringLiteral</span> =&gt; {
             <span class="comment">// Reference for CockroachDB: https://www.cockroachlabs.com/docs/stable/sql-constants.html#string-literals-with-character-escapes</span>
+            <span class="comment">// Reference for Postgres: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS</span>
             <span class="comment">// octal and hexadecimal escape sequences seem not to be returned by crdb in defaults,</span>
             <span class="comment">// so we do not try parsing them.</span>
             <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">expect</span>(<span class="ident">Token::CStyleStringLiteral</span>)<span class="question-mark">?</span>;
