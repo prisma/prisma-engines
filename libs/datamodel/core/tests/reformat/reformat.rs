@@ -5,7 +5,7 @@ use indoc::indoc;
 
 fn reformat(input: impl Into<Cow<'static, str>>) -> String {
     let input = input.into();
-    datamodel::reformat(input.to_owned(), 2).unwrap_or_else(|| input.to_string())
+    datamodel::reformat(&input, 2).unwrap_or_else(|| input.to_string())
 }
 
 #[test]

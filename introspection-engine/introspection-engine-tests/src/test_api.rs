@@ -16,6 +16,7 @@ use migration_connector::{ConnectorParams, MigrationConnector};
 use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
+use std::borrow::Cow;
 use std::fmt::Write;
 use test_setup::{sqlite_test_url, DatasourceBlock, TestApiArgs};
 use tracing::Instrument;
@@ -157,7 +158,7 @@ impl TestApi {
 
     #[tracing::instrument(skip(self, data_model_string))]
     #[track_caller]
-    pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
+    pub async fn re_introspect(&self, data_model_string: impl Into<Cow<'static, str>>) -> Result<String> {
         let config = self.configuration();
         let data_model = parse_datamodel(data_model_string);
         let introspection_result = self.test_introspect_internal(data_model).await?;
@@ -171,7 +172,7 @@ impl TestApi {
 
     #[tracing::instrument(skip(self, data_model_string))]
     #[track_caller]
-    pub async fn re_introspect_dml(&self, data_model_string: &str) -> Result<String> {
+    pub async fn re_introspect_dml(&self, data_model_string: impl Into<Cow<'static, str>>) -> Result<String> {
         let config = self.configuration();
         let data_model = parse_datamodel(data_model_string);
         let introspection_result = self.test_introspect_internal(data_model).await?;
@@ -183,7 +184,7 @@ impl TestApi {
         Ok(dm)
     }
 
-    pub async fn re_introspect_warnings(&self, data_model_string: &str) -> Result<String> {
+    pub async fn re_introspect_warnings(&self, data_model_string: impl Into<Cow<'static, str>>) -> Result<String> {
         let data_model = parse_datamodel(data_model_string);
         let introspection_result = self.test_introspect_internal(data_model).await?;
 
@@ -273,15 +274,16 @@ impl TestApi {
     }
 
     #[track_caller]
-    pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
+    pub fn assert_eq_datamodels(
+        &self,
+        expected_without_header: &str,
+        result_with_header: impl Into<Cow<'static, str>>,
+    ) {
+        let result_with_header = result_with_header.into();
         let expected_with_source = self.dm_with_sources(expected_without_header);
         let expected_with_generator = self.dm_with_generator_and_preview_flags(&expected_with_source);
 
-        let parsed_expected = datamodel::parse_datamodel(&expected_with_generator)
-            .map_err(|err| err.to_pretty_string("schema.prisma", &expected_with_generator))
-            .unwrap()
-            .subject;
-
+        let parsed_expected = datamodel::parse_datamodel(expected_with_generator).unwrap().subject;
         let parsed_result = datamodel::parse_datamodel(result_with_header).unwrap().subject;
 
         let reformatted_expected =
@@ -340,9 +342,6 @@ impl TestApi {
 }
 
 #[track_caller]
-fn parse_datamodel(dm: &str) -> Datamodel {
-    datamodel::parse_datamodel(dm)
-        .map_err(|diagnostics| diagnostics.to_pretty_string("schema.prisma", dm))
-        .unwrap()
-        .subject
+fn parse_datamodel(dm: impl Into<Cow<'static, str>>) -> Datamodel {
+    datamodel::parse_datamodel(dm).unwrap().subject
 }

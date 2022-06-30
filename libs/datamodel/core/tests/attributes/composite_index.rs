@@ -238,7 +238,7 @@ fn reformat() {
     "#};
 
     let datamodel = with_header(schema, crate::Provider::Mongo, &["fullTextIndex"]);
-    let result = datamodel::reformat(datamodel.clone(), 2).unwrap_or_else(|| datamodel.to_owned());
+    let result = datamodel::reformat(&datamodel, 2).unwrap_or_else(|| datamodel.to_owned());
 
     let expected = expect![[r#"
         datasource test {

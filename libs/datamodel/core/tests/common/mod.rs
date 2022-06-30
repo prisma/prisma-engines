@@ -9,7 +9,7 @@ use pretty_assertions::assert_eq;
 
 pub(crate) fn reformat(input: impl Into<Cow<'static, str>>) -> String {
     let input = input.into();
-    datamodel::reformat(input.clone(), 2).unwrap_or_else(|| input.to_string())
+    datamodel::reformat(&input, 2).unwrap_or_else(|| input.to_string())
 }
 
 pub(crate) trait DatasourceAsserts {

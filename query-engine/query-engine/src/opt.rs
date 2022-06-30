@@ -138,9 +138,8 @@ impl PrismaOpt {
     }
 
     pub fn datamodel(&self) -> PrismaResult<Datamodel> {
-        let datamodel_str = self.datamodel_str()?;
-
-        let datamodel = datamodel::parse_datamodel(datamodel_str);
+        let datamodel_str = self.datamodel_str()?.to_string();
+        let datamodel = datamodel::parse_datamodel(datamodel_str.clone());
 
         match datamodel {
             Err(errors) => Err(PrismaError::ConversionError(errors, datamodel_str.to_string())),
@@ -169,7 +168,12 @@ impl PrismaOpt {
                 Ok(config)
             })
         };
-        config_result.map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
+        config_result.map_err(|errors| {
+            PrismaError::ConversionError(
+                errors.to_pretty_string("schema.prisma", datamodel_str),
+                datamodel_str.to_string(),
+            )
+        })
     }
 
     /// Extract the log format from on the RUST_LOG_FORMAT env var.

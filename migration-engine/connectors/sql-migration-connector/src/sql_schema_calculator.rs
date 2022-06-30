@@ -6,30 +6,39 @@ use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
 use datamodel::{
     datamodel_connector::{walker_ext_traits::*, ReferentialAction, ScalarType},
     dml::{prisma_value, PrismaValue},
-    parser_database::{walkers::ScalarFieldWalker, IndexType, ScalarFieldType, SortOrder},
+    parser_database::{walkers::ScalarFieldWalker, IndexType, ParserDatabase, ScalarFieldType, SortOrder},
     schema_ast::ast::{self, FieldArity},
-    ValidatedSchema,
+    Configuration,
 };
 use sql::walkers::SqlSchemaExt;
 use sql_schema_describer as sql;
 use std::collections::HashMap;
 
-pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
+pub(crate) fn calculate_sql_schema(
+    db: &ParserDatabase,
+    configuration: &Configuration,
+    flavour: &dyn SqlFlavour,
+) -> SqlDatabaseSchema {
     let mut schema = SqlDatabaseSchema::default();
 
-    schema.describer_schema.enums = flavour.calculate_enums(datamodel);
+    schema.describer_schema.enums = flavour.calculate_enums(db);
 
     let mut context = Context {
-        datamodel,
+        db,
+        configuration,
         schema: &mut schema,
         flavour,
-        model_id_to_table_id: HashMap::with_capacity(datamodel.db.models_count()),
+        model_id_to_table_id: HashMap::with_capacity(db.models_count()),
     };
 
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     push_model_tables(&mut context);
 
-    if context.datamodel.referential_integrity().uses_foreign_keys() {
+    if configuration
+        .referential_integrity()
+        .unwrap_or_default()
+        .uses_foreign_keys()
+    {
         push_inline_relations(&mut context);
     }
 
@@ -40,7 +49,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
 }
 
 fn push_model_tables(ctx: &mut Context<'_>) {
-    for model in ctx.datamodel.db.walk_models() {
+    for model in ctx.db.walk_models() {
         let table_id = ctx.schema.describer_schema.push_table(model.database_name().to_owned());
         ctx.model_id_to_table_id.insert(model.model_id(), table_id);
         let table = &mut ctx.schema.describer_schema[table_id];
@@ -98,20 +107,20 @@ fn push_model_tables(ctx: &mut Context<'_>) {
 }
 
 fn push_inline_relations(ctx: &mut Context<'_>) {
-    for relation in ctx.datamodel.db.walk_relations().filter_map(|r| r.refine().as_inline()) {
+    for relation in ctx.db.walk_relations().filter_map(|r| r.refine().as_inline()) {
         let relation_field = relation
             .forward_relation_field()
             .expect("Expecting a complete relation in sql_schmea_calculator");
+
         let fk_columns: Vec<String> = relation_field
             .referencing_fields()
             .expect("Expecting a relation fields in sql_schmea_calculator")
             .map(|rf| rf.database_name().to_owned())
             .collect();
+
         let on_delete_action = relation_field.explicit_on_delete().unwrap_or_else(|| {
-            relation_field.default_on_delete_action(
-                ctx.datamodel.configuration.referential_integrity().unwrap_or_default(),
-                ctx.flavour.datamodel_connector(),
-            )
+            let ref_integrity = ctx.configuration.referential_integrity().unwrap_or_default();
+            relation_field.default_on_delete_action(ref_integrity, ctx.flavour.datamodel_connector())
         });
 
         ctx.schema.describer_schema.foreign_keys.push((
@@ -136,9 +145,8 @@ fn push_inline_relations(ctx: &mut Context<'_>) {
 }
 
 fn push_relation_tables(ctx: &mut Context<'_>) {
-    let datamodel = ctx.datamodel;
     let flavour = ctx.flavour;
-    let m2m_relations = datamodel
+    let m2m_relations = ctx
         .db
         .walk_relations()
         .filter_map(|relation| relation.refine().as_many_to_many());
@@ -147,7 +155,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
         let table_name = format!("_{}", m2m.relation_name());
         let table_name = table_name
             .chars()
-            .take(datamodel.configuration.max_identifier_length())
+            .take(ctx.configuration.max_identifier_length())
             .collect::<String>();
         let model_a = m2m.model_a();
         let model_b = m2m.model_b();
@@ -198,7 +206,12 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
             ];
         }
 
-        if ctx.datamodel.referential_integrity().uses_foreign_keys() {
+        if ctx
+            .configuration
+            .referential_integrity()
+            .unwrap_or_default()
+            .uses_foreign_keys()
+        {
             ctx.schema.describer_schema.foreign_keys.push((
                 table_id,
                 sql::ForeignKey {
@@ -266,7 +279,7 @@ fn push_column_for_model_enum_scalar_field(
     table_id: sql::TableId,
     ctx: &mut Context<'_>,
 ) {
-    let r#enum = ctx.datamodel.db.walk_enum(enum_id);
+    let r#enum = ctx.db.walk_enum(enum_id);
     let value_for_name = |name: &str| -> PrismaValue {
         match r#enum.values().find(|v| v.name() == name).map(|v| v.database_name()) {
             Some(v) => PrismaValue::Enum(v.to_owned()),
@@ -454,7 +467,8 @@ fn column_arity(arity: FieldArity) -> sql::ColumnArity {
 }
 
 pub(crate) struct Context<'a> {
-    datamodel: &'a ValidatedSchema,
+    db: &'a ParserDatabase,
+    configuration: &'a Configuration,
     schema: &'a mut SqlDatabaseSchema,
     flavour: &'a dyn SqlFlavour,
     model_id_to_table_id: HashMap<ast::ModelId, sql::TableId>,

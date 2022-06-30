@@ -13,12 +13,10 @@ use std::borrow::Cow;
 
 /// Returns either the reformatted schema, or the original input if we can't reformat. This happens
 /// if and only if the source does not parse to a well formed AST.
-pub fn reformat(source: impl Into<Cow<'static, str>>, indent_width: usize) -> Option<String> {
-    let source = source.into();
-
-    let db = crate::parse_schema_ast(&source).ok().and_then(|ast| {
+pub fn reformat(source: &str, indent_width: usize) -> Option<String> {
+    let db = crate::parse_schema_ast(source).ok().and_then(|ast| {
         let mut diagnostics = diagnostics::Diagnostics::new();
-        let db = parser_database::ParserDatabase::new(source.clone(), ast, &mut diagnostics);
+        let db = parser_database::ParserDatabase::new(source.to_string(), ast, &mut diagnostics);
         diagnostics.to_result().ok().map(move |_| db)
     });
 
@@ -38,12 +36,12 @@ pub fn reformat(source: impl Into<Cow<'static, str>>, indent_width: usize) -> Op
             let source = db.into_source();
 
             if missing_bits.is_empty() {
-                source
+                Cow::Owned(source.into_owned())
             } else {
                 Cow::Owned(enrich(&source, &missing_bits))
             }
         }
-        None => source,
+        None => Cow::Borrowed(source),
     };
 
     Reformatter::new(&source_to_reformat).reformat_internal(indent_width)

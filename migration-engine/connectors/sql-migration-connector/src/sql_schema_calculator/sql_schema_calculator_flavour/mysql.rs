@@ -1,16 +1,18 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MysqlFlavour;
-use datamodel::{datamodel_connector::ScalarType, parser_database::walkers::*, ValidatedSchema};
+use datamodel::{
+    datamodel_connector::ScalarType,
+    parser_database::{walkers::*, ParserDatabase},
+};
 use sql_schema_describer as sql;
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {
-    fn calculate_enums(&self, datamodel: &ValidatedSchema) -> Vec<sql::Enum> {
+    fn calculate_enums(&self, db: &ParserDatabase) -> Vec<sql::Enum> {
         // This is a lower bound for the size of the generated enums (we assume
         // each enum is used at least once).
         let mut enums = Vec::new();
 
-        let enum_fields = datamodel
-            .db
+        let enum_fields = db
             .walk_models()
             .flat_map(|model| model.scalar_fields())
             .filter_map(|field| field.field_type_as_enum().map(|enum_walker| (field, enum_walker)));

@@ -2,8 +2,7 @@ use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::{PostgresFlavour, SqlFlavour};
 use datamodel::{
     datamodel_connector::ScalarType,
-    parser_database::{walkers::*, IndexAlgorithm, OperatorClass},
-    ValidatedSchema,
+    parser_database::{walkers::*, IndexAlgorithm, OperatorClass, ParserDatabase},
 };
 use either::Either;
 use sql::postgres::PostgresSchemaExt;
@@ -11,10 +10,8 @@ use sql_datamodel_connector::cockroach_datamodel_connector::SequenceFunction;
 use sql_schema_describer as sql;
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {
-    fn calculate_enums(&self, datamodel: &ValidatedSchema) -> Vec<sql::Enum> {
-        datamodel
-            .db
-            .walk_enums()
+    fn calculate_enums(&self, db: &ParserDatabase) -> Vec<sql::Enum> {
+        db.walk_enums()
             .map(|r#enum| sql::Enum {
                 name: r#enum.database_name().to_owned(),
                 values: r#enum.values().map(|val| val.database_name().to_owned()).collect(),
@@ -43,7 +40,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
 
     fn push_connector_data(&self, context: &mut super::super::Context<'_>) {
         let mut postgres_ext = PostgresSchemaExt::default();
-        let db = &context.datamodel.db;
+        let db = &context.db;
 
         for (table_idx, model) in db.walk_models().enumerate() {
             let table_id = sql::TableId(table_idx as u32);

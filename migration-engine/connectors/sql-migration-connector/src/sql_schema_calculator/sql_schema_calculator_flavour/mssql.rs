@@ -27,7 +27,7 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
     fn push_connector_data(&self, context: &mut super::super::Context<'_>) {
         let mut data = MssqlSchemaExt::default();
 
-        for (table_idx, model) in context.datamodel.db.walk_models().enumerate() {
+        for (table_idx, model) in context.db.walk_models().enumerate() {
             let table_id = sql_schema_describer::TableId(table_idx as u32);
             if model.primary_key().and_then(|pk| pk.clustered()) == Some(false) {
                 data.nonclustered_primary_keys.push(table_id);

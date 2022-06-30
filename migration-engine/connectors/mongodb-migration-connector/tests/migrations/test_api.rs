@@ -1,11 +1,18 @@
-use datamodel::common::preview_features::PreviewFeature;
+use datamodel::{
+    common::preview_features::PreviewFeature, datamodel_connector::Diagnostics, parser_database::ParserDatabase,
+};
 use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use migration_connector::{ConnectorParams, DiffTarget, MigrationConnector};
 use mongodb::bson::{self, doc};
 use mongodb_migration_connector::MongoDbMigrationConnector;
 use once_cell::sync::Lazy;
-use std::{collections::BTreeMap, fmt::Write as _, io::Write as _, sync::atomic::AtomicUsize};
+use std::{
+    collections::BTreeMap,
+    fmt::Write as _,
+    io::Write as _,
+    sync::{atomic::AtomicUsize, Arc},
+};
 use tokio::sync::OnceCell;
 
 static CONN_STR: Lazy<String> = Lazy::new(|| match std::env::var("TEST_DATABASE_URL") {
@@ -167,7 +174,9 @@ pub(crate) fn test_scenario(scenario_name: &str) {
     }
 
     RT.block_on(async move {
-        let parsed_schema = datamodel::parse_schema_parserdb(&schema).unwrap();
+        let config1 = datamodel::parse_configuration(&schema).unwrap().subject;
+        let config2 = datamodel::parse_configuration(&schema).unwrap().subject;
+        let parsed_schema = datamodel::parse_schema_parserdb(schema.clone()).unwrap();
         let (db_name, mut connector) = new_connector(parsed_schema.configuration.preview_features());
         let client = client().await;
         let db = client.database(&db_name);
@@ -178,10 +187,21 @@ pub(crate) fn test_scenario(scenario_name: &str) {
             .database_schema_from_diff_target(DiffTarget::Database, None)
             .await
             .unwrap();
+
         let to = connector
-            .database_schema_from_diff_target(DiffTarget::Datamodel(&schema), None)
+            .database_schema_from_diff_target(
+                DiffTarget::Datamodel(Arc::new({
+                    let ast = datamodel::parse_schema_ast(&schema).unwrap();
+                    let mut diagnostics = Diagnostics::new();
+                    let db = ParserDatabase::new(schema.clone(), ast, &mut diagnostics);
+
+                    (db, config1)
+                })),
+                None,
+            )
             .await
             .unwrap();
+
         let migration = connector.diff(from, to).unwrap();
 
         connector.apply_migration(&migration).await.unwrap();
@@ -220,8 +240,18 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
             .database_schema_from_diff_target(DiffTarget::Database, None)
             .await
             .unwrap();
+
         let to = connector
-            .database_schema_from_diff_target(DiffTarget::Datamodel(&schema), None)
+            .database_schema_from_diff_target(
+                DiffTarget::Datamodel(Arc::new({
+                    let ast = datamodel::parse_schema_ast(&schema).unwrap();
+                    let mut diagnostics = Diagnostics::new();
+                    let db = ParserDatabase::new(schema.clone(), ast, &mut diagnostics);
+
+                    (db, config2)
+                })),
+                None,
+            )
             .await
             .unwrap();
         let migration = connector.diff(from, to).unwrap();

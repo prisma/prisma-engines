@@ -6,15 +6,15 @@ pub use serialization_ast::DataModelMetaFormat;
 use ast_builders::{schema_to_dmmf, DmmfQuerySchemaRenderer};
 use prisma_models::InternalDataModelBuilder;
 use schema::{QuerySchemaRef, QuerySchemaRenderer};
-use std::sync::Arc;
+use std::{borrow::Cow, sync::Arc};
 
-pub fn dmmf_json_from_schema(schema: &str) -> String {
+pub fn dmmf_json_from_schema(schema: impl Into<Cow<'static, str>>) -> String {
     let dmmf = dmmf_from_schema(schema);
     serde_json::to_string(&dmmf).unwrap()
 }
 
 // enable raw param?
-pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
+pub fn dmmf_from_schema(schema: impl Into<Cow<'static, str>>) -> DataModelMetaFormat {
     let (config, dml) = datamodel::parse_schema(schema).unwrap();
 
     // We only support one data source at the moment, so take the first one (default not exposed yet).

@@ -283,16 +283,13 @@ mod tests {
     use super::schema_to_dmmf;
     use datamodel::dml::Datamodel;
     use pretty_assertions::assert_eq;
-    use std::fs;
+    use std::{borrow::Cow, fs};
 
-    pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
+    pub(crate) fn parse(datamodel_string: impl Into<Cow<'static, str>>) -> Datamodel {
         match datamodel::parse_datamodel(datamodel_string) {
             Ok(s) => s.subject,
             Err(errs) => {
-                panic!(
-                    "Datamodel parsing failed\n\n{}",
-                    errs.to_pretty_string("", datamodel_string)
-                )
+                panic!("Datamodel parsing failed\n\n{errs}",)
             }
         }
     }
@@ -318,7 +315,7 @@ mod tests {
             println!("TESTING: {}", test_case);
 
             let datamodel_string = load_from_file(format!("{}.prisma", test_case).as_str());
-            let dml = parse(&datamodel_string);
+            let dml = parse(datamodel_string);
             let dmmf_string = render_to_dmmf(&dml);
 
             assert_eq_json(

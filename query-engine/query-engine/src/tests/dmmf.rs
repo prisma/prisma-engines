@@ -7,10 +7,11 @@ use datamodel_connector::ConnectorCapabilities;
 use prisma_models::InternalDataModelBuilder;
 use query_core::{schema::QuerySchema, schema_builder};
 use serial_test::serial;
-use std::sync::Arc;
+use std::{borrow::Cow, sync::Arc};
 
-pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
-    let config = datamodel::parse_configuration(datamodel_string).unwrap();
+pub fn get_query_schema(datamodel_string: impl Into<Cow<'static, str>>) -> (QuerySchema, datamodel::dml::Datamodel) {
+    let datamodel_string = datamodel_string.into();
+    let config = datamodel::parse_configuration(&datamodel_string).unwrap();
     let dm = datamodel::parse_datamodel(datamodel_string).unwrap().subject;
     let datasource = config.subject.datasources.first();
 

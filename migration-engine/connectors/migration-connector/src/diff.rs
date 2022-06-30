@@ -1,10 +1,12 @@
+use datamodel::{parser_database::ParserDatabase, Configuration};
+
 use crate::migrations_directory::MigrationDirectory;
-use std::fmt::Debug;
+use std::{fmt::Debug, sync::Arc};
 
 /// Diffable things
 pub enum DiffTarget<'a> {
     /// A Prisma schema.
-    Datamodel(&'a str),
+    Datamodel(Arc<(ParserDatabase, Configuration)>),
     /// A migrations folder. What is diffable is the state of the database schema at the end of the
     /// migrations history.
     Migrations(&'a [MigrationDirectory]),
@@ -29,7 +31,7 @@ impl DiffTarget<'_> {
     /// Try interpreting the DiffTarget as a Datamodel variant.
     pub fn as_datamodel(&self) -> Option<&str> {
         match self {
-            DiffTarget::Datamodel(schema) => Some(schema),
+            DiffTarget::Datamodel(schema) => Some(schema.0.source()),
             _ => None,
         }
     }

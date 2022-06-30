@@ -115,14 +115,11 @@ impl SqlMigrationConnector {
         shadow_database_connection_string: Option<String>,
     ) -> ConnectorResult<SqlDatabaseSchema> {
         match target {
-            DiffTarget::Datamodel(schema) => {
-                let schema =
-                    datamodel::parse_schema_parserdb(schema).map_err(ConnectorError::new_schema_parser_error)?;
-                Ok(sql_schema_calculator::calculate_sql_schema(
-                    &schema,
-                    self.flavour.as_ref(),
-                ))
-            }
+            DiffTarget::Datamodel(schema) => Ok(sql_schema_calculator::calculate_sql_schema(
+                &schema.0,
+                &schema.1,
+                self.flavour.as_ref(),
+            )),
             DiffTarget::Migrations(migrations) => self
                 .flavour
                 .sql_schema_from_migration_history(migrations, shadow_database_connection_string)

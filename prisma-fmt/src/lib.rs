@@ -6,6 +6,8 @@ mod native;
 mod preview;
 mod text_document_completion;
 
+use std::borrow::Cow;
+
 use datamodel::ast;
 use log::*;
 use lsp_types::{Position, Range};
@@ -14,7 +16,7 @@ use lsp_types::{Position, Range};
 /// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).
 /// Input and output are both JSON, the request being a `CompletionParams` object and the response
 /// being a `CompletionList` object.
-pub fn text_document_completion(schema: &str, params: &str) -> String {
+pub fn text_document_completion(schema: impl Into<Cow<'static, str>>, params: &str) -> String {
     let params = if let Ok(params) = serde_json::from_str::<lsp_types::CompletionParams>(params) {
         params
     } else {
@@ -28,7 +30,7 @@ pub fn text_document_completion(schema: &str, params: &str) -> String {
 }
 
 /// This API is modelled on an LSP [code action request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_codeAction=). Input and output are both JSON, the request being a `CodeActionParams` object and the response being a list of `CodeActionOrCommand` objects.
-pub fn code_actions(schema: &str, params: &str) -> String {
+pub fn code_actions(schema: impl Into<Cow<'static, str>>, params: &str) -> String {
     let params = if let Ok(params) = serde_json::from_str::<lsp_types::CodeActionParams>(params) {
         params
     } else {
@@ -36,7 +38,7 @@ pub fn code_actions(schema: &str, params: &str) -> String {
         return serde_json::to_string(&code_actions::empty_code_actions()).unwrap();
     };
 
-    let actions = code_actions::available_actions(schema, params);
+    let actions = code_actions::available_actions(schema, &params);
     serde_json::to_string(&actions).unwrap()
 }
 
@@ -53,19 +55,19 @@ pub fn format(schema: &str, params: &str) -> String {
         Ok(params) => params,
         Err(err) => {
             warn!("Error parsing DocumentFormattingParams params: {}", err);
-            return schema.to_owned();
+            return schema.to_string();
         }
     };
 
-    datamodel::reformat(schema, params.options.tab_size as usize).unwrap_or_else(|| schema.to_owned())
+    datamodel::reformat(schema, params.options.tab_size as usize).unwrap_or_else(|| schema.to_string())
 }
 
 pub fn lint(schema: String) -> String {
-    lint::run(&schema)
+    lint::run(schema)
 }
 
 pub fn native_types(schema: String) -> String {
-    native::run(&schema)
+    native::run(schema)
 }
 
 pub fn preview_features() -> String {
@@ -73,7 +75,7 @@ pub fn preview_features() -> String {
 }
 
 pub fn referential_actions(schema: String) -> String {
-    actions::run(&schema)
+    actions::run(schema)
 }
 
 /// This is the same command as get_config()

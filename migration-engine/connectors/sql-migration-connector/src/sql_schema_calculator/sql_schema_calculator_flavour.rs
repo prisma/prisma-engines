@@ -4,12 +4,14 @@ mod postgres;
 mod sqlite;
 
 use datamodel::{
-    datamodel_connector::ScalarType, parser_database::walkers::*, schema_ast::ast::FieldArity, ValidatedSchema,
+    datamodel_connector::ScalarType,
+    parser_database::{walkers::*, ParserDatabase},
+    schema_ast::ast::FieldArity,
 };
 use sql_schema_describer::{self as sql, ColumnArity, ColumnType, ColumnTypeFamily};
 
 pub(crate) trait SqlSchemaCalculatorFlavour {
-    fn calculate_enums(&self, _datamodel: &ValidatedSchema) -> Vec<sql::Enum> {
+    fn calculate_enums(&self, _db: &ParserDatabase) -> Vec<sql::Enum> {
         Vec::new()
     }
 

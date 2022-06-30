@@ -183,7 +183,7 @@ impl QueryEngine {
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
-        let ast = datamodel::parse_datamodel(&datamodel)
+        let ast = datamodel::parse_datamodel(datamodel.clone())
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?
             .subject;
 
@@ -226,7 +226,12 @@ impl QueryEngine {
                 let preview_features: Vec<_> = builder.config.subject.preview_features().iter().collect();
                 let url = data_source
                     .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
-                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
+                    .map_err(|err| {
+                        crate::error::ApiError::Conversion(
+                            err.to_pretty_string("schema.prisma", &builder.datamodel.raw),
+                            builder.datamodel.raw.clone(),
+                        )
+                    })?;
 
                 let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
                 let connector = executor.primary_connector();

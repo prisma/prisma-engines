@@ -95,6 +95,30 @@ pub fn parse_schema(schema_str: impl Into<Cow<'static, str>>) -> Result<(Configu
     parse_datamodel_internal(schema_str).map(|v| v.subject)
 }
 
+pub fn lint_schema(
+    schema_str: impl Into<Cow<'static, str>>,
+) -> Result<Vec<diagnostics::DatamodelWarning>, Diagnostics> {
+    let schema_str = schema_str.into();
+
+    let datamodel_string: Cow<'static, str> = schema_str.into();
+    let mut diagnostics = diagnostics::Diagnostics::new();
+    let ast = schema_ast::parser::parse_schema(&datamodel_string, &mut diagnostics);
+
+    let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
+    let preview_features = preview_features(&generators);
+    let datasources = load_sources(&ast, preview_features, &mut diagnostics);
+
+    diagnostics.to_result()?;
+
+    let out = validate(datamodel_string, ast, &datasources, preview_features, diagnostics);
+
+    if !out.diagnostics.errors().is_empty() {
+        return Err(out.diagnostics);
+    }
+
+    Ok(out.diagnostics.warnings().to_vec())
+}
+
 pub struct ValidatedSchema {
     pub configuration: Configuration,
     pub db: parser_database::ParserDatabase,
@@ -254,7 +278,7 @@ fn render_schema_ast(schema: &ast::SchemaAst, ident_width: usize) -> String {
     let mut out = String::with_capacity(schema.tops.len() * 20);
     let mut renderer = schema_ast::renderer::Renderer::new(&mut out, ident_width);
     renderer.render(schema);
-    reformat(out, 2).expect("Internal error: failed to reformat introspected schema")
+    reformat(&out, 2).expect("Internal error: failed to reformat introspected schema")
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {

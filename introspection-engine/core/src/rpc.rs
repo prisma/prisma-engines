@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use crate::error::Error;
 use datamodel::{dml::Datamodel, Configuration};
 use introspection_connector::{
@@ -104,14 +106,13 @@ impl RpcImpl {
         composite_type_depth: CompositeTypeDepth,
     ) -> RpcResult<IntrospectionResultOutput> {
         let (config, _url, connector) = RpcImpl::load_connector(&schema).await?;
+        let (config2, _, _) = RpcImpl::load_connector(&schema).await?;
 
         let input_data_model = if !force {
-            Self::parse_datamodel(&schema)?
+            Self::parse_datamodel(schema)?
         } else {
             Datamodel::new()
         };
-
-        let (config2, _, _) = RpcImpl::load_connector(&schema).await?;
 
         let ctx = IntrospectionContext {
             preview_features: config2.preview_features(),
@@ -141,10 +142,10 @@ impl RpcImpl {
     }
 
     /// This function parses the provided schema and returns the contained Datamodel.
-    pub fn parse_datamodel(schema: &str) -> RpcResult<Datamodel> {
+    pub fn parse_datamodel(schema: impl Into<Cow<'static, str>>) -> RpcResult<Datamodel> {
         let final_dm = datamodel::parse_datamodel(schema)
             .map(|d| d.subject)
-            .map_err(|err| Error::DatamodelError(err.to_pretty_string("schema.prisma", schema)))?;
+            .map_err(|err| Error::DatamodelError(err))?;
 
         Ok(final_dm)
     }

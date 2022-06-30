@@ -54,12 +54,12 @@ fn main() {
     }
 }
 
-fn plug<F: Fn(&str) -> String>(f: F) {
+fn plug<F: Fn(String) -> String>(f: F) {
     let mut datamodel_string = String::new();
 
     io::stdin()
         .read_to_string(&mut datamodel_string)
         .expect("Unable to read from stdin.");
 
-    print!("{}", f(&datamodel_string))
+    print!("{}", f(datamodel_string))
 }

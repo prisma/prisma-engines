@@ -10,7 +10,7 @@ use crate::{
 };
 use datamodel::dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
 use once_cell::sync::OnceCell;
-use std::sync::Arc;
+use std::{borrow::Cow, sync::Arc};
 
 #[derive(Debug, Default)]
 pub struct InternalDataModelBuilder {
@@ -21,7 +21,7 @@ pub struct InternalDataModelBuilder {
 }
 
 impl InternalDataModelBuilder {
-    pub fn new(datamodel: &str) -> Self {
+    pub fn new(datamodel: impl Into<Cow<'static, str>>) -> Self {
         let datamodel = datamodel::parse_datamodel(datamodel)
             .expect("Expected valid datamodel.")
             .subject;

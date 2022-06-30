@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use datamodel::diagnostics::{DatamodelError, DatamodelWarning};
 
 #[derive(serde::Serialize)]
@@ -8,8 +10,8 @@ pub struct MiniError {
     is_warning: bool,
 }
 
-pub(crate) fn run(schema: &str) -> String {
-    let datamodel_result = datamodel::parse_datamodel(schema);
+pub(crate) fn run(schema: impl Into<Cow<'static, str>>) -> String {
+    let datamodel_result = datamodel::lint_schema(schema);
 
     match datamodel_result {
         Err(err) => {
@@ -39,9 +41,8 @@ pub(crate) fn run(schema: &str) -> String {
 
             print_diagnostics(mini_errors)
         }
-        Ok(validated_datamodel) => {
-            let mini_warnings: Vec<MiniError> = validated_datamodel
-                .warnings
+        Ok(warnings) => {
+            let mini_warnings: Vec<MiniError> = warnings
                 .into_iter()
                 .map(|warn: DatamodelWarning| MiniError {
                     start: warn.span().start,
@@ -65,7 +66,7 @@ mod tests {
     use expect_test::expect;
     use indoc::indoc;
 
-    fn lint(s: &str) -> String {
+    fn lint(s: &'static str) -> String {
         let result = super::run(s);
         let value: serde_json::Value = serde_json::from_str(&result).unwrap();
 

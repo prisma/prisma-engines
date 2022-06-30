@@ -492,7 +492,7 @@ fn implicit_many_to_many_relation() {
     post.assert_relation_field("parents");
 }
 
-fn convert(datamodel: &str) -> Arc<InternalDataModel> {
+fn convert(datamodel: &'static str) -> Arc<InternalDataModel> {
     let builder = InternalDataModelBuilder::new(datamodel);
     builder.build("not_important".to_string())
 }

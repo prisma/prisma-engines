@@ -24,7 +24,7 @@ pub enum PrismaError {
     ConnectorError(Box<ConnectorError>),
 
     #[error("{}", _0)]
-    ConversionError(Diagnostics, String),
+    ConversionError(String, String),
 
     #[error("{}", _0)]
     IOError(anyhow::Error),
@@ -45,8 +45,6 @@ pub enum PrismaError {
 
 impl From<PrismaError> for user_facing_errors::Error {
     fn from(err: PrismaError) -> Self {
-        use std::fmt::Write as _;
-
         match err {
             PrismaError::ConnectorError(connector_err) => match *connector_err {
                 ConnectorError {
@@ -58,14 +56,9 @@ impl From<PrismaError> for user_facing_errors::Error {
                     user_facing_errors::Error::new_non_panic_with_current_backtrace(err.to_string())
                 }
             },
-            PrismaError::ConversionError(errors, dml_string) => {
-                let mut full_error = errors.to_pretty_string("schema.prisma", &dml_string);
-                write!(full_error, "\nValidation Error Count: {}", errors.errors().len()).unwrap();
-
-                user_facing_errors::Error::from(user_facing_errors::KnownError::new(
-                    user_facing_errors::common::SchemaParserError { full_error },
-                ))
-            }
+            PrismaError::ConversionError(full_error, _) => user_facing_errors::Error::from(
+                user_facing_errors::KnownError::new(user_facing_errors::common::SchemaParserError { full_error }),
+            ),
             other => user_facing_errors::Error::new_non_panic_with_current_backtrace(other.to_string()),
         }
     }

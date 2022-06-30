@@ -1,6 +1,7 @@
 use crate::{json_rpc::types::*, CoreError, CoreResult};
+use datamodel::{datamodel_connector::Diagnostics, parser_database::ParserDatabase};
 use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
-use std::path::Path;
+use std::{path::Path, sync::Arc};
 use user_facing_errors::migration_engine::MigrationNameTooLong;
 
 /// Create a new migration.
@@ -23,9 +24,26 @@ pub async fn create_migration(
     let from = connector
         .database_schema_from_diff_target(DiffTarget::Migrations(&previous_migrations), None)
         .await?;
+
+    let db = {
+        // TODO: what do we map here?
+        let ast = datamodel::parse_schema_ast(&input.prisma_schema).unwrap();
+        let mut diag = Diagnostics::new();
+        let db = ParserDatabase::new(input.prisma_schema.clone(), ast, &mut diag);
+
+        if diag.has_errors() {
+            panic!();
+        }
+
+        db
+    };
+
+    let config = datamodel::parse_configuration(&input.prisma_schema).unwrap();
+
     let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.prisma_schema), None)
+        .database_schema_from_diff_target(DiffTarget::Datamodel(Arc::new((db, config.subject))), None)
         .await?;
+
     let migration = connector.diff(from, to)?;
 
     if connector.migration_is_empty(&migration) && !input.draft {

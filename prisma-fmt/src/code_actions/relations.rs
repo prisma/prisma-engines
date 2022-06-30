@@ -1,12 +1,7 @@
 use std::collections::HashMap;
 
 use datamodel::parser_database::walkers::CompleteInlineRelationWalker;
-use lsp_types::{
-    CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Diagnostic, DiagnosticSeverity, Range, TextEdit,
-    WorkspaceEdit,
-};
-
-use super::IndentationOptions;
+use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Range, TextEdit, WorkspaceEdit};
 
 /// If the referencing side of the one-to-one relation does not point
 /// to a unique constraint, the action adds the attribute.

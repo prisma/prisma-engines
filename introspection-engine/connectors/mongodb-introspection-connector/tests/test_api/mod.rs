@@ -104,13 +104,15 @@ where
     );
 
     let mut config = datamodel::parse_configuration(&datamodel_string).unwrap();
-    let datamodel = datamodel::parse_datamodel(&datamodel_string).unwrap();
 
     let ctx = IntrospectionContext {
         source: config.subject.datasources.pop().unwrap(),
         composite_type_depth,
         preview_features,
     };
+
+    let config = datamodel::parse_configuration(&datamodel_string).unwrap().subject;
+    let datamodel = datamodel::parse_datamodel(datamodel_string).unwrap();
 
     RT.block_on(async move {
         let client = mongodb_client::create(&connection_string).await.unwrap();
@@ -125,7 +127,6 @@ where
         database.drop(None).await.unwrap();
 
         let res = res.unwrap();
-        let config = datamodel::parse_configuration(&datamodel_string).unwrap().subject;
 
         TestResult {
             datamodel: datamodel::render_datamodel_to_string(&res.data_model, Some(&config)),

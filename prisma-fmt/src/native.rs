@@ -1,7 +1,7 @@
 use datamodel::datamodel_connector::NativeTypeConstructor;
 
-pub(crate) fn run(schema: &str) -> String {
-    let validated_configuration = match datamodel::parse_configuration(schema) {
+pub(crate) fn run(schema: String) -> String {
+    let validated_configuration = match datamodel::parse_configuration(&schema) {
         Ok(validated_configuration) => validated_configuration,
         Err(_) => return "[]".to_owned(),
     };

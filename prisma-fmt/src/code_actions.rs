@@ -1,15 +1,12 @@
 mod relations;
 
-use std::fmt;
+use std::borrow::Cow;
 
 use datamodel::{
     ast,
     datamodel_connector::Diagnostics,
     parse_schema_ast,
-    parser_database::{
-        walkers::{ModelWalker, RefinedRelationWalker},
-        ParserDatabase,
-    },
+    parser_database::{walkers::RefinedRelationWalker, ParserDatabase},
 };
 use log::warn;
 use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic};
@@ -18,8 +15,13 @@ pub(crate) fn empty_code_actions() -> Vec<CodeActionOrCommand> {
     Vec::new()
 }
 
-pub(crate) fn available_actions(schema: &str, params: &CodeActionParams) -> Vec<CodeActionOrCommand> {
-    let schema_ast = if let Ok(schema_ast) = parse_schema_ast(schema) {
+pub(crate) fn available_actions(
+    schema: impl Into<Cow<'static, str>>,
+    params: &CodeActionParams,
+) -> Vec<CodeActionOrCommand> {
+    let schema = schema.into();
+
+    let schema_ast = if let Ok(schema_ast) = parse_schema_ast(&schema) {
         schema_ast
     } else {
         warn!("Failed to parse schema AST in code action request.");
@@ -30,7 +32,7 @@ pub(crate) fn available_actions(schema: &str, params: &CodeActionParams) -> Vec<
 
     let db = {
         let mut diag = Diagnostics::new();
-        ParserDatabase::new(schema_ast, &mut diag)
+        ParserDatabase::new(schema, schema_ast, &mut diag)
     };
 
     for relation in db.walk_relations() {
@@ -40,10 +42,10 @@ pub(crate) fn available_actions(schema: &str, params: &CodeActionParams) -> Vec<
                 None => continue,
             };
 
-            relations::add_referenced_side_unique(&mut actions, params, schema, complete_relation);
+            relations::add_referenced_side_unique(&mut actions, params, db.source(), complete_relation);
 
             if relation.is_one_to_one() {
-                relations::add_referencing_side_unique(&mut actions, params, schema, complete_relation);
+                relations::add_referencing_side_unique(&mut actions, params, db.source(), complete_relation);
             }
         }
     }
@@ -67,8 +69,4 @@ pub(super) fn diagnostics_for_span<'a>(
     } else {
         Some(res)
     }
-}
-
-pub(super) fn indentation_type(model: ModelWalker<'_>) -> IndentationOptions {
-    model.ast_model()
 }

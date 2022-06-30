@@ -1,16 +1,15 @@
 use datamodel::{
     datamodel_connector::walker_ext_traits::*,
-    parser_database::{IndexType, SortOrder},
-    ValidatedSchema,
+    parser_database::{IndexType, ParserDatabase, SortOrder},
 };
 use mongodb_schema_describer::{IndexField, IndexFieldProperty, MongoSchema};
 
 /// Datamodel -> MongoSchema
-pub(crate) fn calculate(datamodel: &ValidatedSchema) -> MongoSchema {
+pub(crate) fn calculate(db: &ParserDatabase) -> MongoSchema {
     let mut schema = MongoSchema::default();
     let connector = mongodb_datamodel_connector::MongoDbDatamodelConnector;
 
-    for model in datamodel.db.walk_models() {
+    for model in db.walk_models() {
         let collection_id = schema.push_collection(model.database_name().to_owned());
 
         for index in model.indexes() {

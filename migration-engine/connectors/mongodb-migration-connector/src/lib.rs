@@ -51,11 +51,7 @@ impl MongoDbMigrationConnector {
 
     async fn mongodb_schema_from_diff_target(&self, target: DiffTarget<'_>) -> ConnectorResult<MongoSchema> {
         match target {
-            DiffTarget::Datamodel(schema) => {
-                let validated_schema =
-                    datamodel::parse_schema_parserdb(schema).map_err(ConnectorError::new_schema_parser_error)?;
-                Ok(schema_calculator::calculate(&validated_schema))
-            }
+            DiffTarget::Datamodel(schema) => Ok(schema_calculator::calculate(&schema.0)),
             DiffTarget::Database => self.client().await?.describe().await,
             DiffTarget::Migrations(_) => Err(unsupported_command_error()),
             DiffTarget::Empty => Ok(MongoSchema::default()),

@@ -27,11 +27,12 @@ pub fn version() -> Version {
 
 #[napi]
 pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
-    let datamodel = datamodel::parse_datamodel(&datamodel_string)
-        .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
-
     let config = datamodel::parse_configuration(&datamodel_string)
         .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
+
+    let datamodel = datamodel::parse_datamodel(datamodel_string.clone())
+        .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
+
     let datasource = config.subject.datasources.first();
 
     let capabilities = datasource
