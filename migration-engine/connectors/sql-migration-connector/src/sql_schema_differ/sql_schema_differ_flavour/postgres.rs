@@ -12,7 +12,7 @@ use once_cell::sync::Lazy;
 use regex::RegexSet;
 use sql_schema_describer::{
     postgres::PostgresSchemaExt,
-    walkers::{ColumnWalker, IndexWalker, SqlSchemaExt},
+    walkers::{ColumnWalker, IndexWalker},
 };
 
 /// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.
@@ -104,7 +104,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             .map(|cols| {
                 schemas
                     .combine(cols)
-                    .map(|((schema, ext), (_table_id, column_id))| (schema.walk_column(column_id), ext))
+                    .map(|((schema, ext), (_table_id, column_id))| (schema.walk(column_id), ext))
             })
             .filter_map(|cols| {
                 cols.map(|(col, ext)| {

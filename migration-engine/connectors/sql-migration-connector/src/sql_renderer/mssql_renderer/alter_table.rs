@@ -12,7 +12,7 @@ use crate::{
 };
 use sql_schema_describer::{
     mssql::MssqlSchemaExt,
-    walkers::{ColumnWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, TableWalker},
     ColumnId, DefaultValue,
 };
 use std::borrow::Cow;
@@ -206,14 +206,12 @@ impl<'a> AlterTableConstructor<'a> {
     }
 
     fn add_column(&mut self, column_id: ColumnId) {
-        let column = self.tables.next.schema.walk_column(column_id);
+        let column = self.tables.next.schema.walk(column_id);
         self.add_columns.push(self.renderer.render_column(column));
     }
 
     fn drop_column(&mut self, column_id: ColumnId) {
-        let name = self
-            .renderer
-            .quote(self.tables.previous.schema.walk_column(column_id).name());
+        let name = self.renderer.quote(self.tables.previous.walk(column_id).name());
 
         self.drop_columns.push(format!("{}", name));
     }

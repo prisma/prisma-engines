@@ -87,7 +87,7 @@ impl SqlRenderer for PostgresFlavour {
             table_name: ddl::PostgresIdentifier::Simple(foreign_key.table().name().into()),
             clauses: vec![ddl::AlterTableClause::AddForeignKey(ddl::ForeignKey {
                 constrained_columns: foreign_key.constrained_columns().map(|c| c.name().into()).collect(),
-                referenced_columns: foreign_key.referenced_column_names().iter().map(|c| c.into()).collect(),
+                referenced_columns: foreign_key.referenced_columns().map(|c| c.name().into()).collect(),
                 constraint_name: foreign_key.constraint_name().map(From::from),
                 referenced_table: foreign_key.referenced_table().name().into(),
                 on_delete: Some(match foreign_key.on_delete_action() {
@@ -211,13 +211,13 @@ impl SqlRenderer for PostgresFlavour {
                     column_id,
                     has_virtual_default: _,
                 } => {
-                    let column = schemas.next.walk_column(*column_id);
+                    let column = schemas.next.walk(*column_id);
                     let col_sql = self.render_column(column);
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
                 TableChange::DropColumn { column_id } => {
-                    let name = self.quote(schemas.previous.walk_column(*column_id).name());
+                    let name = self.quote(schemas.previous.walk(*column_id).name());
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::AlterColumn(AlterColumn {
@@ -847,7 +847,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>)
     // Find all usages as a default and drop them
     {
         for (colid, _) in &alter_enum.previous_usages_as_default {
-            let column = schemas.previous.walk_column(*colid);
+            let column = schemas.previous.walk(*colid);
 
             let drop_default = format!(
                 r#"ALTER TABLE "{table_name}" ALTER COLUMN "{column_name}" DROP DEFAULT"#,
@@ -957,7 +957,7 @@ fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>
         .previous_usages_as_default
         .iter()
         .filter_map(|(prev_colidx, _)| {
-            let col = schemas.previous.walk_column(*prev_colidx);
+            let col = schemas.previous.walk(*prev_colidx);
             col.default()
                 .and_then(|d| d.as_value())
                 .and_then(|v| v.as_enum_value())

@@ -913,6 +913,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                 ),
             ],
             foreign_keys: [],
+            foreign_key_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -1792,6 +1793,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                 ),
             ],
             foreign_keys: [],
+            foreign_key_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -2666,6 +2668,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                 ),
             ],
             foreign_keys: [],
+            foreign_key_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -2985,27 +2988,32 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                 ),
             ],
             foreign_keys: [
-                (
-                    TableId(
+                ForeignKey {
+                    constrained_table: TableId(
                         0,
                     ),
-                    ForeignKey {
-                        constraint_name: Some(
-                            "Post_ibfk_1",
-                        ),
-                        columns: [
-                            "user_id",
-                        ],
-                        referenced_table: TableId(
-                            1,
-                        ),
-                        referenced_columns: [
-                            "id",
-                        ],
-                        on_delete_action: Restrict,
-                        on_update_action: Restrict,
-                    },
-                ),
+                    referenced_table: TableId(
+                        1,
+                    ),
+                    constraint_name: Some(
+                        "Post_ibfk_1",
+                    ),
+                    on_delete_action: Restrict,
+                    on_update_action: Restrict,
+                },
+            ],
+            foreign_key_columns: [
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        0,
+                    ),
+                    constrained_column: ColumnId(
+                        1,
+                    ),
+                    referenced_column: ColumnId(
+                        2,
+                    ),
+                },
             ],
             views: [],
             procedures: [],
@@ -3069,6 +3077,7 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
                 ),
             ],
             foreign_keys: [],
+            foreign_key_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -3163,6 +3172,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                 ),
             ],
             foreign_keys: [],
+            foreign_key_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -3226,6 +3236,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
                 ),
             ],
             foreign_keys: [],
+            foreign_key_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -3607,6 +3618,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                 ),
             ],
             foreign_keys: [],
+            foreign_key_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -3753,27 +3765,32 @@ fn dangling_foreign_keys_are_filtered_out(api: TestApi) {
                 ),
             ],
             foreign_keys: [
-                (
-                    TableId(
+                ForeignKey {
+                    constrained_table: TableId(
                         0,
                     ),
-                    ForeignKey {
-                        constraint_name: Some(
-                            "dog_ibfk_2",
-                        ),
-                        columns: [
-                            "bestFriendId",
-                        ],
-                        referenced_table: TableId(
-                            1,
-                        ),
-                        referenced_columns: [
-                            "id",
-                        ],
-                        on_delete_action: Restrict,
-                        on_update_action: Restrict,
-                    },
-                ),
+                    referenced_table: TableId(
+                        1,
+                    ),
+                    constraint_name: Some(
+                        "dog_ibfk_2",
+                    ),
+                    on_delete_action: Restrict,
+                    on_update_action: Restrict,
+                },
+            ],
+            foreign_key_columns: [
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        0,
+                    ),
+                    constrained_column: ColumnId(
+                        1,
+                    ),
+                    referenced_column: ColumnId(
+                        2,
+                    ),
+                },
             ],
             views: [],
             procedures: [],

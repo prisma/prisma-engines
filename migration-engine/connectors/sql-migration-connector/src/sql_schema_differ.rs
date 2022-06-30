@@ -16,10 +16,7 @@ use crate::{
     SqlFlavour,
 };
 use column::ColumnTypeChange;
-use sql_schema_describer::{
-    walkers::{ForeignKeyWalker, SqlSchemaExt},
-    ColumnId, IndexId, TableId,
-};
+use sql_schema_describer::{walkers::ForeignKeyWalker, ColumnId, IndexId, TableId};
 use std::collections::HashSet;
 use table::TableDiffer;
 
@@ -237,7 +234,7 @@ fn added_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
             let from_recreate = alter_columns(differ).into_iter().any(|tc| match tc {
                 TableChange::DropAndRecreateColumn { column_id, .. } => {
                     let id = column_id.previous;
-                    differ.previous().schema.walk_column(id).is_part_of_primary_key()
+                    differ.previous().walk(id).is_part_of_primary_key()
                 }
                 _ => false,
             });
@@ -273,7 +270,7 @@ fn dropped_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
                 TableChange::DropAndRecreateColumn { column_id, .. } => differ
                     .previous()
                     .schema
-                    .walk_column(column_id.previous)
+                    .walk(column_id.previous)
                     .is_part_of_primary_key(),
                 _ => false,
             });
@@ -433,7 +430,7 @@ fn push_redefined_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferData
 fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>) -> bool {
     let references_same_table = db.flavour.table_names_match(fks.map(|fk| fk.referenced_table().name()));
 
-    let references_same_column_count = fks.previous.referenced_columns_count() == fks.next.referenced_columns_count();
+    let references_same_column_count = fks.previous.referenced_columns().len() == fks.next.referenced_columns().len();
     let constrains_same_column_count = fks.previous.constrained_columns().len() == fks.next.constrained_columns().len();
 
     let constrains_same_columns = fks.interleave(|fk| fk.constrained_columns()).all(|cols| {
@@ -448,7 +445,7 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>)
 
     // Foreign key references different columns or the same columns in a different order.
     let references_same_columns = fks
-        .interleave(|fk| fk.referenced_column_names())
+        .interleave(|fk| fk.referenced_columns().map(|c| c.name()))
         .all(|pair| pair.previous == pair.next);
 
     let same_on_delete_action = fks.previous.on_delete_action() == fks.next.on_delete_action();

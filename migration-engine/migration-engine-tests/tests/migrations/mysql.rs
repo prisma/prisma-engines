@@ -24,16 +24,13 @@ fn indexes_on_foreign_key_fields_are_not_created_twice(api: TestApi) {
 
     api.schema_push_w_datasource(schema).send();
 
-    let sql_schema = api
-        .assert_schema()
-        .assert_table("Human", |table| {
-            table
-                .assert_foreign_keys_count(1)
-                .assert_fk_on_columns(&["catname"], |fk| fk.assert_references("Cat", &["name"]))
-                .assert_indexes_count(1)
-                .assert_index_on_columns(&["catname"], |idx| idx.assert_is_not_unique())
-        })
-        .into_schema();
+    api.assert_schema().assert_table("Human", |table| {
+        table
+            .assert_foreign_keys_count(1)
+            .assert_fk_on_columns(&["catname"], |fk| fk.assert_references("Cat", &["name"]))
+            .assert_indexes_count(1)
+            .assert_index_on_columns(&["catname"], |idx| idx.assert_is_not_unique())
+    });
 
     // Test that after introspection, we do not migrate further.
     api.schema_push_w_datasource(schema)
@@ -41,8 +38,6 @@ fn indexes_on_foreign_key_fields_are_not_created_twice(api: TestApi) {
         .send()
         .assert_green()
         .assert_no_steps();
-
-    api.assert_schema().assert_equals(&sql_schema);
 }
 
 // We have to test this because one enum on MySQL can map to multiple enums in the database.

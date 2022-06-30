@@ -2,11 +2,14 @@
 
 use crate::{
     getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
-    DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType, Lazy, PrimaryKey, PrimaryKeyColumn,
-    PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend, Table, View,
+    DescriberResult, ForeignKeyAction, Index, IndexColumn, IndexType, Lazy, PrimaryKey, PrimaryKeyColumn, PrismaValue,
+    Regex, SQLSortOrder, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend, Table, View,
 };
 use indexmap::IndexMap;
-use quaint::{ast::Value, prelude::Queryable};
+use quaint::{
+    ast::Value,
+    prelude::{Queryable, ResultRow},
+};
 use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug, path::Path};
 use tracing::trace;
 
@@ -42,36 +45,15 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         let table_ids = self.get_table_names(&mut schema).await?;
 
         for (table_name, table_id) in &table_ids {
-            self.get_table(table_name, *table_id, &table_ids, &mut schema).await?
+            self.push_table(table_name, *table_id, &mut schema).await?;
         }
 
-        // SQLite allows foreign key definitions without specifying the referenced columns, it then
-        // assumes the pk is used.
-        let foreign_keys_without_referenced_columns: Vec<(ForeignKeyId, Vec<String>)> = schema
-            .walk_foreign_keys()
-            .filter(|fk| fk.referenced_columns_count() == 0)
-            .map(|fk| {
-                (
-                    fk.id,
-                    fk.referenced_table()
-                        .primary_key()
-                        .unwrap()
-                        .column_names()
-                        .map(|name| name.to_owned())
-                        .collect(),
-                )
-            })
-            .collect();
-
-        for (foreign_key_id, columns) in foreign_keys_without_referenced_columns {
-            schema[foreign_key_id].1.referenced_columns = columns;
+        for (table_name, table_id) in &table_ids {
+            self.push_foreign_keys(table_name, *table_id, &table_ids, &mut schema)
+                .await?;
         }
 
         schema.views = self.get_views().await?;
-
-        schema
-            .foreign_keys
-            .sort_by_cached_key(|(id, fk)| (*id, fk.columns.to_owned()));
 
         Ok(schema)
     }
@@ -143,13 +125,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(size.try_into().unwrap())
     }
 
-    async fn get_table(
-        &self,
-        name: &str,
-        table_id: TableId,
-        table_ids: &IndexMap<String, TableId>,
-        schema: &mut SqlSchema,
-    ) -> DescriberResult<()> {
+    async fn push_table(&self, name: &str, table_id: TableId, schema: &mut SqlSchema) -> DescriberResult<()> {
         let (table_columns, primary_key) = self.get_columns(name).await?;
         let indices = self.get_indices(name).await?;
 
@@ -162,8 +138,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         for col in table_columns {
             schema.columns.push((table_id, col));
         }
-
-        self.push_foreign_keys(name, table_id, table_ids, schema).await?;
 
         Ok(())
     }
@@ -327,120 +301,117 @@ impl<'a> SqlSchemaDescriber<'a> {
         table_ids: &IndexMap<String, TableId>,
         schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
-        struct IntermediateForeignKey {
-            pub columns: BTreeMap<i64, String>,
-            pub referenced_table: TableId,
-            pub referenced_columns: BTreeMap<i64, String>,
-            pub on_delete_action: ForeignKeyAction,
-            pub on_update_action: ForeignKeyAction,
+        let sql = format!(r#"PRAGMA foreign_key_list("{}");"#, table_name);
+        let result_set = self.conn.query_raw(&sql, &[]).await?;
+        let mut current_foreign_key: Option<(i64, ForeignKeyId)> = None;
+        let mut current_foreign_key_columns: Vec<(i64, ColumnId, Option<ColumnId>)> = Vec::new();
+
+        fn get_ids(
+            row: &ResultRow,
+            table_id: TableId,
+            table_ids: &IndexMap<String, TableId>,
+            schema: &SqlSchema,
+        ) -> Option<(ColumnId, TableId, Option<ColumnId>)> {
+            let column = schema.walk(table_id).column(&row.get_expect_string("from"))?.id;
+            let referenced_table = schema.walk(*table_ids.get(&row.get_expect_string("table"))?);
+            // this can be null if the primary key and shortened fk syntax was used
+            let referenced_column = row
+                .get_string("to")
+                .and_then(|colname| Some(referenced_table.column(&colname)?.id));
+
+            Some((column, referenced_table.id, referenced_column))
         }
 
-        let sql = format!(r#"PRAGMA foreign_key_list("{}");"#, table_name);
-        trace!("describing table foreign keys, SQL: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for foreign keys");
+        fn get_referential_actions(row: &ResultRow) -> [ForeignKeyAction; 2] {
+            let on_delete_action = match row.get_expect_string("on_delete").to_lowercase().as_str() {
+                "no action" => ForeignKeyAction::NoAction,
+                "restrict" => ForeignKeyAction::Restrict,
+                "set null" => ForeignKeyAction::SetNull,
+                "set default" => ForeignKeyAction::SetDefault,
+                "cascade" => ForeignKeyAction::Cascade,
+                s => panic!("Unrecognized on delete action '{}'", s),
+            };
+            let on_update_action = match row.get_expect_string("on_update").to_lowercase().as_str() {
+                "no action" => ForeignKeyAction::NoAction,
+                "restrict" => ForeignKeyAction::Restrict,
+                "set null" => ForeignKeyAction::SetNull,
+                "set default" => ForeignKeyAction::SetDefault,
+                "cascade" => ForeignKeyAction::Cascade,
+                s => panic!("Unrecognized on update action '{}'", s),
+            };
+            [on_delete_action, on_update_action]
+        }
 
-        // Since one foreign key with multiple columns will be represented here as several
-        // rows with the same ID, we have to use an intermediate representation that gets
-        // translated into the real foreign keys in another pass
-        let mut intermediate_fks: BTreeMap<i64, IntermediateForeignKey> = BTreeMap::new();
+        fn flush_current_fk(
+            current_foreign_key: &mut Option<(i64, ForeignKeyId)>,
+            current_columns: &mut Vec<(i64, ColumnId, Option<ColumnId>)>,
+            schema: &mut SqlSchema,
+        ) {
+            current_columns.sort_by_key(|(seq, _, _)| *seq);
+            let fkid = if let Some((_, id)) = current_foreign_key {
+                *id
+            } else {
+                return;
+            };
+
+            // SQLite allows foreign key definitions without specifying the referenced columns, it then
+            // assumes the pk is used.
+            if current_columns[0].2.is_none() {
+                let referenced_table_pk_columns = schema
+                    .walk(fkid)
+                    .referenced_table()
+                    .primary_key_columns()
+                    .map(|w| w.column_id)
+                    .collect::<Vec<_>>();
+
+                if referenced_table_pk_columns.len() == current_columns.len() {
+                    for (col, referenced) in current_columns.drain(..).zip(referenced_table_pk_columns) {
+                        schema.push_foreign_key_column(fkid, [col.1, referenced]);
+                    }
+                }
+            } else {
+                for (_, col, referenced) in current_columns.iter() {
+                    schema.push_foreign_key_column(fkid, [*col, referenced.unwrap()]);
+                }
+            }
+
+            *current_foreign_key = None;
+            current_columns.clear();
+        }
+
         for row in result_set.into_iter() {
             trace!("got FK description row {:?}", row);
             let id = row.get("id").and_then(|x| x.as_integer()).expect("id");
             let seq = row.get("seq").and_then(|x| x.as_integer()).expect("seq");
-            let column = row.get("from").and_then(|x| x.to_string()).expect("from");
-            // this can be null if the primary key and shortened fk syntax was used
-            let referenced_column = row.get("to").and_then(|x| x.to_string());
-            let referenced_table = row.get("table").and_then(|x| x.to_string()).expect("table");
-            let referenced_table_id = if let Some(id) = table_ids.get(&referenced_table) {
-                *id
-            } else {
-                continue;
-            };
-            match intermediate_fks.get_mut(&id) {
-                Some(fk) => {
-                    fk.columns.insert(seq, column);
-                    if let Some(column) = referenced_column {
-                        fk.referenced_columns.insert(seq, column);
-                    };
-                }
+            let (column_id, referenced_table_id, referenced_column_id) =
+                if let Some(ids) = get_ids(&row, table_id, table_ids, schema) {
+                    ids
+                } else {
+                    continue;
+                };
+
+            match &mut current_foreign_key {
                 None => {
-                    let mut columns: BTreeMap<i64, String> = BTreeMap::new();
-                    columns.insert(seq, column);
-                    let mut referenced_columns: BTreeMap<i64, String> = BTreeMap::new();
-
-                    if let Some(column) = referenced_column {
-                        referenced_columns.insert(seq, column);
-                    };
-                    let on_delete_action = match row
-                        .get("on_delete")
-                        .and_then(|x| x.to_string())
-                        .expect("on_delete")
-                        .to_lowercase()
-                        .as_str()
-                    {
-                        "no action" => ForeignKeyAction::NoAction,
-                        "restrict" => ForeignKeyAction::Restrict,
-                        "set null" => ForeignKeyAction::SetNull,
-                        "set default" => ForeignKeyAction::SetDefault,
-                        "cascade" => ForeignKeyAction::Cascade,
-                        s => panic!("Unrecognized on delete action '{}'", s),
-                    };
-                    let on_update_action = match row
-                        .get("on_update")
-                        .and_then(|x| x.to_string())
-                        .expect("on_update")
-                        .to_lowercase()
-                        .as_str()
-                    {
-                        "no action" => ForeignKeyAction::NoAction,
-                        "restrict" => ForeignKeyAction::Restrict,
-                        "set null" => ForeignKeyAction::SetNull,
-                        "set default" => ForeignKeyAction::SetDefault,
-                        "cascade" => ForeignKeyAction::Cascade,
-                        s => panic!("Unrecognized on update action '{}'", s),
-                    };
-                    let fk = IntermediateForeignKey {
-                        columns,
-                        referenced_table: referenced_table_id,
-                        referenced_columns,
-                        on_delete_action,
-                        on_update_action,
-                    };
-                    intermediate_fks.insert(id, fk);
+                    let foreign_key_id =
+                        schema.push_foreign_key(None, [table_id, referenced_table_id], get_referential_actions(&row));
+                    current_foreign_key = Some((id, foreign_key_id));
                 }
-            };
-        }
+                Some((sqlite_id, _)) if *sqlite_id == id => {}
+                Some(_) => {
+                    // Flush current foreign key.
+                    flush_current_fk(&mut current_foreign_key, &mut current_foreign_key_columns, schema);
 
-        for (_, intermediate_fk) in intermediate_fks {
-            let mut column_keys: Vec<&i64> = intermediate_fk.columns.keys().collect();
-            column_keys.sort();
-            let mut columns: Vec<String> = vec![];
-            columns.reserve(column_keys.len());
-            for i in column_keys {
-                columns.push(intermediate_fk.columns[i].to_owned());
+                    let foreign_key_id =
+                        schema.push_foreign_key(None, [table_id, referenced_table_id], get_referential_actions(&row));
+                    current_foreign_key = Some((id, foreign_key_id));
+                }
             }
 
-            let mut referenced_column_keys: Vec<&i64> = intermediate_fk.referenced_columns.keys().collect();
-            referenced_column_keys.sort();
-            let mut referenced_columns: Vec<String> = vec![];
-            referenced_columns.reserve(referenced_column_keys.len());
-            for i in referenced_column_keys {
-                referenced_columns.push(intermediate_fk.referenced_columns[i].clone());
-            }
-
-            let fk = ForeignKey {
-                columns,
-                referenced_table: intermediate_fk.referenced_table,
-                referenced_columns,
-                on_delete_action: intermediate_fk.on_delete_action,
-                on_update_action: intermediate_fk.on_update_action,
-
-                // Not relevant in SQLite since we cannot ALTER or DROP foreign keys by
-                // constraint name.
-                constraint_name: None,
-            };
-            schema.foreign_keys.push((table_id, fk));
+            current_foreign_key_columns.push((seq, column_id, referenced_column_id));
         }
+
+        // Flush the last foreign key.
+        flush_current_fk(&mut current_foreign_key, &mut current_foreign_key_columns, schema);
 
         Ok(())
     }

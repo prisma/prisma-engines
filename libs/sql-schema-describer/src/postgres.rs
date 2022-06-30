@@ -4,7 +4,7 @@ mod default;
 
 use self::default::get_default_value;
 use super::*;
-use crate::{getters::Getter, walkers::SqlSchemaExt};
+use crate::getters::Getter;
 use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use indoc::indoc;
@@ -436,8 +436,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
         self.get_sequences(schema, &mut pg_ext).await?;
         sql_schema.enums = self.get_enums(schema).await?;
-        self.get_columns(schema, &sql_schema.enums, &table_names, &mut sql_schema.columns)
-            .await?;
+        self.get_columns(schema, &table_names, &mut sql_schema).await?;
         self.get_foreign_keys(schema, &table_names, &mut sql_schema).await?;
 
         self.get_indices(schema, &table_names, &mut pg_ext, &mut sql_schema)
@@ -447,8 +446,6 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         sql_schema.procedures = self.get_procedures(schema).await?;
 
         // Make sure the vectors we use binary search on are sorted.
-        sql_schema.foreign_keys.sort_by_key(|(table_id, _)| *table_id);
-        sql_schema.columns.sort_by_key(|(table_id, _)| *table_id);
         pg_ext.indexes.sort_by_key(|(id, _)| *id);
         pg_ext.opclasses.sort_by_key(|(id, _)| *id);
 
@@ -579,9 +576,8 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_columns(
         &self,
         schema: &str,
-        enums: &[Enum],
         table_ids: &IndexMap<String, TableId>,
-        columns: &mut Vec<(TableId, Column)>,
+        sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
         let is_visible_clause = if self.is_cockroach() {
             " AND info.is_hidden = 'NO'"
@@ -644,9 +640,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                     .circumstances
                     .contains(Circumstances::CockroachWithPostgresNativeTypes)
             {
-                get_column_type_cockroachdb(&col, enums)
+                get_column_type_cockroachdb(&col, &sql_schema.enums)
             } else {
-                get_column_type_postgresql(&col, enums)
+                get_column_type_postgresql(&col, &sql_schema.enums)
             };
             let default = col
                 .get("column_default")
@@ -668,10 +664,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 auto_increment,
             };
 
-            columns.push((*table_id, col));
+            sql_schema.columns.push((*table_id, col));
         }
-
-        trace!("Found table columns: {:?}", columns);
 
         Ok(())
     }
@@ -745,14 +739,15 @@ impl<'a> SqlSchemaDescriber<'a> {
     ) -> DescriberResult<()> {
         // The `generate_subscripts` in the inner select is needed because the optimizer is free to reorganize the unnested rows if not explicitly ordered.
         let sql = r#"
-            SELECT con.oid         as "con_id",
-                att2.attname    as "child_column",
-                cl.relname      as "parent_table",
-                att.attname     as "parent_column",
+            SELECT
+                con.oid         AS "con_id",
+                att2.attname    AS "child_column",
+                cl.relname      AS "parent_table",
+                att.attname     AS "parent_column",
                 con.confdeltype,
                 con.confupdtype,
-                rel_ns.nspname as "referenced_schema_name",
-                conname         as constraint_name,
+                rel_ns.nspname  AS "referenced_schema_name",
+                conname         AS constraint_name,
                 child,
                 parent,
                 table_name
@@ -780,18 +775,34 @@ impl<'a> SqlSchemaDescriber<'a> {
                     JOIN pg_attribute att2 on att2.attrelid = con.conrelid and att2.attnum = con.parent
                     JOIN pg_class rel_cl on con.confrelid = rel_cl.oid
                     JOIN pg_namespace rel_ns on rel_cl.relnamespace = rel_ns.oid
-            ORDER BY con_id, con.colidx;
+            ORDER BY constraint_name, con_id, con.colidx;
         "#;
 
+        let mut current_fk: Option<(i64, ForeignKeyId)> = None;
+
+        fn get_ids(
+            table_name: &str,
+            column_name: &str,
+            referenced_table_name: &str,
+            referenced_column_name: &str,
+            table_ids: &IndexMap<String, TableId>,
+            sql_schema: &SqlSchema,
+        ) -> Option<(TableId, ColumnId, TableId, ColumnId)> {
+            let table_id = *table_ids.get(table_name)?;
+            let referenced_table_id = *table_ids.get(referenced_table_name)?;
+            let column_id = sql_schema.walk(table_id).column(column_name)?.id;
+            let referenced_column_id = sql_schema.walk(referenced_table_id).column(referenced_column_name)?.id;
+
+            Some((table_id, column_id, referenced_table_id, referenced_column_id))
+        }
+
         // One foreign key with multiple columns will be represented here as several
-        // rows with the same ID, which we will have to combine into corresponding foreign key
-        // objects.
+        // rows with the same ID.
         let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
-        let mut intermediate_fks: BTreeMap<i64, (TableId, ForeignKey)> = BTreeMap::new();
         for row in result_set.into_iter() {
             trace!("Got description FK row {:?}", row);
             let id = row.get_expect_i64("con_id");
-            let column = row.get_expect_string("child_column");
+            let column_name = row.get_expect_string("child_column");
             let table_name = row.get_expect_string("table_name");
             let constraint_name = row.get_expect_string("constraint_name");
             let referenced_table = row.get_expect_string("parent_table");
@@ -806,17 +817,19 @@ impl<'a> SqlSchemaDescriber<'a> {
                 }));
             }
 
-            let referenced_table_id = if let Some(id) = table_ids.get(&referenced_table) {
-                *id
+            let (table_id, column_id, referenced_table_id, referenced_column_id) = if let Some(ids) = get_ids(
+                &table_name,
+                &column_name,
+                &referenced_table,
+                &referenced_column,
+                table_ids,
+                sql_schema,
+            ) {
+                ids
             } else {
                 continue;
             };
 
-            let table_id = if let Some(id) = table_ids.get(table_name.as_str()) {
-                *id
-            } else {
-                continue;
-            };
             let confdeltype = row
                 .get_char("confdeltype")
                 .unwrap_or_else(|| row.get_expect_string("confdeltype").chars().next().unwrap());
@@ -840,32 +853,24 @@ impl<'a> SqlSchemaDescriber<'a> {
                 'd' => ForeignKeyAction::SetDefault,
                 _ => panic!("unrecognized foreign key action (on update) '{}'", confupdtype),
             };
-            match intermediate_fks.get_mut(&id) {
-                Some((_, fk)) => {
-                    fk.columns.push(column);
-                    fk.referenced_columns.push(referenced_column);
-                }
-                None => {
-                    let fk = ForeignKey {
-                        constraint_name: Some(constraint_name),
-                        columns: vec![column],
-                        referenced_table: referenced_table_id,
-                        referenced_columns: vec![referenced_column],
-                        on_delete_action,
-                        on_update_action,
-                    };
-                    intermediate_fks.insert(id, (table_id, fk));
-                }
-            };
-        }
 
-        for (_, (table_id, fk)) in intermediate_fks {
-            sql_schema.foreign_keys.push((table_id, fk));
-        }
+            match current_fk {
+                Some((current_oid, _)) if current_oid == id => (),
+                None | Some(_) => {
+                    let fkid = sql_schema.push_foreign_key(
+                        Some(constraint_name),
+                        [table_id, referenced_table_id],
+                        [on_delete_action, on_update_action],
+                    );
 
-        sql_schema
-            .foreign_keys
-            .sort_by_cached_key(|(id, fk)| (*id, fk.columns.to_owned()));
+                    current_fk = Some((id, fkid));
+                }
+            }
+
+            if let Some((_, fkid)) = current_fk {
+                sql_schema.push_foreign_key_column(fkid, [column_id, referenced_column_id]);
+            }
+        }
 
         Ok(())
     }
@@ -1063,7 +1068,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for (table_id, (indexes, pk)) in indexes_map {
             let pk_is_invalid = {
-                let table = sql_schema.table_walker_at(table_id);
+                let table = sql_schema.walk(table_id);
                 pk.as_ref()
                     .map(|pk| pk.columns.iter().all(|col| table.column(col.name()).is_none()))
                     .unwrap_or(false)

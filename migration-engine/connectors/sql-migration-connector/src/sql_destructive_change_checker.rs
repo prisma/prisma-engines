@@ -31,10 +31,7 @@ use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{
     BoxFuture, ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics, Migration,
 };
-use sql_schema_describer::{
-    walkers::{ColumnWalker, SqlSchemaExt},
-    ColumnArity,
-};
+use sql_schema_describer::{walkers::ColumnWalker, ColumnArity};
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
 
@@ -111,7 +108,7 @@ impl SqlMigrationConnector {
                     for change in changes {
                         match change {
                             TableChange::DropColumn { column_id } => {
-                                let column = schemas.previous.walk_column(*column_id);
+                                let column = schemas.previous.walk(*column_id);
 
                                 self.check_column_drop(&column, &mut plan, step_index);
                             }
@@ -125,7 +122,7 @@ impl SqlMigrationConnector {
                                 column_id,
                                 has_virtual_default,
                             } => {
-                                let column = schemas.next.walk_column(*column_id);
+                                let column = schemas.next.walk(*column_id);
 
                                 self.check_add_column(&column, *has_virtual_default, &mut plan, step_index)
                             }
@@ -160,7 +157,7 @@ impl SqlMigrationConnector {
                         }
 
                         for added_column_idx in &redefine_table.added_columns {
-                            let column = schemas.next.walk_column(*added_column_idx);
+                            let column = schemas.next.walk(*added_column_idx);
                             let has_virtual_default = redefine_table
                                 .added_columns_with_virtual_defaults
                                 .contains(added_column_idx);
@@ -168,7 +165,7 @@ impl SqlMigrationConnector {
                         }
 
                         for dropped_column_idx in &redefine_table.dropped_columns {
-                            let column = schemas.previous.walk_column(*dropped_column_idx);
+                            let column = schemas.previous.walk(*dropped_column_idx);
                             self.check_column_drop(&column, &mut plan, step_index);
                         }
 
@@ -235,18 +232,14 @@ impl SqlMigrationConnector {
                     }
                 }
                 SqlMigrationStep::DropTable { table_id } => {
-                    self.check_table_drop(
-                        schemas.previous.table_walker_at(*table_id).name(),
-                        &mut plan,
-                        step_index,
-                    );
+                    self.check_table_drop(schemas.previous.walk(*table_id).name(), &mut plan, step_index);
                 }
                 SqlMigrationStep::CreateIndex {
                     table_id: (Some(_), table_id),
                     index_id,
                     from_drop_and_recreate: false,
                 } => {
-                    let index = schemas.next.table_walker_at(*table_id).index_at(*index_id);
+                    let index = schemas.next.walk(*table_id).index_at(*index_id);
 
                     if index.index_type().is_unique() {
                         plan.push_warning(
@@ -265,7 +258,7 @@ impl SqlMigrationConnector {
                     previous_usages_as_default: _,
                 }) if !dropped_variants.is_empty() => plan.push_warning(
                     SqlMigrationWarningCheck::EnumValueRemoval {
-                        enm: schemas.next.walk_enum(id.next).name().to_owned(),
+                        enm: schemas.next.walk(id.next).name().to_owned(),
                         values: dropped_variants.clone(),
                     },
                     step_index,

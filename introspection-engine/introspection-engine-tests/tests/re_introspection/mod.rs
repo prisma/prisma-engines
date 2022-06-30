@@ -715,7 +715,7 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mysql, Mssql, CockroachDb))]
+#[test_connector(exclude(Mysql, Mssql, CockroachDb, Sqlite))]
 async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1068,14 +1068,14 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
           id           Int         @id @default(autoincrement())
           user_id      Int         @unique
           user_id2     Int         @unique
-          custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
           custom_User2 Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
         }
 
         model Custom_User {
           id           Int   @id @default(autoincrement())
-          custom_Post  Post? @relation("CustomRelationName")
           custom_Post2 Post? @relation("AnotherCustomRelationName")
+          custom_Post  Post? @relation("CustomRelationName")
 
           @@map("User")
         }
@@ -1632,7 +1632,7 @@ async fn re_introspecting_ignore(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Vitess, CockroachDb))]
+#[test_connector(exclude(Vitess, CockroachDb, Sqlite))]
 async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestApi) -> TestResult {
     // We do not have enough information to correctly assign which field should point to column A in the
     // join table and which one to B

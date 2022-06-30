@@ -1,7 +1,7 @@
 use super::{differ_database::DifferDatabase, foreign_keys_match};
 use crate::{flavour::SqlFlavour, pair::Pair};
 use sql_schema_describer::{
-    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     PrimaryKey, TableId,
 };
 
@@ -25,13 +25,13 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
     pub(crate) fn dropped_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
         self.db
             .dropped_columns(self.tables.map(|t| t.id))
-            .map(move |colid| self.tables.previous.schema.walk_column(colid))
+            .map(move |colid| self.tables.previous.walk(colid))
     }
 
     pub(crate) fn added_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
         self.db
             .created_columns(self.tables.map(|t| t.id))
-            .map(move |colid| self.tables.next.schema.walk_column(colid))
+            .map(move |colid| self.tables.next.walk(colid))
     }
 
     pub(crate) fn created_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {

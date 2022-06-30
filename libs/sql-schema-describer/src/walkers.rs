@@ -3,8 +3,9 @@
 #![deny(missing_docs)]
 
 use crate::{
-    ids::*, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index,
-    IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SQLSortOrder, SqlSchema, Table, UserDefinedType, View,
+    ids::*, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
+    ForeignKeyColumn, Index, IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SQLSortOrder, SqlSchema, Table,
+    UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
 use std::ops::Range;
@@ -28,12 +29,9 @@ pub struct Walker<'a, Id> {
 }
 
 impl<'a, Id> Walker<'a, Id> {
-    /// Make another walker for the same schema.
-    pub fn jump<T>(self, other_id: T) -> Walker<'a, T> {
-        Walker {
-            schema: self.schema,
-            id: other_id,
-        }
+    /// Jump to the item identified by `other_id`.
+    pub fn walk<I: 'static>(self, other_id: I) -> Walker<'a, I> {
+        self.schema.walk(other_id)
     }
 }
 
@@ -263,7 +261,7 @@ impl<'a> TableWalker<'a> {
     pub fn columns(self) -> impl ExactSizeIterator<Item = ColumnWalker<'a>> {
         self.columns_range()
             .into_iter()
-            .map(move |idx| self.jump(ColumnId(idx as u32)))
+            .map(move |idx| self.walk(ColumnId(idx as u32)))
     }
 
     /// The number of foreign key constraints on the table.
@@ -273,20 +271,20 @@ impl<'a> TableWalker<'a> {
 
     /// Traverse to an index by id.
     pub fn index_at(&self, index_id: IndexId) -> IndexWalker<'a> {
-        self.jump(index_id)
+        self.walk(index_id)
     }
 
     /// Traverse the indexes on the table.
     pub fn indexes(self) -> impl ExactSizeIterator<Item = IndexWalker<'a>> {
         let table_id = self.id;
 
-        (0..self.table().indices.len()).map(move |index_index| self.jump(IndexId(table_id, index_index as u32)))
+        (0..self.table().indices.len()).map(move |index_index| self.walk(IndexId(table_id, index_index as u32)))
     }
 
     /// Traverse the foreign keys on the table.
-    pub fn foreign_keys(self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
+    pub fn foreign_keys(self) -> impl ExactSizeIterator<Item = ForeignKeyWalker<'a>> {
         self.foreign_keys_range()
-            .map(move |id| self.jump(ForeignKeyId(id as u32)))
+            .map(move |id| self.walk(ForeignKeyId(id as u32)))
     }
 
     /// Traverse foreign keys from other tables, referencing current table.
@@ -305,12 +303,15 @@ impl<'a> TableWalker<'a> {
     }
 
     fn foreign_keys_range(self) -> Range<usize> {
-        range_for_key(&self.schema.foreign_keys, self.id, |(id, _)| *id)
+        range_for_key(&self.schema.foreign_keys, self.id, |fk| fk.constrained_table)
     }
 
     /// Try to traverse a foreign key for a single column.
-    pub fn foreign_key_for_column(self, column: &str) -> Option<ForeignKeyWalker<'a>> {
-        self.foreign_keys().find(|fk| fk.constrained_column_names() == [column])
+    pub fn foreign_key_for_column(self, column: ColumnId) -> Option<ForeignKeyWalker<'a>> {
+        self.foreign_keys().find(|fk| {
+            let cols = fk.columns();
+            cols.len() == 1 && cols[0].constrained_column == column
+        })
     }
 
     /// Traverse to the primary key of the table.
@@ -357,7 +358,7 @@ pub struct PrimaryKeyColumnWalker<'a> {
     schema: &'a SqlSchema,
     primary_key_column_id: usize,
     table_id: TableId,
-    column_id: ColumnId,
+    pub(crate) column_id: ColumnId,
 }
 
 impl<'a> PrimaryKeyColumnWalker<'a> {
@@ -392,17 +393,14 @@ impl<'a> PrimaryKeyColumnWalker<'a> {
 }
 
 impl<'schema> ForeignKeyWalker<'schema> {
-    /// The names of the foreign key columns on the referencing table.
-    pub fn constrained_column_names(&self) -> &'schema [String] {
-        &self.foreign_key().columns
+    fn columns(self) -> &'schema [ForeignKeyColumn] {
+        let range = range_for_key(&self.schema.foreign_key_columns, self.id, |col| col.foreign_key_id);
+        &self.schema.foreign_key_columns[range]
     }
 
     /// The foreign key columns on the referencing table.
-    pub fn constrained_columns<'b>(&'b self) -> impl ExactSizeIterator<Item = ColumnWalker<'schema>> + 'b {
-        self.foreign_key()
-            .columns
-            .iter()
-            .map(move |colname| self.table().columns().find(|column| colname == column.name()).unwrap())
+    pub fn constrained_columns(self) -> impl ExactSizeIterator<Item = ColumnWalker<'schema>> {
+        self.columns().iter().map(move |col| self.walk(col.constrained_column))
     }
 
     /// The name of the foreign key constraint.
@@ -410,34 +408,23 @@ impl<'schema> ForeignKeyWalker<'schema> {
         self.foreign_key().constraint_name.as_deref()
     }
 
-    /// The underlying ForeignKey struct.
-    pub fn foreign_key(&self) -> &'schema ForeignKey {
-        &self.schema[self.id].1
-    }
-
-    /// Access the underlying ForeignKey struct.
-    pub fn inner(&self) -> &'schema ForeignKey {
-        self.foreign_key()
+    fn foreign_key(self) -> &'schema ForeignKey {
+        &self.schema.foreign_keys[self.id.0 as usize]
     }
 
     /// The `ON DELETE` behaviour of the foreign key.
-    pub fn on_delete_action(&self) -> &ForeignKeyAction {
-        &self.foreign_key().on_delete_action
+    pub fn on_delete_action(self) -> ForeignKeyAction {
+        self.foreign_key().on_delete_action
     }
 
     /// The `ON UPDATE` behaviour of the foreign key.
-    pub fn on_update_action(&self) -> &ForeignKeyAction {
-        &self.foreign_key().on_update_action
+    pub fn on_update_action(self) -> ForeignKeyAction {
+        self.foreign_key().on_update_action
     }
 
-    /// The names of the columns referenced by the foreign key on the referenced table.
-    pub fn referenced_column_names(&self) -> &'schema [String] {
-        &self.foreign_key().referenced_columns
-    }
-
-    /// The number of columns referenced by the constraint.
-    pub fn referenced_columns_count(&self) -> usize {
-        self.foreign_key().referenced_columns.len()
+    /// The columns referenced by the foreign key on the referenced table.
+    pub fn referenced_columns(self) -> impl ExactSizeIterator<Item = ColumnWalker<'schema>> {
+        self.columns().iter().map(move |col| self.walk(col.referenced_column))
     }
 
     /// The table the foreign key "points to".
@@ -446,18 +433,19 @@ impl<'schema> ForeignKeyWalker<'schema> {
     }
 
     /// The table the foreign key "points to".
-    pub fn referenced_table(&self) -> TableWalker<'schema> {
-        self.jump(self.foreign_key().referenced_table)
+    pub fn referenced_table(self) -> TableWalker<'schema> {
+        self.walk(self.foreign_key().referenced_table)
     }
 
     /// Traverse to the referencing/constrained table.
-    pub fn table(&self) -> TableWalker<'schema> {
-        self.jump(self.schema[self.id].0)
+    pub fn table(self) -> TableWalker<'schema> {
+        self.walk(self.foreign_key().constrained_table)
     }
 
     /// True if relation is back to the same table.
-    pub fn is_self_relation(&self) -> bool {
-        self.table().name() == self.referenced_table().name()
+    pub fn is_self_relation(self) -> bool {
+        let fk = self.foreign_key();
+        fk.constrained_table == fk.referenced_table
     }
 }
 
@@ -561,7 +549,7 @@ impl<'a> IndexWalker<'a> {
 
     /// Traverse to the table of the index.
     pub fn table(self) -> TableWalker<'a> {
-        self.jump(self.id.0)
+        self.walk(self.id.0)
     }
 }
 
@@ -586,20 +574,11 @@ pub trait SqlSchemaExt {
     /// Find a table by name.
     fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>>;
 
-    /// Find a table by id.
-    fn table_walker_at(&self, table_id: TableId) -> TableWalker<'_>;
-
     /// Find a view by index.
     fn view_walker_at(&self, index: usize) -> ViewWalker<'_>;
 
     /// Find a user-defined type by index.
     fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_>;
-
-    /// Walk an enum by ID.
-    fn walk_enum(&self, enum_id: EnumId) -> EnumWalker<'_>;
-
-    /// Walk a column by id
-    fn walk_column(&self, column_id: ColumnId) -> ColumnWalker<'_>;
 }
 
 impl SqlSchemaExt for SqlSchema {
@@ -608,10 +587,6 @@ impl SqlSchemaExt for SqlSchema {
             id: TableId(self.tables.iter().position(|table| table.name == name)? as u32),
             schema: self,
         })
-    }
-
-    fn table_walker_at(&self, id: TableId) -> TableWalker<'_> {
-        TableWalker { id, schema: self }
     }
 
     fn view_walker_at(&self, index: usize) -> ViewWalker<'_> {
@@ -626,14 +601,6 @@ impl SqlSchemaExt for SqlSchema {
             udt_index: index,
             schema: self,
         }
-    }
-
-    fn walk_enum(&self, id: EnumId) -> EnumWalker<'_> {
-        EnumWalker { schema: self, id }
-    }
-
-    fn walk_column(&self, id: ColumnId) -> ColumnWalker<'_> {
-        ColumnWalker { schema: self, id }
     }
 }
 

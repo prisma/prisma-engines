@@ -204,10 +204,12 @@ impl MigrationConnector for SqlMigrationConnector {
         Box::pin(async move { self.flavour.raw_cmd(&script).await })
     }
 
+    #[tracing::instrument(skip(self, from, to))]
     fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> ConnectorResult<Migration> {
         let previous = SqlDatabaseSchema::from_erased(from);
         let next = SqlDatabaseSchema::from_erased(to);
         let steps = sql_schema_differ::calculate_steps(Pair::new(&previous, &next), self.flavour.as_ref());
+        tracing::debug!(?steps, "Inferred migration steps.");
 
         Ok(Migration::new(SqlMigration {
             before: previous.describer_schema,

@@ -34,7 +34,7 @@ impl Index<EnumId> for SqlSchema {
 }
 
 /// The identifier for a column in a SqlSchema.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct ColumnId(pub u32);
 
 impl Index<ColumnId> for SqlSchema {
@@ -76,19 +76,5 @@ impl Index<IndexFieldId> for SqlSchema {
 }
 
 /// The identifier for a ForeignKey in the schema.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct ForeignKeyId(pub(crate) u32);
-
-impl Index<ForeignKeyId> for SqlSchema {
-    type Output = (TableId, crate::ForeignKey);
-
-    fn index(&self, index: ForeignKeyId) -> &Self::Output {
-        &self.foreign_keys[index.0 as usize]
-    }
-}
-
-impl IndexMut<ForeignKeyId> for SqlSchema {
-    fn index_mut(&mut self, index: ForeignKeyId) -> &mut Self::Output {
-        &mut self.foreign_keys[index.0 as usize]
-    }
-}

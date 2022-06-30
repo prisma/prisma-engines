@@ -70,6 +70,7 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
             ]
           ],
           "foreign_keys": [],
+          "foreign_key_columns": [],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
@@ -135,6 +136,7 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
             ]
           ],
           "foreign_keys": [],
+          "foreign_key_columns": [],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
@@ -205,6 +207,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
             ]
           ],
           "foreign_keys": [],
+          "foreign_key_columns": [],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
@@ -270,6 +273,7 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
             ]
           ],
           "foreign_keys": [],
+          "foreign_key_columns": [],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
