@@ -256,18 +256,20 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
-        match index.index_type() {
-            IndexType::Normal => format!(
-                "DROP INDEX {} ON {}",
-                self.quote(index.name()),
-                self.quote_with_schema(index.table().name())
-            ),
-            IndexType::Unique => format!(
+        let ext: &MssqlSchemaExt = index.schema.downcast_connector_data().unwrap_or_default();
+
+        if ext.index_is_a_constraint(index.id) {
+            format!(
                 "ALTER TABLE {} DROP CONSTRAINT {}",
                 self.quote_with_schema(index.table().name()),
                 self.quote(index.name()),
-            ),
-            IndexType::Fulltext => unreachable!("Fulltext index on SQL Server"),
+            )
+        } else {
+            format!(
+                "DROP INDEX {} ON {}",
+                self.quote(index.name()),
+                self.quote_with_schema(index.table().name())
+            )
         }
     }
 

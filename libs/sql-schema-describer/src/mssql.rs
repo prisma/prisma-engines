@@ -64,11 +64,13 @@ pub struct SqlSchemaDescriber<'a> {
 #[derive(Default)]
 pub struct MssqlSchemaExt {
     pub clustered_indexes: Vec<IndexId>,
+    pub constraints: Vec<IndexId>,
     pub nonclustered_primary_keys: Vec<TableId>,
 }
 
 const DEFAULT_REF: &MssqlSchemaExt = &MssqlSchemaExt {
     clustered_indexes: Vec::new(),
+    constraints: Vec::new(),
     nonclustered_primary_keys: Vec::new(),
 };
 
@@ -85,6 +87,10 @@ impl MssqlSchemaExt {
 
     pub fn index_is_clustered(&self, index_id: IndexId) -> bool {
         self.clustered_indexes.binary_search(&index_id).is_ok()
+    }
+
+    pub fn index_is_a_constraint(&self, index_id: IndexId) -> bool {
+        self.constraints.binary_search(&index_id).is_ok()
     }
 }
 
@@ -396,6 +402,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             SELECT DISTINCT
                 ind.name AS index_name,
                 ind.is_unique AS is_unique,
+                ind.is_unique_constraint AS is_unique_constraint,
                 ind.is_primary_key AS is_primary_key,
                 ind.type_desc as clustering,
                 col.name AS column_name,
@@ -446,6 +453,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let seq_in_index = row.get_expect_i64("seq_in_index");
             let pos = seq_in_index - 1;
             let is_unique = row.get_expect_bool("is_unique");
+            let is_unique_constraint = row.get_expect_bool("is_unique_constraint");
 
             let is_pk = row.get_expect_bool("is_primary_key");
 
@@ -495,6 +503,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                 if clustered {
                     mssql_ext
                         .clustered_indexes
+                        .push(IndexId(table_id, table.indices.len() as u32));
+                }
+
+                if is_unique_constraint {
+                    mssql_ext
+                        .constraints
                         .push(IndexId(table_id, table.indices.len() as u32));
                 }
 
