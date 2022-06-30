@@ -698,7 +698,7 @@ fn push_missing_relation_attribute(inline_relation: walkers::InlineRelationWalke
         content.push(')');
 
         ctx.missing_bits.push(MissingBit {
-            position: forward.ast_field().span.end - 1,
+            position: before_newline(forward.ast_field().span.end, ctx.original_schema),
             content,
         })
     }
@@ -888,4 +888,14 @@ fn fields_argument(inline: walkers::InlineRelationWalker<'_>) -> String {
 fn references_argument(inline: walkers::InlineRelationWalker<'_>) -> String {
     let field_names: Vec<&str> = inline.referenced_fields().map(|f| f.name()).collect();
     format!("references: [{}]", field_names.join(", "))
+}
+
+/// Assuming the last characters before span_end are newlines. We can fix this more thoroughly by
+/// not including the newline in field spans.
+fn before_newline(span_end: usize, original_schema: &str) -> usize {
+    assert!(&original_schema[span_end - 1..span_end] == "\n");
+    match &original_schema[span_end - 2..span_end - 1] {
+        "\r" => span_end - 2,
+        _ => span_end - 1,
+    }
 }

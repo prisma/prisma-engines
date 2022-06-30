@@ -1279,3 +1279,53 @@ fn mongodb_inline_relations_reformat_as_expected() {
 
     expected.assert_eq(&reformat(schema));
 }
+
+#[test]
+fn reformat_missing_forward_relation_arguments_with_crln() {
+    let schema = r#"
+    generator client {
+      provider = "prisma-client-js"
+      output   = "../generated/client"
+    }
+
+    datasource db {
+      provider = "sqlite"
+      url      = "file:dev.db"
+    }
+
+    model Post {
+      id     Int @id
+      user   User
+    }
+
+    model User {
+      id     Int @id
+      posts  Post[]
+    }
+    "#;
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+          output   = "../generated/client"
+        }
+
+        datasource db {
+          provider = "sqlite"
+          url      = "file:dev.db"
+        }
+
+        model Post {
+          id     Int  @id
+          user   User @relation(fields: [userId], references: [id])
+          userId Int
+        }
+
+        model User {
+          id    Int    @id
+          posts Post[]
+        }
+    "#]];
+
+    expected.assert_eq(&reformat(&schema.replace('\n', "\r\n")));
+}
