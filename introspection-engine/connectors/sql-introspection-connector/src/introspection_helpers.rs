@@ -247,62 +247,6 @@ pub(crate) fn calculate_relation_field(
     )
 }
 
-pub(crate) fn calculate_backrelation_field(
-    schema: &SqlSchema,
-    model: &Model,
-    other_model: &Model,
-    relation_field: &RelationField,
-    relation_info: &RelationInfo,
-) -> Result<RelationField, SqlError> {
-    match schema.table_walkers().find(|t| t.name() == model.name) {
-        None => Err(SqlError::SchemaInconsistent {
-            explanation: format!("Table {} not found.", &model.name),
-        }),
-        Some(table) => {
-            let new_relation_info = RelationInfo {
-                name: relation_info.name.clone(),
-                fk_name: None,
-                to: model.name.clone(),
-                fields: vec![],
-                references: vec![],
-                on_delete: None,
-                on_update: None,
-            };
-
-            // unique or id
-            let other_is_unique = table.indexes().any(|i| {
-                columns_match(
-                    &i.columns()
-                        .map(|c| c.as_column().name().to_string())
-                        .collect::<Vec<_>>(),
-                    &relation_info.fields,
-                ) && i.index_type().is_unique()
-            }) || columns_match(
-                &table
-                    .primary_key_columns()
-                    .map(|c| c.as_column().name().to_owned())
-                    .collect::<Vec<_>>(),
-                &relation_info.fields,
-            );
-
-            let arity = match relation_field.arity {
-                FieldArity::Required | FieldArity::Optional if other_is_unique => FieldArity::Optional,
-                FieldArity::Required | FieldArity::Optional => FieldArity::List,
-                FieldArity::List => FieldArity::Optional,
-            };
-
-            //if the backrelation name would be duplicate, probably due to being a selfrelation
-            let name = if model.name == other_model.name && relation_field.name == model.name {
-                format!("other_{}", model.name.clone())
-            } else {
-                model.name.clone()
-            };
-
-            Ok(RelationField::new(&name, arity, arity, new_relation_info))
-        }
-    }
-}
-
 // This is not called for prisma many to many relations. For them the name is just the name of the join table.
 fn calculate_relation_name(
     fk: ForeignKeyWalker<'_>,

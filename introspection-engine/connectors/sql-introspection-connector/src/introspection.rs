@@ -1,7 +1,7 @@
 use crate::{
     calculate_datamodel::CalculateDatamodelContext as Context,
     introspection_helpers::{
-        calculate_backrelation_field, calculate_index, calculate_many_to_many_field, calculate_relation_field,
+        calculate_index, calculate_many_to_many_field, calculate_relation_field,
         calculate_scalar_field, is_new_migration_table, is_old_migration_table, is_prisma_1_point_0_join_table,
         is_prisma_1_point_1_or_2_join_table, is_relay_table, primary_key_is_clustered,
     },
@@ -108,23 +108,6 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
     }
 
     let mut fields_to_be_added = Vec::new();
-
-    // add backrelation fields
-    for model in ctx.datamodel.models() {
-        for relation_field in model.relation_fields() {
-            let relation_info = &relation_field.relation_info;
-            if ctx
-                .datamodel
-                .find_related_field_for_info(relation_info, &relation_field.name)
-                .is_none()
-            {
-                let other_model = ctx.datamodel.find_model(&relation_info.to).unwrap();
-                let field = calculate_backrelation_field(schema, model, other_model, relation_field, relation_info)?;
-
-                fields_to_be_added.push((other_model.name.clone(), field));
-            }
-        }
-    }
 
     // add prisma many to many relation fields
     for table in schema
