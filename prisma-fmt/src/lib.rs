@@ -158,6 +158,14 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
     Some(offset)
 }
 
+/// Converts an LSP range to a span.
+pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
+    let start = position_to_offset(&range.start, document).unwrap();
+    let end = position_to_offset(&range.end, document).unwrap();
+
+    ast::Span::new(start, end)
+}
+
 /// Converts a span of byte offsets to an LSP range.
 pub(crate) fn span_to_range(span: ast::Span, document: &str) -> Range {
     let start = offset_to_position(span.start, document).unwrap();

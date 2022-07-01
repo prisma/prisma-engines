@@ -1,5 +1,5 @@
-use datamodel::schema_ast::source_file::SourceFile;
 use crate::migrations_directory::MigrationDirectory;
+use datamodel::schema_ast::source_file::SourceFile;
 use std::fmt::Debug;
 
 /// Diffable things

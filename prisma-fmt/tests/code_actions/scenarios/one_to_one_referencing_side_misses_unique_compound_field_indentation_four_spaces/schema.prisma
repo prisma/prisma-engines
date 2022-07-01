@@ -1,0 +1,20 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model B {
+    id   Int @id
+    bId1 Int
+    bId2 Int
+    A    A   @relation(fields: [bId1, bId2], references: [field1, field2])
+}
+
+model A {
+    id     Int @id
+    field1 Int
+    field2 Int
+    B      B?
+
+    @@unique([field1, field2])
+}

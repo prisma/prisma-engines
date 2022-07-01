@@ -67,7 +67,7 @@ use names::Names;
 ///   Currently only index name collisions.
 pub struct ParserDatabase {
     ast: ast::SchemaAst,
-    _file: SourceFile,
+    file: SourceFile,
     interner: interner::StringInterner,
     _names: Names,
     types: Types,
@@ -92,7 +92,7 @@ impl ParserDatabase {
         if ctx.diagnostics.has_errors() {
             return ParserDatabase {
                 ast,
-                _file: file,
+                file: file,
                 interner,
                 _names: names,
                 types,
@@ -107,7 +107,7 @@ impl ParserDatabase {
         if ctx.diagnostics.has_errors() {
             return ParserDatabase {
                 ast,
-                _file: file,
+                file: file,
                 interner,
                 _names: names,
                 types,
@@ -125,7 +125,7 @@ impl ParserDatabase {
 
         ParserDatabase {
             ast,
-            _file: file,
+            file: file,
             interner,
             _names: names,
             types,
@@ -141,6 +141,11 @@ impl ParserDatabase {
     /// The total number of models.
     pub fn models_count(&self) -> usize {
         self.types.model_attributes.len()
+    }
+
+    /// The source file contents.
+    pub fn source(&self) -> &str {
+        self.file.as_str()
     }
 }
 

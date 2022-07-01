@@ -2,6 +2,7 @@ mod primary_key;
 mod unique_criteria;
 
 pub use primary_key::*;
+use schema_ast::ast::{IndentationType, NewlineType};
 pub(crate) use unique_criteria::*;
 
 use super::{
@@ -271,5 +272,48 @@ impl<'db> ModelWalker<'db> {
     pub fn complete_inline_relations_from(self) -> impl Iterator<Item = CompleteInlineRelationWalker<'db>> + 'db {
         self.inline_relations_from()
             .filter_map(|relation| relation.as_complete())
+    }
+
+    /// How fields and arguments are indented in the model.
+    pub fn indentation(self) -> IndentationType {
+        let field = match self.scalar_fields().last() {
+            Some(field) => field,
+            None => return IndentationType::default(),
+        };
+
+        let src = self.db.source();
+        let start = field.ast_field().span.start;
+
+        let mut spaces = 0;
+
+        for i in (0..start).rev() {
+            match src.chars().nth(i) {
+                Some('\t') => return IndentationType::Tabs,
+                Some(' ') => spaces += 1,
+                _ => return IndentationType::Spaces(spaces),
+            }
+        }
+
+        IndentationType::default()
+    }
+
+    /// What kind of newlines the model uses.
+    pub fn newline(self) -> NewlineType {
+        let field = match dbg!(self.scalar_fields().last()) {
+            Some(field) => field,
+            None => return NewlineType::default(),
+        };
+
+        let src = self.db.source();
+        let start = field.ast_field().span.end - 2;
+
+        while let Some(c) = dbg!(src.chars().skip(start).next()) {
+            match c {
+                '\r' => return NewlineType::Windows,
+                _ => return NewlineType::Unix,
+            }
+        }
+
+        NewlineType::default()
     }
 }

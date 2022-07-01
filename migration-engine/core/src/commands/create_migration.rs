@@ -26,7 +26,9 @@ pub async fn create_migration(
         .await?;
     let to = connector
         .database_schema_from_diff_target(
-            DiffTarget::Datamodel(SourceFile::new_allocated(Arc::new(input.prisma_schema.into_boxed_str()))),
+            DiffTarget::Datamodel(SourceFile::new_allocated(Arc::new(
+                input.prisma_schema.into_boxed_str(),
+            ))),
             None,
         )
         .await?;

@@ -3,13 +3,14 @@ mod relations;
 use std::sync::Arc;
 
 use datamodel::{
+    ast,
     datamodel_connector::Diagnostics,
     parse_schema_ast,
     parser_database::{walkers::RefinedRelationWalker, ParserDatabase},
     schema_ast::source_file::SourceFile,
 };
 use log::warn;
-use lsp_types::{CodeActionOrCommand, CodeActionParams};
+use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic};
 
 pub(crate) fn empty_code_actions() -> Vec<CodeActionOrCommand> {
     Vec::new()
@@ -46,4 +47,22 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
     }
 
     actions
+}
+
+pub(super) fn diagnostics_for_span<'a>(
+    schema: &str,
+    diagnostics: &'a [Diagnostic],
+    span: ast::Span,
+) -> Option<Vec<Diagnostic>> {
+    let res: Vec<_> = diagnostics
+        .iter()
+        .filter(|diag| span.overlaps(crate::range_to_span(diag.range, schema)))
+        .cloned()
+        .collect();
+
+    if res.is_empty() {
+        None
+    } else {
+        Some(res)
+    }
 }

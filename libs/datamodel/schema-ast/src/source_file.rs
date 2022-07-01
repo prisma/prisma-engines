@@ -37,6 +37,30 @@ impl SourceFile {
     }
 }
 
+impl From<&'static str> for SourceFile {
+    fn from(s: &'static str) -> Self {
+        Self::new_static(s)
+    }
+}
+
+impl From<Box<str>> for SourceFile {
+    fn from(s: Box<str>) -> Self {
+        Self::new_allocated(Arc::new(s))
+    }
+}
+
+impl From<Arc<Box<str>>> for SourceFile {
+    fn from(s: Arc<Box<str>>) -> Self {
+        Self::new_allocated(s)
+    }
+}
+
+impl From<String> for SourceFile {
+    fn from(s: String) -> Self {
+        Self::new_allocated(Arc::new(s.into_boxed_str()))
+    }
+}
+
 #[derive(Debug, Clone)]
 enum Contents {
     Static(&'static str),

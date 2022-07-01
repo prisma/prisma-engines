@@ -108,7 +108,9 @@ impl ValidatedSchema {
     }
 }
 
-pub fn parse_schema_parserdb(file: SourceFile) -> Result<ValidatedSchema, String> {
+pub fn parse_schema_parserdb(file: impl Into<SourceFile>) -> Result<ValidatedSchema, String> {
+    let file = file.into();
+
     let mut diagnostics = Diagnostics::new();
     let db = ParserDatabase::new(file.clone(), &mut diagnostics);
 
