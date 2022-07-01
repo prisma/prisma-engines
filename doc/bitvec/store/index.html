@@ -19,9 +19,9 @@ aliasing rules within their batch.</p>
 <p><code>bitvec</code> manages this through the <a href="trait.BitStore.html"><code>BitStore</code></a> trait. It is implemented on three
 type families available from the Rust standard libraries:</p>
 <ul>
-<li><a href="https://doc.rust-lang.org/1.61.0/core/primitive/index.html">unsigned integers</a></li>
-<li><a href="https://doc.rust-lang.org/1.61.0/core/sync/atomic/index.html">atomic</a> unsigned integers</li>
-<li><a href="https://doc.rust-lang.org/1.61.0/core/cell/struct.Cell.html"><code>Cell</code></a> wrappers of unsigned integers</li>
+<li><a href="https://doc.rust-lang.org/1.62.0/core/primitive/index.html">unsigned integers</a></li>
+<li><a href="https://doc.rust-lang.org/1.62.0/core/sync/atomic/index.html">atomic</a> unsigned integers</li>
+<li><a href="https://doc.rust-lang.org/1.62.0/core/cell/struct.Cell.html"><code>Cell</code></a> wrappers of unsigned integers</li>
 </ul>
 <p><code>bitvec</code> receives a memory region typed with one of these three families and
 wraps it in one of its data structures based on <a href="../slice/struct.BitSlice.html"><code>BitSlice</code></a>. The target
@@ -29,7 +29,7 @@ processor is responsible for handling any contention between memory elements;
 this is irrelevant to the <code>bitvec</code> model. <code>bitvec</code> is solely responsible for
 proving to the Rust compiler that all memory accesses through its types are
 correctly managed according to the <code>&amp;</code>/<code>&amp;mut</code> shared/exclusion reference model,
-and the <a href="https://doc.rust-lang.org/1.61.0/core/cell/struct.UnsafeCell.html"><code>UnsafeCell</code></a> shared-mutation model.</p>
+and the <a href="https://doc.rust-lang.org/1.62.0/core/cell/struct.UnsafeCell.html"><code>UnsafeCell</code></a> shared-mutation model.</p>
 <p>Through <a href="trait.BitStore.html"><code>BitStore</code></a>, <code>bitvec</code> is able to demonstrate that <code>&amp;mut BitSlice</code>
 references to a region of <em>bits</em> have no other <code>BitSlice</code> references capable of
 viewing those bits. However, <code>&amp;mut BitSlice</code> references <em>may</em> have other
@@ -41,11 +41,11 @@ API uses to mark events that can induce aliases to memory locations. When a
 <code>&amp;mut BitSlice&lt;_, T&gt;</code> typed with an ordinary unsigned integer use any of the
 APIs that call <a href="../slice/struct.BitSlice.html#method.split_at_mut"><code>.split_at_mut()</code></a>, it transitions to
 <code>&amp;mut BitSlice&lt;_, T::Alias&gt;</code>. The <a href="trait.BitStore.html#associatedtype.Alias"><code>::Alias</code></a> associated type is always a type
-that manages aliasing references to a single memory location: either an <a href="https://doc.rust-lang.org/1.61.0/core/sync/atomic/index.html">atomic</a>
-unsigned integer <code>T</code> or a <a href="https://doc.rust-lang.org/1.61.0/core/cell/struct.Cell.html"><code>Cell</code></a> of the unsigned integer <code>T</code>. The Rust
+that manages aliasing references to a single memory location: either an <a href="https://doc.rust-lang.org/1.62.0/core/sync/atomic/index.html">atomic</a>
+unsigned integer <code>T</code> or a <a href="https://doc.rust-lang.org/1.62.0/core/cell/struct.Cell.html"><code>Cell</code></a> of the unsigned integer <code>T</code>. The Rust
 standard library guarantees that these types will behave correctly when multiple
 references to a single location attempt to read from and write to it.</p>
-<p>The <a href="https://doc.rust-lang.org/1.61.0/core/sync/atomic/index.html">atomic</a> and <a href="https://doc.rust-lang.org/1.61.0/core/cell/struct.Cell.html"><code>Cell</code></a> types stay as themselves when <a href="../slice/struct.BitSlice.html"><code>BitSlice</code></a> introduces
+<p>The <a href="https://doc.rust-lang.org/1.62.0/core/sync/atomic/index.html">atomic</a> and <a href="https://doc.rust-lang.org/1.62.0/core/cell/struct.Cell.html"><code>Cell</code></a> types stay as themselves when <a href="../slice/struct.BitSlice.html"><code>BitSlice</code></a> introduces
 aliasing conditions, as they are already alias-aware.</p>
 <p>Lastly, the <code>bitvec</code> memory description model as implemented in the <a href="../domain/index.html"><code>domain</code></a>
 module is able to perform the inverse transition: where it can demonstrate a
@@ -53,7 +53,7 @@ static awareness that the <code>&amp;</code>/<code>&amp;mut</code> exclusion rul
 particular element slice <code>[T]</code>, it may apply the <a href="trait.BitStore.html#associatedtype.Unalias"><code>::Unalias</code></a> marker to undo
 any <code>::Alias</code>ing, and present a type that has no more aliasing protection than
 that with which the memory region was initially declared.</p>
-<p>Namely, this means that the <a href="https://doc.rust-lang.org/1.61.0/core/sync/atomic/index.html">atomic</a> and <a href="https://doc.rust-lang.org/1.61.0/core/cell/struct.Cell.html"><code>Cell</code></a> wrappers will never be removed
+<p>Namely, this means that the <a href="https://doc.rust-lang.org/1.62.0/core/sync/atomic/index.html">atomic</a> and <a href="https://doc.rust-lang.org/1.62.0/core/cell/struct.Cell.html"><code>Cell</code></a> wrappers will never be removed
 from a region that had them before it was given to <code>bitvec</code>, while a region of
 ordinary integers may regain the ability to be viewed without synchrony guards
 if <code>bitvec</code> can prove safety in the <a href="../domain/index.html"><code>domain</code></a> module.</p>
@@ -66,5 +66,5 @@ coërced to interfere with each other.</p>
 <p>!</p>
 </div></details><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.BitStore.html" title="bitvec::store::BitStore trait">BitStore</a></div><div class="item-right docblock-short"><p>Common interface for memory regions.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

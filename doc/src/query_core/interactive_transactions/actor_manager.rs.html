@@ -112,7 +112,26 @@
 <span id="107">107</span>
 <span id="108">108</span>
 <span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Operation</span>, <span class="ident">ResponseData</span>};
+<span class="kw">use</span> <span class="ident">lru::LruCache</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">schema::QuerySchemaRef</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">sync::Arc</span>};
@@ -127,16 +146,23 @@
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">spawn_client_list_clear_actor</span>, <span class="ident">spawn_itx_actor</span>, <span class="ident">ITXClient</span>, <span class="ident">OpenTx</span>, <span class="ident">TransactionError</span>, <span class="ident">TxId</span>};
 
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">CACHE_EVICTION_SECS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">std::env::var</span>(<span class="string">&quot;CLOSED_TX_CLEANUP&quot;</span>) {
-    <span class="prelude-val">Ok</span>(<span class="ident">size</span>) =&gt; <span class="ident">size</span>.<span class="ident">parse</span>().<span class="ident">unwrap_or</span>(<span class="number">300</span>),
-    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="number">300</span>,
+<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">CLOSED_TX_CACHE_SIZE</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">std::env::var</span>(<span class="string">&quot;CLOSED_TX_CACHE_SIZE&quot;</span>) {
+    <span class="prelude-val">Ok</span>(<span class="ident">size</span>) =&gt; <span class="ident">size</span>.<span class="ident">parse</span>().<span class="ident">unwrap_or</span>(<span class="number">100</span>),
+    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="number">100</span>,
 });
 
 <span class="kw">static</span> <span class="ident">CHANNEL_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">100</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TransactionActorManager</span> {
+    <span class="doccomment">/// Map of active ITx clients</span>
     <span class="kw">pub</span> <span class="ident">clients</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">TxId</span>, <span class="ident">ITXClient</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Cache of closed transactions. We keep the last N closed transactions in memory to</span>
+    <span class="doccomment">/// return better error messages if operations are performed on closed transactions.</span>
+    <span class="kw">pub</span> <span class="ident">closed_txs</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">TxId</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Channel used to signal an ITx is closed and can be moved to the list of closed transactions.</span>
     <span class="ident">send_done</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Handle to the task in charge of clearing actors.</span>
+    <span class="doccomment">/// Used to abort the task when the TransactionActorManager is dropped.</span>
     <span class="ident">bg_reader_clear</span>: <span class="ident">JoinHandle</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
 }
 
@@ -156,12 +182,14 @@
 <span class="kw">impl</span> <span class="ident">TransactionActorManager</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">clients</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">TxId</span>, <span class="ident">ITXClient</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="ident">HashMap::new</span>()));
+        <span class="kw">let</span> <span class="ident">closed_txs</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">TxId</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="ident">LruCache::new</span>(<span class="kw-2">*</span><span class="ident">CLOSED_TX_CACHE_SIZE</span>)));
 
         <span class="kw">let</span> (<span class="ident">send_done</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">channel</span>::<span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span>(<span class="ident">CHANNEL_SIZE</span>);
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">spawn_client_list_clear_actor</span>(<span class="ident">clients</span>.<span class="ident">clone</span>(), <span class="ident">rx</span>);
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">spawn_client_list_clear_actor</span>(<span class="ident">clients</span>.<span class="ident">clone</span>(), <span class="ident">closed_txs</span>.<span class="ident">clone</span>(), <span class="ident">rx</span>);
 
         <span class="self">Self</span> {
             <span class="ident">clients</span>,
+            <span class="ident">closed_txs</span>,
             <span class="ident">send_done</span>,
             <span class="ident">bg_reader_clear</span>: <span class="ident">handle</span>,
         }
@@ -174,16 +202,20 @@
             <span class="ident">value</span>,
             <span class="ident">timeout</span>,
             <span class="ident">CHANNEL_SIZE</span>,
-            <span class="kw-2">*</span><span class="ident">CACHE_EVICTION_SECS</span>,
             <span class="self">self</span>.<span class="ident">send_done</span>.<span class="ident">clone</span>(),
         );
 
         <span class="self">self</span>.<span class="ident">clients</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">tx_id</span>, <span class="ident">client</span>);
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="kw-2">&amp;</span><span class="ident">TxId</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ITXClient</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="kw-2">&amp;</span><span class="ident">TxId</span>, <span class="ident">from_operation</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ITXClient</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">client</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">clients</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="ident">tx_id</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">client</span>.<span class="ident">clone</span>())
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">closed_txs</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">contains</span>(<span class="ident">tx_id</span>) {
+            <span class="prelude-val">Err</span>(<span class="ident">TransactionError::Closed</span> {
+                <span class="ident">reason</span>: <span class="macro">format!</span>(<span class="string">&quot;A {from_operation} cannot be executed on a closed transaction.&quot;</span>),
+            }
+            .<span class="ident">into</span>())
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="ident">TransactionError::NotFound</span>.<span class="ident">into</span>())
         }
@@ -195,7 +227,8 @@
         <span class="ident">operation</span>: <span class="ident">Operation</span>,
         <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_client</span>(<span class="ident">tx_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_client</span>(<span class="ident">tx_id</span>, <span class="string">&quot;query&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
         <span class="ident">client</span>.<span class="ident">execute</span>(<span class="ident">operation</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
     }
 
@@ -205,22 +238,25 @@
         <span class="ident">operations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span>,
         <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_client</span>(<span class="ident">tx_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_client</span>(<span class="ident">tx_id</span>, <span class="string">&quot;batch query&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
         <span class="ident">client</span>.<span class="ident">batch_execute</span>(<span class="ident">operations</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="kw-2">&amp;</span><span class="ident">TxId</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_client</span>(<span class="ident">tx_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_client</span>(<span class="ident">tx_id</span>, <span class="string">&quot;commit&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="ident">client</span>.<span class="ident">commit</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="kw-2">&amp;</span><span class="ident">TxId</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_client</span>(<span class="ident">tx_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_client</span>(<span class="ident">tx_id</span>, <span class="string">&quot;rollback&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="ident">client</span>.<span class="ident">rollback</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

@@ -145,7 +145,6 @@
 <span id="140">140</span>
 <span id="141">141</span>
 <span id="142">142</span>
-<span id="143">143</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CoreError</span>;
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">Connection</span>, <span class="ident">ConnectionLike</span>, <span class="ident">Transaction</span>};
 <span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
@@ -172,18 +171,17 @@
 <span class="doccomment">/// TransactionActorManager, it looks for the client in the hashmap and passes the operation to the client. The ITXClient sends a message to the</span>
 <span class="doccomment">/// ITXServer and waits for a response. The ITXServer will then perform the operation and return the result. The ITXServer will perform one</span>
 <span class="doccomment">/// operation at a time. All other operations will sit in the message queue waiting to be processed.</span>
-<span class="doccomment">/// The ITXServer will handle all messages until it transitions state, e.g &quot;rollback&quot; or &quot;commit&quot;.</span>
-
-<span class="doccomment">/// After that the ITXServer will move into the cache eviction state. In this state, the connection is closed, and any messages it receives, it will</span>
-<span class="doccomment">/// will reply with its last state. i.e committed, rollbacked or timeout. The eviction state is there so that if a prisma wants to</span>
-<span class="comment">// perform an action on a iTx that has completed it will get a better message rather than the error message that this transaction doesn&#39;t exist</span>
-
-<span class="doccomment">/// Once the eviction timeout is exceeded, the ITXServer will send a message to the Background Client list Actor to say that it is completed,</span>
-<span class="doccomment">/// and the ITXServer will end. The Background Client list Actor removes the client from the list of clients that are active.</span>
-
-<span class="doccomment">/// During the time the ITXServer is active there is a timer running and if that timeout is exceeded, the</span>
-<span class="doccomment">/// transaction is rolledback and the connection to the database is closed. The ITXServer will then move into the eviction state.</span>
 <span class="doccomment">///</span>
+<span class="doccomment">/// The ITXServer will handle all messages until:</span>
+<span class="doccomment">/// - It transitions state, e.g &quot;rollback&quot; or &quot;commit&quot;</span>
+<span class="doccomment">/// - It exceeds its timeout, in which case the iTx is rolledback and the connection to the database is closed.</span>
+
+<span class="doccomment">/// Once the ITXServer is done handling messages from the iTx Client, it sends a last message to the Background Client list Actor to say that it is completed and then shuts down.</span>
+<span class="doccomment">/// The Background Client list Actor removes the client from the list of active clients and keeps in cache the iTx id of the closed transaction.</span>
+
+<span class="doccomment">/// We keep a list of closed transactions so that if any further messages are received for this iTx id,</span>
+<span class="doccomment">/// the TransactionActorManager can reply with a helpful error message which explains that no operation can be performed on a closed transaction</span>
+<span class="doccomment">/// rather than an error message stating that the transaction does not exist.</span>
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TxId</span>(<span class="ident">String</span>);
@@ -290,5 +288,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

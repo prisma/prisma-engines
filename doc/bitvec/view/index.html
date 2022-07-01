@@ -13,8 +13,8 @@ used.</p>
 <p>This module provides an extension trait, <a href="trait.BitView.html"><code>BitView</code></a>, which provides methods on
 many memory types (all <a href="../mem/trait.BitRegister.html"><code>BitRegister</code></a> integers, and slices and arrays of them)
 to construct <a href="../slice/struct.BitSlice.html"><code>BitSlice</code></a> over those values.</p>
-<p>In addition, the traits <a href="trait.AsBits.html"><code>AsBits</code></a> and <a href="trait.AsBitsMut.html"><code>AsBitsMut</code></a> are analogues of <a href="https://doc.rust-lang.org/1.61.0/core/convert/trait.AsRef.html"><code>AsRef</code></a>
-and <a href="https://doc.rust-lang.org/1.61.0/core/convert/trait.AsMut.html"><code>AsMut</code></a>, respectively. These traits have a blanket implementation for all
+<p>In addition, the traits <a href="trait.AsBits.html"><code>AsBits</code></a> and <a href="trait.AsBitsMut.html"><code>AsBitsMut</code></a> are analogues of <a href="https://doc.rust-lang.org/1.62.0/core/convert/trait.AsRef.html"><code>AsRef</code></a>
+and <a href="https://doc.rust-lang.org/1.62.0/core/convert/trait.AsMut.html"><code>AsMut</code></a>, respectively. These traits have a blanket implementation for all
 <code>A: As{Ref,Mut}&lt;[T: BitRegister]&gt;</code>, so that any type that implements a view to a
 suitable memory region automatically implements a view to that region’s bits.</p>
 <p>These traits are distinct because <a href="trait.BitView.html"><code>BitView</code></a> combines the im/mutable view
@@ -27,5 +27,5 @@ generic type system of any library without undue effort.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AsBitsMut.html" title="bitvec::view::AsBitsMut trait">AsBitsMut</a></div><div class="item-right docblock-short"><p>Views a region as a mutable <a href="../slice/struct.BitSlice.html"><code>BitSlice</code></a>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.BitView.html" title="bitvec::view::BitView trait">BitView</a></div><div class="item-right docblock-short"><p>Creates a <a href="../slice/struct.BitSlice.html"><code>BitSlice</code></a> view over some type that supports it.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.BitViewSized.html" title="bitvec::view::BitViewSized trait">BitViewSized</a></div><div class="item-right docblock-short"><p>Helper for size awareness on <code>Sized</code> storage regions.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

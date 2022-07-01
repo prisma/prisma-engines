@@ -14,7 +14,7 @@ cross-platform utilities. It is up to the user to know how to use sockets
 when using this crate. <em>If you don’t know how to create a socket using
 libc/system calls then this crate is not for you</em>. Most, if not all,
 functions directly relate to the equivalent system call with no error
-handling applied, so no handling errors such as <a href="https://doc.rust-lang.org/1.61.0/std/io/error/enum.ErrorKind.html#variant.Interrupted"><code>EINTR</code></a>. As a result using
+handling applied, so no handling errors such as <a href="https://doc.rust-lang.org/1.62.0/std/io/error/enum.ErrorKind.html#variant.Interrupted"><code>EINTR</code></a>. As a result using
 this crate can be a little wordy, but it should give you maximal flexibility
 over configuration of sockets.</p>
 <h2 id="examples"><a href="#examples">Examples</a></h2>
@@ -36,7 +36,7 @@ over configuration of sockets.</p>
 that are not available on all OSs.</p>
 </div></details><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Domain.html" title="socket2::Domain struct">Domain</a></div><div class="item-right docblock-short"><p>Specification of the communication domain for a socket.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.MaybeUninitSlice.html" title="socket2::MaybeUninitSlice struct">MaybeUninitSlice</a></div><div class="item-right docblock-short"><p>A version of <a href="https://doc.rust-lang.org/1.61.0/std/io/struct.IoSliceMut.html"><code>IoSliceMut</code></a> that allows the buffer to be uninitialised.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.MaybeUninitSlice.html" title="socket2::MaybeUninitSlice struct">MaybeUninitSlice</a></div><div class="item-right docblock-short"><p>A version of <a href="https://doc.rust-lang.org/1.62.0/std/io/struct.IoSliceMut.html"><code>IoSliceMut</code></a> that allows the buffer to be uninitialised.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Protocol.html" title="socket2::Protocol struct">Protocol</a></div><div class="item-right docblock-short"><p>Protocol specification used for creating sockets via <code>Socket::new</code>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.RecvFlags.html" title="socket2::RecvFlags struct">RecvFlags</a></div><div class="item-right docblock-short"><p>Flags for incoming messages.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SockAddr.html" title="socket2::SockAddr struct">SockAddr</a></div><div class="item-right docblock-short"><p>The address of a socket.</p>
@@ -47,5 +47,5 @@ than the <code>Socket</code> type itself.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Type.html" title="socket2::Type struct">Type</a></div><div class="item-right docblock-short"><p>Specification of communication semantics on a socket.</p>
 </div></div></div><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.InterfaceIndexOrAddress.html" title="socket2::InterfaceIndexOrAddress enum">InterfaceIndexOrAddress</a></div><div class="item-right docblock-short"><p>A local interface specified by its index or an address assigned to it.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="socket2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="socket2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

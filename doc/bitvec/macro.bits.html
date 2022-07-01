@@ -36,7 +36,7 @@
 <p>This macro constructs a <a href="array/struct.BitArray.html"><code>BitArray</code></a> temporary and then immediately borrows it
 as a <code>BitSlice</code>. The compiler should extend the lifetime of the underlying
 <code>BitArray</code> for the duration of the expression’s lifetime.</p>
-<p>This macro takes a superset of the <a href="https://doc.rust-lang.org/1.61.0/alloc/macro.vec.html"><code>vec!</code></a> argument syntax: it may be invoked
+<p>This macro takes a superset of the <a href="https://doc.rust-lang.org/1.62.0/alloc/macro.vec.html"><code>vec!</code></a> argument syntax: it may be invoked
 with either a sequence of bit expressions, or a single bit expression and a
 repetiton counter. Additionally, you may provide the names of a <a href="order/trait.BitOrder.html"><code>BitOrder</code></a> and
 a <a href="store/trait.BitStore.html"><code>BitStore</code></a> implementor as the <code>BitArray</code>’s type arguments. You may also use
@@ -86,5 +86,5 @@ point of use.</p>
 <span class="ident">c</span>.<span class="ident">set_aliased</span>(<span class="number">0</span>, <span class="bool-val">true</span>);
 <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="macro">bits!</span>[<span class="ident">Msb0</span>, <span class="ident">AtomicU32</span>; <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>];
 <span class="ident">d</span>.<span class="ident">set_aliased</span>(<span class="number">0</span>, <span class="bool-val">true</span>);</code></pre></div>
-</div></details></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

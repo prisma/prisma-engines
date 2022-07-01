@@ -48,15 +48,15 @@ running blocking operations in an asynchronous context.</p>
 <h4 id="spawning"><a href="#spawning">Spawning</a></h4>
 <p>Perhaps the most important function in this module is <a href="fn.spawn.html"><code>task::spawn</code></a>. This
 function can be thought of as an async equivalent to the standard library’s
-<a href="https://doc.rust-lang.org/1.61.0/std/thread/fn.spawn.html"><code>thread::spawn</code></a>. It takes an <code>async</code> block or other
-<a href="https://doc.rust-lang.org/1.61.0/core/future/future/trait.Future.html">future</a>, and creates a new task to run that work concurrently:</p>
+<a href="https://doc.rust-lang.org/1.62.0/std/thread/fn.spawn.html"><code>thread::spawn</code></a>. It takes an <code>async</code> block or other
+<a href="https://doc.rust-lang.org/1.62.0/core/future/future/trait.Future.html">future</a>, and creates a new task to run that work concurrently:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::task</span>;
 
 <span class="ident">task::spawn</span>(<span class="kw">async</span> {
     <span class="comment">// perform some work here...</span>
 });</code></pre></div>
-<p>Like <a href="https://doc.rust-lang.org/1.61.0/std/thread/fn.spawn.html"><code>std::thread::spawn</code></a>, <code>task::spawn</code> returns a <a href="struct.JoinHandle.html"><code>JoinHandle</code></a> struct.
+<p>Like <a href="https://doc.rust-lang.org/1.62.0/std/thread/fn.spawn.html"><code>std::thread::spawn</code></a>, <code>task::spawn</code> returns a <a href="struct.JoinHandle.html"><code>JoinHandle</code></a> struct.
 A <code>JoinHandle</code> is itself a future which may be used to await the output of
 the spawned task. For example:</p>
 
@@ -72,7 +72,7 @@ the spawned task. For example:</p>
 <span class="comment">// Await the result of the spawned task.</span>
 <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">join</span>.<span class="kw">await</span><span class="question-mark">?</span>;
 <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="string">&quot;hello world!&quot;</span>);</code></pre></div>
-<p>Again, like <code>std::thread</code>’s <a href="https://doc.rust-lang.org/1.61.0/std/thread/struct.JoinHandle.html"><code>JoinHandle</code> type</a>, if the spawned
+<p>Again, like <code>std::thread</code>’s <a href="https://doc.rust-lang.org/1.62.0/std/thread/struct.JoinHandle.html"><code>JoinHandle</code> type</a>, if the spawned
 task panics, awaiting its <code>JoinHandle</code> will return a <a href="struct.JoinError.html"><code>JoinError</code></a>. For
 example:</p>
 
@@ -139,7 +139,7 @@ context switches.</p>
 <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="string">&quot;blocking completed&quot;</span>);</code></pre></div>
 <h5 id="yield_now"><a href="#yield_now">yield_now</a></h5>
 <p>In addition, this module provides a <a href="fn.yield_now.html"><code>task::yield_now</code></a> async function
-that is analogous to the standard library’s <a href="https://doc.rust-lang.org/1.61.0/std/thread/fn.yield_now.html"><code>thread::yield_now</code></a>. Calling
+that is analogous to the standard library’s <a href="https://doc.rust-lang.org/1.62.0/std/thread/fn.yield_now.html"><code>thread::yield_now</code></a>. Calling
 and <code>await</code>ing this function will cause the current task to yield to the
 Tokio runtime’s scheduler, allowing other tasks to be
 scheduled. Eventually, the yielding task will be polled again, allowing it
@@ -158,7 +158,7 @@ to execute. For example:</p>
     <span class="macro">println!</span>(<span class="string">&quot;main task done!&quot;</span>);
 }</code></pre></div>
 <h4 id="cooperative-scheduling"><a href="#cooperative-scheduling">Cooperative scheduling</a></h4>
-<p>A single call to <a href="https://doc.rust-lang.org/1.61.0/core/future/future/trait.Future.html#tymethod.poll"><code>poll</code></a> on a top-level task may potentially do a lot of
+<p>A single call to <a href="https://doc.rust-lang.org/1.62.0/core/future/future/trait.Future.html#tymethod.poll"><code>poll</code></a> on a top-level task may potentially do a lot of
 work before it returns <code>Poll::Pending</code>. If a task runs for a long period of
 time without yielding back to the executor, it can starve other tasks
 waiting on that executor to execute them, or drive underlying resources.
@@ -213,5 +213,5 @@ blocking the executor.</p>
 Tokio. Using this exposes your service to starvation if the unconstrained future never yields
 otherwise.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.yield_now.html" title="tokio::task::yield_now fn">yield_now</a></div><div class="item-right docblock-short"><p>Yields execution back to the Tokio runtime.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

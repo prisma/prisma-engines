@@ -33,7 +33,7 @@ which provides extension methods on ordinary memory to view it as a
 appropriate buffers at compile time. Each data structure also has its own
 constructor functions that create new buffers or borrow existing values.</p>
 <p>Once in use, <code>bitvec</code>’s types obey all the same patterns and APIs that you have
-come to expect from their analogues in the <a href="https://doc.rust-lang.org/1.61.0/core/index.html"><code>core</code></a>, <a href="https://doc.rust-lang.org/1.61.0/alloc/index.html"><code>alloc</code></a>, and <a href="https://doc.rust-lang.org/1.61.0/std/index.html"><code>std</code></a>
+come to expect from their analogues in the <a href="https://doc.rust-lang.org/1.62.0/core/index.html"><code>core</code></a>, <a href="https://doc.rust-lang.org/1.62.0/alloc/index.html"><code>alloc</code></a>, and <a href="https://doc.rust-lang.org/1.62.0/std/index.html"><code>std</code></a>
 libraries.</p>
 <h2 id="usage"><a href="#usage">Usage</a></h2>
 <p><code>bitvec</code> provides data structures that specialize the major sequence types in
@@ -143,7 +143,7 @@ characteristics they want or need without significant effort on their part.</p>
 <p>This works by supplying two type parameters: an <code>O</code> <a href="order/trait.BitOrder.html"><code>BitOrder</code></a> ordering of
 bits within a register element, and a <code>T</code> <a href="store/trait.BitStore.html"><code>BitStore</code></a> register element used for
 storage and memory description. <code>T</code> is restricted to be only the raw unsigned
-integers, and <a href="access/trait.BitSafe.html"><code>bitvec</code>-provided wrappers</a> over <a href="https://doc.rust-lang.org/1.61.0/core/sync/atomic/index.html">atomic</a> and <a href="https://doc.rust-lang.org/1.61.0/core/cell/struct.Cell.html"><code>Cell</code></a>
+integers, and <a href="access/trait.BitSafe.html"><code>bitvec</code>-provided wrappers</a> over <a href="https://doc.rust-lang.org/1.62.0/core/sync/atomic/index.html">atomic</a> and <a href="https://doc.rust-lang.org/1.62.0/core/cell/struct.Cell.html"><code>Cell</code></a>
 synchronization guards, that fit within processor registers on your target.</p>
 <p>These parameters permit the <code>bitvec</code> type system to track memory access rules
 and bit addressing, thus enabling a nearly seamless use of <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a>s as if
@@ -196,7 +196,7 @@ region.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="mem/index.html" title="bitvec::mem mod">mem</a></div><div class="item-right docblock-short"><p>Memory element descriptions.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="order/index.html" title="bitvec::order mod">order</a></div><div class="item-right docblock-short"><p>Ordering of bits within register elements.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="prelude/index.html" title="bitvec::prelude mod">prelude</a></div><div class="item-right docblock-short"><p><a href="index.html"><code>bitvec</code></a> symbol export.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="ptr/index.html" title="bitvec::ptr mod">ptr</a></div><div class="item-right docblock-short"><p>Mirror of the <a href="https://doc.rust-lang.org/1.61.0/core/ptr/index.html"><code>core::ptr</code></a> module and <code>bitvec</code>-specific pointer structures.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="ptr/index.html" title="bitvec::ptr mod">ptr</a></div><div class="item-right docblock-short"><p>Mirror of the <a href="https://doc.rust-lang.org/1.62.0/core/ptr/index.html"><code>core::ptr</code></a> module and <code>bitvec</code>-specific pointer structures.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="slice/index.html" title="bitvec::slice mod">slice</a></div><div class="item-right docblock-short"><p>A dynamically-sized view into individual bits of a memory region.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="store/index.html" title="bitvec::store mod">store</a></div><div class="item-right docblock-short"><p>Memory modeling.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="vec/index.html" title="bitvec::vec mod">vec</a></div><div class="item-right docblock-short"><p>A dynamically-allocated buffer containing a <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> region.</p>
@@ -207,5 +207,5 @@ region.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bitbox.html" title="bitvec::bitbox macro">bitbox</a></div><div class="item-right docblock-short"><p>Constructs a new <a href="boxed/struct.BitBox.html"><code>BitBox</code></a> from a bit-pattern description.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bits.html" title="bitvec::bits macro">bits</a></div><div class="item-right docblock-short"><p>Creates a borrowed <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> in the local scope.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bitvec.html" title="bitvec::bitvec macro">bitvec</a></div><div class="item-right docblock-short"><p>Constructs a new <a href="vec/struct.BitVec.html"><code>BitVec</code></a> from a bit-pattern description.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>
