@@ -9,7 +9,7 @@ pub async fn schema_push(
     input: SchemaPushInput,
     connector: &mut dyn MigrationConnector,
 ) -> CoreResult<SchemaPushOutput> {
-    let source = SourceFile::new_allocated(Arc::new(input.schema.into_boxed_str()));
+    let source = SourceFile::new_allocated(Arc::from(input.schema.into_boxed_str()));
     let datamodel = parse_schema(source.clone())?;
 
     if let Some(err) = connector.check_database_version_compatibility(&datamodel) {

@@ -299,7 +299,7 @@ impl<'db> ModelWalker<'db> {
 
     /// What kind of newlines the model uses.
     pub fn newline(self) -> NewlineType {
-        let field = match dbg!(self.scalar_fields().last()) {
+        let field = match self.scalar_fields().last() {
             Some(field) => field,
             None => return NewlineType::default(),
         };
@@ -307,13 +307,9 @@ impl<'db> ModelWalker<'db> {
         let src = self.db.source();
         let start = field.ast_field().span.end - 2;
 
-        while let Some(c) = dbg!(src.chars().skip(start).next()) {
-            match c {
-                '\r' => return NewlineType::Windows,
-                _ => return NewlineType::Unix,
-            }
+        match src.chars().nth(start) {
+            Some('\r') => NewlineType::Windows,
+            _ => NewlineType::Unix,
         }
-
-        NewlineType::default()
     }
 }

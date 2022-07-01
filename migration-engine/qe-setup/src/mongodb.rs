@@ -20,7 +20,7 @@ pub(crate) async fn mongo_setup(schema: &str, url: &str) -> ConnectorResult<()> 
         .unwrap();
 
     let parsed_schema =
-        datamodel::parse_schema_parserdb(SourceFile::new_allocated(Arc::new(schema.to_owned().into_boxed_str())))
+        datamodel::parse_schema_parserdb(SourceFile::new_allocated(Arc::from(schema.to_owned().into_boxed_str())))
             .unwrap();
 
     for model in parsed_schema.db.walk_models() {

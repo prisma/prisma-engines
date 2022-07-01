@@ -93,7 +93,7 @@ async fn json_rpc_diff_target_to_connector(
             let mut connector = crate::schema_to_connector_unchecked(&schema_contents)?;
             let schema = connector
                 .database_schema_from_diff_target(
-                    McDiff::Datamodel(SourceFile::new_allocated(Arc::new(schema_contents.into_boxed_str()))),
+                    McDiff::Datamodel(SourceFile::new_allocated(Arc::from(schema_contents.into_boxed_str()))),
                     None,
                 )
                 .await?;

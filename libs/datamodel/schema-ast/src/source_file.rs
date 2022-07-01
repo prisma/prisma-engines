@@ -12,7 +12,7 @@ impl SourceFile {
         }
     }
 
-    pub fn new_allocated(s: Arc<Box<str>>) -> Self {
+    pub fn new_allocated(s: Arc<str>) -> Self {
         Self {
             contents: Contents::Allocated(s),
         }
@@ -45,25 +45,25 @@ impl From<&'static str> for SourceFile {
 
 impl From<Box<str>> for SourceFile {
     fn from(s: Box<str>) -> Self {
-        Self::new_allocated(Arc::new(s))
+        Self::new_allocated(Arc::from(s))
     }
 }
 
-impl From<Arc<Box<str>>> for SourceFile {
-    fn from(s: Arc<Box<str>>) -> Self {
+impl From<Arc<str>> for SourceFile {
+    fn from(s: Arc<str>) -> Self {
         Self::new_allocated(s)
     }
 }
 
 impl From<String> for SourceFile {
     fn from(s: String) -> Self {
-        Self::new_allocated(Arc::new(s.into_boxed_str()))
+        Self::new_allocated(Arc::from(s.into_boxed_str()))
     }
 }
 
 #[derive(Debug, Clone)]
 enum Contents {
     Static(&'static str),
-    Allocated(Arc<Box<str>>),
+    Allocated(Arc<str>),
     FromFile(Arc<(Box<Path>, Box<str>)>),
 }

@@ -14,7 +14,7 @@ pub async fn evaluate_data_loss(
     connector: &mut dyn MigrationConnector,
 ) -> CoreResult<EvaluateDataLossOutput> {
     error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
-    let source_file = SourceFile::new_allocated(Arc::new(input.prisma_schema.into_boxed_str()));
+    let source_file = SourceFile::new_allocated(Arc::from(input.prisma_schema.into_boxed_str()));
 
     let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
 

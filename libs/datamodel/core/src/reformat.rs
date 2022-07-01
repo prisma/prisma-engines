@@ -6,7 +6,7 @@ use std::{borrow::Cow, sync::Arc};
 /// Returns either the reformatted schema, or the original input if we can't reformat. This happens
 /// if and only if the source does not parse to a well formed AST.
 pub fn reformat(source: &str, indent_width: usize) -> Option<String> {
-    let file = SourceFile::new_allocated(Arc::new(source.to_owned().into_boxed_str()));
+    let file = SourceFile::new_allocated(Arc::from(source.to_owned().into_boxed_str()));
 
     let mut diagnostics = diagnostics::Diagnostics::new();
     let db = parser_database::ParserDatabase::new(file, &mut diagnostics);

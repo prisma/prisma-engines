@@ -92,7 +92,7 @@ impl ParserDatabase {
         if ctx.diagnostics.has_errors() {
             return ParserDatabase {
                 ast,
-                file: file,
+                file,
                 interner,
                 _names: names,
                 types,
@@ -107,7 +107,7 @@ impl ParserDatabase {
         if ctx.diagnostics.has_errors() {
             return ParserDatabase {
                 ast,
-                file: file,
+                file,
                 interner,
                 _names: names,
                 types,
@@ -125,7 +125,7 @@ impl ParserDatabase {
 
         ParserDatabase {
             ast,
-            file: file,
+            file,
             interner,
             _names: names,
             types,

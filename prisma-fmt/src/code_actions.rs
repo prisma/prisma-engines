@@ -24,7 +24,7 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
 
     let mut actions = Vec::new();
 
-    let file = SourceFile::new_allocated(Arc::new(schema.into_boxed_str()));
+    let file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
 
     let db = {
         let mut diag = Diagnostics::new();
@@ -49,9 +49,9 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
     actions
 }
 
-pub(super) fn diagnostics_for_span<'a>(
+pub(super) fn diagnostics_for_span(
     schema: &str,
-    diagnostics: &'a [Diagnostic],
+    diagnostics: &[Diagnostic],
     span: ast::Span,
 ) -> Option<Vec<Diagnostic>> {
     let res: Vec<_> = diagnostics

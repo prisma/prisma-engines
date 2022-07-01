@@ -149,7 +149,7 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, dia
 fn parse_datamodel_internal(
     datamodel_string: &str,
 ) -> Result<Validated<(Configuration, dml::Datamodel)>, diagnostics::Diagnostics> {
-    let file = SourceFile::new_allocated(Arc::new(datamodel_string.to_owned().into_boxed_str()));
+    let file = SourceFile::new_allocated(Arc::from(datamodel_string.to_owned().into_boxed_str()));
 
     let mut diagnostics = diagnostics::Diagnostics::new();
     let db = ParserDatabase::new(file, &mut diagnostics);

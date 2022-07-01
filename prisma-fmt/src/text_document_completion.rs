@@ -20,7 +20,7 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
         warn!("Failed to parse schema AST in completion request.");
         return empty_completion_list();
     };
-    let source_file = SourceFile::new_allocated(Arc::new(schema.into_boxed_str()));
+    let source_file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
 
     let position =
         if let Some(pos) = super::position_to_offset(&params.text_document_position.position, source_file.as_str()) {
