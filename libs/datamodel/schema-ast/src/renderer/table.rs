@@ -18,7 +18,7 @@ impl Row {
 }
 
 #[derive(Debug)]
-pub struct TableFormat {
+pub(crate) struct TableFormat {
     pub table: Vec<Row>,
     row: i32,
     line_ending: bool,

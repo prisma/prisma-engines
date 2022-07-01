@@ -4,11 +4,11 @@ mod table;
 use crate::ast;
 use crate::ast::{Attribute, WithDocumentation};
 
-pub use string_builder::StringBuilder;
-pub use table::TableFormat;
+pub(crate) use string_builder::StringBuilder;
+pub(crate) use table::TableFormat;
 
 /// Get the sort order for an attribute, in the canonical sorting order.
-pub fn get_sort_index_of_attribute(is_field_attribute: bool, attribute_name: &str) -> usize {
+pub(crate) fn get_sort_index_of_attribute(is_field_attribute: bool, attribute_name: &str) -> usize {
     // this must match the order defined for rendering in libs/datamodel/core/src/transform/dml_to_ast/lower_field.rs
     let correct_order: &[&str] = if is_field_attribute {
         &["id", "unique", "default", "updatedAt", "map", "relation", "ignore"]
@@ -22,7 +22,7 @@ pub fn get_sort_index_of_attribute(is_field_attribute: bool, attribute_name: &st
         .unwrap_or(usize::MAX)
 }
 
-pub trait LineWriteable {
+pub(crate) trait LineWriteable {
     fn write(&mut self, param: &str);
     fn line_empty(&self) -> bool;
     fn end_line(&mut self);
@@ -264,7 +264,7 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
-    pub fn render_field(target: &mut TableFormat, field: &ast::Field, is_commented_out: bool) {
+    fn render_field(target: &mut TableFormat, field: &ast::Field, is_commented_out: bool) {
         Self::render_documentation(
             &mut target.interleave_writer(),
             field.documentation.as_ref(),
@@ -313,7 +313,7 @@ impl<'a> Renderer<'a> {
         };
     }
 
-    pub fn render_field_attribute(target: &mut dyn LineWriteable, attribute: &ast::Attribute) {
+    fn render_field_attribute(target: &mut dyn LineWriteable, attribute: &ast::Attribute) {
         target.write("@");
         target.write(&attribute.name.name);
 
@@ -324,7 +324,7 @@ impl<'a> Renderer<'a> {
         }
     }
 
-    pub fn render_field_type(target: &mut dyn LineWriteable, field_type: &ast::FieldType) {
+    fn render_field_type(target: &mut dyn LineWriteable, field_type: &ast::FieldType) {
         match field_type {
             ast::FieldType::Supported(ft) => {
                 target.write(&ft.name);
@@ -390,11 +390,11 @@ impl<'a> Renderer<'a> {
         target.write(")");
     }
 
-    pub fn indent_up(&mut self) {
+    pub(crate) fn indent_up(&mut self) {
         self.indent += 1
     }
 
-    pub fn indent_down(&mut self) {
+    pub(crate) fn indent_down(&mut self) {
         if self.indent == 0 {
             panic!("Indentation error.")
         }

@@ -17,4 +17,4 @@ pub use parse_schema::parse_schema;
 // It is more convenient if this enum is directly available here.
 #[derive(pest_derive::Parser)]
 #[grammar = "parser/datamodel.pest"]
-pub struct PrismaDatamodelParser;
+pub(crate) struct PrismaDatamodelParser;
