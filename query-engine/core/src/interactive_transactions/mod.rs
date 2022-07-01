@@ -24,7 +24,7 @@ pub use messages::*;
 /// TransactionActorManager, it looks for the client in the hashmap and passes the operation to the client. The ITXClient sends a message to the
 /// ITXServer and waits for a response. The ITXServer will then perform the operation and return the result. The ITXServer will perform one
 /// operation at a time. All other operations will sit in the message queue waiting to be processed.
-/// 
+///
 /// The ITXServer will handle all messages until:
 /// - It transitions state, e.g "rollback" or "commit"
 /// - It exceeds its timeout, in which case the iTx is rolledback and the connection to the database is closed.

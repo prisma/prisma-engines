@@ -90,7 +90,7 @@ mod interactive_tx {
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
         assert!(known_err
             .message
-            .contains("A commit was executed on a closed transaction."));
+            .contains("A commit cannot be executed on a closed transaction."));
 
         // Try again
         let res = runner.commit_tx(tx_id).await?;
@@ -100,7 +100,7 @@ mod interactive_tx {
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
         assert!(known_err
             .message
-            .contains("A commit was executed on a closed transaction."));
+            .contains("A commit cannot be executed on a closed transaction."));
 
         Ok(())
     }
@@ -286,7 +286,7 @@ mod interactive_tx {
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
         assert!(known_err
             .message
-            .contains("A commit was executed on a closed transaction."));
+            .contains("A commit cannot be executed on a closed transaction."));
 
         // Expect the state of the tx to be expired so the rollback should fail.
         let res = runner.rollback_tx(tx_id.clone()).await?;
@@ -296,14 +296,14 @@ mod interactive_tx {
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
         assert!(known_err
             .message
-            .contains("A rollback was executed on a closed transaction."));
+            .contains("A rollback cannot be executed on a closed transaction."));
 
         // Expect the state of the tx to be expired so the query should fail.
         assert_error!(
             runner,
             r#"{ findManyTestModel { id } }"#,
             2028,
-            "A query was executed on a closed transaction."
+            "A query cannot be executed on a closed transaction."
         );
 
         runner
@@ -317,7 +317,7 @@ mod interactive_tx {
             .await?
             .assert_failure(
                 2028,
-                Some("A batch query was executed on a closed transaction.".to_string()),
+                Some("A batch query cannot be executed on a closed transaction.".to_string()),
             );
 
         Ok(())
