@@ -111,7 +111,7 @@ impl SqlMigrationConnector {
 
     async fn db_schema_from_diff_target(
         &mut self,
-        target: &DiffTarget<'_>,
+        target: DiffTarget<'_>,
         shadow_database_connection_string: Option<String>,
     ) -> ConnectorResult<SqlDatabaseSchema> {
         match target {
@@ -194,7 +194,7 @@ impl MigrationConnector for SqlMigrationConnector {
         shadow_database_connection_string: Option<String>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
-            self.db_schema_from_diff_target(&diff_target, shadow_database_connection_string)
+            self.db_schema_from_diff_target(diff_target, shadow_database_connection_string)
                 .await
                 .map(From::from)
         })

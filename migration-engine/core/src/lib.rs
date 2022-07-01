@@ -16,6 +16,7 @@ mod state;
 mod timings;
 
 pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
+use datamodel::schema_ast::source_file::SourceFile;
 pub use migration_connector;
 
 use datamodel::ValidatedSchema;
@@ -37,7 +38,7 @@ use std::env;
 use std::path::Path;
 use user_facing_errors::common::InvalidConnectionString;
 
-fn parse_schema(schema: &str) -> CoreResult<ValidatedSchema> {
+fn parse_schema(schema: SourceFile) -> CoreResult<ValidatedSchema> {
     datamodel::parse_schema_parserdb(schema).map_err(CoreError::new_schema_parser_error)
 }
 

@@ -498,7 +498,7 @@ pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
 
 #[track_caller]
 pub(crate) fn expect_error(schema: &str, expectation: &expect_test::Expect) {
-    match datamodel::parse_schema_parserdb(schema) {
+    match datamodel::parse_schema(schema) {
         Ok(_) => panic!("Expected a validation error, but the schema is valid."),
         Err(err) => expectation.assert_eq(&err),
     }
@@ -517,7 +517,7 @@ pub(crate) fn parse_error(datamodel_string: &str) -> Diagnostics {
 
 #[track_caller]
 pub(crate) fn assert_valid(schema: &str) {
-    match datamodel::parse_schema_parserdb(schema) {
+    match datamodel::parse_schema(schema) {
         Ok(_) => (),
         Err(err) => panic!("{err}"),
     }
@@ -541,19 +541,5 @@ pub(crate) const MYSQL_SOURCE: &str = r#"
     datasource db {
         provider = "mysql"
         url      = "mysql://localhost:3306"
-    }
-"#;
-
-pub(crate) const MSSQL_SOURCE: &str = r#"
-    datasource db {
-        provider = "sqlserver"
-        url      = "sqlserver://localhost:1433"
-    }
-"#;
-
-pub(crate) const COCKROACHDB_SOURCE: &str = r#"
-    datasource db {
-        provider = "cockroachdb"
-        url      = "postgresql://localhost:5432"
     }
 "#;
