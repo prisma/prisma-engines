@@ -11,7 +11,7 @@ use super::RelationWalker;
 #[derive(Copy, Clone)]
 pub struct TwoWayEmbeddedManyToManyRelationWalker<'db>(pub(super) RelationWalker<'db>);
 
-impl<'ast, 'db> TwoWayEmbeddedManyToManyRelationWalker<'db> {
+impl<'db> TwoWayEmbeddedManyToManyRelationWalker<'db> {
     /// Gets the relation attributes from the AST.
     fn get(&self) -> &'db Relation {
         &self.0.db.relations[self.0.id]

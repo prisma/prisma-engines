@@ -198,7 +198,6 @@ fn test_drop_sqlite_database(api: TestApi) {
 #[test_connector(tags(Postgres, Mysql))]
 fn test_drop_database(api: TestApi) {
     let connection_string = api.connection_string();
-    drop(api);
     let output = run(&["--datasource", &connection_string, "drop-database"]);
     assert!(output.status.success(), "{:#?}", output);
 

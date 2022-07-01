@@ -1,5 +1,8 @@
 use crate::common::{Indented, IndexColumn, IteratorJoin, SQL_INDENTATION};
-use std::{borrow::Cow, fmt::Display};
+use std::{
+    borrow::Cow,
+    fmt::{Display, Write as _},
+};
 
 struct Ident<'a>(&'a str);
 
@@ -206,7 +209,7 @@ impl Display for CreateIndex<'_> {
                 let mut rendered = Ident(&s.name).to_string();
 
                 if let Some(length) = s.length {
-                    rendered.push_str(&format!("({})", length));
+                    write!(rendered, "({})", length).unwrap();
                 }
 
                 if let Some(sort_order) = s.sort_order {
@@ -256,10 +259,10 @@ impl Display for CreateTable<'_> {
             self.primary_key
                 .iter()
                 .map(|col| {
-                    let mut rendered = format!("{}", Ident(&col.name));
+                    let mut rendered = Ident(&col.name).to_string();
 
                     if let Some(length) = col.length {
-                        rendered.push_str(&format!("({})", length));
+                        write!(rendered, "({})", length).unwrap();
                     }
 
                     if let Some(sort_order) = col.sort_order {
@@ -354,7 +357,7 @@ impl Display for IndexClause<'_> {
                 let mut rendered = format!("{}", Ident(col.name.as_ref()));
 
                 if let Some(length) = col.length {
-                    rendered.push_str(&format!("({})", length));
+                    write!(rendered, "({})", length).unwrap();
                 };
 
                 if let Some(sort_order) = col.sort_order {

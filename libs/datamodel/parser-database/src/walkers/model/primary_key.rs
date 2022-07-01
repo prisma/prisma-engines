@@ -13,7 +13,7 @@ pub struct PrimaryKeyWalker<'db> {
     pub(crate) db: &'db ParserDatabase,
 }
 
-impl<'ast, 'db> PrimaryKeyWalker<'db> {
+impl<'db> PrimaryKeyWalker<'db> {
     /// The `@(@)id` AST node.
     pub fn ast_attribute(self) -> &'db ast::Attribute {
         &self.db.ast[self.attribute.source_attribute]
