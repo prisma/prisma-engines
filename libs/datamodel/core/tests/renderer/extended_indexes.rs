@@ -3,8 +3,12 @@ use expect_test::expect;
 
 #[test]
 fn expanded_index_capability_rendering_works() {
-    let dm = with_header(
-        r#"
+    let dm = r#"
+        datasource db {
+            provider = "mysql"
+            url = env("TEST_DATABASE_URL")
+        }
+
         model User {
         id         Int    @id
         firstName  String @unique(sort: Desc, length: 5)
@@ -15,10 +19,7 @@ fn expanded_index_capability_rendering_works() {
         @@index([firstName(sort: Desc), middleName(sort: Asc, length: 5), lastName(sort: Desc, length: 5), generation(sort:Asc)])
         @@unique([firstName(sort: Desc), middleName(length: 5), lastName(sort: Desc, length: 5), generation(sort:Asc)])
     }
-    "#,
-        Provider::Mysql,
-        &[],
-    );
+    "#;
 
     let expected = expect![[r#"
      model User {
@@ -33,8 +34,8 @@ fn expanded_index_capability_rendering_works() {
      }
     "#]];
 
-    let dml = datamodel::parse_datamodel(&dm).unwrap().subject;
-    let configuration = datamodel::parse_configuration(&dm).unwrap().subject;
+    let dml = datamodel::parse_datamodel(dm).unwrap().subject;
+    let configuration = datamodel::parse_configuration(dm).unwrap().subject;
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&configuration));
     expected.assert_eq(&rendered)
 }

@@ -40,7 +40,7 @@ fn duplicate_attributes_should_error() {
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  id String @id
-        [1;94m 3 | [0m  unique String @[1;91munique[0m @unique
+        [1;94m 3 | [0m  unique String @[1;91munique [0m@unique
         [1;94m   | [0m
         [1;91merror[0m: [1mAttribute "@unique" is defined twice.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m

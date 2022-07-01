@@ -23,6 +23,6 @@ fn model_to_serializable(config: &ValidatedConfiguration) -> SerializeableMcf {
     SerializeableMcf {
         generators: generator::generators_to_json_value(&config.subject.generators),
         datasources: source::render_sources_to_json_value(&config.subject.datasources),
-        warnings: config.warnings.iter().map(|f| f.description()).collect(),
+        warnings: config.warnings.iter().map(|f| f.message().to_owned()).collect(),
     }
 }

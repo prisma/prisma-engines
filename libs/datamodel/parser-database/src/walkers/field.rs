@@ -1,8 +1,6 @@
-use schema_ast::ast;
-
-use crate::ScalarType;
-
 use super::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker};
+use crate::ScalarType;
+use schema_ast::ast;
 
 #[derive(Copy, Clone)]
 enum InnerWalker<'db> {

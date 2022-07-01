@@ -103,7 +103,7 @@ fn index_does_not_accept_missing_length_with_extended_indexes() {
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m         id         Int    @id
-        [1;94m14 | [0m         firstName  String @[1;91munique[0m @test.Text
+        [1;94m14 | [0m         firstName  String @[1;91munique [0m@test.Text
         [1;94m   | [0m
         [1;91merror[0m: [1mYou cannot define an index on fields with native type `Text` of MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m

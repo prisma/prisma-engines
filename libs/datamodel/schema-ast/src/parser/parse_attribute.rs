@@ -1,28 +1,24 @@
 use super::{
-    helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
+    helpers::{parsing_catch_all, Pair, ToIdentifier},
     Rule,
 };
 use crate::{ast::*, parser::parse_arguments::parse_arguments_list};
 
-pub fn parse_attribute(token: &Token<'_>, diagnostics: &mut diagnostics::Diagnostics) -> Attribute {
-    let mut name: Option<Identifier> = None;
+pub(crate) fn parse_attribute(pair: Pair<'_>, diagnostics: &mut diagnostics::Diagnostics) -> Attribute {
+    let span = Span::from(pair.as_span());
+    let mut name = Identifier {
+        name: String::new(),
+        span,
+    };
     let mut arguments: ArgumentsList = ArgumentsList::default();
 
-    for current in token.relevant_children() {
+    for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::attribute => return parse_attribute(&current, diagnostics),
-            Rule::attribute_name => name = Some(current.to_id()),
-            Rule::arguments_list => parse_arguments_list(&current, &mut arguments, diagnostics),
+            Rule::attribute_name => name = current.to_id(),
+            Rule::arguments_list => parse_arguments_list(current, &mut arguments, diagnostics),
             _ => parsing_catch_all(&current, "attribute"),
         }
     }
 
-    match name {
-        Some(name) => Attribute {
-            name,
-            arguments,
-            span: Span::from(token.as_span()),
-        },
-        _ => panic!("Encountered impossible type during parsing: {:?}", token.as_str()),
-    }
+    Attribute { name, arguments, span }
 }

@@ -220,7 +220,7 @@ fn composite_types_are_parsed_without_error() {
                                         },
                                         span: Span {
                                             start: 247,
-                                            end: 249,
+                                            end: 250,
                                         },
                                     },
                                     Attribute {

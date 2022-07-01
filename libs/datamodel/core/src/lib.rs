@@ -122,8 +122,7 @@ pub fn parse_schema_parserdb(file: impl Into<SourceFile>) -> Result<ValidatedSch
     let preview_features = preview_features(&generators);
     let datasources = load_sources(db.ast(), preview_features, &mut diagnostics);
 
-    let out = validate(db, &datasources, preview_features, diagnostics);
-
+    let mut out = validate(db, &datasources, preview_features, diagnostics);
     out.diagnostics
         .to_result()
         .map_err(|err| err.to_pretty_string("schema.prisma", file.as_str()))?;
@@ -178,7 +177,7 @@ fn parse_datamodel_internal(
             },
             datamodel,
         ),
-        warnings: out.diagnostics.warnings().to_vec(),
+        warnings: out.diagnostics.into_warnings(),
     })
 }
 
@@ -209,7 +208,7 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
             generators,
             datasources,
         },
-        warnings: diagnostics.warnings().to_owned(),
+        warnings: diagnostics.into_warnings(),
     })
 }
 
@@ -248,11 +247,11 @@ pub fn render_datamodel_and_config_to_string(
 }
 
 /// Renders as a string into the stream.
-fn render_schema_ast(schema: &ast::SchemaAst, ident_width: usize) -> String {
-    let mut out = String::with_capacity(schema.tops.len() * 20);
-    let mut renderer = schema_ast::renderer::Renderer::new(&mut out, ident_width);
+fn render_schema_ast(schema: &ast::SchemaAst, indent_width: usize) -> String {
+    let mut renderer = schema_ast::renderer::Renderer::new(indent_width);
+    renderer.stream.reserve(schema.tops.len() * 20);
     renderer.render(schema);
-    reformat(&out, 2).expect("Internal error: failed to reformat introspected schema")
+    reformat(&renderer.stream, 2).expect("Internal error: failed to reformat introspected schema")
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {
