@@ -28,7 +28,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         },
     };
 
-    let result = prisma_fmt::code_actions(&schema, &serde_json::to_string_pretty(&params).unwrap());
+    let result = prisma_fmt::code_actions(schema, &serde_json::to_string_pretty(&params).unwrap());
     // Prettify the JSON
     let result =
         serde_json::to_string_pretty(&serde_json::from_str::<Vec<lsp_types::CodeActionOrCommand>>(&result).unwrap())

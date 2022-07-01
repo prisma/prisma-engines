@@ -38,6 +38,7 @@ mod value_validator;
 pub use names::is_reserved_type_name;
 pub use relations::ReferentialAction;
 pub use schema_ast::ast;
+use schema_ast::source_file::SourceFile;
 pub use types::{IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SortOrder};
 pub use value_validator::{ValueListValidator, ValueValidator};
 
@@ -66,6 +67,7 @@ use names::Names;
 ///   Currently only index name collisions.
 pub struct ParserDatabase {
     ast: ast::SchemaAst,
+    _file: SourceFile,
     interner: interner::StringInterner,
     _names: Names,
     types: Types,
@@ -74,7 +76,9 @@ pub struct ParserDatabase {
 
 impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(ast: ast::SchemaAst, diagnostics: &mut Diagnostics) -> Self {
+    pub fn new(file: SourceFile, diagnostics: &mut Diagnostics) -> Self {
+        let ast = schema_ast::parse_schema(file.as_str(), diagnostics);
+
         let mut interner = Default::default();
         let mut names = Default::default();
         let mut types = Default::default();
@@ -88,6 +92,7 @@ impl ParserDatabase {
         if ctx.diagnostics.has_errors() {
             return ParserDatabase {
                 ast,
+                _file: file,
                 interner,
                 _names: names,
                 types,
@@ -102,6 +107,7 @@ impl ParserDatabase {
         if ctx.diagnostics.has_errors() {
             return ParserDatabase {
                 ast,
+                _file: file,
                 interner,
                 _names: names,
                 types,
@@ -119,6 +125,7 @@ impl ParserDatabase {
 
         ParserDatabase {
             ast,
+            _file: file,
             interner,
             _names: names,
             types,

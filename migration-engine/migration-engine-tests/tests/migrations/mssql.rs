@@ -1,3 +1,4 @@
+use datamodel::schema_ast::source_file::SourceFile;
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
 
@@ -172,7 +173,10 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
         }
     "#;
 
-    let migration = api.connector_diff(DiffTarget::Database, DiffTarget::Datamodel(target_schema));
+    let migration = api.connector_diff(
+        DiffTarget::Database,
+        DiffTarget::Datamodel(SourceFile::new_static(target_schema)),
+    );
     let expected = expect![[r#"
         BEGIN TRY
 

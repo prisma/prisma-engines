@@ -7,7 +7,7 @@ pub use test_macros::test_connector;
 pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
-use datamodel::common::preview_features::PreviewFeature;
+use datamodel::{common::preview_features::PreviewFeature, schema_ast::source_file::SourceFile};
 use migration_core::{
     commands::diff,
     migration_connector::{
@@ -280,11 +280,11 @@ impl TestApi {
         Reset::new(&mut self.connector)
     }
 
-    pub fn expect_sql_for_schema(&mut self, schema: &str, sql: &expect_test::Expect) {
+    pub fn expect_sql_for_schema(&mut self, schema: &'static str, sql: &expect_test::Expect) {
         // let dir = tempfile::tempdir().unwrap();
         // let schema_path = dir.path().join("schema.prisma");
         // std::fs::write(&schema_path, schema).unwrap();
-        let found = self.connector_diff(DiffTarget::Empty, DiffTarget::Datamodel(schema));
+        let found = self.connector_diff(DiffTarget::Empty, DiffTarget::Datamodel(SourceFile::new_static(schema)));
         sql.assert_eq(&found);
     }
 

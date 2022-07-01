@@ -1,3 +1,4 @@
+use datamodel::schema_ast::source_file::SourceFile;
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
 use quaint::Value;
@@ -399,7 +400,10 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
         }
     "#;
 
-    let migration = api.connector_diff(DiffTarget::Database, DiffTarget::Datamodel(target_schema));
+    let migration = api.connector_diff(
+        DiffTarget::Database,
+        DiffTarget::Datamodel(SourceFile::new_static(target_schema)),
+    );
     let expected = expect![[r#"
         -- RenameForeignKey
         ALTER TABLE "Dog" RENAME CONSTRAINT "favouriteFood" TO "Dog_favourite_food_id_fkey";
@@ -629,7 +633,10 @@ fn scalar_list_default_diffing(api: TestApi) {
         }
     "#;
 
-    let migration = api.connector_diff(DiffTarget::Datamodel(schema_1), DiffTarget::Datamodel(schema_2));
+    let migration = api.connector_diff(
+        DiffTarget::Datamodel(SourceFile::new_static(schema_1)),
+        DiffTarget::Datamodel(SourceFile::new_static(schema_2)),
+    );
 
     let expected_migration = expect![[r#"
         -- AlterTable
