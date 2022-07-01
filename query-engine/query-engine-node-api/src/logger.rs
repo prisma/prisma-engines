@@ -142,3 +142,14 @@ impl<S: Subscriber> Layer<S> for CallbackLayer {
         self.callback.call(Ok(result), ThreadsafeFunctionCallMode::Blocking);
     }
 }
+
+impl Drop for CallbackLayer {
+    fn drop(&mut self) {
+        unsafe {
+            napi::sys::napi_release_threadsafe_function(
+                self.callback.raw(),
+                napi::sys::ThreadsafeFunctionReleaseMode::release,
+            );
+        }
+    }
+}
