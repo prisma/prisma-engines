@@ -148,7 +148,7 @@ impl Drop for CallbackLayer {
         unsafe {
             napi::sys::napi_release_threadsafe_function(
                 self.callback.raw(),
-                napi::sys::ThreadsafeFunctionReleaseMode::release,
+                napi::sys::ThreadsafeFunctionReleaseMode::abort,
             );
         }
     }
