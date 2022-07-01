@@ -336,9 +336,9 @@ pub fn spawn_client_list_clear_actor(
             if let Some(id) = rx.recv().await {
                 trace!("removing {} from client list", id);
 
-                let mut guard = clients.write().await;
-                guard.remove(&id);
-                drop(guard);
+                let mut clients_guard = clients.write().await;
+                clients_guard.remove(&id);
+                drop(clients_guard);
 
                 closed_txs.write().await.put(id, ());
             }

@@ -76,9 +76,14 @@ impl TransactionActorManager {
         self.clients.write().await.insert(tx_id, client);
     }
 
-    async fn get_client(&self, tx_id: &TxId) -> crate::Result<ITXClient> {
+    async fn get_client(&self, tx_id: &TxId, from_operation: &str) -> crate::Result<ITXClient> {
         if let Some(client) = self.clients.read().await.get(tx_id) {
             Ok(client.clone())
+        } else if self.closed_txs.read().await.contains(tx_id) {
+            Err(TransactionError::Closed {
+                reason: format!("A {from_operation} cannot be executed on a closed transaction."),
+            }
+            .into())
         } else {
             Err(TransactionError::NotFound.into())
         }
@@ -90,8 +95,8 @@ impl TransactionActorManager {
         operation: Operation,
         trace_id: Option<String>,
     ) -> crate::Result<ResponseData> {
-        self.handle_closed_tx(tx_id, "query").await?;
-        let client = self.get_client(tx_id).await?;
+        let client = self.get_client(tx_id, "query").await?;
+
         client.execute(operation, trace_id).await
     }
 
@@ -101,33 +106,22 @@ impl TransactionActorManager {
         operations: Vec<Operation>,
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
-        self.handle_closed_tx(tx_id, "batch query").await?;
-        let client = self.get_client(tx_id).await?;
+        let client = self.get_client(tx_id, "batch query").await?;
+
         client.batch_execute(operations, trace_id).await
     }
 
     pub async fn commit_tx(&self, tx_id: &TxId) -> crate::Result<()> {
-        self.handle_closed_tx(tx_id, "commit").await?;
-        let client = self.get_client(tx_id).await?;
+        let client = self.get_client(tx_id, "commit").await?;
         client.commit().await?;
+
         Ok(())
     }
 
     pub async fn rollback_tx(&self, tx_id: &TxId) -> crate::Result<()> {
-        self.handle_closed_tx(tx_id, "rollback").await?;
-        let client = self.get_client(tx_id).await?;
+        let client = self.get_client(tx_id, "rollback").await?;
         client.rollback().await?;
-        Ok(())
-    }
 
-    async fn handle_closed_tx(&self, tx_id: &TxId, operation: &str) -> crate::Result<()> {
-        if self.closed_txs.read().await.contains(tx_id) {
-            Err(TransactionError::Closed {
-                reason: format!("A {operation} cannot be executed on a closed transaction."),
-            }
-            .into())
-        } else {
-            Ok(())
-        }
+        Ok(())
     }
 }
