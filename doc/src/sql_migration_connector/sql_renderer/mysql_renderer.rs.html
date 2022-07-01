@@ -544,7 +544,7 @@
     },
     <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>,
 };
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Write</span> <span class="kw">as</span> <span class="kw">_</span>};
 
 <span class="kw">impl</span> <span class="ident">MysqlFlavour</span> {
     <span class="kw">fn</span> <span class="ident">render_column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">col</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">ddl::Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -652,7 +652,7 @@
                             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>()));
 
                             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">length</span>) <span class="op">=</span> <span class="ident">c</span>.<span class="ident">length</span>() {
-                                <span class="ident">rendered</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, <span class="ident">length</span>));
+                                <span class="macro">write!</span>(<span class="ident">rendered</span>, <span class="string">&quot;({})&quot;</span>, <span class="ident">length</span>).<span class="ident">unwrap</span>();
                             }
 
                             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sort_order</span>) <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>() {

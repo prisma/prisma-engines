@@ -20,23 +20,33 @@
 <span id="15">15</span>
 <span id="16">16</span>
 <span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Prisma Schema AST.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! - The `ast` module defines the AST data structure.</span>
 <span class="doccomment">//! - The `parser` module is responsible from going from a source string to an AST.</span>
-<span class="doccomment">//! - The `renderer` module is responsible for rendering an AST to a string.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser::parse_schema</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reformat::reformat</span>;
 
 <span class="doccomment">/// The AST data structure. It aims to faithfully represent the syntax of a Prisma Schema, with</span>
 <span class="doccomment">/// source span information.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ast</span>;
 
 <span class="doccomment">/// String -&gt; AST</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">parser</span>;
+<span class="kw">mod</span> <span class="ident">parser</span>;
 
 <span class="doccomment">/// AST -&gt; String</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">renderer</span>;
+
+<span class="doccomment">/// String -&gt; String</span>
+<span class="kw">mod</span> <span class="ident">reformat</span>;
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>
