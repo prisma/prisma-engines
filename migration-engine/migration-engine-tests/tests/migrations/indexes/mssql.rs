@@ -1,4 +1,4 @@
-use indoc::{formatdoc, indoc};
+use indoc::formatdoc;
 use migration_engine_tests::test_api::*;
 
 #[test_connector(tags(Mssql))]

@@ -733,7 +733,6 @@ dependencies = [
  "native-types",
  "once_cell",
  "parser-database",
- "pest",
  "pretty_assertions",
  "regex",
  "schema-ast",

@@ -17,7 +17,7 @@ use sql_schema_describer::{
     },
     ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
 };
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt::Write as _};
 
 impl MysqlFlavour {
     fn render_column<'a>(&self, col: ColumnWalker<'a>) -> ddl::Column<'a> {
@@ -125,7 +125,7 @@ impl SqlRenderer for MysqlFlavour {
                             let mut rendered = format!("{}", self.quote(c.as_column().name()));
 
                             if let Some(length) = c.length() {
-                                rendered.push_str(&format!("({})", length));
+                                write!(rendered, "({})", length).unwrap();
                             }
 
                             if let Some(sort_order) = c.sort_order() {

@@ -334,7 +334,7 @@ mod tests {
                 assert_eq!(metrics.to_json(Default::default()), empty);
 
                 absolute_counter!("counter_1", 4, "label" => "one");
-                let _ = describe_counter!("counter_2", "this is a description for counter 2");
+                describe_counter!("counter_2", "this is a description for counter 2");
                 absolute_counter!("counter_2", 2, "label" => "one", "another_label" => "two");
 
                 describe_gauge!("gauge_1", "a description for gauge 1");
@@ -450,7 +450,7 @@ mod tests {
             let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
             async {
                 absolute_counter!("counter_1", 4, "label" => "one");
-                let _ = describe_counter!("counter_2", "this is a description for counter 2");
+                describe_counter!("counter_2", "this is a description for counter 2");
                 absolute_counter!("counter_2", 2, "label" => "one", "another_label" => "two");
 
                 describe_gauge!("gauge_1", "a description for gauge 1");

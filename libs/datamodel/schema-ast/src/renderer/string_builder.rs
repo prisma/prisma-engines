@@ -1,6 +1,6 @@
 use super::LineWriteable;
 
-pub struct StringBuilder {
+pub(crate) struct StringBuilder {
     buffer: Vec<String>,
 }
 

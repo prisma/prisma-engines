@@ -112,7 +112,7 @@ pub fn parse_schema_parserdb(src: &str) -> Result<ValidatedSchema, String> {
         .to_result()
         .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
 
-    let ast = schema_ast::parser::parse_schema(src, &mut diagnostics);
+    let ast = schema_ast::parse_schema(src, &mut diagnostics);
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
     let datasources = load_sources(&ast, preview_features, &mut diagnostics);
@@ -149,7 +149,7 @@ fn parse_datamodel_internal(
     datamodel_string: &str,
 ) -> Result<Validated<(Configuration, dml::Datamodel)>, diagnostics::Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let ast = schema_ast::parser::parse_schema(datamodel_string, &mut diagnostics);
+    let ast = schema_ast::parse_schema(datamodel_string, &mut diagnostics);
 
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
@@ -179,7 +179,7 @@ fn parse_datamodel_internal(
 
 pub fn parse_schema_ast(datamodel_string: &str) -> Result<ast::SchemaAst, diagnostics::Diagnostics> {
     let mut diagnostics = Diagnostics::default();
-    let schema = schema_ast::parser::parse_schema(datamodel_string, &mut diagnostics);
+    let schema = schema_ast::parse_schema(datamodel_string, &mut diagnostics);
 
     diagnostics.to_result()?;
 
@@ -189,7 +189,7 @@ pub fn parse_schema_ast(datamodel_string: &str) -> Result<ast::SchemaAst, diagno
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
     let mut diagnostics = Diagnostics::default();
-    let ast = schema_ast::parser::parse_schema(schema, &mut diagnostics);
+    let ast = schema_ast::parse_schema(schema, &mut diagnostics);
 
     diagnostics.to_result()?;
 

@@ -3,7 +3,7 @@ use chrono::Utc;
 use migration_engine_tests::test_api::*;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Insert, Value};
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, fmt::Write as _, str::FromStr};
 
 static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
@@ -788,19 +788,23 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
             let column_name = format!("column_{}", idx);
 
-            previous_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @db.{native_type} \n",
+            writeln!(
+                previous_columns,
+                "{column_name}  {prisma_type}? @db.{native_type}",
                 prisma_type = prisma_type(from),
                 native_type = from,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
-            next_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @db.{native_type}\n",
+            writeln!(
+                next_columns,
+                "{column_name}  {prisma_type}? @db.{native_type}",
                 prisma_type = prisma_type(to),
                 native_type = to,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
             insert = insert.value(column_name.clone(), seed.clone());
 
@@ -876,19 +880,23 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             let column_name = format!("column_{}", idx);
 
-            previous_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @db.{native_type} \n",
+            writeln!(
+                previous_columns,
+                "{column_name}  {prisma_type}? @db.{native_type}",
                 prisma_type = prisma_type(from),
                 native_type = from,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
-            next_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @db.{native_type}\n",
+            writeln!(
+                next_columns,
+                "{column_name}  {prisma_type}? @db.{native_type}",
                 prisma_type = prisma_type(to),
                 native_type = to,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
             insert = insert.value(column_name.clone(), seed.clone());
 
@@ -975,19 +983,23 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
             let column_name = format!("column_{}", idx);
 
-            previous_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @db.{native_type} \n",
+            writeln!(
+                previous_columns,
+                "{column_name}  {prisma_type}? @db.{native_type}",
                 prisma_type = prisma_type(from),
                 native_type = from,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
-            next_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @db.{native_type}\n",
+            writeln!(
+                next_columns,
+                "{column_name}  {prisma_type}? @db.{native_type}",
                 prisma_type = prisma_type(to),
                 native_type = to,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
             insert = insert.value(column_name.clone(), seed.clone());
 
@@ -1160,19 +1172,23 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
 
             let column_name = format!("column_{}", idx);
 
-            previous_columns.push_str(&format!(
-                "{column_name}  {prisma_type}[] @db.{native_type} \n",
+            writeln!(
+                previous_columns,
+                "{column_name}  {prisma_type}[] @db.{native_type}",
                 prisma_type = prisma_type(from),
                 native_type = from,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
-            next_columns.push_str(&format!(
-                "{column_name}  {prisma_type} @db.{native_type}\n",
+            writeln!(
+                next_columns,
+                "{column_name}  {prisma_type} @db.{native_type}",
                 prisma_type = prisma_type(to),
                 native_type = to,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
             insert = insert.value(column_name.clone(), seed.clone());
 
