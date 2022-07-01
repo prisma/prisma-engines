@@ -88,16 +88,19 @@ mod interactive_tx {
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err.message.contains("Transaction is no longer valid. Last state"));
+        assert!(known_err
+            .message
+            .contains("A commit cannot be executed on a closed transaction."));
 
-        // Wait for cache eviction, no tx should be found.
-        time::sleep(time::Duration::from_secs(2)).await;
+        // Try again
         let res = runner.commit_tx(tx_id).await?;
         let error = res.err().unwrap();
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err.message.contains("Transaction not found."));
+        assert!(known_err
+            .message
+            .contains("A commit cannot be executed on a closed transaction."));
 
         Ok(())
     }
@@ -275,14 +278,47 @@ mod interactive_tx {
         // Wait for tx to expire
         time::sleep(time::Duration::from_millis(1500)).await;
 
-        // Expect the state of the tx to be expired.
-        // Status of the tx must be `Expired`
+        // Expect the state of the tx to be expired so the commit should fail.
         let res = runner.commit_tx(tx_id.clone()).await?;
         let error = res.err().unwrap();
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err.message.contains("Transaction is no longer valid"));
+        assert!(known_err
+            .message
+            .contains("A commit cannot be executed on a closed transaction."));
+
+        // Expect the state of the tx to be expired so the rollback should fail.
+        let res = runner.rollback_tx(tx_id.clone()).await?;
+        let error = res.err().unwrap();
+        let known_err = error.as_known().unwrap();
+
+        assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
+        assert!(known_err
+            .message
+            .contains("A rollback cannot be executed on a closed transaction."));
+
+        // Expect the state of the tx to be expired so the query should fail.
+        assert_error!(
+            runner,
+            r#"{ findManyTestModel { id } }"#,
+            2028,
+            "A query cannot be executed on a closed transaction."
+        );
+
+        runner
+            .batch(
+                vec![
+                    "{ findManyTestModel { id } }".to_string(),
+                    "{ findManyTestModel { id } }".to_string(),
+                ],
+                false,
+            )
+            .await?
+            .assert_failure(
+                2028,
+                Some("A batch query cannot be executed on a closed transaction.".to_string()),
+            );
 
         Ok(())
     }

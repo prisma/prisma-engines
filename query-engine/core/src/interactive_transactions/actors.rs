@@ -69,24 +69,6 @@ impl ITXServer {
         }
     }
 
-    async fn process_eviction_state_msg(&mut self, op: TxOpRequest) {
-        let msg = match self.cached_tx {
-            CachedTx::Committed => TxOpResponse::Committed(Ok(())),
-            CachedTx::RolledBack => TxOpResponse::RolledBack(Ok(())),
-            CachedTx::Expired => TxOpResponse::Expired,
-            _ => {
-                error!("[{}] unexpected state {}", self.id.to_string(), self.cached_tx);
-                let _ = self.rollback(true).await;
-                let msg = "The transaction was in an unexpected state and rolledback".to_string();
-                let err = Err(TransactionError::Unknown { reason: msg }.into());
-                TxOpResponse::RolledBack(err)
-            }
-        };
-
-        // we ignore any errors when sending
-        let _ = op.respond_to.send(msg);
-    }
-
     async fn execute_single(&mut self, operation: &Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
         let conn = self.cached_tx.as_open()?;
         execute_single_operation(
@@ -255,7 +237,6 @@ pub fn spawn_itx_actor(
     value: OpenTx,
     timeout: Duration,
     channel_size: usize,
-    cache_eviction_secs: u64,
     send_done: Sender<TxId>,
 ) -> ITXClient {
     let (tx_to_server, rx_from_client) = channel::<TxOpRequest>(channel_size);
@@ -293,23 +274,9 @@ pub fn spawn_itx_actor(
             }
 
             trace!("[{}] completed with {}", server.id.to_string(), server.cached_tx);
-            let eviction_sleep = time::sleep(Duration::from_secs(cache_eviction_secs));
-            tokio::pin!(eviction_sleep);
-
-            loop {
-                tokio::select! {
-                    _ = &mut eviction_sleep => {
-                        break;
-                    }
-                    msg = server.receive.recv() => {
-                        if let Some(op) = msg {
-                                server.process_eviction_state_msg(op).await;
-                            }
-                        }
-                }
-            }
 
             let _ = send_done.send(server.id.clone()).await;
+
             trace!("[{}] has stopped with {}", server.id.to_string(), server.cached_tx);
         }
         .with_subscriber(dispatcher),
@@ -361,13 +328,19 @@ pub fn spawn_itx_actor(
 */
 pub fn spawn_client_list_clear_actor(
     clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
+    closed_txs: Arc<RwLock<lru::LruCache<TxId, ()>>>,
     mut rx: Receiver<TxId>,
 ) -> JoinHandle<()> {
     tokio::task::spawn(async move {
         loop {
             if let Some(id) = rx.recv().await {
                 trace!("removing {} from client list", id);
-                clients.write().await.remove(&id);
+
+                let mut clients_guard = clients.write().await;
+                clients_guard.remove(&id);
+                drop(clients_guard);
+
+                closed_txs.write().await.put(id, ());
             }
         }
     })
