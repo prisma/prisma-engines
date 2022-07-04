@@ -195,6 +195,10 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">argument</span>;
 <span class="kw">mod</span> <span class="ident">attribute</span>;
 <span class="kw">mod</span> <span class="ident">comment</span>;
@@ -206,7 +210,9 @@
 <span class="kw">mod</span> <span class="ident">find_at_position</span>;
 <span class="kw">mod</span> <span class="ident">generator_config</span>;
 <span class="kw">mod</span> <span class="ident">identifier</span>;
+<span class="kw">mod</span> <span class="ident">indentation_type</span>;
 <span class="kw">mod</span> <span class="ident">model</span>;
+<span class="kw">mod</span> <span class="ident">newline_type</span>;
 <span class="kw">mod</span> <span class="ident">source_config</span>;
 <span class="kw">mod</span> <span class="ident">top</span>;
 <span class="kw">mod</span> <span class="ident">traits</span>;
@@ -222,7 +228,9 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">find_at_position</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">generator_config::GeneratorConfig</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">identifier::Identifier</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">indentation_type::IndentationType</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">model</span>::{<span class="ident">FieldId</span>, <span class="ident">Model</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">newline_type::NewlineType</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">r#enum</span>::{<span class="ident">Enum</span>, <span class="ident">EnumValue</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">source_config::SourceConfig</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">top::Top</span>;

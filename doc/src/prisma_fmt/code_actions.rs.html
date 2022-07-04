@@ -49,33 +49,61 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">relations</span>;
 
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
+    <span class="ident">ast</span>,
     <span class="ident">datamodel_connector::Diagnostics</span>,
     <span class="ident">parse_schema_ast</span>,
     <span class="ident">parser_database</span>::{<span class="ident">walkers::RefinedRelationWalker</span>, <span class="ident">ParserDatabase</span>},
+    <span class="ident">schema_ast::source_file::SourceFile</span>,
 };
 <span class="kw">use</span> <span class="ident">log::warn</span>;
-<span class="kw">use</span> <span class="ident">lsp_types</span>::{<span class="ident">CodeActionOrCommand</span>, <span class="ident">CodeActionParams</span>};
+<span class="kw">use</span> <span class="ident">lsp_types</span>::{<span class="ident">CodeActionOrCommand</span>, <span class="ident">CodeActionParams</span>, <span class="ident">Diagnostic</span>};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">empty_code_actions</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CodeActionOrCommand</span><span class="op">&gt;</span> {
     <span class="ident">Vec::new</span>()
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">available_actions</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">CodeActionParams</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CodeActionOrCommand</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">schema_ast</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">schema_ast</span>) <span class="op">=</span> <span class="ident">parse_schema_ast</span>(<span class="ident">schema</span>) {
-        <span class="ident">schema_ast</span>
-    } <span class="kw">else</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">available_actions</span>(<span class="ident">schema</span>: <span class="ident">String</span>, <span class="ident">params</span>: <span class="ident">CodeActionParams</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CodeActionOrCommand</span><span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="ident">parse_schema_ast</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>).<span class="ident">is_err</span>() {
         <span class="macro">warn!</span>(<span class="string">&quot;Failed to parse schema AST in code action request.&quot;</span>);
         <span class="kw">return</span> <span class="ident">empty_code_actions</span>();
     };
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actions</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
+    <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">SourceFile::new_allocated</span>(<span class="ident">Arc::from</span>(<span class="ident">schema</span>.<span class="ident">into_boxed_str</span>()));
+
     <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diag</span> <span class="op">=</span> <span class="ident">Diagnostics::new</span>();
-        <span class="ident">ParserDatabase::new</span>(<span class="ident">schema_ast</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diag</span>)
+        <span class="ident">ParserDatabase::new</span>(<span class="ident">file</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">diag</span>)
     };
 
     <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_relations</span>() {
@@ -85,15 +113,35 @@
                 <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>,
             };
 
-            <span class="ident">relations::add_referenced_side_unique</span>(<span class="kw-2">&amp;mut</span> <span class="ident">actions</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>, <span class="ident">schema</span>, <span class="ident">complete_relation</span>);
+            <span class="ident">relations::add_referenced_side_unique</span>(<span class="kw-2">&amp;mut</span> <span class="ident">actions</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>, <span class="ident">file</span>.<span class="ident">as_str</span>(), <span class="ident">complete_relation</span>);
 
             <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">is_one_to_one</span>() {
-                <span class="ident">relations::add_referencing_side_unique</span>(<span class="kw-2">&amp;mut</span> <span class="ident">actions</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>, <span class="ident">schema</span>, <span class="ident">complete_relation</span>);
+                <span class="ident">relations::add_referencing_side_unique</span>(<span class="kw-2">&amp;mut</span> <span class="ident">actions</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>, <span class="ident">file</span>.<span class="ident">as_str</span>(), <span class="ident">complete_relation</span>);
             }
         }
     }
 
     <span class="ident">actions</span>
+}
+
+<span class="doccomment">/// A function to find diagnostics matching the given span. Used for</span>
+<span class="doccomment">/// copying the diagnostics to a code action quick fix.</span>
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">diagnostics_for_span</span>(
+    <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span>[<span class="ident">Diagnostic</span>],
+    <span class="ident">span</span>: <span class="ident">ast::Span</span>,
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">diagnostics</span>
+        .<span class="ident">iter</span>()
+        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">diag</span><span class="op">|</span> <span class="ident">span</span>.<span class="ident">overlaps</span>(<span class="ident"><span class="kw">crate</span>::range_to_span</span>(<span class="ident">diag</span>.<span class="ident">range</span>, <span class="ident">schema</span>)))
+        .<span class="ident">cloned</span>()
+        .<span class="ident">collect</span>();
+
+    <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">is_empty</span>() {
+        <span class="prelude-val">None</span>
+    } <span class="kw">else</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">res</span>)
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_fmt" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>

@@ -278,11 +278,58 @@
 <span id="273">273</span>
 <span id="274">274</span>
 <span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">primary_key</span>;
 <span class="kw">mod</span> <span class="ident">unique_criteria</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">primary_key</span>::<span class="kw-2">*</span>;
+
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">unique_criteria</span>::<span class="kw-2">*</span>;
+
+<span class="kw">use</span> <span class="ident">schema_ast::ast</span>::{<span class="ident">IndentationType</span>, <span class="ident">NewlineType</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">CompleteInlineRelationWalker</span>, <span class="ident">IndexWalker</span>, <span class="ident">InlineRelationWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationWalker</span>,
@@ -551,6 +598,47 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">complete_inline_relations_from</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
         <span class="self">self</span>.<span class="ident">inline_relations_from</span>()
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">relation</span><span class="op">|</span> <span class="ident">relation</span>.<span class="ident">as_complete</span>())
+    }
+
+    <span class="doccomment">/// How fields and arguments are indented in the model.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indentation</span>(<span class="self">self</span>) -&gt; <span class="ident">IndentationType</span> {
+        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">scalar_fields</span>().<span class="ident">last</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">IndentationType::default</span>(),
+        };
+
+        <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">source</span>();
+        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>.<span class="ident">start</span>;
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spaces</span> <span class="op">=</span> <span class="number">0</span>;
+
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> (<span class="number">0</span>..<span class="ident">start</span>).<span class="ident">rev</span>() {
+            <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">is_char_boundary</span>(<span class="ident">i</span>) {
+                <span class="kw">match</span> <span class="ident">src</span>[<span class="ident">i</span>..].<span class="ident">chars</span>().<span class="ident">next</span>() {
+                    <span class="prelude-val">Some</span>(<span class="string">&#39;\t&#39;</span>) =&gt; <span class="kw">return</span> <span class="ident">IndentationType::Tabs</span>,
+                    <span class="prelude-val">Some</span>(<span class="string">&#39; &#39;</span>) =&gt; <span class="ident">spaces</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
+                    <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="ident">IndentationType::Spaces</span>(<span class="ident">spaces</span>),
+                }
+            }
+        }
+
+        <span class="ident">IndentationType::default</span>()
+    }
+
+    <span class="doccomment">/// What kind of newlines the model uses.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">newline</span>(<span class="self">self</span>) -&gt; <span class="ident">NewlineType</span> {
+        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">scalar_fields</span>().<span class="ident">last</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">NewlineType::default</span>(),
+        };
+
+        <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">source</span>();
+        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>.<span class="ident">end</span> <span class="op">-</span> <span class="number">2</span>;
+
+        <span class="kw">match</span> <span class="ident">src</span>.<span class="ident">chars</span>().<span class="ident">nth</span>(<span class="ident">start</span>) {
+            <span class="prelude-val">Some</span>(<span class="string">&#39;\r&#39;</span>) =&gt; <span class="ident">NewlineType::Windows</span>,
+            <span class="kw">_</span> =&gt; <span class="ident">NewlineType::Unix</span>,
+        }
     }
 }
 </code></pre></div>

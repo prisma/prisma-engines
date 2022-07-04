@@ -39,13 +39,15 @@
 <span id="34">34</span>
 <span id="35">35</span>
 <span id="36">36</span>
+<span id="37">37</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::migrations_directory::MigrationDirectory</span>;
+<span class="kw">use</span> <span class="ident">datamodel::schema_ast::source_file::SourceFile</span>;
 <span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
 
 <span class="doccomment">/// Diffable things</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// A Prisma schema.</span>
-    <span class="ident">Datamodel</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+    <span class="ident">Datamodel</span>(<span class="ident">SourceFile</span>),
     <span class="doccomment">/// A migrations folder. What is diffable is the state of the database schema at the end of the</span>
     <span class="doccomment">/// migrations history.</span>
     <span class="ident">Migrations</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">MigrationDirectory</span>]),
@@ -70,7 +72,7 @@
     <span class="doccomment">/// Try interpreting the DiffTarget as a Datamodel variant.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_datamodel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DiffTarget::Datamodel</span>(<span class="ident">schema</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">schema</span>),
+            <span class="ident">DiffTarget::Datamodel</span>(<span class="ident">schema</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">schema</span>.<span class="ident">as_str</span>()),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
