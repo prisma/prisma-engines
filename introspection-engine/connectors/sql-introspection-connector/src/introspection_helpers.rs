@@ -9,13 +9,12 @@ use datamodel::{
 use sql::walkers::{ColumnWalker, ForeignKeyWalker, TableWalker};
 use sql_schema_describer::{
     self as sql, mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, ColumnArity, ColumnTypeFamily, ForeignKeyAction,
-    IndexFieldId, IndexType, SQLSortOrder, SqlSchema,
+    IndexType, SQLSortOrder, SqlSchema,
 };
 use std::collections::HashSet;
 use tracing::debug;
 
-//checks
-pub fn is_old_migration_table(table: TableWalker<'_>) -> bool {
+pub(crate) fn is_old_migration_table(table: TableWalker<'_>) -> bool {
     table.name() == "_Migration"
         && table.columns().any(|c| c.name() == "revision")
         && table.columns().any(|c| c.name() == "name")
@@ -30,7 +29,7 @@ pub fn is_old_migration_table(table: TableWalker<'_>) -> bool {
         && table.columns().any(|c| c.name() == "finished_at")
 }
 
-pub fn is_new_migration_table(table: TableWalker<'_>) -> bool {
+pub(crate) fn is_new_migration_table(table: TableWalker<'_>) -> bool {
     table.name() == "_prisma_migrations"
         && table.columns().any(|c| c.name() == "id")
         && table.columns().any(|c| c.name() == "checksum")
@@ -98,7 +97,7 @@ fn common_prisma_m_to_n_relation_conditions(table: TableWalker<'_>) -> bool {
             i.columns().len() == 2
                 && is_a(i.columns().next().unwrap().as_column().name())
                 && is_b(i.columns().nth(1).unwrap().as_column().name())
-                && i.index_type().is_unique()
+                && i.is_unique()
         })
     //INDEX [B]
     && table
@@ -141,7 +140,7 @@ pub fn calculate_many_to_many_field(
     RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
 }
 
-pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Context) -> IndexDefinition {
+pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Context) -> Option<IndexDefinition> {
     let tpe = match index.index_type() {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
         IndexType::Normal => datamodel::dml::IndexType::Normal,
@@ -149,6 +148,7 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Co
             datamodel::dml::IndexType::Fulltext
         }
         IndexType::Fulltext => datamodel::dml::IndexType::Normal,
+        IndexType::PrimaryKey => return None,
     };
 
     // We do not populate name in client by default. It increases datamodel noise, and we would
@@ -156,20 +156,18 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Co
     // keep them. This is a change in introspection behaviour, but due to re-introspection previous
     // datamodels and clients should keep working as before.
 
-    IndexDefinition {
+    Some(IndexDefinition {
         name: None,
         db_name: Some(index.name().to_owned()),
         fields: index
             .columns()
-            .enumerate()
-            .map(|(i, c)| {
+            .map(|c| {
                 let sort_order = c.sort_order().map(|sort| match sort {
                     SQLSortOrder::Asc => SortOrder::Asc,
                     SQLSortOrder::Desc => SortOrder::Desc,
                 });
 
-                let index_field_id = IndexFieldId(index.id, i as u32);
-                let operator_class = get_opclass(index_field_id, index.schema, ctx);
+                let operator_class = get_opclass(c.id, index.schema, ctx);
 
                 IndexField {
                     path: vec![(c.as_column().name().to_owned(), None)],
@@ -183,13 +181,13 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Co
         defined_on_field: index.columns().len() == 1,
         algorithm: index_algorithm(index, ctx),
         clustered: index_is_clustered(index.id, index.schema, ctx),
-    }
+    })
 }
 
 pub(crate) fn calculate_scalar_field(column: ColumnWalker<'_>, ctx: &mut Context) -> ScalarField {
     debug!("Handling column {:?}", column);
 
-    let field_type = calculate_scalar_field_type_with_native_types(column.column(), ctx);
+    let field_type = calculate_scalar_field_type_with_native_types(column, ctx);
 
     let is_id = column.is_single_primary_key();
     let arity = match column.column_type().arity {
@@ -199,7 +197,7 @@ pub(crate) fn calculate_scalar_field(column: ColumnWalker<'_>, ctx: &mut Context
         ColumnArity::List => FieldArity::List,
     };
 
-    let default_value = crate::defaults::calculate_default(column.table().table(), column.column(), ctx);
+    let default_value = crate::defaults::calculate_default(column, ctx);
 
     ScalarField {
         name: column.name().to_owned(),
@@ -287,10 +285,12 @@ pub(crate) fn calculate_backrelation_field(
                         .map(|c| c.as_column().name().to_string())
                         .collect::<Vec<_>>(),
                     &relation_info.fields,
-                ) && i.index_type().is_unique()
+                ) && i.is_unique()
             }) || columns_match(
                 &table
                     .primary_key_columns()
+                    .into_iter()
+                    .flatten()
                     .map(|c| c.as_column().name().to_owned())
                     .collect::<Vec<_>>(),
                 &relation_info.fields,
@@ -344,11 +344,11 @@ fn calculate_relation_name(
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_for_native_type(column: &sql::Column) -> FieldType {
-    debug!("Calculating field type for '{}'", column.name);
-    let fdt = column.tpe.full_data_type.to_owned();
+pub(crate) fn calculate_scalar_field_type_for_native_type(column: ColumnWalker<'_>) -> FieldType {
+    debug!("Calculating field type for '{}'", column.name());
+    let fdt = column.column_type().full_data_type.to_owned();
 
-    match &column.tpe.family {
+    match column.column_type_family() {
         ColumnTypeFamily::Int => FieldType::Scalar(ScalarType::Int, None),
         ColumnTypeFamily::BigInt => FieldType::Scalar(ScalarType::BigInt, None),
         ColumnTypeFamily::Float => FieldType::Scalar(ScalarType::Float, None),
@@ -364,12 +364,15 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &sql::Column) 
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_with_native_types(column: &sql::Column, ctx: &mut Context) -> FieldType {
-    debug!("Calculating native field type for '{}'", column.name);
+pub(crate) fn calculate_scalar_field_type_with_native_types(
+    column: sql::ColumnWalker<'_>,
+    ctx: &mut Context,
+) -> FieldType {
+    debug!("Calculating native field type for '{}'", column.name());
     let scalar_type = calculate_scalar_field_type_for_native_type(column);
 
     match scalar_type {
-        FieldType::Scalar(scal_type, _) => match &column.tpe.native_type {
+        FieldType::Scalar(scal_type, _) => match &column.column_type().native_type {
             None => scalar_type,
             Some(native_type) => {
                 let native_type_instance = ctx.source.active_connector.introspect_native_type(native_type.clone());
@@ -441,7 +444,7 @@ fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &mut Context) -> O
         return None;
     }
 
-    let data: &PostgresSchemaExt = index.schema.downcast_connector_data().unwrap_or_default();
+    let data: &PostgresSchemaExt = index.schema.downcast_connector_data();
 
     Some(match data.index_algorithm(index.id) {
         sql::postgres::SqlIndexAlgorithm::BTree => IndexAlgorithm::BTree,
@@ -458,27 +461,27 @@ fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &mut Cont
         return None;
     }
 
-    let ext: &MssqlSchemaExt = schema.downcast_connector_data().unwrap_or_default();
+    let ext: &MssqlSchemaExt = schema.downcast_connector_data();
 
     Some(ext.index_is_clustered(index_id))
 }
 
-pub(crate) fn primary_key_is_clustered(table_id: sql::TableId, ctx: &mut Context) -> Option<bool> {
+pub(crate) fn primary_key_is_clustered(pkid: sql::IndexId, ctx: &mut Context) -> Option<bool> {
     if !ctx.sql_family().is_mssql() {
         return None;
     }
 
-    let ext: &MssqlSchemaExt = ctx.schema.downcast_connector_data().unwrap_or_default();
+    let ext: &MssqlSchemaExt = ctx.schema.downcast_connector_data();
 
-    Some(ext.pk_is_clustered(table_id))
+    Some(ext.index_is_clustered(pkid))
 }
 
-fn get_opclass(index_field_id: sql::IndexFieldId, schema: &SqlSchema, ctx: &mut Context) -> Option<OperatorClass> {
+fn get_opclass(index_field_id: sql::IndexColumnId, schema: &SqlSchema, ctx: &mut Context) -> Option<OperatorClass> {
     if !ctx.sql_family().is_postgres() {
         return None;
     }
 
-    let ext: &PostgresSchemaExt = schema.downcast_connector_data().unwrap_or_default();
+    let ext: &PostgresSchemaExt = schema.downcast_connector_data();
 
     let opclass = match ext.get_opclass(index_field_id) {
         Some(opclass) => opclass,

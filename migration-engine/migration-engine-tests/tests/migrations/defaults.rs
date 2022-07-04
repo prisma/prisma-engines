@@ -1,6 +1,6 @@
 use migration_engine_tests::test_api::*;
 use prisma_value::PrismaValue;
-use sql_schema_describer::{DefaultKind, DefaultValue};
+use sql_schema_describer::{DefaultKind, DefaultValue, SqlSchemaExt};
 
 // MySQL 5.7 and MariaDB are skipped, because the datamodel parser gives us a
 // chrono DateTime, and we don't render that in the exact expected format.
@@ -466,12 +466,14 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
         .assert_no_steps();
 
     let sql_schema = api.assert_schema().into_schema();
-    let (table_id, _) = sql_schema.table_bang(&api.normalize_identifier("Fruit"));
+    let table_id = sql_schema.table_walker(&api.normalize_identifier("Fruit")).unwrap().id;
 
     if api.is_mssql() {
         let default = sql_schema
-            .find_column(table_id, "sideNames")
-            .and_then(|(_, c)| c.default.clone())
+            .walk(table_id)
+            .column("sideNames")
+            .unwrap()
+            .default()
             .unwrap();
         assert_eq!(DefaultValue::value("top\ndown").kind(), default.kind());
         assert!(default
@@ -479,10 +481,7 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
             .map(|cn| cn.starts_with("Fruit_sideNames_df"))
             .unwrap());
 
-        let default = sql_schema
-            .find_column(table_id, "contains")
-            .and_then(|(_, c)| c.default.clone())
-            .unwrap();
+        let default = sql_schema.walk(table_id).column("contains").unwrap().default().unwrap();
         assert_eq!(DefaultValue::value("'potassium'").kind(), default.kind());
         assert!(default
             .constraint_name()
@@ -490,8 +489,10 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
             .unwrap());
 
         let default = sql_schema
-            .find_column(table_id, "seasonality")
-            .and_then(|(_, c)| c.default.clone())
+            .walk(table_id)
+            .column("seasonality")
+            .unwrap()
+            .default()
             .unwrap();
         assert_eq!(DefaultValue::value(r#""summer""#).kind(), default.kind());
         assert!(default
@@ -500,24 +501,16 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
             .unwrap());
     } else {
         assert_eq!(
-            sql_schema
-                .find_column(table_id, "sideNames")
-                .and_then(|(_, c)| c.default.clone()),
-            Some(DefaultValue::value(PrismaValue::String("top\ndown".to_string())))
+            sql_schema.walk(table_id).column("sideNames").unwrap().default(),
+            Some(&DefaultValue::value(PrismaValue::String("top\ndown".to_string())))
         );
-
         assert_eq!(
-            sql_schema
-                .find_column(table_id, "contains")
-                .and_then(|(_, c)| c.default.clone()),
-            Some(DefaultValue::value(PrismaValue::String("'potassium'".to_string())))
+            sql_schema.walk(table_id).column("contains").unwrap().default(),
+            Some(&DefaultValue::value(PrismaValue::String("'potassium'".to_string())))
         );
-
         assert_eq!(
-            sql_schema
-                .find_column(table_id, "seasonality")
-                .and_then(|(_, c)| c.default.clone()),
-            Some(DefaultValue::value(PrismaValue::String(r#""summer""#.to_string())))
+            sql_schema.walk(table_id).column("seasonality").unwrap().default(),
+            Some(&DefaultValue::value(PrismaValue::String(r#""summer""#.to_string())))
         );
     }
 }

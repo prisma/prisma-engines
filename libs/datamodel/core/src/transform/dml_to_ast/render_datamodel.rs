@@ -193,7 +193,7 @@ fn render_field_attributes(field: &Field, model: &Model, params: RenderParams<'_
                 args.push((Some("name"), string_literal(name).to_string()));
             }
 
-            if let Some(db_name) = &pk.db_name {
+            if let Some(db_name) = pk.db_name.as_ref().filter(|s| !s.is_empty()) {
                 if !primary_key_name_matches(pk, model, params.connector()) {
                     args.push((Some("map"), string_literal(db_name).to_string()));
                 }
@@ -268,7 +268,7 @@ fn render_field_attributes(field: &Field, model: &Model, params: RenderParams<'_
             }
         }
 
-        if let Some(fk_name) = &relation_info.fk_name {
+        if let Some(fk_name) = relation_info.fk_name.as_ref().filter(|s| !s.is_empty()) {
             if let Some(src) = params.datasource {
                 if !foreign_key_name_matches(relation_info, parent_model, &*src.active_connector) {
                     args.push((Some("map"), string_literal(fk_name).to_string()));
@@ -434,7 +434,7 @@ fn render_model_attributes(model: &dml::Model, params: RenderParams<'_>, out: &m
                 args.push((Some("name"), string_literal(name).to_string()));
             }
 
-            if let (Some(db_name), Some(src)) = (&pk.db_name, params.datasource) {
+            if let (Some(db_name), Some(src)) = (pk.db_name.as_ref().filter(|s| !s.is_empty()), params.datasource) {
                 if !primary_key_name_matches(pk, model, &*src.active_connector) {
                     args.push((Some("map"), string_literal(db_name).to_string()));
                 }
@@ -560,7 +560,7 @@ fn push_index_arguments(
         args.push((Some("name"), string_literal(name).to_string()));
     }
 
-    if let Some(mapped_name) = &index.db_name {
+    if let Some(mapped_name) = index.db_name.as_ref().filter(|s| !s.is_empty()) {
         if !index_name_matches(index, params.datamodel, model, params.connector()) {
             args.push((Some("map"), string_literal(mapped_name).to_string()));
         }

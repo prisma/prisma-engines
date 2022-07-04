@@ -6,26 +6,22 @@ use crate::{
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase, table::TableDiffer, ColumnChanges},
 };
 use native_types::{MsSqlType, MsSqlTypeParameter};
-use sql_schema_describer::{
-    mssql::MssqlSchemaExt,
-    walkers::{ColumnWalker, IndexWalker},
-    ColumnId, ColumnTypeFamily,
-};
+use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt, ColumnId, ColumnTypeFamily};
 
 impl SqlSchemaDifferFlavour for MssqlFlavour {
     fn can_rename_foreign_key(&self) -> bool {
         true
     }
 
-    fn indexes_match(&self, a: IndexWalker<'_>, b: IndexWalker<'_>) -> bool {
-        let mssql_ext_previous: &MssqlSchemaExt = a.schema.downcast_connector_data().unwrap_or_default();
-        let mssql_ext_next: &MssqlSchemaExt = b.schema.downcast_connector_data().unwrap_or_default();
+    fn indexes_match(&self, a: sql::IndexWalker<'_>, b: sql::IndexWalker<'_>) -> bool {
+        let mssql_ext_previous: &MssqlSchemaExt = a.schema.downcast_connector_data();
+        let mssql_ext_next: &MssqlSchemaExt = b.schema.downcast_connector_data();
 
         mssql_ext_previous.index_is_clustered(a.id) == mssql_ext_next.index_is_clustered(b.id)
     }
 
-    fn should_skip_index_for_new_table(&self, index: IndexWalker<'_>) -> bool {
-        index.index_type().is_unique()
+    fn should_skip_index_for_new_table(&self, index: sql::IndexWalker<'_>) -> bool {
+        index.is_unique()
     }
 
     fn should_recreate_the_primary_key_on_column_recreate(&self) -> bool {
@@ -57,7 +53,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
             .collect();
     }
 
-    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: Pair<sql::ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         let previous_family = differ.previous.column_type_family();
         let next_family = differ.next.column_type_family();
         let previous_type: Option<MsSqlType> = differ.previous.column_native_type();
@@ -69,11 +65,12 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
         }
     }
 
-    fn primary_key_changed(&self, tables: Pair<sql_schema_describer::walkers::TableWalker<'_>>) -> bool {
-        let previous_ext: &MssqlSchemaExt = tables.previous.schema.downcast_connector_data().unwrap_or_default();
-        let next_ext: &MssqlSchemaExt = tables.next.schema.downcast_connector_data().unwrap_or_default();
-
-        previous_ext.pk_is_clustered(tables.previous.id) != next_ext.pk_is_clustered(tables.next.id)
+    fn primary_key_changed(&self, tables: Pair<sql::TableWalker<'_>>) -> bool {
+        let pk_clusterings = tables.map(|t| {
+            let ext: &MssqlSchemaExt = t.schema.downcast_connector_data();
+            t.primary_key().map(|pk| ext.index_is_clustered(pk.id)).unwrap_or(false)
+        });
+        pk_clusterings.previous != pk_clusterings.next
     }
 
     fn push_index_changes_for_column_changes(
@@ -93,7 +90,6 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
                 .any(|col| col.as_column().id == column_id.previous)
         }) {
             steps.push(SqlMigrationStep::DropIndex {
-                table_id: table.previous().id,
                 index_id: dropped_index.previous.id,
             })
         }

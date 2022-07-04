@@ -882,24 +882,27 @@ fn fulltext_index(api: TestApi) {
 
 #[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
 fn fulltext_index_with_map(api: TestApi) {
-    let dm = formatdoc! {r#"
-        {}
+    let dm = indoc! {r#"
+        datasource db {
+            provider = "mysql"
+            url = env("TEST_DATABASE_URL")
+        }
 
-        generator client {{
+        generator client {
           provider = "prisma-client-js"
           previewFeatures = ["fullTextIndex"]
-        }}
+        }
 
-        model A {{
+        model A {
           id Int    @id
           a  String @db.Text
           b  String @db.Text
 
           @@fulltext([a, b], map: "with_map")
-        }}
-    "#, api.datasource_block()};
+        }
+    "#};
 
-    api.schema_push(&dm).send().assert_green();
+    api.schema_push(dm).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["a", "b"], |index| index.assert_is_fulltext().assert_name("with_map"))

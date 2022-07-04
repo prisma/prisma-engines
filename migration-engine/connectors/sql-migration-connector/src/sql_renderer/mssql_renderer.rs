@@ -95,7 +95,7 @@ impl SqlRenderer for MssqlFlavour {
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: Pair<&SqlSchema>) -> Vec<String> {
         let AlterTable { table_ids, changes } = alter_table;
-        let tables = schemas.tables(*table_ids);
+        let tables = schemas.walk(*table_ids);
         alter_table::create_statements(self, tables, changes)
     }
 
@@ -123,12 +123,12 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_create_index(&self, index: IndexWalker<'_>) -> String {
-        let mssql_schema_ext: &MssqlSchemaExt = index.schema.downcast_connector_data().unwrap_or_default();
+        let mssql_schema_ext: &MssqlSchemaExt = index.schema.downcast_connector_data();
         let index_name = self.quote(index.name());
         let table_reference = self.quote_with_schema(index.table().name()).to_string();
 
         let columns = index.columns().map(|c| {
-            let mut rendered = format!("{}", self.quote(c.get().name()));
+            let mut rendered = Quoted::mssql_ident(c.as_column().name()).to_string();
 
             if let Some(sort_order) = c.sort_order() {
                 rendered.push(' ');
@@ -156,21 +156,21 @@ impl SqlRenderer for MssqlFlavour {
                 format!("CREATE {clustering}INDEX {index_name} ON {table_reference}({columns})",)
             }
             IndexType::Fulltext => todo!("SQL Server full-text indices..."),
+            IndexType::PrimaryKey => unreachable!(),
         }
     }
 
     fn render_create_table_as(&self, table: TableWalker<'_>, table_name: &str) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n    ");
-        let mssql_schema_ext: &MssqlSchemaExt = table.schema.downcast_connector_data().unwrap_or_default();
+        let mssql_schema_ext: &MssqlSchemaExt = table.schema.downcast_connector_data();
 
         let primary_key = if let Some(pk) = table.primary_key() {
             let column_names = pk
-                .columns
-                .iter()
+                .columns()
                 .map(|col| {
-                    let mut rendered = format!("{}", self.quote(col.name()));
+                    let mut rendered = Quoted::mssql_ident(col.name()).to_string();
 
-                    if let Some(sort_order) = col.sort_order {
+                    if let Some(sort_order) = col.sort_order() {
                         rendered.push(' ');
                         rendered.push_str(sort_order.as_ref());
                     }
@@ -179,30 +179,27 @@ impl SqlRenderer for MssqlFlavour {
                 })
                 .join(",");
 
-            let clustering = if mssql_schema_ext.pk_is_clustered(table.id) {
+            let clustering = if mssql_schema_ext.index_is_clustered(pk.id) {
                 " CLUSTERED"
             } else {
                 " NONCLUSTERED"
             };
 
-            let constraint_name = self.quote(pk.constraint_name.as_ref().unwrap());
+            let constraint_name = Quoted::mssql_ident(pk.name());
 
             format!(",\n    CONSTRAINT {constraint_name} PRIMARY KEY{clustering} ({column_names})",)
         } else {
             String::new()
         };
 
-        let constraints = table
-            .indexes()
-            .filter(|index| index.index_type().is_unique())
-            .collect::<Vec<_>>();
+        let constraints = table.indexes().filter(|index| index.is_unique()).collect::<Vec<_>>();
 
         let constraints = if !constraints.is_empty() {
             let constraints = constraints
                 .iter()
                 .map(|index| {
                     let columns = index.columns().map(|col| {
-                        let mut rendered = format!("{}", self.quote(col.get().name()));
+                        let mut rendered = format!("{}", self.quote(col.as_column().name()));
 
                         if let Some(sort_order) = col.sort_order() {
                             rendered.push(' ');
@@ -255,7 +252,7 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
-        let ext: &MssqlSchemaExt = index.schema.downcast_connector_data().unwrap_or_default();
+        let ext: &MssqlSchemaExt = index.schema.downcast_connector_data();
 
         if ext.index_is_a_constraint(index.id) {
             format!(
@@ -277,7 +274,7 @@ impl SqlRenderer for MssqlFlavour {
         let mut result = vec!["BEGIN TRANSACTION".to_string()];
 
         for redefine_table in tables {
-            let tables = schemas.tables(redefine_table.table_ids);
+            let tables = schemas.walk(redefine_table.table_ids);
             // This is a copy of our new modified table.
             let temporary_table_name = format!("_prisma_new_{}", &tables.next.name());
 
@@ -285,18 +282,18 @@ impl SqlRenderer for MssqlFlavour {
             let needs_autoincrement = redefine_table
                 .column_pairs
                 .iter()
-                .any(|(column_indexes, _, _)| schemas.columns(*column_indexes).next.is_autoincrement());
+                .any(|(column_indexes, _, _)| schemas.walk(*column_indexes).next.is_autoincrement());
 
             // Let's make the [columns] nicely rendered.
             let columns: Vec<_> = redefine_table
                 .column_pairs
                 .iter()
-                .map(|(column_indexes, _, _)| schemas.columns(*column_indexes).next.name())
+                .map(|(column_indexes, _, _)| schemas.walk(*column_indexes).next.name())
                 .map(|c| self.quote(c).to_string())
                 .collect();
 
             // Drop the indexes on the table.
-            for index in tables.previous.indexes() {
+            for index in tables.previous.indexes().filter(|idx| !idx.is_primary_key()) {
                 result.push(self.render_drop_index(index));
             }
 
@@ -355,7 +352,7 @@ impl SqlRenderer for MssqlFlavour {
             result.push(self.render_rename_table(&temporary_table_name, tables.next.name()));
 
             // Recreate the indexes.
-            for index in tables.next.indexes().filter(|i| !i.index_type().is_unique()) {
+            for index in tables.next.indexes().filter(|i| !i.is_unique() && !i.is_primary_key()) {
                 result.push(self.render_create_index(index));
             }
         }

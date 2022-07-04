@@ -1,6 +1,5 @@
 use crate::test_api::*;
 use barrel::{types, Migration};
-use indoc::indoc;
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
@@ -95,19 +94,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
             tables: [
                 Table {
                     name: "User",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "primary_col",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: None,
-                        },
-                    ),
                 },
             ],
             enums: [
@@ -914,6 +900,29 @@ fn all_mysql_column_types_must_work(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -975,19 +984,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
             tables: [
                 Table {
                     name: "User",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "primary_col",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: None,
-                        },
-                    ),
                 },
             ],
             enums: [
@@ -1794,6 +1790,29 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -1855,19 +1874,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
             tables: [
                 Table {
                     name: "User",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "primary_col",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: None,
-                        },
-                    ),
                 },
             ],
             enums: [
@@ -2669,6 +2675,29 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -2737,29 +2766,9 @@ fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
     let full_sql = migration.make::<barrel::backend::MySql>();
     api.raw_cmd(&full_sql);
     let result = api.describe();
-    let (_, table) = result.table_bang("Employee");
-
-    let columns = vec![
-        IndexColumn {
-            name: "name".into(),
-            sort_order: Some(SQLSortOrder::Asc),
-            length: None,
-        },
-        IndexColumn {
-            name: "age".into(),
-            sort_order: Some(SQLSortOrder::Asc),
-            length: None,
-        },
-    ];
-
-    assert_eq!(
-        table.indices,
-        &[Index {
-            name: "age_and_name_index".into(),
-            columns,
-            tpe: IndexType::Unique,
-        }]
-    );
+    result.assert_table("Employee", |t| {
+        t.assert_index_on_columns(&["name", "age"], |idx| idx.assert_name("age_and_name_index"))
+    });
 }
 
 #[test_connector(tags(Mysql), exclude(Mysql8))]
@@ -2775,29 +2784,9 @@ fn old_mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
     let full_sql = migration.make::<barrel::backend::MySql>();
     api.raw_cmd(&full_sql);
     let result = api.describe();
-    let (_, table) = result.table_bang("Employee");
-
-    let columns = vec![
-        IndexColumn {
-            name: "name".into(),
-            sort_order: Some(SQLSortOrder::Asc),
-            length: None,
-        },
-        IndexColumn {
-            name: "age".into(),
-            sort_order: Some(SQLSortOrder::Asc),
-            length: None,
-        },
-    ];
-
-    assert_eq!(
-        table.indices,
-        &[Index {
-            name: "age_and_name_index".into(),
-            columns,
-            tpe: IndexType::Unique,
-        }]
-    );
+    result.assert_table("Employee", |t| {
+        t.assert_index_on_columns(&["name", "age"], |idx| idx.assert_name("age_and_name_index"))
+    });
 }
 
 #[test_connector(tags(Mysql))]
@@ -2873,49 +2862,9 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
             tables: [
                 Table {
                     name: "Post",
-                    indices: [
-                        Index {
-                            name: "user_id",
-                            columns: [
-                                IndexColumn {
-                                    name: "user_id",
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                    length: None,
-                                },
-                            ],
-                            tpe: Normal,
-                        },
-                    ],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "id",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: None,
-                        },
-                    ),
                 },
                 Table {
                     name: "User",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "id",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: None,
-                        },
-                    ),
                 },
             ],
             enums: [],
@@ -3015,6 +2964,67 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     ),
                 },
             ],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "user_id",
+                    tpe: Normal,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: ColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        2,
+                    ),
+                    column_id: ColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -3038,8 +3048,6 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
             tables: [
                 Table {
                     name: "User",
-                    indices: [],
-                    primary_key: None,
                 },
             ],
             enums: [],
@@ -3078,6 +3086,8 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [],
+            index_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -3102,8 +3112,6 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             tables: [
                 Table {
                     name: "string_defaults_test",
-                    indices: [],
-                    primary_key: None,
                 },
             ],
             enums: [],
@@ -3173,6 +3181,8 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [],
+            index_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -3197,8 +3207,6 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
             tables: [
                 Table {
                     name: "test",
-                    indices: [],
-                    primary_key: None,
                 },
             ],
             enums: [],
@@ -3237,6 +3245,8 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [],
+            index_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -3272,8 +3282,6 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
             tables: [
                 Table {
                     name: "game",
-                    indices: [],
-                    primary_key: None,
                 },
             ],
             enums: [
@@ -3619,6 +3627,8 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [],
+            index_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -3650,155 +3660,23 @@ fn dangling_foreign_keys_are_filtered_out(api: TestApi) {
     "#;
 
     api.raw_cmd(setup);
+    let result = api.describe();
+    let fks: Vec<_> = result
+        .walk_foreign_keys()
+        .map(|fk| (fk.constraint_name(), fk.referenced_table().name()))
+        .collect();
 
     let expectation = expect![[r#"
-        SqlSchema {
-            tables: [
-                Table {
-                    name: "dog",
-                    indices: [
-                        Index {
-                            name: "bestFriendId",
-                            columns: [
-                                IndexColumn {
-                                    name: "bestFriendId",
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                    length: None,
-                                },
-                            ],
-                            tpe: Normal,
-                        },
-                    ],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "id",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: None,
-                        },
-                    ),
-                },
-                Table {
-                    name: "platypus",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "id",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: None,
-                        },
-                    ),
-                },
-            ],
-            enums: [],
-            columns: [
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "id",
-                        tpe: ColumnType {
-                            full_data_type: "int(11)",
-                            family: Int,
-                            arity: Required,
-                            native_type: Some(
-                                String(
-                                    "Int",
-                                ),
-                            ),
-                        },
-                        default: None,
-                        auto_increment: false,
-                    },
+        [
+            (
+                Some(
+                    "dog_ibfk_2",
                 ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "bestFriendId",
-                        tpe: ColumnType {
-                            full_data_type: "int(11)",
-                            family: Int,
-                            arity: Nullable,
-                            native_type: Some(
-                                String(
-                                    "Int",
-                                ),
-                            ),
-                        },
-                        default: None,
-                        auto_increment: false,
-                    },
-                ),
-                (
-                    TableId(
-                        1,
-                    ),
-                    Column {
-                        name: "id",
-                        tpe: ColumnType {
-                            full_data_type: "int(11)",
-                            family: Int,
-                            arity: Required,
-                            native_type: Some(
-                                String(
-                                    "Int",
-                                ),
-                            ),
-                        },
-                        default: None,
-                        auto_increment: false,
-                    },
-                ),
-            ],
-            foreign_keys: [
-                ForeignKey {
-                    constrained_table: TableId(
-                        0,
-                    ),
-                    referenced_table: TableId(
-                        1,
-                    ),
-                    constraint_name: Some(
-                        "dog_ibfk_2",
-                    ),
-                    on_delete_action: Restrict,
-                    on_update_action: Restrict,
-                },
-            ],
-            foreign_key_columns: [
-                ForeignKeyColumn {
-                    foreign_key_id: ForeignKeyId(
-                        0,
-                    ),
-                    constrained_column: ColumnId(
-                        1,
-                    ),
-                    referenced_column: ColumnId(
-                        2,
-                    ),
-                },
-            ],
-            views: [],
-            procedures: [],
-            user_defined_types: [],
-            connector_data: <ConnectorData>,
-        }
+                "platypus",
+            ),
+        ]
     "#]];
-    api.expect_schema(expectation);
+    expectation.assert_debug_eq(&fks);
 }
 
 #[test_connector(tags(Mysql8))]
@@ -3815,9 +3693,9 @@ fn primary_key_length_is_handled(api: TestApi) {
     let schema = api.describe();
     let table = schema.table_walkers().next().unwrap();
 
-    assert_eq!(1, table.primary_key_columns().len());
+    assert_eq!(1, table.primary_key_columns_count());
 
-    let columns = table.primary_key_columns().collect::<Vec<_>>();
+    let columns = table.primary_key_columns().unwrap().collect::<Vec<_>>();
 
     assert_eq!("id", columns[0].as_column().name());
     assert_eq!(Some(255), columns[0].length());
@@ -3840,9 +3718,9 @@ fn index_length_and_sorting_is_handled(api: TestApi) {
     let schema = api.describe();
     let table = schema.table_walkers().next().unwrap();
 
-    assert_eq!(1, table.indexes().len());
+    assert_eq!(2, table.indexes().len());
 
-    let index = table.indexes().next().unwrap();
+    let index = table.indexes().find(|idx| !idx.is_primary_key()).unwrap();
     let columns = index.columns().collect::<Vec<_>>();
 
     assert_eq!(2, columns.len());
