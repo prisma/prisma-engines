@@ -170,7 +170,7 @@ pub(super) fn add_referenced_side_unique(
     if relation
         .referenced_model()
         .unique_criterias()
-        .any(|crit| crit.contains_exactly_fields(relation.referencing_fields()))
+        .any(|crit| crit.contains_exactly_fields(relation.referenced_fields()))
     {
         return;
     }
