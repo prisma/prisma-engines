@@ -2,8 +2,10 @@ mod primary_key;
 mod unique_criteria;
 
 pub use primary_key::*;
-use schema_ast::ast::{IndentationType, NewlineType};
+
 pub(crate) use unique_criteria::*;
+
+use schema_ast::ast::{IndentationType, NewlineType};
 
 use super::{
     CompleteInlineRelationWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
@@ -287,10 +289,12 @@ impl<'db> ModelWalker<'db> {
         let mut spaces = 0;
 
         for i in (0..start).rev() {
-            match src.chars().nth(i) {
-                Some('\t') => return IndentationType::Tabs,
-                Some(' ') => spaces += 1,
-                _ => return IndentationType::Spaces(spaces),
+            if src.is_char_boundary(i) {
+                match src[i..].chars().next() {
+                    Some('\t') => return IndentationType::Tabs,
+                    Some(' ') => spaces += 1,
+                    _ => return IndentationType::Spaces(spaces),
+                }
             }
         }
 

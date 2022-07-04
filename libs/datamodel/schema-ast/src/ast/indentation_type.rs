@@ -6,7 +6,7 @@ pub enum IndentationType {
     /// Uses a tab character.
     Tabs,
     /// Uses the given amount of spaces.
-    Spaces(u8),
+    Spaces(usize),
 }
 
 impl Default for IndentationType {

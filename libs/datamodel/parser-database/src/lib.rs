@@ -38,13 +38,13 @@ mod value_validator;
 pub use names::is_reserved_type_name;
 pub use relations::ReferentialAction;
 pub use schema_ast::ast;
-use schema_ast::source_file::SourceFile;
 pub use types::{IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SortOrder};
 pub use value_validator::{ValueListValidator, ValueValidator};
 
 use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};
 use names::Names;
+use schema_ast::source_file::SourceFile;
 
 /// ParserDatabase is a container for a Schema AST, together with information
 /// gathered during schema validation. Each validation step enriches the

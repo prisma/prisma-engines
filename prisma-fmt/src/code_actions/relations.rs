@@ -105,6 +105,8 @@ pub(super) fn add_referencing_side_unique(
         ..Default::default()
     };
 
+    // The returned diagnostics are the ones we promise to fix with
+    // the code action.
     let diagnostics = super::diagnostics_for_span(
         schema,
         &params.context.diagnostics,
@@ -222,6 +224,8 @@ pub(super) fn add_referenced_side_unique(
         ..Default::default()
     };
 
+    // The returned diagnostics are the ones we promise to fix with
+    // the code action.
     let diagnostics = super::diagnostics_for_span(
         schema,
         &params.context.diagnostics,

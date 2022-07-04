@@ -49,6 +49,8 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
     actions
 }
 
+/// A function to find diagnostics matching the given span. Used for
+/// copying the diagnostics to a code action quick fix.
 pub(super) fn diagnostics_for_span(
     schema: &str,
     diagnostics: &[Diagnostic],
