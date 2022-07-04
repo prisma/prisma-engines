@@ -77,7 +77,7 @@ pub(super) fn add_referencing_side_unique(
         let model = relation.referencing_model();
         let newline = model.newline();
 
-        let separator = if model.ast_model().attributes.len() == 0 {
+        let separator = if model.ast_model().attributes.is_empty() {
             ""
         } else {
             newline.as_ref()
@@ -195,7 +195,7 @@ pub(super) fn add_referenced_side_unique(
         let indentation = model.indentation();
         let newline = model.newline();
 
-        let separator = if model.ast_model().attributes.len() == 0 {
+        let separator = if model.ast_model().attributes.is_empty() {
             newline.as_ref()
         } else {
             ""
