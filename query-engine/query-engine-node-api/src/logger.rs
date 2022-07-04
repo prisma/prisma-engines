@@ -1,8 +1,8 @@
 use core::fmt;
-use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use query_core::{is_user_facing_trace_filter, MetricRegistry};
 use serde_json::Value;
 use std::collections::BTreeMap;
+use std::sync::Arc;
 use tracing::{
     field::{Field, Visit},
     level_filters::LevelFilter,
@@ -14,6 +14,8 @@ use tracing_subscriber::{
     Layer, Registry,
 };
 
+use crate::log_callback::LogCallback;
+
 pub(crate) struct Logger {
     dispatcher: Dispatch,
     metrics: Option<MetricRegistry>,
@@ -24,7 +26,7 @@ impl Logger {
     pub fn new(
         log_queries: bool,
         log_level: LevelFilter,
-        log_callback: ThreadsafeFunction<String>,
+        log_callback: LogCallback,
         enable_metrics: bool,
         enable_tracing: bool,
     ) -> Self {
@@ -44,8 +46,9 @@ impl Logger {
             FilterExt::boxed(log_level)
         };
 
+        let log_callback_arc = Arc::new(log_callback);
         let is_user_trace = filter_fn(is_user_facing_trace_filter);
-        let tracer = crate::tracer::new_pipeline().install_simple(log_callback.clone());
+        let tracer = crate::tracer::new_pipeline().install_simple(Arc::clone(&log_callback_arc));
         let telemetry = if enable_tracing {
             let telemetry = tracing_opentelemetry::layer()
                 .with_tracer(tracer)
@@ -55,7 +58,7 @@ impl Logger {
             None
         };
 
-        let layer = CallbackLayer::new(log_callback).with_filter(filters);
+        let layer = CallbackLayer::new(log_callback_arc).with_filter(filters);
 
         let metrics = if enable_metrics {
             query_core::metrics::setup();
@@ -132,13 +135,12 @@ impl<'a> ToString for JsonVisitor<'a> {
     }
 }
 
-#[derive(Clone)]
-pub struct CallbackLayer {
-    callback: ThreadsafeFunction<String>,
+pub(crate) struct CallbackLayer {
+    callback: Arc<LogCallback>,
 }
 
 impl CallbackLayer {
-    pub fn new(callback: ThreadsafeFunction<String>) -> Self {
+    pub fn new(callback: Arc<LogCallback>) -> Self {
         CallbackLayer { callback }
     }
 }
@@ -149,8 +151,6 @@ impl<S: Subscriber> Layer<S> for CallbackLayer {
         let mut visitor = JsonVisitor::new(event.metadata().level(), event.metadata().target());
         event.record(&mut visitor);
 
-        let result = visitor.to_string();
-
-        self.callback.call(Ok(result), ThreadsafeFunctionCallMode::Blocking);
+        let _ = self.callback.call(visitor.to_string());
     }
 }
