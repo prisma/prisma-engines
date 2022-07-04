@@ -273,6 +273,12 @@ impl TestApi {
     }
 
     #[track_caller]
+    pub async fn expect_re_introspected_datamodel(&self, schema: &str, expectation: expect_test::Expect) {
+        let found = self.re_introspect(schema).await.unwrap();
+        expectation.assert_eq(&found);
+    }
+
+    #[track_caller]
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
         let expected_with_source = self.dm_with_sources(expected_without_header);
         let expected_with_generator = self.dm_with_generator_and_preview_flags(&expected_with_source);

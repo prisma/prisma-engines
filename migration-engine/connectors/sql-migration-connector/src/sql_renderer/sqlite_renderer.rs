@@ -85,7 +85,7 @@ impl SqlRenderer for SqliteFlavour {
                     column_id,
                     has_virtual_default: _,
                 } => {
-                    let column = schemas.next.walk_column(*column_id);
+                    let column = schemas.next.walk(*column_id);
                     let col_sql = render_column(&column);
 
                     statements.push(format!(
@@ -118,10 +118,10 @@ impl SqlRenderer for SqliteFlavour {
             foreign_keys: table
                 .foreign_keys()
                 .map(move |fk| sql_ddl::sqlite::ForeignKey {
-                    constrains: fk.constrained_column_names().iter().map(|name| name.into()).collect(),
+                    constrains: fk.constrained_columns().map(|col| col.name().into()).collect(),
                     references: (
                         fk.referenced_table().name().into(),
-                        fk.referenced_column_names().iter().map(|name| name.into()).collect(),
+                        fk.referenced_columns().map(|col| col.name().into()).collect(),
                     ),
                     constraint_name: fk.constraint_name().map(From::from),
                     on_delete: Some(match fk.on_delete_action() {
@@ -278,7 +278,7 @@ fn copy_current_table_into_new_table(
     let destination_columns = redefine_table
         .column_pairs
         .iter()
-        .map(|(column_ids, _, _)| tables.next.schema.walk_column(column_ids.next).name());
+        .map(|(column_ids, _, _)| tables.next.walk(column_ids.next).name());
 
     let source_columns = redefine_table.column_pairs.iter().map(|(column_ides, changes, _)| {
         let columns = tables.map(|t| t.schema).columns(*column_ides);

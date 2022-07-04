@@ -17,6 +17,7 @@ mod parsers;
 pub use self::{
     error::{DescriberError, DescriberErrorKind, DescriberResult},
     ids::*,
+    walkers::*,
 };
 
 use once_cell::sync::Lazy;
@@ -27,7 +28,6 @@ use std::{
     any::Any,
     fmt::{self, Debug},
 };
-use walkers::{EnumWalker, ForeignKeyWalker, SqlSchemaExt, TableWalker, UserDefinedTypeWalker, ViewWalker};
 
 /// A database description connector.
 #[async_trait::async_trait]
@@ -51,7 +51,7 @@ pub struct SqlMetadata {
 }
 
 /// The result of describing a database schema.
-#[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct SqlSchema {
     /// The schema's tables.
     tables: Vec<Table>,
@@ -60,7 +60,9 @@ pub struct SqlSchema {
     /// The schema's columns.
     columns: Vec<(TableId, Column)>,
     /// All foreign keys.
-    pub foreign_keys: Vec<(TableId, ForeignKey)>,
+    foreign_keys: Vec<ForeignKey>,
+    /// Constrained and referenced columns of foreign keys.
+    foreign_key_columns: Vec<ForeignKeyColumn>,
     /// The schema's views,
     views: Vec<View>,
     /// The stored procedures.
@@ -93,7 +95,7 @@ impl SqlSchema {
 
     /// Find a column by table and name. Prefer `walk_column()` if possible.
     pub fn find_column<'a>(&'a self, table_id: TableId, name: &str) -> Option<(ColumnId, &'a Column)> {
-        self.table_walker_at(table_id)
+        self.walk(table_id)
             .columns()
             .find(|col| col.name() == name)
             .map(|col| (col.id, col.column()))
@@ -101,7 +103,7 @@ impl SqlSchema {
 
     /// Find a column or panic. For tests.
     pub fn column_bang(&self, table_id: TableId, name: &str) -> &Column {
-        self.table_walker_at(table_id)
+        self.walk(table_id)
             .columns()
             .find(|col| col.name() == name)
             .map(|col| col.column())
@@ -127,23 +129,6 @@ impl SqlSchema {
         self.user_defined_types.iter().find(|x| x.name == name)
     }
 
-    /// Is this schema empty?
-    pub fn is_empty(&self) -> bool {
-        matches!(
-            self,
-            SqlSchema {
-                tables,
-                enums,
-                views,
-                procedures,
-                user_defined_types,
-                columns,
-                foreign_keys,
-                connector_data: _,
-            } if tables.is_empty() && enums.is_empty() && views.is_empty() && procedures.is_empty() && user_defined_types.is_empty() && columns.is_empty() && foreign_keys.is_empty()
-        )
-    }
-
     pub fn iter_tables(&self) -> impl Iterator<Item = (TableId, &Table)> {
         self.tables
             .iter()
@@ -162,6 +147,35 @@ impl SqlSchema {
         let id = ColumnId(self.columns.len() as u32);
         self.columns.push((table_id, column));
         id
+    }
+
+    pub fn push_foreign_key(
+        &mut self,
+        constraint_name: Option<String>,
+        [constrained_table, referenced_table]: [TableId; 2],
+        [on_delete_action, on_update_action]: [ForeignKeyAction; 2],
+    ) -> ForeignKeyId {
+        let id = ForeignKeyId(self.foreign_keys.len() as u32);
+        self.foreign_keys.push(ForeignKey {
+            constrained_table,
+            constraint_name,
+            referenced_table,
+            on_delete_action,
+            on_update_action,
+        });
+        id
+    }
+
+    pub fn push_foreign_key_column(
+        &mut self,
+        foreign_key_id: ForeignKeyId,
+        [constrained_column, referenced_column]: [ColumnId; 2],
+    ) {
+        self.foreign_key_columns.push(ForeignKeyColumn {
+            foreign_key_id,
+            constrained_column,
+            referenced_column,
+        });
     }
 
     pub fn push_table(&mut self, name: String) -> TableId {
@@ -204,15 +218,16 @@ impl SqlSchema {
         })
     }
 
-    pub fn walk_foreign_key(&self, id: ForeignKeyId) -> ForeignKeyWalker<'_> {
-        ForeignKeyWalker { schema: self, id }
-    }
-
     pub fn walk_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'_>> {
         (0..self.foreign_keys.len()).map(move |fk_idx| ForeignKeyWalker {
             schema: self,
             id: ForeignKeyId(fk_idx as u32),
         })
+    }
+
+    /// Traverse a schema item by id.
+    pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
+        Walker { id, schema: self }
     }
 }
 
@@ -556,29 +571,23 @@ impl ForeignKeyAction {
     }
 }
 
-/// A foreign key.
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ForeignKey {
-    /// The database name of the foreign key constraint, when available.
-    pub constraint_name: Option<String>,
-    /// Column names.
-    pub columns: Vec<String>,
+struct ForeignKey {
+    /// The table the foreign key is defined on.
+    constrained_table: TableId,
     /// Referenced table.
-    pub referenced_table: TableId,
-    /// Referenced columns.
-    pub referenced_columns: Vec<String>,
-    /// Action on deletion.
-    pub on_delete_action: ForeignKeyAction,
-    /// Action on update.
-    pub on_update_action: ForeignKeyAction,
+    referenced_table: TableId,
+    /// The foreign key constraint name, when available.
+    constraint_name: Option<String>,
+    on_delete_action: ForeignKeyAction,
+    on_update_action: ForeignKeyAction,
 }
 
-impl PartialEq for ForeignKey {
-    fn eq(&self, other: &Self) -> bool {
-        self.columns == other.columns
-            && self.referenced_table == other.referenced_table
-            && self.referenced_columns == other.referenced_columns
-    }
+#[derive(Serialize, Deserialize, Debug)]
+struct ForeignKeyColumn {
+    foreign_key_id: ForeignKeyId,
+    constrained_column: ColumnId,
+    referenced_column: ColumnId,
 }
 
 /// A SQL enum.

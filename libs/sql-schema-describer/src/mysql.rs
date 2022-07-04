@@ -3,7 +3,10 @@ use bigdecimal::ToPrimitive;
 use indexmap::IndexMap;
 use indoc::indoc;
 use native_types::{MySqlType, NativeType};
-use quaint::{prelude::Queryable, Value};
+use quaint::{
+    prelude::{Queryable, ResultRow},
+    Value,
+};
 use serde_json::from_str;
 use std::{
     borrow::Cow,
@@ -82,12 +85,10 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         // these indices out from the data model.
         for (table_id, (indexes, _)) in &mut indexes {
             indexes.retain(|_, index| {
-                index.columns.iter().all(|left| {
-                    sql_schema
-                        .table_walker_at(*table_id)
-                        .columns()
-                        .any(|col| col.name() == left.name)
-                })
+                index
+                    .columns
+                    .iter()
+                    .all(|left| sql_schema.walk(*table_id).columns().any(|col| col.name() == left.name))
             });
         }
 
@@ -590,20 +591,9 @@ impl<'a> SqlSchemaDescriber<'a> {
         table_ids: &IndexMap<String, TableId>,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
-        // Foreign keys covering multiple columns will return multiple rows, which we need to
-        // merge.
-        //
-        // (constrained_table_id, constraint_name) -> ForeignKey
-        let mut map: BTreeMap<(TableId, String), ForeignKey> = BTreeMap::new();
-
-        // XXX: Is constraint_name unique? Need a way to uniquely associate rows with foreign keys
-        // One should think it's unique since it's used to join information_schema.key_column_usage
-        // and information_schema.referential_constraints tables in this query lifted from
-        // Stack Overflow
-        //
-        // We alias all the columns because MySQL column names are case-insensitive in queries, but the
-        // information schema column names became upper-case in MySQL 8, causing the code fetching
-        // the result values by column name below to fail.
+        // We alias all the columns because MySQL column names are case-insensitive in queries, but
+        // the information schema column names became upper-case in MySQL 8, causing the code
+        // fetching the result values by column name below to fail.
         let sql = "
             SELECT
                 kcu.constraint_name constraint_name,
@@ -621,29 +611,39 @@ impl<'a> SqlSchemaDescriber<'a> {
                 kcu.table_schema = ?
                 AND rc.constraint_schema = ?
                 AND kcu.referenced_column_name IS NOT NULL
-            ORDER BY ordinal_position
+            ORDER BY table_schema, table_name, constraint_name, ordinal_position
         ";
 
+        fn get_ids(
+            row: &ResultRow,
+            table_ids: &IndexMap<String, TableId>,
+            sql_schema: &SqlSchema,
+        ) -> Option<(TableId, ColumnId, TableId, ColumnId)> {
+            let table_name = row.get_expect_string("table_name");
+            let column_name = row.get_expect_string("column_name");
+            let referenced_table_name = row.get_expect_string("referenced_table_name");
+            let referenced_column_name = row.get_expect_string("referenced_column_name");
+
+            let table_id = *table_ids.get(&table_name)?;
+            let referenced_table_id = *table_ids.get(&referenced_table_name)?;
+            let column_id = sql_schema.walk(table_id).column(&column_name)?.id;
+            let referenced_column_id = sql_schema.walk(referenced_table_id).column(&referenced_column_name)?.id;
+
+            Some((table_id, column_id, referenced_table_id, referenced_column_id))
+        }
+
         let result_set = conn.query_raw(sql, &[schema_name.into(), schema_name.into()]).await?;
+        let mut current_fk: Option<(TableId, String, ForeignKeyId)> = None;
 
         for row in result_set.into_iter() {
             trace!("Got description FK row {:#?}", row);
-            let table_name = row.get_expect_string("table_name");
-            let table_id = if let Some(id) = table_ids.get(table_name.as_str()) {
-                *id
-            } else {
-                continue;
-            };
+            let (table_id, column_id, referenced_table_id, referenced_column_id) =
+                if let Some(ids) = get_ids(&row, table_ids, sql_schema) {
+                    ids
+                } else {
+                    continue;
+                };
             let constraint_name = row.get_expect_string("constraint_name");
-            let column = row.get_expect_string("column_name");
-            let referenced_table = row.get_expect_string("referenced_table_name");
-            let referenced_table_id = if let Some(id) = table_ids.get(&referenced_table) {
-                *id
-            } else {
-                continue;
-            };
-            let referenced_column = row.get_expect_string("referenced_column_name");
-            let ord_pos = row.get_expect_i64("ordinal_position");
             let on_delete_action = match row.get_expect_string("delete_rule").to_lowercase().as_str() {
                 "cascade" => ForeignKeyAction::Cascade,
                 "set null" => ForeignKeyAction::SetNull,
@@ -661,30 +661,23 @@ impl<'a> SqlSchemaDescriber<'a> {
                 s => panic!("Unrecognized on update action '{}'", s),
             };
 
-            let fk = map
-                .entry((table_id, constraint_name.clone()))
-                .or_insert_with(move || ForeignKey {
-                    constraint_name: Some(constraint_name.clone()),
-                    columns: Vec::new(),
-                    referenced_table: referenced_table_id,
-                    referenced_columns: Vec::new(),
-                    on_delete_action,
-                    on_update_action,
-                });
+            match &current_fk {
+                Some((cur_table_id, cur_constraint_name, _))
+                    if *cur_table_id == table_id && *cur_constraint_name == constraint_name => {}
+                None | Some(_) => {
+                    let fkid = sql_schema.push_foreign_key(
+                        Some(constraint_name.clone()),
+                        [table_id, referenced_table_id],
+                        [on_delete_action, on_update_action],
+                    );
 
-            let pos = ord_pos as usize - 1;
-            if fk.columns.len() <= pos {
-                fk.columns.resize(pos + 1, "".to_string());
+                    current_fk = Some((table_id, constraint_name, fkid));
+                }
             }
-            fk.columns[pos] = column;
-            if fk.referenced_columns.len() <= pos {
-                fk.referenced_columns.resize(pos + 1, "".to_string());
-            }
-            fk.referenced_columns[pos] = referenced_column;
-        }
 
-        for ((table_id, _), fk) in map {
-            sql_schema.foreign_keys.push((table_id, fk));
+            if let Some((_, _, fkid)) = current_fk {
+                sql_schema.push_foreign_key_column(fkid, [column_id, referenced_column_id]);
+            }
         }
 
         Ok(())

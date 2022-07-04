@@ -190,7 +190,11 @@ impl TableAssertion<'_> {
             fk: self
                 .table
                 .foreign_keys()
-                .find(|fk| fk.constrained_column_names() == cols)
+                .find(|fk| {
+                    let constrained_columns = fk.constrained_columns();
+                    constrained_columns.len() == cols.len()
+                        && constrained_columns.zip(cols).all(|(a, b)| a.name() == *b)
+                })
                 .unwrap(),
         };
 
@@ -317,12 +321,16 @@ pub struct ForeignKeyAssertion<'a> {
 impl<'a> ForeignKeyAssertion<'a> {
     pub fn assert_references(&self, table: &str, columns: &[&str]) -> &Self {
         assert_eq!(self.fk.referenced_table().name(), table);
-        assert_eq!(self.fk.referenced_column_names(), columns);
+        let referenced_columns = self.fk.referenced_columns();
+        assert_eq!(referenced_columns.len(), columns.len());
+        for (a, b) in referenced_columns.zip(columns.iter()) {
+            assert_eq!(a.name(), *b);
+        }
         self
     }
 
     pub fn assert_on_delete(&self, expected: ForeignKeyAction) -> &Self {
-        assert_eq!(self.fk.on_delete_action(), &expected);
+        assert_eq!(self.fk.on_delete_action(), expected);
         self
     }
 }

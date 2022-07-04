@@ -45,8 +45,16 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
             .filter(|(idx, left)| {
                 let mut already_visited = table.foreign_keys().take(*idx);
                 already_visited.any(|right| {
-                    left.referenced_table().id == right.referenced_table().id
-                        && left.constrained_column_names() == right.constrained_column_names()
+                    let (left_constrained, right_constrained) =
+                        (left.constrained_columns(), right.constrained_columns());
+                    left_constrained.len() == right_constrained.len()
+                        && left_constrained
+                            .zip(right_constrained)
+                            .all(|(left, right)| left.id == right.id)
+                        && left
+                            .referenced_columns()
+                            .zip(right.referenced_columns())
+                            .all(|(left, right)| left.id == right.id)
                 })
             })
             .map(|(_, fk)| fk.id)
@@ -56,7 +64,7 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
             .filter(|fk| !duplicated_foreign_keys.contains(&fk.id))
         {
             version_check.has_inline_relations(table);
-            version_check.uses_on_delete(foreign_key.foreign_key(), table);
+            version_check.uses_on_delete(foreign_key);
 
             let mut relation_field = calculate_relation_field(foreign_key, &m2m_tables, &duplicated_foreign_keys);
 

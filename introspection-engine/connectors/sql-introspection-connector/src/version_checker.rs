@@ -7,9 +7,10 @@ use datamodel::dml::{Datamodel, Model};
 use introspection_connector::{IntrospectionContext, Version, Warning};
 use native_types::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;
+use sql_schema_describer::ForeignKeyWalker;
 use sql_schema_describer::{
     walkers::{ColumnWalker, TableWalker},
-    ForeignKey, ForeignKeyAction, PrimaryKey, SqlSchema,
+    ForeignKeyAction, PrimaryKey, SqlSchema,
 };
 use tracing::debug;
 
@@ -112,10 +113,11 @@ impl VersionChecker {
     }
 
     #[allow(clippy::nonminimal_bool)] // more readable this way
-    pub fn uses_on_delete(&mut self, fk: &ForeignKey, table: TableWalker<'_>) {
-        if !(fk.on_delete_action == ForeignKeyAction::NoAction || fk.on_delete_action == ForeignKeyAction::SetNull)
-            && !is_prisma_1_or_11_list_table(table)
-            && fk.on_delete_action != ForeignKeyAction::Cascade
+    pub fn uses_on_delete(&mut self, fk: ForeignKeyWalker<'_>) {
+        let action = fk.on_delete_action();
+        if !(action == ForeignKeyAction::NoAction || action == ForeignKeyAction::SetNull)
+            && !is_prisma_1_or_11_list_table(fk.table())
+            && action != ForeignKeyAction::Cascade
         {
             self.uses_on_delete = true
         }

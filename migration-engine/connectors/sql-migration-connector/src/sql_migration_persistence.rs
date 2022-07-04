@@ -21,10 +21,9 @@ impl MigrationPersistence for SqlMigrationConnector {
                 return Ok(());
             }
 
-            if !schema.is_empty()
-                && schema
-                    .table_walkers()
-                    .any(|t| !self.flavour().table_should_be_ignored(t.name()))
+            if schema
+                .table_walkers()
+                .any(|t| !self.flavour().table_should_be_ignored(t.name()))
             {
                 return Err(ConnectorError::user_facing(
                     user_facing_errors::migration_engine::DatabaseSchemaNotEmpty,

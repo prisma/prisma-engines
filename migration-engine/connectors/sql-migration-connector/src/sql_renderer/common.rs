@@ -67,7 +67,7 @@ pub(crate) fn render_nullability(column: ColumnWalker<'_>) -> &'static str {
     }
 }
 
-pub(crate) fn render_referential_action(action: &ForeignKeyAction) -> &'static str {
+pub(crate) fn render_referential_action(action: ForeignKeyAction) -> &'static str {
     match action {
         ForeignKeyAction::NoAction => "NO ACTION",
         ForeignKeyAction::Restrict => "RESTRICT",

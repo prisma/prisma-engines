@@ -10,7 +10,6 @@ use datamodel::{
     schema_ast::ast::{self, FieldArity},
     ValidatedSchema,
 };
-use sql::walkers::SqlSchemaExt;
 use sql_schema_describer as sql;
 use std::collections::HashMap;
 
@@ -102,36 +101,43 @@ fn push_inline_relations(ctx: &mut Context<'_>) {
         let relation_field = relation
             .forward_relation_field()
             .expect("Expecting a complete relation in sql_schmea_calculator");
-        let fk_columns: Vec<String> = relation_field
-            .referencing_fields()
-            .expect("Expecting a relation fields in sql_schmea_calculator")
-            .map(|rf| rf.database_name().to_owned())
-            .collect();
+        let referencing_model = ctx.model_id_to_table_id[&relation_field.model().model_id()];
+        let referenced_model = ctx.model_id_to_table_id[&relation.referenced_model().model_id()];
         let on_delete_action = relation_field.explicit_on_delete().unwrap_or_else(|| {
             relation_field.default_on_delete_action(
                 ctx.datamodel.configuration.referential_integrity().unwrap_or_default(),
                 ctx.flavour.datamodel_connector(),
             )
         });
+        let on_update_action = relation_field
+            .explicit_on_update()
+            .map(convert_referential_action)
+            .unwrap_or_else(|| sql::ForeignKeyAction::Cascade);
 
-        ctx.schema.describer_schema.foreign_keys.push((
-            ctx.model_id_to_table_id[&relation_field.model().model_id()],
-            sql::ForeignKey {
-                constraint_name: Some(relation.constraint_name(ctx.flavour.datamodel_connector()).into_owned()),
-                columns: fk_columns,
-                referenced_table: ctx.model_id_to_table_id[&relation.referenced_model().model_id()],
-                referenced_columns: relation_field
-                    .referenced_fields()
-                    .expect("Expected references to be defined on relation field")
-                    .map(|f| f.database_name().to_owned())
-                    .collect(),
-                on_update_action: relation_field
-                    .explicit_on_update()
-                    .map(convert_referential_action)
-                    .unwrap_or_else(|| sql::ForeignKeyAction::Cascade),
-                on_delete_action: convert_referential_action(on_delete_action),
-            },
-        ));
+        let fkid = ctx.schema.describer_schema.push_foreign_key(
+            Some(relation.constraint_name(ctx.flavour.datamodel_connector()).into_owned()),
+            [referencing_model, referenced_model],
+            [convert_referential_action(on_delete_action), on_update_action],
+        );
+
+        let columns = relation_field
+            .fields()
+            .unwrap()
+            .zip(relation_field.referenced_fields().unwrap());
+
+        for (referencing, referenced) in columns {
+            let column = [
+                ctx.walk(referencing_model)
+                    .column(referencing.database_name())
+                    .unwrap()
+                    .id,
+                ctx.walk(referenced_model)
+                    .column(referenced.database_name())
+                    .unwrap()
+                    .id,
+            ];
+            ctx.schema.describer_schema.push_foreign_key_column(fkid, column);
+        }
     }
 }
 
@@ -150,11 +156,14 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
             .take(datamodel.configuration.max_identifier_length())
             .collect::<String>();
         let model_a = m2m.model_a();
+        let model_a_table_id = ctx.model_id_to_table_id[&model_a.model_id()];
         let model_b = m2m.model_b();
+        let model_b_table_id = ctx.model_id_to_table_id[&model_b.model_id()];
         let model_a_column = "A";
         let model_b_column = "B";
         let model_a_id = model_a.primary_key().unwrap().fields().next().unwrap();
         let model_b_id = model_b.primary_key().unwrap().fields().next().unwrap();
+
         let max_identifier_length = ctx.flavour.datamodel_connector().max_identifier_length();
         let fk_suffix = "_fkey";
         let max_table_name_len = max_identifier_length - fk_suffix.len() - 2;
@@ -173,6 +182,42 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
         };
 
         let table_id = ctx.schema.describer_schema.push_table(table_name);
+        let column_a_type = ctx
+            .walk(model_a_table_id)
+            .primary_key_columns()
+            .next()
+            .unwrap()
+            .as_column()
+            .column_type()
+            .clone();
+        let column_b_type = ctx
+            .walk(model_b_table_id)
+            .primary_key_columns()
+            .next()
+            .unwrap()
+            .as_column()
+            .column_type()
+            .clone();
+
+        let column_a_id = ctx.schema.describer_schema.push_column(
+            table_id,
+            sql::Column {
+                name: model_a_column.into(),
+                tpe: column_a_type,
+                default: None,
+                auto_increment: false,
+            },
+        );
+        let column_b_id = ctx.schema.describer_schema.push_column(
+            table_id,
+            sql::Column {
+                name: model_b_column.into(),
+                tpe: column_b_type,
+                default: None,
+                auto_increment: false,
+            },
+        );
+
         {
             let mut table = &mut ctx.schema.describer_schema[table_id];
             table.indices = vec![
@@ -199,49 +244,42 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
         }
 
         if ctx.datamodel.referential_integrity().uses_foreign_keys() {
-            ctx.schema.describer_schema.foreign_keys.push((
-                table_id,
-                sql::ForeignKey {
-                    constraint_name: Some(model_a_fk_name),
-                    columns: vec![model_a_column.into()],
-                    referenced_table: ctx.model_id_to_table_id[&model_a.model_id()],
-                    referenced_columns: vec![model_a_id.database_name().into()],
-                    on_update_action: flavour.m2m_foreign_key_action(model_a, model_b),
-                    on_delete_action: flavour.m2m_foreign_key_action(model_a, model_b),
-                },
-            ));
+            let fkid = ctx.schema.describer_schema.push_foreign_key(
+                Some(model_a_fk_name),
+                [table_id, ctx.model_id_to_table_id[&model_a.model_id()]],
+                [flavour.m2m_foreign_key_action(model_a, model_b); 2],
+            );
 
-            ctx.schema.describer_schema.foreign_keys.push((
-                table_id,
-                sql::ForeignKey {
-                    constraint_name: Some(model_b_fk_name),
-                    columns: vec![model_b_column.into()],
-                    referenced_table: ctx.model_id_to_table_id[&model_b.model_id()],
-                    referenced_columns: vec![model_b_id.database_name().into()],
-                    on_update_action: flavour.m2m_foreign_key_action(model_a, model_b),
-                    on_delete_action: flavour.m2m_foreign_key_action(model_a, model_b),
-                },
-            ));
-        }
-
-        for (column_name, model, id) in [
-            (model_a_column, model_a, model_a_id),
-            (model_b_column, model_b, model_b_id),
-        ] {
-            ctx.schema.describer_schema.push_column(
-                table_id,
-                sql::Column {
-                    name: column_name.into(),
-                    tpe: ctx
-                        .schema
-                        .table_walker_at(ctx.model_id_to_table_id[&model.model_id()])
-                        .column(id.database_name())
+            ctx.schema.describer_schema.push_foreign_key_column(
+                fkid,
+                [
+                    column_a_id,
+                    ctx.schema
+                        .describer_schema
+                        .walk(model_a_table_id)
+                        .column(model_a_id.database_name())
                         .unwrap()
-                        .column_type()
-                        .clone(),
-                    default: None,
-                    auto_increment: false,
-                },
+                        .id,
+                ],
+            );
+
+            let fkid = ctx.schema.describer_schema.push_foreign_key(
+                Some(model_b_fk_name),
+                [table_id, ctx.model_id_to_table_id[&model_b.model_id()]],
+                [flavour.m2m_foreign_key_action(model_a, model_b); 2],
+            );
+
+            ctx.schema.describer_schema.push_foreign_key_column(
+                fkid,
+                [
+                    column_b_id,
+                    ctx.schema
+                        .describer_schema
+                        .walk(model_b_table_id)
+                        .column(model_b_id.database_name())
+                        .unwrap()
+                        .id,
+                ],
             );
         }
     }
@@ -458,6 +496,12 @@ pub(crate) struct Context<'a> {
     schema: &'a mut SqlDatabaseSchema,
     flavour: &'a dyn SqlFlavour,
     model_id_to_table_id: HashMap<ast::ModelId, sql::TableId>,
+}
+
+impl Context<'_> {
+    fn walk<I>(&self, id: I) -> sql::Walker<'_, I> {
+        self.schema.walk(id)
+    }
 }
 
 fn convert_referential_action(action: ReferentialAction) -> sql::ForeignKeyAction {

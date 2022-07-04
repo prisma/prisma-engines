@@ -70,16 +70,28 @@ pub(crate) fn is_prisma_1_point_0_join_table(table: TableWalker<'_>) -> bool {
 
 fn common_prisma_m_to_n_relation_conditions(table: TableWalker<'_>) -> bool {
     fn is_a(column: &str) -> bool {
-        column.to_lowercase() == "a"
+        column.eq_ignore_ascii_case("a")
     }
 
     fn is_b(column: &str) -> bool {
-        column.to_lowercase() == "b"
+        column.eq_ignore_ascii_case("b")
     }
 
     let mut fks = table.foreign_keys();
     let first_fk = fks.next();
     let second_fk = fks.next();
+    let a_b_match = || {
+        let first_fk = first_fk.unwrap();
+        let second_fk = second_fk.unwrap();
+        let first_fk_col = first_fk.constrained_columns().next().unwrap().name();
+        let second_fk_col = second_fk.constrained_columns().next().unwrap().name();
+        (first_fk.referenced_table().name() <= second_fk.referenced_table().name()
+            && is_a(first_fk_col)
+            && is_b(second_fk_col))
+            || (second_fk.referenced_table().name() <= first_fk.referenced_table().name()
+                && is_b(first_fk_col)
+                && is_a(second_fk_col))
+    };
     table.name().starts_with('_')
         //UNIQUE INDEX [A,B]
         && table.indexes().any(|i| {
@@ -88,19 +100,14 @@ fn common_prisma_m_to_n_relation_conditions(table: TableWalker<'_>) -> bool {
                 && is_b(i.columns().nth(1).unwrap().as_column().name())
                 && i.index_type().is_unique()
         })
-        //INDEX [B]
-        && table
-            .indexes()
-            .any(|i| i.columns().len() == 1 && is_b(i.columns().next().unwrap().as_column().name()) && i.index_type() == IndexType::Normal)
-
+    //INDEX [B]
+    && table
+        .indexes()
+        .any(|i| i.columns().len() == 1 && is_b(i.columns().next().unwrap().as_column().name()) && i.index_type() == IndexType::Normal)
         // 2 FKs
-        && table.foreign_key_count() == 2
+        && table.foreign_keys().len() == 2
         // Lexicographically lower model referenced by A
-        && if first_fk.unwrap().referenced_table_name() <= second_fk.unwrap().referenced_table_name() {
-            is_a(&first_fk.unwrap().constrained_column_names()[0]) && is_b(&second_fk.unwrap().constrained_column_names()[0])
-        } else {
-            is_b(&first_fk.unwrap().constrained_column_names()[0]) && is_a(&second_fk.unwrap().constrained_column_names()[0])
-        }
+        && a_b_match()
 }
 
 //calculators
@@ -115,7 +122,10 @@ pub fn calculate_many_to_many_field(
         fk_name: None,
         fields: vec![],
         to: opposite_foreign_key.referenced_table_name().to_owned(),
-        references: opposite_foreign_key.referenced_column_names().to_owned(),
+        references: opposite_foreign_key
+            .referenced_columns()
+            .map(|c| c.name().to_owned())
+            .collect(),
         on_delete: None,
         on_update: None,
     };
@@ -123,7 +133,11 @@ pub fn calculate_many_to_many_field(
     let basename = opposite_foreign_key.referenced_table_name();
 
     let name = match is_self_relation {
-        true => format!("{}_{}", basename, &opposite_foreign_key.constrained_column_names()[0]),
+        true => format!(
+            "{}_{}",
+            basename,
+            opposite_foreign_key.constrained_columns().next().unwrap().name()
+        ),
         false => basename.to_owned(),
     };
 
@@ -222,11 +236,11 @@ pub(crate) fn calculate_relation_field(
     let relation_info = RelationInfo {
         name: calculate_relation_name(foreign_key, m2m_table_names, duplicated_foreign_keys),
         fk_name: foreign_key.constraint_name().map(String::from),
-        fields: foreign_key.constrained_column_names().to_owned(),
+        fields: foreign_key.constrained_columns().map(|c| c.name().to_owned()).collect(),
         to: foreign_key.referenced_table().name().to_owned(),
-        references: foreign_key.referenced_column_names().to_owned(),
-        on_delete: Some(map_action(*foreign_key.on_delete_action())),
-        on_update: Some(map_action(*foreign_key.on_update_action())),
+        references: foreign_key.referenced_columns().map(|c| c.name().to_owned()).collect(),
+        on_delete: Some(map_action(foreign_key.on_delete_action())),
+        on_update: Some(map_action(foreign_key.on_update_action())),
     };
 
     let arity = match foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
@@ -311,7 +325,7 @@ fn calculate_relation_name(
 ) -> String {
     let referenced_model = fk.referenced_table().name();
     let model_with_fk = fk.table().name();
-    let fk_column_name = fk.constrained_column_names().join("_");
+    let fk_column_name = fk.constrained_columns().map(|c| c.name()).collect::<Vec<_>>().join("_");
     let name_is_ambiguous = {
         let mut both_ids = [fk.referenced_table().id, fk.table().id];
         both_ids.sort();

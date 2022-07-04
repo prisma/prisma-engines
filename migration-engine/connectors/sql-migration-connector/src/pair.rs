@@ -1,6 +1,6 @@
 use crate::SqlDatabaseSchema;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     ColumnId, EnumId, ForeignKeyId, IndexId, SqlSchema, TableId,
 };
 
@@ -68,38 +68,35 @@ impl<T> Pair<Option<T>> {
 
 impl<'a> Pair<&'a SqlDatabaseSchema> {
     pub(crate) fn enums(&self, ids: Pair<EnumId>) -> Pair<EnumWalker<'a>> {
-        Pair::new(self.previous.walk_enum(ids.previous), self.next.walk_enum(ids.next))
+        Pair::new(self.previous.walk(ids.previous), self.next.walk(ids.next))
     }
 
     pub(crate) fn tables(&self, table_ids: &Pair<TableId>) -> Pair<TableWalker<'a>> {
-        Pair::new(
-            self.previous.table_walker_at(table_ids.previous),
-            self.next.table_walker_at(table_ids.next),
-        )
+        Pair::new(self.previous.walk(table_ids.previous), self.next.walk(table_ids.next))
     }
 }
 
 impl<'a> Pair<&'a SqlDatabaseSchema> {
     pub(crate) fn columns(&self, column_ids: Pair<ColumnId>) -> Pair<ColumnWalker<'a>> {
-        self.zip(column_ids).map(|(s, c)| s.describer_schema.walk_column(c))
+        self.zip(column_ids).map(|(s, c)| s.describer_schema.walk(c))
     }
 }
 
 impl<'a> Pair<&'a SqlSchema> {
     pub(crate) fn enums(self, ids: Pair<EnumId>) -> Pair<EnumWalker<'a>> {
-        Pair::new(self.previous.walk_enum(ids.previous), self.next.walk_enum(ids.next))
+        Pair::new(self.previous.walk(ids.previous), self.next.walk(ids.next))
     }
 
     pub(crate) fn tables(self, table_ids: Pair<TableId>) -> Pair<TableWalker<'a>> {
-        self.zip(table_ids).map(|(s, t)| s.table_walker_at(t))
+        self.zip(table_ids).map(|(s, t)| s.walk(t))
     }
 
     pub(crate) fn columns(self, column_ids: Pair<ColumnId>) -> Pair<ColumnWalker<'a>> {
-        self.zip(column_ids).map(|(s, c)| s.walk_column(c))
+        self.zip(column_ids).map(|(s, c)| s.walk(c))
     }
 
     pub(crate) fn foreign_keys(self, fk_ids: Pair<ForeignKeyId>) -> Pair<ForeignKeyWalker<'a>> {
-        self.zip(fk_ids).map(|(s, id)| s.walk_foreign_key(id))
+        self.zip(fk_ids).map(|(s, id)| s.walk(id))
     }
 }
 

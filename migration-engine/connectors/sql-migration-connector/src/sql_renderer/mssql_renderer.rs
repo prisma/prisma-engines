@@ -74,9 +74,8 @@ impl MssqlFlavour {
 
     fn render_references(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
         let cols = foreign_key
-            .referenced_column_names()
-            .iter()
-            .map(Quoted::mssql_ident)
+            .referenced_columns()
+            .map(|c| Quoted::mssql_ident(c.name()))
             .join(",");
 
         format!(
@@ -393,7 +392,7 @@ impl SqlRenderer for MssqlFlavour {
                 add_constraint,
                 "CONSTRAINT [FK__{}__{}] ",
                 foreign_key.table().name(),
-                foreign_key.constrained_column_names().join("__"),
+                foreign_key.constrained_columns().map(|c| c.name()).join("__"),
             )
             .unwrap();
         }
@@ -402,9 +401,8 @@ impl SqlRenderer for MssqlFlavour {
             add_constraint,
             "FOREIGN KEY ({})",
             foreign_key
-                .constrained_column_names()
-                .iter()
-                .map(|col| self.quote(col))
+                .constrained_columns()
+                .map(|col| Quoted::mssql_ident(col.name()))
                 .join(", ")
         )
         .unwrap();

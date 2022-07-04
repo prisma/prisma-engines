@@ -790,6 +790,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                 ),
             ],
             foreign_keys: [],
+            foreign_key_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -908,184 +909,17 @@ fn mssql_foreign_key_on_delete_must_be_handled(api: TestApi) {
     );
 
     api.raw_cmd(&sql);
-    let expectation = expect![[r#"
-        SqlSchema {
-            tables: [
-                Table {
-                    name: "City",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "id",
-                                    length: None,
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                },
-                            ],
-                            constraint_name: Some(
-                                "PK__City",
-                            ),
-                        },
-                    ),
-                },
-                Table {
-                    name: "User",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "id",
-                                    length: None,
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                },
-                            ],
-                            constraint_name: Some(
-                                "PK__User",
-                            ),
-                        },
-                    ),
-                },
-            ],
-            enums: [],
-            columns: [
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "id",
-                        tpe: ColumnType {
-                            full_data_type: "int",
-                            family: Int,
-                            arity: Required,
-                            native_type: Some(
-                                String(
-                                    "Int",
-                                ),
-                            ),
-                        },
-                        default: None,
-                        auto_increment: true,
-                    },
-                ),
-                (
-                    TableId(
-                        1,
-                    ),
-                    Column {
-                        name: "id",
-                        tpe: ColumnType {
-                            full_data_type: "int",
-                            family: Int,
-                            arity: Required,
-                            native_type: Some(
-                                String(
-                                    "Int",
-                                ),
-                            ),
-                        },
-                        default: None,
-                        auto_increment: true,
-                    },
-                ),
-                (
-                    TableId(
-                        1,
-                    ),
-                    Column {
-                        name: "city",
-                        tpe: ColumnType {
-                            full_data_type: "int",
-                            family: Int,
-                            arity: Nullable,
-                            native_type: Some(
-                                String(
-                                    "Int",
-                                ),
-                            ),
-                        },
-                        default: None,
-                        auto_increment: false,
-                    },
-                ),
-                (
-                    TableId(
-                        1,
-                    ),
-                    Column {
-                        name: "city_cascade",
-                        tpe: ColumnType {
-                            full_data_type: "int",
-                            family: Int,
-                            arity: Nullable,
-                            native_type: Some(
-                                String(
-                                    "Int",
-                                ),
-                            ),
-                        },
-                        default: None,
-                        auto_increment: false,
-                    },
-                ),
-            ],
-            foreign_keys: [
-                (
-                    TableId(
-                        1,
-                    ),
-                    ForeignKey {
-                        constraint_name: Some(
-                            "FK__city",
-                        ),
-                        columns: [
-                            "city",
-                        ],
-                        referenced_table: TableId(
-                            0,
-                        ),
-                        referenced_columns: [
-                            "id",
-                        ],
-                        on_delete_action: NoAction,
-                        on_update_action: NoAction,
-                    },
-                ),
-                (
-                    TableId(
-                        1,
-                    ),
-                    ForeignKey {
-                        constraint_name: Some(
-                            "FK__city_cascade",
-                        ),
-                        columns: [
-                            "city_cascade",
-                        ],
-                        referenced_table: TableId(
-                            0,
-                        ),
-                        referenced_columns: [
-                            "id",
-                        ],
-                        on_delete_action: Cascade,
-                        on_update_action: NoAction,
-                    },
-                ),
-            ],
-            views: [],
-            procedures: [],
-            user_defined_types: [],
-            connector_data: <ConnectorData>,
-        }
-    "#]];
-    api.expect_schema(expectation);
+    let schema = api.describe();
+    let table = schema.table_walker("User").unwrap();
+    let expectations = [
+        ("city", ForeignKeyAction::NoAction),
+        ("city_cascade", ForeignKeyAction::Cascade),
+    ];
+    for (colname, action) in expectations {
+        let column = table.column(colname).unwrap().id;
+        let fk = table.foreign_key_for_column(column).unwrap();
+        assert_eq!(action, fk.on_delete_action());
+    }
 }
 
 #[test_connector(tags(Mssql))]

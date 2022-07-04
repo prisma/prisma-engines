@@ -357,6 +357,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                 ),
             ],
             foreign_keys: [],
+            foreign_key_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],

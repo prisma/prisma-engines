@@ -18,8 +18,6 @@ fn dropping_a_table_with_rows_should_warn(api: TestApi) {
 
     api.schema_push_w_datasource(dm).send().assert_green();
 
-    let original_database_schema = api.assert_schema().into_schema();
-
     let insert = Insert::single_into(api.render_table_name("Test")).value("id", "test");
 
     api.query(insert.into());
@@ -31,11 +29,10 @@ fn dropping_a_table_with_rows_should_warn(api: TestApi) {
         api.normalize_identifier("Test")
     );
 
-    api.schema_push_w_datasource(dm).send().assert_warnings(&[warn.into()]);
-
-    // The schema should not change because the migration should not run if there are warnings
-    // and the force flag isn't passed.
-    api.assert_schema().assert_equals(&original_database_schema);
+    api.schema_push_w_datasource(dm)
+        .send()
+        .assert_warnings(&[warn.into()])
+        .assert_no_steps();
 }
 
 #[test_connector]
@@ -48,8 +45,6 @@ fn dropping_a_column_with_non_null_values_should_warn(api: TestApi) {
     "#;
 
     api.schema_push_w_datasource(dm).send().assert_green();
-
-    let original_database_schema = api.assert_schema().into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "puppiesCount"])
         .values(("a", 7))
@@ -69,11 +64,10 @@ fn dropping_a_column_with_non_null_values_should_warn(api: TestApi) {
         api.normalize_identifier("Test")
     );
 
-    api.schema_push_w_datasource(dm).send().assert_warnings(&[warn.into()]);
-
-    // The schema should not change because the migration should not run if there are warnings
-    // and the force flag isn't passed.
-    api.assert_schema().assert_equals(&original_database_schema);
+    api.schema_push_w_datasource(dm)
+        .send()
+        .assert_warnings(&[warn.into()])
+        .assert_no_steps();
 }
 
 #[test_connector]
@@ -86,8 +80,6 @@ fn altering_a_column_without_non_null_values_should_not_warn(api: TestApi) {
     "#;
 
     api.schema_push_w_datasource(dm).send().assert_green();
-
-    let original_database_schema = api.assert_schema().into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id"])
         .values(("a",))
@@ -102,9 +94,10 @@ fn altering_a_column_without_non_null_values_should_not_warn(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_warnings(&[]);
-
-    api.assert_schema().assert_ne(&original_database_schema);
+    api.schema_push_w_datasource(dm2)
+        .send()
+        .assert_warnings(&[])
+        .assert_has_executed_steps();
 }
 
 #[test_connector]
@@ -117,7 +110,6 @@ fn altering_a_column_with_non_null_values_should_warn(api: TestApi) {
     "#;
 
     api.schema_push_w_datasource(dm).send().assert_green();
-    let original_database_schema = api.assert_schema().into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), vec!["id", "age"])
         .values(("a", 12))
@@ -150,11 +142,9 @@ fn altering_a_column_with_non_null_values_should_warn(api: TestApi) {
              "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `String` to `Int`.".into()
 
         }
-    ]);
-
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
-    api.assert_schema().assert_equals(&original_database_schema);
+    ]).assert_no_steps();
 
     assert_eq!(api.dump_table("Test").len(), 2);
 }
@@ -298,7 +288,6 @@ fn changing_a_column_from_required_to_optional_should_work(api: TestApi) {
     "#;
 
     api.schema_push_w_datasource(dm).send().assert_green();
-    let original_database_schema = api.assert_schema().into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
@@ -313,9 +302,10 @@ fn changing_a_column_from_required_to_optional_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2).send().assert_green();
-
-    api.assert_schema().assert_ne(&original_database_schema);
+    api.schema_push_w_datasource(dm2)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
 
     // Check that no data was lost.
     {
@@ -340,7 +330,6 @@ fn changing_a_column_from_optional_to_required_is_unexecutable(api: TestApi) {
     "#;
 
     api.schema_push_w_datasource(dm).send().assert_green();
-    let original_database_schema = api.assert_schema().into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
@@ -364,11 +353,10 @@ fn changing_a_column_from_optional_to_required_is_unexecutable(api: TestApi) {
     api.schema_push_w_datasource(dm2)
         .send()
         .assert_no_warning()
-        .assert_unexecutable(&[error]);
-
-    // The schema should not change because the migration should not run if there are warnings
-    // and the force flag isn't passed.
-    api.assert_schema().assert_equals(&original_database_schema);
+        .assert_unexecutable(&[error])
+        // The schema should not change because the migration should not run if there are warnings
+        // and the force flag isn't passed.
+        .assert_no_steps();
 
     // Check that no data was lost.
     {

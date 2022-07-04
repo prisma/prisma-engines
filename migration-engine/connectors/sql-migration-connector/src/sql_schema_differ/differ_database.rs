@@ -1,7 +1,7 @@
 use super::{column, enums::EnumDiffer, table::TableDiffer};
 use crate::{flavour::SqlFlavour, pair::Pair, SqlDatabaseSchema};
 use sql_schema_describer::{
-    walkers::{ColumnWalker, EnumWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, EnumWalker, TableWalker},
     ColumnId, TableId,
 };
 use std::{
@@ -141,7 +141,7 @@ impl<'a> DifferDatabase<'a> {
             .values()
             .filter(|p| p.previous.is_none())
             .filter_map(|p| p.next)
-            .map(move |table_id| self.schemas.next.table_walker_at(table_id))
+            .map(move |table_id| self.schemas.next.walk(table_id))
     }
 
     pub(crate) fn dropped_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = ColumnId> + '_ {
@@ -155,7 +155,7 @@ impl<'a> DifferDatabase<'a> {
             .values()
             .filter(|p| p.next.is_none())
             .filter_map(|p| p.previous)
-            .map(move |table_id| self.schemas.previous.table_walker_at(table_id))
+            .map(move |table_id| self.schemas.previous.walk(table_id))
     }
 
     fn range_columns(

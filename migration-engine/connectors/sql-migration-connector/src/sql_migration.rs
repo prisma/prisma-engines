@@ -87,21 +87,17 @@ impl SqlMigration {
                 SqlMigrationStep::DropForeignKey { foreign_key_id } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
-                        self.schemas().previous.walk_foreign_key(*foreign_key_id).table().name(),
+                        self.schemas().previous.walk(*foreign_key_id).table().name(),
                         idx,
                     ));
                 }
                 SqlMigrationStep::AlterPrimaryKey(table_id) => {
-                    drift_items.insert((
-                        DriftType::ChangedTable,
-                        self.before.table_walker_at(table_id.previous).name(),
-                        idx,
-                    ));
+                    drift_items.insert((DriftType::ChangedTable, self.before.walk(table_id.previous).name(), idx));
                 }
                 SqlMigrationStep::DropIndex { table_id, .. } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
-                        self.schemas().previous.table_walker_at(*table_id).name(),
+                        self.schemas().previous.walk(*table_id).name(),
                         idx,
                     ));
                 }
@@ -141,16 +137,12 @@ impl SqlMigration {
                     table_id: (_, table_id),
                     ..
                 } => {
-                    drift_items.insert((
-                        DriftType::ChangedTable,
-                        self.schemas().next.table_walker_at(*table_id).name(),
-                        idx,
-                    ));
+                    drift_items.insert((DriftType::ChangedTable, self.schemas().next.walk(*table_id).name(), idx));
                 }
                 SqlMigrationStep::AddForeignKey { foreign_key_id: id } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
-                        self.schemas().next.walk_foreign_key(*id).table().name(),
+                        self.schemas().next.walk(*id).table().name(),
                         idx,
                     ));
                 }
@@ -206,7 +198,7 @@ impl SqlMigration {
                 SqlMigrationStep::DropUserDefinedType(_) => {}
                 SqlMigrationStep::CreateEnum(enum_id) => {
                     out.push_str("  - ");
-                    out.push_str(self.schemas().next.walk_enum(*enum_id).name());
+                    out.push_str(self.schemas().next.walk(*enum_id).name());
                     out.push('\n');
                 }
                 SqlMigrationStep::AlterEnum(alter_enum) => {
@@ -223,27 +215,23 @@ impl SqlMigration {
                     }
                 }
                 SqlMigrationStep::AlterPrimaryKey(table_id) => {
-                    let table_name = self.schemas().previous.table_walker_at(table_id.previous).name();
+                    let table_name = self.schemas().previous.walk(table_id.previous).name();
                     out.push_str("   [*] Changed the primary key for `");
                     out.push_str(table_name);
                     out.push_str("`\n");
                 }
                 SqlMigrationStep::DropForeignKey { foreign_key_id } => {
-                    let fk = self.schemas().previous.walk_foreign_key(*foreign_key_id);
+                    let fk = self.schemas().previous.walk(*foreign_key_id);
 
                     out.push_str("  [-] Removed foreign key on columns (");
-                    out.push_str(&fk.constrained_column_names().join(", "));
+                    out.push_str(&fk.constrained_columns().map(|c| c.name()).join(", "));
                     out.push_str(")\n")
                 }
                 SqlMigrationStep::DropIndex {
                     table_id,
                     index_id: index_index,
                 } => {
-                    let index = self
-                        .schemas()
-                        .previous
-                        .table_walker_at(*table_id)
-                        .index_at(*index_index);
+                    let index = self.schemas().previous.walk(*table_id).index_at(*index_index);
 
                     out.push_str("  [-] Removed ");
 
@@ -265,7 +253,7 @@ impl SqlMigration {
                                 has_virtual_default: _,
                             } => {
                                 out.push_str("  [+] Added column `");
-                                out.push_str(self.schemas().next.walk_column(*column_id).name());
+                                out.push_str(self.schemas().next.walk(*column_id).name());
                                 out.push_str("`\n");
                             }
                             TableChange::AlterColumn(alter_column) => {
@@ -273,7 +261,7 @@ impl SqlMigration {
                                 write!(
                                     out,
                                     "{}` ",
-                                    self.schemas().next.walk_column(alter_column.column_id.next).name(),
+                                    self.schemas().next.walk(alter_column.column_id.next).name(),
                                 )
                                 .unwrap();
                                 render_column_changes(
@@ -285,12 +273,12 @@ impl SqlMigration {
                             }
                             TableChange::DropColumn { column_id } => {
                                 out.push_str("  [-] Removed column `");
-                                out.push_str(self.schemas().previous.walk_column(*column_id).name());
+                                out.push_str(self.schemas().previous.walk(*column_id).name());
                                 out.push_str("`\n");
                             }
                             TableChange::DropAndRecreateColumn { column_id, changes } => {
                                 out.push_str("  [*] Column `");
-                                out.push_str(self.schemas().next.walk_column(column_id.next).name());
+                                out.push_str(self.schemas().next.walk(column_id.next).name());
                                 out.push_str("` would be dropped and recreated ");
                                 render_column_changes(self.schemas().columns(*column_id), changes, &mut out);
                                 out.push('\n');
@@ -315,17 +303,17 @@ impl SqlMigration {
                 }
                 SqlMigrationStep::DropTable { table_id } => {
                     out.push_str("  - ");
-                    out.push_str(self.schemas().previous.table_walker_at(*table_id).name());
+                    out.push_str(self.schemas().previous.walk(*table_id).name());
                     out.push('\n');
                 }
                 SqlMigrationStep::DropEnum(enum_id) => {
                     out.push_str("  - ");
-                    out.push_str(self.schemas().previous.walk_enum(*enum_id).name());
+                    out.push_str(self.schemas().previous.walk(*enum_id).name());
                     out.push('\n');
                 }
                 SqlMigrationStep::CreateTable { table_id } => {
                     out.push_str("  - ");
-                    out.push_str(self.schemas().next.table_walker_at(*table_id).name());
+                    out.push_str(self.schemas().next.walk(*table_id).name());
                     out.push('\n');
                 }
                 SqlMigrationStep::RedefineTables(_) => {}
@@ -342,7 +330,7 @@ impl SqlMigration {
                     index_id: index_index,
                     from_drop_and_recreate: _,
                 } => {
-                    let index = self.schemas().next.table_walker_at(*table_id).index_at(*index_index);
+                    let index = self.schemas().next.walk(*table_id).index_at(*index_index);
 
                     out.push_str("  [+] Added ");
 
@@ -355,9 +343,9 @@ impl SqlMigration {
                     out.push_str(")\n");
                 }
                 SqlMigrationStep::AddForeignKey { foreign_key_id } => {
-                    let foreign_key = self.schemas().next.walk_foreign_key(*foreign_key_id);
+                    let foreign_key = self.schemas().next.walk(*foreign_key_id);
                     out.push_str("  [+] Added foreign key on columns (");
-                    out.push_str(&foreign_key.constrained_column_names().join(", "));
+                    out.push_str(&foreign_key.constrained_columns().map(|c| c.name()).join(", "));
                     out.push_str(")\n")
                 }
                 SqlMigrationStep::RenameIndex { table, index } => {

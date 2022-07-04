@@ -38,16 +38,6 @@ impl SchemaAssertion {
         self.schema
     }
 
-    pub fn assert_equals(self, other: &SqlSchema) -> Self {
-        assert_eq!(&self.schema, other);
-        self
-    }
-
-    pub fn assert_ne(self, other: &SqlSchema) -> Self {
-        assert_ne!(&self.schema, other);
-        self
-    }
-
     #[track_caller]
     fn find_table<'a>(&'a self, table_name: &str) -> TableWalker<'a> {
         match self.schema.table_walkers().find(|t| {
@@ -199,7 +189,7 @@ impl<'a> TableAssertion<'a> {
         if let Some(fk) = self
             .table
             .foreign_keys()
-            .find(|fk| fk.constrained_column_names() == columns)
+            .find(|fk| fk.constrained_columns().map(|c| c.name()).collect::<Vec<_>>() == columns)
         {
             fk_assertions(ForeignKeyAssertion { fk, tags: self.tags });
         } else {
@@ -740,12 +730,10 @@ impl<'a> ForeignKeyAssertion<'a> {
     pub fn assert_references(self, table: &str, columns: &[&str]) -> Self {
         assert!(
             self.is_same_table_name(self.fk.referenced_table().name(), table)
-                && self.fk.referenced_column_names() == columns,
-            r#"Assertion failed. Expected reference to "{}" ({:?}). Found "{}" ({:?}) "#,
+                && self.fk.referenced_columns().map(|c| c.name()).collect::<Vec<_>>() == columns,
+            r#"Assertion failed. Expected reference to "{}" ({:?})."#,
             table,
             columns,
-            self.fk.referenced_table().name(),
-            self.fk.referenced_column_names(),
         );
 
         self
@@ -754,7 +742,7 @@ impl<'a> ForeignKeyAssertion<'a> {
     #[track_caller]
     pub fn assert_referential_action_on_delete(self, action: ForeignKeyAction) -> Self {
         assert!(
-            *self.fk.on_delete_action() == action,
+            self.fk.on_delete_action() == action,
             "Assertion failed: expected foreign key to {:?} on delete, but got {:?}.",
             action,
             self.fk.on_delete_action()
@@ -766,7 +754,7 @@ impl<'a> ForeignKeyAssertion<'a> {
     #[track_caller]
     pub fn assert_referential_action_on_update(self, action: ForeignKeyAction) -> Self {
         assert!(
-            *self.fk.on_update_action() == action,
+            self.fk.on_update_action() == action,
             "Assertion failed: expected foreign key to {:?} on update, but got {:?}.",
             action,
             self.fk.on_update_action()
