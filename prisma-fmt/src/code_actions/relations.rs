@@ -75,10 +75,16 @@ pub(super) fn add_referencing_side_unique(
     } else {
         let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
         let model = relation.referencing_model();
+        let newline = model.newline();
+
+        let separator = if model.ast_model().attributes.len() == 0 {
+            ""
+        } else {
+            newline.as_ref()
+        };
 
         let indentation = model.indentation();
-        let newline = model.newline();
-        let new_text = format!("{indentation}@@unique([{fields}]){newline}}}");
+        let new_text = format!("{separator}{indentation}@@unique([{fields}]){newline}}}");
 
         let start = crate::offset_to_position(model.ast_model().span.end - 1, schema).unwrap();
         let end = crate::offset_to_position(model.ast_model().span.end, schema).unwrap();
@@ -188,7 +194,14 @@ pub(super) fn add_referenced_side_unique(
 
         let indentation = model.indentation();
         let newline = model.newline();
-        let new_text = format!("{indentation}@@unique([{fields}]){newline}}}");
+
+        let separator = if model.ast_model().attributes.len() == 0 {
+            newline.as_ref()
+        } else {
+            ""
+        };
+
+        let new_text = format!("{separator}{indentation}@@unique([{fields}]){newline}}}");
 
         let start = crate::offset_to_position(model.ast_model().span.end - 1, schema).unwrap();
         let end = crate::offset_to_position(model.ast_model().span.end, schema).unwrap();

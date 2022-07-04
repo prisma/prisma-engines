@@ -12,9 +12,15 @@ pub enum NewlineType {
 
 impl fmt::Display for NewlineType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
+    }
+}
+
+impl AsRef<str> for NewlineType {
+    fn as_ref(&self) -> &str {
         match self {
-            NewlineType::Unix => f.write_str("\n"),
-            NewlineType::Windows => f.write_str("\r\n"),
+            NewlineType::Unix => "\n",
+            NewlineType::Windows => "\r\n",
         }
     }
 }
