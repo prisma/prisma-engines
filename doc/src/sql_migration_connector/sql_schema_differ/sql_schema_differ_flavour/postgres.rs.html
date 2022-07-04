@@ -668,7 +668,7 @@
 <span class="kw">use</span> <span class="ident">regex::RegexSet</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
     <span class="ident">postgres::PostgresSchemaExt</span>,
-    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">IndexWalker</span>, <span class="ident">SqlSchemaExt</span>},
+    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">IndexWalker</span>},
 };
 
 <span class="doccomment">/// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.</span>
@@ -760,7 +760,7 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">cols</span><span class="op">|</span> {
                 <span class="ident">schemas</span>
                     .<span class="ident">combine</span>(<span class="ident">cols</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">schema</span>, <span class="ident">ext</span>), (<span class="ident">_table_id</span>, <span class="ident">column_id</span>))<span class="op">|</span> (<span class="ident">schema</span>.<span class="ident">walk_column</span>(<span class="ident">column_id</span>), <span class="ident">ext</span>))
+                    .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">schema</span>, <span class="ident">ext</span>), (<span class="ident">_table_id</span>, <span class="ident">column_id</span>))<span class="op">|</span> (<span class="ident">schema</span>.<span class="ident">walk</span>(<span class="ident">column_id</span>), <span class="ident">ext</span>))
             })
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">cols</span><span class="op">|</span> {
                 <span class="ident">cols</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">col</span>, <span class="ident">ext</span>)<span class="op">|</span> {

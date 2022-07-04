@@ -1334,13 +1334,18 @@
 <span id="1329">1329</span>
 <span id="1330">1330</span>
 <span id="1331">1331</span>
+<span id="1332">1332</span>
+<span id="1333">1333</span>
+<span id="1334">1334</span>
+<span id="1335">1335</span>
+<span id="1336">1336</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">mod</span> <span class="ident">default</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::default::get_default_value</span>;
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">getters::Getter</span>, <span class="ident">walkers::SqlSchemaExt</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::getters::Getter</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
@@ -1772,8 +1777,7 @@
 
         <span class="self">self</span>.<span class="ident">get_sequences</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pg_ext</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="ident">sql_schema</span>.<span class="ident">enums</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_enums</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">get_columns</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">enums</span>, <span class="kw-2">&amp;</span><span class="ident">table_names</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>.<span class="ident">columns</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">get_columns</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">table_names</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">get_foreign_keys</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">table_names</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">get_indices</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">table_names</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pg_ext</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>)
@@ -1783,8 +1787,6 @@
         <span class="ident">sql_schema</span>.<span class="ident">procedures</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_procedures</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// Make sure the vectors we use binary search on are sorted.</span>
-        <span class="ident">sql_schema</span>.<span class="ident">foreign_keys</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="ident">table_id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">table_id</span>);
-        <span class="ident">sql_schema</span>.<span class="ident">columns</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="ident">table_id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">table_id</span>);
         <span class="ident">pg_ext</span>.<span class="ident">indexes</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="ident">id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">id</span>);
         <span class="ident">pg_ext</span>.<span class="ident">opclasses</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="ident">id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">id</span>);
 
@@ -1915,9 +1917,8 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_columns</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">enums</span>: <span class="kw-2">&amp;</span>[<span class="ident">Enum</span>],
         <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span>,
-        <span class="ident">columns</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TableId</span>, <span class="ident">Column</span>)<span class="op">&gt;</span>,
+        <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>,
     ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">is_visible_clause</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroach</span>() {
             <span class="string">&quot; AND info.is_hidden = &#39;NO&#39;&quot;</span>
@@ -1980,9 +1981,9 @@
                     .<span class="ident">circumstances</span>
                     .<span class="ident">contains</span>(<span class="ident">Circumstances::CockroachWithPostgresNativeTypes</span>)
             {
-                <span class="ident">get_column_type_cockroachdb</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="ident">enums</span>)
+                <span class="ident">get_column_type_cockroachdb</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">enums</span>)
             } <span class="kw">else</span> {
-                <span class="ident">get_column_type_postgresql</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="ident">enums</span>)
+                <span class="ident">get_column_type_postgresql</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">enums</span>)
             };
             <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="ident">col</span>
                 .<span class="ident">get</span>(<span class="string">&quot;column_default&quot;</span>)
@@ -2004,10 +2005,8 @@
                 <span class="ident">auto_increment</span>,
             };
 
-            <span class="ident">columns</span>.<span class="ident">push</span>((<span class="kw-2">*</span><span class="ident">table_id</span>, <span class="ident">col</span>));
+            <span class="ident">sql_schema</span>.<span class="ident">columns</span>.<span class="ident">push</span>((<span class="kw-2">*</span><span class="ident">table_id</span>, <span class="ident">col</span>));
         }
-
-        <span class="macro">trace!</span>(<span class="string">&quot;Found table columns: {:?}&quot;</span>, <span class="ident">columns</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -2081,14 +2080,15 @@
     ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// The `generate_subscripts` in the inner select is needed because the optimizer is free to reorganize the unnested rows if not explicitly ordered.</span>
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">r#&quot;
-            SELECT con.oid         as &quot;con_id&quot;,
-                att2.attname    as &quot;child_column&quot;,
-                cl.relname      as &quot;parent_table&quot;,
-                att.attname     as &quot;parent_column&quot;,
+            SELECT
+                con.oid         AS &quot;con_id&quot;,
+                att2.attname    AS &quot;child_column&quot;,
+                cl.relname      AS &quot;parent_table&quot;,
+                att.attname     AS &quot;parent_column&quot;,
                 con.confdeltype,
                 con.confupdtype,
-                rel_ns.nspname as &quot;referenced_schema_name&quot;,
-                conname         as constraint_name,
+                rel_ns.nspname  AS &quot;referenced_schema_name&quot;,
+                conname         AS constraint_name,
                 child,
                 parent,
                 table_name
@@ -2116,18 +2116,34 @@
                     JOIN pg_attribute att2 on att2.attrelid = con.conrelid and att2.attnum = con.parent
                     JOIN pg_class rel_cl on con.confrelid = rel_cl.oid
                     JOIN pg_namespace rel_ns on rel_cl.relnamespace = rel_ns.oid
-            ORDER BY con_id, con.colidx;
+            ORDER BY constraint_name, con_id, con.colidx;
         &quot;#</span>;
 
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_fk</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">i64</span>, <span class="ident">ForeignKeyId</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+
+        <span class="kw">fn</span> <span class="ident">get_ids</span>(
+            <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+            <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+            <span class="ident">referenced_table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+            <span class="ident">referenced_column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+            <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span>,
+            <span class="ident">sql_schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>,
+        ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">TableId</span>, <span class="ident">ColumnId</span>, <span class="ident">TableId</span>, <span class="ident">ColumnId</span>)<span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="ident">table_name</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">referenced_table_id</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="ident">referenced_table_name</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">column_id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">walk</span>(<span class="ident">table_id</span>).<span class="ident">column</span>(<span class="ident">column_name</span>)<span class="question-mark">?</span>.<span class="ident">id</span>;
+            <span class="kw">let</span> <span class="ident">referenced_column_id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">walk</span>(<span class="ident">referenced_table_id</span>).<span class="ident">column</span>(<span class="ident">referenced_column_name</span>)<span class="question-mark">?</span>.<span class="ident">id</span>;
+
+            <span class="prelude-val">Some</span>((<span class="ident">table_id</span>, <span class="ident">column_id</span>, <span class="ident">referenced_table_id</span>, <span class="ident">referenced_column_id</span>))
+        }
+
         <span class="comment">// One foreign key with multiple columns will be represented here as several</span>
-        <span class="comment">// rows with the same ID, which we will have to combine into corresponding foreign key</span>
-        <span class="comment">// objects.</span>
+        <span class="comment">// rows with the same ID.</span>
         <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">intermediate_fks</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">i64</span>, (<span class="ident">TableId</span>, <span class="ident">ForeignKey</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">result_set</span>.<span class="ident">into_iter</span>() {
             <span class="macro">trace!</span>(<span class="string">&quot;Got description FK row {:?}&quot;</span>, <span class="ident">row</span>);
             <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;con_id&quot;</span>);
-            <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;child_column&quot;</span>);
+            <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;child_column&quot;</span>);
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;constraint_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">referenced_table</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;parent_table&quot;</span>);
@@ -2142,17 +2158,19 @@
                 }));
             }
 
-            <span class="kw">let</span> <span class="ident">referenced_table_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">referenced_table</span>) {
-                <span class="kw-2">*</span><span class="ident">id</span>
+            <span class="kw">let</span> (<span class="ident">table_id</span>, <span class="ident">column_id</span>, <span class="ident">referenced_table_id</span>, <span class="ident">referenced_column_id</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ids</span>) <span class="op">=</span> <span class="ident">get_ids</span>(
+                <span class="kw-2">&amp;</span><span class="ident">table_name</span>,
+                <span class="kw-2">&amp;</span><span class="ident">column_name</span>,
+                <span class="kw-2">&amp;</span><span class="ident">referenced_table</span>,
+                <span class="kw-2">&amp;</span><span class="ident">referenced_column</span>,
+                <span class="ident">table_ids</span>,
+                <span class="ident">sql_schema</span>,
+            ) {
+                <span class="ident">ids</span>
             } <span class="kw">else</span> {
                 <span class="kw">continue</span>;
             };
 
-            <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="ident">table_name</span>.<span class="ident">as_str</span>()) {
-                <span class="kw-2">*</span><span class="ident">id</span>
-            } <span class="kw">else</span> {
-                <span class="kw">continue</span>;
-            };
             <span class="kw">let</span> <span class="ident">confdeltype</span> <span class="op">=</span> <span class="ident">row</span>
                 .<span class="ident">get_char</span>(<span class="string">&quot;confdeltype&quot;</span>)
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;confdeltype&quot;</span>).<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>());
@@ -2176,32 +2194,24 @@
                 <span class="string">&#39;d&#39;</span> =&gt; <span class="ident">ForeignKeyAction::SetDefault</span>,
                 <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unrecognized foreign key action (on update) &#39;{}&#39;&quot;</span>, <span class="ident">confupdtype</span>),
             };
-            <span class="kw">match</span> <span class="ident">intermediate_fks</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
-                <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">fk</span>)) =&gt; {
-                    <span class="ident">fk</span>.<span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">column</span>);
-                    <span class="ident">fk</span>.<span class="ident">referenced_columns</span>.<span class="ident">push</span>(<span class="ident">referenced_column</span>);
-                }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">fk</span> <span class="op">=</span> <span class="ident">ForeignKey</span> {
-                        <span class="ident">constraint_name</span>: <span class="prelude-val">Some</span>(<span class="ident">constraint_name</span>),
-                        <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">column</span>],
-                        <span class="ident">referenced_table</span>: <span class="ident">referenced_table_id</span>,
-                        <span class="ident">referenced_columns</span>: <span class="macro">vec!</span>[<span class="ident">referenced_column</span>],
-                        <span class="ident">on_delete_action</span>,
-                        <span class="ident">on_update_action</span>,
-                    };
-                    <span class="ident">intermediate_fks</span>.<span class="ident">insert</span>(<span class="ident">id</span>, (<span class="ident">table_id</span>, <span class="ident">fk</span>));
-                }
-            };
-        }
 
-        <span class="kw">for</span> (<span class="kw">_</span>, (<span class="ident">table_id</span>, <span class="ident">fk</span>)) <span class="kw">in</span> <span class="ident">intermediate_fks</span> {
-            <span class="ident">sql_schema</span>.<span class="ident">foreign_keys</span>.<span class="ident">push</span>((<span class="ident">table_id</span>, <span class="ident">fk</span>));
-        }
+            <span class="kw">match</span> <span class="ident">current_fk</span> {
+                <span class="prelude-val">Some</span>((<span class="ident">current_oid</span>, <span class="kw">_</span>)) <span class="kw">if</span> <span class="ident">current_oid</span> <span class="op">==</span> <span class="ident">id</span> =&gt; (),
+                <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
+                    <span class="kw">let</span> <span class="ident">fkid</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">push_foreign_key</span>(
+                        <span class="prelude-val">Some</span>(<span class="ident">constraint_name</span>),
+                        [<span class="ident">table_id</span>, <span class="ident">referenced_table_id</span>],
+                        [<span class="ident">on_delete_action</span>, <span class="ident">on_update_action</span>],
+                    );
 
-        <span class="ident">sql_schema</span>
-            .<span class="ident">foreign_keys</span>
-            .<span class="ident">sort_by_cached_key</span>(<span class="op">|</span>(<span class="ident">id</span>, <span class="ident">fk</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">id</span>, <span class="ident">fk</span>.<span class="ident">columns</span>.<span class="ident">to_owned</span>()));
+                    <span class="ident">current_fk</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">id</span>, <span class="ident">fkid</span>));
+                }
+            }
+
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">fkid</span>)) <span class="op">=</span> <span class="ident">current_fk</span> {
+                <span class="ident">sql_schema</span>.<span class="ident">push_foreign_key_column</span>(<span class="ident">fkid</span>, [<span class="ident">column_id</span>, <span class="ident">referenced_column_id</span>]);
+            }
+        }
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -2399,7 +2409,7 @@
 
         <span class="kw">for</span> (<span class="ident">table_id</span>, (<span class="ident">indexes</span>, <span class="ident">pk</span>)) <span class="kw">in</span> <span class="ident">indexes_map</span> {
             <span class="kw">let</span> <span class="ident">pk_is_invalid</span> <span class="op">=</span> {
-                <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">table_walker_at</span>(<span class="ident">table_id</span>);
+                <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">walk</span>(<span class="ident">table_id</span>);
                 <span class="ident">pk</span>.<span class="ident">as_ref</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">column</span>(<span class="ident">col</span>.<span class="ident">name</span>()).<span class="ident">is_none</span>()))
                     .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)

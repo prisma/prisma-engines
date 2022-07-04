@@ -557,6 +557,20 @@
 <span id="552">552</span>
 <span id="553">553</span>
 <span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>, <span class="ident">SqlError</span>, <span class="ident">SqlFamilyTrait</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">common</span>::{<span class="ident">preview_features::PreviewFeature</span>, <span class="ident">RelationNames</span>},
@@ -629,16 +643,28 @@
 
 <span class="kw">fn</span> <span class="ident">common_prisma_m_to_n_relation_conditions</span>(<span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">fn</span> <span class="ident">is_a</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">column</span>.<span class="ident">to_lowercase</span>() <span class="op">==</span> <span class="string">&quot;a&quot;</span>
+        <span class="ident">column</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;a&quot;</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">is_b</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">column</span>.<span class="ident">to_lowercase</span>() <span class="op">==</span> <span class="string">&quot;b&quot;</span>
+        <span class="ident">column</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;b&quot;</span>)
     }
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fks</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">foreign_keys</span>();
     <span class="kw">let</span> <span class="ident">first_fk</span> <span class="op">=</span> <span class="ident">fks</span>.<span class="ident">next</span>();
     <span class="kw">let</span> <span class="ident">second_fk</span> <span class="op">=</span> <span class="ident">fks</span>.<span class="ident">next</span>();
+    <span class="kw">let</span> <span class="ident">a_b_match</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">first_fk</span> <span class="op">=</span> <span class="ident">first_fk</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">second_fk</span> <span class="op">=</span> <span class="ident">second_fk</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">first_fk_col</span> <span class="op">=</span> <span class="ident">first_fk</span>.<span class="ident">constrained_columns</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>();
+        <span class="kw">let</span> <span class="ident">second_fk_col</span> <span class="op">=</span> <span class="ident">second_fk</span>.<span class="ident">constrained_columns</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>();
+        (<span class="ident">first_fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">second_fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>()
+            <span class="op">&amp;&amp;</span> <span class="ident">is_a</span>(<span class="ident">first_fk_col</span>)
+            <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">second_fk_col</span>))
+            <span class="op">|</span><span class="op">|</span> (<span class="ident">second_fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">first_fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>()
+                <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">first_fk_col</span>)
+                <span class="op">&amp;&amp;</span> <span class="ident">is_a</span>(<span class="ident">second_fk_col</span>))
+    };
     <span class="ident">table</span>.<span class="ident">name</span>().<span class="ident">starts_with</span>(<span class="string">&#39;_&#39;</span>)
         <span class="comment">//UNIQUE INDEX [A,B]</span>
         <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">indexes</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
@@ -647,19 +673,14 @@
                 <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">i</span>.<span class="ident">columns</span>().<span class="ident">nth</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">as_column</span>().<span class="ident">name</span>())
                 <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">index_type</span>().<span class="ident">is_unique</span>()
         })
-        <span class="comment">//INDEX [B]</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>
-            .<span class="ident">indexes</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">i</span>.<span class="ident">columns</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">as_column</span>().<span class="ident">name</span>()) <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">index_type</span>() <span class="op">==</span> <span class="ident">IndexType::Normal</span>)
-
+    <span class="comment">//INDEX [B]</span>
+    <span class="op">&amp;&amp;</span> <span class="ident">table</span>
+        .<span class="ident">indexes</span>()
+        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">i</span>.<span class="ident">columns</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">as_column</span>().<span class="ident">name</span>()) <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">index_type</span>() <span class="op">==</span> <span class="ident">IndexType::Normal</span>)
         <span class="comment">// 2 FKs</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">foreign_key_count</span>() <span class="op">==</span> <span class="number">2</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">foreign_keys</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span>
         <span class="comment">// Lexicographically lower model referenced by A</span>
-        <span class="op">&amp;&amp;</span> <span class="kw">if</span> <span class="ident">first_fk</span>.<span class="ident">unwrap</span>().<span class="ident">referenced_table_name</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">second_fk</span>.<span class="ident">unwrap</span>().<span class="ident">referenced_table_name</span>() {
-            <span class="ident">is_a</span>(<span class="kw-2">&amp;</span><span class="ident">first_fk</span>.<span class="ident">unwrap</span>().<span class="ident">constrained_column_names</span>()[<span class="number">0</span>]) <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="kw-2">&amp;</span><span class="ident">second_fk</span>.<span class="ident">unwrap</span>().<span class="ident">constrained_column_names</span>()[<span class="number">0</span>])
-        } <span class="kw">else</span> {
-            <span class="ident">is_b</span>(<span class="kw-2">&amp;</span><span class="ident">first_fk</span>.<span class="ident">unwrap</span>().<span class="ident">constrained_column_names</span>()[<span class="number">0</span>]) <span class="op">&amp;&amp;</span> <span class="ident">is_a</span>(<span class="kw-2">&amp;</span><span class="ident">second_fk</span>.<span class="ident">unwrap</span>().<span class="ident">constrained_column_names</span>()[<span class="number">0</span>])
-        }
+        <span class="op">&amp;&amp;</span> <span class="ident">a_b_match</span>()
 }
 
 <span class="comment">//calculators</span>
@@ -674,7 +695,10 @@
         <span class="ident">fk_name</span>: <span class="prelude-val">None</span>,
         <span class="ident">fields</span>: <span class="macro">vec!</span>[],
         <span class="ident">to</span>: <span class="ident">opposite_foreign_key</span>.<span class="ident">referenced_table_name</span>().<span class="ident">to_owned</span>(),
-        <span class="ident">references</span>: <span class="ident">opposite_foreign_key</span>.<span class="ident">referenced_column_names</span>().<span class="ident">to_owned</span>(),
+        <span class="ident">references</span>: <span class="ident">opposite_foreign_key</span>
+            .<span class="ident">referenced_columns</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
+            .<span class="ident">collect</span>(),
         <span class="ident">on_delete</span>: <span class="prelude-val">None</span>,
         <span class="ident">on_update</span>: <span class="prelude-val">None</span>,
     };
@@ -682,7 +706,11 @@
     <span class="kw">let</span> <span class="ident">basename</span> <span class="op">=</span> <span class="ident">opposite_foreign_key</span>.<span class="ident">referenced_table_name</span>();
 
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">is_self_relation</span> {
-        <span class="bool-val">true</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">basename</span>, <span class="kw-2">&amp;</span><span class="ident">opposite_foreign_key</span>.<span class="ident">constrained_column_names</span>()[<span class="number">0</span>]),
+        <span class="bool-val">true</span> =&gt; <span class="macro">format!</span>(
+            <span class="string">&quot;{}_{}&quot;</span>,
+            <span class="ident">basename</span>,
+            <span class="ident">opposite_foreign_key</span>.<span class="ident">constrained_columns</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>()
+        ),
         <span class="bool-val">false</span> =&gt; <span class="ident">basename</span>.<span class="ident">to_owned</span>(),
     };
 
@@ -781,11 +809,11 @@
     <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">RelationInfo</span> {
         <span class="ident">name</span>: <span class="ident">calculate_relation_name</span>(<span class="ident">foreign_key</span>, <span class="ident">m2m_table_names</span>, <span class="ident">duplicated_foreign_keys</span>),
         <span class="ident">fk_name</span>: <span class="ident">foreign_key</span>.<span class="ident">constraint_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
-        <span class="ident">fields</span>: <span class="ident">foreign_key</span>.<span class="ident">constrained_column_names</span>().<span class="ident">to_owned</span>(),
+        <span class="ident">fields</span>: <span class="ident">foreign_key</span>.<span class="ident">constrained_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>()).<span class="ident">collect</span>(),
         <span class="ident">to</span>: <span class="ident">foreign_key</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-        <span class="ident">references</span>: <span class="ident">foreign_key</span>.<span class="ident">referenced_column_names</span>().<span class="ident">to_owned</span>(),
-        <span class="ident">on_delete</span>: <span class="prelude-val">Some</span>(<span class="ident">map_action</span>(<span class="kw-2">*</span><span class="ident">foreign_key</span>.<span class="ident">on_delete_action</span>())),
-        <span class="ident">on_update</span>: <span class="prelude-val">Some</span>(<span class="ident">map_action</span>(<span class="kw-2">*</span><span class="ident">foreign_key</span>.<span class="ident">on_update_action</span>())),
+        <span class="ident">references</span>: <span class="ident">foreign_key</span>.<span class="ident">referenced_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>()).<span class="ident">collect</span>(),
+        <span class="ident">on_delete</span>: <span class="prelude-val">Some</span>(<span class="ident">map_action</span>(<span class="ident">foreign_key</span>.<span class="ident">on_delete_action</span>())),
+        <span class="ident">on_update</span>: <span class="prelude-val">Some</span>(<span class="ident">map_action</span>(<span class="ident">foreign_key</span>.<span class="ident">on_update_action</span>())),
     };
 
     <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">foreign_key</span>.<span class="ident">constrained_columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="op">!</span><span class="ident">c</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>()) {
@@ -870,7 +898,7 @@
 ) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">referenced_model</span> <span class="op">=</span> <span class="ident">fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>();
     <span class="kw">let</span> <span class="ident">model_with_fk</span> <span class="op">=</span> <span class="ident">fk</span>.<span class="ident">table</span>().<span class="ident">name</span>();
-    <span class="kw">let</span> <span class="ident">fk_column_name</span> <span class="op">=</span> <span class="ident">fk</span>.<span class="ident">constrained_column_names</span>().<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>);
+    <span class="kw">let</span> <span class="ident">fk_column_name</span> <span class="op">=</span> <span class="ident">fk</span>.<span class="ident">constrained_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>);
     <span class="kw">let</span> <span class="ident">name_is_ambiguous</span> <span class="op">=</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">both_ids</span> <span class="op">=</span> [<span class="ident">fk</span>.<span class="ident">referenced_table</span>().<span class="ident">id</span>, <span class="ident">fk</span>.<span class="ident">table</span>().<span class="ident">id</span>];
         <span class="ident">both_ids</span>.<span class="ident">sort</span>();

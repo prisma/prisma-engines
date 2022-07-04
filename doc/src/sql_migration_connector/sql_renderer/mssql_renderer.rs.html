@@ -547,8 +547,6 @@
 <span id="542">542</span>
 <span id="543">543</span>
 <span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">alter_table</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">common</span>::<span class="kw-2">*</span>, <span class="ident">IteratorJoin</span>, <span class="ident">Quoted</span>, <span class="ident">SqlRenderer</span>};
@@ -625,9 +623,8 @@
 
     <span class="kw">fn</span> <span class="ident">render_references</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">cols</span> <span class="op">=</span> <span class="ident">foreign_key</span>
-            .<span class="ident">referenced_column_names</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="ident">Quoted::mssql_ident</span>)
+            .<span class="ident">referenced_columns</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">Quoted::mssql_ident</span>(<span class="ident">c</span>.<span class="ident">name</span>()))
             .<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>);
 
         <span class="macro">format!</span>(
@@ -944,7 +941,7 @@
                 <span class="ident">add_constraint</span>,
                 <span class="string">&quot;CONSTRAINT [FK__{}__{}] &quot;</span>,
                 <span class="ident">foreign_key</span>.<span class="ident">table</span>().<span class="ident">name</span>(),
-                <span class="ident">foreign_key</span>.<span class="ident">constrained_column_names</span>().<span class="ident">join</span>(<span class="string">&quot;__&quot;</span>),
+                <span class="ident">foreign_key</span>.<span class="ident">constrained_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>()).<span class="ident">join</span>(<span class="string">&quot;__&quot;</span>),
             )
             .<span class="ident">unwrap</span>();
         }
@@ -953,9 +950,8 @@
             <span class="ident">add_constraint</span>,
             <span class="string">&quot;FOREIGN KEY ({})&quot;</span>,
             <span class="ident">foreign_key</span>
-                .<span class="ident">constrained_column_names</span>()
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">col</span>))
+                .<span class="ident">constrained_columns</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">Quoted::mssql_ident</span>(<span class="ident">col</span>.<span class="ident">name</span>()))
                 .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
         )
         .<span class="ident">unwrap</span>();

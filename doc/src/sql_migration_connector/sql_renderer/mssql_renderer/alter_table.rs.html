@@ -309,8 +309,6 @@
 <span id="304">304</span>
 <span id="305">305</span>
 <span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::render_default</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::MssqlFlavour</span>,
@@ -325,7 +323,7 @@
 };
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
     <span class="ident">mssql::MssqlSchemaExt</span>,
-    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">SqlSchemaExt</span>, <span class="ident">TableWalker</span>},
+    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">TableWalker</span>},
     <span class="ident">ColumnId</span>, <span class="ident">DefaultValue</span>,
 };
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -519,14 +517,12 @@
     }
 
     <span class="kw">fn</span> <span class="ident">add_column</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">column_id</span>: <span class="ident">ColumnId</span>) {
-        <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">schema</span>.<span class="ident">walk_column</span>(<span class="ident">column_id</span>);
+        <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">schema</span>.<span class="ident">walk</span>(<span class="ident">column_id</span>);
         <span class="self">self</span>.<span class="ident">add_columns</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">render_column</span>(<span class="ident">column</span>));
     }
 
     <span class="kw">fn</span> <span class="ident">drop_column</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">column_id</span>: <span class="ident">ColumnId</span>) {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">renderer</span>
-            .<span class="ident">quote</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">schema</span>.<span class="ident">walk_column</span>(<span class="ident">column_id</span>).<span class="ident">name</span>());
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="ident">column_id</span>).<span class="ident">name</span>());
 
         <span class="self">self</span>.<span class="ident">drop_columns</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">name</span>));
     }
