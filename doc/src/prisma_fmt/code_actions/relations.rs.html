@@ -419,7 +419,7 @@
     <span class="kw">if</span> <span class="ident">relation</span>
         .<span class="ident">referenced_model</span>()
         .<span class="ident">unique_criterias</span>()
-        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">crit</span><span class="op">|</span> <span class="ident">crit</span>.<span class="ident">contains_exactly_fields</span>(<span class="ident">relation</span>.<span class="ident">referencing_fields</span>()))
+        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">crit</span><span class="op">|</span> <span class="ident">crit</span>.<span class="ident">contains_exactly_fields</span>(<span class="ident">relation</span>.<span class="ident">referenced_fields</span>()))
     {
         <span class="kw">return</span>;
     }
