@@ -13,6 +13,11 @@ pub(crate) fn test_scenario(scenario_name: &str) {
     };
 
     path.clear();
+    write!(path, "{}/{}/diagnostics.json", SCENARIOS_PATH, scenario_name).unwrap();
+    let diagnostics = std::fs::read_to_string(&path).unwrap_or_else(|_| String::new());
+    let diagnostics = serde_json::from_str(&diagnostics).unwrap_or_default();
+
+    path.clear();
     write!(path, "{}/{}/result.json", SCENARIOS_PATH, scenario_name).unwrap();
     let expected_result = std::fs::read_to_string(&path).unwrap_or_else(|_| String::new());
 
@@ -21,14 +26,17 @@ pub(crate) fn test_scenario(scenario_name: &str) {
             uri: "file:/path/to/schema.prisma".parse().unwrap(),
         },
         range: lsp_types::Range::default(),
-        context: lsp_types::CodeActionContext::default(),
+        context: lsp_types::CodeActionContext {
+            diagnostics,
+            ..Default::default()
+        },
         work_done_progress_params: lsp_types::WorkDoneProgressParams { work_done_token: None },
         partial_result_params: lsp_types::PartialResultParams {
             partial_result_token: None,
         },
     };
 
-    let result = prisma_fmt::code_actions(&schema, &serde_json::to_string_pretty(&params).unwrap());
+    let result = prisma_fmt::code_actions(schema, &serde_json::to_string_pretty(&params).unwrap());
     // Prettify the JSON
     let result =
         serde_json::to_string_pretty(&serde_json::from_str::<Vec<lsp_types::CodeActionOrCommand>>(&result).unwrap())

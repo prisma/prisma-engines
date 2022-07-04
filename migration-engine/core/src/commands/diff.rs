@@ -2,6 +2,7 @@ use crate::{
     core_error::CoreResult,
     json_rpc::types::{DiffParams, DiffResult, DiffTarget, PathContainer, SchemaContainer, UrlContainer},
 };
+use datamodel::schema_ast::source_file::SourceFile;
 use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorHost, DatabaseSchema, DiffTarget as McDiff, MigrationConnector};
 use std::{path::Path, sync::Arc};
@@ -91,7 +92,10 @@ async fn json_rpc_diff_target_to_connector(
             let schema_contents = read_prisma_schema_from_path(schema)?;
             let mut connector = crate::schema_to_connector_unchecked(&schema_contents)?;
             let schema = connector
-                .database_schema_from_diff_target(McDiff::Datamodel(&schema_contents), None)
+                .database_schema_from_diff_target(
+                    McDiff::Datamodel(SourceFile::new_allocated(Arc::from(schema_contents.into_boxed_str()))),
+                    None,
+                )
                 .await?;
             Ok(Some((connector, schema)))
         }

@@ -1,7 +1,7 @@
 mod context;
 mod validations;
 
-use crate::{ast, common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics};
+use crate::{common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics};
 use datamodel_connector::{Connector, EmptyDatamodelConnector, ReferentialIntegrity};
 use enumflags2::BitFlags;
 use parser_database::ParserDatabase;
@@ -23,17 +23,14 @@ pub struct ValidateOutput {
 /// * ...
 /// * Validate the schema
 pub(crate) fn validate(
-    ast_schema: ast::SchemaAst,
+    db: ParserDatabase,
     sources: &[configuration::Datasource],
     preview_features: BitFlags<PreviewFeature>,
-    mut diagnostics: Diagnostics,
+    diagnostics: Diagnostics,
 ) -> ValidateOutput {
     let source = sources.first();
     let connector = source.map(|s| s.active_connector).unwrap_or(&EmptyDatamodelConnector);
     let referential_integrity = source.map(|s| s.referential_integrity()).unwrap_or_default();
-
-    // Make sense of the AST.
-    let db = ParserDatabase::new(ast_schema, &mut diagnostics);
 
     let mut output = ValidateOutput {
         db,

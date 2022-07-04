@@ -1,0 +1,16 @@
+[
+  {
+    "range": {
+      "start": {
+        "line": 13,
+        "character": 2
+      },
+      "end": {
+        "line": 13,
+        "character": 10
+      }
+    },
+    "severity": 1,
+    "message": "The field has to be unique due to a relation"
+  }
+]

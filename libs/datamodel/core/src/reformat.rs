@@ -1,36 +1,35 @@
 use crate::ParserDatabase;
 use parser_database::walkers;
-use schema_ast::ast;
-use std::borrow::Cow;
+use schema_ast::{ast, source_file::SourceFile};
+use std::{borrow::Cow, sync::Arc};
 
 /// Returns either the reformatted schema, or the original input if we can't reformat. This happens
 /// if and only if the source does not parse to a well formed AST.
 pub fn reformat(source: &str, indent_width: usize) -> Option<String> {
-    let db = crate::parse_schema_ast(source).ok().and_then(|ast| {
-        let mut diagnostics = diagnostics::Diagnostics::new();
-        let db = parser_database::ParserDatabase::new(ast, &mut diagnostics);
-        diagnostics.to_result().ok().map(move |_| db)
-    });
-    let source_to_reformat: Cow<'_, str> = match db {
-        Some(db) => {
-            let mut missing_bits = Vec::new();
-            let mut ctx = MagicReformatCtx {
-                original_schema: source,
-                missing_bits: &mut missing_bits,
-                db: &db,
-            };
-            push_missing_fields(&mut ctx);
-            push_missing_attributes(&mut ctx);
-            push_missing_relation_attribute_args(&mut ctx);
-            missing_bits.sort_by_key(|bit| bit.position);
+    let file = SourceFile::new_allocated(Arc::from(source.to_owned().into_boxed_str()));
 
-            if missing_bits.is_empty() {
-                Cow::Borrowed(source)
-            } else {
-                Cow::Owned(enrich(source, &missing_bits))
-            }
+    let mut diagnostics = diagnostics::Diagnostics::new();
+    let db = parser_database::ParserDatabase::new(file, &mut diagnostics);
+
+    let source_to_reformat = if diagnostics.has_errors() {
+        Cow::Borrowed(source)
+    } else {
+        let mut missing_bits = Vec::new();
+        let mut ctx = MagicReformatCtx {
+            original_schema: source,
+            missing_bits: &mut missing_bits,
+            db: &db,
+        };
+        push_missing_fields(&mut ctx);
+        push_missing_attributes(&mut ctx);
+        push_missing_relation_attribute_args(&mut ctx);
+        missing_bits.sort_by_key(|bit| bit.position);
+
+        if missing_bits.is_empty() {
+            Cow::Borrowed(source)
+        } else {
+            Cow::Owned(enrich(source, &missing_bits))
         }
-        None => Cow::Borrowed(source),
     };
 
     schema_ast::reformat(&source_to_reformat, indent_width)

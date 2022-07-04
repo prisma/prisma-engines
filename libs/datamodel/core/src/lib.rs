@@ -58,6 +58,8 @@ mod configuration;
 mod reformat;
 mod transform;
 
+use std::sync::Arc;
+
 pub use crate::{
     configuration::{Configuration, Datasource, Generator, StringFromEnvVar},
     reformat::reformat,
@@ -66,6 +68,7 @@ pub use datamodel_connector;
 pub use diagnostics;
 pub use parser_database;
 pub use parser_database::is_reserved_type_name;
+use schema_ast::source_file::SourceFile;
 pub use schema_ast::{self, ast};
 
 use crate::common::preview_features::PreviewFeature;
@@ -105,27 +108,25 @@ impl ValidatedSchema {
     }
 }
 
-/// Parse and validate the whole schema.
-pub fn parse_schema_parserdb(src: &str) -> Result<ValidatedSchema, String> {
+pub fn parse_schema_parserdb(file: impl Into<SourceFile>) -> Result<ValidatedSchema, String> {
+    let file = file.into();
+
     let mut diagnostics = Diagnostics::new();
+    let db = ParserDatabase::new(file.clone(), &mut diagnostics);
+
     diagnostics
         .to_result()
-        .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
+        .map_err(|err| err.to_pretty_string("schema.prisma", file.as_str()))?;
 
-    let ast = schema_ast::parse_schema(src, &mut diagnostics);
-    let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
+    let generators = GeneratorLoader::load_generators_from_ast(db.ast(), &mut diagnostics);
     let preview_features = preview_features(&generators);
-    let datasources = load_sources(&ast, preview_features, &mut diagnostics);
+    let datasources = load_sources(db.ast(), preview_features, &mut diagnostics);
 
-    diagnostics
-        .to_result()
-        .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
-
-    let out = validate(ast, &datasources, preview_features, diagnostics);
+    let out = validate(db, &datasources, preview_features, diagnostics);
 
     out.diagnostics
         .to_result()
-        .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
+        .map_err(|err| err.to_pretty_string("schema.prisma", file.as_str()))?;
 
     Ok(ValidatedSchema {
         configuration: Configuration {
@@ -148,16 +149,20 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, dia
 fn parse_datamodel_internal(
     datamodel_string: &str,
 ) -> Result<Validated<(Configuration, dml::Datamodel)>, diagnostics::Diagnostics> {
-    let mut diagnostics = diagnostics::Diagnostics::new();
-    let ast = schema_ast::parse_schema(datamodel_string, &mut diagnostics);
+    let file = SourceFile::new_allocated(Arc::from(datamodel_string.to_owned().into_boxed_str()));
 
-    let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
-    let preview_features = preview_features(&generators);
-    let datasources = load_sources(&ast, preview_features, &mut diagnostics);
+    let mut diagnostics = diagnostics::Diagnostics::new();
+    let db = ParserDatabase::new(file, &mut diagnostics);
 
     diagnostics.to_result()?;
 
-    let out = validate(ast, &datasources, preview_features, diagnostics);
+    let generators = GeneratorLoader::load_generators_from_ast(db.ast(), &mut diagnostics);
+    let preview_features = preview_features(&generators);
+    let datasources = load_sources(db.ast(), preview_features, &mut diagnostics);
+
+    diagnostics.to_result()?;
+
+    let out = validate(db, &datasources, preview_features, diagnostics);
 
     if !out.diagnostics.errors().is_empty() {
         return Err(out.diagnostics);

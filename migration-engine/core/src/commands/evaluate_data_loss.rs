@@ -1,4 +1,7 @@
+use std::sync::Arc;
+
 use crate::{json_rpc::types::*, CoreResult};
+use datamodel::schema_ast::source_file::SourceFile;
 use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
 
 /// Development command for migrations. Evaluate the data loss induced by the
@@ -11,6 +14,7 @@ pub async fn evaluate_data_loss(
     connector: &mut dyn MigrationConnector,
 ) -> CoreResult<EvaluateDataLossOutput> {
     error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    let source_file = SourceFile::new_allocated(Arc::from(input.prisma_schema.into_boxed_str()));
 
     let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
 
@@ -18,7 +22,7 @@ pub async fn evaluate_data_loss(
         .database_schema_from_diff_target(DiffTarget::Migrations(&migrations_from_directory), None)
         .await?;
     let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.prisma_schema), None)
+        .database_schema_from_diff_target(DiffTarget::Datamodel(source_file), None)
         .await?;
     let migration = connector.diff(from, to)?;
 

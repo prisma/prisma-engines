@@ -2,10 +2,11 @@ use datamodel::{
     datamodel_connector::{Connector, Diagnostics, ReferentialIntegrity},
     parse_configuration, parse_schema_ast,
     parser_database::ParserDatabase,
-    schema_ast::ast,
+    schema_ast::{ast, source_file::SourceFile},
 };
 use log::*;
 use lsp_types::*;
+use std::sync::Arc;
 
 pub(crate) fn empty_completion_list() -> CompletionList {
     CompletionList {
@@ -14,22 +15,22 @@ pub(crate) fn empty_completion_list() -> CompletionList {
     }
 }
 
-pub(crate) fn completion(schema: &str, params: CompletionParams) -> CompletionList {
-    let schema_ast = if let Ok(schema_ast) = parse_schema_ast(schema) {
-        schema_ast
-    } else {
+pub(crate) fn completion(schema: String, params: CompletionParams) -> CompletionList {
+    if parse_schema_ast(&schema).is_err() {
         warn!("Failed to parse schema AST in completion request.");
         return empty_completion_list();
     };
+    let source_file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
 
-    let position = if let Some(pos) = super::position_to_offset(&params.text_document_position.position, schema) {
-        pos
-    } else {
-        warn!("Received a position outside of the document boundaries in CompletionParams");
-        return empty_completion_list();
-    };
+    let position =
+        if let Some(pos) = super::position_to_offset(&params.text_document_position.position, source_file.as_str()) {
+            pos
+        } else {
+            warn!("Received a position outside of the document boundaries in CompletionParams");
+            return empty_completion_list();
+        };
 
-    let (connector, referential_integrity) = parse_configuration(schema)
+    let (connector, referential_integrity) = parse_configuration(source_file.as_str())
         .ok()
         .and_then(|conf| conf.subject.datasources.into_iter().next())
         .map(|datasource| (datasource.active_connector, datasource.referential_integrity()))
@@ -47,7 +48,7 @@ pub(crate) fn completion(schema: &str, params: CompletionParams) -> CompletionLi
 
     let db = {
         let mut diag = Diagnostics::new();
-        ParserDatabase::new(schema_ast, &mut diag)
+        ParserDatabase::new(source_file, &mut diag)
     };
 
     push_ast_completions(&mut list, connector, referential_integrity, &db, position);

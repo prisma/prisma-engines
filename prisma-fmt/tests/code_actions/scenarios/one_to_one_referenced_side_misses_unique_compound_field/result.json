@@ -32,7 +32,7 @@
                 "character": 1
               }
             },
-            "newText": "  @@unique([field1, field2])\n}"
+            "newText": "\n  @@unique([field1, field2])\n}"
           }
         ]
       }

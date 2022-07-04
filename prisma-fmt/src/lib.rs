@@ -14,7 +14,7 @@ use lsp_types::{Position, Range};
 /// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).
 /// Input and output are both JSON, the request being a `CompletionParams` object and the response
 /// being a `CompletionList` object.
-pub fn text_document_completion(schema: &str, params: &str) -> String {
+pub fn text_document_completion(schema: String, params: &str) -> String {
     let params = if let Ok(params) = serde_json::from_str::<lsp_types::CompletionParams>(params) {
         params
     } else {
@@ -28,7 +28,7 @@ pub fn text_document_completion(schema: &str, params: &str) -> String {
 }
 
 /// This API is modelled on an LSP [code action request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_codeAction=). Input and output are both JSON, the request being a `CodeActionParams` object and the response being a list of `CodeActionOrCommand` objects.
-pub fn code_actions(schema: &str, params: &str) -> String {
+pub fn code_actions(schema: String, params: &str) -> String {
     let params = if let Ok(params) = serde_json::from_str::<lsp_types::CodeActionParams>(params) {
         params
     } else {
@@ -156,6 +156,14 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
     }
 
     Some(offset)
+}
+
+/// Converts an LSP range to a span.
+pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
+    let start = position_to_offset(&range.start, document).unwrap();
+    let end = position_to_offset(&range.end, document).unwrap();
+
+    ast::Span::new(start, end)
 }
 
 /// Converts a span of byte offsets to an LSP range.

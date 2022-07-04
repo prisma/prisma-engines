@@ -44,6 +44,7 @@ pub use value_validator::{ValueListValidator, ValueValidator};
 use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};
 use names::Names;
+use schema_ast::source_file::SourceFile;
 
 /// ParserDatabase is a container for a Schema AST, together with information
 /// gathered during schema validation. Each validation step enriches the
@@ -66,6 +67,7 @@ use names::Names;
 ///   Currently only index name collisions.
 pub struct ParserDatabase {
     ast: ast::SchemaAst,
+    file: SourceFile,
     interner: interner::StringInterner,
     _names: Names,
     types: Types,
@@ -74,7 +76,9 @@ pub struct ParserDatabase {
 
 impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(ast: ast::SchemaAst, diagnostics: &mut Diagnostics) -> Self {
+    pub fn new(file: SourceFile, diagnostics: &mut Diagnostics) -> Self {
+        let ast = schema_ast::parse_schema(file.as_str(), diagnostics);
+
         let mut interner = Default::default();
         let mut names = Default::default();
         let mut types = Default::default();
@@ -88,6 +92,7 @@ impl ParserDatabase {
         if ctx.diagnostics.has_errors() {
             return ParserDatabase {
                 ast,
+                file,
                 interner,
                 _names: names,
                 types,
@@ -102,6 +107,7 @@ impl ParserDatabase {
         if ctx.diagnostics.has_errors() {
             return ParserDatabase {
                 ast,
+                file,
                 interner,
                 _names: names,
                 types,
@@ -119,6 +125,7 @@ impl ParserDatabase {
 
         ParserDatabase {
             ast,
+            file,
             interner,
             _names: names,
             types,
@@ -134,6 +141,11 @@ impl ParserDatabase {
     /// The total number of models.
     pub fn models_count(&self) -> usize {
         self.types.model_attributes.len()
+    }
+
+    /// The source file contents.
+    pub fn source(&self) -> &str {
+        self.file.as_str()
     }
 }
 

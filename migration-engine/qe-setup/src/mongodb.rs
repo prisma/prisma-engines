@@ -1,3 +1,6 @@
+use std::sync::Arc;
+
+use datamodel::schema_ast::source_file::SourceFile;
 use migration_core::migration_connector::{ConnectorError, ConnectorResult};
 use url::Url;
 
@@ -16,7 +19,9 @@ pub(crate) async fn mongo_setup(schema: &str, url: &str) -> ConnectorResult<()> 
         .await
         .unwrap();
 
-    let parsed_schema = datamodel::parse_schema_parserdb(schema).unwrap();
+    let parsed_schema =
+        datamodel::parse_schema_parserdb(SourceFile::new_allocated(Arc::from(schema.to_owned().into_boxed_str())))
+            .unwrap();
 
     for model in parsed_schema.db.walk_models() {
         client
