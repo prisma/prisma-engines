@@ -1230,3 +1230,31 @@ fn sequence_with_multiple_models_works(api: TestApi) {
     api.schema_push(schema).send().assert_green();
     api.schema_push(schema).send().assert_green().assert_no_steps();
 }
+
+#[test_connector(tags(CockroachDb))]
+fn bigint_defaults_work(api: TestApi) {
+    let schema = r#"
+        datasource mypg {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model foo {
+          id  String @id
+          bar BigInt @default(0)
+        }
+    "#;
+    let sql = expect![[r#"
+        -- CreateTable
+        CREATE TABLE "foo" (
+            "id" STRING NOT NULL,
+            "bar" INT8 NOT NULL DEFAULT 0,
+
+            CONSTRAINT "foo_pkey" PRIMARY KEY ("id")
+        );
+    "#]];
+    api.expect_sql_for_schema(schema, &sql);
+
+    api.schema_push(schema).send().assert_green();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}

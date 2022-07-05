@@ -258,3 +258,47 @@ fn prisma_9537(api: TestApi) {
         .send()
         .assert_green();
 }
+
+#[test_connector(tags(Mssql))]
+fn bigint_defaults_work(api: TestApi) {
+    let schema = r#"
+        datasource mypg {
+            provider = "sqlserver"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model foo {
+          id  String @id
+          bar BigInt @default(0)
+        }
+    "#;
+    let sql = expect![[r#"
+        BEGIN TRY
+
+        BEGIN TRAN;
+
+        -- CreateTable
+        CREATE TABLE [bigint_defaults_work].[foo] (
+            [id] NVARCHAR(1000) NOT NULL,
+            [bar] BIGINT NOT NULL CONSTRAINT [foo_bar_df] DEFAULT 0,
+            CONSTRAINT [foo_pkey] PRIMARY KEY CLUSTERED ([id])
+        );
+
+        COMMIT TRAN;
+
+        END TRY
+        BEGIN CATCH
+
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRAN;
+        END;
+        THROW
+
+        END CATCH
+    "#]];
+    api.expect_sql_for_schema(schema, &sql);
+
+    api.schema_push(schema).send().assert_green();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}

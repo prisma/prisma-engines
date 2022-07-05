@@ -694,3 +694,31 @@ fn json_defaults_with_escaped_quotes_work(api: TestApi) {
 
     api.expect_sql_for_schema(schema, &sql);
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn bigint_defaults_work(api: TestApi) {
+    let schema = r#"
+        datasource mypg {
+            provider = "postgresql"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model foo {
+          id  String @id
+          bar BigInt @default(0)
+        }
+    "#;
+    let sql = expect![[r#"
+        -- CreateTable
+        CREATE TABLE "foo" (
+            "id" TEXT NOT NULL,
+            "bar" BIGINT NOT NULL DEFAULT 0,
+
+            CONSTRAINT "foo_pkey" PRIMARY KEY ("id")
+        );
+    "#]];
+    api.expect_sql_for_schema(schema, &sql);
+
+    api.schema_push(schema).send().assert_green();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}
