@@ -406,7 +406,7 @@ mod order_by_nulls {
             runner,
             r#"{ findManyTestModel(orderBy: { id: { sort: asc, nulls: first } }) { id } }"#,
             2009,
-            "Query parsing/validation error at `Query.findManyTestModel.orderBy.TestModelOrderByWithRelationAndSearchRelevanceInput.id`: Value types mismatch."
+            "Value types mismatch"
         );
 
         Ok(())
@@ -418,7 +418,7 @@ mod order_by_nulls {
             runner,
             r#"{ findManyTestModel(orderBy: { string: { sort: asc, nulls: first } }) { id } }"#,
             2009,
-            "Query parsing/validation error at `Query.findManyTestModel.orderBy.TestModelOrderByWithRelationAndSearchRelevanceInput.string`: Value types mismatch."
+            "Value types mismatch"
         );
 
         Ok(())
