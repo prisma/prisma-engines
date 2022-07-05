@@ -102,7 +102,7 @@ block_level_attribute = { "@@" ~ attribute ~ trailing_comment? ~ NEWLINE }
 // An attribute may have no arguments at all.
 attribute = { attribute_name? ~ arguments_list? }
 // This is a poor-mans version of name spacing. This is currently used for native types.
-attribute_name = @{ (non_empty_identifier ~ ".")? ~ non_empty_identifier }
+attribute_name = @{ (non_empty_identifier ~ ".")? ~ non_empty_identifier? }
 
 // ######################################
 // Arguments
