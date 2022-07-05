@@ -59,6 +59,7 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
             })
             .map(|(_, fk)| fk.id)
             .collect();
+
         for foreign_key in table
             .foreign_keys()
             .filter(|fk| !duplicated_foreign_keys.contains(&fk.id))

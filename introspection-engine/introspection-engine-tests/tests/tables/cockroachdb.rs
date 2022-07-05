@@ -426,3 +426,186 @@ async fn datetime_default_expressions_are_not_truncated(api: &TestApi) -> TestRe
     api.expect_datamodel(&expected).await;
     Ok(())
 }
+
+#[test_connector(tags(CockroachDb))]
+async fn northwind(api: TestApi) {
+    let setup = include_str!("./northwind_postgresql.sql");
+    api.raw_cmd(setup).await;
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "cockroachdb"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model categories {
+          category_id   Int        @id(map: "pk_categories") @db.Int2
+          category_name String     @db.String(15)
+          description   String?
+          picture       Bytes?
+          products      products[]
+        }
+
+        model customer_customer_demo {
+          customer_id           String                @db.Char
+          customer_type_id      String                @db.Char
+          customer_demographics customer_demographics @relation(fields: [customer_type_id], references: [customer_type_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_customer_customer_demo_customer_demographics")
+          customers             customers             @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_customer_customer_demo_customers")
+
+          @@id([customer_id, customer_type_id], map: "pk_customer_customer_demo")
+        }
+
+        model customer_demographics {
+          customer_type_id       String                   @id(map: "pk_customer_demographics") @db.Char
+          customer_desc          String?
+          customer_customer_demo customer_customer_demo[]
+        }
+
+        model customers {
+          customer_id            String                   @id(map: "pk_customers") @db.Char
+          company_name           String                   @db.String(40)
+          contact_name           String?                  @db.String(30)
+          contact_title          String?                  @db.String(30)
+          address                String?                  @db.String(60)
+          city                   String?                  @db.String(15)
+          region                 String?                  @db.String(15)
+          postal_code            String?                  @db.String(10)
+          country                String?                  @db.String(15)
+          phone                  String?                  @db.String(24)
+          fax                    String?                  @db.String(24)
+          customer_customer_demo customer_customer_demo[]
+          orders                 orders[]
+        }
+
+        model employee_territories {
+          employee_id  Int         @db.Int2
+          territory_id String      @db.String(20)
+          employees    employees   @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_territories_employees")
+          territories  territories @relation(fields: [territory_id], references: [territory_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_territories_territories")
+
+          @@id([employee_id, territory_id], map: "pk_employee_territories")
+        }
+
+        model employees {
+          employee_id          Int                    @id(map: "pk_employees") @db.Int2
+          last_name            String                 @db.String(20)
+          first_name           String                 @db.String(10)
+          title                String?                @db.String(30)
+          title_of_courtesy    String?                @db.String(25)
+          birth_date           DateTime?              @db.Date
+          hire_date            DateTime?              @db.Date
+          address              String?                @db.String(60)
+          city                 String?                @db.String(15)
+          region               String?                @db.String(15)
+          postal_code          String?                @db.String(10)
+          country              String?                @db.String(15)
+          home_phone           String?                @db.String(24)
+          extension            String?                @db.String(4)
+          photo                Bytes?
+          notes                String?
+          reports_to           Int?                   @db.Int2
+          photo_path           String?                @db.String(255)
+          employees            employees?             @relation("employeesToemployees", fields: [reports_to], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_employees_employees")
+          employee_territories employee_territories[]
+          other_employees      employees[]            @relation("employeesToemployees")
+          orders               orders[]
+        }
+
+        model order_details {
+          order_id   Int      @db.Int2
+          product_id Int      @db.Int2
+          unit_price Float    @db.Float4
+          quantity   Int      @db.Int2
+          discount   Float    @db.Float4
+          orders     orders   @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_order_details_orders")
+          products   products @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_order_details_products")
+
+          @@id([order_id, product_id], map: "pk_order_details")
+        }
+
+        model orders {
+          order_id         Int             @id(map: "pk_orders") @db.Int2
+          customer_id      String?         @db.Char
+          employee_id      Int?            @db.Int2
+          order_date       DateTime?       @db.Date
+          required_date    DateTime?       @db.Date
+          shipped_date     DateTime?       @db.Date
+          ship_via         Int?            @db.Int2
+          freight          Float?          @db.Float4
+          ship_name        String?         @db.String(40)
+          ship_address     String?         @db.String(60)
+          ship_city        String?         @db.String(15)
+          ship_region      String?         @db.String(15)
+          ship_postal_code String?         @db.String(10)
+          ship_country     String?         @db.String(15)
+          customers        customers?      @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_customers")
+          employees        employees?      @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_employees")
+          shippers         shippers?       @relation(fields: [ship_via], references: [shipper_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_shippers")
+          order_details    order_details[]
+        }
+
+        model products {
+          product_id        Int             @id(map: "pk_products") @db.Int2
+          product_name      String          @db.String(40)
+          supplier_id       Int?            @db.Int2
+          category_id       Int?            @db.Int2
+          quantity_per_unit String?         @db.String(20)
+          unit_price        Float?          @db.Float4
+          units_in_stock    Int?            @db.Int2
+          units_on_order    Int?            @db.Int2
+          reorder_level     Int?            @db.Int2
+          discontinued      Int
+          categories        categories?     @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_products_categories")
+          suppliers         suppliers?      @relation(fields: [supplier_id], references: [supplier_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_products_suppliers")
+          order_details     order_details[]
+        }
+
+        model region {
+          region_id          Int           @id(map: "pk_region") @db.Int2
+          region_description String        @db.Char
+          territories        territories[]
+        }
+
+        model shippers {
+          shipper_id   Int      @id(map: "pk_shippers") @db.Int2
+          company_name String   @db.String(40)
+          phone        String?  @db.String(24)
+          orders       orders[]
+        }
+
+        model suppliers {
+          supplier_id   Int        @id(map: "pk_suppliers") @db.Int2
+          company_name  String     @db.String(40)
+          contact_name  String?    @db.String(30)
+          contact_title String?    @db.String(30)
+          address       String?    @db.String(60)
+          city          String?    @db.String(15)
+          region        String?    @db.String(15)
+          postal_code   String?    @db.String(10)
+          country       String?    @db.String(15)
+          phone         String?    @db.String(24)
+          fax           String?    @db.String(24)
+          homepage      String?
+          products      products[]
+        }
+
+        model territories {
+          territory_id          String                 @id(map: "pk_territories") @db.String(20)
+          territory_description String                 @db.Char
+          region_id             Int                    @db.Int2
+          region                region                 @relation(fields: [region_id], references: [region_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_territories_region")
+          employee_territories  employee_territories[]
+        }
+
+        model us_states {
+          state_id     Int     @id(map: "pk_usstates") @db.Int2
+          state_name   String? @db.String(100)
+          state_abbr   String? @db.String(2)
+          state_region String? @db.String(50)
+        }
+    "#]];
+    api.expect_datamodel(&expectation).await;
+}

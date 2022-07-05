@@ -158,14 +158,11 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         ctx: IntrospectionContext,
     ) -> ConnectorResult<IntrospectionResult> {
         let sql_schema = self.catch(self.describe(Some(&ctx.source.active_provider))).await?;
-        tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
 
         let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, previous_data_model, ctx)
             .map_err(|sql_introspection_error| {
                 sql_introspection_error.into_connector_error(self.connection.connection_info())
             })?;
-
-        tracing::debug!("Calculating datamodel is done: {:?}", introspection_result.data_model);
 
         Ok(introspection_result)
     }

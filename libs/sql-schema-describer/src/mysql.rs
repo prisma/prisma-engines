@@ -78,7 +78,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
 
         Self::get_all_columns(&table_names, self.conn, schema, &mut sql_schema, &flavour).await?;
         let mut indexes = self.get_all_indexes(&table_names, schema).await?;
-        Self::get_foreign_keys(self.conn, schema, &table_names, &mut sql_schema).await?;
+        push_foreign_keys(schema, &table_names, &mut sql_schema, self.conn).await?;
 
         // In certain cases we cannot query any columns, but we can still list
         // indices. This leads to a very broken result, so we instead just take
@@ -585,104 +585,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(map)
     }
 
-    async fn get_foreign_keys(
-        conn: &dyn Queryable,
-        schema_name: &str,
-        table_ids: &IndexMap<String, TableId>,
-        sql_schema: &mut SqlSchema,
-    ) -> DescriberResult<()> {
-        // We alias all the columns because MySQL column names are case-insensitive in queries, but
-        // the information schema column names became upper-case in MySQL 8, causing the code
-        // fetching the result values by column name below to fail.
-        let sql = "
-            SELECT
-                kcu.constraint_name constraint_name,
-                kcu.column_name column_name,
-                kcu.referenced_table_name referenced_table_name,
-                kcu.referenced_column_name referenced_column_name,
-                kcu.ordinal_position ordinal_position,
-                kcu.table_name table_name,
-                rc.delete_rule delete_rule,
-                rc.update_rule update_rule
-            FROM information_schema.key_column_usage AS kcu
-            INNER JOIN information_schema.referential_constraints AS rc ON
-            kcu.constraint_name = rc.constraint_name
-            WHERE
-                kcu.table_schema = ?
-                AND rc.constraint_schema = ?
-                AND kcu.referenced_column_name IS NOT NULL
-            ORDER BY table_schema, table_name, constraint_name, ordinal_position
-        ";
-
-        fn get_ids(
-            row: &ResultRow,
-            table_ids: &IndexMap<String, TableId>,
-            sql_schema: &SqlSchema,
-        ) -> Option<(TableId, ColumnId, TableId, ColumnId)> {
-            let table_name = row.get_expect_string("table_name");
-            let column_name = row.get_expect_string("column_name");
-            let referenced_table_name = row.get_expect_string("referenced_table_name");
-            let referenced_column_name = row.get_expect_string("referenced_column_name");
-
-            let table_id = *table_ids.get(&table_name)?;
-            let referenced_table_id = *table_ids.get(&referenced_table_name)?;
-            let column_id = sql_schema.walk(table_id).column(&column_name)?.id;
-            let referenced_column_id = sql_schema.walk(referenced_table_id).column(&referenced_column_name)?.id;
-
-            Some((table_id, column_id, referenced_table_id, referenced_column_id))
-        }
-
-        let result_set = conn.query_raw(sql, &[schema_name.into(), schema_name.into()]).await?;
-        let mut current_fk: Option<(TableId, String, ForeignKeyId)> = None;
-
-        for row in result_set.into_iter() {
-            trace!("Got description FK row {:#?}", row);
-            let (table_id, column_id, referenced_table_id, referenced_column_id) =
-                if let Some(ids) = get_ids(&row, table_ids, sql_schema) {
-                    ids
-                } else {
-                    continue;
-                };
-            let constraint_name = row.get_expect_string("constraint_name");
-            let on_delete_action = match row.get_expect_string("delete_rule").to_lowercase().as_str() {
-                "cascade" => ForeignKeyAction::Cascade,
-                "set null" => ForeignKeyAction::SetNull,
-                "set default" => ForeignKeyAction::SetDefault,
-                "restrict" => ForeignKeyAction::Restrict,
-                "no action" => ForeignKeyAction::NoAction,
-                s => panic!("Unrecognized on delete action '{}'", s),
-            };
-            let on_update_action = match row.get_expect_string("update_rule").to_lowercase().as_str() {
-                "cascade" => ForeignKeyAction::Cascade,
-                "set null" => ForeignKeyAction::SetNull,
-                "set default" => ForeignKeyAction::SetDefault,
-                "restrict" => ForeignKeyAction::Restrict,
-                "no action" => ForeignKeyAction::NoAction,
-                s => panic!("Unrecognized on update action '{}'", s),
-            };
-
-            match &current_fk {
-                Some((cur_table_id, cur_constraint_name, _))
-                    if *cur_table_id == table_id && *cur_constraint_name == constraint_name => {}
-                None | Some(_) => {
-                    let fkid = sql_schema.push_foreign_key(
-                        Some(constraint_name.clone()),
-                        [table_id, referenced_table_id],
-                        [on_delete_action, on_update_action],
-                    );
-
-                    current_fk = Some((table_id, constraint_name, fkid));
-                }
-            }
-
-            if let Some((_, _, fkid)) = current_fk {
-                sql_schema.push_foreign_key_column(fkid, [column_id, referenced_column_id]);
-            }
-        }
-
-        Ok(())
-    }
-
     fn get_column_type_and_enum(
         table: &str,
         column_name: &str,
@@ -865,4 +767,107 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
     }
+}
+
+async fn push_foreign_keys(
+    schema_name: &str,
+    table_ids: &IndexMap<String, TableId>,
+    sql_schema: &mut SqlSchema,
+    conn: &dyn Queryable,
+) -> DescriberResult<()> {
+    // We alias all the columns because MySQL column names are case-insensitive in queries, but
+    // the information schema column names became upper-case in MySQL 8, causing the code
+    // fetching the result values by column name below to fail.
+    let sql = "
+            SELECT
+                kcu.constraint_name constraint_name,
+                kcu.column_name column_name,
+                kcu.referenced_table_name referenced_table_name,
+                kcu.referenced_column_name referenced_column_name,
+                kcu.ordinal_position ordinal_position,
+                kcu.table_name table_name,
+                rc.delete_rule delete_rule,
+                rc.update_rule update_rule
+            FROM information_schema.key_column_usage AS kcu
+            INNER JOIN information_schema.referential_constraints AS rc ON
+                BINARY kcu.constraint_name = BINARY rc.constraint_name
+            WHERE
+                BINARY kcu.table_schema = ?
+                AND BINARY rc.constraint_schema = ?
+                AND kcu.referenced_column_name IS NOT NULL
+
+            ORDER BY
+                BINARY kcu.table_schema,
+                BINARY kcu.table_name,
+                BINARY kcu.constraint_name,
+                kcu.ordinal_position
+        ";
+
+    fn get_ids(
+        row: &ResultRow,
+        table_ids: &IndexMap<String, TableId>,
+        sql_schema: &SqlSchema,
+    ) -> Option<(TableId, ColumnId, TableId, ColumnId)> {
+        let table_name = row.get_expect_string("table_name");
+        let column_name = row.get_expect_string("column_name");
+        let referenced_table_name = row.get_expect_string("referenced_table_name");
+        let referenced_column_name = row.get_expect_string("referenced_column_name");
+
+        let table_id = *table_ids.get(&table_name)?;
+        let referenced_table_id = *table_ids.get(&referenced_table_name)?;
+        let column_id = sql_schema.walk(table_id).column(&column_name)?.id;
+        let referenced_column_id = sql_schema.walk(referenced_table_id).column(&referenced_column_name)?.id;
+
+        Some((table_id, column_id, referenced_table_id, referenced_column_id))
+    }
+
+    let result_set = conn.query_raw(sql, &[schema_name.into(), schema_name.into()]).await?;
+    let mut current_fk: Option<(TableId, String, ForeignKeyId)> = None;
+
+    for row in result_set.into_iter() {
+        trace!("Got description FK row {:#?}", row);
+        let (table_id, column_id, referenced_table_id, referenced_column_id) =
+            if let Some(ids) = get_ids(&row, table_ids, sql_schema) {
+                ids
+            } else {
+                continue;
+            };
+        let constraint_name = row.get_expect_string("constraint_name");
+        let on_delete_action = match row.get_expect_string("delete_rule").to_lowercase().as_str() {
+            "cascade" => ForeignKeyAction::Cascade,
+            "set null" => ForeignKeyAction::SetNull,
+            "set default" => ForeignKeyAction::SetDefault,
+            "restrict" => ForeignKeyAction::Restrict,
+            "no action" => ForeignKeyAction::NoAction,
+            s => panic!("Unrecognized on delete action '{}'", s),
+        };
+        let on_update_action = match row.get_expect_string("update_rule").to_lowercase().as_str() {
+            "cascade" => ForeignKeyAction::Cascade,
+            "set null" => ForeignKeyAction::SetNull,
+            "set default" => ForeignKeyAction::SetDefault,
+            "restrict" => ForeignKeyAction::Restrict,
+            "no action" => ForeignKeyAction::NoAction,
+            s => panic!("Unrecognized on update action '{}'", s),
+        };
+
+        match &current_fk {
+            Some((cur_table_id, cur_constraint_name, _))
+                if *cur_table_id == table_id && *cur_constraint_name == constraint_name => {}
+            None | Some(_) => {
+                let fkid = sql_schema.push_foreign_key(
+                    Some(constraint_name.clone()),
+                    [table_id, referenced_table_id],
+                    [on_delete_action, on_update_action],
+                );
+
+                current_fk = Some((table_id, constraint_name, fkid));
+            }
+        }
+
+        if let Some((_, _, fkid)) = current_fk {
+            sql_schema.push_foreign_key_column(fkid, [column_id, referenced_column_id]);
+        }
+    }
+
+    Ok(())
 }
