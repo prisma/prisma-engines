@@ -122,13 +122,17 @@ pub mod aggregations {
 
 pub mod ordering {
     pub const SORT_ORDER: &str = "SortOrder";
+    pub const NULLS_ORDER: &str = "NullsOrder";
     pub const ASC: &str = "asc";
     pub const DESC: &str = "desc";
+    pub const FIRST: &str = "first";
+    pub const LAST: &str = "last";
 
     // Full-text-search specifics
     pub const UNDERSCORE_RELEVANCE: &str = "_relevance";
     pub const SEARCH: &str = "search";
     pub const SORT: &str = "sort";
+    pub const NULLS: &str = "nulls";
     pub const FIELDS: &str = "fields";
 }
 

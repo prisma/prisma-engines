@@ -178,12 +178,13 @@ pub struct Identifier {
 }
 
 impl Identifier {
-    pub fn new<T>(name: String, namespace: T) -> Self
+    pub fn new<T, U>(name: T, namespace: U) -> Self
     where
         T: Into<String>,
+        U: Into<String>,
     {
         Self {
-            name,
+            name: name.into(),
             namespace: namespace.into(),
         }
     }

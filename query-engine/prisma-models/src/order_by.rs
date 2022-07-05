@@ -7,6 +7,12 @@ pub enum SortOrder {
     Descending,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum NullsOrder {
+    First,
+    Last,
+}
+
 #[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
 pub enum SortAggregation {
     Count,
@@ -59,11 +65,17 @@ impl OrderBy {
         }
     }
 
-    pub fn scalar(field: ScalarFieldRef, path: Vec<OrderByHop>, sort_order: SortOrder) -> Self {
+    pub fn scalar(
+        field: ScalarFieldRef,
+        path: Vec<OrderByHop>,
+        sort_order: SortOrder,
+        nulls_order: Option<NullsOrder>,
+    ) -> Self {
         Self::Scalar(OrderByScalar {
             field,
             path,
             sort_order,
+            nulls_order,
         })
     }
 
@@ -156,6 +168,7 @@ pub struct OrderByScalar {
     pub field: ScalarFieldRef,
     pub path: Vec<OrderByHop>,
     pub sort_order: SortOrder,
+    pub nulls_order: Option<NullsOrder>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -195,6 +208,7 @@ impl From<ScalarFieldRef> for OrderBy {
             field,
             path: vec![],
             sort_order: SortOrder::Ascending,
+            nulls_order: None,
         })
     }
 }

@@ -106,6 +106,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::WritableAutoincField,
     ConnectorCapability::ImplicitManyToManyRelation,
     ConnectorCapability::DecimalType,
+    ConnectorCapability::OrderByNullsFirstLast,
 ];
 
 pub struct PostgresDatamodelConnector;

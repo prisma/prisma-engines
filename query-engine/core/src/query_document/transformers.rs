@@ -10,11 +10,11 @@ use chrono::prelude::*;
 use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
 use std::convert::TryInto;
 
-impl TryInto<PrismaValue> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for PrismaValue {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<PrismaValue> {
-        match self {
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<PrismaValue> {
+        match value {
             ParsedInputValue::Single(val) => Ok(val),
             ParsedInputValue::List(values) => values
                 .into_iter()
@@ -39,11 +39,11 @@ impl TryInto<PrismaValue> for ParsedInputValue {
     }
 }
 
-impl TryInto<ParsedInputMap> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for ParsedInputMap {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<ParsedInputMap> {
-        match self {
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<ParsedInputMap> {
+        match value {
             ParsedInputValue::Map(val) => Ok(val),
             v => Err(QueryParserError {
                 path: QueryPath::default(),
@@ -56,11 +56,11 @@ impl TryInto<ParsedInputMap> for ParsedInputValue {
     }
 }
 
-impl TryInto<Option<ParsedInputMap>> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for Option<ParsedInputMap> {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<Option<ParsedInputMap>> {
-        match self {
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<ParsedInputMap>> {
+        match value {
             ParsedInputValue::Single(PrismaValue::Null) => Ok(None),
             ParsedInputValue::Map(val) => Ok(Some(val)),
             v => Err(QueryParserError {
@@ -74,11 +74,11 @@ impl TryInto<Option<ParsedInputMap>> for ParsedInputValue {
     }
 }
 
-impl TryInto<ParsedInputList> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for ParsedInputList {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<Vec<ParsedInputValue>> {
-        match self {
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<Vec<ParsedInputValue>> {
+        match value {
             ParsedInputValue::List(vals) => Ok(vals),
             v => Err(QueryParserError {
                 path: QueryPath::default(),
@@ -91,11 +91,11 @@ impl TryInto<ParsedInputList> for ParsedInputValue {
     }
 }
 
-impl TryInto<Vec<PrismaValue>> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for Vec<PrismaValue> {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<Vec<PrismaValue>> {
-        match self {
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<Vec<PrismaValue>> {
+        match value {
             ParsedInputValue::List(vals) => vals
                 .into_iter()
                 .map(|val| val.try_into())
@@ -111,11 +111,11 @@ impl TryInto<Vec<PrismaValue>> for ParsedInputValue {
     }
 }
 
-impl TryInto<Option<String>> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for Option<String> {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<Option<String>> {
-        let prisma_value: PrismaValue = self.try_into()?;
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<String>> {
+        let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
             PrismaValue::String(s) => Ok(Some(s)),
@@ -132,12 +132,12 @@ impl TryInto<Option<String>> for ParsedInputValue {
     }
 }
 
-impl TryInto<OrderBy> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for OrderBy {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<OrderBy> {
-        match self {
-            Self::OrderBy(ord) => Ok(ord),
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<OrderBy> {
+        match value {
+            ParsedInputValue::OrderBy(ord) => Ok(ord),
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
@@ -149,12 +149,12 @@ impl TryInto<OrderBy> for ParsedInputValue {
     }
 }
 
-impl TryInto<ScalarFieldRef> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for ScalarFieldRef {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<ScalarFieldRef> {
-        match self {
-            Self::ScalarField(f) => Ok(f),
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<ScalarFieldRef> {
+        match value {
+            ParsedInputValue::ScalarField(f) => Ok(f),
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
@@ -166,11 +166,11 @@ impl TryInto<ScalarFieldRef> for ParsedInputValue {
     }
 }
 
-impl TryInto<Option<f64>> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for Option<f64> {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<Option<f64>> {
-        let prisma_value: PrismaValue = self.try_into()?;
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<f64>> {
+        let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
             PrismaValue::Float(d) => Ok(d.to_f64()),
@@ -186,11 +186,11 @@ impl TryInto<Option<f64>> for ParsedInputValue {
     }
 }
 
-impl TryInto<Option<bool>> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for Option<bool> {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<Option<bool>> {
-        let prisma_value: PrismaValue = self.try_into()?;
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<bool>> {
+        let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
             PrismaValue::Boolean(b) => Ok(Some(b)),
@@ -206,11 +206,11 @@ impl TryInto<Option<bool>> for ParsedInputValue {
     }
 }
 
-impl TryInto<Option<DateTime<FixedOffset>>> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for Option<DateTime<FixedOffset>> {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<Option<DateTime<FixedOffset>>> {
-        let prisma_value: PrismaValue = self.try_into()?;
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<DateTime<FixedOffset>>> {
+        let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
             PrismaValue::DateTime(dt) => Ok(Some(dt)),
@@ -226,11 +226,11 @@ impl TryInto<Option<DateTime<FixedOffset>>> for ParsedInputValue {
     }
 }
 
-impl TryInto<Option<i64>> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for Option<i64> {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<Option<i64>> {
-        let prisma_value: PrismaValue = self.try_into()?;
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<i64>> {
+        let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
             PrismaValue::Int(i) => Ok(Some(i)),
@@ -246,11 +246,11 @@ impl TryInto<Option<i64>> for ParsedInputValue {
     }
 }
 
-impl TryInto<bool> for ParsedInputValue {
+impl TryFrom<ParsedInputValue> for bool {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<bool> {
-        let prisma_value: PrismaValue = self.try_into()?;
+    fn try_from(value: ParsedInputValue) -> QueryParserResult<bool> {
+        let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
             PrismaValue::Boolean(b) => Ok(b),
