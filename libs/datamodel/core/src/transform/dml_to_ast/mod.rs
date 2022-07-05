@@ -1,16 +1,16 @@
-mod datasource_serializer;
-mod generator_serializer;
 mod lower;
 mod lower_enum_attributes;
 mod lower_enum_value_attributes;
 mod lower_field;
 mod lower_model_attributes;
+mod render_configuration;
 
-pub(crate) use datasource_serializer::add_sources_to_ast;
-pub(crate) use generator_serializer::GeneratorSerializer;
-pub(crate) use lower::{lower, LowerParams};
+pub(crate) use self::{
+    lower::{lower, LowerParams},
+    render_configuration::render_configuration,
+};
 
-use crate::{ast, configuration::StringFromEnvVar};
+use crate::configuration::StringFromEnvVar;
 use ::dml::{model::*, traits::*};
 use datamodel_connector::{constraint_names::ConstraintNames, Connector};
 use dml::datamodel::Datamodel;
@@ -19,28 +19,18 @@ use lower_enum_attributes::*;
 use lower_enum_value_attributes::*;
 use lower_field::*;
 use lower_model_attributes::*;
+use schema_ast::renderer::Renderer;
 
-fn lower_string_from_env_var(arg_name: &str, string_from_env: &StringFromEnvVar) -> ast::ConfigBlockProperty {
-    match string_from_env.as_env_var() {
-        Some(ref env_var) => {
-            let values = ast::ArgumentsList {
-                arguments: vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
-                    env_var.to_string(),
-                    ast::Span::empty(),
-                ))],
-                ..Default::default()
-            };
-            ast::ConfigBlockProperty {
-                name: ast::Identifier::new(arg_name),
-                value: ast::Expression::Function("env".to_owned(), values, ast::Span::empty()),
-                span: ast::Span::empty(),
-            }
+fn render_string_from_env(string_from_env: &StringFromEnvVar, out: &mut String) {
+    match &string_from_env.from_env_var {
+        Some(var_name) => {
+            out.push_str("env(");
+            Renderer::render_str(out, var_name);
+            out.push(')');
         }
-        None => ast::ConfigBlockProperty {
-            name: ast::Identifier::new(arg_name),
-            value: ast::Expression::StringValue(string_from_env.as_literal().unwrap().to_string(), ast::Span::empty()),
-            span: ast::Span::empty(),
-        },
+        None => {
+            Renderer::render_str(out, string_from_env.value.as_ref().unwrap());
+        }
     }
 }
 
@@ -48,7 +38,7 @@ fn primary_key_name_matches(pk: &PrimaryKeyDefinition, model: &Model, connector:
     pk.db_name.as_ref().unwrap() == &ConstraintNames::primary_key_name(model.final_database_name(), connector)
 }
 
-pub fn foreign_key_name_matches(
+pub(crate) fn foreign_key_name_matches(
     ri: &::dml::relation_info::RelationInfo,
     model: &Model,
     connector: &dyn Connector,
@@ -73,7 +63,7 @@ pub fn foreign_key_name_matches(
         == &ConstraintNames::foreign_key_constraint_name(model.final_database_name(), &column_names, connector)
 }
 
-pub fn index_name_matches(
+pub(crate) fn index_name_matches(
     idx: &IndexDefinition,
     datamodel: &Datamodel,
     model: &Model,

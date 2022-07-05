@@ -24,7 +24,7 @@ pub(crate) fn get_sort_index_of_attribute(attribute_name: &str) -> usize {
         .unwrap_or(usize::MAX)
 }
 
-pub(crate) trait LineWriteable {
+pub trait LineWriteable {
     fn write(&mut self, param: &str);
     fn end_line(&mut self);
 }
@@ -334,8 +334,8 @@ impl Renderer {
         target.write("]");
     }
 
-    // https://datatracker.ietf.org/doc/html/rfc8259#section-7
-    fn render_str(target: &mut dyn LineWriteable, param: &str) {
+    /// https://datatracker.ietf.org/doc/html/rfc8259#section-7
+    pub fn render_str(target: &mut dyn LineWriteable, param: &str) {
         target.write("\"");
         for c in param.char_indices() {
             match c {

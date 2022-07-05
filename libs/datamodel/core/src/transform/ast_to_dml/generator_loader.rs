@@ -1,9 +1,8 @@
-use super::super::helpers::*;
 use crate::{
     common::preview_features::GENERATOR, configuration::Generator, diagnostics::*, schema_ast::ast::WithSpan,
     transform::ast_to_dml::common::parse_and_validate_preview_features, StringFromEnvVar,
 };
-use parser_database::ast;
+use parser_database::{ast, ValueListValidator, ValueValidator};
 use std::{collections::HashMap, convert::TryFrom};
 
 const PROVIDER_KEY: &str = "provider";

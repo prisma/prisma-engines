@@ -1,6 +1,5 @@
-use crate::ast;
-use crate::diagnostics::DatamodelError;
-use crate::transform::helpers::ValueValidator;
+use crate::{ast, diagnostics::DatamodelError};
+use parser_database::ValueValidator;
 
 pub(crate) struct EnvFunction {
     var_name: String,
