@@ -154,7 +154,7 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
                 && !sf.is_required()
                 && !sf.is_list()
             {
-                types.push(InputType::object(order_by_sort_nulls_object_type(ctx)));
+                types.push(InputType::object(sort_nulls_object_type(ctx)));
             }
 
             Some(input_field(sf.name.clone(), types, None).optional())
@@ -176,7 +176,7 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
     }
 }
 
-fn order_by_sort_nulls_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
+fn sort_nulls_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
     let ident = Identifier::new("SortOrderInput", PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
