@@ -598,3 +598,31 @@ fn alter_constraint_name(mut api: TestApi) {
             migration.expect_contents(expected_script)
         });
 }
+
+#[test_connector(tags(Mysql))]
+fn bigint_defaults_work(api: TestApi) {
+    let schema = r#"
+        datasource mypg {
+            provider = "mysql"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model foo {
+          id  String @id
+          bar BigInt @default(0)
+        }
+    "#;
+    let sql = expect![[r#"
+        -- CreateTable
+        CREATE TABLE `foo` (
+            `id` VARCHAR(191) NOT NULL,
+            `bar` BIGINT NOT NULL DEFAULT 0,
+
+            PRIMARY KEY (`id`)
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    "#]];
+    api.expect_sql_for_schema(schema, &sql);
+
+    api.schema_push(schema).send().assert_green();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}
