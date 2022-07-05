@@ -624,6 +624,14 @@
 <span id="619">619</span>
 <span id="620">620</span>
 <span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions and types for conveniently traversing and querying a SqlSchema.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
@@ -646,7 +654,7 @@
 
 <span class="doccomment">/// A generic reference to a schema item. It holds a reference to the schema so it can offer a</span>
 <span class="doccomment">/// convenient API based on the Id type.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Id</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The identifier.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">Id</span>,
@@ -654,9 +662,17 @@
     <span class="kw">pub</span> <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlSchema</span>,
 }
 
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">std::fmt::Debug</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">I</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>)
+            .<span class="ident">finish</span>()
+    }
+}
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Id</span><span class="op">&gt;</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Id</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Jump to the item identified by `other_id`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">other_id</span>: <span class="ident">I</span>) -&gt; <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">other_id</span>: <span class="ident">I</span>) -&gt; <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">walk</span>(<span class="ident">other_id</span>)
     }
 }
