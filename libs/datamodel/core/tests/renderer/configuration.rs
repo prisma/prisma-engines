@@ -1,5 +1,5 @@
+use crate::common::*;
 use datamodel::{parse_schema, render_datamodel_and_config_to_string};
-use indoc::indoc;
 
 #[test]
 fn shadow_database_url_round_trips() {

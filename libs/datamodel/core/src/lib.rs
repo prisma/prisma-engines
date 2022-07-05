@@ -77,7 +77,7 @@ use enumflags2::BitFlags;
 use parser_database::ParserDatabase;
 use transform::{
     ast_to_dml::{validate, DatasourceLoader, GeneratorLoader},
-    dml_to_ast::{self, lower, GeneratorSerializer, LowerParams},
+    dml_to_ast::{lower, LowerParams},
 };
 
 #[derive(Debug)]
@@ -228,7 +228,10 @@ fn load_sources(
 pub fn render_datamodel_to_string(datamodel: &dml::Datamodel, configuration: Option<&Configuration>) -> String {
     let datasource = configuration.and_then(|c| c.datasources.first());
     let lowered = lower(LowerParams { datasource, datamodel });
-    render_schema_ast(&lowered, 2)
+    let mut renderer = schema_ast::renderer::Renderer::new(DEFAULT_INDENT_WIDTH);
+    renderer.stream.reserve(&lowered.tops.len() * 20);
+    renderer.render(&lowered);
+    reformat(&renderer.stream, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 
 /// Renders a datamodel, sources and generators.
@@ -236,24 +239,19 @@ pub fn render_datamodel_and_config_to_string(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) -> String {
-    let mut lowered = lower(LowerParams {
+    let lowered = lower(LowerParams {
         datasource: config.datasources.first(),
         datamodel,
     });
 
-    dml_to_ast::add_sources_to_ast(config, &mut lowered);
-    GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
-    render_schema_ast(&lowered, 2)
-}
-
-/// Renders as a string into the stream.
-fn render_schema_ast(schema: &ast::SchemaAst, indent_width: usize) -> String {
-    let mut renderer = schema_ast::renderer::Renderer::new(indent_width);
-    renderer.stream.reserve(schema.tops.len() * 20);
-    renderer.render(schema);
-    reformat(&renderer.stream, 2).expect("Internal error: failed to reformat introspected schema")
+    let mut renderer = schema_ast::renderer::Renderer::new(2);
+    transform::dml_to_ast::render_configuration(config, &mut renderer.stream);
+    renderer.render(&lowered);
+    reformat(&renderer.stream, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {
     generators.iter().map(|gen| gen.preview_features()).collect()
 }
+
+const DEFAULT_INDENT_WIDTH: usize = 2;

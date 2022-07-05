@@ -1,5 +1,4 @@
 use super::{
-    super::helpers::{ValueListValidator, ValueValidator},
     builtin_datasource_providers::{
         CockroachDbDatasourceProvider, MongoDbDatasourceProvider, MsSqlDatasourceProvider, MySqlDatasourceProvider,
         PostgresDatasourceProvider, SqliteDatasourceProvider,
@@ -11,6 +10,7 @@ use crate::{
     common::{preview_features::PreviewFeature, provider_names::*},
     configuration::StringFromEnvVar,
     diagnostics::{DatamodelError, Diagnostics},
+    parser_database::{ValueListValidator, ValueValidator},
     Datasource,
 };
 use datamodel_connector::ReferentialIntegrity;
