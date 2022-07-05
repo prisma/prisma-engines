@@ -901,6 +901,7 @@ fn should_add_back_relations_for_more_complex_cases() {
 
           post     Post     @relation(fields: [postId], references: [post_id])
           category Category @relation(fields: [categoryId], references: [category_id])
+
           @@map("post_to_category")
         }
     "#]];

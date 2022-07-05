@@ -32,8 +32,7 @@ fn free_floating_doc_comments_must_work_in_models() {
     }
     "#;
 
-    // must not crash
-    let _ = parse(dml);
+    assert_valid(dml);
 }
 
 #[test]
@@ -44,8 +43,7 @@ fn free_floating_doc_comments_must_work_in_enums() {
       /// documentation comment
     }"#;
 
-    // must not crash
-    let _ = parse(dml);
+    assert_valid(dml);
 }
 
 #[test]
@@ -57,8 +55,7 @@ fn doc_comments_must_work_on_block_attributes() {
       @@id([id1, id2]) /// Documentation comment block attribute
     }"#;
 
-    // must not crash
-    let _ = parse(dml);
+    assert_valid(dml);
 }
 
 #[test]
@@ -70,8 +67,7 @@ fn comments_must_work_on_block_attributes() {
       @@id([id1, id2]) // Documentation comment block attribute
     }"#;
 
-    // must not crash
-    let _ = parse(dml);
+    assert_valid(dml);
 }
 
 #[test]
@@ -87,7 +83,6 @@ fn comments_must_work_in_enums() {
       // Comment below
     }"#;
 
-    // must not crash
     let schema = parse(dml);
     schema
         .assert_has_enum("Role")
@@ -136,8 +131,7 @@ fn comments_in_a_generator_must_work() {
     }
     "#;
 
-    // must not crash
-    let _ = parse(dml);
+    assert_valid(dml);
 }
 
 #[test]
@@ -150,8 +144,7 @@ fn comments_in_a_datasource_must_work() {
         }
     "#;
 
-    // must not crash
-    let _ = parse(dml);
+    assert_valid(dml);
 }
 
 #[test]

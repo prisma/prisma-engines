@@ -1106,7 +1106,7 @@ fn mongodb_no_unique_index_for_id() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel User {
-        [1;94m12 | [0m  id String @[1;91munique[0m @id @map("_id") @test.ObjectId
+        [1;94m12 | [0m  id String @[1;91munique [0m@id @map("_id") @test.ObjectId
         [1;94m   | [0m
     "#]];
 

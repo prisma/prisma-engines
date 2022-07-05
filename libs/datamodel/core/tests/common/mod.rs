@@ -297,6 +297,7 @@ impl ModelAsserts for dml::Model {
         self
     }
 
+    #[track_caller]
     fn assert_with_documentation(&self, t: &str) -> &Self {
         assert_eq!(self.documentation, Some(t.to_owned()));
         self

@@ -1,10 +1,6 @@
 use super::{
-    helpers::{parsing_catch_all, TokenExtensions},
-    parse_composite_type::parse_composite_type,
-    parse_enum::parse_enum,
-    parse_model::parse_model,
-    parse_source_and_generator::parse_config_block,
-    PrismaDatamodelParser, Rule,
+    parse_composite_type::parse_composite_type, parse_enum::parse_enum, parse_model::parse_model,
+    parse_source_and_generator::parse_config_block, PrismaDatamodelParser, Rule,
 };
 use crate::ast::*;
 use diagnostics::{DatamodelError, Diagnostics};
@@ -18,25 +14,28 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
         Ok(mut datamodel_wrapped) => {
             let datamodel = datamodel_wrapped.next().unwrap();
             let mut top_level_definitions: Vec<Top> = vec![];
-            for current in datamodel.relevant_children() {
+            let mut pending_block_comment = None;
+            let mut pairs = datamodel.into_inner().peekable();
+
+            while let Some(current) = pairs.next() {
                 match current.as_rule() {
                     Rule::model_declaration => {
                         let keyword = current.clone().into_inner().find(|pair| matches!(pair.as_rule(), Rule::TYPE_KEYWORD | Rule::MODEL_KEYWORD) ).expect("Expected model or type keyword");
 
                         match keyword.as_rule() {
                             Rule::TYPE_KEYWORD => {
-                                top_level_definitions.push(Top::CompositeType(parse_composite_type(&current, diagnostics)))
+                                top_level_definitions.push(Top::CompositeType(parse_composite_type(current, pending_block_comment.take(), diagnostics)))
                             }
                             Rule::MODEL_KEYWORD => {
-                                top_level_definitions.push(Top::Model(parse_model(&current, diagnostics)))
+                                top_level_definitions.push(Top::Model(parse_model(current, pending_block_comment.take(), diagnostics)))
                             }
                             _ => unreachable!(),
                         }
 
                     },
-                    Rule::enum_declaration => top_level_definitions.push(Top::Enum(parse_enum(&current, diagnostics))),
+                    Rule::enum_declaration => top_level_definitions.push(Top::Enum(parse_enum(current,pending_block_comment.take(),  diagnostics))),
                     Rule::config_block => {
-                        top_level_definitions.push(parse_config_block(&current, diagnostics));
+                        top_level_definitions.push(parse_config_block(current, diagnostics));
                     },
                     Rule::type_alias => {
                         let error = DatamodelError::new_validation_error(
@@ -46,7 +45,17 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
 
                         diagnostics.push_error(error);
                     }
-                    Rule::comment_block => (),
+                    Rule::comment_block => {
+                        match pairs.peek().map(|b| b.as_rule()) {
+                            Some(Rule::empty_lines) => {
+                                // free floating
+                            }
+                            Some(Rule::model_declaration) | Some(Rule::enum_declaration) | Some(Rule::config_block) => {
+                                pending_block_comment = Some(current);
+                            }
+                            _ => (),
+                        }
+                    },
                     Rule::EOI => {}
                     Rule::CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
                         "This line is invalid. It does not start with any known Prisma schema keyword.".to_owned(),
@@ -56,7 +65,8 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
                         "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \'model\', \'enum\', \'datasource\' and \'generator\'.".to_owned(),
                         current.as_span().into(),
                     )),
-                    _ => parsing_catch_all(&current, "datamodel"),
+                    Rule::empty_lines => (),
+                    _ => unreachable!(),
                 }
             }
 

@@ -107,8 +107,7 @@ impl GeneratorLoader {
 
         let preview_features = match preview_features_arg {
             Some((Ok(arr), span)) => {
-                let (features, mut diag) = parse_and_validate_preview_features(arr, &GENERATOR, span);
-                diagnostics.append(&mut diag);
+                let features = parse_and_validate_preview_features(arr, &GENERATOR, span, diagnostics);
 
                 Some(features)
             }
