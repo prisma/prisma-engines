@@ -32,7 +32,7 @@
                 "character": 1
               }
             },
-            "newText": "  @@unique([bId1, bId2])\n}"
+            "newText": "\n  @@unique([bId1, bId2])\n}"
           }
         ]
       }

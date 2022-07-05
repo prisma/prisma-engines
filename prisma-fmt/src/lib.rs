@@ -166,12 +166,9 @@ pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
     ast::Span::new(start, end)
 }
 
-/// Converts a span of byte offsets to an LSP range.
-pub(crate) fn span_to_range(span: ast::Span, document: &str) -> Range {
-    let start = offset_to_position(span.start, document).unwrap();
-    let end = offset_to_position(span.end - 2, document).unwrap();
-
-    Range { start, end }
+/// Gives the LSP position right after the given span.
+pub(crate) fn position_after_span(span: ast::Span, document: &str) -> Position {
+    offset_to_position(span.end - 1, document).unwrap()
 }
 
 /// Converts a byte offset to an LSP position, if the given offset
