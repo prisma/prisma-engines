@@ -452,437 +452,231 @@
 <span id="447">447</span>
 <span id="448">448</span>
 <span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
-<span id="461">461</span>
-<span id="462">462</span>
-<span id="463">463</span>
-<span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
-<span id="477">477</span>
-<span id="478">478</span>
-<span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
-<span id="484">484</span>
-<span id="485">485</span>
-<span id="486">486</span>
-<span id="487">487</span>
-<span id="488">488</span>
-<span id="489">489</span>
-<span id="490">490</span>
-<span id="491">491</span>
-<span id="492">492</span>
-<span id="493">493</span>
-<span id="494">494</span>
-<span id="495">495</span>
-<span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
-<span id="508">508</span>
-<span id="509">509</span>
-<span id="510">510</span>
-<span id="511">511</span>
-<span id="512">512</span>
-<span id="513">513</span>
-<span id="514">514</span>
-<span id="515">515</span>
-<span id="516">516</span>
-<span id="517">517</span>
-<span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">parser</span>::{<span class="ident">PrismaDatamodelParser</span>, <span class="ident">Rule</span>},
     <span class="ident">renderer</span>::{<span class="ident">get_sort_index_of_attribute</span>, <span class="ident">LineWriteable</span>, <span class="ident">Renderer</span>, <span class="ident">TableFormat</span>},
 };
 <span class="kw">use</span> <span class="ident">pest::Parser</span>;
+<span class="kw">use</span> <span class="ident">std::iter::Peekable</span>;
 
 <span class="kw">type</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pest::iterators::Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Rule</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Reformat the AST to a string, standardizing alignment and indentation.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reformat</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">indent_width</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident">PrismaDatamodelParser::parse</span>(<span class="ident">Rule::schema</span>, <span class="ident">input</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">target_string</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">input</span>.<span class="ident">len</span>());
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">renderer</span> <span class="op">=</span> <span class="ident">Renderer::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">target_string</span>, <span class="ident">indent_width</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">renderer</span> <span class="op">=</span> <span class="ident">Renderer::new</span>(<span class="ident">indent_width</span>);
+    <span class="ident">renderer</span>.<span class="ident">stream</span>.<span class="ident">reserve</span>(<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">2</span>);
     <span class="ident">reformat_top</span>(<span class="kw-2">&amp;mut</span> <span class="ident">renderer</span>, <span class="ident">ast</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>());
 
     <span class="comment">// all schemas must end with a newline</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">target_string</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\n&#39;</span>) {
-        <span class="ident">target_string</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">renderer</span>.<span class="ident">stream</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\n&#39;</span>) {
+        <span class="ident">renderer</span>.<span class="ident">stream</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
     }
 
-    <span class="prelude-val">Some</span>(<span class="ident">target_string</span>)
+    <span class="prelude-val">Some</span>(<span class="ident">renderer</span>.<span class="ident">stream</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">reformat_top</span>(<span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Renderer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seen_at_least_one_top_level_element</span> <span class="op">=</span> <span class="bool-val">false</span>;
+<span class="kw">fn</span> <span class="ident">reformat_top</span>(<span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Renderer</span>, <span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>().<span class="ident">peekable</span>();
+    <span class="ident">eat_empty_lines</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pairs</span>);
 
-    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
+    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>) <span class="op">=</span> <span class="ident">pairs</span>.<span class="ident">next</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::WHITESPACE</span> =&gt; {}
-            <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::doc_comment_and_new_line</span> =&gt; {}
-            <span class="kw">_</span> =&gt; {}
-        };
-
-        <span class="comment">// new line handling outside of blocks:</span>
-        <span class="comment">// * fold multiple new lines between blocks into one</span>
-        <span class="comment">// * all new lines before the first block get removed</span>
-        <span class="kw">if</span> <span class="ident">is_top_level_element</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>) {
-            <span class="comment">// separate top level elements with new lines</span>
-            <span class="kw">if</span> <span class="ident">seen_at_least_one_top_level_element</span> {
-                <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot;\n&quot;</span>);
+            <span class="ident">Rule::model_declaration</span> <span class="op">|</span> <span class="ident">Rule::enum_declaration</span> <span class="op">|</span> <span class="ident">Rule::config_block</span> =&gt; {
+                <span class="ident">reformat_block_element</span>(<span class="ident">current</span>, <span class="ident">target</span>)
             }
-            <span class="ident">seen_at_least_one_top_level_element</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        }
-
-        <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::doc_comment_and_new_line</span> =&gt; {
-                <span class="ident">comment</span>(<span class="ident">current</span>.<span class="ident">as_str</span>(), <span class="ident">target</span>);
-            }
-            <span class="ident">Rule::model_declaration</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">keyword</span> <span class="op">=</span> <span class="ident">current</span>
-                    .<span class="ident">clone</span>()
-                    .<span class="ident">into_inner</span>()
-                    .<span class="ident">find</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">pair</span>.<span class="ident">as_rule</span>(), <span class="ident">Rule::TYPE_KEYWORD</span> <span class="op">|</span> <span class="ident">Rule::MODEL_KEYWORD</span>))
-                    .<span class="ident">expect</span>(<span class="string">&quot;Expected model or type keyword&quot;</span>);
-
-                <span class="kw">match</span> <span class="ident">keyword</span>.<span class="ident">as_rule</span>() {
-                    <span class="ident">Rule::TYPE_KEYWORD</span> =&gt; <span class="ident">reformat_composite_type</span>(<span class="ident">current</span>, <span class="ident">target</span>),
-                    <span class="ident">Rule::MODEL_KEYWORD</span> =&gt; <span class="ident">reformat_model</span>(<span class="ident">current</span>, <span class="ident">target</span>),
-                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
-                };
-            }
-            <span class="ident">Rule::enum_declaration</span> =&gt; <span class="ident">reformat_enum</span>(<span class="ident">current</span>, <span class="ident">target</span>),
-            <span class="ident">Rule::config_block</span> =&gt; <span class="ident">reformat_config_block</span>(<span class="ident">current</span>, <span class="ident">target</span>),
             <span class="ident">Rule::comment_block</span> =&gt; {
-                <span class="kw">for</span> <span class="ident">comment_token</span> <span class="kw">in</span> <span class="ident">current</span>.<span class="ident">into_inner</span>() {
-                    <span class="ident">comment</span>(<span class="ident">comment_token</span>.<span class="ident">as_str</span>(), <span class="ident">target</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+                <span class="ident">reformat_comment_block</span>(<span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">table</span>);
+                <span class="ident">table</span>.<span class="ident">render</span>(<span class="ident">target</span>);
+            }
+            <span class="ident">Rule::empty_lines</span> =&gt; {
+                <span class="kw">match</span> <span class="ident">pairs</span>.<span class="ident">peek</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">as_rule</span>()) {
+                    <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Rule::EOI</span>) =&gt; (), <span class="comment">// skip the last empty lines</span>
+                    <span class="kw">_</span> =&gt; <span class="ident">target</span>.<span class="ident">end_line</span>(),
                 }
+            }
+            <span class="ident">Rule::CATCH_ALL</span> <span class="op">|</span> <span class="ident">Rule::BLOCK_LEVEL_CATCH_ALL</span> <span class="op">|</span> <span class="ident">Rule::arbitrary_block</span> =&gt; {
+                <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">current</span>.<span class="ident">as_str</span>());
             }
             <span class="ident">Rule::EOI</span> =&gt; {}
-            <span class="ident">Rule::NEWLINE</span> =&gt; {} <span class="comment">// Do not render user provided newlines. We have a strong opinionation about new lines on the top level.</span>
-            <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">current</span>, <span class="ident">target</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         }
     }
-
-    <span class="comment">// FLUSH IT. Otherwise pending new lines do not get rendered.</span>
-    <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot;&quot;</span>);
 }
 
-<span class="kw">fn</span> <span class="ident">reformat_config_block</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Renderer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">keyword</span> <span class="op">=</span> <span class="ident">pair</span>
-        .<span class="ident">clone</span>()
-        .<span class="ident">into_inner</span>()
-        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> [<span class="ident">Rule::GENERATOR_KEYWORD</span>, <span class="ident">Rule::DATASOURCE_KEYWORD</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">as_rule</span>()))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">tok</span><span class="op">|</span> <span class="ident">tok</span>.<span class="ident">as_str</span>())
-        .<span class="ident">unwrap</span>();
-
-    <span class="ident">reformat_block_element</span>(
-        <span class="ident">keyword</span>,
-        <span class="ident">target</span>,
-        <span class="ident">pair</span>,
-        <span class="kw-2">&amp;</span>(<span class="op">|</span><span class="ident">table</span>, <span class="kw">_</span>, <span class="ident">pair</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::key_value</span> =&gt; <span class="ident">reformat_key_value</span>(<span class="ident">pair</span>, <span class="ident">table</span>),
-            <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">pair</span>, <span class="ident">table</span>),
-        }),
-    );
-}
-
-<span class="kw">fn</span> <span class="ident">reformat_key_value</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TableFormat</span>) {
+<span class="kw">fn</span> <span class="ident">reformat_key_value</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TableFormat</span>) {
+    <span class="ident">table</span>.<span class="ident">start_new_line</span>();
     <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::non_empty_identifier</span> <span class="op">|</span> <span class="ident">Rule::maybe_empty_identifier</span> =&gt; {
-                <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">current</span>.<span class="ident">as_str</span>());
-                <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot;=&quot;</span>);
-            }
+            <span class="ident">Rule::non_empty_identifier</span> =&gt; <span class="ident">table</span>.<span class="ident">column_locked_writer_for</span>(<span class="number">0</span>).<span class="ident">write</span>(<span class="ident">current</span>.<span class="ident">as_str</span>()),
             <span class="ident">Rule::expression</span> =&gt; {
-                <span class="ident">reformat_expression</span>(<span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">target</span>.<span class="ident">column_locked_writer_for</span>(<span class="number">2</span>));
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">column_locked_writer_for</span>(<span class="number">1</span>);
+                <span class="ident">writer</span>.<span class="ident">write</span>(<span class="string">&quot;= &quot;</span>);
+                <span class="ident">reformat_expression</span>(<span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">writer</span>);
             }
-            <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::doc_comment_and_new_line</span> =&gt; {
-                <span class="macro">panic!</span>(<span class="string">&quot;Comments inside config key/value not supported yet.&quot;</span>)
-            }
-            <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">current</span>, <span class="ident">target</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">reformat_model</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Renderer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="ident">reformat_block_element</span>(
-        <span class="string">&quot;model&quot;</span>,
-        <span class="ident">target</span>,
-        <span class="ident">pair</span>,
-        <span class="kw-2">&amp;</span>(<span class="op">|</span><span class="ident">table</span>, <span class="ident">renderer</span>, <span class="ident">pair</span><span class="op">|</span> {
-            <span class="kw">match</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>() {
-                <span class="ident">Rule::block_level_attribute</span> =&gt; {
-                    <span class="comment">// model level attributes reset the table. -&gt; .render() does that</span>
-                    <span class="ident">table</span>.<span class="ident">render</span>(<span class="ident">renderer</span>);
-                    <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
-                    <span class="ident">reformat_attribute</span>(<span class="ident">attribute</span>, <span class="string">&quot;@@&quot;</span>, <span class="ident">renderer</span>);
+<span class="kw">fn</span> <span class="ident">reformat_block_element</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">renderer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Renderer</span>) {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">TableFormat::default</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>(); <span class="comment">// (Option&lt;doc_comment&gt;, attribute)</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pending_block_comment</span> <span class="op">=</span> <span class="prelude-val">None</span>; <span class="comment">// comment before an attribute</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>().<span class="ident">peekable</span>();
+    <span class="kw">let</span> <span class="ident">block_type</span> <span class="op">=</span> <span class="ident">pairs</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
+
+    <span class="kw">loop</span> {
+        <span class="kw">let</span> <span class="ident">ate_empty_lines</span> <span class="op">=</span> <span class="ident">eat_empty_lines</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pairs</span>);
+
+        <span class="comment">// Decide what to do with the empty lines.</span>
+        <span class="kw">if</span> <span class="ident">ate_empty_lines</span> {
+            <span class="kw">match</span> <span class="ident">pairs</span>.<span class="ident">peek</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>()) {
+                <span class="prelude-val">Some</span>(<span class="ident">Rule::BLOCK_CLOSE</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Rule::block_level_attribute</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Rule::comment_block</span>) =&gt; {
+                    <span class="comment">// Reformat away the empty lines at the end of blocks and before attributes (we</span>
+                    <span class="comment">// re-add them later).</span>
                 }
-                <span class="ident">Rule::field_declaration</span> =&gt; <span class="ident">reformat_field</span>(<span class="ident">pair</span>, <span class="ident">table</span>),
-                <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">pair</span>, <span class="ident">table</span>),
-            }
-        }),
-    );
-}
-
-<span class="kw">fn</span> <span class="ident">reformat_composite_type</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Renderer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="ident">reformat_block_element</span>(
-        <span class="string">&quot;type&quot;</span>,
-        <span class="ident">target</span>,
-        <span class="ident">pair</span>,
-        <span class="kw-2">&amp;</span>(<span class="op">|</span><span class="ident">table</span>, <span class="ident">renderer</span>, <span class="ident">pair</span><span class="op">|</span> {
-            <span class="kw">match</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>() {
-                <span class="ident">Rule::block_level_attribute</span> =&gt; {
-                    <span class="comment">// model level attributes reset the table. -&gt; .render() does that</span>
+                <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
+                    <span class="comment">// Reset the table layout on an empty line.</span>
                     <span class="ident">table</span>.<span class="ident">render</span>(<span class="ident">renderer</span>);
-                    <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
-                    <span class="ident">reformat_attribute</span>(<span class="ident">attribute</span>, <span class="string">&quot;@@&quot;</span>, <span class="ident">renderer</span>);
+                    <span class="ident">table</span> <span class="op">=</span> <span class="ident">TableFormat::default</span>();
+                    <span class="ident">table</span>.<span class="ident">start_new_line</span>();
                 }
-                <span class="ident">Rule::field_declaration</span> =&gt; <span class="ident">reformat_field</span>(<span class="ident">pair</span>, <span class="ident">table</span>),
-                <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">pair</span>, <span class="ident">table</span>),
+                <span class="kw">_</span> =&gt; (),
             }
-        }),
-    );
-}
+        }
 
-<span class="kw">fn</span> <span class="ident">reformat_block_element</span>(
-    <span class="ident">block_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">renderer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Renderer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">the_fn</span>: <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">TableFormat</span>, <span class="kw-2">&amp;mut</span> <span class="ident">Renderer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>)),
-) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">TableFormat::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block_has_opened</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">let</span> <span class="ident">current</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pairs</span>.<span class="ident">next</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">current</span>) =&gt; <span class="ident">current</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+        };
 
-    <span class="comment">// sort attributes</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">extract_and_sort_attributes</span>(<span class="ident">pair</span>.<span class="ident">clone</span>(), <span class="bool-val">false</span>);
-
-    <span class="comment">// used to add a new line between fields and block attributes if there isn&#39;t one already</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_line_was_empty</span> <span class="op">=</span> <span class="bool-val">false</span>;
-
-    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::MODEL_KEYWORD</span> <span class="op">|</span> <span class="ident">Rule::TYPE_KEYWORD</span> <span class="op">|</span> <span class="ident">Rule::GENERATOR_KEYWORD</span> <span class="op">|</span> <span class="ident">Rule::DATASOURCE_KEYWORD</span> =&gt; (),
             <span class="ident">Rule::BLOCK_OPEN</span> =&gt; {
-                <span class="ident">block_has_opened</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                <span class="comment">// Reformat away the empty lines at the beginning of the block.</span>
+                <span class="ident">eat_empty_lines</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pairs</span>);
             }
             <span class="ident">Rule::BLOCK_CLOSE</span> =&gt; {
-                <span class="comment">// New line between fields and attributes</span>
-                <span class="comment">// only if there isn&#39;t already a new line in between</span>
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">attributes</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">last_line_was_empty</span> {
-                    <span class="ident">table</span>.<span class="ident">render</span>(<span class="ident">renderer</span>);
-                    <span class="ident">table</span> <span class="op">=</span> <span class="ident">TableFormat::new</span>();
-                    <span class="ident">renderer</span>.<span class="ident">end_line</span>();
+                <span class="comment">// Flush current table.</span>
+                <span class="ident">table</span>.<span class="ident">render</span>(<span class="ident">renderer</span>);
+                <span class="ident">table</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+
+                <span class="comment">// We are going to render the block attributes: new line.</span>
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">attributes</span>.<span class="ident">is_empty</span>() {
+                    <span class="ident">table</span>.<span class="ident">start_new_line</span>();
                 }
 
-                <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">attributes</span>.<span class="ident">drain</span>(..) {
-                    <span class="ident">the_fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">table</span>, <span class="ident">renderer</span>, <span class="ident">pair</span>);
-                    <span class="comment">// New line after each block attribute</span>
-                    <span class="ident">table</span>.<span class="ident">render</span>(<span class="ident">renderer</span>);
-                    <span class="ident">table</span> <span class="op">=</span> <span class="ident">TableFormat::new</span>();
-                    <span class="ident">renderer</span>.<span class="ident">maybe_end_line</span>();
+                <span class="ident">sort_attributes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">attributes</span>[..]);
+
+                <span class="kw">for</span> (<span class="ident">comment</span>, <span class="ident">pair</span>) <span class="kw">in</span> <span class="ident">attributes</span>.<span class="ident">drain</span>(..) {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">comment</span>) <span class="op">=</span> <span class="ident">comment</span> {
+                        <span class="ident">reformat_comment_block</span>(<span class="ident">comment</span>, <span class="kw-2">&amp;mut</span> <span class="ident">table</span>);
+                    }
+                    <span class="ident">reformat_block_attribute</span>(<span class="ident">pair</span>, <span class="kw-2">&amp;mut</span> <span class="ident">table</span>);
                 }
+
+                <span class="ident">table</span>.<span class="ident">render</span>(<span class="ident">renderer</span>);
+                <span class="ident">renderer</span>.<span class="ident">indent_down</span>();
+                <span class="ident">renderer</span>.<span class="ident">write</span>(<span class="string">&quot;}&quot;</span>);
+                <span class="ident">renderer</span>.<span class="ident">end_line</span>();
             }
 
-            <span class="ident">Rule::block_level_attribute</span> =&gt; {}
-
-            <span class="ident">Rule::non_empty_identifier</span> <span class="op">|</span> <span class="ident">Rule::maybe_empty_identifier</span> =&gt; {
-                <span class="comment">// Begin.</span>
+            <span class="ident">Rule::non_empty_identifier</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">block_name</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">as_str</span>();
-                <span class="ident">renderer</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{} {} {{&quot;</span>, <span class="ident">block_type</span>, <span class="ident">block_name</span>));
+                <span class="ident">renderer</span>.<span class="ident">write</span>(<span class="ident">block_type</span>);
+                <span class="ident">renderer</span>.<span class="ident">write</span>(<span class="string">&quot; &quot;</span>);
+                <span class="ident">renderer</span>.<span class="ident">write</span>(<span class="ident">block_name</span>);
+                <span class="ident">renderer</span>.<span class="ident">write</span>(<span class="string">&quot; {&quot;</span>);
                 <span class="ident">renderer</span>.<span class="ident">end_line</span>();
                 <span class="ident">renderer</span>.<span class="ident">indent_up</span>();
             }
-            <span class="ident">Rule::comment_block</span> =&gt; {
-                <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">current</span>.<span class="ident">into_inner</span>() {
-                    <span class="kw">if</span> <span class="ident">block_has_opened</span> {
-                        <span class="ident">comment</span>(<span class="ident">current</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">table</span>.<span class="ident">interleave_writer</span>())
-                    } <span class="kw">else</span> {
-                        <span class="ident">comment</span>(<span class="ident">current</span>.<span class="ident">as_str</span>(), <span class="ident">renderer</span>)
-                    }
-                }
-            }
-            <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::comment_and_new_line</span> <span class="op">|</span> <span class="ident">Rule::doc_comment_and_new_line</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">block_has_opened</span> {
-                    <span class="ident">comment</span>(<span class="ident">current</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">table</span>.<span class="ident">interleave_writer</span>())
-                } <span class="kw">else</span> {
-                    <span class="ident">comment</span>(<span class="ident">current</span>.<span class="ident">as_str</span>(), <span class="ident">renderer</span>)
-                }
-            }
-            <span class="ident">Rule::NEWLINE</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">block_has_opened</span> {
-                    <span class="ident">last_line_was_empty</span> <span class="op">=</span> <span class="ident">renderer</span>.<span class="ident">line_empty</span>();
 
-                    <span class="comment">// do not render newlines before the block</span>
-                    <span class="comment">// Reset the table layout on a newline.</span>
-                    <span class="ident">table</span>.<span class="ident">render</span>(<span class="ident">renderer</span>);
-                    <span class="ident">table</span> <span class="op">=</span> <span class="ident">TableFormat::new</span>();
-                    <span class="ident">renderer</span>.<span class="ident">end_line</span>();
+            <span class="ident">Rule::comment_block</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">pairs</span>.<span class="ident">peek</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">Rule::block_level_attribute</span>) {
+                    <span class="ident">pending_block_comment</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">clone</span>()); <span class="comment">// move it with the attribute</span>
+                } <span class="kw">else</span> {
+                    <span class="kw">if</span> <span class="ident">ate_empty_lines</span> {
+                        <span class="ident">table</span>.<span class="ident">render</span>(<span class="ident">renderer</span>);
+                        <span class="ident">table</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+                        <span class="ident">table</span>.<span class="ident">start_new_line</span>();
+                    }
+                    <span class="ident">reformat_comment_block</span>(<span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">table</span>);
                 }
             }
-            <span class="ident">Rule::BLOCK_LEVEL_CATCH_ALL</span> =&gt; {
-                <span class="ident">table</span>.<span class="ident">interleave</span>(<span class="ident">strip_new_line</span>(<span class="ident">current</span>.<span class="ident">as_str</span>()));
+
+            <span class="ident">Rule::field_declaration</span> =&gt; <span class="ident">reformat_field</span>(<span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">table</span>),
+            <span class="ident">Rule::key_value</span> =&gt; <span class="ident">reformat_key_value</span>(<span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">table</span>),
+            <span class="ident">Rule::enum_value_declaration</span> =&gt; <span class="ident">reformat_enum_entry</span>(<span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">table</span>),
+
+            <span class="ident">Rule::block_level_attribute</span> =&gt; {
+                <span class="ident">attributes</span>.<span class="ident">push</span>((<span class="ident">pending_block_comment</span>.<span class="ident">take</span>(), <span class="ident">current</span>));
             }
-            <span class="kw">_</span> =&gt; <span class="ident">the_fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">table</span>, <span class="ident">renderer</span>, <span class="ident">current</span>),
+
+            <span class="ident">Rule::CATCH_ALL</span> <span class="op">|</span> <span class="ident">Rule::BLOCK_LEVEL_CATCH_ALL</span> =&gt; {
+                <span class="ident">table</span>.<span class="ident">interleave</span>(<span class="ident">current</span>.<span class="ident">as_str</span>().<span class="ident">trim_end_matches</span>(<span class="string">&#39;\n&#39;</span>));
+            }
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         }
     }
-
-    <span class="comment">// End.</span>
-    <span class="ident">table</span>.<span class="ident">render</span>(<span class="ident">renderer</span>);
-    <span class="ident">renderer</span>.<span class="ident">indent_down</span>();
-    <span class="ident">renderer</span>.<span class="ident">write</span>(<span class="string">&quot;}&quot;</span>);
-    <span class="ident">renderer</span>.<span class="ident">maybe_end_line</span>();
 }
 
-<span class="kw">fn</span> <span class="ident">reformat_enum</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Renderer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="ident">reformat_block_element</span>(
-        <span class="string">&quot;enum&quot;</span>,
-        <span class="ident">target</span>,
-        <span class="ident">pair</span>,
-        <span class="kw-2">&amp;</span>(<span class="op">|</span><span class="ident">table</span>, <span class="ident">target</span>, <span class="ident">pair</span><span class="op">|</span> {
-            <span class="comment">//</span>
-            <span class="kw">match</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>() {
-                <span class="ident">Rule::block_level_attribute</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
-                    <span class="ident">table</span>.<span class="ident">render</span>(<span class="ident">target</span>);
-                    <span class="ident">reformat_attribute</span>(<span class="ident">attribute</span>, <span class="string">&quot;@@&quot;</span>, <span class="ident">target</span>);
-                    <span class="ident">table</span>.<span class="ident">end_line</span>();
-                }
-                <span class="ident">Rule::enum_value_declaration</span> =&gt; <span class="ident">reformat_enum_entry</span>(<span class="ident">pair</span>, <span class="ident">table</span>),
-                <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">pair</span>, <span class="ident">table</span>),
-            }
-        }),
-    );
-}
-
-<span class="kw">fn</span> <span class="ident">reformat_enum_entry</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TableFormat</span>) {
+<span class="kw">fn</span> <span class="ident">reformat_block_attribute</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TableFormat</span>) {
+    <span class="macro">assert!</span>(<span class="ident">pair</span>.<span class="ident">as_rule</span>() <span class="op">==</span> <span class="ident">Rule::block_level_attribute</span>);
     <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::non_empty_identifier</span> =&gt; <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">current</span>.<span class="ident">as_str</span>()),
-            <span class="ident">Rule::attribute</span> =&gt; <span class="ident">reformat_attribute</span>(<span class="ident">current</span>, <span class="string">&quot;@&quot;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">target</span>.<span class="ident">column_locked_writer_for</span>(<span class="number">2</span>)),
-            <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::comment</span> =&gt; <span class="ident">target</span>.<span class="ident">append_suffix_to_current_row</span>(<span class="ident">current</span>.<span class="ident">as_str</span>()),
-            <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">current</span>, <span class="ident">target</span>),
+            <span class="ident">Rule::attribute</span> =&gt; {
+                <span class="ident">table</span>.<span class="ident">start_new_line</span>();
+                <span class="ident">reformat_attribute</span>(<span class="ident">current</span>, <span class="string">&quot;@@&quot;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">table</span>.<span class="ident">column_locked_writer_for</span>(<span class="number">0</span>))
+            }
+
+            <span class="ident">Rule::trailing_comment</span> =&gt; {
+                <span class="ident">table</span>.<span class="ident">append_suffix_to_current_row</span>(<span class="ident">current</span>.<span class="ident">as_str</span>());
+            }
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">extract_and_sort_attributes</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">is_field_attribute</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="comment">// get indices of attributes and store in separate Vector</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
-        <span class="kw">if</span> <span class="ident">is_field_attribute</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Rule::attribute</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>() {
-                <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">pair</span>)
+<span class="kw">fn</span> <span class="ident">reformat_enum_entry</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TableFormat</span>) {
+    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
+        <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
+            <span class="ident">Rule::non_empty_identifier</span> =&gt; {
+                <span class="ident">table</span>.<span class="ident">start_new_line</span>();
+                <span class="ident">table</span>.<span class="ident">column_locked_writer_for</span>(<span class="number">0</span>).<span class="ident">write</span>(<span class="ident">current</span>.<span class="ident">as_str</span>())
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Rule::block_level_attribute</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">pair</span>)
+            <span class="ident">Rule::attribute</span> =&gt; <span class="ident">reformat_attribute</span>(<span class="ident">current</span>, <span class="string">&quot;@&quot;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">table</span>.<span class="ident">column_locked_writer_for</span>(<span class="number">1</span>)),
+            <span class="ident">Rule::trailing_comment</span> =&gt; <span class="ident">table</span>.<span class="ident">append_suffix_to_current_row</span>(<span class="ident">current</span>.<span class="ident">as_str</span>()),
+            <span class="ident">Rule::comment_block</span> =&gt; <span class="ident">reformat_comment_block</span>(<span class="ident">current</span>, <span class="ident">table</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         }
     }
+}
 
-    <span class="comment">// sort attributes</span>
-    <span class="ident">attributes</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">sort_index_a</span> <span class="op">=</span> <span class="ident">get_sort_index_of_attribute</span>(<span class="ident">is_field_attribute</span>, <span class="ident">a</span>.<span class="ident">as_str</span>());
-        <span class="kw">let</span> <span class="ident">sort_index_b</span> <span class="op">=</span> <span class="ident">get_sort_index_of_attribute</span>(<span class="ident">is_field_attribute</span>, <span class="ident">b</span>.<span class="ident">as_str</span>());
+<span class="kw">fn</span> <span class="ident">sort_attributes</span>(<span class="ident">attributes</span>: <span class="kw-2">&amp;mut</span> [(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>)]) {
+    <span class="ident">attributes</span>.<span class="ident">sort_by</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">a</span>), (<span class="kw">_</span>, <span class="ident">b</span>)<span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">sort_index_a</span> <span class="op">=</span> <span class="ident">get_sort_index_of_attribute</span>(<span class="ident">a</span>.<span class="ident">as_str</span>());
+        <span class="kw">let</span> <span class="ident">sort_index_b</span> <span class="op">=</span> <span class="ident">get_sort_index_of_attribute</span>(<span class="ident">b</span>.<span class="ident">as_str</span>());
         <span class="ident">sort_index_a</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">sort_index_b</span>)
     });
-    <span class="ident">attributes</span>
 }
 
-<span class="kw">fn</span> <span class="ident">reformat_field</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TableFormat</span>) {
-    <span class="comment">// extract and sort attributes</span>
-    <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">extract_and_sort_attributes</span>(<span class="ident">pair</span>.<span class="ident">clone</span>(), <span class="bool-val">true</span>);
+<span class="kw">fn</span> <span class="ident">reformat_field</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TableFormat</span>) {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
-    <span class="comment">// iterate through tokens and reorder attributes</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes_count</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="ident">inner_pairs_with_sorted_attributes</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span>.<span class="ident">as_rule</span>() {
-        <span class="ident">Rule::attribute</span> =&gt; {
-            <span class="ident">attributes_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">attributes</span>[<span class="ident">attributes_count</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">clone</span>()
-        }
-        <span class="kw">_</span> =&gt; <span class="ident">p</span>,
-    });
-
-    <span class="comment">// Write existing attributes first.</span>
-    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">inner_pairs_with_sorted_attributes</span> {
+    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::non_empty_identifier</span> <span class="op">|</span> <span class="ident">Rule::maybe_empty_identifier</span> =&gt; {
-                <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">current</span>.<span class="ident">as_str</span>());
+            <span class="ident">Rule::non_empty_identifier</span> =&gt; {
+                <span class="ident">table</span>.<span class="ident">start_new_line</span>();
+                <span class="ident">table</span>
+                    .<span class="ident">column_locked_writer_for</span>(<span class="ident">FIELD_NAME_COLUMN</span>)
+                    .<span class="ident">write</span>(<span class="ident">current</span>.<span class="ident">as_str</span>());
             }
             <span class="ident">Rule::field_type</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">target</span>.<span class="ident">column_locked_writer_for</span>(<span class="number">1</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">column_locked_writer_for</span>(<span class="ident">FIELD_TYPE_COLUMN</span>);
                 <span class="ident">reformat_field_type</span>(<span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">writer</span>);
             }
-            <span class="comment">// This is Prisma 1 thing, we should not render them. Example:</span>
+            <span class="comment">// This is a Prisma 1 thing, we should not render them. Example:</span>
             <span class="comment">//</span>
             <span class="comment">// ```no_run</span>
             <span class="comment">// model Site {</span>
@@ -891,17 +685,23 @@
             <span class="comment">// }</span>
             <span class="comment">// ```</span>
             <span class="ident">Rule::LEGACY_COLON</span> =&gt; {}
-            <span class="ident">Rule::attribute</span> =&gt; <span class="ident">reformat_attribute</span>(<span class="ident">current</span>, <span class="string">&quot;@&quot;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">target</span>.<span class="ident">column_locked_writer_for</span>(<span class="number">2</span>)),
-            <span class="comment">// This is a comment at the end of a field.</span>
-            <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::comment</span> =&gt; <span class="ident">target</span>.<span class="ident">append_suffix_to_current_row</span>(<span class="ident">current</span>.<span class="ident">as_str</span>()),
-            <span class="comment">// This is a comment before the field declaration. Hence it must be interlevaed.</span>
-            <span class="ident">Rule::doc_comment_and_new_line</span> =&gt; <span class="ident">comment</span>(<span class="ident">current</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">target</span>.<span class="ident">interleave_writer</span>()),
-            <span class="ident">Rule::NEWLINE</span> =&gt; {} <span class="comment">// we do the new lines ourselves</span>
-            <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">current</span>, <span class="ident">target</span>),
+            <span class="ident">Rule::trailing_comment</span> =&gt; <span class="ident">table</span>.<span class="ident">append_suffix_to_current_row</span>(<span class="ident">current</span>.<span class="ident">as_str</span>()),
+            <span class="ident">Rule::attribute</span> =&gt; {
+                <span class="ident">attributes</span>.<span class="ident">push</span>((<span class="prelude-val">None</span>, <span class="ident">current</span>));
+            }
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         }
     }
 
-    <span class="ident">target</span>.<span class="ident">maybe_end_line</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes_writer</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">column_locked_writer_for</span>(<span class="ident">FIELD_ATTRIBUTES_COLUMN</span>);
+    <span class="ident">sort_attributes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">attributes</span>[..]);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">into_iter</span>().<span class="ident">peekable</span>();
+    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">attribute</span>)) <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">next</span>() {
+        <span class="ident">reformat_attribute</span>(<span class="ident">attribute</span>, <span class="string">&quot;@&quot;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">attributes_writer</span>);
+        <span class="kw">if</span> <span class="ident">attributes</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {
+            <span class="ident">attributes_writer</span>.<span class="ident">write</span>(<span class="string">&quot; &quot;</span>);
+        }
+    }
 }
 
 <span class="kw">fn</span> <span class="ident">reformat_field_type</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">LineWriteable</span>) {
@@ -924,7 +724,7 @@
                 <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">get_identifier</span>(<span class="ident">current</span>));
                 <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot;[]?&quot;</span>);
             }
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         }
     }
 }
@@ -941,7 +741,7 @@
             <span class="macro">assert!</span>(<span class="ident">ident_token</span>.<span class="ident">as_rule</span>() <span class="op">==</span> <span class="ident">Rule::base_type</span>);
             <span class="ident">ident_token</span>.<span class="ident">as_str</span>()
         }
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Get identified failed. Unexpected input: {:#?}&quot;</span>, <span class="ident">pair</span>),
+        <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">pair</span>),
     };
 
     <span class="ident">ident_token</span>
@@ -953,18 +753,11 @@
     <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
             <span class="ident">Rule::attribute_name</span> =&gt; {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">target</span>.<span class="ident">line_empty</span>() {
-                    <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot; &quot;</span>);
-                }
                 <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">owl</span>);
                 <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">current</span>.<span class="ident">as_str</span>());
             }
-            <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::doc_comment_and_new_line</span> =&gt; {
-                <span class="macro">panic!</span>(<span class="string">&quot;Comments inside attributes not supported yet.&quot;</span>)
-            }
             <span class="ident">Rule::arguments_list</span> =&gt; <span class="ident">reformat_arguments_list</span>(<span class="ident">current</span>, <span class="ident">target</span>),
-            <span class="ident">Rule::NEWLINE</span> =&gt; (), <span class="comment">// skip</span>
-            <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">current</span>, <span class="ident">target</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         }
     }
 }
@@ -998,7 +791,7 @@
                 <span class="ident">reformat_attribute_arg</span>(<span class="ident">current</span>, <span class="ident">target</span>);
             }
             <span class="ident">Rule::trailing_comma</span> =&gt; (), <span class="comment">// skip it</span>
-            <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">current</span>, <span class="ident">target</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         };
     }
 
@@ -1013,11 +806,8 @@
                 <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot;: &quot;</span>);
             }
             <span class="ident">Rule::expression</span> =&gt; <span class="ident">reformat_expression</span>(<span class="ident">current</span>, <span class="ident">target</span>),
-            <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::doc_comment_and_new_line</span> =&gt; {
-                <span class="macro">panic!</span>(<span class="string">&quot;Comments inside attribute argument not supported yet.&quot;</span>)
-            }
             <span class="ident">Rule::trailing_comma</span> =&gt; (), <span class="comment">// skip it</span>
-            <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">current</span>, <span class="ident">target</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         };
     }
 }
@@ -1030,10 +820,7 @@
             <span class="ident">Rule::constant_literal</span> =&gt; <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">current</span>.<span class="ident">as_str</span>()),
             <span class="ident">Rule::function</span> =&gt; <span class="ident">reformat_function_expression</span>(<span class="ident">current</span>, <span class="ident">target</span>),
             <span class="ident">Rule::array_expression</span> =&gt; <span class="ident">reformat_array_expression</span>(<span class="ident">current</span>, <span class="ident">target</span>),
-            <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::doc_comment_and_new_line</span> =&gt; {
-                <span class="macro">panic!</span>(<span class="string">&quot;Comments inside expressions not supported yet.&quot;</span>)
-            }
-            <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">current</span>, <span class="ident">target</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         }
     }
 }
@@ -1051,10 +838,7 @@
                 <span class="ident">reformat_expression</span>(<span class="ident">current</span>, <span class="ident">target</span>);
                 <span class="ident">expr_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             }
-            <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::doc_comment_and_new_line</span> =&gt; {
-                <span class="macro">panic!</span>(<span class="string">&quot;Comments inside expressions not supported yet.&quot;</span>)
-            }
-            <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">current</span>, <span class="ident">target</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         }
     }
 
@@ -1068,55 +852,55 @@
                 <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">current</span>.<span class="ident">as_str</span>());
             }
             <span class="ident">Rule::arguments_list</span> =&gt; <span class="ident">reformat_arguments_list</span>(<span class="ident">current</span>, <span class="ident">target</span>),
-            <span class="kw">_</span> =&gt; <span class="ident">reformat_generic_pair</span>(<span class="ident">current</span>, <span class="ident">target</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">reformat_generic_pair</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">LineWriteable</span>) {
-    <span class="kw">match</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>() {
-        <span class="ident">Rule::NEWLINE</span> =&gt; <span class="ident">target</span>.<span class="ident">end_line</span>(),
-        <span class="ident">Rule::comment_block</span> =&gt; {
-            <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
-                <span class="ident">reformat_generic_pair</span>(<span class="ident">pair</span>, <span class="ident">target</span>)
+<span class="attribute">#[<span class="ident">track_caller</span>]</span>
+<span class="kw">fn</span> <span class="ident">unreachable</span>(<span class="ident">pair</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="op">!</span> {
+    <span class="macro">unreachable!</span>(<span class="string">&quot;Encountered impossible declaration during formatting: {pair:?}&quot;</span>)
+}
+
+<span class="kw">fn</span> <span class="ident">reformat_comment_block</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TableFormat</span>) {
+    <span class="macro">assert!</span>(<span class="ident">pair</span>.<span class="ident">as_rule</span>() <span class="op">==</span> <span class="ident">Rule::comment_block</span>);
+    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
+        <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
+            <span class="ident">Rule::comment</span> <span class="op">|</span> <span class="ident">Rule::doc_comment</span> =&gt; {
+                <span class="ident">table</span>.<span class="ident">start_new_line</span>();
+                <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() <span class="op">==</span> <span class="ident">Rule::doc_comment</span> {
+                    <span class="string">&quot;///&quot;</span>
+                } <span class="kw">else</span> {
+                    <span class="string">&quot;//&quot;</span>
+                };
+
+                <span class="ident">table</span>.<span class="ident">append_suffix_to_current_row</span>(<span class="ident">prefix</span>);
+                <span class="kw">for</span> <span class="ident">inner</span> <span class="kw">in</span> <span class="ident">current</span>.<span class="ident">into_inner</span>() {
+                    <span class="kw">match</span> <span class="ident">inner</span>.<span class="ident">as_rule</span>() {
+                        <span class="ident">Rule::doc_content</span> =&gt; <span class="ident">table</span>.<span class="ident">append_suffix_to_current_row</span>(<span class="ident">inner</span>.<span class="ident">as_str</span>()),
+                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                    }
+                }
             }
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         }
-        <span class="ident">Rule::doc_comment_and_new_line</span> <span class="op">|</span> <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::comment_and_new_line</span> <span class="op">|</span> <span class="ident">Rule::comment</span> =&gt; {
-            <span class="ident">comment</span>(<span class="ident">pair</span>.<span class="ident">as_str</span>(), <span class="ident">target</span>)
-        }
-        <span class="ident">Rule::WHITESPACE</span> =&gt; {} <span class="comment">// we are very opinionated about whitespace and hence ignore user input</span>
-        <span class="ident">Rule::CATCH_ALL</span> <span class="op">|</span> <span class="ident">Rule::BLOCK_LEVEL_CATCH_ALL</span> =&gt; {
-            <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">pair</span>.<span class="ident">as_str</span>());
-        }
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(
-            <span class="string">&quot;Encountered impossible declaration during formatting: {:?}&quot;</span>,
-            <span class="ident">pair</span>.<span class="ident">clone</span>().<span class="ident">tokens</span>()
-        ),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">comment</span>(<span class="ident">comment_text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">LineWriteable</span>) {
-    <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="ident">strip_new_line</span>(<span class="ident">comment_text</span>);
-    <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="ident">trimmed</span>.<span class="ident">trim</span>();
-
-    <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">trimmed</span>);
-    <span class="ident">target</span>.<span class="ident">end_line</span>();
-}
-
-<span class="kw">fn</span> <span class="ident">strip_new_line</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-    <span class="kw">if</span> <span class="ident">str</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\n&#39;</span>) {
-        <span class="kw-2">&amp;</span><span class="ident">str</span>[<span class="number">0</span>..<span class="ident">str</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>] <span class="comment">// slice away line break.</span>
-    } <span class="kw">else</span> {
-        <span class="ident">str</span>
+<span class="doccomment">/// Returns `true` if at least one empty line was eaten.</span>
+<span class="kw">fn</span> <span class="ident">eat_empty_lines</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">pairs</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">match</span> <span class="ident">pairs</span>.<span class="ident">peek</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_rule</span>()) {
+        <span class="prelude-val">Some</span>(<span class="ident">Rule::empty_lines</span>) =&gt; {
+            <span class="ident">pairs</span>.<span class="ident">next</span>(); <span class="comment">// eat it</span>
+            <span class="bool-val">true</span>
+        }
+        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">is_top_level_element</span>(<span class="ident">pair</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="macro">matches!</span>(
-        <span class="ident">pair</span>.<span class="ident">as_rule</span>(),
-        <span class="ident">Rule::model_declaration</span> <span class="op">|</span> <span class="ident">Rule::enum_declaration</span> <span class="op">|</span> <span class="ident">Rule::config_block</span> <span class="op">|</span> <span class="ident">Rule::type_alias</span> <span class="op">|</span> <span class="ident">Rule::comment_block</span>
-    )
-}
+<span class="kw">const</span> <span class="ident">FIELD_NAME_COLUMN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="kw">const</span> <span class="ident">FIELD_TYPE_COLUMN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="kw">const</span> <span class="ident">FIELD_ATTRIBUTES_COLUMN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

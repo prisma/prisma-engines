@@ -85,8 +85,25 @@
 <span id="80">80</span>
 <span id="81">81</span>
 <span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">ToIdentifier</span>, <span class="ident">Token</span>, <span class="ident">TokenExtensions</span>},
+    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Pair</span>, <span class="ident">ToIdentifier</span>},
     <span class="ident">parse_attribute::parse_attribute</span>,
     <span class="ident">parse_comments</span>::<span class="kw-2">*</span>,
     <span class="ident">Rule</span>,
@@ -94,21 +111,33 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="ident">Attribute</span>, <span class="ident">Comment</span>, <span class="ident">Enum</span>, <span class="ident">EnumValue</span>, <span class="ident">Identifier</span>};
 <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">Span</span>};
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_enum</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">Enum</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_enum</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">doc_comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">Enum</span> {
+    <span class="kw">let</span> <span class="ident">comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">doc_comment</span>.<span class="ident">and_then</span>(<span class="ident">parse_comment_block</span>);
+    <span class="kw">let</span> <span class="ident">pair_span</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">as_span</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Identifier</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EnumValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pending_value_comment</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>().<span class="ident">peekable</span>();
 
-    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">token</span>.<span class="ident">relevant_children</span>() {
+    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>) <span class="op">=</span> <span class="ident">pairs</span>.<span class="ident">next</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
+            <span class="ident">Rule::BLOCK_OPEN</span> <span class="op">|</span> <span class="ident">Rule::BLOCK_CLOSE</span> <span class="op">|</span> <span class="ident">Rule::ENUM_KEYWORD</span> =&gt; {}
             <span class="ident">Rule::non_empty_identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">to_id</span>()),
-            <span class="ident">Rule::block_level_attribute</span> =&gt; <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">parse_attribute</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="ident">diagnostics</span>)),
-            <span class="ident">Rule::enum_value_declaration</span> =&gt; <span class="kw">match</span> <span class="ident">parse_enum_value</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="ident">diagnostics</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">enum_value</span>) =&gt; <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">enum_value</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>),
-            },
-            <span class="ident">Rule::comment_block</span> =&gt; <span class="ident">comment</span> <span class="op">=</span> <span class="ident">parse_comment_block</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
+            <span class="ident">Rule::block_level_attribute</span> =&gt; {
+                <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">parse_attribute</span>(<span class="ident">current</span>.<span class="ident">into_inner</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">diagnostics</span>))
+            }
+            <span class="ident">Rule::enum_value_declaration</span> =&gt; {
+                <span class="kw">match</span> <span class="ident">parse_enum_value</span>(<span class="ident">current</span>, <span class="ident">pending_value_comment</span>.<span class="ident">take</span>(), <span class="ident">diagnostics</span>) {
+                    <span class="prelude-val">Ok</span>(<span class="ident">enum_value</span>) =&gt; <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">enum_value</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>),
+                }
+            }
+            <span class="ident">Rule::comment_block</span> =&gt; {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Rule::enum_value_declaration</span>) <span class="op">=</span> <span class="ident">pairs</span>.<span class="ident">peek</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">as_rule</span>()) {
+                    <span class="ident">pending_value_comment</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>);
+                }
+            }
             <span class="ident">Rule::BLOCK_LEVEL_CATCH_ALL</span> =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
                 <span class="string">&quot;This line is not an enum value definition.&quot;</span>.<span class="ident">to_owned</span>(),
                 <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
@@ -123,31 +152,36 @@
             <span class="ident">values</span>,
             <span class="ident">attributes</span>,
             <span class="ident">documentation</span>: <span class="ident">comment</span>,
-            <span class="ident">span</span>: <span class="ident">Span::from</span>(<span class="ident">token</span>.<span class="ident">as_span</span>()),
+            <span class="ident">span</span>: <span class="ident">Span::from</span>(<span class="ident">pair_span</span>),
         },
-        <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(
-            <span class="string">&quot;Encountered impossible enum declaration during parsing, name is missing: {:?}&quot;</span>,
-            <span class="ident">token</span>.<span class="ident">as_str</span>()
-        ),
+        <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Encountered impossible enum declaration during parsing, name is missing.&quot;</span>,),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_enum_value</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EnumValue</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_enum_value</span>(
+    <span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">doc_comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EnumValue</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> (<span class="ident">pair_str</span>, <span class="ident">pair_span</span>) <span class="op">=</span> (<span class="ident">pair</span>.<span class="ident">as_str</span>(), <span class="ident">pair</span>.<span class="ident">as_span</span>());
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Identifier</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">comments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">doc_comment</span>.<span class="ident">and_then</span>(<span class="ident">parse_comment_block</span>);
 
-    <span class="comment">// todo validate that the identifier is valid???</span>
-    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">token</span>.<span class="ident">relevant_children</span>() {
+    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
             <span class="ident">Rule::non_empty_identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">to_id</span>()),
-            <span class="ident">Rule::maybe_empty_identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">to_id</span>()),
-            <span class="ident">Rule::attribute</span> =&gt; <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">parse_attribute</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="ident">diagnostics</span>)),
-            <span class="ident">Rule::doc_comment</span> =&gt; {
-                <span class="ident">comments</span>.<span class="ident">push</span>(<span class="ident">parse_doc_comment</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>));
+            <span class="ident">Rule::attribute</span> =&gt; <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">parse_attribute</span>(<span class="ident">current</span>, <span class="ident">diagnostics</span>)),
+            <span class="ident">Rule::trailing_comment</span> =&gt; {
+                <span class="ident">comment</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">comment</span>, <span class="ident">parse_trailing_comment</span>(<span class="ident">current</span>)) {
+                    (<span class="prelude-val">None</span>, <span class="ident">a</span>) <span class="op">|</span> (<span class="ident">a</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">a</span>,
+                    (<span class="prelude-val">Some</span>(<span class="ident">a</span>), <span class="prelude-val">Some</span>(<span class="ident">b</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Comment</span> {
+                        <span class="ident">text</span>: [<span class="ident">a</span>.<span class="ident">text</span>, <span class="ident">b</span>.<span class="ident">text</span>].<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>),
+                    }),
+                };
             }
-            <span class="ident">Rule::doc_comment_and_new_line</span> =&gt; {
-                <span class="ident">comments</span>.<span class="ident">push</span>(<span class="ident">parse_doc_comment</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>));
+            <span class="ident">Rule::comment_block</span> =&gt; {
+                <span class="ident">parse_comment_block</span>(<span class="ident">current</span>);
             }
             <span class="kw">_</span> =&gt; <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="string">&quot;enum value&quot;</span>),
         }
@@ -157,13 +191,13 @@
         <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">EnumValue</span> {
             <span class="ident">name</span>,
             <span class="ident">attributes</span>,
-            <span class="ident">documentation</span>: <span class="ident">doc_comments_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">comments</span>),
-            <span class="ident">span</span>: <span class="ident">Span::from</span>(<span class="ident">token</span>.<span class="ident">as_span</span>()),
+            <span class="ident">documentation</span>: <span class="ident">comment</span>,
+            <span class="ident">span</span>: <span class="ident">Span::from</span>(<span class="ident">pair_span</span>),
             <span class="ident">commented_out</span>: <span class="bool-val">false</span>,
         }),
         <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(
             <span class="string">&quot;Encountered impossible enum value declaration during parsing, name is missing: {:?}&quot;</span>,
-            <span class="ident">token</span>.<span class="ident">as_str</span>()
+            <span class="ident">pair_str</span>
         ),
     }
 }

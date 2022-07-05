@@ -40,20 +40,6 @@
 <span id="35">35</span>
 <span id="36">36</span>
 <span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-<span id="51">51</span>
 </pre><pre class="rust"><code><span class="doccomment">/// Represents a location in a datamodel&#39;s text representation.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Span</span> {
@@ -80,20 +66,6 @@
     <span class="doccomment">/// Is the given span overlapping with the current span.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">overlaps</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Span</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">other</span>.<span class="ident">start</span>) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">other</span>.<span class="ident">end</span>)
-    }
-
-    <span class="doccomment">/// Adds an offset to a span.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lift_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Span</span> {
-        <span class="ident">Span</span> {
-            <span class="ident">start</span>: <span class="ident">offset</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">start</span>,
-            <span class="ident">end</span>: <span class="ident">offset</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">end</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Span</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[{} - {}]&quot;</span>, <span class="self">self</span>.<span class="ident">start</span>, <span class="self">self</span>.<span class="ident">end</span>)
     }
 }
 

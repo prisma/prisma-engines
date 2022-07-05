@@ -153,105 +153,7 @@
 <span id="148">148</span>
 <span id="149">149</span>
 <span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::LineWriteable</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::StringBuilder</span>;
 <span class="kw">use</span> <span class="ident">std::cmp::max</span>;
 
 <span class="kw">const</span> <span class="ident">COLUMN_SPACING</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
@@ -259,76 +161,43 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Row</span> {
     <span class="comment">// the 2nd String is an arbitrary String that does not influence the table layout. We use it for end of line comments.</span>
+    <span class="doccomment">/// A row with columns aligned by the table format.</span>
     <span class="ident">Regular</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">String</span>),
+    <span class="doccomment">/// A row without columns.</span>
     <span class="ident">Interleaved</span>(<span class="ident">String</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Row</span> {
     <span class="kw">fn</span> <span class="ident">new_regular</span>() -&gt; <span class="ident">Row</span> {
-        <span class="ident">Row::Regular</span>(<span class="ident">Vec::new</span>(), <span class="string">&quot;&quot;</span>.<span class="ident">to_owned</span>())
+        <span class="ident">Row::Regular</span>(<span class="ident">Vec::new</span>(), <span class="ident">String::new</span>())
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TableFormat</span> {
     <span class="kw">pub</span> <span class="ident">table</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span>,
-    <span class="ident">row</span>: <span class="ident">i32</span>,
-    <span class="ident">line_ending</span>: <span class="ident">bool</span>,
-    <span class="ident">maybe_new_line</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TableFormat</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">TableFormat</span> {
-        <span class="ident">TableFormat</span> {
-            <span class="ident">table</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">row</span>: <span class="op">-</span><span class="number">1</span>,
-            <span class="ident">line_ending</span>: <span class="bool-val">true</span>,
-            <span class="ident">maybe_new_line</span>: <span class="bool-val">false</span>,
-        }
-    }
-
     <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">table</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="self">self</span>.<span class="ident">row</span> <span class="op">=</span> <span class="op">-</span><span class="number">1</span>;
-        <span class="self">self</span>.<span class="ident">line_ending</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="self">self</span>.<span class="ident">maybe_new_line</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="ident">std::mem::take</span>(<span class="self">self</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interleave_writer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">TableFormatInterleaveWrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">TableFormatInterleaveWrapper</span> {
-            <span class="ident">formatter</span>: <span class="self">self</span>,
-            <span class="ident">string_builder</span>: <span class="ident">StringBuilder::new</span>(),
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_locked_writer_for</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ColumnLockedWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">column_locked_writer_for</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ColumnLockedWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">ColumnLockedWriter</span> {
             <span class="ident">formatter</span>: <span class="self">self</span>,
             <span class="ident">column</span>: <span class="ident">index</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interleave</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">interleave</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">push</span>(<span class="ident">Row::Interleaved</span>(<span class="ident">String::from</span>(<span class="ident">text</span>)));
-        <span class="comment">// We&#39;ve just ended a line.</span>
-        <span class="self">self</span>.<span class="ident">line_ending</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="self">self</span>.<span class="ident">maybe_new_line</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="self">self</span>.<span class="ident">row</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-
-        <span class="comment">// Prepare next new line.</span>
-        <span class="self">self</span>.<span class="ident">end_line</span>();
     }
 
     <span class="comment">// Safely appends to the column with the given index.</span>
     <span class="kw">fn</span> <span class="ident">append_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">index</span>: <span class="ident">usize</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">line_ending</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">maybe_new_line</span> {
-            <span class="self">self</span>.<span class="ident">start_new_line</span>();
-            <span class="self">self</span>.<span class="ident">line_ending</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="self">self</span>.<span class="ident">maybe_new_line</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        }
-
-        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">table</span>[<span class="self">self</span>.<span class="ident">row</span> <span class="kw">as</span> <span class="ident">usize</span>] {
-            <span class="ident">Row::Regular</span>(<span class="ident">row</span>, <span class="kw">_</span>) =&gt; {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">last_mut</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">Row::Regular</span>(<span class="ident">row</span>, <span class="kw">_</span>)) =&gt; {
                 <span class="kw">while</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">index</span> {
                     <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">String::new</span>());
                 }
@@ -339,23 +208,23 @@
                     <span class="ident">row</span>[<span class="ident">index</span>].<span class="ident">push_str</span>(<span class="ident">text</span>);
                 }
             }
-            <span class="ident">Row::Interleaved</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Cannot append to col in interleaved mode&quot;</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">Row::Interleaved</span>(<span class="kw">_</span>)) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Cannot append to col in interleaved mode&quot;</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_suffix_to_current_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">table</span>[<span class="self">self</span>.<span class="ident">row</span> <span class="kw">as</span> <span class="ident">usize</span>] {
-            <span class="ident">Row::Regular</span>(<span class="kw">_</span>, <span class="ident">suffix</span>) =&gt; <span class="ident">suffix</span>.<span class="ident">push_str</span>(<span class="ident">text</span>),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">append_suffix_to_current_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">last_mut</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">Row::Regular</span>(<span class="kw">_</span>, <span class="ident">suffix</span>)) =&gt; <span class="ident">suffix</span>.<span class="ident">push_str</span>(<span class="ident">text</span>),
             <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;State error: Not inside a regular table row.&quot;</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_new_line</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start_new_line</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">push</span>(<span class="ident">Row::new_regular</span>());
-        <span class="self">self</span>.<span class="ident">row</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">LineWriteable</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">render</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::Renderer</span>) {
         <span class="comment">// First, measure cols</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_number_of_columns</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -385,10 +254,14 @@
                         } <span class="kw">else</span> {
                             <span class="ident">max_widths_for_each_column</span>[<span class="ident">i</span>] <span class="op">-</span> <span class="ident">col</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">COLUMN_SPACING</span>
                         };
-                        <span class="ident">target</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">col</span>, <span class="string">&quot; &quot;</span>.<span class="ident">repeat</span>(<span class="ident">spacing</span>)));
+                        <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">col</span>);
+                        <span class="ident">target</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="string">&quot; &quot;</span>.<span class="ident">repeat</span>(<span class="ident">spacing</span>));
                     }
                     <span class="kw">if</span> <span class="op">!</span><span class="ident">suffix</span>.<span class="ident">is_empty</span>() {
-                        <span class="ident">target</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot; {}&quot;</span>, <span class="ident">suffix</span>));
+                        <span class="kw">if</span> <span class="op">!</span><span class="ident">row</span>.<span class="ident">is_empty</span>() {
+                            <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot; &quot;</span>);
+                        }
+                        <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">suffix</span>);
                     }
                 }
                 <span class="ident">Row::Interleaved</span>(<span class="ident">text</span>) =&gt; {
@@ -405,61 +278,15 @@
 
 <span class="kw">impl</span> <span class="ident">LineWriteable</span> <span class="kw">for</span> <span class="ident">TableFormat</span> {
     <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">line_ending</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">maybe_new_line</span> {
-            <span class="self">self</span>.<span class="ident">start_new_line</span>();
-            <span class="self">self</span>.<span class="ident">line_ending</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="self">self</span>.<span class="ident">maybe_new_line</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        }
-
         <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">trim</span>();
 
-        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">table</span>[<span class="self">self</span>.<span class="ident">row</span> <span class="kw">as</span> <span class="ident">usize</span>] {
-            <span class="ident">Row::Regular</span>(<span class="ident">row</span>, <span class="kw">_</span>) =&gt; <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">String::from</span>(<span class="ident">trimmed</span>)),
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">last_mut</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">Row::Regular</span>(<span class="ident">row</span>, <span class="kw">_</span>)) =&gt; <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">String::from</span>(<span class="ident">trimmed</span>)),
             <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;State error: Not inside a regular table row.&quot;</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">end_line</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// Lazy line ending.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">line_ending</span> {
-            <span class="self">self</span>.<span class="ident">start_new_line</span>();
-            <span class="self">self</span>.<span class="ident">maybe_new_line</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        }
-
-        <span class="self">self</span>.<span class="ident">line_ending</span> <span class="op">=</span> <span class="bool-val">true</span>;
-    }
-
-    <span class="kw">fn</span> <span class="ident">line_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">line_ending</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">maybe_end_line</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">maybe_new_line</span> <span class="op">=</span> <span class="bool-val">true</span>
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TableFormatInterleaveWrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">TableFormat</span>,
-    <span class="ident">string_builder</span>: <span class="ident">StringBuilder</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LineWriteable</span> <span class="kw">for</span> <span class="ident">TableFormatInterleaveWrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">string_builder</span>.<span class="ident">write</span>(<span class="ident">text</span>);
-    }
-
-    <span class="kw">fn</span> <span class="ident">end_line</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">formatter</span>.<span class="ident">interleave</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">string_builder</span>.<span class="ident">to_string</span>());
-        <span class="self">self</span>.<span class="ident">string_builder</span> <span class="op">=</span> <span class="ident">StringBuilder::new</span>();
-    }
-
-    <span class="kw">fn</span> <span class="ident">maybe_end_line</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">formatter</span>.<span class="ident">maybe_end_line</span>();
-    }
-
-    <span class="kw">fn</span> <span class="ident">line_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn</span> <span class="ident">end_line</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {}
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ColumnLockedWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -473,28 +300,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">end_line</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">formatter</span>.<span class="ident">end_line</span>();
-    }
-
-    <span class="kw">fn</span> <span class="ident">maybe_end_line</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">formatter</span>.<span class="ident">maybe_end_line</span>();
-    }
-
-    <span class="kw">fn</span> <span class="ident">line_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">formatter</span>.<span class="ident">line_empty</span>() {
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">formatter</span>.<span class="ident">table</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>() {
-                <span class="ident">Row::Regular</span>(<span class="ident">row</span>, <span class="kw">_</span>) =&gt; <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">column</span> <span class="op">|</span><span class="op">|</span> <span class="ident">row</span>[<span class="self">self</span>.<span class="ident">column</span>].<span class="ident">is_empty</span>(),
-                <span class="ident">Row::Interleaved</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">is_empty</span>(),
-            }
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">TableFormat</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+        <span class="macro">panic!</span>(<span class="string">&quot;Lines cannot be ended from ColumnLockedWriter&quot;</span>);
     }
 }
 </code></pre></div>

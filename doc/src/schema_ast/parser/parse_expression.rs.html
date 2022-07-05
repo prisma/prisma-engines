@@ -205,23 +205,25 @@
 <span id="200">200</span>
 <span id="201">201</span>
 <span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Token</span>, <span class="ident">TokenExtensions</span>},
+    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Pair</span>},
     <span class="ident">parse_arguments::parse_arguments_list</span>,
     <span class="ident">Rule</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_expression</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics::Diagnostics</span>) -&gt; <span class="ident">Expression</span> {
-    <span class="kw">let</span> <span class="ident">first_child</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">first_relevant_child</span>();
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_expression</span>(<span class="ident">token</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics::Diagnostics</span>) -&gt; <span class="ident">Expression</span> {
+    <span class="kw">let</span> <span class="ident">first_child</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">into_inner</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::from</span>(<span class="ident">first_child</span>.<span class="ident">as_span</span>());
     <span class="kw">match</span> <span class="ident">first_child</span>.<span class="ident">as_rule</span>() {
         <span class="ident">Rule::numeric_literal</span> =&gt; <span class="ident">Expression::NumericValue</span>(<span class="ident">first_child</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>(), <span class="ident">span</span>),
-        <span class="ident">Rule::string_literal</span> =&gt; <span class="ident">Expression::StringValue</span>(<span class="ident">parse_string_literal</span>(<span class="kw-2">&amp;</span><span class="ident">first_child</span>, <span class="ident">diagnostics</span>), <span class="ident">span</span>),
+        <span class="ident">Rule::string_literal</span> =&gt; <span class="ident">Expression::StringValue</span>(<span class="ident">parse_string_literal</span>(<span class="ident">first_child</span>, <span class="ident">diagnostics</span>), <span class="ident">span</span>),
         <span class="ident">Rule::constant_literal</span> =&gt; <span class="ident">Expression::ConstantValue</span>(<span class="ident">first_child</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>(), <span class="ident">span</span>),
-        <span class="ident">Rule::function</span> =&gt; <span class="ident">parse_function</span>(<span class="kw-2">&amp;</span><span class="ident">first_child</span>, <span class="ident">diagnostics</span>),
-        <span class="ident">Rule::array_expression</span> =&gt; <span class="ident">parse_array</span>(<span class="kw-2">&amp;</span><span class="ident">first_child</span>, <span class="ident">diagnostics</span>),
+        <span class="ident">Rule::function</span> =&gt; <span class="ident">parse_function</span>(<span class="ident">first_child</span>, <span class="ident">diagnostics</span>),
+        <span class="ident">Rule::array_expression</span> =&gt; <span class="ident">parse_array</span>(<span class="ident">first_child</span>, <span class="ident">diagnostics</span>),
         <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(
             <span class="string">&quot;Encountered impossible literal during parsing: {:?}&quot;</span>,
             <span class="ident">first_child</span>.<span class="ident">tokens</span>()
@@ -229,38 +231,40 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_function</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">Expression</span> {
+<span class="kw">fn</span> <span class="ident">parse_function</span>(<span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">Expression</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arguments</span> <span class="op">=</span> <span class="ident">ArgumentsList::default</span>();
+    <span class="kw">let</span> (<span class="ident">pair_str</span>, <span class="ident">span</span>) <span class="op">=</span> (<span class="ident">pair</span>.<span class="ident">as_str</span>(), <span class="ident">pair</span>.<span class="ident">as_span</span>());
 
-    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">token</span>.<span class="ident">relevant_children</span>() {
+    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
             <span class="ident">Rule::function_name</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">as_str</span>().<span class="ident">to_string</span>()),
-            <span class="ident">Rule::arguments_list</span> =&gt; <span class="ident">parse_arguments_list</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">arguments</span>, <span class="ident">diagnostics</span>),
+            <span class="ident">Rule::arguments_list</span> =&gt; <span class="ident">parse_arguments_list</span>(<span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">arguments</span>, <span class="ident">diagnostics</span>),
             <span class="kw">_</span> =&gt; <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="string">&quot;function&quot;</span>),
         }
     }
 
     <span class="kw">match</span> <span class="ident">name</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">Expression::Function</span>(<span class="ident">name</span>, <span class="ident">arguments</span>, <span class="ident">Span::from</span>(<span class="ident">token</span>.<span class="ident">as_span</span>())),
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Encountered impossible function during parsing: {:?}&quot;</span>, <span class="ident">token</span>.<span class="ident">as_str</span>()),
+        <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">Expression::Function</span>(<span class="ident">name</span>, <span class="ident">arguments</span>, <span class="ident">Span::from</span>(<span class="ident">span</span>)),
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Encountered impossible function during parsing: {:?}&quot;</span>, <span class="ident">pair_str</span>),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_array</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">Expression</span> {
+<span class="kw">fn</span> <span class="ident">parse_array</span>(<span class="ident">token</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">Expression</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">elements</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">as_span</span>();
 
-    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">token</span>.<span class="ident">relevant_children</span>() {
+    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">token</span>.<span class="ident">into_inner</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::expression</span> =&gt; <span class="ident">elements</span>.<span class="ident">push</span>(<span class="ident">parse_expression</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="ident">diagnostics</span>)),
+            <span class="ident">Rule::expression</span> =&gt; <span class="ident">elements</span>.<span class="ident">push</span>(<span class="ident">parse_expression</span>(<span class="ident">current</span>, <span class="ident">diagnostics</span>)),
             <span class="kw">_</span> =&gt; <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="string">&quot;array&quot;</span>),
         }
     }
 
-    <span class="ident">Expression::Array</span>(<span class="ident">elements</span>, <span class="ident">Span::from</span>(<span class="ident">token</span>.<span class="ident">as_span</span>()))
+    <span class="ident">Expression::Array</span>(<span class="ident">elements</span>, <span class="ident">Span::from</span>(<span class="ident">span</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">parse_string_literal</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">parse_string_literal</span>(<span class="ident">token</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">String</span> {
     <span class="macro">assert!</span>(<span class="ident">token</span>.<span class="ident">as_rule</span>() <span class="op">==</span> <span class="ident">Rule::string_literal</span>);
     <span class="kw">let</span> <span class="ident">contents</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">clone</span>().<span class="ident">into_inner</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">contents_str</span> <span class="op">=</span> <span class="ident">contents</span>.<span class="ident">as_str</span>();

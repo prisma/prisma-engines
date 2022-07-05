@@ -100,13 +100,9 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">schema_ast::ast</span>;
-
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CompositeTypeFieldWalker</span>, <span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">ScalarFieldWalker</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ScalarType</span>;
-
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CompositeTypeFieldWalker</span>, <span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">ScalarFieldWalker</span>};
+<span class="kw">use</span> <span class="ident">schema_ast::ast</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">enum</span> <span class="ident">InnerWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {

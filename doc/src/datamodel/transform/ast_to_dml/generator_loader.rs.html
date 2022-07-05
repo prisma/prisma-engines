@@ -151,7 +151,6 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
-<span id="149">149</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::helpers</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::preview_features::GENERATOR</span>, <span class="ident">configuration::Generator</span>, <span class="ident">diagnostics</span>::<span class="kw-2">*</span>, <span class="ident">schema_ast::ast::WithSpan</span>,
@@ -261,8 +260,7 @@
 
         <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">preview_features_arg</span> {
             <span class="prelude-val">Some</span>((<span class="prelude-val">Ok</span>(<span class="ident">arr</span>), <span class="ident">span</span>)) =&gt; {
-                <span class="kw">let</span> (<span class="ident">features</span>, <span class="kw-2">mut</span> <span class="ident">diag</span>) <span class="op">=</span> <span class="ident">parse_and_validate_preview_features</span>(<span class="ident">arr</span>, <span class="kw-2">&amp;</span><span class="ident">GENERATOR</span>, <span class="ident">span</span>);
-                <span class="ident">diagnostics</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">diag</span>);
+                <span class="kw">let</span> <span class="ident">features</span> <span class="op">=</span> <span class="ident">parse_and_validate_preview_features</span>(<span class="ident">arr</span>, <span class="kw-2">&amp;</span><span class="ident">GENERATOR</span>, <span class="ident">span</span>, <span class="ident">diagnostics</span>);
 
                 <span class="prelude-val">Some</span>(<span class="ident">features</span>)
             }

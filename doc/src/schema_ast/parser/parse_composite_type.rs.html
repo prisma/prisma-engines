@@ -117,8 +117,22 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">ToIdentifier</span>, <span class="ident">Token</span>, <span class="ident">TokenExtensions</span>},
+    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Pair</span>, <span class="ident">ToIdentifier</span>},
     <span class="ident">parse_attribute::parse_attribute</span>,
     <span class="ident">parse_comments::parse_comment_block</span>,
     <span class="ident">parse_field::parse_field</span>,
@@ -127,66 +141,78 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>;
 <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_composite_type</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">ast::CompositeType</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_composite_type</span>(
+    <span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">doc_comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+) -&gt; <span class="ident">ast::CompositeType</span> {
+    <span class="kw">let</span> <span class="ident">pair_span</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">as_span</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::Identifier</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ast::Field</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::Comment</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pending_field_comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>();
 
-    <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">token</span>.<span class="ident">relevant_children</span>() {
+    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>) <span class="op">=</span> <span class="ident">pairs</span>.<span class="ident">next</span>() {
+        <span class="kw">let</span> <span class="ident">current_span</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">as_span</span>();
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
             <span class="ident">Rule::TYPE_KEYWORD</span> =&gt; (),
             <span class="ident">Rule::non_empty_identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">to_id</span>()),
             <span class="ident">Rule::block_level_attribute</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="ident">parse_attribute</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="ident">diagnostics</span>);
+                <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="ident">parse_attribute</span>(<span class="ident">current</span>.<span class="ident">into_inner</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">diagnostics</span>);
 
                 <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">attr</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>() {
                     <span class="string">&quot;map&quot;</span> =&gt; {
                         <span class="ident">DatamodelError::new_validation_error</span>(
                             <span class="string">&quot;The name of a composite type is not persisted in the database, therefore it does not need a mapped database name.&quot;</span>
                                 .<span class="ident">to_owned</span>(),
-                            <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
+                            <span class="ident">current_span</span>.<span class="ident">into</span>(),
                         )
                     }
                     <span class="string">&quot;unique&quot;</span> =&gt; {
                         <span class="ident">DatamodelError::new_validation_error</span>(
                             <span class="string">&quot;A unique constraint should be defined in the model containing the embed.&quot;</span>
                                 .<span class="ident">to_owned</span>(),
-                            <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
+                            <span class="ident">current_span</span>.<span class="ident">into</span>(),
                         )
                     }
                     <span class="string">&quot;index&quot;</span> =&gt; {
                         <span class="ident">DatamodelError::new_validation_error</span>(
                             <span class="string">&quot;An index should be defined in the model containing the embed.&quot;</span>
                                 .<span class="ident">to_owned</span>(),
-                            <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
+                            <span class="ident">current_span</span>.<span class="ident">into</span>(),
                         )
                     }
                     <span class="string">&quot;fulltext&quot;</span> =&gt; {
                         <span class="ident">DatamodelError::new_validation_error</span>(
                             <span class="string">&quot;A fulltext index should be defined in the model containing the embed.&quot;</span>
                                 .<span class="ident">to_owned</span>(),
-                            <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
+                            <span class="ident">current_span</span>.<span class="ident">into</span>(),
                         )
                     }
                     <span class="string">&quot;id&quot;</span> =&gt; {
                         <span class="ident">DatamodelError::new_validation_error</span>(
                             <span class="string">&quot;A composite type cannot define an id.&quot;</span>
                                 .<span class="ident">to_owned</span>(),
-                            <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
+                            <span class="ident">current_span</span>.<span class="ident">into</span>(),
                         )
                     }
                     <span class="kw">_</span> =&gt; {
                         <span class="ident">DatamodelError::new_validation_error</span>(
                             <span class="string">&quot;A composite type cannot have block-level attributes.&quot;</span>
                                 .<span class="ident">to_owned</span>(),
-                            <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
+                            <span class="ident">current_span</span>.<span class="ident">into</span>(),
                         )
                     }
                 };
 
                 <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
             }
-            <span class="ident">Rule::field_declaration</span> =&gt; <span class="kw">match</span> <span class="ident">parse_field</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="ident">diagnostics</span>) {
+            <span class="ident">Rule::field_declaration</span> =&gt; <span class="kw">match</span> <span class="ident">parse_field</span>(
+                <span class="kw-2">&amp;</span><span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>,
+                <span class="ident">current</span>,
+                <span class="ident">pending_field_comment</span>.<span class="ident">take</span>(),
+                <span class="ident">diagnostics</span>,
+            ) {
                 <span class="prelude-val">Ok</span>(<span class="ident">field</span>) =&gt; {
                     <span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="ident">field</span>.<span class="ident">attributes</span>.<span class="ident">iter</span>() {
                         <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">attr</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>() {
@@ -197,7 +223,7 @@
                                     <span class="string">&quot;Defining `@{name}` attribute for a field in a composite type is not allowed.&quot;</span>
                                 );
 
-                                <span class="ident">DatamodelError::new_validation_error</span>(<span class="ident">msg</span>, <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>())
+                                <span class="ident">DatamodelError::new_validation_error</span>(<span class="ident">msg</span>, <span class="ident">current_span</span>.<span class="ident">clone</span>().<span class="ident">into</span>())
                             }
                             <span class="kw">_</span> =&gt; <span class="kw">continue</span>,
                         };
@@ -209,7 +235,12 @@
                 }
                 <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>),
             },
-            <span class="ident">Rule::comment_block</span> =&gt; <span class="ident">comment</span> <span class="op">=</span> <span class="ident">parse_comment_block</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
+            <span class="ident">Rule::comment_block</span> =&gt; {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Rule::field_declaration</span>) <span class="op">=</span> <span class="ident">pairs</span>.<span class="ident">peek</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_rule</span>()) {
+                    <span class="ident">pending_field_comment</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>);
+                }
+            }
+            <span class="ident">Rule::BLOCK_OPEN</span> <span class="op">|</span> <span class="ident">Rule::BLOCK_CLOSE</span> =&gt; {}
             <span class="ident">Rule::BLOCK_LEVEL_CATCH_ALL</span> =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
                 <span class="string">&quot;This line is not a valid field or attribute definition.&quot;</span>.<span class="ident">to_owned</span>(),
                 <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
@@ -222,13 +253,10 @@
         <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">ast::CompositeType</span> {
             <span class="ident">name</span>,
             <span class="ident">fields</span>,
-            <span class="ident">documentation</span>: <span class="ident">comment</span>,
-            <span class="ident">span</span>: <span class="ident">ast::Span::from</span>(<span class="ident">token</span>.<span class="ident">as_span</span>()),
+            <span class="ident">documentation</span>: <span class="ident">doc_comment</span>.<span class="ident">and_then</span>(<span class="ident">parse_comment_block</span>),
+            <span class="ident">span</span>: <span class="ident">ast::Span::from</span>(<span class="ident">pair_span</span>),
         },
-        <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(
-            <span class="string">&quot;Encountered impossible model declaration during parsing: {:?}&quot;</span>,
-            <span class="ident">token</span>.<span class="ident">as_str</span>()
-        ),
+        <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Encountered impossible model declaration during parsing&quot;</span>,),
     }
 }
 </code></pre></div>

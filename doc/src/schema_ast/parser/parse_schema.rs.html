@@ -97,13 +97,19 @@
 <span id="92">92</span>
 <span id="93">93</span>
 <span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">TokenExtensions</span>},
-    <span class="ident">parse_composite_type::parse_composite_type</span>,
-    <span class="ident">parse_enum::parse_enum</span>,
-    <span class="ident">parse_model::parse_model</span>,
-    <span class="ident">parse_source_and_generator::parse_config_block</span>,
-    <span class="ident">PrismaDatamodelParser</span>, <span class="ident">Rule</span>,
+    <span class="ident">parse_composite_type::parse_composite_type</span>, <span class="ident">parse_enum::parse_enum</span>, <span class="ident">parse_model::parse_model</span>,
+    <span class="ident">parse_source_and_generator::parse_config_block</span>, <span class="ident">PrismaDatamodelParser</span>, <span class="ident">Rule</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
@@ -117,25 +123,28 @@
         <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">datamodel_wrapped</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">datamodel_wrapped</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">top_level_definitions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Top</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-            <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">datamodel</span>.<span class="ident">relevant_children</span>() {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pending_block_comment</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">datamodel</span>.<span class="ident">into_inner</span>().<span class="ident">peekable</span>();
+
+            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>) <span class="op">=</span> <span class="ident">pairs</span>.<span class="ident">next</span>() {
                 <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
                     <span class="ident">Rule::model_declaration</span> =&gt; {
                         <span class="kw">let</span> <span class="ident">keyword</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">clone</span>().<span class="ident">into_inner</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">pair</span>.<span class="ident">as_rule</span>(), <span class="ident">Rule::TYPE_KEYWORD</span> <span class="op">|</span> <span class="ident">Rule::MODEL_KEYWORD</span>) ).<span class="ident">expect</span>(<span class="string">&quot;Expected model or type keyword&quot;</span>);
 
                         <span class="kw">match</span> <span class="ident">keyword</span>.<span class="ident">as_rule</span>() {
                             <span class="ident">Rule::TYPE_KEYWORD</span> =&gt; {
-                                <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">Top::CompositeType</span>(<span class="ident">parse_composite_type</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="ident">diagnostics</span>)))
+                                <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">Top::CompositeType</span>(<span class="ident">parse_composite_type</span>(<span class="ident">current</span>, <span class="ident">pending_block_comment</span>.<span class="ident">take</span>(), <span class="ident">diagnostics</span>)))
                             }
                             <span class="ident">Rule::MODEL_KEYWORD</span> =&gt; {
-                                <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">Top::Model</span>(<span class="ident">parse_model</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="ident">diagnostics</span>)))
+                                <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">Top::Model</span>(<span class="ident">parse_model</span>(<span class="ident">current</span>, <span class="ident">pending_block_comment</span>.<span class="ident">take</span>(), <span class="ident">diagnostics</span>)))
                             }
                             <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
                         }
 
                     },
-                    <span class="ident">Rule::enum_declaration</span> =&gt; <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">Top::Enum</span>(<span class="ident">parse_enum</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="ident">diagnostics</span>))),
+                    <span class="ident">Rule::enum_declaration</span> =&gt; <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">Top::Enum</span>(<span class="ident">parse_enum</span>(<span class="ident">current</span>,<span class="ident">pending_block_comment</span>.<span class="ident">take</span>(),  <span class="ident">diagnostics</span>))),
                     <span class="ident">Rule::config_block</span> =&gt; {
-                        <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">parse_config_block</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="ident">diagnostics</span>));
+                        <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">parse_config_block</span>(<span class="ident">current</span>, <span class="ident">diagnostics</span>));
                     },
                     <span class="ident">Rule::type_alias</span> =&gt; {
                         <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DatamodelError::new_validation_error</span>(
@@ -145,7 +154,17 @@
 
                         <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
                     }
-                    <span class="ident">Rule::comment_block</span> =&gt; (),
+                    <span class="ident">Rule::comment_block</span> =&gt; {
+                        <span class="kw">match</span> <span class="ident">pairs</span>.<span class="ident">peek</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">as_rule</span>()) {
+                            <span class="prelude-val">Some</span>(<span class="ident">Rule::empty_lines</span>) =&gt; {
+                                <span class="comment">// free floating</span>
+                            }
+                            <span class="prelude-val">Some</span>(<span class="ident">Rule::model_declaration</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Rule::enum_declaration</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Rule::config_block</span>) =&gt; {
+                                <span class="ident">pending_block_comment</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>);
+                            }
+                            <span class="kw">_</span> =&gt; (),
+                        }
+                    },
                     <span class="ident">Rule::EOI</span> =&gt; {}
                     <span class="ident">Rule::CATCH_ALL</span> =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
                         <span class="string">&quot;This line is invalid. It does not start with any known Prisma schema keyword.&quot;</span>.<span class="ident">to_owned</span>(),
@@ -155,7 +174,8 @@
                         <span class="string">&quot;This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \&#39;model\&#39;, \&#39;enum\&#39;, \&#39;datasource\&#39; and \&#39;generator\&#39;.&quot;</span>.<span class="ident">to_owned</span>(),
                         <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
                     )),
-                    <span class="kw">_</span> =&gt; <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="string">&quot;datamodel&quot;</span>),
+                    <span class="ident">Rule::empty_lines</span> =&gt; (),
+                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
                 }
             }
 
