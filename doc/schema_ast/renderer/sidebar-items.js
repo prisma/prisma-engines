@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Renderer",""]]});
+initSidebarItems({"struct":[["Renderer",""]],"trait":[["LineWriteable",""]]});

@@ -45,10 +45,8 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
-<span id="43">43</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::diagnostics::DatamodelError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::helpers::ValueValidator</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">diagnostics::DatamodelError</span>};
+<span class="kw">use</span> <span class="ident">parser_database::ValueValidator</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">EnvFunction</span> {
     <span class="ident">var_name</span>: <span class="ident">String</span>,
