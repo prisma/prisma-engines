@@ -20,7 +20,7 @@ pub fn walk_columns(schema: &SqlSchema) -> impl Iterator<Item = ColumnWalker<'_>
 
 /// A generic reference to a schema item. It holds a reference to the schema so it can offer a
 /// convenient API based on the Id type.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct Walker<'a, Id> {
     /// The identifier.
     pub id: Id,
@@ -28,9 +28,17 @@ pub struct Walker<'a, Id> {
     pub schema: &'a SqlSchema,
 }
 
+impl<I: std::fmt::Debug> std::fmt::Debug for Walker<'_, I> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct(std::any::type_name::<Self>())
+            .field("id", &self.id)
+            .finish()
+    }
+}
+
 impl<'a, Id> Walker<'a, Id> {
     /// Jump to the item identified by `other_id`.
-    pub fn walk<I: 'static>(self, other_id: I) -> Walker<'a, I> {
+    pub fn walk<I>(self, other_id: I) -> Walker<'a, I> {
         self.schema.walk(other_id)
     }
 }

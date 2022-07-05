@@ -63,7 +63,7 @@ pub fn calculate_datamodel(
     let mut warnings = vec![];
     if !previous_datamodel.is_empty() {
         enrich(previous_datamodel, &mut datamodel, &ctx, &mut warnings);
-        tracing::debug!("Enriching datamodel is done: {:?}", datamodel);
+        debug!("Enriching datamodel is done.");
     }
 
     // commenting out models, fields, enums, enum values
@@ -75,8 +75,7 @@ pub fn calculate_datamodel(
     // if based on a previous Prisma version add id default opinionations
     add_prisma_1_id_defaults(&version, &mut datamodel, schema, &mut warnings, &ctx);
 
-    // renderer -> parser -> validator, is_commented_out gets lost between renderer and parser
-    debug!("Done calculating data model {:?}", datamodel);
+    debug!("Done calculating datamodel.");
     Ok(IntrospectionResult {
         data_model: datamodel,
         warnings,

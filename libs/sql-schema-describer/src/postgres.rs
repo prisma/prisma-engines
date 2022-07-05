@@ -775,7 +775,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                     JOIN pg_attribute att2 on att2.attrelid = con.conrelid and att2.attnum = con.parent
                     JOIN pg_class rel_cl on con.confrelid = rel_cl.oid
                     JOIN pg_namespace rel_ns on rel_cl.relnamespace = rel_ns.oid
-            ORDER BY constraint_name, con_id, con.colidx;
+            ORDER BY table_name, constraint_name, con_id, con.colidx;
         "#;
 
         let mut current_fk: Option<(i64, ForeignKeyId)> = None;
