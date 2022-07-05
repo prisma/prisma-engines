@@ -150,7 +150,8 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
         ModelField::Scalar(sf) => {
             let mut types = vec![InputType::Enum(SORT_ORDER_ENUM.clone())];
 
-            if ctx.capabilities.contains(ConnectorCapability::OrderByNullsFirstLast)
+            if ctx.has_feature(&PreviewFeature::OrderByNulls)
+                && ctx.capabilities.contains(ConnectorCapability::OrderByNullsFirstLast)
                 && !sf.is_required()
                 && !sf.is_list()
             {

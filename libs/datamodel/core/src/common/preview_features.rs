@@ -65,7 +65,8 @@ features!(
     Cockroachdb,
     Tracing,
     ImprovedQueryRaw,
-    Metrics
+    Metrics,
+    OrderByNulls,
 );
 
 // Mapping of which active, deprecated and hidden
