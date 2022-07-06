@@ -274,9 +274,6 @@
 <span id="269">269</span>
 <span id="270">270</span>
 <span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">convert_case</span>::{<span class="ident">Case</span>, <span class="ident">Casing</span>};
 <span class="kw">use</span> <span class="ident">introspection_connector::Warning</span>;
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer</span>::{<span class="ident">IndexFieldProperty</span>, <span class="ident">IndexWalker</span>};
@@ -495,13 +492,10 @@
                 .<span class="ident">iter</span>()
                 .<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">database_name</span>.<span class="ident">as_deref</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">field_name</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">field_name</span>);
 
-            <span class="ident">next_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cf</span> {
-                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">path_length</span> =&gt; <span class="prelude-val">None</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">cf</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">type_name</span> <span class="op">=</span> <span class="ident">cf</span>.<span class="ident">r#type</span>.<span class="ident">as_composite_type</span>().<span class="ident">unwrap</span>();
-                    <span class="prelude-val">Some</span>(<span class="ident">type_name</span>.<span class="ident">to_string</span>())
-                }
-                <span class="prelude-val">None</span> =&gt; {
+            <span class="ident">next_type</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">cf</span>, <span class="ident">cf</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">cf</span><span class="op">|</span> <span class="ident">cf</span>.<span class="ident">r#type</span>.<span class="ident">as_composite_type</span>())) {
+                (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">path_length</span> =&gt; <span class="prelude-val">None</span>,
+                (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="ident">type_name</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">type_name</span>.<span class="ident">to_string</span>()),
+                (<span class="prelude-val">None</span>, <span class="kw">_</span>) <span class="op">|</span> (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">docs</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;Field referred in an index, but found no data to define the type.&quot;</span>);
 
                     <span class="kw">let</span> (<span class="ident">field_name</span>, <span class="ident">database_name</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::sanitize_string</span>(<span class="ident">field_name</span>) {
