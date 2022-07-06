@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, Pair, ToIdentifier},
+    helpers::{parsing_catch_all, Pair},
     parse_attribute::parse_attribute,
     parse_comments::*,
     parse_field::parse_field,
@@ -18,10 +18,8 @@ pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnos
     for current in pair.into_inner() {
         match current.as_rule() {
             Rule::MODEL_KEYWORD | Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE => {}
-            Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::block_level_attribute => {
-                attributes.push(parse_attribute(current.into_inner().next().unwrap(), diagnostics))
-            }
+            Rule::identifier => name = Some(current.into()),
+            Rule::block_attribute => attributes.push(parse_attribute(current, diagnostics)),
             Rule::field_declaration => match parse_field(
                 &name.as_ref().unwrap().name,
                 current,

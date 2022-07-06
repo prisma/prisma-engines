@@ -23,7 +23,7 @@ fn text_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -52,7 +52,7 @@ fn longtext_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -81,7 +81,7 @@ fn mediumtext_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -110,7 +110,7 @@ fn tinytext_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -139,7 +139,7 @@ fn blob_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -168,7 +168,7 @@ fn longblob_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -197,7 +197,7 @@ fn mediumblob_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -226,7 +226,7 @@ fn tinyblob_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -255,7 +255,7 @@ fn text_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -284,7 +284,7 @@ fn longtext_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -313,7 +313,7 @@ fn mediumtext_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -342,7 +342,7 @@ fn tinytext_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -371,7 +371,7 @@ fn blob_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -400,7 +400,7 @@ fn longblob_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -429,7 +429,7 @@ fn mediumblob_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -458,7 +458,7 @@ fn tinyblob_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -486,7 +486,7 @@ fn text_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -514,7 +514,7 @@ fn longtext_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -542,7 +542,7 @@ fn mediumtext_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -570,7 +570,7 @@ fn tinytext_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -598,7 +598,7 @@ fn blob_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -626,7 +626,7 @@ fn longblob_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -654,7 +654,7 @@ fn mediumblob_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -682,7 +682,7 @@ fn tinyblob_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -812,7 +812,7 @@ fn should_fail_on_argument_for_bit_0_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id        Int   @id
-        [1;94m 8 | [0m  firstName Bytes @[1;91mdb.Bit(0)[0m
+        [1;94m 8 | [0m  firstName Bytes [1;91m@db.Bit(0)[0m
         [1;94m   | [0m
     "#]];
 
@@ -838,7 +838,7 @@ fn should_fail_on_argument_for_bit_65_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id        Int   @id
-        [1;94m 8 | [0m  firstName Bytes @[1;91mdb.Bit(65)[0m
+        [1;94m 8 | [0m  firstName Bytes [1;91m@db.Bit(65)[0m
         [1;94m   | [0m
     "#]];
 
@@ -864,7 +864,7 @@ fn should_only_allow_bit_one_for_booleans() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id        Int     @id
-        [1;94m 8 | [0m  firstName Boolean @[1;91mdb.Bit(2)[0m
+        [1;94m 8 | [0m  firstName Boolean [1;91m@db.Bit(2)[0m
         [1;94m   | [0m
     "#]];
 
@@ -890,7 +890,7 @@ fn should_fail_on_argument_out_of_range_for_char_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id        Int    @id
-        [1;94m 8 | [0m  firstName String @[1;91mdb.Char(256)[0m
+        [1;94m 8 | [0m  firstName String [1;91m@db.Char(256)[0m
         [1;94m   | [0m
     "#]];
 
@@ -916,7 +916,7 @@ fn should_fail_on_argument_out_of_range_for_varchar_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id        Int    @id
-        [1;94m 8 | [0m  firstName String @[1;91mdb.Char(655350)[0m
+        [1;94m 8 | [0m  firstName String [1;91m@db.Char(655350)[0m
         [1;94m   | [0m
     "#]];
 
@@ -942,7 +942,7 @@ fn should_fail_on_argument_out_of_range_for_decimal_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id        Int     @id
-        [1;94m 8 | [0m  firstName Decimal @[1;91mdb.Decimal(66,20)[0m
+        [1;94m 8 | [0m  firstName Decimal [1;91m@db.Decimal(66,20)[0m
         [1;94m   | [0m
     "#]];
 
@@ -965,7 +965,7 @@ fn should_fail_on_argument_out_of_range_for_decimal_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id        Int     @id
-        [1;94m 8 | [0m  firstName Decimal @[1;91mdb.Decimal(44,33)[0m
+        [1;94m 8 | [0m  firstName Decimal [1;91m@db.Decimal(44,33)[0m
         [1;94m   | [0m
     "#]];
 
@@ -991,7 +991,7 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m    id     Int  @id
-        [1;94m 8 | [0m    dec Decimal @[1;91mdb.Decimal(2, 4)[0m
+        [1;94m 8 | [0m    dec Decimal [1;91m@db.Decimal(2, 4)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1017,7 +1017,7 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
         [1;94m 8 | [0m          id     Int      @id
-        [1;94m 9 | [0m          bigInt DateTime @[1;91mdb.TinyInt[0m
+        [1;94m 9 | [0m          bigInt DateTime [1;91m@db.TinyInt[0m
         [1;94m   | [0m
     "#]];
 

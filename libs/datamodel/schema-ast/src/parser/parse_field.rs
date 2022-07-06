@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, Pair, ToIdentifier},
+    helpers::{parsing_catch_all, Pair},
     parse_attribute::parse_attribute,
     parse_comments::*,
     parse_types::parse_field_type,
@@ -22,7 +22,7 @@ pub(crate) fn parse_field(
 
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::non_empty_identifier => name = Some(current.to_id()),
+            Rule::identifier => name = Some(current.into()),
             Rule::field_type => field_type = Some(parse_field_type(current, diagnostics)?),
             Rule::LEGACY_COLON => {
                 return Err(DatamodelError::new_legacy_parser_error(
@@ -30,7 +30,7 @@ pub(crate) fn parse_field(
                     current.as_span().into(),
                 ))
             }
-            Rule::attribute => attributes.push(parse_attribute(current, diagnostics)),
+            Rule::field_attribute => attributes.push(parse_attribute(current, diagnostics)),
             Rule::trailing_comment => {
                 comment = match (comment, parse_trailing_comment(current)) {
                     (c, None) | (None, c) => c,

@@ -163,7 +163,7 @@ fn clustered_index_allowed_only_in_sql_server() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a], clustered: true)[0m
+        [1;94m15 | [0m  [1;91m@@index([a], clustered: true)[0m
         [1;94m   | [0m
     "#]];
 
@@ -187,7 +187,7 @@ fn clustered_unique_allowed_only_in_sql_server() {
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m  id Int @id @map("_id")
-        [1;94m13 | [0m  a  Int @[1;91munique(clustered: true)[0m
+        [1;94m13 | [0m  a  Int [1;91m@unique(clustered: true)[0m
         [1;94m   | [0m
     "#]];
 
@@ -214,7 +214,7 @@ fn clustered_compound_unique_allowed_only_in_sql_server() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91munique([a, b], clustered: true)[0m
+        [1;94m16 | [0m  [1;91m@@unique([a, b], clustered: true)[0m
         [1;94m   | [0m
     "#]];
 
@@ -237,7 +237,7 @@ fn non_clustered_id_allowed_only_in_sql_server() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Int @[1;91mid(clustered: false)[0m @map("_id")
+        [1;94m12 | [0m  id Int [1;91m@id(clustered: false)[0m @map("_id")
         [1;94m   | [0m
     "#]];
 
@@ -263,7 +263,7 @@ fn non_clustered_compound_id_allowed_only_in_sql_server() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mid([left, right], clustered: false)[0m
+        [1;94m15 | [0m  [1;91m@@id([left, right], clustered: false)[0m
         [1;94m   | [0m
     "#]];
 
@@ -289,13 +289,13 @@ fn id_and_index_clustering_together_not_allowed() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Int @[1;91mid[0m
+        [1;94m12 | [0m  id Int [1;91m@id[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@@index": A model can only hold one clustered index or key.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a], clustered: true)[0m
+        [1;94m15 | [0m  [1;91m@@index([a], clustered: true)[0m
         [1;94m   | [0m
     "#]];
 
@@ -319,13 +319,13 @@ fn id_and_unique_clustering_together_not_allowed() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Int @[1;91mid[0m
+        [1;94m12 | [0m  id Int [1;91m@id[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@unique": A model can only hold one clustered index or key.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m  id Int @id
-        [1;94m13 | [0m  a  Int @[1;91munique(clustered: true)[0m
+        [1;94m13 | [0m  a  Int [1;91m@unique(clustered: true)[0m
         [1;94m   | [0m
     "#]];
 

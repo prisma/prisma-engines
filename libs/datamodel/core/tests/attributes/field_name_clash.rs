@@ -25,7 +25,7 @@ fn naming_a_scalar_field_same_as_generated_id_name_should_error() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mid([a, b])[0m
+        [1;94m16 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -55,7 +55,7 @@ fn naming_a_field_same_as_generated_uniq_name_should_error() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91munique([a, b])[0m
+        [1;94m16 | [0m  [1;91m@@unique([a, b])[0m
         [1;94m   | [0m
     "#]];
 

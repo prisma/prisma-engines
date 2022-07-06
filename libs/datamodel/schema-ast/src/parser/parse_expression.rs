@@ -12,8 +12,8 @@ pub(crate) fn parse_expression(token: Pair<'_>, diagnostics: &mut diagnostics::D
     match first_child.as_rule() {
         Rule::numeric_literal => Expression::NumericValue(first_child.as_str().to_string(), span),
         Rule::string_literal => Expression::StringValue(parse_string_literal(first_child, diagnostics), span),
-        Rule::constant_literal => Expression::ConstantValue(first_child.as_str().to_string(), span),
-        Rule::function => parse_function(first_child, diagnostics),
+        Rule::path => Expression::ConstantValue(first_child.as_str().to_string(), span),
+        Rule::function_call => parse_function(first_child, diagnostics),
         Rule::array_expression => parse_array(first_child, diagnostics),
         _ => unreachable!(
             "Encountered impossible literal during parsing: {:?}",
@@ -29,7 +29,7 @@ fn parse_function(pair: Pair<'_>, diagnostics: &mut Diagnostics) -> Expression {
 
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::function_name => name = Some(current.as_str().to_string()),
+            Rule::path => name = Some(current.as_str().to_string()),
             Rule::arguments_list => parse_arguments_list(current, &mut arguments, diagnostics),
             _ => parsing_catch_all(&current, "function"),
         }

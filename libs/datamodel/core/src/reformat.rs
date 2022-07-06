@@ -211,7 +211,6 @@ fn push_missing_scalar_fields(inline: walkers::InlineRelationWalker<'_>, ctx: &m
 
         let mut attributes: String = String::new();
         if let Some((_datasource_name, _type_name, _args, span)) = field.blueprint.raw_native_type() {
-            attributes.push('@');
             attributes.push_str(&ctx.original_schema[span.start..span.end]);
         }
 

@@ -32,7 +32,7 @@ fn mongodb_does_not_support_autoincrement() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel User {
-        [1;94m12 | [0m  id Int @id @[1;91mdefault(autoincrement())[0m @map("_id")
+        [1;94m12 | [0m  id Int @id [1;91m@default(autoincrement())[0m @map("_id")
         [1;94m   | [0m
     "#]];
 

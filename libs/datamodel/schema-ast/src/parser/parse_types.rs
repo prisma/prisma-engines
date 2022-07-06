@@ -37,7 +37,7 @@ pub fn parse_field_type(
 fn parse_base_type(pair: Pair<'_>, diagnostics: &mut Diagnostics) -> FieldType {
     let current = pair.into_inner().next().unwrap();
     match current.as_rule() {
-        Rule::non_empty_identifier => FieldType::Supported(Identifier {
+        Rule::identifier => FieldType::Supported(Identifier {
             name: current.as_str().to_string(),
             span: Span::from(current.as_span()),
         }),

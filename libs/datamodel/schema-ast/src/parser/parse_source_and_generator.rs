@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, Pair, ToIdentifier},
+    helpers::{parsing_catch_all, Pair},
     parse_comments::*,
     parse_expression::parse_expression,
     Rule,
@@ -16,7 +16,7 @@ pub(crate) fn parse_config_block(pair: Pair<'_>, diagnostics: &mut Diagnostics) 
 
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::non_empty_identifier => name = Some(current.to_id()),
+            Rule::identifier => name = Some(current.into()),
             Rule::key_value => properties.push(parse_key_value(current, diagnostics)),
             Rule::comment_block => comment = parse_comment_block(current),
             Rule::DATASOURCE_KEYWORD | Rule::GENERATOR_KEYWORD => kw = Some(current.as_str()),
@@ -58,7 +58,7 @@ fn parse_key_value(pair: Pair<'_>, diagnostics: &mut Diagnostics) -> ConfigBlock
 
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::non_empty_identifier => name = Some(current.to_id()),
+            Rule::identifier => name = Some(current.into()),
             Rule::expression => value = Some(parse_expression(current, diagnostics)),
             _ => unreachable!(
                 "Encountered impossible source property declaration during parsing: {:?}",
