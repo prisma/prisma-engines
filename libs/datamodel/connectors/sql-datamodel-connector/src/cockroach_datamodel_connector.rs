@@ -37,7 +37,6 @@ const TIME_TYPE_NAME: &str = "Time";
 const TIME_TZ_TYPE_NAME: &str = "Timetz";
 const UUID_TYPE_NAME: &str = "Uuid";
 const VAR_BIT_TYPE_NAME: &str = "VarBit";
-const VARCHAR_TYPE_NAME: &str = "VarChar";
 
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, &[ScalarType::String]),
@@ -49,7 +48,6 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::with_optional_args(TIME_TYPE_NAME, 1, &[ScalarType::DateTime]),
     NativeTypeConstructor::with_optional_args(TIME_TZ_TYPE_NAME, 1, &[ScalarType::DateTime]),
     NativeTypeConstructor::with_optional_args(VAR_BIT_TYPE_NAME, 1, &[ScalarType::String]),
-    NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, &[ScalarType::String]),
     NativeTypeConstructor::without_args(BOOL_TYPE_NAME, &[ScalarType::Boolean]),
     NativeTypeConstructor::without_args(BYTES_TYPE_NAME, &[ScalarType::Bytes]),
     NativeTypeConstructor::without_args(DATE_TYPE_NAME, &[ScalarType::DateTime]),
