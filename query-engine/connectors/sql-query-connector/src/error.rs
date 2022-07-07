@@ -258,7 +258,7 @@ impl SqlError {
                 ConnectorError::from_kind(ErrorKind::QueryParameterLimitExceeded(e))
             }
             SqlError::MissingFullTextSearchIndex => ConnectorError::from_kind(ErrorKind::MissingFullTextSearchIndex),
-            SqlError::InvalidIsolationLevel(msg) => ConnectorError::from_kind(ErrorKind::InternalConversionError(msg))
+            SqlError::InvalidIsolationLevel(msg) => ConnectorError::from_kind(ErrorKind::InternalConversionError(msg)),
         }
     }
 }
