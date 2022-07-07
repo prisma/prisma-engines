@@ -85,7 +85,7 @@
 <span id="80">80</span>
 <span id="81">81</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Pair</span>, <span class="ident">ToIdentifier</span>},
+    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Pair</span>},
     <span class="ident">parse_comments</span>::<span class="kw-2">*</span>,
     <span class="ident">parse_expression::parse_expression</span>,
     <span class="ident">Rule</span>,
@@ -102,7 +102,7 @@
 
     <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::non_empty_identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">to_id</span>()),
+            <span class="ident">Rule::identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">into</span>()),
             <span class="ident">Rule::key_value</span> =&gt; <span class="ident">properties</span>.<span class="ident">push</span>(<span class="ident">parse_key_value</span>(<span class="ident">current</span>, <span class="ident">diagnostics</span>)),
             <span class="ident">Rule::comment_block</span> =&gt; <span class="ident">comment</span> <span class="op">=</span> <span class="ident">parse_comment_block</span>(<span class="ident">current</span>),
             <span class="ident">Rule::DATASOURCE_KEYWORD</span> <span class="op">|</span> <span class="ident">Rule::GENERATOR_KEYWORD</span> =&gt; <span class="ident">kw</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">as_str</span>()),
@@ -144,7 +144,7 @@
 
     <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::non_empty_identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">to_id</span>()),
+            <span class="ident">Rule::identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">into</span>()),
             <span class="ident">Rule::expression</span> =&gt; <span class="ident">value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parse_expression</span>(<span class="ident">current</span>, <span class="ident">diagnostics</span>)),
             <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(
                 <span class="string">&quot;Encountered impossible source property declaration during parsing: {:?}&quot;</span>,

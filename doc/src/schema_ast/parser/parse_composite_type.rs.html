@@ -132,7 +132,7 @@
 <span id="127">127</span>
 <span id="128">128</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Pair</span>, <span class="ident">ToIdentifier</span>},
+    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Pair</span>},
     <span class="ident">parse_attribute::parse_attribute</span>,
     <span class="ident">parse_comments::parse_comment_block</span>,
     <span class="ident">parse_field::parse_field</span>,
@@ -156,9 +156,9 @@
         <span class="kw">let</span> <span class="ident">current_span</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">as_span</span>();
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
             <span class="ident">Rule::TYPE_KEYWORD</span> =&gt; (),
-            <span class="ident">Rule::non_empty_identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">to_id</span>()),
-            <span class="ident">Rule::block_level_attribute</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="ident">parse_attribute</span>(<span class="ident">current</span>.<span class="ident">into_inner</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">diagnostics</span>);
+            <span class="ident">Rule::identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">into</span>()),
+            <span class="ident">Rule::block_attribute</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="ident">parse_attribute</span>(<span class="ident">current</span>, <span class="ident">diagnostics</span>);
 
                 <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">attr</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>() {
                     <span class="string">&quot;map&quot;</span> =&gt; {

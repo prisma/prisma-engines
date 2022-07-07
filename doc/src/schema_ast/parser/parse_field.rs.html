@@ -66,7 +66,7 @@
 <span id="61">61</span>
 <span id="62">62</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Pair</span>, <span class="ident">ToIdentifier</span>},
+    <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Pair</span>},
     <span class="ident">parse_attribute::parse_attribute</span>,
     <span class="ident">parse_comments</span>::<span class="kw-2">*</span>,
     <span class="ident">parse_types::parse_field_type</span>,
@@ -89,7 +89,7 @@
 
     <span class="kw">for</span> <span class="ident">current</span> <span class="kw">in</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>() {
         <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::non_empty_identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">to_id</span>()),
+            <span class="ident">Rule::identifier</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>.<span class="ident">into</span>()),
             <span class="ident">Rule::field_type</span> =&gt; <span class="ident">field_type</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parse_field_type</span>(<span class="ident">current</span>, <span class="ident">diagnostics</span>)<span class="question-mark">?</span>),
             <span class="ident">Rule::LEGACY_COLON</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_legacy_parser_error</span>(
@@ -97,7 +97,7 @@
                     <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
                 ))
             }
-            <span class="ident">Rule::attribute</span> =&gt; <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">parse_attribute</span>(<span class="ident">current</span>, <span class="ident">diagnostics</span>)),
+            <span class="ident">Rule::field_attribute</span> =&gt; <span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">parse_attribute</span>(<span class="ident">current</span>, <span class="ident">diagnostics</span>)),
             <span class="ident">Rule::trailing_comment</span> =&gt; {
                 <span class="ident">comment</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">comment</span>, <span class="ident">parse_trailing_comment</span>(<span class="ident">current</span>)) {
                     (<span class="ident">c</span>, <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="ident">c</span>) =&gt; <span class="ident">c</span>,
