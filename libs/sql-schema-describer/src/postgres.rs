@@ -884,79 +884,12 @@ impl<'a> SqlSchemaDescriber<'a> {
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
         let mut indexes_map = BTreeMap::new();
-
-        let sql = r#"
-        SELECT indexinfos.relname                          AS name,
-               columnInfos.attname                         AS column_name,
-               rawIndex.indisunique                        AS is_unique,
-               rawIndex.indisprimary                       AS is_primary_key,
-               tableInfos.relname                          AS table_name,
-               indexAccess.amname                          AS index_algo,
-               rawIndex.indkeyidx,
-               rawIndex.opclass                            AS opclass,
-               rawIndex.opcdefault                         AS opcdefault,
-               CASE rawIndex.sort_order & 1
-                   WHEN 1 THEN 'DESC'
-                   ELSE 'ASC'
-                   END                                     AS column_order
-        FROM
-            -- pg_class stores infos about tables, indices etc: https://www.postgresql.org/docs/current/catalog-pg-class.html
-            pg_class tableInfos,
-            pg_class indexInfos,
-            -- pg_index stores indices: https://www.postgresql.org/docs/current/catalog-pg-index.html
-            (
-                SELECT i.indrelid,
-                       i.indexrelid,
-                       i.indisunique,
-                       i.indisprimary,
-                       i.indkey,
-                       opc.opcname opclass,
-                       opc.opcdefault opcdefault,
-                       o.OPTION AS sort_order,
-                       c.colnum AS sort_order_colnum,
-                       generate_subscripts(i.indkey, 1) AS indkeyidx
-                FROM pg_index i
-                         CROSS JOIN LATERAL UNNEST(indkey) WITH ordinality AS c (colnum, ordinality)
-                         LEFT JOIN LATERAL UNNEST(indclass) WITH ordinality AS p (opcoid, ordinality)
-                                   ON c.ordinality = p.ordinality
-                         LEFT JOIN LATERAL UNNEST(indoption) WITH ordinality AS o (OPTION, ordinality)
-                                   ON c.ordinality = o.ordinality
-                         LEFT JOIN pg_opclass opc ON opc.oid = p.opcoid
-                WHERE i.indpred IS NULL
-                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, i.indoption, opc.opcname, sort_order, sort_order_colnum, opc.opcdefault
-                ORDER BY i.indrelid, i.indexrelid
-            ) rawIndex,
-            -- pg_attribute stores infos about columns: https://www.postgresql.org/docs/current/catalog-pg-attribute.html
-            pg_attribute columnInfos,
-            -- pg_namespace stores info about the schema
-            pg_namespace schemaInfo,
-            -- index access methods: https://www.postgresql.org/docs/9.3/catalog-pg-am.html
-            pg_am indexAccess
-        WHERE
-          -- find table info for index
-            tableInfos.oid = rawIndex.indrelid
-          -- find index info
-          AND indexInfos.oid = rawIndex.indexrelid
-          -- find table columns
-          AND columnInfos.attrelid = tableInfos.oid
-          AND columnInfos.attnum = rawIndex.indkey[rawIndex.indkeyidx]
-          -- we only consider ordinary tables
-          AND tableInfos.relkind = 'r'
-          -- we only consider stuff out of one specific schema
-          AND tableInfos.relnamespace = schemaInfo.oid
-          AND schemaInfo.nspname = $1
-          AND rawIndex.sort_order_colnum = columnInfos.attnum
-          AND indexAccess.oid = indexInfos.relam
-        GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname,
-                 rawIndex.indkeyidx, column_order, index_algo, opclass, opcdefault
-        ORDER BY indexinfos.relname, rawIndex.indkeyidx;
-        "#;
-
+        let sql = include_str!("postgres/indexes_query.sql");
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         for row in rows {
             trace!("Got index: {:?}", row);
-            let name = row.get_expect_string("name");
+            let name = row.get_expect_string("index_name");
             let column_name = row.get_expect_string("column_name");
             let is_unique = row.get_expect_bool("is_unique");
             let is_primary_key = row.get_expect_bool("is_primary_key");
