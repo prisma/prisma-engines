@@ -156,6 +156,9 @@ pub enum SqlError {
     #[error("{}", _0)]
     TransactionAlreadyClosed(String),
 
+    #[error("{}", _0)]
+    InvalidIsolationLevel(String),
+
     #[error("Query parameter limit exceeded error: {0}.")]
     QueryParameterLimitExceeded(String),
 
@@ -255,6 +258,7 @@ impl SqlError {
                 ConnectorError::from_kind(ErrorKind::QueryParameterLimitExceeded(e))
             }
             SqlError::MissingFullTextSearchIndex => ConnectorError::from_kind(ErrorKind::MissingFullTextSearchIndex),
+            SqlError::InvalidIsolationLevel(msg) => ConnectorError::from_kind(ErrorKind::InternalConversionError(msg))
         }
     }
 }
@@ -288,6 +292,7 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::ColumnNotFound { column } => SqlError::ColumnDoesNotExist(format!("{}", column)),
             QuaintKind::TableDoesNotExist { table } => SqlError::TableDoesNotExist(format!("{}", table)),
             QuaintKind::ConnectionClosed => SqlError::ConnectionClosed,
+            QuaintKind::InvalidIsolationLevel(msg) => Self::InvalidIsolationLevel(msg),
             e @ QuaintKind::UnsupportedColumnType { .. } => SqlError::ConversionError(e.into()),
             e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{}", e)),
             e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),

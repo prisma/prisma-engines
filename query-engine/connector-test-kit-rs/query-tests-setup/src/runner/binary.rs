@@ -87,10 +87,16 @@ impl RunnerInterface for BinaryRunner {
         Ok(PrismaResponse::Multi(batch_response).into())
     }
 
-    async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> TestResult<TxId> {
+    async fn start_tx(
+        &self,
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+        isolation_level: Option<String>,
+    ) -> TestResult<TxId> {
         let body = serde_json::json!({
             "max_wait": max_acquisition_millis,
-            "timeout": valid_for_millis
+            "timeout": valid_for_millis,
+            "isolation_level": isolation_level,
         });
 
         let body_bytes = serde_json::to_vec(&body).unwrap();

@@ -16,7 +16,10 @@ pub trait Connector {
 
 #[async_trait]
 pub trait Connection: ConnectionLike {
-    async fn start_transaction<'a>(&'a mut self) -> crate::Result<Box<dyn Transaction + 'a>>;
+    async fn start_transaction<'a>(
+        &'a mut self,
+        isolation_level: Option<String>,
+    ) -> crate::Result<Box<dyn Transaction + 'a>>;
 
     /// Explicit upcast.
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike;
@@ -35,6 +38,8 @@ pub trait Transaction: ConnectionLike {
 /// Marker trait required by the query core executor to abstract connections and
 /// transactions into something that can is capable of writing to or reading from the database.
 pub trait ConnectionLike: ReadOperations + WriteOperations + Send + Sync {}
+
+// pub enum IsolationLevel {}
 
 /// A wrapper struct allowing to either filter for records or for the core to
 /// communicate already known record selectors to connectors.

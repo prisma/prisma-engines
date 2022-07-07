@@ -24,7 +24,12 @@ pub trait RunnerInterface: Sized {
     async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<QueryResult>;
 
     /// start a transaction for a batch run
-    async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> TestResult<TxId>;
+    async fn start_tx(
+        &self,
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+        isolation_level: Option<String>,
+    ) -> TestResult<TxId>;
 
     /// commit transaction
     async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult>;
@@ -92,11 +97,22 @@ impl Runner {
         Ok(response)
     }
 
-    pub async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> TestResult<TxId> {
+    pub async fn start_tx(
+        &self,
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+        isolation_level: Option<String>,
+    ) -> TestResult<TxId> {
         match self {
-            Runner::Direct(r) => r.start_tx(max_acquisition_millis, valid_for_millis).await,
+            Runner::Direct(r) => {
+                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
+                    .await
+            }
+            Runner::Binary(r) => {
+                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
+                    .await
+            }
             Runner::NodeApi(_) => todo!(),
-            Runner::Binary(r) => r.start_tx(max_acquisition_millis, valid_for_millis).await,
         }
     }
 

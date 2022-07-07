@@ -110,12 +110,12 @@ pub struct OpenTx {
 }
 
 impl OpenTx {
-    pub async fn start(mut conn: Box<dyn Connection>) -> crate::Result<Self> {
+    pub async fn start(mut conn: Box<dyn Connection>, isolation_level: Option<String>) -> crate::Result<Self> {
         // Forces static lifetime for the transaction, disabling the lifetime checks for `tx`.
         // Why is this okay? We store the connection the tx depends on with its lifetime next to
         // the tx in the struct. Neither the connection nor the tx are moved out of this struct.
         // The `OpenTx` struct is dropped as a unit.
-        let transaction: Box<dyn Transaction + '_> = conn.start_transaction().await?;
+        let transaction: Box<dyn Transaction + '_> = conn.start_transaction(isolation_level).await?;
         let tx = unsafe {
             let tx: Box<dyn Transaction + 'static> = std::mem::transmute(transaction);
             tx

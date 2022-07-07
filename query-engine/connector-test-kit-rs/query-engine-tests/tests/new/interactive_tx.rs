@@ -9,7 +9,7 @@ mod interactive_tx {
 
     #[connector_test]
     async fn basic_commit_workflow(mut runner: Runner) -> TestResult<()> {
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -36,7 +36,7 @@ mod interactive_tx {
 
     #[connector_test]
     async fn basic_rollback_workflow(mut runner: Runner) -> TestResult<()> {
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -64,7 +64,7 @@ mod interactive_tx {
     #[connector_test]
     async fn tx_expiration_cycle(mut runner: Runner) -> TestResult<()> {
         // Tx expires after one second.
-        let tx_id = runner.start_tx(5000, 1000).await?;
+        let tx_id = runner.start_tx(5000, 1000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -108,7 +108,7 @@ mod interactive_tx {
     #[connector_test]
     async fn no_auto_rollback(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         // Row is created
@@ -135,7 +135,7 @@ mod interactive_tx {
     #[connector_test(only(Postgres))]
     async fn raw_queries(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -164,7 +164,7 @@ mod interactive_tx {
     #[connector_test]
     async fn batch_queries_success(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         let queries = vec![
@@ -190,7 +190,7 @@ mod interactive_tx {
     #[connector_test]
     async fn batch_queries_rollback(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         let queries = vec![
@@ -216,7 +216,7 @@ mod interactive_tx {
     #[connector_test]
     async fn batch_queries_failure(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         // One dup key, will cause failure of the batch.
@@ -259,7 +259,7 @@ mod interactive_tx {
     #[connector_test]
     async fn tx_expiration_failure_cycle(mut runner: Runner) -> TestResult<()> {
         // Tx expires after one seconds.
-        let tx_id = runner.start_tx(5000, 1000).await?;
+        let tx_id = runner.start_tx(5000, 1000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         // Row is created
@@ -327,10 +327,10 @@ mod interactive_tx {
     #[connector_test(exclude(Sqlite))]
     async fn multiple_tx(mut runner: Runner) -> TestResult<()> {
         // First transaction.
-        let tx_id_a = runner.start_tx(2000, 2000).await?;
+        let tx_id_a = runner.start_tx(2000, 2000, None).await?;
 
         // Second transaction.
-        let tx_id_b = runner.start_tx(2000, 2000).await?;
+        let tx_id_b = runner.start_tx(2000, 2000, None).await?;
 
         // Execute on first transaction.
         runner.set_active_tx(tx_id_a.clone());
