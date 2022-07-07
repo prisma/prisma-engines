@@ -37,7 +37,7 @@ fn empty_index_names_are_rejected() {
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m
-        [1;94m 6 | [0m  @@[1;91mindex([firstName,lastName], name: "")[0m
+        [1;94m 6 | [0m  [1;91m@@index([firstName,lastName], name: "")[0m
         [1;94m   | [0m
     "#]];
 
@@ -63,7 +63,7 @@ fn empty_unique_index_names_are_rejected() {
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m
-        [1;94m 6 | [0m  @@[1;91munique([firstName,lastName], name: "")[0m
+        [1;94m 6 | [0m  [1;91m@@unique([firstName,lastName], name: "")[0m
         [1;94m   | [0m
     "#]];
 
@@ -93,7 +93,7 @@ fn having_both_the_map_and_name_argument_must_be_rejected() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mindex([firstName,lastName], name: "BOTH MAP AND NAME IS NOT OK", map: "MyIndexName")[0m
+        [1;94m16 | [0m  [1;91m@@index([firstName,lastName], name: "BOTH MAP AND NAME IS NOT OK", map: "MyIndexName")[0m
         [1;94m   | [0m
     "#]];
 

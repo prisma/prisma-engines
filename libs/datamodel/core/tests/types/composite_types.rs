@@ -156,7 +156,7 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 179,
+                                            start: 178,
                                             end: 190,
                                         },
                                     },
@@ -219,7 +219,7 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 247,
+                                            start: 246,
                                             end: 250,
                                         },
                                     },
@@ -257,7 +257,7 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 251,
+                                            start: 250,
                                             end: 266,
                                         },
                                     },
@@ -290,7 +290,7 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 268,
+                                            start: 267,
                                             end: 278,
                                         },
                                     },
@@ -308,7 +308,7 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 280,
+                                            start: 279,
                                             end: 291,
                                         },
                                     },
@@ -682,7 +682,6 @@ fn block_level_map_not_allowed() {
         [1;94m   | [0m
         [1;94m13 | [0m
         [1;94m14 | [0m  [1;91m@@map("foo")[0m
-        [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -713,7 +712,6 @@ fn block_level_unique_not_allowed() {
         [1;94m   | [0m
         [1;94m13 | [0m
         [1;94m14 | [0m  [1;91m@@unique([field])[0m
-        [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -744,7 +742,6 @@ fn block_level_index_not_allowed() {
         [1;94m   | [0m
         [1;94m13 | [0m
         [1;94m14 | [0m  [1;91m@@index([field])[0m
-        [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -775,7 +772,6 @@ fn block_level_fulltext_not_allowed() {
         [1;94m   | [0m
         [1;94m13 | [0m
         [1;94m14 | [0m  [1;91m@@fulltext([field])[0m
-        [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -806,7 +802,6 @@ fn block_level_id_not_allowed() {
         [1;94m   | [0m
         [1;94m13 | [0m
         [1;94m14 | [0m  [1;91m@@id([field])[0m
-        [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
 

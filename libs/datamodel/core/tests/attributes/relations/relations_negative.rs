@@ -773,7 +773,7 @@ fn mapping_foreign_keys_with_a_name_that_is_too_long_should_error() {
           [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
         [1;94m18 | [0m  user_id Int
-        [1;94m19 | [0m  user    User   @[1;91mrelation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
+        [1;94m19 | [0m  user    User   [1;91m@relation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
         [1;94m   | [0m
     "#]];
 
@@ -805,7 +805,7 @@ fn mapping_foreign_keys_on_sqlite_should_error() {
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  user_id Int
-        [1;94m14 | [0m  user    User   @[1;91mrelation(fields:[post_id], references: [id], map: "NoNamedForeignKeysOnSQLite")[0m
+        [1;94m14 | [0m  user    User   [1;91m@relation(fields:[post_id], references: [id], map: "NoNamedForeignKeysOnSQLite")[0m
         [1;94m   | [0m
     "#]];
 
@@ -865,7 +865,7 @@ fn relation_attribute_on_a_composite_field_errors() {
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m            id Int @id
-        [1;94m13 | [0m            addres Address? @[1;91mrelation("TestAddress")[0m
+        [1;94m13 | [0m            addres Address? [1;91m@relation("TestAddress")[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mNo such argument.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m

@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, Pair, ToIdentifier},
+    helpers::{parsing_catch_all, Pair},
     parse_attribute::parse_attribute,
     parse_comments::*,
     Rule,
@@ -19,10 +19,8 @@ pub fn parse_enum(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnostics: &m
     while let Some(current) = pairs.next() {
         match current.as_rule() {
             Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE | Rule::ENUM_KEYWORD => {}
-            Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::block_level_attribute => {
-                attributes.push(parse_attribute(current.into_inner().next().unwrap(), diagnostics))
-            }
+            Rule::identifier => name = Some(current.into()),
+            Rule::block_attribute => attributes.push(parse_attribute(current, diagnostics)),
             Rule::enum_value_declaration => {
                 match parse_enum_value(current, pending_value_comment.take(), diagnostics) {
                     Ok(enum_value) => values.push(enum_value),
@@ -66,8 +64,8 @@ fn parse_enum_value(
 
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::attribute => attributes.push(parse_attribute(current, diagnostics)),
+            Rule::identifier => name = Some(current.into()),
+            Rule::field_attribute => attributes.push(parse_attribute(current, diagnostics)),
             Rule::trailing_comment => {
                 comment = match (comment, parse_trailing_comment(current)) {
                     (None, a) | (a, None) => a,

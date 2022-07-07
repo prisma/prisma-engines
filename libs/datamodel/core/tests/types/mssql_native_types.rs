@@ -24,7 +24,7 @@ fn text_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -53,7 +53,7 @@ fn ntext_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -82,7 +82,7 @@ fn varchar_max_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -111,7 +111,7 @@ fn nvarchar_max_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -140,7 +140,7 @@ fn xml_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -169,7 +169,7 @@ fn varbinary_max_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -198,7 +198,7 @@ fn image_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91munique([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@unique([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -227,7 +227,7 @@ fn text_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -256,7 +256,7 @@ fn ntext_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -285,7 +285,7 @@ fn varchar_max_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -314,7 +314,7 @@ fn nvarchar_max_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -343,7 +343,7 @@ fn xml_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -372,7 +372,7 @@ fn varbinary_max_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -401,7 +401,7 @@ fn image_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  @@[1;91mindex([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -429,7 +429,7 @@ fn text_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -457,7 +457,7 @@ fn ntext_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -485,7 +485,7 @@ fn varchar_max_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -513,7 +513,7 @@ fn nvarchar_max_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -541,7 +541,7 @@ fn xml_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -569,7 +569,7 @@ fn varbinary_max_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -597,7 +597,7 @@ fn image_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91mid([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -623,7 +623,7 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int     @id
-        [1;94m 8 | [0m  dec Decimal @[1;91mdb.Decimal(2,4)[0m
+        [1;94m 8 | [0m  dec Decimal [1;91m@db.Decimal(2,4)[0m
         [1;94m   | [0m
     "#]];
 
@@ -649,7 +649,7 @@ fn should_fail_on_argument_out_of_range_for_char_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int    @id
-        [1;94m 8 | [0m  dec String @[1;91mdb.Char(8001)[0m
+        [1;94m 8 | [0m  dec String [1;91m@db.Char(8001)[0m
         [1;94m   | [0m
     "#]];
 
@@ -675,7 +675,7 @@ fn should_fail_on_argument_out_of_range_for_nchar_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int    @id
-        [1;94m 8 | [0m  dec String @[1;91mdb.NChar(4001)[0m
+        [1;94m 8 | [0m  dec String [1;91m@db.NChar(4001)[0m
         [1;94m   | [0m
     "#]];
 
@@ -701,7 +701,7 @@ fn should_fail_on_argument_out_of_range_for_varchar_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int    @id
-        [1;94m 8 | [0m  dec String @[1;91mdb.VarChar(8001)[0m
+        [1;94m 8 | [0m  dec String [1;91m@db.VarChar(8001)[0m
         [1;94m   | [0m
     "#]];
 
@@ -727,7 +727,7 @@ fn should_fail_on_argument_out_of_range_for_nvarchar_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int    @id
-        [1;94m 8 | [0m  dec String @[1;91mdb.NVarChar(4001)[0m
+        [1;94m 8 | [0m  dec String [1;91m@db.NVarChar(4001)[0m
         [1;94m   | [0m
     "#]];
 
@@ -753,7 +753,7 @@ fn should_fail_on_argument_out_of_range_for_varbinary_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int   @id
-        [1;94m 8 | [0m  dec Bytes @[1;91mdb.VarBinary(8001)[0m
+        [1;94m 8 | [0m  dec Bytes [1;91m@db.VarBinary(8001)[0m
         [1;94m   | [0m
     "#]];
 
@@ -779,7 +779,7 @@ fn should_fail_on_argument_out_of_range_for_binary_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int   @id
-        [1;94m 8 | [0m  dec Bytes @[1;91mdb.Binary(8001)[0m
+        [1;94m 8 | [0m  dec Bytes [1;91m@db.Binary(8001)[0m
         [1;94m   | [0m
     "#]];
 
@@ -805,7 +805,7 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id     Int      @id
-        [1;94m 8 | [0m  bigInt DateTime @[1;91mdb.Bit[0m
+        [1;94m 8 | [0m  bigInt DateTime [1;91m@db.Bit[0m
         [1;94m   | [0m
     "#]];
 
@@ -831,7 +831,7 @@ fn should_fail_on_bad_type_params() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id     Int    @id
-        [1;94m 8 | [0m  s      String @[1;91mdb.NVarChar(Ma)[0m
+        [1;94m 8 | [0m  s      String [1;91m@db.NVarChar(Ma)[0m
         [1;94m   | [0m
     "#]];
 
@@ -857,7 +857,7 @@ fn should_fail_on_too_many_type_params() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id     Int    @id
-        [1;94m 8 | [0m  s      String @[1;91mdb.NVarChar(1, 2)[0m
+        [1;94m 8 | [0m  s      String [1;91m@db.NVarChar(1, 2)[0m
         [1;94m   | [0m
     "#]];
 

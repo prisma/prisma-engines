@@ -55,7 +55,7 @@ fn reformat_key_value(pair: Pair<'_>, table: &mut TableFormat) {
     table.start_new_line();
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::non_empty_identifier => table.column_locked_writer_for(0).write(current.as_str()),
+            Rule::identifier => table.column_locked_writer_for(0).write(current.as_str()),
             Rule::expression => {
                 let mut writer = table.column_locked_writer_for(1);
                 writer.write("= ");
@@ -79,7 +79,7 @@ fn reformat_block_element(pair: Pair<'_>, renderer: &mut Renderer) {
         // Decide what to do with the empty lines.
         if ate_empty_lines {
             match pairs.peek().map(|pair| pair.as_rule()) {
-                Some(Rule::BLOCK_CLOSE) | Some(Rule::block_level_attribute) | Some(Rule::comment_block) => {
+                Some(Rule::BLOCK_CLOSE) | Some(Rule::block_attribute) | Some(Rule::comment_block) => {
                     // Reformat away the empty lines at the end of blocks and before attributes (we
                     // re-add them later).
                 }
@@ -128,7 +128,7 @@ fn reformat_block_element(pair: Pair<'_>, renderer: &mut Renderer) {
                 renderer.end_line();
             }
 
-            Rule::non_empty_identifier => {
+            Rule::identifier => {
                 let block_name = current.as_str();
                 renderer.write(block_type);
                 renderer.write(" ");
@@ -139,7 +139,7 @@ fn reformat_block_element(pair: Pair<'_>, renderer: &mut Renderer) {
             }
 
             Rule::comment_block => {
-                if pairs.peek().map(|pair| pair.as_rule()) == Some(Rule::block_level_attribute) {
+                if pairs.peek().map(|pair| pair.as_rule()) == Some(Rule::block_attribute) {
                     pending_block_comment = Some(current.clone()); // move it with the attribute
                 } else {
                     if ate_empty_lines {
@@ -154,11 +154,7 @@ fn reformat_block_element(pair: Pair<'_>, renderer: &mut Renderer) {
             Rule::field_declaration => reformat_field(current, &mut table),
             Rule::key_value => reformat_key_value(current, &mut table),
             Rule::enum_value_declaration => reformat_enum_entry(current, &mut table),
-
-            Rule::block_level_attribute => {
-                attributes.push((pending_block_comment.take(), current));
-            }
-
+            Rule::block_attribute => attributes.push((pending_block_comment.take(), current)),
             Rule::CATCH_ALL | Rule::BLOCK_LEVEL_CATCH_ALL => {
                 table.interleave(current.as_str().trim_end_matches('\n'));
             }
@@ -168,17 +164,17 @@ fn reformat_block_element(pair: Pair<'_>, renderer: &mut Renderer) {
 }
 
 fn reformat_block_attribute(pair: Pair<'_>, table: &mut TableFormat) {
-    assert!(pair.as_rule() == Rule::block_level_attribute);
+    debug_assert!(pair.as_rule() == Rule::block_attribute);
+    table.start_new_line();
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::attribute => {
-                table.start_new_line();
-                reformat_attribute(current, "@@", &mut table.column_locked_writer_for(0))
+            Rule::path => {
+                let mut writer = table.column_locked_writer_for(0);
+                writer.write("@@");
+                writer.write(current.as_str());
             }
-
-            Rule::trailing_comment => {
-                table.append_suffix_to_current_row(current.as_str());
-            }
+            Rule::arguments_list => reformat_arguments_list(current, &mut table.column_locked_writer_for(0)),
+            Rule::trailing_comment => table.append_suffix_to_current_row(current.as_str()),
             _ => unreachable(&current),
         }
     }
@@ -187,11 +183,15 @@ fn reformat_block_attribute(pair: Pair<'_>, table: &mut TableFormat) {
 fn reformat_enum_entry(pair: Pair<'_>, table: &mut TableFormat) {
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::non_empty_identifier => {
+            Rule::identifier => {
                 table.start_new_line();
                 table.column_locked_writer_for(0).write(current.as_str())
             }
-            Rule::attribute => reformat_attribute(current, "@", &mut table.column_locked_writer_for(1)),
+            Rule::field_attribute => {
+                let mut writer = table.column_locked_writer_for(1);
+                writer.write("@");
+                reformat_function_call(current, &mut writer)
+            }
             Rule::trailing_comment => table.append_suffix_to_current_row(current.as_str()),
             Rule::comment_block => reformat_comment_block(current, table),
             _ => unreachable(&current),
@@ -212,7 +212,7 @@ fn reformat_field(pair: Pair<'_>, table: &mut TableFormat) {
 
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::non_empty_identifier => {
+            Rule::identifier => {
                 table.start_new_line();
                 table
                     .column_locked_writer_for(FIELD_NAME_COLUMN)
@@ -232,7 +232,7 @@ fn reformat_field(pair: Pair<'_>, table: &mut TableFormat) {
             // ```
             Rule::LEGACY_COLON => {}
             Rule::trailing_comment => table.append_suffix_to_current_row(current.as_str()),
-            Rule::attribute => {
+            Rule::field_attribute => {
                 attributes.push((None, current));
             }
             _ => unreachable(&current),
@@ -243,7 +243,8 @@ fn reformat_field(pair: Pair<'_>, table: &mut TableFormat) {
     sort_attributes(&mut attributes[..]);
     let mut attributes = attributes.into_iter().peekable();
     while let Some((_, attribute)) = attributes.next() {
-        reformat_attribute(attribute, "@", &mut attributes_writer);
+        attributes_writer.write("@");
+        reformat_function_call(attribute, &mut attributes_writer);
         if attributes.peek().is_some() {
             attributes_writer.write(" ");
         }
@@ -293,21 +294,6 @@ fn get_identifier(pair: Pair<'_>) -> &str {
     ident_token
 }
 
-fn reformat_attribute(pair: Pair<'_>, owl: &str, target: &mut dyn LineWriteable) {
-    let rule = pair.as_rule();
-    assert!(rule == Rule::attribute);
-    for current in pair.into_inner() {
-        match current.as_rule() {
-            Rule::attribute_name => {
-                target.write(owl);
-                target.write(current.as_str());
-            }
-            Rule::arguments_list => reformat_arguments_list(current, target),
-            _ => unreachable(&current),
-        }
-    }
-}
-
 fn reformat_arguments_list(pair: Pair<'_>, target: &mut dyn LineWriteable) {
     debug_assert_eq!(pair.as_rule(), Rule::arguments_list);
 
@@ -347,7 +333,7 @@ fn reformat_arguments_list(pair: Pair<'_>, target: &mut dyn LineWriteable) {
 fn reformat_attribute_arg(pair: Pair<'_>, target: &mut dyn LineWriteable) {
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::argument_name => {
+            Rule::identifier => {
                 target.write(current.as_str());
                 target.write(": ");
             }
@@ -363,8 +349,8 @@ fn reformat_expression(pair: Pair<'_>, target: &mut dyn LineWriteable) {
         match current.as_rule() {
             Rule::numeric_literal => target.write(current.as_str()),
             Rule::string_literal => target.write(current.as_str()),
-            Rule::constant_literal => target.write(current.as_str()),
-            Rule::function => reformat_function_expression(current, target),
+            Rule::path => target.write(current.as_str()),
+            Rule::function_call => reformat_function_call(current, target),
             Rule::array_expression => reformat_array_expression(current, target),
             _ => unreachable(&current),
         }
@@ -391,12 +377,10 @@ fn reformat_array_expression(pair: Pair<'_>, target: &mut dyn LineWriteable) {
     target.write("]");
 }
 
-fn reformat_function_expression(pair: Pair<'_>, target: &mut dyn LineWriteable) {
+fn reformat_function_call(pair: Pair<'_>, target: &mut dyn LineWriteable) {
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::function_name => {
-                target.write(current.as_str());
-            }
+            Rule::path => target.write(current.as_str()),
             Rule::arguments_list => reformat_arguments_list(current, target),
             _ => unreachable(&current),
         }

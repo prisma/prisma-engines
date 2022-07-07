@@ -289,7 +289,7 @@ fn should_not_work_outside_mongo() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a.field])[0m
+        [1;94m15 | [0m  [1;91m@@index([a.field])[0m
         [1;94m   | [0m
     "#]];
 
@@ -376,12 +376,11 @@ fn a_bonkers_definition_2() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+        [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields:  in type A.[0m
           [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
         [1;94m18 | [0m
         [1;94m19 | [0m  [1;91m@@index([a.])[0m
-        [1;94m20 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -630,19 +629,19 @@ fn index_to_a_missing_field_in_a_composite_type() {
           [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
         [1;94m18 | [0m
-        [1;94m19 | [0m  @@[1;91mindex([a.cat])[0m
+        [1;94m19 | [0m  [1;91m@@index([a.cat])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "B": The unique index definition refers to the unknown fields: cat in type A.[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  @@index([a.cat])
-        [1;94m20 | [0m  @@[1;91munique([a.cat])[0m
+        [1;94m20 | [0m  [1;91m@@unique([a.cat])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: cat in type A.[0m
           [1;94m-->[0m  [4mschema.prisma:21[0m
         [1;94m   | [0m
         [1;94m20 | [0m  @@unique([a.cat])
-        [1;94m21 | [0m  @@[1;91mfulltext([a.cat])[0m
+        [1;94m21 | [0m  [1;91m@@fulltext([a.cat])[0m
         [1;94m   | [0m
     "#]];
 
@@ -674,19 +673,19 @@ fn index_to_a_missing_composite_field() {
           [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
         [1;94m18 | [0m
-        [1;94m19 | [0m  @@[1;91mindex([b.field])[0m
+        [1;94m19 | [0m  [1;91m@@index([b.field])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "B": The unique index definition refers to the unknown fields: b.[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  @@index([b.field])
-        [1;94m20 | [0m  @@[1;91munique([b.field])[0m
+        [1;94m20 | [0m  [1;91m@@unique([b.field])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: b.[0m
           [1;94m-->[0m  [4mschema.prisma:21[0m
         [1;94m   | [0m
         [1;94m20 | [0m  @@unique([b.field])
-        [1;94m21 | [0m  @@[1;91mfulltext([b.field])[0m
+        [1;94m21 | [0m  [1;91m@@fulltext([b.field])[0m
         [1;94m   | [0m
     "#]];
 
@@ -719,19 +718,19 @@ fn non_composite_field_in_the_path() {
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m
-        [1;94m20 | [0m  @@[1;91mindex([b.field, a.field])[0m
+        [1;94m20 | [0m  [1;91m@@index([b.field, a.field])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "B": The unique index definition refers to the unknown fields: b.field.[0m
           [1;94m-->[0m  [4mschema.prisma:21[0m
         [1;94m   | [0m
         [1;94m20 | [0m  @@index([b.field, a.field])
-        [1;94m21 | [0m  @@[1;91munique([b.field, a.field])[0m
+        [1;94m21 | [0m  [1;91m@@unique([b.field, a.field])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: b.field.[0m
           [1;94m-->[0m  [4mschema.prisma:22[0m
         [1;94m   | [0m
         [1;94m21 | [0m  @@unique([b.field, a.field])
-        [1;94m22 | [0m  @@[1;91mfulltext([b.field, a.field])[0m
+        [1;94m22 | [0m  [1;91m@@fulltext([b.field, a.field])[0m
         [1;94m   | [0m
     "#]];
 
@@ -766,7 +765,7 @@ fn non_composite_field_in_the_middle_of_the_path() {
           [1;94m-->[0m  [4mschema.prisma:24[0m
         [1;94m   | [0m
         [1;94m23 | [0m
-        [1;94m24 | [0m  @@[1;91mindex([c.bonk.field])[0m
+        [1;94m24 | [0m  [1;91m@@index([c.bonk.field])[0m
         [1;94m   | [0m
     "#]];
 

@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, Pair, ToIdentifier},
+    helpers::{parsing_catch_all, Pair},
     parse_expression::parse_expression,
     Rule,
 };
@@ -24,11 +24,9 @@ pub(crate) fn parse_arguments_list(token: Pair<'_>, arguments: &mut ast::Argumen
             Rule::empty_argument => {
                 let name = current
                     .into_inner()
-                    .find(|tok| tok.as_rule() == Rule::argument_name)
+                    .find(|tok| tok.as_rule() == Rule::identifier)
                     .unwrap();
-                arguments
-                    .empty_arguments
-                    .push(ast::EmptyArgument { name: name.to_id() })
+                arguments.empty_arguments.push(ast::EmptyArgument { name: name.into() })
             }
             Rule::trailing_comma => {
                 arguments.trailing_comma = Some(current.as_span().into());
@@ -46,7 +44,7 @@ fn parse_named_arg(pair: Pair<'_>, diagnostics: &mut Diagnostics) -> ast::Argume
 
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::argument_name => name = Some(current.to_id()),
+            Rule::identifier => name = Some(current.into()),
             Rule::expression => argument = Some(parse_expression(current, diagnostics)),
             _ => parsing_catch_all(&current, "attribute argument"),
         }

@@ -101,7 +101,7 @@ fn only_single_column_allowed() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mindex([a, b], type: SpGist)[0m
+        [1;94m16 | [0m  [1;91m@@index([a, b], type: SpGist)[0m
         [1;94m   | [0m
     "#]];
 
@@ -184,7 +184,7 @@ fn inet_ops_with_wrong_prisma_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetOps)], type: SpGist)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetOps)], type: SpGist)[0m
         [1;94m   | [0m
     "#]];
 
@@ -210,7 +210,7 @@ fn inet_ops_with_wrong_index_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetOps)], type: Gin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetOps)], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -375,7 +375,7 @@ fn text_ops_with_wrong_prisma_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TextOps)], type: SpGist)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TextOps)], type: SpGist)[0m
         [1;94m   | [0m
     "#]];
 
@@ -401,7 +401,7 @@ fn no_ops_weird_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a], type: SpGist)[0m
+        [1;94m15 | [0m  [1;91m@@index([a], type: SpGist)[0m
         [1;94m   | [0m
     "#]];
 
@@ -427,7 +427,7 @@ fn text_ops_with_wrong_index_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TextOps)], type: Gist)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TextOps)], type: Gist)[0m
         [1;94m   | [0m
     "#]];
 

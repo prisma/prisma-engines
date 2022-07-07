@@ -19,7 +19,7 @@ fn should_fail_on_native_type_with_invalid_datasource_name() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id     Int    @id
-        [1;94m 8 | [0m  bigInt Int    @[1;91mpg.Integer[0m
+        [1;94m 8 | [0m  bigInt Int    [1;91m@pg.Integer[0m
         [1;94m   | [0m
     "#]];
 
@@ -46,7 +46,7 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
         [1;94m 8 | [0m  bigInt Int    @pg.Integer
-        [1;94m 9 | [0m  foobar String @[1;91mpg.VarChar(2, 3, 4)[0m
+        [1;94m 9 | [0m  foobar String [1;91m@pg.VarChar(2, 3, 4)[0m
         [1;94m   | [0m
     "#]];
 
@@ -73,7 +73,7 @@ fn should_fail_on_native_type_with_unknown_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id     Int    @id
-        [1;94m 8 | [0m  bigInt Int    @[1;91mpg.Numerical(3, 4)[0m
+        [1;94m 8 | [0m  bigInt Int    [1;91m@pg.Numerical(3, 4)[0m
         [1;94m   | [0m
     "#]];
 
@@ -100,13 +100,13 @@ fn should_fail_on_native_type_with_incompatible_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id     Int    @id
-        [1;94m 8 | [0m  foobar Boolean @[1;91mpg.VarChar(5)[0m
+        [1;94m 8 | [0m  foobar Boolean [1;91m@pg.VarChar(5)[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mNative type BigInt is not compatible with declared field type Int, expected field type BigInt.[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
         [1;94m 8 | [0m  foobar Boolean @pg.VarChar(5)
-        [1;94m 9 | [0m  foo Int @[1;91mpg.BigInt[0m
+        [1;94m 9 | [0m  foo Int [1;91m@pg.BigInt[0m
         [1;94m   | [0m
     "#]];
 
@@ -132,7 +132,7 @@ fn should_fail_on_native_type_with_invalid_arguments() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id     Int    @id
-        [1;94m 8 | [0m  foobar String @[1;91mpg.VarChar(a)[0m
+        [1;94m 8 | [0m  foobar String [1;91m@pg.VarChar(a)[0m
         [1;94m   | [0m
     "#]];
 

@@ -16,7 +16,7 @@ fn should_fail_if_field_type_is_string() {
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  id Int @id
-        [1;94m 3 | [0m  lastSeen String @[1;91mupdatedAt[0m
+        [1;94m 3 | [0m  lastSeen String [1;91m@updatedAt[0m
         [1;94m   | [0m
     "#]];
 
@@ -44,7 +44,7 @@ fn should_fail_if_field_arity_is_list() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id Int @id
-        [1;94m 8 | [0m  lastSeen DateTime[] @[1;91mupdatedAt[0m
+        [1;94m 8 | [0m  lastSeen DateTime[] [1;91m@updatedAt[0m
         [1;94m   | [0m
     "#]];
 

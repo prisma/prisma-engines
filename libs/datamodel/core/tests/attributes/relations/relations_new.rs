@@ -272,7 +272,7 @@ fn relation_must_error_when_referenced_field_does_not_exist() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m        userId Int
-        [1;94m12 | [0m        user User @[1;91mrelation(fields: [userId], references: [fooBar])[0m
+        [1;94m12 | [0m        user User [1;91m@relation(fields: [userId], references: [fooBar])[0m
         [1;94m   | [0m
     "#]];
 
@@ -301,7 +301,7 @@ fn relation_must_error_when_referenced_field_is_not_scalar() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m        userId Int
-        [1;94m12 | [0m        user User @[1;91mrelation(fields: [userId], references: [posts])[0m
+        [1;94m12 | [0m        user User [1;91m@relation(fields: [userId], references: [posts])[0m
         [1;94m   | [0m
     "#]];
 
@@ -475,7 +475,7 @@ fn relation_must_error_when_number_of_fields_and_references_is_not_equal() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m        userName String
-        [1;94m12 | [0m        user     User    @[1;91mrelation(fields: [userId, userName], references: [id])[0m
+        [1;94m12 | [0m        user     User    [1;91m@relation(fields: [userId, userName], references: [id])[0m
         [1;94m   | [0m
     "#]];
 

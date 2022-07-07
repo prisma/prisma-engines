@@ -157,7 +157,7 @@ fn bit_minmax_no_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: BitMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: BitMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -183,7 +183,7 @@ fn bit_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: BitMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: BitMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -266,7 +266,7 @@ fn varbit_minmax_no_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: VarBitMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: VarBitMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -292,7 +292,7 @@ fn varbit_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: VarBitMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: VarBitMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -375,7 +375,7 @@ fn date_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: DateMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: DateMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -429,7 +429,7 @@ fn date_minmaxmulti_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: DateMinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: DateMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -483,7 +483,7 @@ fn date_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: DateBloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: DateBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -566,7 +566,7 @@ fn real_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Float4MinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Float4MinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -620,7 +620,7 @@ fn real_minmaxmulti_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Float4MinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Float4MinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -674,7 +674,7 @@ fn real_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Float4BloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Float4BloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -868,7 +868,7 @@ fn double_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Float8MinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Float8MinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -922,7 +922,7 @@ fn double_minmaxmulti_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Float8MinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Float8MinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -976,7 +976,7 @@ fn double_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Float8BloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Float8BloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1059,7 +1059,7 @@ fn inet_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1085,7 +1085,7 @@ fn inet_minmax_no_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1139,7 +1139,7 @@ fn inet_minmaxmulti_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetMinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1165,7 +1165,7 @@ fn inet_minmaxmulti_no_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetMinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1219,7 +1219,7 @@ fn inet_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetBloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1245,7 +1245,7 @@ fn inet_bloom_no_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetBloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1299,7 +1299,7 @@ fn inet_inclusion_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetInclusionOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetInclusionOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1325,7 +1325,7 @@ fn inet_inclusion_no_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetInclusionOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetInclusionOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1408,7 +1408,7 @@ fn int2_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int2MinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Int2MinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1434,7 +1434,7 @@ fn int2_minmax_no_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int2MinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Int2MinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1488,7 +1488,7 @@ fn int2_minmaxmulti_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int2MinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Int2MinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1514,7 +1514,7 @@ fn int2_minmaxmulti_no_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int2MinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Int2MinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1568,7 +1568,7 @@ fn int2_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int2BloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Int2BloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1594,7 +1594,7 @@ fn int2_bloom_no_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int2BloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Int2BloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1704,7 +1704,7 @@ fn int4_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int4MinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Int4MinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1786,7 +1786,7 @@ fn int4_minmaxmulti_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int4MinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Int4MinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1868,7 +1868,7 @@ fn int4_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int4BloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Int4BloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2230,7 +2230,7 @@ fn decimal_minmax_wrong_prisma_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: NumericMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: NumericMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2284,7 +2284,7 @@ fn decimal_minmaxmulti_wrong_prisma_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: NumericMinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: NumericMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2338,7 +2338,7 @@ fn decimal_bloom_wrong_prisma_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: NumericBloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: NumericBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2505,7 +2505,7 @@ fn oid_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: OidMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: OidMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2559,7 +2559,7 @@ fn oid_minmaxmulti_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: OidMinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: OidMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2613,7 +2613,7 @@ fn oid_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: OidBloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: OidBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2696,7 +2696,7 @@ fn char_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: BpcharMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: BpcharMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2750,7 +2750,7 @@ fn char_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: BpcharBloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: BpcharBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2915,7 +2915,7 @@ fn text_minmax_wrong_prisma_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TextMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TextMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -2969,7 +2969,7 @@ fn text_bloom_wrong_prisma_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TextBloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TextBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3275,7 +3275,7 @@ fn timestamp_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TimestampMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TimestampMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3329,7 +3329,7 @@ fn timestamp_minmaxmulti_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TimestampMinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TimestampMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3383,7 +3383,7 @@ fn timestamp_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TimestampBloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TimestampBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3466,7 +3466,7 @@ fn timestamptz_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TimestampTzMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TimestampTzMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3520,7 +3520,7 @@ fn timestamptz_minmaxmulti_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TimestampTzMinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TimestampTzMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3574,7 +3574,7 @@ fn timestamptz_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TimestampTzBloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TimestampTzBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3657,7 +3657,7 @@ fn time_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TimeMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TimeMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3711,7 +3711,7 @@ fn time_minmaxmulti_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TimeMinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TimeMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3765,7 +3765,7 @@ fn time_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TimeBloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TimeBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3848,7 +3848,7 @@ fn timetz_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TimeTzMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TimeTzMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3902,7 +3902,7 @@ fn timetz_minmaxmulti_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TimeTzMinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TimeTzMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -3956,7 +3956,7 @@ fn timetz_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: TimeTzBloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: TimeTzBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -4039,7 +4039,7 @@ fn uuid_minmax_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: UuidMinMaxOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: UuidMinMaxOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -4093,7 +4093,7 @@ fn uuid_minmaxmulti_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: UuidMinMaxMultiOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: UuidMinMaxMultiOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -4147,7 +4147,7 @@ fn uuid_bloom_wrong_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: UuidBloomOps)], type: Brin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: UuidBloomOps)], type: Brin)[0m
         [1;94m   | [0m
     "#]];
 

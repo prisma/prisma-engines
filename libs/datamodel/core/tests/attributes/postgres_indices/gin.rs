@@ -212,7 +212,7 @@ fn jsonb_ops_with_wrong_prisma_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: JsonbOps)], type: Gin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbOps)], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -238,7 +238,7 @@ fn jsonb_ops_invalid_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: JsonbOps)], type: Gin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbOps)], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -264,7 +264,7 @@ fn jsonb_ops_invalid_index_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: JsonbOps)], type: Gist)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbOps)], type: Gist)[0m
         [1;94m   | [0m
     "#]];
 
@@ -348,7 +348,7 @@ fn jsonb_path_ops_invalid_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: JsonbPathOps)], type: Gin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbPathOps)], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -374,7 +374,7 @@ fn jsonb_path_ops_with_wrong_prisma_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: JsonbPathOps)], type: Gin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbPathOps)], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -400,7 +400,7 @@ fn jsonb_path_ops_invalid_index_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: JsonbPathOps)], type: Gist)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbPathOps)], type: Gist)[0m
         [1;94m   | [0m
     "#]];
 
@@ -483,7 +483,7 @@ fn non_array_field_array_ops() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: ArrayOps)], type: Gin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: ArrayOps)], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -509,7 +509,7 @@ fn array_ops_invalid_index_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: ArrayOps)], type: Gist)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: ArrayOps)], type: Gist)[0m
         [1;94m   | [0m
     "#]];
 

@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, Pair, ToIdentifier},
+    helpers::{parsing_catch_all, Pair},
     parse_attribute::parse_attribute,
     parse_comments::parse_comment_block,
     parse_field::parse_field,
@@ -23,9 +23,9 @@ pub(crate) fn parse_composite_type(
         let current_span = current.as_span();
         match current.as_rule() {
             Rule::TYPE_KEYWORD => (),
-            Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::block_level_attribute => {
-                let attr = parse_attribute(current.into_inner().next().unwrap(), diagnostics);
+            Rule::identifier => name = Some(current.into()),
+            Rule::block_attribute => {
+                let attr = parse_attribute(current, diagnostics);
 
                 let err = match attr.name.name.as_str() {
                     "map" => {
