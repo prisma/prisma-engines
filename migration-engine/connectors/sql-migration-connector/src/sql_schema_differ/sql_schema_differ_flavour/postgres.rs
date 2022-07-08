@@ -21,6 +21,7 @@ static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
         // PostGIS. Reference: https://postgis.net/docs/manual-1.4/ch04.html#id418599
         "(?i)^spatial_ref_sys$",
         "(?i)^geometry_columns$",
+        "(?i)^geography_columns$",
     ])
     .unwrap()
 });
