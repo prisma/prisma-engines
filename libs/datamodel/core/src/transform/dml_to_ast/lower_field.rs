@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     ast::{self, Attribute, Span},
-    common::{constraint_names::ConstraintNames, RelationNames},
+    common::RelationNames,
     dml::*,
     Datasource,
 };
