@@ -60,6 +60,7 @@ fn parse_key_value(pair: Pair<'_>, diagnostics: &mut Diagnostics) -> ConfigBlock
         match current.as_rule() {
             Rule::identifier => name = Some(current.into()),
             Rule::expression => value = Some(parse_expression(current, diagnostics)),
+            Rule::trailing_comment => (),
             _ => unreachable!(
                 "Encountered impossible source property declaration during parsing: {:?}",
                 current.tokens()

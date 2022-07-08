@@ -61,6 +61,7 @@ fn reformat_key_value(pair: Pair<'_>, table: &mut TableFormat) {
                 writer.write("= ");
                 reformat_expression(current, &mut writer);
             }
+            Rule::trailing_comment => table.append_suffix_to_current_row(current.as_str()),
             _ => unreachable(&current),
         }
     }
