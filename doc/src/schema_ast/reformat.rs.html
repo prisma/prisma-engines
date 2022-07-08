@@ -436,6 +436,7 @@
 <span id="431">431</span>
 <span id="432">432</span>
 <span id="433">433</span>
+<span id="434">434</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">parser</span>::{<span class="ident">PrismaDatamodelParser</span>, <span class="ident">Rule</span>},
     <span class="ident">renderer</span>::{<span class="ident">get_sort_index_of_attribute</span>, <span class="ident">LineWriteable</span>, <span class="ident">Renderer</span>, <span class="ident">TableFormat</span>},
@@ -499,6 +500,7 @@
                 <span class="ident">writer</span>.<span class="ident">write</span>(<span class="string">&quot;= &quot;</span>);
                 <span class="ident">reformat_expression</span>(<span class="ident">current</span>, <span class="kw-2">&amp;mut</span> <span class="ident">writer</span>);
             }
+            <span class="ident">Rule::trailing_comment</span> =&gt; <span class="ident">table</span>.<span class="ident">append_suffix_to_current_row</span>(<span class="ident">current</span>.<span class="ident">as_str</span>()),
             <span class="kw">_</span> =&gt; <span class="ident">unreachable</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>),
         }
     }
