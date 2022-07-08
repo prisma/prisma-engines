@@ -49,7 +49,6 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod common;
-pub mod dml;
 
 /// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a JSON representation.
 pub mod mcf;
@@ -58,26 +57,26 @@ mod configuration;
 mod reformat;
 mod transform;
 
-use std::sync::Arc;
-
 pub use crate::{
     configuration::{Configuration, Datasource, Generator, StringFromEnvVar},
     reformat::reformat,
 };
 pub use datamodel_connector;
 pub use diagnostics;
+pub use dml;
 pub use parser_database;
 pub use parser_database::is_reserved_type_name;
-use schema_ast::source_file::SourceFile;
 pub use schema_ast::{self, ast};
 
 use crate::common::preview_features::PreviewFeature;
 use diagnostics::Diagnostics;
 use enumflags2::BitFlags;
 use parser_database::ParserDatabase;
+use schema_ast::source_file::SourceFile;
+use std::sync::Arc;
 use transform::{
     ast_to_dml::{validate, DatasourceLoader, GeneratorLoader},
-    dml_to_ast::{lower, LowerParams},
+    dml_to_ast::RenderParams,
 };
 
 #[derive(Debug)]
@@ -227,11 +226,9 @@ fn load_sources(
 /// Renders the datamodel _without configuration blocks_.
 pub fn render_datamodel_to_string(datamodel: &dml::Datamodel, configuration: Option<&Configuration>) -> String {
     let datasource = configuration.and_then(|c| c.datasources.first());
-    let lowered = lower(LowerParams { datasource, datamodel });
-    let mut renderer = schema_ast::renderer::Renderer::new(DEFAULT_INDENT_WIDTH);
-    renderer.stream.reserve(&lowered.tops.len() * 20);
-    renderer.render(&lowered);
-    reformat(&renderer.stream, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
+    let mut out = String::new();
+    transform::dml_to_ast::render(RenderParams { datasource, datamodel }, &mut out);
+    reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 
 /// Renders a datamodel, sources and generators.
@@ -239,15 +236,11 @@ pub fn render_datamodel_and_config_to_string(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) -> String {
-    let lowered = lower(LowerParams {
-        datasource: config.datasources.first(),
-        datamodel,
-    });
-
-    let mut renderer = schema_ast::renderer::Renderer::new(2);
-    transform::dml_to_ast::render_configuration(config, &mut renderer.stream);
-    renderer.render(&lowered);
-    reformat(&renderer.stream, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
+    let mut out = String::new();
+    let datasource = config.datasources.first();
+    transform::dml_to_ast::render_configuration(config, &mut out);
+    transform::dml_to_ast::render(RenderParams { datasource, datamodel }, &mut out);
+    reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {

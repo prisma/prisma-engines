@@ -7,12 +7,12 @@ use crate::{
 use itertools::Itertools;
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct LowerParams<'a> {
+pub(crate) struct RenderParams<'a> {
     pub datasource: Option<&'a Datasource>,
     pub datamodel: &'a dml::Datamodel,
 }
 
-pub(crate) fn lower(params: LowerParams<'_>) -> ast::SchemaAst {
+pub(crate) fn render(params: RenderParams<'_>, out: &mut String) {
     let datamodel = params.datamodel;
     let mut tops: Vec<ast::Top> = Vec::new();
 
@@ -30,10 +30,13 @@ pub(crate) fn lower(params: LowerParams<'_>) -> ast::SchemaAst {
         tops.push(ast::Top::Enum(lower_enum(enm)))
     }
 
-    ast::SchemaAst { tops }
+    let lowered = ast::SchemaAst { tops };
+    let mut renderer = schema_ast::renderer::Renderer::new(2);
+    renderer.render(&lowered);
+    out.push_str(&renderer.stream)
 }
 
-pub(super) fn lower_model(model: &dml::Model, params: LowerParams<'_>) -> ast::Model {
+fn lower_model(model: &dml::Model, params: RenderParams<'_>) -> ast::Model {
     let mut fields: Vec<ast::Field> = Vec::new();
 
     for field in model.fields() {
@@ -69,7 +72,7 @@ fn lower_enum(enm: &dml::Enum) -> ast::Enum {
     }
 }
 
-pub(super) fn lower_field(model: &dml::Model, field: &dml::Field, params: LowerParams<'_>) -> ast::Field {
+pub(super) fn lower_field(model: &dml::Model, field: &dml::Field, params: RenderParams<'_>) -> ast::Field {
     let mut attributes = lower_field_attributes(model, field, params);
 
     let native_type = field.as_scalar_field().and_then(|sf| sf.field_type.as_native_type());
@@ -89,7 +92,7 @@ pub(super) fn lower_field(model: &dml::Model, field: &dml::Field, params: LowerP
     }
 }
 
-pub(super) fn lower_composite_type(r#type: &dml::CompositeType, params: LowerParams<'_>) -> ast::CompositeType {
+pub(super) fn lower_composite_type(r#type: &dml::CompositeType, params: RenderParams<'_>) -> ast::CompositeType {
     let mut fields: Vec<ast::Field> = Vec::new();
 
     for field in r#type.fields.iter() {

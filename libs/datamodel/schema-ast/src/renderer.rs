@@ -50,8 +50,7 @@ impl Renderer {
                 ast::Top::CompositeType(ct) => self.render_composite_type(ct),
                 ast::Top::Model(model) => self.render_model(model),
                 ast::Top::Enum(enm) => self.render_enum(enm),
-                ast::Top::Source(source) => self.render_source_block(source),
-                ast::Top::Generator(generator) => self.render_generator_block(generator),
+                ast::Top::Source(_) | ast::Top::Generator(_) => unreachable!(),
             }
         }
     }
@@ -76,48 +75,6 @@ impl Renderer {
         }
     }
 
-    fn render_source_block(&mut self, source: &ast::SourceConfig) {
-        Self::render_documentation(self, source.documentation.as_ref(), source.is_commented_out());
-
-        self.write("datasource ");
-        self.write(&source.name.name);
-        self.write(" {");
-        self.end_line();
-        self.indent_up();
-
-        for property in &source.properties {
-            self.write(&property.name.name);
-            self.write(" = ");
-            self.write(&Self::render_value_to_string(&property.value));
-            self.end_line();
-        }
-
-        self.indent_down();
-        self.write("}");
-        self.end_line();
-    }
-
-    fn render_generator_block(&mut self, generator: &ast::GeneratorConfig) {
-        Self::render_documentation(self, generator.documentation.as_ref(), generator.is_commented_out());
-
-        self.write("generator ");
-        self.write(&generator.name.name);
-        self.write(" {");
-        self.end_line();
-        self.indent_up();
-
-        for property in &generator.properties {
-            self.write(&property.name.name);
-            self.write(" = ");
-            self.write(&Self::render_value_to_string(&property.value));
-            self.end_line();
-        }
-
-        self.indent_down();
-        self.write("}");
-        self.end_line();
-    }
-
     fn render_model(&mut self, model: &ast::Model) {
         let comment_out = if model.commented_out { "// " } else { "" };
         Self::render_documentation(self, model.documentation.as_ref(), model.is_commented_out());
@@ -126,7 +83,6 @@ impl Renderer {
         self.write(&model.name.name);
         self.write(" {");
         self.end_line();
-        self.indent_up();
 
         for field in &model.fields {
             Self::render_field(self, field, model.commented_out);
@@ -141,7 +97,6 @@ impl Renderer {
             }
         }
 
-        self.indent_down();
         self.write(format!("{}{}", comment_out, "}").as_ref());
         self.end_line();
     }
@@ -152,13 +107,11 @@ impl Renderer {
         self.write("type ");
         self.write(&type_def.name.name);
         self.write(" {\n");
-        self.indent_up();
 
         for field in &type_def.fields {
             Self::render_field(self, field, false);
         }
 
-        self.indent_down();
         self.write("}\n");
     }
 
@@ -168,7 +121,6 @@ impl Renderer {
         self.write("enum ");
         self.write(&enm.name.name);
         self.write(" {\n");
-        self.indent_up();
 
         for value in &enm.values {
             let commented_out = if value.commented_out { "// " } else { "" };
@@ -196,7 +148,6 @@ impl Renderer {
             }
         }
 
-        self.indent_down();
         self.write("}\n");
     }
 
