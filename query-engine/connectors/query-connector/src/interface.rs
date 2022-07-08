@@ -39,8 +39,6 @@ pub trait Transaction: ConnectionLike {
 /// transactions into something that can is capable of writing to or reading from the database.
 pub trait ConnectionLike: ReadOperations + WriteOperations + Send + Sync {}
 
-// pub enum IsolationLevel {}
-
 /// A wrapper struct allowing to either filter for records or for the core to
 /// communicate already known record selectors to connectors.
 ///
