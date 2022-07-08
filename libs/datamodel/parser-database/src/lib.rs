@@ -37,14 +37,13 @@ mod value_validator;
 
 pub use names::is_reserved_type_name;
 pub use relations::ReferentialAction;
-pub use schema_ast::ast;
+pub use schema_ast::{ast, SourceFile};
 pub use types::{IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SortOrder};
 pub use value_validator::{ValueListValidator, ValueValidator};
 
 use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};
 use names::Names;
-use schema_ast::source_file::SourceFile;
 
 /// ParserDatabase is a container for a Schema AST, together with information
 /// gathered during schema validation. Each validation step enriches the
@@ -67,7 +66,7 @@ use schema_ast::source_file::SourceFile;
 ///   Currently only index name collisions.
 pub struct ParserDatabase {
     ast: ast::SchemaAst,
-    file: SourceFile,
+    file: schema_ast::SourceFile,
     interner: interner::StringInterner,
     _names: Names,
     types: Types,
@@ -76,7 +75,7 @@ pub struct ParserDatabase {
 
 impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(file: SourceFile, diagnostics: &mut Diagnostics) -> Self {
+    pub fn new(file: schema_ast::SourceFile, diagnostics: &mut Diagnostics) -> Self {
         let ast = schema_ast::parse_schema(file.as_str(), diagnostics);
 
         let mut interner = Default::default();

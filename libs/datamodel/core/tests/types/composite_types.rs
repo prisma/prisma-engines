@@ -121,7 +121,6 @@ fn composite_types_are_parsed_without_error() {
                                     start: 139,
                                     end: 152,
                                 },
-                                is_commented_out: false,
                             },
                             Field {
                                 field_type: Supported(
@@ -166,7 +165,6 @@ fn composite_types_are_parsed_without_error() {
                                     start: 164,
                                     end: 191,
                                 },
-                                is_commented_out: false,
                             },
                         ],
                         documentation: None,
@@ -318,7 +316,6 @@ fn composite_types_are_parsed_without_error() {
                                     start: 235,
                                     end: 292,
                                 },
-                                is_commented_out: false,
                             },
                             Field {
                                 field_type: Supported(
@@ -344,7 +341,6 @@ fn composite_types_are_parsed_without_error() {
                                     start: 304,
                                     end: 321,
                                 },
-                                is_commented_out: false,
                             },
                         ],
                         attributes: [],
@@ -353,7 +349,6 @@ fn composite_types_are_parsed_without_error() {
                             start: 210,
                             end: 330,
                         },
-                        commented_out: false,
                     },
                 ),
             ],
@@ -375,7 +370,6 @@ fn composite_types_are_parsed_without_error() {
                                 name: "id",
                                 field_type: Scalar(
                                     String,
-                                    None,
                                     Some(
                                         NativeTypeInstance {
                                             name: "ObjectId",
@@ -445,7 +439,6 @@ fn composite_types_are_parsed_without_error() {
                             type: Scalar(
                                 String,
                                 None,
-                                None,
                             ),
                             arity: Optional,
                             database_name: None,
@@ -457,7 +450,6 @@ fn composite_types_are_parsed_without_error() {
                             name: "street",
                             type: Scalar(
                                 String,
-                                None,
                                 Some(
                                     NativeTypeInstance {
                                         name: "ObjectId",

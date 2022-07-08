@@ -6,8 +6,7 @@ use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
 use datamodel::{
     datamodel_connector::{walker_ext_traits::*, ReferentialAction, ScalarType},
     dml::{prisma_value, PrismaValue},
-    parser_database::{walkers::ScalarFieldWalker, IndexType, ScalarFieldType, SortOrder},
-    schema_ast::ast::{self, FieldArity},
+    parser_database::{ast, walkers::ScalarFieldWalker, IndexType, ScalarFieldType, SortOrder},
     ValidatedSchema,
 };
 use sql_schema_describer as sql;
@@ -483,11 +482,11 @@ fn constant_expression_to_sql_default(expr: &ast::Expression, scalar_type: Scala
     }
 }
 
-fn column_arity(arity: FieldArity) -> sql::ColumnArity {
+fn column_arity(arity: ast::FieldArity) -> sql::ColumnArity {
     match &arity {
-        FieldArity::Required => sql::ColumnArity::Required,
-        FieldArity::List => sql::ColumnArity::List,
-        FieldArity::Optional => sql::ColumnArity::Nullable,
+        ast::FieldArity::Required => sql::ColumnArity::Required,
+        ast::FieldArity::List => sql::ColumnArity::List,
+        ast::FieldArity::Optional => sql::ColumnArity::Nullable,
     }
 }
 

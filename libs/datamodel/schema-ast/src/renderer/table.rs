@@ -12,12 +12,6 @@ pub enum Row {
     Interleaved(String),
 }
 
-impl Row {
-    fn new_regular() -> Row {
-        Row::Regular(Vec::new(), String::new())
-    }
-}
-
 #[derive(Debug, Default)]
 pub(crate) struct TableFormat {
     pub table: Vec<Row>,
@@ -28,34 +22,18 @@ impl TableFormat {
         std::mem::take(self);
     }
 
-    pub(crate) fn column_locked_writer_for(&mut self, index: usize) -> ColumnLockedWriter<'_> {
-        ColumnLockedWriter {
-            formatter: self,
-            column: index,
+    pub(crate) fn column_locked_writer_for(&mut self, index: usize) -> &mut String {
+        match self.table.last_mut().unwrap() {
+            Row::Interleaved(row) => row,
+            Row::Regular(columns, _) => {
+                columns.resize(index + 1, String::new());
+                &mut columns[index]
+            }
         }
     }
 
     pub(crate) fn interleave(&mut self, text: &str) {
         self.table.push(Row::Interleaved(String::from(text)));
-    }
-
-    // Safely appends to the column with the given index.
-    fn append_to(&mut self, text: &str, index: usize) {
-        match self.table.last_mut() {
-            Some(Row::Regular(row, _)) => {
-                while row.len() <= index {
-                    row.push(String::new());
-                }
-
-                if row[index].is_empty() {
-                    row[index] = String::from(text);
-                } else {
-                    row[index].push_str(text);
-                }
-            }
-            Some(Row::Interleaved(_)) => panic!("Cannot append to col in interleaved mode"),
-            None => unreachable!(),
-        }
     }
 
     pub(crate) fn append_suffix_to_current_row(&mut self, text: &str) {
@@ -66,23 +44,27 @@ impl TableFormat {
     }
 
     pub(crate) fn start_new_line(&mut self) {
-        self.table.push(Row::new_regular());
+        self.table.push(Row::Regular(Vec::new(), String::new()))
     }
 
     pub(crate) fn render(&mut self, target: &mut super::Renderer) {
         // First, measure cols
-        let mut max_number_of_columns = 0;
+        let max_number_of_columns = self
+            .table
+            .iter()
+            .filter_map(|row| match row {
+                Row::Regular(cols, _) => Some(cols.len()),
+                _ => None,
+            })
+            .max();
 
-        for row in &self.table {
+        let mut max_widths_for_each_column = vec![0; max_number_of_columns.unwrap_or(0)];
+
+        for row in &mut self.table {
             if let Row::Regular(row, _) = row {
-                max_number_of_columns = max(max_number_of_columns, row.len());
-            }
-        }
-
-        let mut max_widths_for_each_column = vec![0; max_number_of_columns];
-
-        for row in &self.table {
-            if let Row::Regular(row, _) = row {
+                while row.last().map(|s| s.as_str()) == Some("") {
+                    row.pop();
+                }
                 for (i, col) in row.iter().enumerate() {
                     max_widths_for_each_column[i] = max(max_widths_for_each_column[i], col.len());
                 }
@@ -132,19 +114,4 @@ impl LineWriteable for TableFormat {
     }
 
     fn end_line(&mut self) {}
-}
-
-pub struct ColumnLockedWriter<'a> {
-    formatter: &'a mut TableFormat,
-    column: usize,
-}
-
-impl<'a> LineWriteable for ColumnLockedWriter<'a> {
-    fn write(&mut self, text: &str) {
-        self.formatter.append_to(text, self.column);
-    }
-
-    fn end_line(&mut self) {
-        panic!("Lines cannot be ended from ColumnLockedWriter");
-    }
 }

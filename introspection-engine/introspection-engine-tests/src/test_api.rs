@@ -138,7 +138,6 @@ impl TestApi {
         self.preview_features
     }
 
-    #[tracing::instrument(skip(self))]
     #[track_caller]
     async fn test_introspect_internal(&self, data_model: Datamodel) -> ConnectorResult<IntrospectionResult> {
         let config = self.configuration();
@@ -274,7 +273,10 @@ impl TestApi {
 
     #[track_caller]
     pub async fn expect_re_introspected_datamodel(&self, schema: &str, expectation: expect_test::Expect) {
-        let found = self.re_introspect(schema).await.unwrap();
+        let config = self.configuration();
+        let data_model = parse_datamodel(schema);
+        let reintrospected = self.test_introspect_internal(data_model).await.unwrap();
+        let found = datamodel::render_datamodel_to_string(&reintrospected.data_model, Some(&config));
         expectation.assert_eq(&found);
     }
 

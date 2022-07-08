@@ -51,23 +51,6 @@ pub struct SchemaAst {
 }
 
 impl SchemaAst {
-    /// Construct an empty Schema AST.
-    pub fn empty() -> Self {
-        SchemaAst { tops: Vec::new() }
-    }
-
-    /// Deprecated. Use ParserDatabase instead where possible.
-    pub fn find_model(&self, model: &str) -> Option<&Model> {
-        self.iter_models().find(|(_, m)| m.name.name == model).map(|(_, m)| m)
-    }
-
-    fn iter_models(&self) -> impl Iterator<Item = (ModelId, &Model)> {
-        self.iter_tops().filter_map(|(top_id, top)| match (top_id, top) {
-            (TopId::Model(model_id), Top::Model(model)) => Some((model_id, model)),
-            _ => None,
-        })
-    }
-
     /// Iterate over all the top-level items in the schema.
     pub fn iter_tops(&self) -> impl Iterator<Item = (TopId, &Top)> {
         self.tops

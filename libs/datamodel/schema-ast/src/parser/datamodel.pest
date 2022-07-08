@@ -17,7 +17,6 @@
 // ######################################
 schema = {
     SOI
-    ~ NEWLINE*
     ~ (model_declaration | enum_declaration | config_block | type_alias | arbitrary_block | comment_block | empty_lines | CATCH_ALL)*
     ~ EOI
     }

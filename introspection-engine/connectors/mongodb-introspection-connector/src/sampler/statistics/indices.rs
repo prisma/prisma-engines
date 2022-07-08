@@ -245,10 +245,7 @@ fn add_missing_types_from_index(
                     } else {
                         unknown_fields.push((Name::CompositeType(type_name.clone()), field_name.clone()));
 
-                        (
-                            dml::CompositeTypeFieldType::Scalar(dml::ScalarType::Json, None, None),
-                            None,
-                        )
+                        (dml::CompositeTypeFieldType::Scalar(dml::ScalarType::Json, None), None)
                     };
 
                     let ct = types.get_mut(&type_name).unwrap();

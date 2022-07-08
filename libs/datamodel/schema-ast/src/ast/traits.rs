@@ -28,9 +28,6 @@ pub trait WithAttributes {
 pub trait WithDocumentation {
     /// The documentation string, if defined.
     fn documentation(&self) -> &Option<Comment>;
-
-    /// Is this node commented out?
-    fn is_commented_out(&self) -> bool;
 }
 
 /// An AST node with a name.

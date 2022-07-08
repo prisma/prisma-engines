@@ -1,10 +1,8 @@
-use datamodel_connector::{ConnectorCapability, DatamodelError};
-use itertools::Itertools;
-use parser_database::walkers::ImplicitManyToManyRelationWalker;
-
 use crate::transform::ast_to_dml::validation_pipeline::{
     context::Context, validations::relations::RELATION_ATTRIBUTE_NAME,
 };
+use datamodel_connector::{ConnectorCapability, DatamodelError};
+use parser_database::walkers::ImplicitManyToManyRelationWalker;
 
 /// Our weird many-to-many requirement.
 pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_>, ctx: &mut Context<'_>) {
@@ -32,7 +30,7 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
             format!(
                 "Implicit many-to-many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",
                 &relation_field.related_model().name(),
-                relation_field.referenced_fields().into_iter().flatten().map(|f| f.name()).join(", ")
+                relation_field.referenced_fields().into_iter().flatten().map(|f| f.name()).collect::<Vec<_>>().join(", ")
             ),
             relation_field.ast_field().span)
         );

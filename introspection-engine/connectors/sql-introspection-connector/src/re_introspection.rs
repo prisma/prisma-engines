@@ -1,12 +1,15 @@
-use crate::introspection_helpers::{
-    replace_index_field_names, replace_pk_field_names, replace_relation_info_field_names,
+use crate::{
+    introspection_helpers::{replace_index_field_names, replace_pk_field_names, replace_relation_info_field_names},
+    warnings::*,
+    SqlFamilyTrait,
 };
-use crate::{warnings::*, SqlFamilyTrait};
-use datamodel::dml::{Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGenerator, WithName};
+use datamodel::dml::{self, Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGenerator, WithName};
 use introspection_connector::{IntrospectionContext, Warning};
 use prisma_value::PrismaValue;
-use std::cmp::Ordering::{self, Equal, Greater, Less};
-use std::collections::{BTreeSet, HashMap};
+use std::{
+    cmp::Ordering::{self, Equal, Greater, Less},
+    collections::{BTreeSet, HashMap},
+};
 
 pub fn enrich(
     old_data_model: &Datamodel,
@@ -464,16 +467,16 @@ fn merge_changed_relation_field_names(old_data_model: &Datamodel, new_data_model
 
                 //the relationinfos of both sides need to be compared since the relationinfo of the
                 // non-fk side does not contain enough information to uniquely identify the correct relationfield
-                let relation_info_partial_eq = old_field.relation_info == new_field.relation_info
-                    && old_related_field.relation_info == related_field.relation_info;
+                let match_as_inline = inline_relation_infos_match(&old_field.relation_info, &new_field.relation_info)
+                    && inline_relation_infos_match(&old_related_field.relation_info, &related_field.relation_info);
 
                 let mf = ModelAndField::new(&new_model.name, &new_field.name);
 
-                if relation_info_partial_eq
-                    && (!is_many_to_many
+                if match_as_inline
+                    || (is_many_to_many
                                 //For many to many the relation infos always look the same, here we have to look at the relation name,
                                 //which translates to the join table name. But in case of self relations we cannot correctly infer the old name
-                                || (old_field.relation_info.name == new_field.relation_info.name && !is_self_relation))
+                                && (old_field.relation_info.name == new_field.relation_info.name && !is_self_relation))
                 {
                     changed_relation_field_names.push((mf.clone(), old_field.name.clone()));
                 }
@@ -511,12 +514,12 @@ fn merge_changed_relation_names(old_data_model: &Datamodel, new_data_model: &mut
 
                 // the relationinfos of both sides need to be compared since the relationinfo of the
                 // non-fk side does not contain enough information to uniquely identify the correct relationfield
-                let relation_info_partial_eq = old_field.relation_info == field.relation_info
-                    && old_related_field.relation_info == related_field.relation_info;
+                let match_as_inline = inline_relation_infos_match(&old_field.relation_info, &field.relation_info)
+                    && inline_relation_infos_match(&old_related_field.relation_info, &related_field.relation_info);
 
                 let many_to_many = old_field.is_list() && old_related_field.is_list();
 
-                if relation_info_partial_eq && !many_to_many {
+                if match_as_inline && !many_to_many {
                     let mf = ModelAndField::new(&model.name, &field.name);
                     let other_mf = ModelAndField::new(&field.relation_info.to, &related_field.name);
 
@@ -880,4 +883,8 @@ fn merge_comments(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
             .find_value_mut(&enum_value_comment.0.value)
             .documentation = enum_value_comment.1.clone();
     }
+}
+
+fn inline_relation_infos_match(a: &dml::RelationInfo, b: &dml::RelationInfo) -> bool {
+    a.to == b.to && a.fields == b.fields && a.references == b.references
 }

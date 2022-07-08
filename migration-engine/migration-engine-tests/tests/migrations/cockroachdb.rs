@@ -1,7 +1,7 @@
 /// Test cockroachdb failure modes
 mod failure_modes;
 
-use datamodel::{dml::ReferentialAction, schema_ast::source_file::SourceFile};
+use datamodel::{dml::ReferentialAction, parser_database::SourceFile};
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
 use prisma_value::PrismaValue;

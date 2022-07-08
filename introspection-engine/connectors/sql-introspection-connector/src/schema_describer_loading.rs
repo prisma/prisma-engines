@@ -1,14 +1,10 @@
-use datamodel::common::preview_features::PreviewFeature;
-use enumflags2::BitFlags;
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
 
-#[tracing::instrument(skip(connection))]
 pub async fn load_describer<'a>(
     connection: &'a dyn Queryable,
     connection_info: &ConnectionInfo,
     provider: Option<&str>,
-    preview_features: BitFlags<PreviewFeature>,
 ) -> Result<Box<dyn SqlSchemaDescriberBackend + 'a>, crate::SqlError> {
     let version = connection.version().await?;
 

@@ -87,7 +87,6 @@ fn parse_enum_value(
             attributes,
             documentation: comment,
             span: Span::from(pair_span),
-            commented_out: false,
         }),
         _ => panic!(
             "Encountered impossible enum value declaration during parsing, name is missing: {:?}",

@@ -1,6 +1,6 @@
 use crate::ParserDatabase;
 use parser_database::walkers;
-use schema_ast::{ast, source_file::SourceFile};
+use schema_ast::{ast, SourceFile};
 use std::{borrow::Cow, sync::Arc};
 
 /// Returns either the reformatted schema, or the original input if we can't reformat. This happens

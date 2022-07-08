@@ -1,62 +1,52 @@
-use crate::{transform::dml_to_ast::render_string_from_env, Configuration, Datasource, Generator};
-use schema_ast::renderer::Renderer;
+use crate::{configuration::StringFromEnvVar, Configuration, Datasource, Generator};
+use schema_ast::string_literal;
+use std::fmt::{self, Write as _};
 
 pub(crate) fn render_configuration(config: &Configuration, out: &mut String) {
     for generator in &config.generators {
-        render_generator(generator, out);
+        render_generator(generator, out).unwrap();
     }
 
     for source in &config.datasources {
-        render_datasource(source, out)
+        render_datasource(source, out).unwrap();
     }
 }
 
-fn render_datasource(datasource: &Datasource, out: &mut String) {
+fn render_datasource(datasource: &Datasource, out: &mut String) -> fmt::Result {
     if let Some(docs) = &datasource.documentation {
-        for line in docs.lines() {
-            out.push_str("/// ");
-            out.push_str(line);
-            out.push('\n');
-        }
+        super::render_documentation(docs, false, out);
     }
-    out.push_str("datasource ");
-    out.push_str(&datasource.name);
-    out.push_str(" {\n");
+    writeln!(
+        out,
+        "datasource {} {{\nprovider = {}",
+        datasource.name,
+        string_literal(&datasource.active_provider)
+    )?;
 
-    {
-        out.push_str("provider = ");
-        Renderer::render_str(out, &datasource.active_provider);
-        out.push('\n');
-    }
-
-    {
-        out.push_str("url = ");
-        render_string_from_env(&datasource.url, out);
-        out.push('\n');
-    }
+    out.push_str("url = ");
+    render_string_from_env(&datasource.url, out)?;
+    out.push('\n');
 
     if let Some((shadow_database_url, _)) = &datasource.shadow_database_url {
         out.push_str("shadowDatabaseUrl = ");
-        render_string_from_env(shadow_database_url, out);
+        render_string_from_env(shadow_database_url, out)?;
         out.push('\n');
     }
 
     if let Some(referential_integrity) = datasource.referential_integrity {
-        out.push_str("referentialIntegrity = ");
-        Renderer::render_str(out, &referential_integrity.to_string());
-        out.push('\n');
+        writeln!(
+            out,
+            "referentialIntegrity = {}",
+            string_literal(&referential_integrity.to_string())
+        )?;
     }
 
-    out.push_str("}\n");
+    out.write_str("}\n")
 }
 
-fn render_generator(generator: &Generator, out: &mut String) {
+fn render_generator(generator: &Generator, out: &mut String) -> fmt::Result {
     if let Some(docs) = &generator.documentation {
-        for line in docs.lines() {
-            out.push_str("/// ");
-            out.push_str(line);
-            out.push('\n');
-        }
+        super::render_documentation(docs, false, out);
     }
     out.push_str("generator ");
     out.push_str(&generator.name);
@@ -71,7 +61,7 @@ fn render_generator(generator: &Generator, out: &mut String) {
 
     if let Some(output) = &generator.output {
         out.push_str("output = ");
-        super::render_string_from_env(output, out);
+        render_string_from_env(output, out)?;
         out.push('\n');
     }
 
@@ -79,7 +69,7 @@ fn render_generator(generator: &Generator, out: &mut String) {
         let mut feats = features.iter().peekable();
         out.push_str("previewFeatures = [");
         while let Some(feature) = feats.next() {
-            Renderer::render_str(out, &feature.to_string());
+            write!(out, "{}", string_literal(&feature.to_string()))?;
             if feats.peek().is_some() {
                 out.push(',');
             }
@@ -91,7 +81,7 @@ fn render_generator(generator: &Generator, out: &mut String) {
         let mut targets = generator.binary_targets.iter().peekable();
         out.push_str("binaryTargets = [");
         while let Some(target) = targets.next() {
-            render_string_from_env(target, out);
+            render_string_from_env(target, out)?;
             if targets.peek().is_some() {
                 out.push(',');
             }
@@ -100,10 +90,17 @@ fn render_generator(generator: &Generator, out: &mut String) {
     }
 
     for (key, value) in &generator.config {
-        out.push_str(key);
-        out.push_str(" = ");
-        Renderer::render_str(out, value);
-        out.push('\n');
+        writeln!(out, "{key} = {}", string_literal(value))?;
     }
-    out.push_str("}\n");
+    out.write_str("}\n")
+}
+
+fn render_string_from_env(string_from_env: &StringFromEnvVar, out: &mut String) -> fmt::Result {
+    match &string_from_env.from_env_var {
+        Some(var_name) => out.write_fmt(format_args!("env({})", string_literal(var_name))),
+        None => out.write_fmt(format_args!(
+            "{}",
+            string_literal(string_from_env.value.as_ref().unwrap())
+        )),
+    }
 }

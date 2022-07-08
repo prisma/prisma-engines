@@ -41,8 +41,7 @@ pub enum FieldType {
     Relation(RelationInfo),
     /// This is a field with an unsupported datatype. The content is the db's description of the type, it should enable migrate to create the type.
     Unsupported(String),
-    /// The first option is Some(x) if the scalar type is based upon a type alias.
-    Scalar(ScalarType, Option<String>, Option<NativeTypeInstance>),
+    Scalar(ScalarType, Option<NativeTypeInstance>),
     /// This is a composite type fields, with a composite type of the given type.
     CompositeType(String),
 }
@@ -50,14 +49,14 @@ pub enum FieldType {
 impl FieldType {
     pub fn as_scalar(&self) -> Option<&ScalarType> {
         match self {
-            FieldType::Scalar(scalar_type, _, _) => Some(scalar_type),
+            FieldType::Scalar(scalar_type, _) => Some(scalar_type),
             _ => None,
         }
     }
 
     pub fn as_native_type(&self) -> Option<(&ScalarType, &NativeTypeInstance)> {
         match self {
-            FieldType::Scalar(a, _, Some(b)) => Some((a, b)),
+            FieldType::Scalar(a, Some(b)) => Some((a, b)),
             _ => None,
         }
     }
@@ -87,14 +86,14 @@ impl FieldType {
 
     pub fn scalar_type(&self) -> Option<ScalarType> {
         match self {
-            FieldType::Scalar(st, _, _) => Some(*st),
+            FieldType::Scalar(st, _) => Some(*st),
             _ => None,
         }
     }
 
     pub fn native_type(&self) -> Option<&NativeTypeInstance> {
         match self {
-            FieldType::Scalar(_, _, Some(nt)) => Some(nt),
+            FieldType::Scalar(_, Some(nt)) => Some(nt),
             _ => None,
         }
     }
@@ -279,7 +278,7 @@ impl Ignorable for Field {
 }
 
 /// Represents a relation field in a model.
-#[derive(Debug, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct RelationField {
     /// Name of the field.
     pub name: String,
@@ -310,46 +309,6 @@ pub struct RelationField {
 
     /// Do we run the referential actions in the core instead of the database.
     pub emulates_referential_actions: Option<bool>,
-}
-
-impl PartialEq for RelationField {
-    //ignores the relation name for reintrospection
-    fn eq(&self, other: &Self) -> bool {
-        let this_matches = self.name == other.name
-            && self.arity == other.arity
-            && self.referential_arity == other.referential_arity
-            && self.documentation == other.documentation
-            && self.is_generated == other.is_generated
-            && self.is_commented_out == other.is_commented_out
-            && self.is_ignored == other.is_ignored
-            && self.relation_info == other.relation_info;
-
-        let this_on_delete = self
-            .relation_info
-            .on_delete
-            .unwrap_or_else(|| self.default_on_delete_action());
-
-        let other_on_delete = other
-            .relation_info
-            .on_delete
-            .unwrap_or_else(|| other.default_on_delete_action());
-
-        let on_delete_matches = this_on_delete == other_on_delete;
-
-        let this_on_update = self
-            .relation_info
-            .on_update
-            .unwrap_or_else(|| self.default_on_update_action());
-
-        let other_on_update = other
-            .relation_info
-            .on_update
-            .unwrap_or_else(|| other.default_on_update_action());
-
-        let on_update_matches = this_on_update == other_on_update;
-
-        this_matches && on_delete_matches && on_update_matches
-    }
 }
 
 impl RelationField {

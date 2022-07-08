@@ -92,9 +92,9 @@ pub(crate) fn composite_types_support(composite_type: CompositeTypeWalker<'_>, c
     ));
 }
 
-/// A composite type must have at least one visible field.
+/// A composite type must have at least one field.
 pub(crate) fn more_than_one_field(composite_type: CompositeTypeWalker<'_>, ctx: &mut Context<'_>) {
-    let num_of_fields = composite_type.fields().filter(|f| f.is_visible()).count();
+    let num_of_fields = composite_type.fields().count();
 
     if num_of_fields > 0 {
         return;
