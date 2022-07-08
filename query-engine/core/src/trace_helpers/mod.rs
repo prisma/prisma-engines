@@ -42,9 +42,9 @@ fn span_to_json(span: &SpanData) -> Value {
 
     json!({
         "span": true,
-        "trace_id": format!("{}", span.span_context.trace_id()),
-        "span_id": format!("{}",span.span_context.span_id()),
-        "parent_span_id": format!("{}",span.parent_span_id),
+        "trace_id": span.span_context.trace_id().to_string(),
+        "span_id": span.span_context.span_id().to_string(),
+        "parent_span_id": span.parent_span_id.to_string(),
         "name": name,
         "start_time": span.start_time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis().to_string(),
         "end_time": span.end_time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis().to_string(),

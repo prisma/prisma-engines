@@ -49,7 +49,7 @@ impl PipelineBuilder {
         }
         let provider = provider_builder.build();
         let tracer = provider.tracer("opentelemetry");
-        let _ = global::set_tracer_provider(provider);
+        global::set_tracer_provider(provider);
 
         tracer
     }
