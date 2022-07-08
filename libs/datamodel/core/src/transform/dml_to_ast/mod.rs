@@ -1,24 +1,23 @@
-mod render_datamodel;
 mod lower_enum_attributes;
 mod lower_enum_value_attributes;
 mod lower_field;
 mod lower_model_attributes;
 mod render_configuration;
+mod render_datamodel;
 
 pub(crate) use self::{
-    render_datamodel::{render, RenderParams},
     render_configuration::render_configuration,
+    render_datamodel::{render, RenderParams},
 };
 
 use crate::configuration::StringFromEnvVar;
-use ::dml::{model::*, traits::*};
 use datamodel_connector::{constraint_names::ConstraintNames, Connector};
-use dml::datamodel::Datamodel;
-use render_datamodel::*;
+use dml::{model::*, traits::*, Datamodel};
 use lower_enum_attributes::*;
 use lower_enum_value_attributes::*;
 use lower_field::*;
 use lower_model_attributes::*;
+use render_datamodel::*;
 use schema_ast::renderer::Renderer;
 
 fn render_string_from_env(string_from_env: &StringFromEnvVar, out: &mut String) {

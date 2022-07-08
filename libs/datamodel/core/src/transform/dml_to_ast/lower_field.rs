@@ -2,10 +2,9 @@ use super::*;
 use crate::{
     ast::{self, Attribute, Span},
     common::{constraint_names::ConstraintNames, RelationNames},
-    dml::{self, Field, Ignorable, SortOrder},
+    dml::*,
     Datasource,
 };
-use ::dml::{prisma_value, traits::WithName, PrismaValue};
 use datamodel_connector::{Connector, EmptyDatamodelConnector};
 
 /// Internal: Lowers a field's arity.
@@ -19,18 +18,12 @@ pub(crate) fn lower_field_arity(field_arity: &dml::FieldArity) -> ast::FieldArit
 
 pub(crate) fn lower_composite_field_type(field_type: &dml::CompositeTypeFieldType) -> ast::FieldType {
     match field_type {
-        ::dml::composite_type::CompositeTypeFieldType::CompositeType(name) => {
-            ast::FieldType::Supported(ast::Identifier::new(name))
-        }
-        ::dml::composite_type::CompositeTypeFieldType::Enum(name) => {
-            ast::FieldType::Supported(ast::Identifier::new(name))
-        }
-        ::dml::composite_type::CompositeTypeFieldType::Unsupported(name) => {
-            ast::FieldType::Unsupported(name.clone(), Span::empty())
-        }
-        ::dml::composite_type::CompositeTypeFieldType::Scalar(tpe, custom_type_name, _) => ast::FieldType::Supported(
-            ast::Identifier::new(custom_type_name.as_ref().unwrap_or(&tpe.to_string())),
-        ),
+        CompositeTypeFieldType::CompositeType(name) => ast::FieldType::Supported(ast::Identifier::new(name)),
+        CompositeTypeFieldType::Enum(name) => ast::FieldType::Supported(ast::Identifier::new(name)),
+        CompositeTypeFieldType::Unsupported(name) => ast::FieldType::Unsupported(name.clone(), Span::empty()),
+        CompositeTypeFieldType::Scalar(tpe, custom_type_name, _) => ast::FieldType::Supported(ast::Identifier::new(
+            custom_type_name.as_ref().unwrap_or(&tpe.to_string()),
+        )),
     }
 }
 

@@ -49,7 +49,6 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod common;
-pub mod dml;
 
 /// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a JSON representation.
 pub mod mcf;
@@ -58,23 +57,23 @@ mod configuration;
 mod reformat;
 mod transform;
 
-use std::sync::Arc;
-
 pub use crate::{
     configuration::{Configuration, Datasource, Generator, StringFromEnvVar},
     reformat::reformat,
 };
 pub use datamodel_connector;
 pub use diagnostics;
+pub use dml;
 pub use parser_database;
 pub use parser_database::is_reserved_type_name;
-use schema_ast::source_file::SourceFile;
 pub use schema_ast::{self, ast};
 
 use crate::common::preview_features::PreviewFeature;
 use diagnostics::Diagnostics;
 use enumflags2::BitFlags;
 use parser_database::ParserDatabase;
+use schema_ast::source_file::SourceFile;
+use std::sync::Arc;
 use transform::{
     ast_to_dml::{validate, DatasourceLoader, GeneratorLoader},
     dml_to_ast::RenderParams,

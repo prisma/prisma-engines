@@ -1,9 +1,8 @@
 use super::*;
 use crate::{
     ast::{self, Argument, Attribute, Span},
-    dml::{self, Ignorable, IndexDefinition, IndexType, Model, SortOrder, WithDatabaseName},
+    dml::{self, Ignorable, IndexAlgorithm, IndexDefinition, IndexType, Model, SortOrder, WithDatabaseName},
 };
-use ::dml::model::IndexAlgorithm;
 
 pub(super) fn lower_model_attributes(model: &dml::Model, params: RenderParams<'_>) -> Vec<ast::Attribute> {
     let mut attributes = vec![];
