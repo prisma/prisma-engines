@@ -106,10 +106,12 @@ pub struct PrismaOpt {
 
     /// Enable OpenTelemetry streaming from requests.
     #[structopt(long)]
-    pub open_telemetry: bool,
+    pub enable_open_telemetry: bool,
 
     /// The url to the OpenTelemetry collector.
-    #[structopt(long, default_value = "http://localhost:4317")]
+    /// Enabling this will send the OpenTelemtry tracing to a collector
+    /// and not via our custom stdout tracer
+    #[structopt(long, default_value)]
     pub open_telemetry_endpoint: String,
 
     #[structopt(subcommand)]

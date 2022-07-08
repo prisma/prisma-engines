@@ -7,6 +7,7 @@ use async_trait::async_trait;
 use connector::Connector;
 use schema::QuerySchemaRef;
 use tokio::time::{self, Duration};
+use tracing_futures::Instrument;
 
 /// Central query executor and main entry point into the query core.
 pub struct InterpretingExecutor<C> {
@@ -126,10 +127,17 @@ where
     ) -> crate::Result<TxId> {
         let id = TxId::default();
         trace!("[{}] Starting...", id);
+        let connection_name = self.connector.name();
+        let conn_span = info_span!(
+            "prisma:connection",
+            user_facing = true,
+            "db.type" = connection_name.as_str()
+        );
         let conn = time::timeout(
             Duration::from_millis(max_acquisition_millis),
             self.connector.get_connection(),
         )
+        .instrument(conn_span)
         .await;
 
         let conn = conn.map_err(|_| TransactionError::AcquisitionTimeout)??;

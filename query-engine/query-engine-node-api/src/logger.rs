@@ -8,7 +8,6 @@ use tracing::{
     level_filters::LevelFilter,
     Dispatch, Level, Subscriber,
 };
-
 use tracing_subscriber::{
     filter::{filter_fn, FilterExt},
     layer::SubscriberExt,
@@ -31,6 +30,7 @@ impl Logger {
         let is_sql_query = filter_fn(|meta| {
             meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
         });
+
         // is a mongodb query?
         let is_mongo_query = filter_fn(|meta| meta.target() == "mongodb_query_connector::query");
 
@@ -43,6 +43,22 @@ impl Logger {
             FilterExt::boxed(log_level)
         };
 
+        let is_user_trace = filter_fn(|meta| {
+            if !meta.is_span() {
+                return false;
+            }
+
+            if meta.fields().iter().any(|f| f.name() == "user_facing") {
+                return true;
+            }
+
+            meta.target() == "quaint::connector::metrics" && meta.name() == "quaint:query"
+        });
+        let tracer = crate::tracer::new_pipeline().install_simple(log_callback.clone());
+        let telemetry = tracing_opentelemetry::layer()
+            .with_tracer(tracer)
+            .with_filter(is_user_trace);
+
         let layer = CallbackLayer::new(log_callback).with_filter(filters);
 
         let metrics = if enable_metrics {
@@ -53,7 +69,7 @@ impl Logger {
         };
 
         Self {
-            dispatcher: Dispatch::new(Registry::default().with(layer).with(metrics.clone())),
+            dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer).with(metrics.clone())),
             metrics,
         }
     }

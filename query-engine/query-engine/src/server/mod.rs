@@ -11,8 +11,7 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Instant;
-use tracing::Level;
-use tracing_futures::Instrument;
+use tracing::{Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 const TRANSACTION_ID_HEADER: &str = "X-transaction-id";
@@ -188,11 +187,11 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         return Ok(handle_debug_headers(&req));
     }
 
-    let cx = get_parent_span_context(&req);
-    let span = tracing::span!(Level::TRACE, "graphql_handler");
-    span.set_parent(cx);
-
     let tx_id = get_transaction_id_from_header(&req);
+
+    let cx = get_parent_span_context(&req);
+    let span = info_span!("prisma:query_bulder", user_facing = true);
+    span.set_parent(cx);
 
     let work = async move {
         let body_start = req.into_body();
@@ -335,15 +334,21 @@ async fn handle_transaction(state: State, req: Request<Body>) -> Result<Response
 }
 
 async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    let cx = get_parent_span_context(&req);
+
     let body_start = req.into_body();
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
     let input: TxInput = serde_json::from_slice(full_body.as_ref()).unwrap();
 
+    let span = tracing::info_span!("prisma:engine:itx", user_facing = true);
+    span.set_parent(cx);
+
     match state
         .cx
         .executor
         .start_tx(state.cx.query_schema().clone(), input.max_wait, input.timeout)
+        .instrument(span)
         .await
     {
         Ok(tx_id) => {
