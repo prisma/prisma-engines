@@ -4,7 +4,7 @@
 use crate::connector::DEFAULT_SQLITE_SCHEMA_NAME;
 use crate::{
     ast,
-    connector::{self, ConnectionInfo, Queryable, TransactionCapable},
+    connector::{self, ConnectionInfo, IsolationLevel, Queryable, TransactionCapable},
 };
 use async_trait::async_trait;
 use std::{fmt, sync::Arc};
@@ -197,16 +197,16 @@ impl Queryable for Quaint {
         self.inner.query(q).await
     }
 
-    async fn execute(&self, q: ast::Query<'_>) -> crate::Result<u64> {
-        self.inner.execute(q).await
-    }
-
     async fn query_raw(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<connector::ResultSet> {
         self.inner.query_raw(sql, params).await
     }
 
     async fn query_raw_typed(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<connector::ResultSet> {
         self.inner.query_raw_typed(sql, params).await
+    }
+
+    async fn execute(&self, q: ast::Query<'_>) -> crate::Result<u64> {
+        self.inner.execute(q).await
     }
 
     async fn execute_raw(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<u64> {
@@ -225,11 +225,19 @@ impl Queryable for Quaint {
         self.inner.version().await
     }
 
+    fn is_healthy(&self) -> bool {
+        self.inner.is_healthy()
+    }
+
     fn begin_statement(&self) -> &'static str {
         self.inner.begin_statement()
     }
 
-    fn is_healthy(&self) -> bool {
-        self.inner.is_healthy()
+    async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()> {
+        self.inner.set_tx_isolation_level(isolation_level).await
+    }
+
+    fn requires_isolation_first(&self) -> bool {
+        self.inner.requires_isolation_first()
     }
 }

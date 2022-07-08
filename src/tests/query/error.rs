@@ -419,3 +419,28 @@ async fn array_into_scalar_should_fail(api: &mut dyn TestApi) -> crate::Result<(
 
     Ok(())
 }
+
+// SQLite errors on anything other than serializable.
+#[test_each_connector(tags("sqlite"))]
+async fn sqlite_isolation_error(api: &mut dyn TestApi) -> crate::Result<()> {
+    let res = api
+        .conn()
+        .start_transaction(Some(IsolationLevel::ReadUncommitted))
+        .await;
+
+    let err = res.err().expect("SQLite must fail on isolation != SERIALIZABLE");
+    assert_eq!(err.to_string(), "Invalid isolation level: READ UNCOMMITTED");
+
+    Ok(())
+}
+
+// Postgres and MySQL error on Snapshot.
+#[test_each_connector(tags("postgresql", "mysql"))]
+async fn snapshot_isolation_error(api: &mut dyn TestApi) -> crate::Result<()> {
+    let res = api.conn().start_transaction(Some(IsolationLevel::Snapshot)).await;
+
+    let err = res.err().expect("Postgres/MySQL must fail on isolation SNAPSHOT");
+    assert_eq!(err.to_string(), "Invalid isolation level: SNAPSHOT");
+
+    Ok(())
+}
