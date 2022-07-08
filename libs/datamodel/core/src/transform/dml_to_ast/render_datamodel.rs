@@ -36,7 +36,7 @@ pub(crate) fn render(params: RenderParams<'_>, out: &mut String) {
     out.push_str(&renderer.stream)
 }
 
-pub(super) fn lower_model(model: &dml::Model, params: RenderParams<'_>) -> ast::Model {
+fn lower_model(model: &dml::Model, params: RenderParams<'_>) -> ast::Model {
     let mut fields: Vec<ast::Field> = Vec::new();
 
     for field in model.fields() {
