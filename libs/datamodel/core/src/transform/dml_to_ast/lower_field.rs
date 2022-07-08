@@ -74,7 +74,7 @@ pub(crate) fn lower_native_type_attribute(
 pub(crate) fn lower_field_attributes(
     model: &dml::Model,
     field: &dml::Field,
-    params: LowerParams<'_>,
+    params: RenderParams<'_>,
 ) -> Vec<ast::Attribute> {
     let datamodel = params.datamodel;
     let mut attributes = vec![];

@@ -1,4 +1,4 @@
-mod lower;
+mod render_datamodel;
 mod lower_enum_attributes;
 mod lower_enum_value_attributes;
 mod lower_field;
@@ -6,7 +6,7 @@ mod lower_model_attributes;
 mod render_configuration;
 
 pub(crate) use self::{
-    lower::{lower, LowerParams},
+    render_datamodel::{render, RenderParams},
     render_configuration::render_configuration,
 };
 
@@ -14,7 +14,7 @@ use crate::configuration::StringFromEnvVar;
 use ::dml::{model::*, traits::*};
 use datamodel_connector::{constraint_names::ConstraintNames, Connector};
 use dml::datamodel::Datamodel;
-use lower::*;
+use render_datamodel::*;
 use lower_enum_attributes::*;
 use lower_enum_value_attributes::*;
 use lower_field::*;

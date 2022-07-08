@@ -77,7 +77,7 @@ use enumflags2::BitFlags;
 use parser_database::ParserDatabase;
 use transform::{
     ast_to_dml::{validate, DatasourceLoader, GeneratorLoader},
-    dml_to_ast::{lower, LowerParams},
+    dml_to_ast::RenderParams,
 };
 
 #[derive(Debug)]
@@ -227,11 +227,9 @@ fn load_sources(
 /// Renders the datamodel _without configuration blocks_.
 pub fn render_datamodel_to_string(datamodel: &dml::Datamodel, configuration: Option<&Configuration>) -> String {
     let datasource = configuration.and_then(|c| c.datasources.first());
-    let lowered = lower(LowerParams { datasource, datamodel });
-    let mut renderer = schema_ast::renderer::Renderer::new(DEFAULT_INDENT_WIDTH);
-    renderer.stream.reserve(&lowered.tops.len() * 20);
-    renderer.render(&lowered);
-    reformat(&renderer.stream, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
+    let mut out = String::new();
+    transform::dml_to_ast::render(RenderParams { datasource, datamodel }, &mut out);
+    reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 
 /// Renders a datamodel, sources and generators.
@@ -239,15 +237,11 @@ pub fn render_datamodel_and_config_to_string(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) -> String {
-    let lowered = lower(LowerParams {
-        datasource: config.datasources.first(),
-        datamodel,
-    });
-
-    let mut renderer = schema_ast::renderer::Renderer::new(2);
-    transform::dml_to_ast::render_configuration(config, &mut renderer.stream);
-    renderer.render(&lowered);
-    reformat(&renderer.stream, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
+    let mut out = String::new();
+    let datasource = config.datasources.first();
+    transform::dml_to_ast::render_configuration(config, &mut out);
+    transform::dml_to_ast::render(RenderParams { datasource, datamodel }, &mut out);
+    reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {

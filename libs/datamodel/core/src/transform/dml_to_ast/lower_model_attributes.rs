@@ -5,8 +5,7 @@ use crate::{
 };
 use ::dml::model::IndexAlgorithm;
 
-/// Internal: Lowers a model's attributes.
-pub(crate) fn lower_model_attributes(model: &dml::Model, params: LowerParams<'_>) -> Vec<ast::Attribute> {
+pub(super) fn lower_model_attributes(model: &dml::Model, params: RenderParams<'_>) -> Vec<ast::Attribute> {
     let mut attributes = vec![];
 
     // @@id
@@ -133,7 +132,7 @@ pub(crate) fn push_field_index_arguments(
     model: &Model,
     index_def: &IndexDefinition,
     args: &mut Vec<Argument>,
-    params: LowerParams<'_>,
+    params: RenderParams<'_>,
 ) {
     let field = index_def.fields.first().unwrap();
 
@@ -165,7 +164,7 @@ pub(crate) fn push_index_map_argument(
     model: &Model,
     index_def: &IndexDefinition,
     args: &mut Vec<Argument>,
-    params: LowerParams<'_>,
+    params: RenderParams<'_>,
 ) {
     if let Some(src) = params.datasource {
         if !super::index_name_matches(index_def, params.datamodel, model, &*src.active_connector) {
