@@ -280,10 +280,7 @@ impl<'db> Context<'db> {
         let diagnostics = &mut self.diagnostics;
         for arg_idx in self.attributes.args.values() {
             let arg = &attr.arguments.arguments[*arg_idx];
-            diagnostics.push_error(DatamodelError::new_unused_argument_error(
-                arg.name.as_ref().map(|n| n.name.as_str()).unwrap_or(""),
-                arg.span,
-            ));
+            diagnostics.push_error(DatamodelError::new_unused_argument_error(arg.span));
         }
 
         self.discard_arguments();

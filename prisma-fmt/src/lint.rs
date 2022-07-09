@@ -19,7 +19,7 @@ pub(crate) fn run(schema: &str) -> String {
                 .map(|err: &DatamodelError| MiniError {
                     start: err.span().start,
                     end: err.span().end,
-                    text: format!("{}", err),
+                    text: err.message().to_string(),
                     is_warning: false,
                 })
                 .collect();

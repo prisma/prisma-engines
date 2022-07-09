@@ -23,7 +23,7 @@ pub enum PrismaError {
     #[error("{}", _0)]
     ConnectorError(Box<ConnectorError>),
 
-    #[error("{}", _0)]
+    #[error("{:?}", _0)]
     ConversionError(Diagnostics, String),
 
     #[error("{}", _0)]
@@ -36,7 +36,7 @@ pub enum PrismaError {
     #[error("Unsupported feature: {}. {}", _0, _1)]
     UnsupportedFeatureError(&'static str, String),
 
-    #[error("Error in data model: {}", _0)]
+    #[error("Error in data model: {:?}", _0)]
     DatamodelError(Diagnostics),
 
     #[error("{}", _0)]

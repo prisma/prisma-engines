@@ -87,7 +87,7 @@ pub(crate) fn composite_types_support(composite_type: CompositeTypeWalker<'_>, c
     }
 
     ctx.push_error(DatamodelError::new_validation_error(
-        format!("Composite types are not supported on {}.", ctx.connector.name()),
+        &format!("Composite types are not supported on {}.", ctx.connector.name()),
         composite_type.ast_composite_type().span,
     ));
 }
@@ -101,7 +101,7 @@ pub(crate) fn more_than_one_field(composite_type: CompositeTypeWalker<'_>, ctx: 
     }
 
     ctx.push_error(DatamodelError::new_validation_error(
-        String::from("A type must have at least one field defined."),
+        "A type must have at least one field defined.",
         composite_type.ast_composite_type().span,
     ));
 }

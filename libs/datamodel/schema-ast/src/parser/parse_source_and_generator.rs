@@ -27,7 +27,7 @@ pub(crate) fn parse_config_block(pair: Pair<'_>, diagnostics: &mut Diagnostics) 
                     kw.unwrap_or("configuration block")
                 );
 
-                let err = DatamodelError::new_validation_error(msg, current.as_span().into());
+                let err = DatamodelError::new_validation_error(&msg, current.as_span().into());
                 diagnostics.push_error(err);
             }
             _ => parsing_catch_all(&current, "source"),

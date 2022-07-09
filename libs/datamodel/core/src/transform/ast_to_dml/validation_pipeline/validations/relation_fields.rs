@@ -167,7 +167,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
                 .span_for_argument("relation", "onDelete")
                 .unwrap_or_else(|| field.ast_field().span);
 
-            ctx.push_error(DatamodelError::new_validation_error(msg(on_delete), span));
+            ctx.push_error(DatamodelError::new_validation_error(&msg(on_delete), span));
         }
     }
 
@@ -181,7 +181,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
                 .span_for_argument("relation", "onUpdate")
                 .unwrap_or_else(|| field.ast_field().span);
 
-            ctx.push_error(DatamodelError::new_validation_error(msg(on_update), span));
+            ctx.push_error(DatamodelError::new_validation_error(&msg(on_update), span));
         }
     }
 }

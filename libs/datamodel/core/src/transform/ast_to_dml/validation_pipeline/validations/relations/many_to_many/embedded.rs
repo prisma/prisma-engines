@@ -22,7 +22,7 @@ pub(crate) fn supports_embedded_relations(relation: TwoWayEmbeddedManyToManyRela
     );
 
     for span in spans {
-        ctx.push_error(DatamodelError::new_validation_error(msg.clone(), span));
+        ctx.push_error(DatamodelError::new_validation_error(&msg, span));
     }
 }
 
@@ -196,9 +196,7 @@ pub(crate) fn validate_no_referential_actions(
     });
 
     for span in referential_action_spans {
-        ctx.push_error(DatamodelError::new_validation_error(
-            "Referential actions on two-way embedded many-to-many relations are not supported".to_owned(),
-            span,
-        ));
+        let msg = "Referential actions on two-way embedded many-to-many relations are not supported";
+        ctx.push_error(DatamodelError::new_validation_error(msg, span));
     }
 }

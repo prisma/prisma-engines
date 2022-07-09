@@ -112,8 +112,8 @@ fn parse_string_literal(token: Pair<'_>, diagnostics: &mut Diagnostics) -> Strin
                     let mut final_span: crate::ast::Span = contents.as_span().into();
                     final_span.start += start;
                     final_span.end = final_span.start + 1 + c.len_utf8();
-                    diagnostics.push_error(DatamodelError::new(
-                        r#"Unknown escape sequence. If the value is a windows-style path, `\` must be escaped as `\\`."#.into(),
+                    diagnostics.push_error(DatamodelError::new_static(
+                        r#"Unknown escape sequence. If the value is a windows-style path, `\` must be escaped as `\\`."#,
                         final_span
                     ));
                 }
@@ -138,7 +138,7 @@ fn try_parse_unicode_codepoint(
             start: slice_offset,
             end: (slice_offset + slice.len()).min(slice_offset + consumed),
         };
-        DatamodelError::new("Invalid unicode escape sequence.".into(), span)
+        DatamodelError::new_static("Invalid unicode escape sequence.", span)
     };
 
     match parse_codepoint(slice) {

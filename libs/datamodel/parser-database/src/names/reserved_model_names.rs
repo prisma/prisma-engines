@@ -26,11 +26,11 @@ pub(crate) fn validate_enum_name(ast_enum: &ast::Enum, diagnostics: &mut Diagnos
     }
 
     diagnostics.push_error(DatamodelError::new_enum_validation_error(
-        format!(
+        &format!(
           "The enum name `{}` is invalid. It is a reserved name. Please change it. Read more at https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/data-model#naming-enums",
           &ast_enum.name.name
         ),
-        ast_enum.name.name.to_owned(),
+        &ast_enum.name.name,
         ast_enum.span,
 ));
 }

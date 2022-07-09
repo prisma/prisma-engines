@@ -404,8 +404,8 @@ impl SequenceFunction {
                     Ok(i) => this.start = Some(i),
                     Err(err) => diagnostics.push_error(err),
                 },
-                (Some(_), _) | (None, _) => diagnostics.push_error(DatamodelError::new(
-                    "Unexpected argument in `sequence()` function call".into(),
+                (Some(_), _) | (None, _) => diagnostics.push_error(DatamodelError::new_static(
+                    "Unexpected argument in `sequence()` function call",
                     span,
                 )),
             }

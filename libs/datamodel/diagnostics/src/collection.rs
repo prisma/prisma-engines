@@ -64,13 +64,6 @@ impl Diagnostics {
     }
 }
 
-impl std::fmt::Display for Diagnostics {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let msg: Vec<String> = self.errors.iter().map(|e| e.to_string()).collect();
-        f.write_str(&msg.join("\n"))
-    }
-}
-
 impl From<DatamodelError> for Diagnostics {
     fn from(error: DatamodelError) -> Self {
         let mut col = Diagnostics::new();
