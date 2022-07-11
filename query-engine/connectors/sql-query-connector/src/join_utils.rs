@@ -120,7 +120,7 @@ fn compute_aggr_join_m2m(
     join_alias: &str,
     previous_join: Option<&AliasedJoin>,
 ) -> AliasedJoin {
-    // _ParentToChild table
+    // _ParentToChild m2m join table
     let m2m_table = rf.as_table();
     // _ParentToChild.Child columns
     let m2m_child_columns = rf.related_field().m2m_columns();
