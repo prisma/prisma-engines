@@ -120,7 +120,7 @@ fn process_order_object(
                     let sort_aggregation = extract_sort_aggregation(inner_field_name.as_str())
                         .expect("To-many relation orderBy must be an aggregation ordering.");
 
-                    let (sort_order, _) = extract_sort_nulls_order(inner_field_value)?;
+                    let (sort_order, _) = extract_order_by_args(inner_field_value)?;
                     Ok(Some(OrderBy::to_many_aggregation(path, sort_order, sort_aggregation)))
                 }
 
@@ -132,7 +132,7 @@ fn process_order_object(
                 }
 
                 Field::Scalar(sf) => {
-                    let (sort_order, nulls_order) = extract_sort_nulls_order(field_value)?;
+                    let (sort_order, nulls_order) = extract_order_by_args(field_value)?;
 
                     if let Some(sort_aggr) = parent_sort_aggregation {
                         // If the parent is a sort aggregation then this scalar is part of that one.
@@ -156,7 +156,7 @@ fn process_order_object(
                     let sort_aggregation = extract_sort_aggregation(inner_field_name.as_str())
                         .expect("To-many composite orderBy must be an aggregation ordering.");
 
-                    let (sort_order, _) = extract_sort_nulls_order(inner_field_value)?;
+                    let (sort_order, _) = extract_order_by_args(inner_field_value)?;
                     Ok(Some(OrderBy::to_many_aggregation(path, sort_order, sort_aggregation)))
                 }
 
@@ -175,7 +175,7 @@ fn extract_order_by_relevance(
     container: &ParentContainer,
     object: ParsedInputMap,
 ) -> QueryGraphBuilderResult<Option<OrderBy>> {
-    let (sort_order, _) = extract_sort_nulls_order(object.get(ordering::SORT).unwrap().clone())?;
+    let (sort_order, _) = extract_order_by_args(object.get(ordering::SORT).unwrap().clone())?;
     let search: PrismaValue = object.get(ordering::SEARCH).unwrap().clone().try_into()?;
     let search = search.into_string().unwrap();
     let fields: PrismaValue = object.get(ordering::FIELDS).unwrap().clone().try_into()?;
@@ -216,7 +216,7 @@ fn extract_sort_aggregation(field_name: &str) -> Option<SortAggregation> {
     }
 }
 
-fn extract_sort_nulls_order(field_value: ParsedInputValue) -> QueryGraphBuilderResult<(SortOrder, Option<NullsOrder>)> {
+fn extract_order_by_args(field_value: ParsedInputValue) -> QueryGraphBuilderResult<(SortOrder, Option<NullsOrder>)> {
     match field_value {
         ParsedInputValue::Map(mut map) => {
             let sort: PrismaValue = map.remove(ordering::SORT).unwrap().try_into()?;
