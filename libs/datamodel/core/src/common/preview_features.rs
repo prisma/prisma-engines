@@ -81,6 +81,7 @@ pub const GENERATOR: FeatureMap = FeatureMap::new()
         FullTextIndex,
         Tracing,
         Metrics,
+        OrderByNulls,
     ])
     .with_deprecated(&[
         AtomicNumberOperations,
