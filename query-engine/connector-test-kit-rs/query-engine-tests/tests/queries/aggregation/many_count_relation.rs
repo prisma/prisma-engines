@@ -507,7 +507,7 @@ mod many_count_rel {
     }
 
     #[connector_test]
-    async fn count_filters(runner: Runner) -> TestResult<()> {
+    async fn filtered_count_one2m_m2m(runner: Runner) -> TestResult<()> {
         // 1 comment / 2 categories
         create_row(
             &runner,
@@ -585,6 +585,60 @@ mod many_count_rel {
             }
           }"#),
           @r###"{"data":{"findManyPost":[{"_count":{"comments":3,"categories":0}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn composite_schema() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              #id(id, Int, @id)
+              children Child[]
+            }
+
+            model Child {
+              #id(id, Int, @id)
+              testId Int?
+              test TestModel? @relation(fields:[testId], references: [id])
+              composite Composite?
+            }
+            
+            type Composite {
+              name String
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(composite_schema), only(MongoDb))]
+    async fn filtered_count_composite(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: {
+                id: 1,
+                children: {
+                  create: [{ id: 1, composite: { name: "A" } }, { id: 2, composite: { name: "B" } }]
+                }
+              }) { id } }
+            "#
+        );
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: {
+                id: 2,
+                children: {
+                  create: [{ id: 3, composite: { name: "C" } }]
+                }
+              }) { id } }
+            "#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyTestModel { _count { children(where: { composite: { is: { name: { in: ["A", "C"] } } } }) } } }"#),
+          @r###"{"data":{"findManyTestModel":[{"_count":{"children":1}},{"_count":{"children":1}}]}}"###
         );
 
         Ok(())
