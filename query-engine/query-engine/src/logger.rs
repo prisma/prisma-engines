@@ -83,7 +83,7 @@ impl<'a> Logger<'a> {
                 return true;
             }
 
-            meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
+            meta.target() == "quaint::connector::metrics" && meta.name() == "quaint:query"
         });
 
         let telemetry = if self.enable_telemetry {
