@@ -3,6 +3,7 @@ use datamodel::{
     parse_configuration, parse_schema_ast,
     parser_database::ParserDatabase,
     schema_ast::{ast, source_file::SourceFile},
+    Datasource,
 };
 use log::*;
 use lsp_types::*;
@@ -30,14 +31,21 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
             return empty_completion_list();
         };
 
-    let (connector, referential_integrity) = parse_configuration(source_file.as_str())
+    let (connector, referential_integrity, datasource) = parse_configuration(source_file.as_str())
         .ok()
         .and_then(|conf| conf.subject.datasources.into_iter().next())
-        .map(|datasource| (datasource.active_connector, datasource.referential_integrity()))
+        .map(|datasource| {
+            (
+                datasource.active_connector,
+                datasource.referential_integrity(),
+                Some(datasource),
+            )
+        })
         .unwrap_or_else(|| {
             (
                 &datamodel::datamodel_connector::EmptyDatamodelConnector,
                 Default::default(),
+                None,
             )
         });
 
@@ -51,7 +59,14 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
         ParserDatabase::new(source_file, &mut diag)
     };
 
-    push_ast_completions(&mut list, connector, referential_integrity, &db, position);
+    push_ast_completions(
+        &mut list,
+        connector,
+        referential_integrity,
+        &db,
+        position,
+        datasource.as_ref(),
+    );
 
     list
 }
@@ -65,6 +80,7 @@ fn push_ast_completions(
     referential_integrity: ReferentialIntegrity,
     db: &ParserDatabase,
     position: usize,
+    datasource: Option<&Datasource>,
 ) {
     match db.ast().find_at_position(position) {
         ast::SchemaPosition::Model(
@@ -77,6 +93,41 @@ fn push_ast_completions(
                     kind: Some(CompletionItemKind::ENUM),
                     // what is the difference between detail and documentation?
                     detail: Some(referential_action.documentation().to_owned()),
+                    ..Default::default()
+                });
+            }
+        }
+        ast::SchemaPosition::Model(
+            model_id,
+            ast::ModelPosition::Field(field_id, ast::FieldPosition::Attribute(attr_name, _, None)),
+        ) if datasource
+            .map(|ds| attr_name.starts_with(&ds.name) && attr_name.contains('.'))
+            .unwrap_or(false) =>
+        {
+            let field = &db.ast()[model_id][field_id];
+            let field_type = if let ast::FieldType::Supported(name) = &field.field_type {
+                name.name.as_str()
+            } else {
+                return;
+            };
+            let constructors = connector
+                .available_native_type_constructors()
+                .iter()
+                // Only the constructors matching the field's Prisma type.
+                .filter(|con| con.prisma_types.iter().any(|pt| pt.as_str() == field_type));
+            for constructor in constructors {
+                let name = constructor.name.to_owned();
+                let args = if constructor.number_of_args + constructor.number_of_optional_args == 0 {
+                    ""
+                } else {
+                    "($0)"
+                };
+
+                completion_list.items.push(CompletionItem {
+                    label: name.to_owned(),
+                    kind: Some(CompletionItemKind::CONSTRUCTOR),
+                    insert_text: Some(format!("{name}{args}")),
+                    insert_text_format: Some(InsertTextFormat::SNIPPET),
                     ..Default::default()
                 });
             }

@@ -1,0 +1,47 @@
+{
+  "isIncomplete": false,
+  "items": [
+    {
+      "label": "Bit",
+      "kind": 4,
+      "insertText": "Bit($0)",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "Binary",
+      "kind": 4,
+      "insertText": "Binary($0)",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "VarBinary",
+      "kind": 4,
+      "insertText": "VarBinary($0)",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "TinyBlob",
+      "kind": 4,
+      "insertText": "TinyBlob",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "Blob",
+      "kind": 4,
+      "insertText": "Blob",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "MediumBlob",
+      "kind": 4,
+      "insertText": "MediumBlob",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "LongBlob",
+      "kind": 4,
+      "insertText": "LongBlob",
+      "insertTextFormat": 2
+    }
+  ]
+}

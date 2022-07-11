@@ -1,0 +1,9 @@
+datasource cr {
+    provider = "cockroachdb"
+    url = env("TEST_DATABASE_URL")
+}
+
+model test {
+    id String @id @default(uuid())
+    number Int @cr.<|>
+}

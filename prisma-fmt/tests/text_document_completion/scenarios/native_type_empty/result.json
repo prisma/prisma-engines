@@ -1,0 +1,23 @@
+{
+  "isIncomplete": false,
+  "items": [
+    {
+      "label": "Int2",
+      "kind": 4,
+      "insertText": "Int2",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "Int4",
+      "kind": 4,
+      "insertText": "Int4",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "Oid",
+      "kind": 4,
+      "insertText": "Oid",
+      "insertTextFormat": 2
+    }
+  ]
+}
