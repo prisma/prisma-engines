@@ -16,10 +16,9 @@ mod state;
 mod timings;
 
 pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
-use datamodel::schema_ast::source_file::SourceFile;
 pub use migration_connector;
 
-use datamodel::ValidatedSchema;
+use datamodel::parser_database::SourceFile;
 use datamodel::{
     common::{
         preview_features::PreviewFeature,
@@ -28,7 +27,7 @@ use datamodel::{
             SQLITE_SOURCE_NAME,
         },
     },
-    Datasource,
+    Datasource, ValidatedSchema,
 };
 use enumflags2::BitFlags;
 use migration_connector::ConnectorParams;

@@ -45,7 +45,6 @@ pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnos
             attributes,
             documentation: doc_comment.and_then(parse_comment_block),
             span: Span::from(pair_span),
-            commented_out: false,
         },
         _ => panic!("Encountered impossible model declaration during parsing",),
     }

@@ -120,12 +120,9 @@ pub fn calculate_many_to_many_field(
     let relation_info = RelationInfo {
         name: relation_name,
         fk_name: None,
-        fields: vec![],
+        fields: Vec::new(),
         to: opposite_foreign_key.referenced_table_name().to_owned(),
-        references: opposite_foreign_key
-            .referenced_columns()
-            .map(|c| c.name().to_owned())
-            .collect(),
+        references: Vec::new(),
         on_delete: None,
         on_update: None,
     };
@@ -352,16 +349,16 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &sql::Column) 
     let fdt = column.tpe.full_data_type.to_owned();
 
     match &column.tpe.family {
-        ColumnTypeFamily::Int => FieldType::Scalar(ScalarType::Int, None, None),
-        ColumnTypeFamily::BigInt => FieldType::Scalar(ScalarType::BigInt, None, None),
-        ColumnTypeFamily::Float => FieldType::Scalar(ScalarType::Float, None, None),
-        ColumnTypeFamily::Decimal => FieldType::Scalar(ScalarType::Decimal, None, None),
-        ColumnTypeFamily::Boolean => FieldType::Scalar(ScalarType::Boolean, None, None),
-        ColumnTypeFamily::String => FieldType::Scalar(ScalarType::String, None, None),
-        ColumnTypeFamily::DateTime => FieldType::Scalar(ScalarType::DateTime, None, None),
-        ColumnTypeFamily::Json => FieldType::Scalar(ScalarType::Json, None, None),
-        ColumnTypeFamily::Uuid => FieldType::Scalar(ScalarType::String, None, None),
-        ColumnTypeFamily::Binary => FieldType::Scalar(ScalarType::Bytes, None, None),
+        ColumnTypeFamily::Int => FieldType::Scalar(ScalarType::Int, None),
+        ColumnTypeFamily::BigInt => FieldType::Scalar(ScalarType::BigInt, None),
+        ColumnTypeFamily::Float => FieldType::Scalar(ScalarType::Float, None),
+        ColumnTypeFamily::Decimal => FieldType::Scalar(ScalarType::Decimal, None),
+        ColumnTypeFamily::Boolean => FieldType::Scalar(ScalarType::Boolean, None),
+        ColumnTypeFamily::String => FieldType::Scalar(ScalarType::String, None),
+        ColumnTypeFamily::DateTime => FieldType::Scalar(ScalarType::DateTime, None),
+        ColumnTypeFamily::Json => FieldType::Scalar(ScalarType::Json, None),
+        ColumnTypeFamily::Uuid => FieldType::Scalar(ScalarType::String, None),
+        ColumnTypeFamily::Binary => FieldType::Scalar(ScalarType::Bytes, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
         ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
     }
@@ -372,13 +369,12 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &sql::Column
     let scalar_type = calculate_scalar_field_type_for_native_type(column);
 
     match scalar_type {
-        FieldType::Scalar(scal_type, _, _) => match &column.tpe.native_type {
+        FieldType::Scalar(scal_type, _) => match &column.tpe.native_type {
             None => scalar_type,
             Some(native_type) => {
                 let native_type_instance = ctx.source.active_connector.introspect_native_type(native_type.clone());
                 FieldType::Scalar(
                     scal_type,
-                    None,
                     Some(datamodel::dml::NativeTypeInstance {
                         args: native_type_instance.args,
                         serialized_native_type: native_type_instance.serialized_native_type,
@@ -421,37 +417,23 @@ pub fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
     a_cols.len() == b_cols.len() && a_cols.iter().all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
 }
 
-pub fn replace_relation_info_field_names(target: &mut Vec<String>, old_name: &str, new_name: &str) {
-    target
-        .iter_mut()
-        .map(|v| {
-            if v == old_name {
-                *v = new_name.to_string()
-            }
-        })
-        .for_each(drop);
+pub(crate) fn replace_relation_info_field_names(target: &mut Vec<String>, old_name: &str, new_name: &str) {
+    for old_name in target.iter_mut().filter(|v| v.as_str() == old_name) {
+        *old_name = new_name.to_owned();
+    }
 }
 
-pub fn replace_pk_field_names(target: &mut Vec<PrimaryKeyField>, old_name: &str, new_name: &str) {
-    target
-        .iter_mut()
-        .map(|field| {
-            if field.name == old_name {
-                field.name = new_name.to_string()
-            }
-        })
-        .for_each(drop);
+pub(crate) fn replace_pk_field_names(target: &mut Vec<PrimaryKeyField>, old_name: &str, new_name: &str) {
+    for field in target.iter_mut().filter(|field| field.name == old_name) {
+        field.name = new_name.to_owned();
+    }
 }
 
-pub fn replace_index_field_names(target: &mut Vec<IndexField>, old_name: &str, new_name: &str) {
-    target
-        .iter_mut()
-        .map(|field| {
-            if field.path.first().map(|p| p.0.as_str()) == Some(old_name) {
-                field.path = vec![(new_name.to_string(), None)];
-            }
-        })
-        .for_each(drop);
+pub(crate) fn replace_index_field_names(target: &mut Vec<IndexField>, old_name: &str, new_name: &str) {
+    let field_matches = |f: &&mut IndexField| f.path.first().map(|p| p.0.as_str()) == Some(old_name);
+    for field in target.iter_mut().filter(field_matches) {
+        field.path = vec![(new_name.to_string(), None)];
+    }
 }
 
 fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &mut Context) -> Option<IndexAlgorithm> {

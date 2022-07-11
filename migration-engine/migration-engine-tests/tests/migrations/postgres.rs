@@ -1,4 +1,4 @@
-use datamodel::schema_ast::source_file::SourceFile;
+use datamodel::parser_database::SourceFile;
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
 use quaint::Value;

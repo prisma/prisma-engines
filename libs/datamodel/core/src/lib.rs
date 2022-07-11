@@ -66,13 +66,11 @@ pub use diagnostics;
 pub use dml;
 pub use parser_database;
 pub use parser_database::is_reserved_type_name;
-pub use schema_ast::{self, ast};
 
 use crate::common::preview_features::PreviewFeature;
 use diagnostics::Diagnostics;
 use enumflags2::BitFlags;
-use parser_database::ParserDatabase;
-use schema_ast::source_file::SourceFile;
+use parser_database::{ast, ParserDatabase, SourceFile};
 use std::sync::Arc;
 use transform::{
     ast_to_dml::{validate, DatasourceLoader, GeneratorLoader},

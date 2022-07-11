@@ -1,5 +1,5 @@
 use crate::migrations_directory::MigrationDirectory;
-use datamodel::schema_ast::source_file::SourceFile;
+use datamodel::parser_database::SourceFile;
 use std::fmt::Debug;
 
 /// Diffable things

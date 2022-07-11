@@ -281,7 +281,7 @@ impl<'a> LiftAstToDml<'a> {
                     kind: dml_default_kind(value, field.r#type().as_builtin_scalar()),
                     db_name: None,
                 }),
-                is_commented_out: field.ast_field().is_commented_out,
+                is_commented_out: false,
             };
 
             fields.push(field);
@@ -476,7 +476,6 @@ impl<'a> LiftAstToDml<'a> {
                 });
                 dml::FieldType::Scalar(
                     parser_database_scalar_type_to_dml_scalar_type(*scalar_type),
-                    None,
                     native_type.map(datamodel_connector_native_type_to_dml_native_type),
                 )
             }
@@ -501,7 +500,6 @@ impl<'a> LiftAstToDml<'a> {
 
                 CompositeTypeFieldType::Scalar(
                     parser_database_scalar_type_to_dml_scalar_type(*scalar_type),
-                    None,
                     native_type.map(datamodel_connector_native_type_to_dml_native_type),
                 )
             }

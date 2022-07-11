@@ -551,7 +551,7 @@ fn filter_out_empty_types(
             match &field.field_type {
                 dml::FieldType::CompositeType(ct) if empty_types.contains(ct) => {
                     fields_with_an_empty_type.push((Name::Model(model_name.clone()), field.name.clone()));
-                    field.field_type = dml::FieldType::Scalar(ScalarType::Json, None, None);
+                    field.field_type = dml::FieldType::Scalar(ScalarType::Json, None);
                     field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
                 }
                 _ => (),
@@ -565,7 +565,7 @@ fn filter_out_empty_types(
             match &field.r#type {
                 CompositeTypeFieldType::CompositeType(name) if empty_types.contains(name) => {
                     fields_with_an_empty_type.push((Name::CompositeType(type_name.clone()), field.name.clone()));
-                    field.r#type = CompositeTypeFieldType::Scalar(ScalarType::Json, None, None);
+                    field.r#type = CompositeTypeFieldType::Scalar(ScalarType::Json, None);
                     field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
                 }
                 _ => (),

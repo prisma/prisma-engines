@@ -1,5 +1,6 @@
-use std::{fs, io, path::Path, sync::Arc};
+use std::sync::Arc;
 
+/// A Prisma schema document.
 #[derive(Debug, Clone)]
 pub struct SourceFile {
     contents: Contents,
@@ -18,20 +19,9 @@ impl SourceFile {
         }
     }
 
-    pub fn from_file(file: Box<Path>) -> io::Result<Self> {
-        let data = fs::read_to_string(file.as_ref())?;
-
-        let this = Self {
-            contents: Contents::FromFile(Arc::new((file, data.into_boxed_str()))),
-        };
-
-        Ok(this)
-    }
-
     pub fn as_str(&self) -> &str {
         match self.contents {
             Contents::Static(s) => s,
-            Contents::FromFile(ref from_file) => from_file.1.as_ref(),
             Contents::Allocated(ref s) => &*s,
         }
     }
@@ -65,5 +55,4 @@ impl From<String> for SourceFile {
 enum Contents {
     Static(&'static str),
     Allocated(Arc<str>),
-    FromFile(Arc<(Box<Path>, Box<str>)>),
 }

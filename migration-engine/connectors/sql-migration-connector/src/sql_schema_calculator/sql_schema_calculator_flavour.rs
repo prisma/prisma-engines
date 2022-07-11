@@ -4,7 +4,9 @@ mod postgres;
 mod sqlite;
 
 use datamodel::{
-    datamodel_connector::ScalarType, parser_database::walkers::*, schema_ast::ast::FieldArity, ValidatedSchema,
+    datamodel_connector::ScalarType,
+    parser_database::{ast::FieldArity, walkers::*},
+    ValidatedSchema,
 };
 use sql_schema_describer::{self as sql, ColumnArity, ColumnType, ColumnTypeFamily};
 

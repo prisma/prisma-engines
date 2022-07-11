@@ -1,16 +1,13 @@
 mod relations;
 
-use std::sync::Arc;
-
 use datamodel::{
-    ast,
     datamodel_connector::Diagnostics,
     parse_schema_ast,
-    parser_database::{walkers::RefinedRelationWalker, ParserDatabase},
-    schema_ast::source_file::SourceFile,
+    parser_database::{ast, walkers::RefinedRelationWalker, ParserDatabase, SourceFile},
 };
 use log::warn;
 use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic};
+use std::sync::Arc;
 
 pub(crate) fn empty_code_actions() -> Vec<CodeActionOrCommand> {
     Vec::new()

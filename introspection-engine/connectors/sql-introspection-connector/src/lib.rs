@@ -36,7 +36,7 @@ pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlError>;
 #[derive(Debug)]
 pub struct SqlIntrospectionConnector {
     connection: Quaint,
-    preview_features: BitFlags<PreviewFeature>,
+    _preview_features: BitFlags<PreviewFeature>,
 }
 
 impl SqlIntrospectionConnector {
@@ -62,7 +62,7 @@ impl SqlIntrospectionConnector {
 
         Ok(SqlIntrospectionConnector {
             connection,
-            preview_features,
+            _preview_features: preview_features,
         })
     }
 
@@ -76,13 +76,7 @@ impl SqlIntrospectionConnector {
         &self,
         provider: Option<&str>,
     ) -> SqlIntrospectionResult<Box<dyn SqlSchemaDescriberBackend + '_>> {
-        load_describer(
-            &self.connection,
-            self.connection.connection_info(),
-            provider,
-            self.preview_features,
-        )
-        .await
+        load_describer(&self.connection, self.connection.connection_info(), provider).await
     }
 
     async fn list_databases_internal(&self) -> SqlIntrospectionResult<Vec<String>> {

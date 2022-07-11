@@ -1,7 +1,6 @@
-use std::sync::Arc;
-
-use datamodel::schema_ast::source_file::SourceFile;
+use datamodel::parser_database::SourceFile;
 use migration_core::migration_connector::{ConnectorError, ConnectorResult};
+use std::sync::Arc;
 use url::Url;
 
 pub(crate) async fn mongo_setup(schema: &str, url: &str) -> ConnectorResult<()> {

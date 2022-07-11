@@ -1,4 +1,4 @@
-use datamodel::{common::preview_features::PreviewFeature, schema_ast::source_file::SourceFile};
+use datamodel::{common::preview_features::PreviewFeature, parser_database::SourceFile};
 use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use migration_connector::{ConnectorParams, DiffTarget, MigrationConnector};

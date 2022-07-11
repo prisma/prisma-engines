@@ -363,14 +363,14 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r#"
+    let dm = expect![[r#"
         model Test {
-            id       Int @id
-            authorId Int @default(autoincrement()) @unique
+          id       Int @id
+          authorId Int @unique @default(autoincrement())
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.expect_re_introspected_datamodel("", dm).await;
 
     Ok(())
 }

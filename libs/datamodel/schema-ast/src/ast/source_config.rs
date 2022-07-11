@@ -29,8 +29,4 @@ impl WithDocumentation for SourceConfig {
     fn documentation(&self) -> &Option<Comment> {
         &self.documentation
     }
-
-    fn is_commented_out(&self) -> bool {
-        false
-    }
 }

@@ -51,7 +51,6 @@ pub(crate) fn parse_field(
             attributes,
             documentation: comment,
             span: Span::from(pair_span),
-            is_commented_out: false,
         }),
         _ => Err(DatamodelError::new_model_validation_error(
             "This field declaration is invalid. It is either missing a name or a type.",

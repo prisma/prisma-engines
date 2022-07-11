@@ -1,5 +1,5 @@
 use crate::{
-    common::preview_features::GENERATOR, configuration::Generator, diagnostics::*, schema_ast::ast::WithSpan,
+    ast::WithSpan, common::preview_features::GENERATOR, configuration::Generator, diagnostics::*,
     transform::ast_to_dml::common::parse_and_validate_preview_features, StringFromEnvVar,
 };
 use parser_database::{ast, ValueListValidator, ValueValidator};

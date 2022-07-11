@@ -2,7 +2,7 @@ use enumflags2::bitflags;
 use std::fmt;
 
 /// Holds information about a relation field.
-#[derive(Debug, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct RelationInfo {
     /// The target model of the relation.
     pub to: String,
@@ -20,13 +20,6 @@ pub struct RelationInfo {
     /// A strategy indicating what happens when
     /// a related node is updated.
     pub on_update: Option<ReferentialAction>,
-}
-
-impl PartialEq for RelationInfo {
-    //ignores the relation name for reintrospection, ignores referential actions that are compared in the relation field.
-    fn eq(&self, other: &Self) -> bool {
-        self.to == other.to && self.fields == other.fields && self.references == other.references
-    }
 }
 
 impl RelationInfo {

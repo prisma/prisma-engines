@@ -4,12 +4,10 @@ mod sqlite;
 mod vitess;
 
 use barrel::types;
-use expect_test::expect;
 use indoc::{formatdoc, indoc};
 use introspection_engine_tests::{assert_eq_json, test_api::*};
 use quaint::prelude::Queryable;
 use serde_json::json;
-use test_macros::test_connector;
 
 #[test_connector(exclude(CockroachDb))]
 async fn mapped_model_name(api: &TestApi) -> TestResult {
@@ -1374,25 +1372,25 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
         }
     "#};
 
-    let final_dm = indoc! {r#"
+    let final_dm = expect![[r#"
         model B {
-            id              Int @id @default(autoincrement())
-            custom_A        A[]
-            special_A       A[] @relation("AToB2")
+          id        Int @id @default(autoincrement())
+          custom_A  A[]
+          special_A A[] @relation("AToB2")
         }
 
         model A {
-            id              Int @id @default(autoincrement())
-            custom_B        B[]
-            special_B       B[] @relation("AToB2")
+          id        Int @id @default(autoincrement())
+          custom_B  B[]
+          special_B B[] @relation("AToB2")
         }
 
         model Unrelated {
-            id Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    api.expect_re_introspected_datamodel(input_dm, final_dm).await;
 
     Ok(())
 }

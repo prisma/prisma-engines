@@ -74,10 +74,6 @@ impl WithDocumentation for Enum {
     fn documentation(&self) -> &Option<Comment> {
         &self.documentation
     }
-
-    fn is_commented_out(&self) -> bool {
-        false
-    }
 }
 
 /// An enum value definition.
@@ -89,7 +85,6 @@ pub struct EnumValue {
     pub documentation: Option<Comment>,
     /// The location of this enum value in the text representation.
     pub span: Span,
-    pub commented_out: bool,
 }
 
 impl WithIdentifier for EnumValue {

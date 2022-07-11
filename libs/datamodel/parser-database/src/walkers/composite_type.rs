@@ -153,11 +153,6 @@ impl<'db> CompositeTypeFieldWalker<'db> {
             .map(move |(datasource_name, name, args, span)| (&db[*datasource_name], &db[*name], args.as_slice(), *span))
     }
 
-    /// Can the client use the field.
-    pub fn is_visible(self) -> bool {
-        !self.ast_field().is_commented_out
-    }
-
     /// The value expression in the `@default` attribute.
     ///
     /// ```ignore

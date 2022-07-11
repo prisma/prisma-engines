@@ -72,7 +72,7 @@ fn composite_type_field_to_dmmf(field: &dml::CompositeTypeField) -> Field {
         kind: match field.r#type {
             CompositeTypeFieldType::CompositeType(_) => String::from("object"),
             CompositeTypeFieldType::Enum(_) => String::from("enum"),
-            CompositeTypeFieldType::Scalar(_, _, _) => String::from("scalar"),
+            CompositeTypeFieldType::Scalar(_, _) => String::from("scalar"),
             CompositeTypeFieldType::Unsupported(_) => String::from("unsupported"),
         },
         is_required: field.arity == dml::FieldArity::Required || field.arity == dml::FieldArity::List,
@@ -90,7 +90,7 @@ fn composite_type_field_to_dmmf(field: &dml::CompositeTypeField) -> Field {
             CompositeTypeFieldType::CompositeType(t) => t.clone(),
             CompositeTypeFieldType::Enum(t) => t.clone(),
             CompositeTypeFieldType::Unsupported(t) => t.clone(),
-            CompositeTypeFieldType::Scalar(t, _, _) => type_to_string(t),
+            CompositeTypeFieldType::Scalar(t, _) => type_to_string(t),
         },
 
         is_generated: None,
@@ -184,7 +184,7 @@ fn get_field_kind(field: &dml::Field) -> String {
         dml::FieldType::CompositeType(_) => String::from("object"),
         dml::FieldType::Relation(_) => String::from("object"),
         dml::FieldType::Enum(_) => String::from("enum"),
-        dml::FieldType::Scalar(_, _, _) => String::from("scalar"),
+        dml::FieldType::Scalar(_, _) => String::from("scalar"),
         dml::FieldType::Unsupported(_) => String::from("unsupported"),
     }
 }
@@ -242,7 +242,7 @@ fn get_field_type(field: &dml::Field) -> String {
         dml::FieldType::Relation(relation_info) => relation_info.to.clone(),
         dml::FieldType::Enum(t) => t.clone(),
         dml::FieldType::Unsupported(t) => t.clone(),
-        dml::FieldType::Scalar(t, _, _) => type_to_string(t),
+        dml::FieldType::Scalar(t, _) => type_to_string(t),
     }
 }
 

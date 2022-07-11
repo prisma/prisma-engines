@@ -7,7 +7,7 @@ pub use test_macros::test_connector;
 pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
-use datamodel::{common::preview_features::PreviewFeature, schema_ast::source_file::SourceFile};
+use datamodel::{common::preview_features::PreviewFeature, parser_database::SourceFile};
 use migration_core::{
     commands::diff,
     migration_connector::{
