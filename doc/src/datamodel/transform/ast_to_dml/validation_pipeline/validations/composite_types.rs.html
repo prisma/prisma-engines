@@ -264,9 +264,9 @@
     ));
 }
 
-<span class="doccomment">/// A composite type must have at least one visible field.</span>
+<span class="doccomment">/// A composite type must have at least one field.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">more_than_one_field</span>(<span class="ident">composite_type</span>: <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">num_of_fields</span> <span class="op">=</span> <span class="ident">composite_type</span>.<span class="ident">fields</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">is_visible</span>()).<span class="ident">count</span>();
+    <span class="kw">let</span> <span class="ident">num_of_fields</span> <span class="op">=</span> <span class="ident">composite_type</span>.<span class="ident">fields</span>().<span class="ident">count</span>();
 
     <span class="kw">if</span> <span class="ident">num_of_fields</span> <span class="op">&gt;</span> <span class="number">0</span> {
         <span class="kw">return</span>;

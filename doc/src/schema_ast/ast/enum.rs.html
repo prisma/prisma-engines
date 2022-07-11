@@ -109,11 +109,6 @@
 <span id="104">104</span>
 <span id="105">105</span>
 <span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Attribute</span>, <span class="ident">Comment</span>, <span class="ident">Identifier</span>, <span class="ident">Span</span>, <span class="ident">WithAttributes</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithSpan</span>};
 
 <span class="doccomment">/// An enum declaration. Enumeration can either be in the database schema, or completely a Prisma level concept.</span>
@@ -190,10 +185,6 @@
     <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">documentation</span>
     }
-
-    <span class="kw">fn</span> <span class="ident">is_commented_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
 }
 
 <span class="doccomment">/// An enum value definition.</span>
@@ -205,7 +196,6 @@
     <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The location of this enum value in the text representation.</span>
     <span class="kw">pub</span> <span class="ident">span</span>: <span class="ident">Span</span>,
-    <span class="kw">pub</span> <span class="ident">commented_out</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">WithIdentifier</span> <span class="kw">for</span> <span class="ident">EnumValue</span> {

@@ -278,8 +278,6 @@
 <span id="273">273</span>
 <span id="274">274</span>
 <span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::database_name::validate_db_name</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::preview_features::PreviewFeature</span>,
@@ -290,7 +288,6 @@
     },
 };
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>};
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="doccomment">/// A model must have either a primary key, or a unique criteria</span>
@@ -311,8 +308,8 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">loose_criterias</span> <span class="op">=</span> <span class="ident">model</span>
         .<span class="ident">unique_criterias</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>());
-            <span class="macro">format!</span>(<span class="string">&quot;- {}&quot;</span>, <span class="ident">field_names</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
+            <span class="kw">let</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>());
+            <span class="macro">format!</span>(<span class="string">&quot;- {}&quot;</span>, <span class="ident">field_names</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
         })
         .<span class="ident">peekable</span>();
 
@@ -322,7 +319,7 @@
     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">loose_criterias</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {
         <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;The following unique criterias were not considered as they contain fields that are not required:\n{}&quot;</span>,
-            <span class="ident">loose_criterias</span>.<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>),
+            <span class="ident">loose_criterias</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>),
         );
 
         <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="ident">msg</span>, <span class="ident">suffix</span>))
@@ -547,8 +544,7 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">id_client_name</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>);
-
+    <span class="kw">let</span> <span class="ident">id_client_name</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>);
     <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">id_client_name</span>) {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
             <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The field `{id_client_name}` clashes with the `@@id` attribute&#39;s name. Please resolve the conflict by providing a custom id name: `@@id([...], name: \&quot;custom_name\&quot;)`&quot;</span>),

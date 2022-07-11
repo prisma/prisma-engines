@@ -99,7 +99,6 @@
 <span id="94">94</span>
 <span id="95">95</span>
 <span id="96">96</span>
-<span id="97">97</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">Pair</span>},
     <span class="ident">parse_attribute::parse_attribute</span>,
@@ -189,7 +188,6 @@
             <span class="ident">attributes</span>,
             <span class="ident">documentation</span>: <span class="ident">comment</span>,
             <span class="ident">span</span>: <span class="ident">Span::from</span>(<span class="ident">pair_span</span>),
-            <span class="ident">commented_out</span>: <span class="bool-val">false</span>,
         }),
         <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(
             <span class="string">&quot;Encountered impossible enum value declaration during parsing, name is missing: {:?}&quot;</span>,

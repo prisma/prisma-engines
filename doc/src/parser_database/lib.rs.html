@@ -166,7 +166,6 @@
 <span id="161">161</span>
 <span id="162">162</span>
 <span id="163">163</span>
-<span id="164">164</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unsafe_code</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">missing_docs</span>)]</span>
 
 <span class="doccomment">//! See the docs on [ParserDatabase](./struct.ParserDatabase.html).</span>
@@ -206,14 +205,13 @@
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">names::is_reserved_type_name</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">relations::ReferentialAction</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">schema_ast::ast</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">schema_ast</span>::{<span class="ident">ast</span>, <span class="ident">SourceFile</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">types</span>::{<span class="ident">IndexAlgorithm</span>, <span class="ident">IndexFieldPath</span>, <span class="ident">IndexType</span>, <span class="ident">OperatorClass</span>, <span class="ident">ScalarFieldType</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">value_validator</span>::{<span class="ident">ValueListValidator</span>, <span class="ident">ValueValidator</span>};
 
 <span class="kw">use</span> <span class="self">self</span>::{<span class="ident">context::Context</span>, <span class="ident">interner::StringId</span>, <span class="ident">relations::Relations</span>, <span class="ident">types::Types</span>};
 <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
 <span class="kw">use</span> <span class="ident">names::Names</span>;
-<span class="kw">use</span> <span class="ident">schema_ast::source_file::SourceFile</span>;
 
 <span class="doccomment">/// ParserDatabase is a container for a Schema AST, together with information</span>
 <span class="doccomment">/// gathered during schema validation. Each validation step enriches the</span>
@@ -236,7 +234,7 @@
 <span class="doccomment">///   Currently only index name collisions.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParserDatabase</span> {
     <span class="ident">ast</span>: <span class="ident">ast::SchemaAst</span>,
-    <span class="ident">file</span>: <span class="ident">SourceFile</span>,
+    <span class="ident">file</span>: <span class="ident">schema_ast::SourceFile</span>,
     <span class="ident">interner</span>: <span class="ident">interner::StringInterner</span>,
     <span class="ident">_names</span>: <span class="ident">Names</span>,
     <span class="ident">types</span>: <span class="ident">Types</span>,
@@ -245,7 +243,7 @@
 
 <span class="kw">impl</span> <span class="ident">ParserDatabase</span> {
     <span class="doccomment">/// See the docs on [ParserDatabase](/struct.ParserDatabase.html).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">file</span>: <span class="ident">SourceFile</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">file</span>: <span class="ident">schema_ast::SourceFile</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident">schema_ast::parse_schema</span>(<span class="ident">file</span>.<span class="ident">as_str</span>(), <span class="ident">diagnostics</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interner</span> <span class="op">=</span> <span class="ident">Default::default</span>();

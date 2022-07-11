@@ -88,12 +88,10 @@
 <span id="83">83</span>
 <span id="84">84</span>
 <span id="85">85</span>
-<span id="86">86</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">Diagnostics</span>, <span class="ident">ReferentialIntegrity</span>},
     <span class="ident">parse_configuration</span>, <span class="ident">parse_schema_ast</span>,
-    <span class="ident">parser_database::ParserDatabase</span>,
-    <span class="ident">schema_ast</span>::{<span class="ident">ast</span>, <span class="ident">source_file::SourceFile</span>},
+    <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">ParserDatabase</span>, <span class="ident">SourceFile</span>},
 };
 <span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">lsp_types</span>::<span class="kw-2">*</span>;

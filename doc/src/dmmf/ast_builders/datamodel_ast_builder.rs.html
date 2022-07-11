@@ -421,7 +421,7 @@
         <span class="ident">kind</span>: <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">r#type</span> {
             <span class="ident">CompositeTypeFieldType::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;object&quot;</span>),
             <span class="ident">CompositeTypeFieldType::Enum</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;enum&quot;</span>),
-            <span class="ident">CompositeTypeFieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;scalar&quot;</span>),
+            <span class="ident">CompositeTypeFieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;scalar&quot;</span>),
             <span class="ident">CompositeTypeFieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;unsupported&quot;</span>),
         },
         <span class="ident">is_required</span>: <span class="ident">field</span>.<span class="ident">arity</span> <span class="op">==</span> <span class="ident">dml::FieldArity::Required</span> <span class="op">|</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">arity</span> <span class="op">==</span> <span class="ident">dml::FieldArity::List</span>,
@@ -439,7 +439,7 @@
             <span class="ident">CompositeTypeFieldType::CompositeType</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">clone</span>(),
             <span class="ident">CompositeTypeFieldType::Enum</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">clone</span>(),
             <span class="ident">CompositeTypeFieldType::Unsupported</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">clone</span>(),
-            <span class="ident">CompositeTypeFieldType::Scalar</span>(<span class="ident">t</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">type_to_string</span>(<span class="ident">t</span>),
+            <span class="ident">CompositeTypeFieldType::Scalar</span>(<span class="ident">t</span>, <span class="kw">_</span>) =&gt; <span class="ident">type_to_string</span>(<span class="ident">t</span>),
         },
 
         <span class="ident">is_generated</span>: <span class="prelude-val">None</span>,
@@ -533,7 +533,7 @@
         <span class="ident">dml::FieldType::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;object&quot;</span>),
         <span class="ident">dml::FieldType::Relation</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;object&quot;</span>),
         <span class="ident">dml::FieldType::Enum</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;enum&quot;</span>),
-        <span class="ident">dml::FieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;scalar&quot;</span>),
+        <span class="ident">dml::FieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;scalar&quot;</span>),
         <span class="ident">dml::FieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;unsupported&quot;</span>),
     }
 }
@@ -591,7 +591,7 @@
         <span class="ident">dml::FieldType::Relation</span>(<span class="ident">relation_info</span>) =&gt; <span class="ident">relation_info</span>.<span class="ident">to</span>.<span class="ident">clone</span>(),
         <span class="ident">dml::FieldType::Enum</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">clone</span>(),
         <span class="ident">dml::FieldType::Unsupported</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">clone</span>(),
-        <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">t</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">type_to_string</span>(<span class="ident">t</span>),
+        <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">t</span>, <span class="kw">_</span>) =&gt; <span class="ident">type_to_string</span>(<span class="ident">t</span>),
     }
 }
 

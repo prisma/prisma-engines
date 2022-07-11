@@ -70,22 +70,16 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">relations</span>;
 
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
-    <span class="ident">ast</span>,
     <span class="ident">datamodel_connector::Diagnostics</span>,
     <span class="ident">parse_schema_ast</span>,
-    <span class="ident">parser_database</span>::{<span class="ident">walkers::RefinedRelationWalker</span>, <span class="ident">ParserDatabase</span>},
-    <span class="ident">schema_ast::source_file::SourceFile</span>,
+    <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">walkers::RefinedRelationWalker</span>, <span class="ident">ParserDatabase</span>, <span class="ident">SourceFile</span>},
 };
 <span class="kw">use</span> <span class="ident">log::warn</span>;
 <span class="kw">use</span> <span class="ident">lsp_types</span>::{<span class="ident">CodeActionOrCommand</span>, <span class="ident">CodeActionParams</span>, <span class="ident">Diagnostic</span>};
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">empty_code_actions</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CodeActionOrCommand</span><span class="op">&gt;</span> {
     <span class="ident">Vec::new</span>()

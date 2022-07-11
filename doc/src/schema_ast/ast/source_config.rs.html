@@ -35,10 +35,6 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Comment</span>, <span class="ident">ConfigBlockProperty</span>, <span class="ident">Identifier</span>, <span class="ident">Span</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithSpan</span>};
 
 <span class="doccomment">/// A source block declaration.</span>
@@ -69,10 +65,6 @@
 <span class="kw">impl</span> <span class="ident">WithDocumentation</span> <span class="kw">for</span> <span class="ident">SourceConfig</span> {
     <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">documentation</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">is_commented_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
     }
 }
 </code></pre></div>

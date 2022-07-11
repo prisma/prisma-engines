@@ -45,9 +45,6 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Attribute</span>, <span class="ident">Comment</span>, <span class="ident">Identifier</span>, <span class="ident">Span</span>};
 
 <span class="doccomment">/// An AST node with a span.</span>
@@ -78,9 +75,6 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WithDocumentation</span> {
     <span class="doccomment">/// The documentation string, if defined.</span>
     <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Is this node commented out?</span>
-    <span class="kw">fn</span> <span class="ident">is_commented_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 }
 
 <span class="doccomment">/// An AST node with a name.</span>

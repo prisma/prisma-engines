@@ -28,31 +28,89 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Prisma Schema AST.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - The `ast` module defines the AST data structure.</span>
-<span class="doccomment">//! - The `parser` module is responsible from going from a source string to an AST.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser::parse_schema</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reformat::reformat</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{<span class="ident">parser::parse_schema</span>, <span class="ident">reformat::reformat</span>, <span class="ident">source_file::SourceFile</span>};
 
 <span class="doccomment">/// The AST data structure. It aims to faithfully represent the syntax of a Prisma Schema, with</span>
 <span class="doccomment">/// source span information.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ast</span>;
 
-<span class="doccomment">/// String -&gt; AST</span>
 <span class="kw">mod</span> <span class="ident">parser</span>;
-
-<span class="doccomment">/// AST -&gt; String</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">renderer</span>;
-
-<span class="doccomment">/// String -&gt; String</span>
 <span class="kw">mod</span> <span class="ident">reformat</span>;
+<span class="kw">mod</span> <span class="ident">renderer</span>;
+<span class="kw">mod</span> <span class="ident">source_file</span>;
 
-<span class="doccomment">/// The PSL content.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">source_file</span>;
+<span class="doccomment">/// Transform the input string into a valid (quoted and escaped) PSL string literal.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// PSL string literals have the exact same grammar as [JSON string</span>
+<span class="doccomment">/// literals](https://datatracker.ietf.org/doc/html/rfc8259#section-7).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # use schema_ast::string_literal;</span>
+<span class="doccomment">///let input = r#&quot;oh</span>
+<span class="doccomment">///hi&quot;#;</span>
+<span class="doccomment">///assert_eq!(r#&quot;&quot;oh\nhi&quot;&quot;#, &amp;string_literal(input).to_string());</span>
+<span class="doccomment">/// ```</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string_literal</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+    <span class="kw">struct</span> <span class="ident">StringLiteral</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>);
+
+    <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">StringLiteral</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\&quot;&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">char_indices</span>() {
+                <span class="kw">match</span> <span class="ident">c</span> {
+                    (<span class="kw">_</span>, <span class="string">&#39;\t&#39;</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\\t&quot;</span>)<span class="question-mark">?</span>,
+                    (<span class="kw">_</span>, <span class="string">&#39;\n&#39;</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\\n&quot;</span>)<span class="question-mark">?</span>,
+                    (<span class="kw">_</span>, <span class="string">&#39;&quot;&#39;</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\\\&quot;&quot;</span>)<span class="question-mark">?</span>,
+                    (<span class="kw">_</span>, <span class="string">&#39;\r&#39;</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\\r&quot;</span>)<span class="question-mark">?</span>,
+                    (<span class="kw">_</span>, <span class="string">&#39;\\&#39;</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\\\\&quot;</span>)<span class="question-mark">?</span>,
+                    <span class="comment">// Control characters</span>
+                    (<span class="kw">_</span>, <span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii_control</span>() =&gt; {
+                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> [<span class="number">0</span>];
+                        <span class="ident">c</span>.<span class="ident">encode_utf8</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>);
+                        <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;\\u{:04x}&quot;</span>, <span class="ident">b</span>[<span class="number">0</span>]))<span class="question-mark">?</span>;
+                    }
+                    (<span class="ident">start</span>, <span class="ident">other</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="ident">start</span>..(<span class="ident">start</span> <span class="op">+</span> <span class="ident">other</span>.<span class="ident">len_utf8</span>())])<span class="question-mark">?</span>,
+                }
+            }
+            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\&quot;&quot;</span>)
+        }
+    }
+
+    <span class="ident">StringLiteral</span>(<span class="ident">s</span>)
+}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

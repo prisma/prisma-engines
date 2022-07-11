@@ -104,7 +104,6 @@
 <span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
-<span id="102">102</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Composite types defined with the `type` keyword.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -141,7 +140,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">CompositeTypeField</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fields</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">f</span>.<span class="ident">r#type</span>, <span class="ident">CompositeTypeFieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)))
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">f</span>.<span class="ident">r#type</span>, <span class="ident">CompositeTypeFieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>)))
     }
 
     <span class="doccomment">/// Gets an iterator over all enum fields.</span>
@@ -174,8 +173,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CompositeTypeFieldType</span> {
     <span class="ident">CompositeType</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// The first option is Some(x) if the scalar type is based upon a type alias.</span>
-    <span class="ident">Scalar</span>(<span class="ident">ScalarType</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>),
+    <span class="ident">Scalar</span>(<span class="ident">ScalarType</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>),
     <span class="doccomment">/// This is an enum field, with an enum of the given name.</span>
     <span class="ident">Enum</span>(<span class="ident">String</span>),
     <span class="doccomment">/// This is a field with an unsupported datatype. The content is the db&#39;s description of the type, it should enable migrate to create the type.</span>
@@ -191,16 +189,16 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">ScalarType</span>, <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">typ</span>, <span class="ident">alias</span>, <span class="ident">native_type</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>((<span class="ident">typ</span>, <span class="ident">alias</span>, <span class="ident">native_type</span>))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">ScalarType</span>, <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">typ</span>, <span class="ident">native_type</span>) <span class="op">=</span> <span class="self">self</span> {
+            <span class="prelude-val">Some</span>((<span class="ident">typ</span>, <span class="ident">native_type</span>))
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">ScalarType</span>, <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>)<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">typ</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">native_type</span>)) <span class="op">=</span> <span class="self">self</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">typ</span>, <span class="prelude-val">Some</span>(<span class="ident">native_type</span>)) <span class="op">=</span> <span class="self">self</span> {
             <span class="prelude-val">Some</span>((<span class="ident">typ</span>, <span class="ident">native_type</span>))
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>

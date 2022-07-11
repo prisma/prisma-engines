@@ -658,7 +658,7 @@
                 <span class="comment">// No defaults on composite fields of type composite</span>
                 <span class="ident">default_value</span>: <span class="prelude-val">None</span>,
             })),
-            <span class="ident">CompositeTypeFieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">CompositeTypeFieldType::Enum</span>(<span class="kw">_</span>) =&gt; {
+            <span class="ident">CompositeTypeFieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">CompositeTypeFieldType::Enum</span>(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">type_ident</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">type_identifier</span>();
 
                 <span class="kw">if</span> <span class="ident">type_ident</span> <span class="op">==</span> <span class="ident">TypeIdentifier::Unsupported</span> {

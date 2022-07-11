@@ -55,13 +55,17 @@
 <span id="50">50</span>
 <span id="51">51</span>
 <span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mssql</span>;
 <span class="kw">mod</span> <span class="ident">mysql</span>;
 <span class="kw">mod</span> <span class="ident">postgres</span>;
 <span class="kw">mod</span> <span class="ident">sqlite</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
-    <span class="ident">datamodel_connector::ScalarType</span>, <span class="ident">parser_database::walkers</span>::<span class="kw-2">*</span>, <span class="ident">schema_ast::ast::FieldArity</span>, <span class="ident">ValidatedSchema</span>,
+    <span class="ident">datamodel_connector::ScalarType</span>,
+    <span class="ident">parser_database</span>::{<span class="ident">ast::FieldArity</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>},
+    <span class="ident">ValidatedSchema</span>,
 };
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>};
 

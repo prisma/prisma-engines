@@ -584,47 +584,6 @@
 <span id="579">579</span>
 <span id="580">580</span>
 <span id="581">581</span>
-<span id="582">582</span>
-<span id="583">583</span>
-<span id="584">584</span>
-<span id="585">585</span>
-<span id="586">586</span>
-<span id="587">587</span>
-<span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
-<span id="593">593</span>
-<span id="594">594</span>
-<span id="595">595</span>
-<span id="596">596</span>
-<span id="597">597</span>
-<span id="598">598</span>
-<span id="599">599</span>
-<span id="600">600</span>
-<span id="601">601</span>
-<span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A field in a model.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::native_type_instance::NativeTypeInstance</span>;
@@ -668,8 +627,7 @@
     <span class="ident">Relation</span>(<span class="ident">RelationInfo</span>),
     <span class="doccomment">/// This is a field with an unsupported datatype. The content is the db&#39;s description of the type, it should enable migrate to create the type.</span>
     <span class="ident">Unsupported</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// The first option is Some(x) if the scalar type is based upon a type alias.</span>
-    <span class="ident">Scalar</span>(<span class="ident">ScalarType</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>),
+    <span class="ident">Scalar</span>(<span class="ident">ScalarType</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>),
     <span class="doccomment">/// This is a composite type fields, with a composite type of the given type.</span>
     <span class="ident">CompositeType</span>(<span class="ident">String</span>),
 }
@@ -677,14 +635,14 @@
 <span class="kw">impl</span> <span class="ident">FieldType</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarType</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::Scalar</span>(<span class="ident">scalar_type</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">scalar_type</span>),
+            <span class="ident">FieldType::Scalar</span>(<span class="ident">scalar_type</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">scalar_type</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">ScalarType</span>, <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::Scalar</span>(<span class="ident">a</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">b</span>)) =&gt; <span class="prelude-val">Some</span>((<span class="ident">a</span>, <span class="ident">b</span>)),
+            <span class="ident">FieldType::Scalar</span>(<span class="ident">a</span>, <span class="prelude-val">Some</span>(<span class="ident">b</span>)) =&gt; <span class="prelude-val">Some</span>((<span class="ident">a</span>, <span class="ident">b</span>)),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -714,14 +672,14 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarType</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::Scalar</span>(<span class="ident">st</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">st</span>),
+            <span class="ident">FieldType::Scalar</span>(<span class="ident">st</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">st</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">nt</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">nt</span>),
+            <span class="ident">FieldType::Scalar</span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">nt</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">nt</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -906,7 +864,7 @@
 }
 
 <span class="doccomment">/// Represents a relation field in a model.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationField</span> {
     <span class="doccomment">/// Name of the field.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
@@ -937,46 +895,6 @@
 
     <span class="doccomment">/// Do we run the referential actions in the core instead of the database.</span>
     <span class="kw">pub</span> <span class="ident">emulates_referential_actions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
-    <span class="comment">//ignores the relation name for reintrospection</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">this_matches</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">arity</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">arity</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">referential_arity</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">referential_arity</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">documentation</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">documentation</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_generated</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">is_generated</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_commented_out</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">is_commented_out</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_ignored</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">is_ignored</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_info</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">relation_info</span>;
-
-        <span class="kw">let</span> <span class="ident">this_on_delete</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">relation_info</span>
-            .<span class="ident">on_delete</span>
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">default_on_delete_action</span>());
-
-        <span class="kw">let</span> <span class="ident">other_on_delete</span> <span class="op">=</span> <span class="ident">other</span>
-            .<span class="ident">relation_info</span>
-            .<span class="ident">on_delete</span>
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">other</span>.<span class="ident">default_on_delete_action</span>());
-
-        <span class="kw">let</span> <span class="ident">on_delete_matches</span> <span class="op">=</span> <span class="ident">this_on_delete</span> <span class="op">==</span> <span class="ident">other_on_delete</span>;
-
-        <span class="kw">let</span> <span class="ident">this_on_update</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">relation_info</span>
-            .<span class="ident">on_update</span>
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">default_on_update_action</span>());
-
-        <span class="kw">let</span> <span class="ident">other_on_update</span> <span class="op">=</span> <span class="ident">other</span>
-            .<span class="ident">relation_info</span>
-            .<span class="ident">on_update</span>
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">other</span>.<span class="ident">default_on_update_action</span>());
-
-        <span class="kw">let</span> <span class="ident">on_update_matches</span> <span class="op">=</span> <span class="ident">this_on_update</span> <span class="op">==</span> <span class="ident">other_on_update</span>;
-
-        <span class="ident">this_matches</span> <span class="op">&amp;&amp;</span> <span class="ident">on_delete_matches</span> <span class="op">&amp;&amp;</span> <span class="ident">on_update_matches</span>
-    }
 }
 
 <span class="kw">impl</span> <span class="ident">RelationField</span> {

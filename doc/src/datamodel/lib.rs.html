@@ -251,8 +251,6 @@
 <span id="246">246</span>
 <span id="247">247</span>
 <span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This crate is responsible for parsing, rendering and formatting a Prisma Schema.</span>
 <span class="doccomment">//! A Prisma Schema consists out of two parts:</span>
 <span class="doccomment">//! 1. The `Datamodel` part refers to the model and enum definitions.</span>
@@ -321,13 +319,11 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database::is_reserved_type_name</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">schema_ast</span>::{<span class="self">self</span>, <span class="ident">ast</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">diagnostics::Diagnostics</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">parser_database::ParserDatabase</span>;
-<span class="kw">use</span> <span class="ident">schema_ast::source_file::SourceFile</span>;
+<span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">ParserDatabase</span>, <span class="ident">SourceFile</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">transform</span>::{
     <span class="ident">ast_to_dml</span>::{<span class="ident">validate</span>, <span class="ident">DatasourceLoader</span>, <span class="ident">GeneratorLoader</span>},

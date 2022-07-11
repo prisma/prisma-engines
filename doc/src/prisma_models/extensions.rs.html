@@ -287,7 +287,7 @@
             <span class="ident">dml::FieldType::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(<span class="string">&quot;composite type support in datamodel_converter&quot;</span>),
             <span class="ident">dml::FieldType::Enum</span>(<span class="ident">x</span>) =&gt; <span class="ident">TypeIdentifier::Enum</span>(<span class="ident">x</span>.<span class="ident">clone</span>()),
             <span class="ident">dml::FieldType::Relation</span>(<span class="kw">_</span>) =&gt; <span class="ident">TypeIdentifier::String</span>, <span class="comment">// Todo: Unused</span>
-            <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">scalar</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; (<span class="kw-2">*</span><span class="ident">scalar</span>).<span class="ident">into</span>(),
+            <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">scalar</span>, <span class="kw">_</span>) =&gt; (<span class="kw-2">*</span><span class="ident">scalar</span>).<span class="ident">into</span>(),
             <span class="ident">dml::FieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">TypeIdentifier::Unsupported</span>,
         }
     }
@@ -311,7 +311,7 @@
 
     <span class="kw">fn</span> <span class="ident">native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_type</span> {
-            <span class="ident">dml::FieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">nt</span>) =&gt; <span class="ident">nt</span>.<span class="ident">clone</span>(),
+            <span class="ident">dml::FieldType::Scalar</span>(<span class="kw">_</span>, <span class="ident">nt</span>) =&gt; <span class="ident">nt</span>.<span class="ident">clone</span>(),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -323,7 +323,7 @@
             <span class="ident">dml::CompositeTypeFieldType::CompositeType</span>(<span class="kw">_</span>) =&gt; {
                 <span class="macro">unreachable!</span>(<span class="string">&quot;Composite fields should not use type identifiers&quot;</span>)
             }
-            <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">scalar</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; (<span class="kw-2">*</span><span class="ident">scalar</span>).<span class="ident">into</span>(),
+            <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">scalar</span>, <span class="kw">_</span>) =&gt; (<span class="kw-2">*</span><span class="ident">scalar</span>).<span class="ident">into</span>(),
             <span class="ident">dml::CompositeTypeFieldType::Enum</span>(<span class="ident">e</span>) =&gt; <span class="ident">TypeIdentifier::Enum</span>(<span class="ident">e</span>.<span class="ident">clone</span>()),
             <span class="ident">dml::CompositeTypeFieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">TypeIdentifier::Unsupported</span>,
         }
@@ -350,7 +350,7 @@
 
     <span class="kw">fn</span> <span class="ident">native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">r#type</span> {
-            <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">nt</span>) =&gt; <span class="ident">nt</span>.<span class="ident">clone</span>(),
+            <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="kw">_</span>, <span class="ident">nt</span>) =&gt; <span class="ident">nt</span>.<span class="ident">clone</span>(),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
