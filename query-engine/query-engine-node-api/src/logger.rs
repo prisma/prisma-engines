@@ -1,6 +1,6 @@
 use core::fmt;
 use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
-use query_core::MetricRegistry;
+use query_core::{is_user_facing_trace_filter, MetricRegistry};
 use serde_json::Value;
 use std::collections::BTreeMap;
 use tracing::{
@@ -43,17 +43,7 @@ impl Logger {
             FilterExt::boxed(log_level)
         };
 
-        let is_user_trace = filter_fn(|meta| {
-            if !meta.is_span() {
-                return false;
-            }
-
-            if meta.fields().iter().any(|f| f.name() == "user_facing") {
-                return true;
-            }
-
-            meta.target() == "quaint::connector::metrics" && meta.name() == "quaint:query"
-        });
+        let is_user_trace = filter_fn(is_user_facing_trace_filter);
         let tracer = crate::tracer::new_pipeline().install_simple(log_callback.clone());
         let telemetry = tracing_opentelemetry::layer()
             .with_tracer(tracer)

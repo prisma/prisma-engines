@@ -8,7 +8,7 @@ use opentelemetry::{
     KeyValue,
 };
 use opentelemetry_otlp::WithExportConfig;
-use query_core::MetricRegistry;
+use query_core::{is_user_facing_trace_filter, MetricRegistry};
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
 use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, EnvFilter, Layer};
 
@@ -74,17 +74,7 @@ impl<'a> Logger<'a> {
     pub fn install(self) -> LoggerResult<()> {
         let filter = create_env_filter(self.log_queries);
 
-        let is_user_trace = filter_fn(|meta| {
-            if !meta.is_span() {
-                return false;
-            }
-
-            if meta.fields().iter().any(|f| f.name() == "user_facing") {
-                return true;
-            }
-
-            meta.target() == "quaint::connector::metrics" && meta.name() == "quaint:query"
-        });
+        let is_user_trace = filter_fn(is_user_facing_trace_filter);
 
         let telemetry = if self.enable_telemetry {
             let tracer = create_otel_tracer(self.service_name, self.telemetry_endpoint);
