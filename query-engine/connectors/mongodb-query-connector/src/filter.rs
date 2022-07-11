@@ -6,7 +6,7 @@ use connector_interface::{
 use mongodb::bson::{doc, Bson, Document};
 use prisma_models::{CompositeFieldRef, PrismaValue, ScalarFieldRef, TypeIdentifier};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) enum MongoFilter {
     Scalar(Document),
     Composite(Document),
@@ -17,8 +17,8 @@ impl MongoFilter {
     pub(crate) fn render(self) -> (Document, Vec<JoinStage>) {
         match self {
             Self::Scalar(document) => (document, vec![]),
-            Self::Relation(rf) => (rf.filter, rf.joins),
             Self::Composite(document) => (document, vec![]),
+            Self::Relation(rf) => (rf.filter, rf.joins),
         }
     }
 
@@ -27,7 +27,7 @@ impl MongoFilter {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct MongoRelationFilter {
     /// The filter that has to be applied to this layer of nesting (after all joins on this layer are done).
     pub filter: Document,

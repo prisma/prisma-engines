@@ -65,6 +65,7 @@ features!(
     Metrics,
     OrderByNulls,
     MultiSchema,
+    FilteredCount
 );
 
 /// Generator preview features
