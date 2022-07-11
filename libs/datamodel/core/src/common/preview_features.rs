@@ -65,7 +65,7 @@ features!(
     Metrics,
     OrderByNulls,
     MultiSchema,
-    FilteredCount
+    FilteredRelationCount,
 );
 
 /// Generator preview features
