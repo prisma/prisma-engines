@@ -59,3 +59,27 @@ async fn a_table_enums_array(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &TestApi) -> TestResult {
+    let sql = r#"CREATE TYPE "threechars" AS ENUM ('123', 'wow','$§!');"#;
+    api.raw_cmd(sql).await;
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        enum threechars {
+          // 123 @map("123")
+          wow
+          // $§! @map("$§!")
+        }
+    "#]];
+    api.expect_datamodel(&expected).await;
+    Ok(())
+}

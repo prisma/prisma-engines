@@ -43,6 +43,11 @@ fn render_enum(enm: &Enum, out: &mut String) {
         if let Some(docs) = &variant.documentation {
             super::render_documentation(docs, false, out);
         }
+
+        if variant.commented_out {
+            out.push_str("// ");
+        }
+
         out.push_str(&variant.name);
 
         if let Some(mapped_name) = &variant.database_name {

@@ -115,7 +115,6 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestAp
     Ok(())
 }
 
-
 #[test_connector(exclude(CockroachDb), capabilities(Enums))]
 async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
