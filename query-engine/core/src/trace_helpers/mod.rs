@@ -34,10 +34,9 @@ fn span_to_json(span: &SpanData) -> Value {
 
     // Override the name of quaint. It will be confusing for users to see quaint instead of
     // Prisma in the spans.
-    let name: Cow<str> = if span.name == "quaint:query" {
-        "prisma:db_query".into()
-    } else {
-        span.name.clone()
+    let name: Cow<str> = match span.name {
+        Cow::Borrowed("quaint:query") => "prisma:db_query".into(),
+        _ => span.name.clone(),
     };
 
     json!({
@@ -57,8 +56,7 @@ pub fn set_span_context(span: &Span, trace_id: Option<String>) {
         return;
     }
 
-    let mut trace: HashMap<String, String> = HashMap::new();
-    trace.insert("traceparent".to_string(), trace_id.unwrap());
+    let trace = HashMap::from([("traceparent".to_string(), trace_id.unwrap())]);
     let parent_context = opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&trace));
 
     span.set_parent(parent_context)
