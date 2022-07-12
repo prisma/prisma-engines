@@ -1,24 +1,22 @@
-use super::{
-    helpers::{Token, TokenExtensions},
-    Rule,
-};
+use super::{helpers::Pair, Rule};
 use crate::{ast::*, parser::parse_expression::parse_expression};
 use diagnostics::{DatamodelError, Diagnostics};
 
 pub fn parse_field_type(
-    token: &Token<'_>,
+    pair: Pair<'_>,
     diagnostics: &mut Diagnostics,
 ) -> Result<(FieldArity, FieldType), DatamodelError> {
-    let current = token.first_relevant_child();
+    assert!(pair.as_rule() == Rule::field_type);
+    let current = pair.into_inner().next().unwrap();
     match current.as_rule() {
         Rule::optional_type => Ok((
             FieldArity::Optional,
-            parse_base_type(&current.first_relevant_child(), diagnostics),
+            parse_base_type(current.into_inner().next().unwrap(), diagnostics),
         )),
-        Rule::base_type => Ok((FieldArity::Required, parse_base_type(&current, diagnostics))),
+        Rule::base_type => Ok((FieldArity::Required, parse_base_type(current, diagnostics))),
         Rule::list_type => Ok((
             FieldArity::List,
-            parse_base_type(&current.first_relevant_child(), diagnostics),
+            parse_base_type(current.into_inner().next().unwrap(), diagnostics),
         )),
         Rule::legacy_required_type => Err(DatamodelError::new_legacy_parser_error(
             "Fields are required by default, `!` is no longer required.",
@@ -36,16 +34,16 @@ pub fn parse_field_type(
     }
 }
 
-fn parse_base_type(token: &Token<'_>, diagnostics: &mut Diagnostics) -> FieldType {
-    let current = token.first_relevant_child();
+fn parse_base_type(pair: Pair<'_>, diagnostics: &mut Diagnostics) -> FieldType {
+    let current = pair.into_inner().next().unwrap();
     match current.as_rule() {
-        Rule::non_empty_identifier => FieldType::Supported(Identifier {
+        Rule::identifier => FieldType::Supported(Identifier {
             name: current.as_str().to_string(),
             span: Span::from(current.as_span()),
         }),
-        Rule::unsupported_type => match parse_expression(&current, diagnostics) {
+        Rule::unsupported_type => match parse_expression(current, diagnostics) {
             Expression::StringValue(lit, span) => FieldType::Unsupported(lit, span),
-            _ => unreachable!("Encountered impossible type during parsing: {:?}", current.tokens()),
+            _ => unreachable!("Encountered impossible type during parsing"),
         },
         _ => unreachable!("Encountered impossible type during parsing: {:?}", current.tokens()),
     }

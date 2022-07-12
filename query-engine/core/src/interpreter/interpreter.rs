@@ -11,6 +11,7 @@ use crossbeam_queue::SegQueue;
 use futures::future::BoxFuture;
 use im::HashMap;
 use prisma_models::prelude::*;
+use tracing::Instrument;
 
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
@@ -224,14 +225,18 @@ impl<'conn> QueryInterpreter<'conn> {
                 match *query {
                     Query::Read(read) => {
                         self.log_line(level, || format!("READ {}", read));
+                        let span = info_span!("engine:read-execute");
                         Ok(read::execute(self.conn, read, None, trace_id)
+                            .instrument(span)
                             .await
                             .map(ExpressionResult::Query)?)
                     }
 
                     Query::Write(write) => {
                         self.log_line(level, || format!("WRITE {}", write));
+                        let span = info_span!("engine:write-execute");
                         Ok(write::execute(self.conn, write, trace_id)
+                            .instrument(span)
                             .await
                             .map(ExpressionResult::Query)?)
                     }

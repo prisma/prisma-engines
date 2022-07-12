@@ -1,4 +1,4 @@
-use indoc::formatdoc;
+use indoc::{formatdoc, indoc};
 use migration_engine_tests::test_api::*;
 use sql_schema_describer::SQLSortOrder;
 
@@ -159,29 +159,39 @@ fn descending_primary_key(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn altering_descending_primary_key(api: TestApi) {
-    let dm = formatdoc! {r#"
-        {}
+    let dm = indoc! {r#"
+        datasource slqserverdb {
+            provider = "sqlserver"
+            url = env("TEST_DATABASE_URL")
+        }
 
-        model A {{
+        model A {
           id Int @id(sort: Desc)
-        }}
-    "#, api.datasource_block()};
+        }
+    "#};
 
-    api.schema_push(&dm).send().assert_green();
+    api.schema_push(dm).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_pk(|pk| pk.assert_column("id", |attr| attr.assert_sort_order(SQLSortOrder::Desc)))
     });
 
-    let dm = formatdoc! {r#"
-        {}
+    let dm = indoc! {r#"
+        datasource slqserverdb {
+            provider = "sqlserver"
+            url = env("TEST_DATABASE_URL")
+        }
 
-        model A {{
+        model A {
           id Int @id
-        }}
-    "#, api.datasource_block()};
+        }
+    "#};
 
-    api.schema_push(&dm).force(true).send().assert_green();
+    api.schema_push(dm)
+        .force(true)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_pk(|pk| pk.assert_column("id", |attr| attr.assert_sort_order(SQLSortOrder::Asc)))

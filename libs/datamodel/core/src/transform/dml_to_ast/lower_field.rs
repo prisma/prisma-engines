@@ -85,7 +85,9 @@ pub(crate) fn lower_field_attributes(
             let mut args = Vec::new();
             let pk = model.primary_key.as_ref().unwrap();
             if let Some(src) = params.datasource {
-                if pk.db_name.is_some() && !super::primary_key_name_matches(pk, model, &*src.active_connector) {
+                if !matches!(pk.db_name.as_deref(), None | Some(""))
+                    && !super::primary_key_name_matches(pk, model, &*src.active_connector)
+                {
                     args.push(ast::Argument::new(
                         "map",
                         ast::Expression::StringValue(String::from(pk.db_name.as_ref().unwrap()), Span::empty()),

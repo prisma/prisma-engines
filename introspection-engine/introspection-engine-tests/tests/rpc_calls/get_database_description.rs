@@ -24,18 +24,7 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
         {
           "tables": [
             {
-              "name": "Blog",
-              "indices": [],
-              "primary_key": {
-                "columns": [
-                  {
-                    "name": "id",
-                    "length": null,
-                    "sort_order": null
-                  }
-                ],
-                "constraint_name": null
-              }
+              "name": "Blog"
             }
           ],
           "enums": [],
@@ -70,6 +59,22 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
             ]
           ],
           "foreign_keys": [],
+          "foreign_key_columns": [],
+          "indexes": [
+            {
+              "table_id": 0,
+              "index_name": "",
+              "tpe": "PrimaryKey"
+            }
+          ],
+          "index_columns": [
+            {
+              "index_id": 0,
+              "column_id": 0,
+              "sort_order": "Asc",
+              "length": null
+            }
+          ],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
@@ -89,18 +94,7 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
         {
           "tables": [
             {
-              "name": "Blog",
-              "indices": [],
-              "primary_key": {
-                "columns": [
-                  {
-                    "name": "id",
-                    "length": null,
-                    "sort_order": null
-                  }
-                ],
-                "constraint_name": null
-              }
+              "name": "Blog"
             }
           ],
           "enums": [],
@@ -135,6 +129,22 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
             ]
           ],
           "foreign_keys": [],
+          "foreign_key_columns": [],
+          "indexes": [
+            {
+              "table_id": 0,
+              "index_name": "",
+              "tpe": "PrimaryKey"
+            }
+          ],
+          "index_columns": [
+            {
+              "index_id": 0,
+              "column_id": 0,
+              "sort_order": "Asc",
+              "length": null
+            }
+          ],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
@@ -154,18 +164,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
         {
           "tables": [
             {
-              "name": "Blog",
-              "indices": [],
-              "primary_key": {
-                "columns": [
-                  {
-                    "name": "id",
-                    "length": null,
-                    "sort_order": null
-                  }
-                ],
-                "constraint_name": "Blog_pkey"
-              }
+              "name": "Blog"
             }
           ],
           "enums": [],
@@ -205,6 +204,22 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
             ]
           ],
           "foreign_keys": [],
+          "foreign_key_columns": [],
+          "indexes": [
+            {
+              "table_id": 0,
+              "index_name": "Blog_pkey",
+              "tpe": "PrimaryKey"
+            }
+          ],
+          "index_columns": [
+            {
+              "index_id": 0,
+              "column_id": 0,
+              "sort_order": "Asc",
+              "length": null
+            }
+          ],
           "views": [],
           "procedures": [],
           "user_defined_types": [],
@@ -224,18 +239,7 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
         {
           "tables": [
             {
-              "name": "Blog",
-              "indices": [],
-              "primary_key": {
-                "columns": [
-                  {
-                    "name": "id",
-                    "length": null,
-                    "sort_order": null
-                  }
-                ],
-                "constraint_name": null
-              }
+              "name": "Blog"
             }
           ],
           "enums": [],
@@ -245,7 +249,7 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
               {
                 "name": "id",
                 "tpe": {
-                  "full_data_type": "INTEGER",
+                  "full_data_type": "integer",
                   "family": "Int",
                   "arity": "Required",
                   "native_type": null
@@ -259,7 +263,7 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
               {
                 "name": "string",
                 "tpe": {
-                  "full_data_type": "TEXT",
+                  "full_data_type": "text",
                   "family": "String",
                   "arity": "Required",
                   "native_type": null
@@ -270,6 +274,22 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
             ]
           ],
           "foreign_keys": [],
+          "foreign_key_columns": [],
+          "indexes": [
+            {
+              "table_id": 0,
+              "index_name": "",
+              "tpe": "PrimaryKey"
+            }
+          ],
+          "index_columns": [
+            {
+              "index_id": 0,
+              "column_id": 0,
+              "sort_order": null,
+              "length": null
+            }
+          ],
           "views": [],
           "procedures": [],
           "user_defined_types": [],

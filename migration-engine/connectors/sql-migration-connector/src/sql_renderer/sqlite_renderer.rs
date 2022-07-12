@@ -22,17 +22,12 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_create_index(&self, index: IndexWalker<'_>) -> String {
-        let index_type = match index.index_type() {
-            IndexType::Unique => "UNIQUE ",
-            IndexType::Normal => "",
-            IndexType::Fulltext => unreachable!("Fulltext index on SQLite"),
-        };
-
-        let index_name = self.quote(index.name());
-        let table_reference = self.quote(index.table().name());
+        let index_type = if index.is_unique() { "UNIQUE " } else { "" };
+        let index_name = Quoted::sqlite_ident(index.name());
+        let table_reference = Quoted::sqlite_ident(index.table().name());
 
         let columns = index.columns().map(|c| {
-            let mut rendered = format!("{}", self.quote(c.get().name()));
+            let mut rendered = format!("{}", self.quote(c.as_column().name()));
 
             if let Some(sort_order) = c.sort_order() {
                 rendered.push(' ');
@@ -67,13 +62,8 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: Pair<&SqlSchema>) -> Vec<String> {
-        let AlterTable {
-            changes,
-            table_ids: table_index,
-        } = alter_table;
-
-        let tables = schemas.tables(*table_index);
-
+        let AlterTable { changes, table_ids } = alter_table;
+        let tables = schemas.walk(*table_ids);
         let mut statements = Vec::new();
 
         // See https://www.sqlite.org/lang_altertable.html for the reference on
@@ -85,7 +75,7 @@ impl SqlRenderer for SqliteFlavour {
                     column_id,
                     has_virtual_default: _,
                 } => {
-                    let column = schemas.next.walk_column(*column_id);
+                    let column = schemas.next.walk(*column_id);
                     let col_sql = render_column(&column);
 
                     statements.push(format!(
@@ -118,10 +108,10 @@ impl SqlRenderer for SqliteFlavour {
             foreign_keys: table
                 .foreign_keys()
                 .map(move |fk| sql_ddl::sqlite::ForeignKey {
-                    constrains: fk.constrained_column_names().iter().map(|name| name.into()).collect(),
+                    constrains: fk.constrained_columns().map(|col| col.name().into()).collect(),
                     references: (
                         fk.referenced_table().name().into(),
-                        fk.referenced_column_names().iter().map(|name| name.into()).collect(),
+                        fk.referenced_columns().map(|col| col.name().into()).collect(),
                     ),
                     constraint_name: fk.constraint_name().map(From::from),
                     on_delete: Some(match fk.on_delete_action() {
@@ -144,8 +134,8 @@ impl SqlRenderer for SqliteFlavour {
 
         if !table.columns().any(|col| col.is_single_primary_key()) {
             create_table.primary_key = table
-                .primary_key_column_names()
-                .map(|v| v.into_iter().map(|name| name.into()).collect());
+                .primary_key_columns()
+                .map(|c| c.map(|c| c.name().into()).collect());
         }
 
         create_table.to_string()
@@ -194,7 +184,7 @@ impl SqlRenderer for SqliteFlavour {
         let mut result = vec!["PRAGMA foreign_keys=OFF".to_string()];
 
         for redefine_table in tables {
-            let tables = schemas.tables(redefine_table.table_ids);
+            let tables = schemas.walk(redefine_table.table_ids);
             let temporary_table_name = format!("new_{}", &tables.next.name());
 
             result.push(self.render_create_table_as(tables.next, &temporary_table_name));
@@ -209,7 +199,7 @@ impl SqlRenderer for SqliteFlavour {
                 new_name = tables.next.name(),
             ));
 
-            for index in tables.next.indexes() {
+            for index in tables.next.indexes().filter(|idx| !idx.is_primary_key()) {
                 result.push(self.render_create_index(index));
             }
         }
@@ -278,10 +268,10 @@ fn copy_current_table_into_new_table(
     let destination_columns = redefine_table
         .column_pairs
         .iter()
-        .map(|(column_ids, _, _)| tables.next.schema.walk_column(column_ids.next).name());
+        .map(|(column_ids, _, _)| tables.next.walk(column_ids.next).name());
 
     let source_columns = redefine_table.column_pairs.iter().map(|(column_ides, changes, _)| {
-        let columns = tables.map(|t| t.schema).columns(*column_ides);
+        let columns = tables.map(|t| t.schema).walk(*column_ides);
 
         let col_became_required_with_a_default =
             changes.arity_changed() && columns.next.arity().is_required() && columns.next.default().is_some();

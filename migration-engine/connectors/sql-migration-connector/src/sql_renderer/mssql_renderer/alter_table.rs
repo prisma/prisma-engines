@@ -12,7 +12,7 @@ use crate::{
 };
 use sql_schema_describer::{
     mssql::MssqlSchemaExt,
-    walkers::{ColumnWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, TableWalker},
     ColumnId, DefaultValue,
 };
 use std::borrow::Cow;
@@ -101,27 +101,13 @@ impl<'a> AlterTableConstructor<'a> {
             let with_schema = format!(
                 "{}.{}",
                 self.renderer.schema_name(),
-                self.tables
-                    .previous
-                    .primary_key()
-                    .unwrap()
-                    .constraint_name
-                    .as_ref()
-                    .unwrap()
+                self.tables.previous.primary_key().unwrap().name()
             );
 
             statements.push(format!(
                 "EXEC SP_RENAME N{}, N{}",
-                Quoted::Single(with_schema),
-                Quoted::Single(
-                    self.tables
-                        .next
-                        .primary_key()
-                        .unwrap()
-                        .constraint_name
-                        .as_ref()
-                        .unwrap()
-                ),
+                Quoted::mssql_string(with_schema),
+                Quoted::mssql_string(self.tables.next.primary_key().unwrap().name()),
             ));
         }
 
@@ -161,7 +147,7 @@ impl<'a> AlterTableConstructor<'a> {
             .tables
             .previous
             .primary_key()
-            .and_then(|pk| pk.constraint_name.as_ref())
+            .map(|pk| pk.name())
             .expect("Missing constraint name in DropPrimaryKey on MSSQL");
 
         self.drop_constraints
@@ -169,19 +155,14 @@ impl<'a> AlterTableConstructor<'a> {
     }
 
     fn add_primary_key(&mut self) {
-        let mssql_schema_ext: &MssqlSchemaExt = self.tables.next.schema.downcast_connector_data().unwrap_or_default();
-        let constraint_name = self
-            .tables
-            .next
-            .primary_key()
-            .and_then(|pk| pk.constraint_name.as_ref())
-            .expect("Missing constraint name in AddPrimaryKey on MSSQL");
+        let mssql_schema_ext: &MssqlSchemaExt = self.tables.next.schema.downcast_connector_data();
+        let next_pk = self.tables.next.primary_key().unwrap();
 
-        let columns = self.tables.next.primary_key_columns();
-        let mut quoted_columns = Vec::with_capacity(columns.len());
+        let columns = self.tables.next.primary_key_columns().unwrap();
+        let mut quoted_columns = Vec::new();
 
         for column in columns {
-            let mut rendered = format!("{}", self.renderer.quote(column.as_column().name()));
+            let mut rendered = Quoted::mssql_ident(column.as_column().name()).to_string();
 
             if let Some(sort_order) = column.sort_order() {
                 rendered.push(' ');
@@ -191,7 +172,7 @@ impl<'a> AlterTableConstructor<'a> {
             quoted_columns.push(rendered);
         }
 
-        let clustering = if mssql_schema_ext.pk_is_clustered(self.tables.next.id) {
+        let clustering = if mssql_schema_ext.index_is_clustered(next_pk.id) {
             " CLUSTERED"
         } else {
             " NONCLUSTERED"
@@ -199,27 +180,25 @@ impl<'a> AlterTableConstructor<'a> {
 
         self.add_constraints.insert(format!(
             "CONSTRAINT {} PRIMARY KEY{} ({})",
-            constraint_name,
+            next_pk.name(),
             clustering,
             quoted_columns.join(","),
         ));
     }
 
     fn add_column(&mut self, column_id: ColumnId) {
-        let column = self.tables.next.schema.walk_column(column_id);
+        let column = self.tables.next.schema.walk(column_id);
         self.add_columns.push(self.renderer.render_column(column));
     }
 
     fn drop_column(&mut self, column_id: ColumnId) {
-        let name = self
-            .renderer
-            .quote(self.tables.previous.schema.walk_column(column_id).name());
+        let name = self.renderer.quote(self.tables.previous.walk(column_id).name());
 
         self.drop_columns.push(format!("{}", name));
     }
 
     fn drop_and_recreate_column(&mut self, columns: Pair<ColumnId>) {
-        let columns = self.tables.map(|t| t.schema).columns(columns);
+        let columns = self.tables.walk(columns);
 
         self.drop_columns
             .push(format!("{}", self.renderer.quote(columns.previous.name())));
@@ -228,7 +207,7 @@ impl<'a> AlterTableConstructor<'a> {
     }
 
     fn alter_column(&mut self, columns: Pair<ColumnId>, changes: &ColumnChanges) {
-        let columns = self.tables.map(|t| t.schema).columns(columns);
+        let columns = self.tables.walk(columns);
         let expanded = expand_alter_column(&columns, changes);
 
         for alter in expanded.into_iter() {

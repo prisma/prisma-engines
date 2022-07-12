@@ -4,7 +4,7 @@ use crate::{
     SqlFlavour, SqlMigrationConnector,
 };
 use migration_connector::{ConnectorResult, DestructiveChangeDiagnostics, Migration};
-use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
+use sql_schema_describer::SqlSchema;
 
 #[tracing::instrument(skip(flavour, migration))]
 pub(crate) async fn apply_migration(
@@ -124,42 +124,36 @@ fn render_raw_sql(
         SqlMigrationStep::AlterSequence(sequence_ids, changes) => {
             renderer.render_alter_sequence(*sequence_ids, *changes, schemas)
         }
-        SqlMigrationStep::AlterPrimaryKey(table_id) => renderer.render_alter_primary_key(schemas.tables(*table_id)),
+        SqlMigrationStep::AlterPrimaryKey(table_id) => renderer.render_alter_primary_key(schemas.walk(*table_id)),
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, schemas),
         SqlMigrationStep::RedefineTables(redefine_tables) => renderer.render_redefine_tables(redefine_tables, schemas),
-        SqlMigrationStep::CreateEnum(enum_id) => renderer.render_create_enum(schemas.next.walk_enum(*enum_id)),
-        SqlMigrationStep::DropEnum(enum_id) => renderer.render_drop_enum(schemas.previous.walk_enum(*enum_id)),
+        SqlMigrationStep::CreateEnum(enum_id) => renderer.render_create_enum(schemas.next.walk(*enum_id)),
+        SqlMigrationStep::DropEnum(enum_id) => renderer.render_drop_enum(schemas.previous.walk(*enum_id)),
         SqlMigrationStep::CreateTable { table_id } => {
-            let table = schemas.next.table_walker_at(*table_id);
+            let table = schemas.next.walk(*table_id);
 
             vec![renderer.render_create_table(table)]
         }
-        SqlMigrationStep::DropTable { table_id } => {
-            renderer.render_drop_table(schemas.previous.table_walker_at(*table_id).name())
-        }
-        SqlMigrationStep::RedefineIndex { table, index } => {
-            renderer.render_drop_and_recreate_index(schemas.tables(*table).indexes(index))
-        }
+        SqlMigrationStep::DropTable { table_id } => renderer.render_drop_table(schemas.previous.walk(*table_id).name()),
+        SqlMigrationStep::RedefineIndex { index } => renderer.render_drop_and_recreate_index(schemas.walk(*index)),
         SqlMigrationStep::AddForeignKey { foreign_key_id } => {
-            let foreign_key = schemas.next.walk_foreign_key(*foreign_key_id);
+            let foreign_key = schemas.next.walk(*foreign_key_id);
             vec![renderer.render_add_foreign_key(foreign_key)]
         }
         SqlMigrationStep::DropForeignKey { foreign_key_id } => {
-            let foreign_key = schemas.previous.walk_foreign_key(*foreign_key_id);
+            let foreign_key = schemas.previous.walk(*foreign_key_id);
             vec![renderer.render_drop_foreign_key(foreign_key)]
         }
         SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, schemas),
         SqlMigrationStep::CreateIndex {
-            table_id: (_, table_id),
+            table_id: _,
             index_id,
             from_drop_and_recreate: _,
-        } => vec![renderer.render_create_index(schemas.next.table_walker_at(*table_id).index_at(*index_id))],
-        SqlMigrationStep::DropIndex { table_id, index_id } => {
-            vec![renderer.render_drop_index(schemas.previous.table_walker_at(*table_id).index_at(*index_id))]
+        } => vec![renderer.render_create_index(schemas.next.walk(*index_id))],
+        SqlMigrationStep::DropIndex { index_id } => {
+            vec![renderer.render_drop_index(schemas.previous.walk(*index_id))]
         }
-        SqlMigrationStep::RenameIndex { table, index } => {
-            renderer.render_rename_index(schemas.tables(*table).indexes(index))
-        }
+        SqlMigrationStep::RenameIndex { index } => renderer.render_rename_index(schemas.walk(*index)),
         SqlMigrationStep::DropView(drop_view) => {
             let view = schemas.previous.view_walker_at(drop_view.view_index);
 
@@ -171,7 +165,7 @@ fn render_raw_sql(
             vec![renderer.render_drop_user_defined_type(&udt)]
         }
         SqlMigrationStep::RenameForeignKey { foreign_key_id } => {
-            let fks = schemas.foreign_keys(*foreign_key_id);
+            let fks = schemas.walk(*foreign_key_id);
             vec![renderer.render_rename_foreign_key(fks)]
         }
     }

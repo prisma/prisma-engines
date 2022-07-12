@@ -24,6 +24,10 @@ const CAPABILITIES: &[ConnectorCapability] = &[
 pub struct SqliteDatamodelConnector;
 
 impl Connector for SqliteDatamodelConnector {
+    fn provider_name(&self) -> &'static str {
+        "sqlite"
+    }
+
     fn name(&self) -> &str {
         "sqlite"
     }

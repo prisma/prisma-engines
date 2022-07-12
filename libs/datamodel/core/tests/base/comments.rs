@@ -32,8 +32,7 @@ fn free_floating_doc_comments_must_work_in_models() {
     }
     "#;
 
-    // must not crash
-    let _ = parse(dml);
+    assert_valid(dml);
 }
 
 #[test]
@@ -44,8 +43,7 @@ fn free_floating_doc_comments_must_work_in_enums() {
       /// documentation comment
     }"#;
 
-    // must not crash
-    let _ = parse(dml);
+    assert_valid(dml);
 }
 
 #[test]
@@ -57,8 +55,7 @@ fn doc_comments_must_work_on_block_attributes() {
       @@id([id1, id2]) /// Documentation comment block attribute
     }"#;
 
-    // must not crash
-    let _ = parse(dml);
+    assert_valid(dml);
 }
 
 #[test]
@@ -70,8 +67,7 @@ fn comments_must_work_on_block_attributes() {
       @@id([id1, id2]) // Documentation comment block attribute
     }"#;
 
-    // must not crash
-    let _ = parse(dml);
+    assert_valid(dml);
 }
 
 #[test]
@@ -85,15 +81,19 @@ fn comments_must_work_in_enums() {
       /// Documentation Comment Enum Value 1
       USER // Comment on the side
       // Comment below
+      PIZZAIOLO /// they make the pizza
     }"#;
 
-    // must not crash
     let schema = parse(dml);
-    schema
+    let role_enum = schema
         .assert_has_enum("Role")
-        .assert_with_documentation("Documentation Comment Enum")
+        .assert_with_documentation("Documentation Comment Enum");
+    role_enum
         .assert_has_value("USER")
         .assert_with_documentation("Documentation Comment Enum Value 1");
+    role_enum
+        .assert_has_value("PIZZAIOLO")
+        .assert_with_documentation("they make the pizza");
 }
 
 #[test]
@@ -136,8 +136,7 @@ fn comments_in_a_generator_must_work() {
     }
     "#;
 
-    // must not crash
-    let _ = parse(dml);
+    assert_valid(dml);
 }
 
 #[test]
@@ -150,8 +149,7 @@ fn comments_in_a_datasource_must_work() {
         }
     "#;
 
-    // must not crash
-    let _ = parse(dml);
+    assert_valid(dml);
 }
 
 #[test]

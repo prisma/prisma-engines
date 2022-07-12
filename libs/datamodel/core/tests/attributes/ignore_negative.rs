@@ -61,7 +61,7 @@ fn disallow_ignore_missing_from_model_with_optional_id() {
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
         [1;94m 1 | [0mmodel ModelOptionalId {
-        [1;94m 2 | [0m  text String? @[1;91mid[0m
+        [1;94m 2 | [0m  text String? [1;91m@id[0m
         [1;94m   | [0m
     "#]];
 
@@ -204,7 +204,7 @@ fn disallow_ignore_on_unsupported() {
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  id Int @id
-        [1;94m 3 | [0m  b  Unsupported("something") @[1;91mignore[0m
+        [1;94m 3 | [0m  b  Unsupported("something") [1;91m@ignore[0m
         [1;94m   | [0m
     "#]];
 

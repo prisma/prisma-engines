@@ -8,7 +8,6 @@ use crate::{
     },
 };
 use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
-use itertools::Itertools;
 use std::borrow::Cow;
 
 /// A model must have either a primary key, or a unique criteria
@@ -29,8 +28,8 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Con
     let mut loose_criterias = model
         .unique_criterias()
         .map(|c| {
-            let mut field_names = c.fields().map(|c| c.name());
-            format!("- {}", field_names.join(", "))
+            let field_names = c.fields().map(|c| c.name());
+            format!("- {}", field_names.collect::<Vec<_>>().join(", "))
         })
         .peekable();
 
@@ -40,7 +39,7 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Con
     let msg = if loose_criterias.peek().is_some() {
         let suffix = format!(
             "The following unique criterias were not considered as they contain fields that are not required:\n{}",
-            loose_criterias.join("\n"),
+            loose_criterias.collect::<Vec<_>>().join("\n"),
         );
 
         Cow::from(format!("{} {}", msg, suffix))
@@ -265,8 +264,7 @@ pub(super) fn id_client_name_does_not_clash_with_field(model: ModelWalker<'_>, c
         return;
     }
 
-    let id_client_name = id.fields().map(|f| f.name()).join("_");
-
+    let id_client_name = id.fields().map(|f| f.name()).collect::<Vec<_>>().join("_");
     if model.scalar_fields().any(|f| f.name() == id_client_name) {
         ctx.push_error(DatamodelError::new_model_validation_error(
             &format!("The field `{id_client_name}` clashes with the `@@id` attribute's name. Please resolve the conflict by providing a custom id name: `@@id([...], name: \"custom_name\")`"),

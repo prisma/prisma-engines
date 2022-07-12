@@ -6,7 +6,6 @@ version = "0.1.0"
 [dependencies]
 datamodel = { path = "../../../libs/datamodel/core", default_features = false }
 mongodb-client = { path = "../../../libs/mongodb-client" }
-mongodb-datamodel-connector = { path = "../../../libs/datamodel/connectors/mongodb-datamodel-connector" }
 mongodb-schema-describer = { path = "../../../libs/mongodb-schema-describer" }
 migration-connector = { path = "../migration-connector" }
 

@@ -1,8 +1,7 @@
 use datamodel::{
     datamodel_connector::{Connector, Diagnostics, ReferentialIntegrity},
     parse_configuration, parse_schema_ast,
-    parser_database::ParserDatabase,
-    schema_ast::{ast, source_file::SourceFile},
+    parser_database::{ast, ParserDatabase, SourceFile},
 };
 use log::*;
 use lsp_types::*;

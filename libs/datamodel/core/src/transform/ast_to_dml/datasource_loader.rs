@@ -1,20 +1,15 @@
-use super::{
-    super::helpers::{ValueListValidator, ValueValidator},
-    builtin_datasource_providers::{
-        CockroachDbDatasourceProvider, MongoDbDatasourceProvider, MsSqlDatasourceProvider, MySqlDatasourceProvider,
-        PostgresDatasourceProvider, SqliteDatasourceProvider,
-    },
-    datasource_provider::DatasourceProvider,
-};
 use crate::{
     ast::{self, SourceConfig, Span},
-    common::{preview_features::PreviewFeature, provider_names::*},
+    common::preview_features::PreviewFeature,
     configuration::StringFromEnvVar,
     diagnostics::{DatamodelError, Diagnostics},
+    parser_database::{ValueListValidator, ValueValidator},
     Datasource,
 };
 use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
+use mongodb_datamodel_connector::*;
+use sql_datamodel_connector::*;
 use std::{borrow::Cow, collections::HashMap, convert::TryFrom};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
@@ -148,13 +143,13 @@ impl DatasourceLoader {
         let documentation = ast_source.documentation.as_ref().map(|comment| comment.text.clone());
         let referential_integrity = get_referential_integrity(&args, preview_features, ast_source, diagnostics);
 
-        let datasource_provider: &'static dyn DatasourceProvider = match provider {
-            p if p == MYSQL_SOURCE_NAME => &MySqlDatasourceProvider,
-            p if p == POSTGRES_SOURCE_NAME || p == POSTGRES_SOURCE_NAME_HEROKU => &PostgresDatasourceProvider,
-            p if p == SQLITE_SOURCE_NAME => &SqliteDatasourceProvider,
-            p if p == MSSQL_SOURCE_NAME => &MsSqlDatasourceProvider,
-            p if p == MONGODB_SOURCE_NAME => &MongoDbDatasourceProvider,
-            p if p == COCKROACHDB_SOURCE_NAME => &CockroachDbDatasourceProvider,
+        let active_connector: &'static dyn datamodel_connector::Connector = match provider {
+            p if MYSQL.is_provider(p) => MYSQL,
+            p if POSTGRES.is_provider(p) => POSTGRES,
+            p if SQLITE.is_provider(p) => SQLITE,
+            p if MSSQL.is_provider(p) => MSSQL,
+            p if MONGODB.is_provider(p) => MONGODB,
+            p if COCKROACH.is_provider(p) => COCKROACH,
 
             _ => {
                 diagnostics.push_error(DatamodelError::new_datasource_provider_not_known_error(
@@ -165,8 +160,6 @@ impl DatasourceLoader {
                 return None;
             }
         };
-
-        let active_connector = datasource_provider.connector();
 
         if let Some(integrity) = referential_integrity {
             if !active_connector
@@ -206,7 +199,7 @@ impl DatasourceLoader {
         Some(Datasource {
             name: source_name.to_string(),
             provider: provider.to_owned(),
-            active_provider: datasource_provider.canonical_name().to_owned(),
+            active_provider: active_connector.provider_name(),
             url,
             url_span: url_arg.span(),
             documentation,
@@ -280,6 +273,6 @@ fn preview_features_guardrail(args: &HashMap<&str, (Span, ValueValidator<'_>)>, 
             }
         }
         let msg = "Preview features are only supported in the generator block. Please move this field to the generator block.";
-        diagnostics.push_error(DatamodelError::new(std::borrow::Cow::Borrowed(msg), span));
+        diagnostics.push_error(DatamodelError::new_static(msg, span));
     }
 }

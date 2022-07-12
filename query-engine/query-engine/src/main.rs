@@ -28,10 +28,10 @@ async fn main() -> Result<(), AnyError> {
 
         let metrics = MetricRegistry::new();
 
-        let mut logger = Logger::new("query-engine-http");
+        let mut logger = Logger::new("prisma-engine-http");
         logger.log_format(opts.log_format());
         logger.log_queries(opts.log_queries());
-        logger.enable_telemetry(opts.open_telemetry);
+        logger.enable_telemetry(opts.enable_open_telemetry);
         logger.telemetry_endpoint(&opts.open_telemetry_endpoint);
         logger.enable_metrics(metrics.clone());
 

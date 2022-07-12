@@ -1,4 +1,4 @@
-use crate::{schema_ast::ast, transform::ast_to_dml::db::ParserDatabase};
+use crate::{ast, transform::ast_to_dml::db::ParserDatabase};
 use datamodel_connector::{walker_ext_traits::*, Connector, ConstraintScope};
 use std::{borrow::Cow, collections::HashMap, ops::Deref};
 

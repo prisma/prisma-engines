@@ -8,16 +8,7 @@ mod postgres;
 pub use migration_core::migration_connector::ConnectorError;
 
 use self::{mongodb::*, mssql::*, mysql::*, postgres::*};
-use datamodel::{
-    common::{
-        preview_features::*,
-        provider_names::{
-            COCKROACHDB_SOURCE_NAME, MONGODB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME,
-            SQLITE_SOURCE_NAME,
-        },
-    },
-    Datasource,
-};
+use datamodel::{builtin_connectors::*, common::preview_features::*, Datasource};
 use enumflags2::BitFlags;
 use migration_core::{
     json_rpc::types::*,
@@ -50,15 +41,15 @@ pub async fn setup(prisma_schema: &str) -> ConnectorResult<()> {
     let (source, url, _preview_features) = parse_configuration(prisma_schema)?;
 
     match &source.active_provider {
-        provider if [POSTGRES_SOURCE_NAME, COCKROACHDB_SOURCE_NAME].contains(&provider.as_str()) => {
+        provider if [POSTGRES.provider_name(), COCKROACH.provider_name()].contains(provider) => {
             postgres_setup(url, prisma_schema).await?
         }
-        provider if [MSSQL_SOURCE_NAME].contains(&provider.as_str()) => mssql_setup(url, prisma_schema).await?,
-        provider if [MYSQL_SOURCE_NAME].contains(&provider.as_str()) => {
+        provider if MSSQL.is_provider(provider) => mssql_setup(url, prisma_schema).await?,
+        provider if MYSQL.is_provider(provider) => {
             mysql_reset(&url).await?;
             diff_and_apply(prisma_schema).await;
         }
-        provider if [SQLITE_SOURCE_NAME].contains(&provider.as_str()) => {
+        provider if SQLITE.is_provider(provider) => {
             // 1. creates schema & database
             let api = migration_core::migration_api(Some(prisma_schema.to_owned()), None)?;
             api.drop_database(url).await.ok();
@@ -73,7 +64,7 @@ pub async fn setup(prisma_schema: &str) -> ConnectorResult<()> {
             diff_and_apply(prisma_schema).await;
         }
 
-        provider if provider == MONGODB_SOURCE_NAME => mongo_setup(prisma_schema, &url).await?,
+        provider if MONGODB.is_provider(provider) => mongo_setup(prisma_schema, &url).await?,
 
         x => unimplemented!("Connector {} is not supported yet", x),
     };
@@ -86,18 +77,18 @@ pub async fn teardown(prisma_schema: &str) -> ConnectorResult<()> {
     let (source, url, _) = parse_configuration(prisma_schema)?;
 
     match &source.active_provider {
-        provider if [POSTGRES_SOURCE_NAME, COCKROACHDB_SOURCE_NAME].contains(&provider.as_str()) => {
+        provider if [POSTGRES.provider_name(), COCKROACH.provider_name()].contains(provider) => {
             postgres_teardown(&url).await?;
         }
 
         provider
             if [
-                SQLITE_SOURCE_NAME,
-                MSSQL_SOURCE_NAME,
-                MYSQL_SOURCE_NAME,
-                MONGODB_SOURCE_NAME,
+                SQLITE.provider_name(),
+                MSSQL.provider_name(),
+                MYSQL.provider_name(),
+                MONGODB.provider_name(),
             ]
-            .contains(&provider.as_str()) => {}
+            .contains(provider) => {}
 
         x => unimplemented!("Connector {} is not supported yet", x),
     };

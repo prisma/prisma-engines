@@ -1,5 +1,5 @@
-use datamodel::ast::{IndentationType, NewlineType};
 use indoc::indoc;
+use schema_ast::ast::{IndentationType, NewlineType};
 
 #[test]
 fn default_spacing() {

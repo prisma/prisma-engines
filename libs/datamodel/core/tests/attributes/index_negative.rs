@@ -24,7 +24,7 @@ fn indexes_on_relation_fields_must_error() {
           [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
         [1;94m 6 | [0m
-        [1;94m 7 | [0m  @@[1;91mindex([identification])[0m
+        [1;94m 7 | [0m  [1;91m@@index([identification])[0m
         [1;94m   | [0m
     "#]];
 
@@ -48,7 +48,7 @@ fn must_error_when_unknown_fields_are_used() {
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m
-        [1;94m 4 | [0m  @@[1;91mindex([foo,bar])[0m
+        [1;94m 4 | [0m  [1;91m@@index([foo,bar])[0m
         [1;94m   | [0m
     "#]];
 
@@ -103,13 +103,13 @@ fn index_does_not_accept_missing_length_with_extended_indexes() {
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m         id         Int    @id
-        [1;94m14 | [0m         firstName  String @[1;91munique[0m @test.Text
+        [1;94m14 | [0m         firstName  String [1;91m@unique [0m@test.Text
         [1;94m   | [0m
         [1;91merror[0m: [1mYou cannot define an index on fields with native type `Text` of MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m         
-        [1;94m16 | [0m         @@[1;91mindex([firstName])[0m
+        [1;94m16 | [0m         [1;91m@@index([firstName])[0m
         [1;94m   | [0m
     "#]];
 
@@ -132,7 +132,7 @@ fn sqlserver_disallows_unique_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id String @[1;91munique(length: 30)[0m @test.VarChar(255)
+        [1;94m12 | [0m  id String [1;91m@unique(length: 30)[0m @test.VarChar(255)
         [1;94m   | [0m
     "#]];
 
@@ -157,7 +157,7 @@ fn sqlserver_disallows_compound_unique_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b String
-        [1;94m14 | [0m  @@[1;91munique([a(length: 10), b(length: 30)])[0m
+        [1;94m14 | [0m  [1;91m@@unique([a(length: 10), b(length: 30)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -183,7 +183,7 @@ fn sqlserver_disallows_index_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m15 | [0m  [1;91m@@index([a(length: 10)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -206,7 +206,7 @@ fn sqlite_disallows_unique_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id String @[1;91munique(length: 30)[0m
+        [1;94m12 | [0m  id String [1;91m@unique(length: 30)[0m
         [1;94m   | [0m
     "#]];
 
@@ -231,7 +231,7 @@ fn sqlite_disallows_compound_unique_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b String
-        [1;94m14 | [0m  @@[1;91munique([a(length: 10), b(length: 30)])[0m
+        [1;94m14 | [0m  [1;91m@@unique([a(length: 10), b(length: 30)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -257,7 +257,7 @@ fn sqlite_disallows_index_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m15 | [0m  [1;91m@@index([a(length: 10)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -281,7 +281,7 @@ fn mongodb_disallows_unique_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m  id String @id @map("_id") @test.ObjectId
-        [1;94m13 | [0m  val String @[1;91munique(length: 30)[0m
+        [1;94m13 | [0m  val String [1;91m@unique(length: 30)[0m
         [1;94m   | [0m
     "#]];
 
@@ -307,7 +307,7 @@ fn mongodb_disallows_compound_unique_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m  b String
-        [1;94m15 | [0m  @@[1;91munique([a(length: 10), b(length: 30)])[0m
+        [1;94m15 | [0m  [1;91m@@unique([a(length: 10), b(length: 30)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -333,7 +333,7 @@ fn mongodb_disallows_index_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m15 | [0m  [1;91m@@index([a(length: 10)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -359,7 +359,7 @@ fn length_argument_does_not_work_with_decimal() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m15 | [0m  [1;91m@@index([a(length: 10)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -385,7 +385,7 @@ fn length_argument_does_not_work_with_json() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m15 | [0m  [1;91m@@index([a(length: 10)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -411,7 +411,7 @@ fn length_argument_does_not_work_with_datetime() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m15 | [0m  [1;91m@@index([a(length: 10)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -437,7 +437,7 @@ fn length_argument_does_not_work_with_boolean() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m15 | [0m  [1;91m@@index([a(length: 10)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -463,7 +463,7 @@ fn length_argument_does_not_work_with_float() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m15 | [0m  [1;91m@@index([a(length: 10)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -489,7 +489,7 @@ fn length_argument_does_not_work_with_bigint() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m15 | [0m  [1;91m@@index([a(length: 10)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -515,7 +515,7 @@ fn length_argument_does_not_work_with_int() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m15 | [0m  [1;91m@@index([a(length: 10)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -541,7 +541,7 @@ fn hash_index_doesnt_allow_sorting() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(sort: Desc)], type: Hash)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(sort: Desc)], type: Hash)[0m
         [1;94m   | [0m
     "#]];
 
@@ -594,7 +594,7 @@ fn fulltext_index_no_preview_feature() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m16 | [0m  [1;91m@@fulltext([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -647,7 +647,7 @@ fn fulltext_index_length_attribute() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mfulltext([a(length: 30), b])[0m
+        [1;94m16 | [0m  [1;91m@@fulltext([a(length: 30), b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -700,7 +700,7 @@ fn fulltext_index_sort_attribute() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mfulltext([a(sort: Desc), b])[0m
+        [1;94m16 | [0m  [1;91m@@fulltext([a(sort: Desc), b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -753,7 +753,7 @@ fn fulltext_index_postgres() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m16 | [0m  [1;91m@@fulltext([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -780,7 +780,7 @@ fn fulltext_index_sql_server() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m16 | [0m  [1;91m@@fulltext([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -807,7 +807,7 @@ fn fulltext_index_sqlite() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m16 | [0m  [1;91m@@fulltext([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -837,13 +837,13 @@ fn only_one_fulltext_index_allowed_per_model_in_mongo() {
           [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
         [1;94m17 | [0m
-        [1;94m18 | [0m  @@[1;91mfulltext([a, b])[0m
+        [1;94m18 | [0m  [1;91m@@fulltext([a, b])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@@fulltext": The current connector only allows one fulltext attribute per model[0m
           [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
         [1;94m18 | [0m  @@fulltext([a, b])
-        [1;94m19 | [0m  @@[1;91mfulltext([a, b, c, d])[0m
+        [1;94m19 | [0m  [1;91m@@fulltext([a, b, c, d])[0m
         [1;94m   | [0m
     "#]];
 
@@ -872,7 +872,7 @@ fn fulltext_index_fields_must_follow_each_other_in_mongo() {
           [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
         [1;94m17 | [0m
-        [1;94m18 | [0m  @@[1;91mfulltext([a, b(sort: Desc), c, d])[0m
+        [1;94m18 | [0m  [1;91m@@fulltext([a, b(sort: Desc), c, d])[0m
         [1;94m   | [0m
     "#]];
 
@@ -908,19 +908,19 @@ fn index_without_fields_must_error() {
           [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
         [1;94m17 | [0m          @@fulltext(fields:[], map: "a")
-        [1;94m18 | [0m          @@[1;91mindex(fields: [ ], map: "b")[0m
+        [1;94m18 | [0m          [1;91m@@index(fields: [ ], map: "b")[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@@unique": The list of fields in an index cannot be empty. Please specify at least one field.[0m
           [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
         [1;94m18 | [0m          @@index(fields: [ ], map: "b")
-        [1;94m19 | [0m          @@[1;91munique(fields: [])[0m
+        [1;94m19 | [0m          [1;91m@@unique(fields: [])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@@fulltext": The list of fields in an index cannot be empty. Please specify at least one field.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0m
-        [1;94m17 | [0m          @@[1;91mfulltext(fields:[], map: "a")[0m
+        [1;94m17 | [0m          [1;91m@@fulltext(fields:[], map: "a")[0m
         [1;94m   | [0m
     "#]];
 
@@ -948,13 +948,13 @@ fn duplicate_indices_on_the_same_fields_are_not_allowed_on_mongodb() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([data], map: "index_a")[0m
+        [1;94m15 | [0m  [1;91m@@index([data], map: "index_a")[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@@index": Index already exists in the model.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m  @@index([data], map: "index_a")
-        [1;94m16 | [0m  @@[1;91mindex([data], map: "index_b")[0m
+        [1;94m16 | [0m  [1;91m@@index([data], map: "index_b")[0m
         [1;94m   | [0m
     "#]];
 
@@ -982,13 +982,13 @@ fn duplicate_uniques_on_the_same_fields_are_not_allowed_on_mongodb() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91munique([data, dota], map: "index_a")[0m
+        [1;94m16 | [0m  [1;91m@@unique([data, dota], map: "index_a")[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@@unique": Index already exists in the model.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0m  @@unique([data, dota], map: "index_a")
-        [1;94m17 | [0m  @@[1;91munique([data, dota], map: "index_b")[0m
+        [1;94m17 | [0m  [1;91m@@unique([data, dota], map: "index_b")[0m
         [1;94m   | [0m
     "#]];
 
@@ -1015,13 +1015,13 @@ fn duplicate_indices_on_the_same_fields_different_sort_same_name_are_not_allowed
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([data(sort: Asc)])[0m
+        [1;94m15 | [0m  [1;91m@@index([data(sort: Asc)])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `A_data_idx` has to be unique in the following namespace: on model `A` for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m  @@index([data(sort: Asc)])
-        [1;94m16 | [0m  @@[1;91mindex([data(sort: Desc)])[0m
+        [1;94m16 | [0m  [1;91m@@index([data(sort: Desc)])[0m
         [1;94m   | [0m
     "#]];
 

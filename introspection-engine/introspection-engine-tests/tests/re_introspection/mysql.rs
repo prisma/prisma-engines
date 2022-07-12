@@ -259,8 +259,8 @@ async fn mysql_keeps_renamed_enum_defaults(api: &TestApi) -> TestResult {
         }
 
         enum A_val {
-          is_false  @map("0")
-          is_true   @map("1")
+          is_false @map("0")
+          is_true  @map("1")
         }
     "#]];
 

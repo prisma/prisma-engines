@@ -2,7 +2,6 @@ mod cockroach_describer_tests;
 
 use crate::test_api::*;
 use barrel::{types, Migration};
-use indoc::indoc;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{postgres::PostgresSchemaExt, *};
@@ -59,7 +58,6 @@ fn all_postgres_column_types_must_work(api: TestApi) {
         t.add_column("smallint_col", types::custom("SMALLINT"));
         t.add_column("smallserial_col", types::custom("SMALLSERIAL"));
         t.add_column("serial_col", types::custom("SERIAL"));
-        // TODO: Test also autoincrement variety
         t.add_column("primary_col", types::primary());
         t.add_column("string1_col", types::text());
         t.add_column("string2_col", types::varchar(1));
@@ -82,35 +80,6 @@ fn all_postgres_column_types_must_work(api: TestApi) {
             tables: [
                 Table {
                     name: "User",
-                    indices: [
-                        Index {
-                            name: "User_uuid_col_key",
-                            columns: [
-                                IndexColumn {
-                                    name: "uuid_col",
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                    length: None,
-                                },
-                            ],
-                            tpe: Unique,
-                        },
-                    ],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "primary_col",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: Some(
-                                "User_pkey",
-                            ),
-                        },
-                    ),
                 },
             ],
             enums: [],
@@ -1003,6 +972,49 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 ),
             ],
             foreign_keys: [],
+            foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "User_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "User_uuid_col_key",
+                    tpe: Unique,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        30,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: ColumnId(
+                        42,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -1023,10 +1035,13 @@ fn all_postgres_column_types_must_work(api: TestApi) {
             indexes: [
                 (
                     IndexId(
-                        TableId(
-                            0,
-                        ),
                         0,
+                    ),
+                    BTree,
+                ),
+                (
+                    IndexId(
+                        1,
                     ),
                     BTree,
                 ),
@@ -1199,154 +1214,55 @@ fn postgres_sequences_must_work(api: TestApi) {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
-    let schema = format!(
-        r##"
-            CREATE TABLE "{schema_name}"."indexes_test" (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                age INTEGER NOT NULL
-            );
+    let schema = r##"
+        CREATE TABLE "indexes_test" (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            age INTEGER NOT NULL
+        );
 
-            CREATE UNIQUE INDEX "my_idx" ON "{schema_name}"."indexes_test" (name, age);
-            CREATE INDEX "my_idx2" ON "{schema_name}"."indexes_test" (age, name);
-        "##,
-        schema_name = api.schema_name()
-    );
-    api.raw_cmd(&schema);
+        CREATE UNIQUE INDEX "my_idx" ON "indexes_test" (name, age);
+        CREATE INDEX "my_idx2" ON "indexes_test" (age, name);
+    "##;
+    api.raw_cmd(schema);
+
+    let schema = api.describe();
+    let found: Vec<_> = schema
+        .table_walkers()
+        .next()
+        .unwrap()
+        .indexes()
+        .map(|idx| (idx.name(), idx.is_unique(), idx.column_names().collect::<Vec<_>>()))
+        .collect();
+
     let expectation = expect![[r#"
-        SqlSchema {
-            tables: [
-                Table {
-                    name: "indexes_test",
-                    indices: [
-                        Index {
-                            name: "my_idx",
-                            columns: [
-                                IndexColumn {
-                                    name: "name",
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                    length: None,
-                                },
-                                IndexColumn {
-                                    name: "age",
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                    length: None,
-                                },
-                            ],
-                            tpe: Unique,
-                        },
-                        Index {
-                            name: "my_idx2",
-                            columns: [
-                                IndexColumn {
-                                    name: "age",
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                    length: None,
-                                },
-                                IndexColumn {
-                                    name: "name",
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                    length: None,
-                                },
-                            ],
-                            tpe: Normal,
-                        },
-                    ],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "id",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: Some(
-                                "indexes_test_pkey",
-                            ),
-                        },
-                    ),
-                },
-            ],
-            enums: [],
-            columns: [
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "id",
-                        tpe: ColumnType {
-                            full_data_type: "text",
-                            family: String,
-                            arity: Required,
-                            native_type: Some(
-                                String(
-                                    "Text",
-                                ),
-                            ),
-                        },
-                        default: None,
-                        auto_increment: false,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "name",
-                        tpe: ColumnType {
-                            full_data_type: "text",
-                            family: String,
-                            arity: Required,
-                            native_type: Some(
-                                String(
-                                    "Text",
-                                ),
-                            ),
-                        },
-                        default: None,
-                        auto_increment: false,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "age",
-                        tpe: ColumnType {
-                            full_data_type: "int4",
-                            family: Int,
-                            arity: Required,
-                            native_type: Some(
-                                String(
-                                    "Integer",
-                                ),
-                            ),
-                        },
-                        default: None,
-                        auto_increment: false,
-                    },
-                ),
-            ],
-            foreign_keys: [],
-            views: [],
-            procedures: [],
-            user_defined_types: [],
-            connector_data: <ConnectorData>,
-        }
+        [
+            (
+                "indexes_test_pkey",
+                false,
+                [
+                    "id",
+                ],
+            ),
+            (
+                "my_idx",
+                true,
+                [
+                    "name",
+                    "age",
+                ],
+            ),
+            (
+                "my_idx2",
+                false,
+                [
+                    "age",
+                    "name",
+                ],
+            ),
+        ]
     "#]];
-    api.expect_schema(expectation);
+    expectation.assert_debug_eq(&found);
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -1366,21 +1282,6 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             tables: [
                 Table {
                     name: "string_defaults_test",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "id",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: Some(
-                                "string_defaults_test_pkey",
-                            ),
-                        },
-                    ),
                 },
             ],
             enums: [],
@@ -1494,6 +1395,30 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                 ),
             ],
             foreign_keys: [],
+            foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "string_defaults_test_pkey",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -1518,8 +1443,6 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
             tables: [
                 Table {
                     name: "test",
-                    indices: [],
-                    primary_key: None,
                 },
             ],
             enums: [],
@@ -1557,6 +1480,9 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
                 ),
             ],
             foreign_keys: [],
+            foreign_key_columns: [],
+            indexes: [],
+            index_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -1581,8 +1507,7 @@ fn index_sort_order_is_handled(api: TestApi) {
 
     let schema = api.describe();
     let table = schema.table_walkers().next().unwrap();
-    let index = table.indexes().next().unwrap();
-
+    let index = table.indexes().nth(1).unwrap();
     let columns = index.columns().collect::<Vec<_>>();
 
     assert_eq!(1, columns.len());
@@ -1594,7 +1519,6 @@ fn index_sort_order_is_handled(api: TestApi) {
 fn index_sort_order_composite_type_desc_desc_is_handled(api: TestApi) {
     let sql = indoc! {r#"
         CREATE TABLE A (
-            id INT PRIMARY KEY,
             a  INT NOT NULL,
             b  INT NOT NULL
         );
@@ -1623,7 +1547,6 @@ fn index_sort_order_composite_type_desc_desc_is_handled(api: TestApi) {
 fn index_sort_order_composite_type_asc_desc_is_handled(api: TestApi) {
     let sql = indoc! {r#"
         CREATE TABLE A (
-            id INT PRIMARY KEY,
             a  INT NOT NULL,
             b  INT NOT NULL
         );
@@ -1808,5 +1731,5 @@ fn int_expressions_in_defaults(api: TestApi) {
 }
 
 fn extract_ext(schema: &SqlSchema) -> &PostgresSchemaExt {
-    schema.downcast_connector_data().unwrap_or_default()
+    schema.downcast_connector_data()
 }

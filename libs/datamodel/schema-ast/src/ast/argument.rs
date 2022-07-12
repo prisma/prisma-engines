@@ -28,10 +28,6 @@ pub struct ArgumentsList {
 }
 
 impl ArgumentsList {
-    pub(crate) fn is_empty(&self) -> bool {
-        self.arguments.is_empty()
-    }
-
     pub(crate) fn iter(&self) -> std::slice::Iter<'_, Argument> {
         self.arguments.iter()
     }
@@ -69,75 +65,6 @@ impl Display for Argument {
 }
 
 impl Argument {
-    pub fn new_string(name: &str, value: String) -> Argument {
-        assert!(!name.is_empty());
-        Argument {
-            name: Some(Identifier::new(name)),
-            value: Expression::StringValue(value, Span::empty()),
-            span: Span::empty(),
-        }
-    }
-
-    pub fn new_numeric(name: &str, value: u32) -> Argument {
-        assert!(!name.is_empty());
-        Argument {
-            name: Some(Identifier::new(name)),
-            value: Expression::NumericValue(value.to_string(), Span::empty()),
-            span: Span::empty(),
-        }
-    }
-
-    pub fn new_constant(name: &str, value: &str) -> Argument {
-        assert!(!name.is_empty());
-        Argument {
-            name: Some(Identifier::new(name)),
-            value: Expression::ConstantValue(String::from(value), Span::empty()),
-            span: Span::empty(),
-        }
-    }
-
-    pub fn new_array(name: &str, value: Vec<Expression>) -> Argument {
-        assert!(!name.is_empty());
-        Argument {
-            name: Some(Identifier::new(name)),
-            value: Expression::Array(value, Span::empty()),
-            span: Span::empty(),
-        }
-    }
-
-    pub fn new_function(name: &str, fn_name: &str, value: Vec<Argument>) -> Argument {
-        assert!(!name.is_empty());
-        Argument {
-            name: Some(Identifier::new(name)),
-            value: Expression::Function(
-                fn_name.to_string(),
-                ArgumentsList {
-                    arguments: value,
-                    ..Default::default()
-                },
-                Span::empty(),
-            ),
-            span: Span::empty(),
-        }
-    }
-
-    pub fn new(name: &str, value: Expression) -> Argument {
-        assert!(!name.is_empty());
-        Argument {
-            name: Some(Identifier::new(name)),
-            value,
-            span: Span::empty(),
-        }
-    }
-
-    pub fn new_unnamed(value: Expression) -> Argument {
-        Argument {
-            name: None,
-            value,
-            span: Span::empty(),
-        }
-    }
-
     pub fn is_unnamed(&self) -> bool {
         self.name.is_none()
     }

@@ -10,13 +10,11 @@ use prisma_value::PrismaValue;
 use sql::{
     postgres::PostgresSchemaExt,
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
-    IndexFieldId,
 };
 use sql_schema_describer::{
     self as sql,
     postgres::{SQLOperatorClassKind, SqlIndexAlgorithm},
-    ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKeyAction, IndexType, PrimaryKey, SQLSortOrder,
-    SqlSchema,
+    ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKeyAction, IndexType, SQLSortOrder, SqlSchema,
 };
 use test_setup::{BitFlags, Tags};
 
@@ -36,16 +34,6 @@ impl SchemaAssertion {
 
     pub fn into_schema(self) -> SqlSchema {
         self.schema
-    }
-
-    pub fn assert_equals(self, other: &SqlSchema) -> Self {
-        assert_eq!(&self.schema, other);
-        self
-    }
-
-    pub fn assert_ne(self, other: &SqlSchema) -> Self {
-        assert_ne!(&self.schema, other);
-        self
     }
 
     #[track_caller]
@@ -199,7 +187,7 @@ impl<'a> TableAssertion<'a> {
         if let Some(fk) = self
             .table
             .foreign_keys()
-            .find(|fk| fk.constrained_column_names() == columns)
+            .find(|fk| fk.constrained_columns().map(|c| c.name()).collect::<Vec<_>>() == columns)
         {
             fk_assertions(ForeignKeyAssertion { fk, tags: self.tags });
         } else {
@@ -281,11 +269,7 @@ impl<'a> TableAssertion<'a> {
     {
         match self.table.primary_key() {
             Some(pk) => {
-                pk_assertions(PrimaryKeyAssertion {
-                    pk,
-                    table: self.table,
-                    tags: self.tags,
-                });
+                pk_assertions(PrimaryKeyAssertion { pk, tags: self.tags });
                 self
             }
             None => panic!("Primary key not found on {}.", self.table.name()),
@@ -294,7 +278,7 @@ impl<'a> TableAssertion<'a> {
 
     #[track_caller]
     pub fn assert_indexes_count(self, n: usize) -> Self {
-        let idx_count = self.table.indexes().len();
+        let idx_count = self.table.indexes().filter(|idx| !idx.is_primary_key()).count();
         assert!(idx_count == n, "Expected {} indexes, found {}.", n, idx_count);
         self
     }
@@ -306,6 +290,7 @@ impl<'a> TableAssertion<'a> {
         if let Some(idx) = self
             .table
             .indexes()
+            .filter(|idx| !idx.is_primary_key())
             .find(|idx| idx.column_names().collect::<Vec<_>>() == columns)
         {
             index_assertions(IndexAssertion {
@@ -323,17 +308,12 @@ impl<'a> TableAssertion<'a> {
         if self
             .table
             .indexes()
-            .any(|idx| idx.name() == name && idx.index_type().is_unique() == unique)
+            .any(|idx| idx.name() == name && idx.is_unique() == unique)
         {
             self
         } else {
             panic!("Could not find index with name {} and correct type", name);
         }
-    }
-
-    pub fn debug_print(self) -> Self {
-        println!("{:?}", self.table);
-        self
     }
 }
 
@@ -644,8 +624,7 @@ impl IndexColumnAssertion {
 }
 
 pub struct PrimaryKeyAssertion<'a> {
-    pk: &'a PrimaryKey,
-    table: TableWalker<'a>,
+    pk: IndexWalker<'a>,
     tags: BitFlags<Tags>,
 }
 
@@ -662,14 +641,13 @@ impl<'a> PrimaryKeyAssertion<'a> {
     {
         let col = self
             .pk
-            .columns
-            .iter()
-            .find(|c| c.name == column_name)
+            .columns()
+            .find(|c| c.name() == column_name)
             .unwrap_or_else(|| panic!("Could not find column {}", column_name));
 
         f(IndexColumnAssertion {
-            length: col.length,
-            sort_order: col.sort_order,
+            length: col.length(),
+            sort_order: col.sort_order(),
             operator_class: None,
         });
 
@@ -679,12 +657,11 @@ impl<'a> PrimaryKeyAssertion<'a> {
     #[track_caller]
     pub fn assert_has_autoincrement(self) -> Self {
         assert!(
-            self.table
-                .columns()
-                .any(
-                    |column| self.pk.column_names().any(|name| name == column.name()) && column.is_autoincrement()
-                        || matches!(column.default().map(|d| d.kind()), Some(DefaultKind::UniqueRowid))
-                ),
+            self.pk.columns().any(|column| column.as_column().is_autoincrement()
+                || matches!(
+                    column.as_column().default().map(|d| d.kind()),
+                    Some(DefaultKind::UniqueRowid)
+                )),
             "Assertion failed: expected a sequence on the primary key, found none."
         );
 
@@ -693,27 +670,23 @@ impl<'a> PrimaryKeyAssertion<'a> {
 
     pub fn assert_has_no_autoincrement(self) -> Self {
         assert!(
-            !self
-                .table
-                .columns()
-                .any(|column| self.pk.column_names().any(|c| c == column.name()) && column.is_autoincrement()),
+            !self.pk.columns().any(|column| column.as_column().is_autoincrement()),
             "Assertion failed: expected no sequence on the primary key, but found one."
         );
 
         self
     }
 
-    pub fn assert_constraint_name(self, constraint_name: Option<String>) -> Self {
-        assert_eq!(self.pk.constraint_name, constraint_name);
-
+    pub fn assert_constraint_name(self, constraint_name: &str) -> Self {
+        assert_eq!(self.pk.name(), constraint_name);
         self
     }
 
     #[track_caller]
     pub fn assert_non_clustered(self) -> Self {
         if self.tags.contains(Tags::Mssql) {
-            let ext: &sql::mssql::MssqlSchemaExt = self.table.schema.downcast_connector_data().unwrap_or_default();
-            assert!(!ext.pk_is_clustered(self.table.id))
+            let ext: &sql::mssql::MssqlSchemaExt = self.pk.schema.downcast_connector_data();
+            assert!(!ext.index_is_clustered(self.pk.id))
         }
 
         self
@@ -722,8 +695,8 @@ impl<'a> PrimaryKeyAssertion<'a> {
     #[track_caller]
     pub fn assert_clustered(self) -> Self {
         if self.tags.contains(Tags::Mssql) {
-            let ext: &sql::mssql::MssqlSchemaExt = self.table.schema.downcast_connector_data().unwrap_or_default();
-            assert!(ext.pk_is_clustered(self.table.id))
+            let ext: &sql::mssql::MssqlSchemaExt = self.pk.schema.downcast_connector_data();
+            assert!(ext.index_is_clustered(self.pk.id))
         }
 
         self
@@ -740,12 +713,10 @@ impl<'a> ForeignKeyAssertion<'a> {
     pub fn assert_references(self, table: &str, columns: &[&str]) -> Self {
         assert!(
             self.is_same_table_name(self.fk.referenced_table().name(), table)
-                && self.fk.referenced_column_names() == columns,
-            r#"Assertion failed. Expected reference to "{}" ({:?}). Found "{}" ({:?}) "#,
+                && self.fk.referenced_columns().map(|c| c.name()).collect::<Vec<_>>() == columns,
+            r#"Assertion failed. Expected reference to "{}" ({:?})."#,
             table,
             columns,
-            self.fk.referenced_table().name(),
-            self.fk.referenced_column_names(),
         );
 
         self
@@ -754,7 +725,7 @@ impl<'a> ForeignKeyAssertion<'a> {
     #[track_caller]
     pub fn assert_referential_action_on_delete(self, action: ForeignKeyAction) -> Self {
         assert!(
-            *self.fk.on_delete_action() == action,
+            self.fk.on_delete_action() == action,
             "Assertion failed: expected foreign key to {:?} on delete, but got {:?}.",
             action,
             self.fk.on_delete_action()
@@ -766,7 +737,7 @@ impl<'a> ForeignKeyAssertion<'a> {
     #[track_caller]
     pub fn assert_referential_action_on_update(self, action: ForeignKeyAction) -> Self {
         assert!(
-            *self.fk.on_update_action() == action,
+            self.fk.on_update_action() == action,
             "Assertion failed: expected foreign key to {:?} on update, but got {:?}.",
             action,
             self.fk.on_update_action()
@@ -818,7 +789,7 @@ impl<'a> IndexAssertion<'a> {
     #[track_caller]
     pub fn assert_clustered(self) -> Self {
         if self.tags.contains(Tags::Mssql) {
-            let ext: &sql::mssql::MssqlSchemaExt = self.index.schema.downcast_connector_data().unwrap_or_default();
+            let ext: &sql::mssql::MssqlSchemaExt = self.index.schema.downcast_connector_data();
             assert!(ext.index_is_clustered(self.index.id))
         }
 
@@ -828,7 +799,7 @@ impl<'a> IndexAssertion<'a> {
     #[track_caller]
     pub fn assert_non_clustered(self) -> Self {
         if self.tags.contains(Tags::Mssql) {
-            let ext: &sql::mssql::MssqlSchemaExt = self.index.schema.downcast_connector_data().unwrap_or_default();
+            let ext: &sql::mssql::MssqlSchemaExt = self.index.schema.downcast_connector_data();
             assert!(!ext.index_is_clustered(self.index.id))
         }
 
@@ -842,7 +813,7 @@ impl<'a> IndexAssertion<'a> {
     }
 
     pub fn assert_algorithm(self, algo: SqlIndexAlgorithm) -> Self {
-        let postgres_ext: &PostgresSchemaExt = self.index.schema.downcast_connector_data().unwrap_or_default();
+        let postgres_ext: &PostgresSchemaExt = self.index.schema.downcast_connector_data();
         let algorithm = postgres_ext.index_algorithm(self.index.id);
         assert_eq!(algorithm, algo);
 
@@ -853,18 +824,16 @@ impl<'a> IndexAssertion<'a> {
     where
         F: FnOnce(IndexColumnAssertion) -> IndexColumnAssertion,
     {
-        let (col_idx, col) = self
+        let col = self
             .index
             .columns()
-            .enumerate()
-            .find(|(_, c)| c.as_column().name() == column_name)
+            .find(|c| c.as_column().name() == column_name)
             .unwrap();
 
         let operator_class = if self.tags.contains(Tags::Postgres) {
-            let ext: &PostgresSchemaExt = self.index.schema.downcast_connector_data().unwrap_or_default();
+            let ext: &PostgresSchemaExt = self.index.schema.downcast_connector_data();
 
-            ext.get_opclass(IndexFieldId(self.index.id, col_idx as u32))
-                .map(|c| c.kind.clone())
+            ext.get_opclass(col.id).map(|c| c.kind.clone())
         } else {
             None
         };

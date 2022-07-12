@@ -49,7 +49,6 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod common;
-pub mod dml;
 
 /// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a JSON representation.
 pub mod mcf;
@@ -58,27 +57,30 @@ mod configuration;
 mod reformat;
 mod transform;
 
-use std::sync::Arc;
-
 pub use crate::{
     configuration::{Configuration, Datasource, Generator, StringFromEnvVar},
     reformat::reformat,
 };
 pub use datamodel_connector;
 pub use diagnostics;
+pub use dml;
 pub use parser_database;
 pub use parser_database::is_reserved_type_name;
-use schema_ast::source_file::SourceFile;
-pub use schema_ast::{self, ast};
 
 use crate::common::preview_features::PreviewFeature;
 use diagnostics::Diagnostics;
 use enumflags2::BitFlags;
-use parser_database::ParserDatabase;
+use parser_database::{ast, ParserDatabase, SourceFile};
+use std::sync::Arc;
 use transform::{
     ast_to_dml::{validate, DatasourceLoader, GeneratorLoader},
-    dml_to_ast::{self, lower, GeneratorSerializer, LowerParams},
+    dml_to_ast::RenderParams,
 };
+
+pub mod builtin_connectors {
+    pub use mongodb_datamodel_connector::*;
+    pub use sql_datamodel_connector::*;
+}
 
 #[derive(Debug)]
 pub struct Validated<T> {
@@ -122,8 +124,7 @@ pub fn parse_schema_parserdb(file: impl Into<SourceFile>) -> Result<ValidatedSch
     let preview_features = preview_features(&generators);
     let datasources = load_sources(db.ast(), preview_features, &mut diagnostics);
 
-    let out = validate(db, &datasources, preview_features, diagnostics);
-
+    let mut out = validate(db, &datasources, preview_features, diagnostics);
     out.diagnostics
         .to_result()
         .map_err(|err| err.to_pretty_string("schema.prisma", file.as_str()))?;
@@ -178,7 +179,7 @@ fn parse_datamodel_internal(
             },
             datamodel,
         ),
-        warnings: out.diagnostics.warnings().to_vec(),
+        warnings: out.diagnostics.into_warnings(),
     })
 }
 
@@ -209,7 +210,7 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
             generators,
             datasources,
         },
-        warnings: diagnostics.warnings().to_owned(),
+        warnings: diagnostics.into_warnings(),
     })
 }
 
@@ -228,8 +229,9 @@ fn load_sources(
 /// Renders the datamodel _without configuration blocks_.
 pub fn render_datamodel_to_string(datamodel: &dml::Datamodel, configuration: Option<&Configuration>) -> String {
     let datasource = configuration.and_then(|c| c.datasources.first());
-    let lowered = lower(LowerParams { datasource, datamodel });
-    render_schema_ast(&lowered, 2)
+    let mut out = String::new();
+    transform::dml_to_ast::render(RenderParams { datasource, datamodel }, &mut out);
+    reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 
 /// Renders a datamodel, sources and generators.
@@ -237,24 +239,15 @@ pub fn render_datamodel_and_config_to_string(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) -> String {
-    let mut lowered = lower(LowerParams {
-        datasource: config.datasources.first(),
-        datamodel,
-    });
-
-    dml_to_ast::add_sources_to_ast(config, &mut lowered);
-    GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
-    render_schema_ast(&lowered, 2)
-}
-
-/// Renders as a string into the stream.
-fn render_schema_ast(schema: &ast::SchemaAst, ident_width: usize) -> String {
-    let mut out = String::with_capacity(schema.tops.len() * 20);
-    let mut renderer = schema_ast::renderer::Renderer::new(&mut out, ident_width);
-    renderer.render(schema);
-    reformat(&out, 2).expect("Internal error: failed to reformat introspected schema")
+    let mut out = String::new();
+    let datasource = config.datasources.first();
+    transform::dml_to_ast::render_configuration(config, &mut out);
+    transform::dml_to_ast::render(RenderParams { datasource, datamodel }, &mut out);
+    reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {
     generators.iter().map(|gen| gen.preview_features()).collect()
 }
+
+const DEFAULT_INDENT_WIDTH: usize = 2;

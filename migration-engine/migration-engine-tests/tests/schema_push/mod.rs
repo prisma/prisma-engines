@@ -222,7 +222,7 @@ fn alter_constraint_name_push(api: TestApi) {
 
     api.assert_schema().assert_table("A", |table| {
         if !no_named_pk {
-            table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomId".into())));
+            table.assert_pk(|pk| pk.assert_constraint_name("CustomId"));
         };
         table.assert_has_index_name_and_type("CustomUnique", true);
         table.assert_has_index_name_and_type("CustomCompoundUnique", true);
@@ -231,7 +231,7 @@ fn alter_constraint_name_push(api: TestApi) {
 
     api.assert_schema().assert_table("B", |table| {
         if !no_named_pk {
-            table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomCompoundId".into())));
+            table.assert_pk(|pk| pk.assert_constraint_name("CustomCompoundId"));
         };
         if !api.is_sqlite() {
             table.assert_fk_with_name("CustomFK");

@@ -20,7 +20,7 @@ fn should_fail_on_invalid_precision_for_decimal_type() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id        Int     @id
-        [1;94m 8 | [0m  firstName Decimal @[1;91mdb.Decimal(1001,3)[0m
+        [1;94m 8 | [0m  firstName Decimal [1;91m@db.Decimal(1001,3)[0m
         [1;94m   | [0m
     "#]];
 
@@ -46,7 +46,7 @@ fn should_fail_on_invalid_precision_for_time_types() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int      @id
-        [1;94m 8 | [0m  val DateTime @[1;91mdb.Time(7)[0m
+        [1;94m 8 | [0m  val DateTime [1;91m@db.Time(7)[0m
         [1;94m   | [0m
     "#]];
 
@@ -69,7 +69,7 @@ fn should_fail_on_invalid_precision_for_time_types() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int      @id
-        [1;94m 8 | [0m  val DateTime @[1;91mdb.Time(-1)[0m
+        [1;94m 8 | [0m  val DateTime [1;91m@db.Time(-1)[0m
         [1;94m   | [0m
     "#]];
 
@@ -92,7 +92,7 @@ fn should_fail_on_invalid_precision_for_time_types() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int      @id
-        [1;94m 8 | [0m  val DateTime @[1;91mdb.Timestamp(7)[0m
+        [1;94m 8 | [0m  val DateTime [1;91m@db.Timestamp(7)[0m
         [1;94m   | [0m
     "#]];
 
@@ -115,7 +115,7 @@ fn should_fail_on_invalid_precision_for_time_types() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int      @id
-        [1;94m 8 | [0m  val DateTime @[1;91mdb.Timestamp(-1)[0m
+        [1;94m 8 | [0m  val DateTime [1;91m@db.Timestamp(-1)[0m
         [1;94m   | [0m
     "#]];
 
@@ -141,7 +141,7 @@ fn should_fail_on_argument_out_of_range_for_bit_data_types() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int   @id
-        [1;94m 8 | [0m  val Bytes @[1;91mdb.Bit(0)[0m
+        [1;94m 8 | [0m  val Bytes [1;91m@db.Bit(0)[0m
         [1;94m   | [0m
     "#]];
 
@@ -164,7 +164,7 @@ fn should_fail_on_argument_out_of_range_for_bit_data_types() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int   @id
-        [1;94m 8 | [0m  val Bytes @[1;91mdb.VarBit(0)[0m
+        [1;94m 8 | [0m  val Bytes [1;91m@db.VarBit(0)[0m
         [1;94m   | [0m
     "#]];
 
@@ -190,7 +190,7 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int     @id
-        [1;94m 8 | [0m  dec Decimal @[1;91mdb.Decimal(2, 4)[0m
+        [1;94m 8 | [0m  dec Decimal [1;91m@db.Decimal(2, 4)[0m
         [1;94m   | [0m
     "#]];
 

@@ -111,7 +111,7 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
         port: 123,
         unix_path: None,
         subcommand: Some(Subcommand::Cli(CliOpt::Dmmf)),
-        open_telemetry: false,
+        enable_open_telemetry: false,
         open_telemetry_endpoint: String::new(),
     };
 

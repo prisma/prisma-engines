@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use datamodel::parser_database::walkers::CompleteInlineRelationWalker;
+use datamodel::parser_database::walkers::{CompleteInlineRelationWalker, ModelWalker, ScalarFieldWalker};
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Range, TextEdit, WorkspaceEdit};
 
 /// If the referencing side of the one-to-one relation does not point
@@ -63,39 +63,7 @@ pub(super) fn add_referencing_side_unique(
         _ => (),
     }
 
-    let mut fields = relation.referencing_fields();
-
-    let (new_text, start, end) = if fields.len() == 1 {
-        let new_text = String::from(" @unique");
-
-        let field = fields.next().unwrap();
-        let range = crate::span_to_range(field.ast_field().span, schema);
-
-        (new_text, range.end, range.end)
-    } else {
-        let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
-        let model = relation.referencing_model();
-        let newline = model.newline();
-
-        let separator = if model.ast_model().attributes.is_empty() {
-            ""
-        } else {
-            newline.as_ref()
-        };
-
-        let indentation = model.indentation();
-        let new_text = format!("{separator}{indentation}@@unique([{fields}]){newline}}}");
-
-        let start = crate::offset_to_position(model.ast_model().span.end - 1, schema).unwrap();
-        let end = crate::offset_to_position(model.ast_model().span.end, schema).unwrap();
-
-        (new_text, start, end)
-    };
-
-    let text = TextEdit {
-        range: Range { start, end },
-        new_text,
-    };
+    let text = create_missing_unique(schema, relation.referencing_model(), relation.referencing_fields());
 
     let mut changes = HashMap::new();
     changes.insert(params.text_document.uri.clone(), vec![text]);
@@ -170,7 +138,7 @@ pub(super) fn add_referenced_side_unique(
     if relation
         .referenced_model()
         .unique_criterias()
-        .any(|crit| crit.contains_exactly_fields(relation.referencing_fields()))
+        .any(|crit| crit.contains_exactly_fields(relation.referenced_fields()))
     {
         return;
     }
@@ -181,40 +149,7 @@ pub(super) fn add_referenced_side_unique(
         _ => (),
     }
 
-    let mut fields = relation.referenced_fields();
-
-    let (new_text, start, end) = if fields.len() == 1 {
-        let new_text = String::from(" @unique");
-
-        let field = fields.next().unwrap();
-        let start = crate::offset_to_position(field.ast_field().span.end - 1, schema).unwrap();
-
-        (new_text, start, start)
-    } else {
-        let model = relation.referenced_model();
-        let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
-
-        let indentation = model.indentation();
-        let newline = model.newline();
-
-        let separator = if model.ast_model().attributes.is_empty() {
-            newline.as_ref()
-        } else {
-            ""
-        };
-
-        let new_text = format!("{separator}{indentation}@@unique([{fields}]){newline}}}");
-
-        let start = crate::offset_to_position(model.ast_model().span.end - 1, schema).unwrap();
-        let end = crate::offset_to_position(model.ast_model().span.end, schema).unwrap();
-
-        (new_text, start, end)
-    };
-
-    let text = TextEdit {
-        range: Range { start, end },
-        new_text,
-    };
+    let text = create_missing_unique(schema, relation.referenced_model(), relation.referenced_fields());
 
     let mut changes = HashMap::new();
     changes.insert(params.text_document.uri.clone(), vec![text]);
@@ -241,4 +176,46 @@ pub(super) fn add_referenced_side_unique(
     };
 
     actions.push(CodeActionOrCommand::CodeAction(action));
+}
+
+fn create_missing_unique<'a>(
+    schema: &str,
+    model: ModelWalker<'a>,
+    mut fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'a>> + 'a,
+) -> TextEdit {
+    let (new_text, range) = if fields.len() == 1 {
+        let new_text = String::from(" @unique");
+
+        let field = fields.next().unwrap();
+        let position = crate::position_after_span(field.ast_field().span, schema);
+
+        let range = Range {
+            start: position,
+            end: position,
+        };
+
+        (new_text, range)
+    } else {
+        let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
+
+        let indentation = model.indentation();
+        let newline = model.newline();
+
+        let separator = if model.ast_model().attributes.is_empty() {
+            newline.as_ref()
+        } else {
+            ""
+        };
+
+        let new_text = format!("{separator}{indentation}@@unique([{fields}]){newline}}}");
+
+        let start = crate::offset_to_position(model.ast_model().span.end - 1, schema).unwrap();
+        let end = crate::offset_to_position(model.ast_model().span.end, schema).unwrap();
+
+        let range = Range { start, end };
+
+        (new_text, range)
+    };
+
+    TextEdit { range, new_text }
 }

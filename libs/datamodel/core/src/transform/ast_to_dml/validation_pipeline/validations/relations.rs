@@ -88,7 +88,7 @@ pub(super) fn field_arity(relation: InlineRelationWalker<'_>, ctx: &mut Context<
     let scalar_field_names: Vec<&str> = relation.referencing_fields().unwrap().map(|f| f.name()).collect();
 
     ctx.push_error(DatamodelError::new_validation_error(
-        format!(
+        &format!(
             "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
             forward_relation_field.name(),
             scalar_field_names.join(", "),
@@ -108,7 +108,7 @@ pub(super) fn same_length_in_referencing_and_referenced(relation: InlineRelation
     match (relation_field.referencing_fields(), relation_field.referenced_fields()) {
         (Some(fields), Some(references)) if fields.len() != references.len() => {
             ctx.push_error(DatamodelError::new_validation_error(
-                "You must specify the same number of fields in `fields` and `references`.".to_owned(),
+                "You must specify the same number of fields in `fields` and `references`.",
                 relation_field.relation_attribute().unwrap().span,
             ));
         }
@@ -200,7 +200,7 @@ fn referencing_fields_in_correct_order(relation: InlineRelationWalker<'_>, ctx: 
     }
 
     ctx.push_error(DatamodelError::new_validation_error(
-        format!(
+        &format!(
             "The argument `references` must refer to a unique criteria in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.",
             relation.referenced_model().name(),
             relation.referenced_fields().map(|f| f.name()).join(", ")
@@ -488,7 +488,7 @@ fn cascade_error_with_default_values(
 
     msg.push_str(" Read more at https://pris.ly/d/cyclic-referential-actions");
 
-    DatamodelError::new_validation_error(msg, relation.referencing_field().ast_field().span)
+    DatamodelError::new_validation_error(&msg, relation.referencing_field().ast_field().span)
 }
 
 /// The types of the referencing and referenced scalar fields in a relation must be compatible.

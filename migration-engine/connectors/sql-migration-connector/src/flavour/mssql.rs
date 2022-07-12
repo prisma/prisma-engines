@@ -83,7 +83,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
-        sql_datamodel_connector::MSSQL
+        datamodel::builtin_connectors::MSSQL
     }
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
@@ -336,6 +336,12 @@ impl SqlFlavour for MssqlFlavour {
         })
     }
 
+    fn empty_database_schema(&self) -> SqlSchema {
+        let mut schema = SqlSchema::default();
+        schema.set_connector_data(Box::new(sql_schema_describer::mssql::MssqlSchemaExt::default()));
+        schema
+    }
+
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.raw_cmd("SELECT 1")
     }
@@ -345,8 +351,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()> {
-        let url =
-            MssqlUrl::new(&connector_params.connection_string).map_err(|err| ConnectorError::url_parse_error(err))?;
+        let url = MssqlUrl::new(&connector_params.connection_string).map_err(ConnectorError::url_parse_error)?;
         let params = Params { connector_params, url };
         self.state.set_params(params);
         Ok(())

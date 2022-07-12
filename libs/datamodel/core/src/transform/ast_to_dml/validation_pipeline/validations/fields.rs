@@ -129,10 +129,7 @@ pub(crate) fn validate_length_used_with_correct_types(
 pub(super) fn validate_native_type_arguments<'db>(field: impl Into<TypedFieldWalker<'db>>, ctx: &mut Context<'db>) {
     let field = field.into();
 
-    let connector_name = ctx
-        .datasource
-        .map(|ds| ds.active_provider.clone())
-        .unwrap_or_else(|| "Default".to_owned());
+    let connector_name = ctx.datasource.map(|ds| ds.active_provider).unwrap_or_else(|| "Default");
     let (scalar_type, (attr_scope, type_name, args, span)) = match (field.scalar_type(), field.raw_native_type()) {
         (Some(scalar_type), Some(raw)) => (scalar_type, raw),
         _ => return,
@@ -155,7 +152,7 @@ pub(super) fn validate_native_type_arguments<'db>(field: impl Into<TypedFieldWal
         cons
     } else {
         return ctx.push_error(DatamodelError::new_native_type_name_unknown(
-            &connector_name,
+            connector_name,
             type_name,
             span,
         ));
@@ -339,7 +336,7 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
                         unsupported_lit, field.name(), prisma_type.as_str(), &source.name, native_type
                     );
 
-            ctx.push_error(DatamodelError::new_validation_error(msg, field.ast_field().span));
+            ctx.push_error(DatamodelError::new_validation_error(&msg, field.ast_field().span));
         }
     }
 }

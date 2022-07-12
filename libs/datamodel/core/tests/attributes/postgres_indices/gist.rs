@@ -179,7 +179,7 @@ fn wrong_ops_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetOps)], type: Gist)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetOps)], type: Gist)[0m
         [1;94m   | [0m
     "#]];
 
@@ -205,7 +205,7 @@ fn wrong_ops_index_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetOps)], type: Hash)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetOps)], type: Hash)[0m
         [1;94m   | [0m
     "#]];
 
@@ -231,7 +231,7 @@ fn wrong_ops_no_native_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: InetOps)], type: Gist)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: InetOps)], type: Gist)[0m
         [1;94m   | [0m
     "#]];
 

@@ -8,7 +8,7 @@ use crate::{
     version_checker::VersionChecker,
     SqlFamilyTrait, SqlIntrospectionResult,
 };
-use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel, Datasource};
+use datamodel::{builtin_connectors::*, common::preview_features::PreviewFeature, dml::Datamodel, Datasource};
 use enumflags2::BitFlags;
 use introspection_connector::{IntrospectionContext, IntrospectionResult};
 use quaint::prelude::SqlFamily;
@@ -25,7 +25,7 @@ pub(crate) struct CalculateDatamodelContext<'a> {
 
 impl CalculateDatamodelContext<'_> {
     pub(crate) fn is_cockroach(&self) -> bool {
-        self.source.active_provider == datamodel::common::provider_names::COCKROACHDB_SOURCE_NAME
+        self.source.active_connector.provider_name() == COCKROACH.provider_name()
     }
 }
 
@@ -63,7 +63,7 @@ pub fn calculate_datamodel(
     let mut warnings = vec![];
     if !previous_datamodel.is_empty() {
         enrich(previous_datamodel, &mut datamodel, &ctx, &mut warnings);
-        tracing::debug!("Enriching datamodel is done: {:?}", datamodel);
+        debug!("Enriching datamodel is done.");
     }
 
     // commenting out models, fields, enums, enum values
@@ -75,8 +75,7 @@ pub fn calculate_datamodel(
     // if based on a previous Prisma version add id default opinionations
     add_prisma_1_id_defaults(&version, &mut datamodel, schema, &mut warnings, &ctx);
 
-    // renderer -> parser -> validator, is_commented_out gets lost between renderer and parser
-    debug!("Done calculating data model {:?}", datamodel);
+    debug!("Done calculating datamodel.");
     Ok(IntrospectionResult {
         data_model: datamodel,
         warnings,

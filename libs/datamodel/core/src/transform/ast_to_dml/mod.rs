@@ -1,7 +1,5 @@
-mod builtin_datasource_providers;
 mod common;
 mod datasource_loader;
-mod datasource_provider;
 mod generator_loader;
 mod lift;
 mod validation_pipeline;

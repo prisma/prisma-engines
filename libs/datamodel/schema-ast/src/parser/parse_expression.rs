@@ -1,20 +1,20 @@
 use super::{
-    helpers::{parsing_catch_all, Token, TokenExtensions},
+    helpers::{parsing_catch_all, Pair},
     parse_arguments::parse_arguments_list,
     Rule,
 };
 use crate::ast::*;
 use diagnostics::{DatamodelError, Diagnostics};
 
-pub(crate) fn parse_expression(token: &Token<'_>, diagnostics: &mut diagnostics::Diagnostics) -> Expression {
-    let first_child = token.first_relevant_child();
+pub(crate) fn parse_expression(token: Pair<'_>, diagnostics: &mut diagnostics::Diagnostics) -> Expression {
+    let first_child = token.into_inner().next().unwrap();
     let span = Span::from(first_child.as_span());
     match first_child.as_rule() {
         Rule::numeric_literal => Expression::NumericValue(first_child.as_str().to_string(), span),
-        Rule::string_literal => Expression::StringValue(parse_string_literal(&first_child, diagnostics), span),
-        Rule::constant_literal => Expression::ConstantValue(first_child.as_str().to_string(), span),
-        Rule::function => parse_function(&first_child, diagnostics),
-        Rule::array_expression => parse_array(&first_child, diagnostics),
+        Rule::string_literal => Expression::StringValue(parse_string_literal(first_child, diagnostics), span),
+        Rule::path => Expression::ConstantValue(first_child.as_str().to_string(), span),
+        Rule::function_call => parse_function(first_child, diagnostics),
+        Rule::array_expression => parse_array(first_child, diagnostics),
         _ => unreachable!(
             "Encountered impossible literal during parsing: {:?}",
             first_child.tokens()
@@ -22,38 +22,40 @@ pub(crate) fn parse_expression(token: &Token<'_>, diagnostics: &mut diagnostics:
     }
 }
 
-fn parse_function(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Expression {
+fn parse_function(pair: Pair<'_>, diagnostics: &mut Diagnostics) -> Expression {
     let mut name: Option<String> = None;
     let mut arguments = ArgumentsList::default();
+    let (pair_str, span) = (pair.as_str(), pair.as_span());
 
-    for current in token.relevant_children() {
+    for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::function_name => name = Some(current.as_str().to_string()),
-            Rule::arguments_list => parse_arguments_list(&current, &mut arguments, diagnostics),
+            Rule::path => name = Some(current.as_str().to_string()),
+            Rule::arguments_list => parse_arguments_list(current, &mut arguments, diagnostics),
             _ => parsing_catch_all(&current, "function"),
         }
     }
 
     match name {
-        Some(name) => Expression::Function(name, arguments, Span::from(token.as_span())),
-        _ => unreachable!("Encountered impossible function during parsing: {:?}", token.as_str()),
+        Some(name) => Expression::Function(name, arguments, Span::from(span)),
+        _ => unreachable!("Encountered impossible function during parsing: {:?}", pair_str),
     }
 }
 
-fn parse_array(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Expression {
+fn parse_array(token: Pair<'_>, diagnostics: &mut Diagnostics) -> Expression {
     let mut elements: Vec<Expression> = vec![];
+    let span = token.as_span();
 
-    for current in token.relevant_children() {
+    for current in token.into_inner() {
         match current.as_rule() {
-            Rule::expression => elements.push(parse_expression(&current, diagnostics)),
+            Rule::expression => elements.push(parse_expression(current, diagnostics)),
             _ => parsing_catch_all(&current, "array"),
         }
     }
 
-    Expression::Array(elements, Span::from(token.as_span()))
+    Expression::Array(elements, Span::from(span))
 }
 
-fn parse_string_literal(token: &Token<'_>, diagnostics: &mut Diagnostics) -> String {
+fn parse_string_literal(token: Pair<'_>, diagnostics: &mut Diagnostics) -> String {
     assert!(token.as_rule() == Rule::string_literal);
     let contents = token.clone().into_inner().next().unwrap();
     let contents_str = contents.as_str();
@@ -110,8 +112,8 @@ fn parse_string_literal(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Str
                     let mut final_span: crate::ast::Span = contents.as_span().into();
                     final_span.start += start;
                     final_span.end = final_span.start + 1 + c.len_utf8();
-                    diagnostics.push_error(DatamodelError::new(
-                        r#"Unknown escape sequence. If the value is a windows-style path, `\` must be escaped as `\\`."#.into(),
+                    diagnostics.push_error(DatamodelError::new_static(
+                        r#"Unknown escape sequence. If the value is a windows-style path, `\` must be escaped as `\\`."#,
                         final_span
                     ));
                 }
@@ -136,7 +138,7 @@ fn try_parse_unicode_codepoint(
             start: slice_offset,
             end: (slice_offset + slice.len()).min(slice_offset + consumed),
         };
-        DatamodelError::new("Invalid unicode escape sequence.".into(), span)
+        DatamodelError::new_static("Invalid unicode escape sequence.", span)
     };
 
     match parse_codepoint(slice) {

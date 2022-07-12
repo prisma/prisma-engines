@@ -110,12 +110,12 @@ fn nice_error_missing_attribute_name() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating: The name of a Attribute must not be empty.[0m
+        [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
         [1;94m 1 | [0mmodel User {
-        [1;94m 2 | [0m  id Int @id @[1;91m[0m
-        [1;94m   | [0m              [1;91m^ Unexpected token.[0m
+        [1;94m 2 | [0m  [1;91mid Int @id @[0m
+        [1;94m 3 | [0m}
         [1;94m   | [0m
     "#]];
 

@@ -2,7 +2,7 @@ use crate::{
     core_error::CoreResult,
     json_rpc::types::{DiffParams, DiffResult, DiffTarget, PathContainer, SchemaContainer, UrlContainer},
 };
-use datamodel::schema_ast::source_file::SourceFile;
+use datamodel::parser_database::SourceFile;
 use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorHost, DatabaseSchema, DiffTarget as McDiff, MigrationConnector};
 use std::{path::Path, sync::Arc};

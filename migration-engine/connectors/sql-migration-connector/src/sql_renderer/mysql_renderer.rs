@@ -12,8 +12,7 @@ use regex::Regex;
 use sql_ddl::{mysql as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
     walkers::{
-        ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker, UserDefinedTypeWalker,
-        ViewWalker,
+        ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
     ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
 };
@@ -54,16 +53,13 @@ impl SqlRenderer for MysqlFlavour {
             changes: vec![ddl::AlterTableClause::AddForeignKey(ddl::ForeignKey {
                 constraint_name: foreign_key.constraint_name().map(From::from),
                 constrained_columns: foreign_key
-                    .constrained_column_names()
-                    .iter()
-                    .map(|c| Cow::Borrowed(c.as_str()))
+                    .constrained_columns()
+                    .map(|c| Cow::Borrowed(c.name()))
                     .collect(),
                 referenced_table: foreign_key.referenced_table().name().into(),
                 referenced_columns: foreign_key
-                    .referenced_column_names()
-                    .iter()
-                    .map(String::as_str)
-                    .map(Cow::Borrowed)
+                    .referenced_columns()
+                    .map(|c| Cow::Borrowed(c.name()))
                     .collect(),
                 on_delete: Some(match foreign_key.on_delete_action() {
                     ForeignKeyAction::Cascade => ddl::ForeignKeyAction::Cascade,
@@ -108,7 +104,7 @@ impl SqlRenderer for MysqlFlavour {
             changes,
         } = alter_table;
 
-        let tables = schemas.tables(*table_index);
+        let tables = schemas.walk(*table_index);
 
         let mut lines = Vec::new();
 
@@ -121,6 +117,7 @@ impl SqlRenderer for MysqlFlavour {
                     tables
                         .next
                         .primary_key_columns()
+                        .unwrap()
                         .map(|c| {
                             let mut rendered = format!("{}", self.quote(c.as_column().name()));
 
@@ -141,14 +138,14 @@ impl SqlRenderer for MysqlFlavour {
                     column_id,
                     has_virtual_default: _,
                 } => {
-                    let column = tables.next.schema.walk_column(*column_id);
+                    let column = tables.next.walk(*column_id);
                     let col_sql = self.render_column(column);
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
                 TableChange::DropColumn { column_id } => lines.push(
                     sql_ddl::mysql::AlterTableClause::DropColumn {
-                        column_name: tables.previous.schema.walk_column(*column_id).name().into(),
+                        column_name: tables.previous.walk(*column_id).name().into(),
                     }
                     .to_string(),
                 ),
@@ -157,7 +154,7 @@ impl SqlRenderer for MysqlFlavour {
                     column_id,
                     type_change: _,
                 }) => {
-                    let columns = schemas.columns(*column_id);
+                    let columns = schemas.walk(*column_id);
                     let expanded = MysqlAlterColumn::new(columns, *changes);
 
                     match expanded {
@@ -171,7 +168,7 @@ impl SqlRenderer for MysqlFlavour {
                     };
                 }
                 TableChange::DropAndRecreateColumn { column_id, changes: _ } => {
-                    let columns = schemas.columns(*column_id);
+                    let columns = schemas.walk(*column_id);
                     lines.push(format!("DROP COLUMN `{}`", columns.previous.name()));
                     lines.push(format!("ADD COLUMN {}", self.render_column(columns.next)));
                 }
@@ -201,6 +198,7 @@ impl SqlRenderer for MysqlFlavour {
                 sql_schema_describer::IndexType::Unique => ddl::IndexType::Unique,
                 sql_schema_describer::IndexType::Normal => ddl::IndexType::Normal,
                 sql_schema_describer::IndexType::Fulltext => ddl::IndexType::Fulltext,
+                sql_schema_describer::IndexType::PrimaryKey => unreachable!(),
             },
             index_name: index.name().into(),
             on: (
@@ -208,7 +206,7 @@ impl SqlRenderer for MysqlFlavour {
                 index
                     .columns()
                     .map(|c| IndexColumn {
-                        name: c.get().name().into(),
+                        name: c.as_column().name().into(),
                         length: c.length(),
                         sort_order: c.sort_order().map(|so| match so {
                             SQLSortOrder::Asc => SortOrder::Asc,
@@ -228,17 +226,19 @@ impl SqlRenderer for MysqlFlavour {
             columns: table.columns().map(|col| self.render_column(col)).collect(),
             indexes: table
                 .indexes()
+                .filter(|idx| !idx.is_primary_key())
                 .map(move |index| ddl::IndexClause {
                     index_name: Some(Cow::from(index.name())),
                     r#type: match index.index_type() {
                         sql_schema_describer::IndexType::Unique => ddl::IndexType::Unique,
                         sql_schema_describer::IndexType::Normal => ddl::IndexType::Normal,
                         sql_schema_describer::IndexType::Fulltext => ddl::IndexType::Fulltext,
+                        sql_schema_describer::IndexType::PrimaryKey => unreachable!(),
                     },
                     columns: index
                         .columns()
                         .map(|c| IndexColumn {
-                            name: c.get().name().into(),
+                            name: c.as_column().name().into(),
                             length: c.length(),
                             sort_order: c.sort_order().map(|so| match so {
                                 SQLSortOrder::Asc => SortOrder::Asc,
@@ -251,6 +251,8 @@ impl SqlRenderer for MysqlFlavour {
                 .collect(),
             primary_key: table
                 .primary_key_columns()
+                .into_iter()
+                .flatten()
                 .map(|c| IndexColumn {
                     name: c.as_column().name().into(),
                     length: c.length(),

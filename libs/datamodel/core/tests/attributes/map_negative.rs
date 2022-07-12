@@ -21,7 +21,7 @@ fn map_must_error_for_relation_fields() {
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m  fooId Int
-        [1;94m 4 | [0m  relationField  Foo @relation(fields: [fooId], references: [id]) @[1;91mmap("custom_name")[0m
+        [1;94m 4 | [0m  relationField  Foo @relation(fields: [fooId], references: [id]) [1;91m@map("custom_name")[0m
         [1;94m   | [0m
     "#]];
 
@@ -45,7 +45,7 @@ fn mongodb_field_mapping_cannot_start_with_a_dollar_sign() {
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m  id    Int    @id @map("_id")
-        [1;94m13 | [0m  field String @[1;91mmap("$field")[0m
+        [1;94m13 | [0m  field String [1;91m@map("$field")[0m
         [1;94m   | [0m
     "#]];
 
@@ -69,7 +69,7 @@ fn mongodb_field_mapping_cannot_contain_periods() {
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m  id    Int    @id @map("_id")
-        [1;94m13 | [0m  field String @[1;91mmap("field.schwield")[0m
+        [1;94m13 | [0m  field String [1;91m@map("field.schwield")[0m
         [1;94m   | [0m
     "#]];
 

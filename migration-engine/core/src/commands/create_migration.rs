@@ -1,5 +1,5 @@
 use crate::{json_rpc::types::*, CoreError, CoreResult};
-use datamodel::schema_ast::source_file::SourceFile;
+use datamodel::parser_database::SourceFile;
 use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
 use std::{path::Path, sync::Arc};
 use user_facing_errors::migration_engine::MigrationNameTooLong;

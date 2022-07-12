@@ -1,8 +1,6 @@
 mod shadow_db;
 
 use crate::{sql_renderer::IteratorJoin, SqlFlavour};
-#[allow(unused_imports)] // wtf, this one is unused on CI, not locally
-use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{
@@ -125,9 +123,9 @@ impl SqlFlavour for PostgresFlavour {
 
     fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
         if self.is_cockroachdb() {
-            sql_datamodel_connector::COCKROACH
+            datamodel::builtin_connectors::COCKROACH
         } else {
-            sql_datamodel_connector::POSTGRES
+            datamodel::builtin_connectors::POSTGRES
         }
     }
 
@@ -348,6 +346,12 @@ impl SqlFlavour for PostgresFlavour {
         Box::pin(self.raw_cmd("DROP TABLE _prisma_migrations"))
     }
 
+    fn empty_database_schema(&self) -> SqlSchema {
+        let mut schema = SqlSchema::default();
+        schema.set_connector_data(Box::new(sql_schema_describer::postgres::PostgresSchemaExt::default()));
+        schema
+    }
+
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(self, |_, _, _| future::ready(Ok(())))
     }
@@ -373,10 +377,10 @@ impl SqlFlavour for PostgresFlavour {
         let mut url: Url = connector_params
             .connection_string
             .parse()
-            .map_err(|err| ConnectorError::url_parse_error(err))?;
+            .map_err(ConnectorError::url_parse_error)?;
         disable_postgres_statement_cache(&mut url)?;
         let connection_string = url.to_string();
-        let url = PostgresUrl::new(url).map_err(|err| ConnectorError::url_parse_error(err))?;
+        let url = PostgresUrl::new(url).map_err(ConnectorError::url_parse_error)?;
         connector_params.connection_string = connection_string;
         let params = Params { connector_params, url };
         self.state.set_params(params);

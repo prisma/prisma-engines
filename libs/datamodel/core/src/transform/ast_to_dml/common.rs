@@ -9,8 +9,8 @@ pub fn parse_and_validate_preview_features(
     preview_features: Vec<String>,
     feature_map: &FeatureMap,
     span: ast::Span,
-) -> (Vec<PreviewFeature>, Diagnostics) {
-    let mut diagnostics = Diagnostics::new();
+    diagnostics: &mut Diagnostics,
+) -> Vec<PreviewFeature> {
     let mut features = vec![];
 
     for feature_str in preview_features {
@@ -18,10 +18,7 @@ pub fn parse_and_validate_preview_features(
         match feature_opt {
             Some(feature) if feature_map.is_deprecated(&feature) => {
                 features.push(feature);
-                diagnostics.push_warning(DatamodelWarning::new_deprecated_preview_feature_warning(
-                    &feature_str,
-                    span,
-                ))
+                diagnostics.push_warning(DatamodelWarning::new_feature_deprecated(&feature_str, span));
             }
 
             Some(feature) if !feature_map.is_valid(&feature) => {
@@ -42,5 +39,5 @@ pub fn parse_and_validate_preview_features(
         }
     }
 
-    (features, diagnostics)
+    features
 }

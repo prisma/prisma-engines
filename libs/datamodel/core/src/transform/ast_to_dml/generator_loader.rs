@@ -1,9 +1,8 @@
-use super::super::helpers::*;
 use crate::{
-    common::preview_features::GENERATOR, configuration::Generator, diagnostics::*, schema_ast::ast::WithSpan,
+    ast::WithSpan, common::preview_features::GENERATOR, configuration::Generator, diagnostics::*,
     transform::ast_to_dml::common::parse_and_validate_preview_features, StringFromEnvVar,
 };
-use parser_database::ast;
+use parser_database::{ast, ValueListValidator, ValueValidator};
 use std::{collections::HashMap, convert::TryFrom};
 
 const PROVIDER_KEY: &str = "provider";
@@ -107,8 +106,7 @@ impl GeneratorLoader {
 
         let preview_features = match preview_features_arg {
             Some((Ok(arr), span)) => {
-                let (features, mut diag) = parse_and_validate_preview_features(arr, &GENERATOR, span);
-                diagnostics.append(&mut diag);
+                let features = parse_and_validate_preview_features(arr, &GENERATOR, span, diagnostics);
 
                 Some(features)
             }

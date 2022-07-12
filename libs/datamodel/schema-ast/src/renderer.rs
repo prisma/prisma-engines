@@ -1,393 +1,25 @@
-mod string_builder;
 mod table;
 
-use crate::ast;
-use crate::ast::{Attribute, WithDocumentation};
-
-pub(crate) use string_builder::StringBuilder;
 pub(crate) use table::TableFormat;
-
-/// Get the sort order for an attribute, in the canonical sorting order.
-pub(crate) fn get_sort_index_of_attribute(is_field_attribute: bool, attribute_name: &str) -> usize {
-    // this must match the order defined for rendering in libs/datamodel/core/src/transform/dml_to_ast/lower_field.rs
-    let correct_order: &[&str] = if is_field_attribute {
-        &["id", "unique", "default", "updatedAt", "map", "relation", "ignore"]
-    } else {
-        &["id", "unique", "index", "fulltext", "map", "ignore"]
-    };
-
-    correct_order
-        .iter()
-        .position(|p| attribute_name.trim_start_matches('@').starts_with(p))
-        .unwrap_or(usize::MAX)
-}
 
 pub(crate) trait LineWriteable {
     fn write(&mut self, param: &str);
-    fn line_empty(&self) -> bool;
     fn end_line(&mut self);
-    fn maybe_end_line(&mut self);
 }
 
-pub struct Renderer<'a> {
-    stream: &'a mut dyn std::fmt::Write,
+pub(crate) struct Renderer {
+    pub stream: String,
     indent: usize,
-    new_line: usize,
-    is_new: bool,
-    maybe_new_line: usize,
     indent_width: usize,
 }
 
-impl<'a> Renderer<'a> {
-    pub fn new(stream: &'a mut dyn std::fmt::Write, indent_width: usize) -> Renderer<'a> {
+impl Renderer {
+    pub(crate) fn new(indent_width: usize) -> Renderer {
         Renderer {
-            stream,
+            stream: String::new(),
             indent: 0,
             indent_width,
-            new_line: 0,
-            maybe_new_line: 0,
-            is_new: true,
         }
-    }
-
-    pub fn render(&mut self, datamodel: &ast::SchemaAst) {
-        let mut type_renderer: Option<TableFormat> = None;
-
-        for (i, top) in datamodel.tops.iter().enumerate() {
-            if let Some(renderer) = &mut type_renderer {
-                renderer.render(self);
-                type_renderer = None;
-            }
-
-            if i != 0 {
-                // We put an extra line break in between top level structs.
-                self.end_line();
-            }
-
-            match top {
-                ast::Top::CompositeType(ct) => self.render_composite_type(ct),
-                ast::Top::Model(model) => self.render_model(model),
-                ast::Top::Enum(enm) => self.render_enum(enm),
-                ast::Top::Source(source) => self.render_source_block(source),
-                ast::Top::Generator(generator) => self.render_generator_block(generator),
-            }
-        }
-
-        self.stream.write_char('\n').expect("Writer error.");
-    }
-
-    fn render_documentation(
-        target: &mut dyn LineWriteable,
-        documentation: Option<&ast::Comment>,
-        is_commented_out: bool,
-    ) {
-        if let Some(doc) = documentation {
-            for line in doc.text.split('\n') {
-                // We comment out objects in introspection. Those are put into `//` comments.
-                // We use the documentation on the object to render an explanation for why that happened. It's nice if this explanation is also in a `//` instead of a `///` comment.
-                if is_commented_out {
-                    target.write("// ");
-                } else {
-                    target.write("/// ");
-                }
-                target.write(line);
-                target.end_line();
-            }
-        }
-    }
-
-    fn render_source_block(&mut self, source: &ast::SourceConfig) {
-        Self::render_documentation(self, source.documentation.as_ref(), source.is_commented_out());
-
-        self.write("datasource ");
-        self.write(&source.name.name);
-        self.write(" {");
-        self.end_line();
-        self.indent_up();
-
-        let mut formatter = TableFormat::new();
-
-        for property in &source.properties {
-            formatter.write(&property.name.name);
-            formatter.write(" = ");
-            formatter.write(&Self::render_value_to_string(&property.value));
-            formatter.end_line();
-        }
-
-        formatter.render(self);
-
-        self.indent_down();
-        self.write("}");
-        self.end_line();
-    }
-
-    fn render_generator_block(&mut self, generator: &ast::GeneratorConfig) {
-        Self::render_documentation(self, generator.documentation.as_ref(), generator.is_commented_out());
-
-        self.write("generator ");
-        self.write(&generator.name.name);
-        self.write(" {");
-        self.end_line();
-        self.indent_up();
-
-        let mut formatter = TableFormat::new();
-
-        for property in &generator.properties {
-            formatter.write(&property.name.name);
-            formatter.write(" = ");
-            formatter.write(&Self::render_value_to_string(&property.value));
-            formatter.end_line();
-        }
-
-        formatter.render(self);
-
-        self.indent_down();
-        self.write("}");
-        self.end_line();
-    }
-
-    fn render_model(&mut self, model: &ast::Model) {
-        let comment_out = if model.commented_out {
-            "// ".to_string()
-        } else {
-            "".to_string()
-        };
-
-        Self::render_documentation(self, model.documentation.as_ref(), model.is_commented_out());
-
-        self.write(format!("{}model ", comment_out).as_ref());
-        self.write(&model.name.name);
-        self.write(" {");
-        self.end_line();
-        self.indent_up();
-
-        let mut field_formatter = TableFormat::new();
-
-        for field in &model.fields {
-            Self::render_field(&mut field_formatter, field, model.commented_out);
-        }
-
-        field_formatter.render(self);
-
-        if !model.attributes.is_empty() {
-            self.end_line();
-            // sort attributes
-            let attributes = Self::sort_attributes(model.attributes.clone(), false);
-            for attribute in attributes {
-                self.render_block_attribute(&attribute, comment_out.clone());
-            }
-        }
-
-        self.indent_down();
-        self.write(format!("{}{}", comment_out, "}").as_ref());
-        self.end_line();
-    }
-
-    fn render_composite_type(&mut self, type_def: &ast::CompositeType) {
-        Self::render_documentation(self, type_def.documentation.as_ref(), type_def.is_commented_out());
-
-        self.write("type ");
-        self.write(&type_def.name.name);
-        self.write(" {");
-        self.end_line();
-        self.indent_up();
-
-        let mut field_formatter = TableFormat::new();
-
-        for field in &type_def.fields {
-            Self::render_field(&mut field_formatter, field, false);
-        }
-
-        field_formatter.render(self);
-
-        self.indent_down();
-        self.write("}");
-        self.end_line();
-    }
-
-    fn sort_attributes(mut attributes: Vec<Attribute>, is_field_attribute: bool) -> Vec<Attribute> {
-        // sort attributes
-        attributes.sort_by(|a, b| {
-            let sort_index_a = get_sort_index_of_attribute(is_field_attribute, a.name.name.as_str());
-            let sort_index_b = get_sort_index_of_attribute(is_field_attribute, b.name.name.as_str());
-            sort_index_a.cmp(&sort_index_b)
-        });
-        attributes
-    }
-
-    fn render_enum(&mut self, enm: &ast::Enum) {
-        Self::render_documentation(self, enm.documentation.as_ref(), enm.is_commented_out());
-
-        self.write("enum ");
-        self.write(&enm.name.name);
-        self.write(" {");
-        self.end_line();
-        self.indent_up();
-
-        for value in &enm.values {
-            //todo do the commenting out
-
-            let commented_out = if value.commented_out {
-                "// ".to_string()
-            } else {
-                "".to_string()
-            };
-            self.write(format!("{}{}", commented_out, &value.name.name).as_str());
-            if !value.attributes.is_empty() {
-                let mut attributes_builder = StringBuilder::new();
-
-                for attribute in &value.attributes {
-                    attributes_builder.write(" ");
-                    Self::render_field_attribute(&mut attributes_builder, attribute);
-                }
-
-                self.write(&attributes_builder.to_string());
-            }
-
-            if let Some(comment) = &value.documentation {
-                self.write(&format!(" // {}", comment.text.as_str()));
-            }
-
-            self.end_line();
-        }
-
-        if !enm.attributes.is_empty() {
-            self.end_line();
-            let attributes = Self::sort_attributes(enm.attributes.clone(), false);
-            for attribute in attributes {
-                self.render_block_attribute(&attribute, "".to_string());
-            }
-        }
-
-        self.indent_down();
-        self.write("}");
-        self.end_line();
-    }
-
-    fn render_field(target: &mut TableFormat, field: &ast::Field, is_commented_out: bool) {
-        Self::render_documentation(
-            &mut target.interleave_writer(),
-            field.documentation.as_ref(),
-            field.is_commented_out,
-        );
-
-        let commented_out = if field.is_commented_out || is_commented_out {
-            "// ".to_string()
-        } else {
-            "".to_string()
-        };
-
-        target.write(format!("{}{}", &commented_out, &field.name.name).as_ref());
-
-        // Type
-        {
-            let mut type_builder = StringBuilder::new();
-
-            Self::render_field_type(&mut type_builder, &field.field_type);
-            Self::render_field_arity(&mut type_builder, &field.arity);
-
-            target.write(&type_builder.to_string());
-        }
-
-        // Attributes
-        if !field.attributes.is_empty() {
-            let mut attributes_builder = StringBuilder::new();
-
-            let attributes = Self::sort_attributes(field.attributes.clone(), true);
-            for attribute in attributes {
-                attributes_builder.write(" ");
-                Self::render_field_attribute(&mut attributes_builder, &attribute);
-            }
-
-            target.write(&attributes_builder.to_string());
-        }
-
-        target.end_line();
-    }
-
-    fn render_field_arity(target: &mut dyn LineWriteable, field_arity: &ast::FieldArity) {
-        match field_arity {
-            ast::FieldArity::List => target.write("[]"),
-            ast::FieldArity::Optional => target.write("?"),
-            ast::FieldArity::Required => {}
-        };
-    }
-
-    fn render_field_attribute(target: &mut dyn LineWriteable, attribute: &ast::Attribute) {
-        target.write("@");
-        target.write(&attribute.name.name);
-
-        if !attribute.arguments.is_empty() {
-            target.write("(");
-            Self::render_arguments(target, &attribute.arguments);
-            target.write(")");
-        }
-    }
-
-    fn render_field_type(target: &mut dyn LineWriteable, field_type: &ast::FieldType) {
-        match field_type {
-            ast::FieldType::Supported(ft) => {
-                target.write(&ft.name);
-            }
-            ast::FieldType::Unsupported(lit, _) => {
-                target.write("Unsupported(\"");
-                target.write(lit);
-                target.write("\")");
-            }
-        }
-    }
-
-    fn render_block_attribute(&mut self, attribute: &ast::Attribute, commented_out: String) {
-        self.write(format!("{}@@", commented_out).as_ref());
-        self.write(&attribute.name.name);
-
-        if !attribute.arguments.is_empty() {
-            self.write("(");
-            Self::render_arguments(self, &attribute.arguments);
-            self.write(")");
-        }
-
-        self.end_line();
-    }
-
-    fn render_arguments(target: &mut dyn LineWriteable, args: &ast::ArgumentsList) {
-        for (idx, arg) in args.iter().enumerate() {
-            if idx > 0 {
-                target.write(", ");
-            }
-            Self::render_argument(target, arg);
-        }
-    }
-
-    fn render_argument(target: &mut dyn LineWriteable, arg: &ast::Argument) {
-        if let Some(arg_name) = &arg.name {
-            target.write(&arg_name.name);
-            target.write(": ");
-        }
-        Self::render_value(target, &arg.value);
-    }
-
-    pub fn render_value_to_string(val: &ast::Expression) -> String {
-        let mut builder = StringBuilder::new();
-        Self::render_value(&mut builder, val);
-        builder.to_string()
-    }
-
-    fn render_value(target: &mut dyn LineWriteable, val: &ast::Expression) {
-        match val {
-            ast::Expression::Array(vals, _) => Self::render_expression_array(target, vals),
-            ast::Expression::ConstantValue(val, _) => target.write(val),
-            ast::Expression::NumericValue(val, _) => target.write(val),
-            ast::Expression::StringValue(val, _) => Self::render_str(target, val),
-            ast::Expression::Function(name, args, _) => Self::render_func(target, name, args),
-        };
-    }
-
-    fn render_func(target: &mut dyn LineWriteable, name: &str, args: &ast::ArgumentsList) {
-        target.write(name);
-        target.write("(");
-        Self::render_arguments(target, args);
-        target.write(")");
     }
 
     pub(crate) fn indent_up(&mut self) {
@@ -400,66 +32,30 @@ impl<'a> Renderer<'a> {
         }
         self.indent -= 1
     }
-
-    fn render_expression_array(target: &mut dyn LineWriteable, vals: &[ast::Expression]) {
-        target.write("[");
-        for (idx, arg) in vals.iter().enumerate() {
-            if idx > 0 {
-                target.write(", ");
-            }
-            Self::render_value(target, arg);
-        }
-        target.write("]");
-    }
-
-    // https://datatracker.ietf.org/doc/html/rfc8259#section-7
-    fn render_str(target: &mut dyn LineWriteable, param: &str) {
-        target.write("\"");
-        for c in param.char_indices() {
-            match c {
-                (_, '\t') => target.write("\\t"),
-                (_, '\n') => target.write("\\n"),
-                (_, '"') => target.write("\\\""),
-                (_, '\r') => target.write("\\r"),
-                (_, '\\') => target.write("\\\\"),
-                // Control characters
-                (_, c) if c.is_ascii_control() => {
-                    let mut b = [0];
-                    c.encode_utf8(&mut b);
-                    let formatted = format!("\\u{:04x}", b[0]);
-                    target.write(&formatted)
-                }
-                (start, other) => target.write(&param[start..(start + other.len_utf8())]),
-            }
-        }
-        target.write("\"");
-    }
 }
 
-impl<'a> LineWriteable for Renderer<'a> {
+impl LineWriteable for Renderer {
     fn write(&mut self, param: &str) {
-        self.is_new = false;
-        if self.new_line > 0 || self.maybe_new_line > 0 {
-            for _i in 0..std::cmp::max(self.new_line, self.maybe_new_line) {
-                self.stream.write_char('\n').expect("Writer error.");
+        if self.stream.is_empty() || self.stream.ends_with('\n') {
+            for _ in 0..(self.indent * self.indent_width) {
+                self.stream.push(' ');
             }
-            write!(self.stream, "{}", " ".repeat(self.indent * self.indent_width)).expect("Writer error.");
-            self.new_line = 0;
-            self.maybe_new_line = 0;
         }
 
-        self.stream.write_str(param).expect("Writer error.");
+        self.stream.push_str(param);
     }
 
     fn end_line(&mut self) {
-        self.new_line += 1;
+        self.stream.push('\n');
+    }
+}
+
+impl<'a> LineWriteable for &'a mut String {
+    fn write(&mut self, param: &str) {
+        self.push_str(param);
     }
 
-    fn maybe_end_line(&mut self) {
-        self.maybe_new_line += 1;
-    }
-
-    fn line_empty(&self) -> bool {
-        self.new_line != 0 || self.maybe_new_line != 0 || self.is_new
+    fn end_line(&mut self) {
+        panic!("cannot end line in string builder");
     }
 }

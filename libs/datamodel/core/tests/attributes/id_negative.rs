@@ -15,7 +15,7 @@ fn id_should_error_if_the_field_is_not_required() {
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
         [1;94m 1 | [0mmodel Model {
-        [1;94m 2 | [0m  id Int? @[1;91mid[0m
+        [1;94m 2 | [0m  id Int? [1;91m@id[0m
         [1;94m   | [0m
     "#]];
 
@@ -125,7 +125,7 @@ fn relation_fields_as_part_of_compound_id_must_error() {
           [1;94m-->[0m  [4mschema.prisma:5[0m
         [1;94m   | [0m
         [1;94m 4 | [0m
-        [1;94m 5 | [0m  @@[1;91mid([name, identification])[0m
+        [1;94m 5 | [0m  [1;91m@@id([name, identification])[0m
         [1;94m   | [0m
     "#]];
 
@@ -151,7 +151,7 @@ fn must_error_when_multi_field_is_referring_fields_that_are_not_required() {
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m
-        [1;94m 6 | [0m  @@[1;91mid([a,b,c])[0m
+        [1;94m 6 | [0m  [1;91m@@id([a,b,c])[0m
         [1;94m   | [0m
     "#]];
 
@@ -202,7 +202,7 @@ fn relation_field_as_id_must_error() {
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
         [1;94m 1 | [0mmodel User {
-        [1;94m 2 | [0m  identification Identification @relation(references:[id]) @[1;91mid[0m
+        [1;94m 2 | [0m  identification Identification @relation(references:[id]) [1;91m@id[0m
         [1;94m   | [0m
     "#]];
 
@@ -231,7 +231,7 @@ fn invalid_name_for_compound_id_must_error() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mid([name, identification], name: "Test.User")[0m
+        [1;94m15 | [0m  [1;91m@@id([name, identification], name: "Test.User")[0m
         [1;94m   | [0m
     "#]];
 
@@ -395,13 +395,13 @@ fn mapping_id_with_a_name_that_is_too_long_should_error() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mid([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
+        [1;94m15 | [0m  [1;91m@@id([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "User1": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell' specified in the `map` argument for the `@id` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.[0m
           [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
         [1;94m18 | [0mmodel User1 {
-        [1;94m19 | [0m  name           String @[1;91mid(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")[0m
+        [1;94m19 | [0m  name           String [1;91m@id(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")[0m
         [1;94m   | [0m
     "#]];
 
@@ -458,7 +458,7 @@ fn bytes_should_not_be_allowed_as_id_on_sql_server() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0mmodel A {
-        [1;94m11 | [0m    id Bytes @[1;91mid[0m
+        [1;94m11 | [0m    id Bytes [1;91m@id[0m
         [1;94m   | [0m
     "#]];
 
@@ -521,7 +521,7 @@ fn mysql_does_not_allow_id_sort_argument() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Int @[1;91mid(sort: Desc)[0m
+        [1;94m12 | [0m  id Int [1;91m@id(sort: Desc)[0m
         [1;94m   | [0m
     "#]];
 
@@ -547,7 +547,7 @@ fn mysql_does_not_allow_compound_id_sort_argument() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mid([a(sort: Asc), b(sort: Desc)])[0m
+        [1;94m15 | [0m  [1;91m@@id([a(sort: Asc), b(sort: Desc)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -570,7 +570,7 @@ fn postgresql_does_not_allow_id_sort_argument() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Int @[1;91mid(sort: Desc)[0m
+        [1;94m12 | [0m  id Int [1;91m@id(sort: Desc)[0m
         [1;94m   | [0m
     "#]];
 
@@ -596,7 +596,7 @@ fn postgresql_does_not_allow_compound_id_sort_argument() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mid([a(sort: Asc), b(sort: Desc)])[0m
+        [1;94m15 | [0m  [1;91m@@id([a(sort: Asc), b(sort: Desc)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -619,7 +619,7 @@ fn sqlite_does_not_allow_id_sort_argument() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Int @[1;91mid(sort: Desc)[0m
+        [1;94m12 | [0m  id Int [1;91m@id(sort: Desc)[0m
         [1;94m   | [0m
     "#]];
 
@@ -642,7 +642,7 @@ fn mongodb_does_not_allow_id_sort_argument() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id String @[1;91mid(sort: Desc)[0m @map("_id") @test.ObjectId
+        [1;94m12 | [0m  id String [1;91m@id(sort: Desc)[0m @map("_id") @test.ObjectId
         [1;94m   | [0m
     "#]];
 
@@ -668,7 +668,7 @@ fn sqlite_does_not_allow_compound_id_sort_argument() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mid([a(sort: Asc), b(sort: Desc)])[0m
+        [1;94m15 | [0m  [1;91m@@id([a(sort: Asc), b(sort: Desc)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -691,7 +691,7 @@ fn postgresql_does_not_allow_id_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id String @[1;91mid(length: 10)[0m
+        [1;94m12 | [0m  id String [1;91m@id(length: 10)[0m
         [1;94m   | [0m
     "#]];
 
@@ -717,7 +717,7 @@ fn postgresql_does_not_allow_compound_id_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mid([a(length: 10), b(length: 20)])[0m
+        [1;94m15 | [0m  [1;91m@@id([a(length: 10), b(length: 20)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -740,7 +740,7 @@ fn sqlserver_does_not_allow_id_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id String @[1;91mid(length: 10)[0m
+        [1;94m12 | [0m  id String [1;91m@id(length: 10)[0m
         [1;94m   | [0m
     "#]];
 
@@ -766,7 +766,7 @@ fn sqlserver_does_not_allow_compound_id_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mid([a(length: 10), b(length: 20)])[0m
+        [1;94m15 | [0m  [1;91m@@id([a(length: 10), b(length: 20)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -789,7 +789,7 @@ fn sqlite_does_not_allow_id_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id String @[1;91mid(length: 10)[0m
+        [1;94m12 | [0m  id String [1;91m@id(length: 10)[0m
         [1;94m   | [0m
     "#]];
 
@@ -812,7 +812,7 @@ fn mongodb_does_not_allow_id_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id String @[1;91mid(length: 10)[0m @map("_id") @test.ObjectId
+        [1;94m12 | [0m  id String [1;91m@id(length: 10)[0m @map("_id") @test.ObjectId
         [1;94m   | [0m
     "#]];
 
@@ -838,7 +838,7 @@ fn sqlite_does_not_allow_compound_id_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mid([a(length: 10), b(length: 20)])[0m
+        [1;94m15 | [0m  [1;91m@@id([a(length: 10), b(length: 20)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -861,7 +861,7 @@ fn length_argument_does_not_work_with_decimal() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Decimal @[1;91mid(length: 10)[0m
+        [1;94m12 | [0m  id Decimal [1;91m@id(length: 10)[0m
         [1;94m   | [0m
     "#]];
 
@@ -884,7 +884,7 @@ fn length_argument_does_not_work_with_json() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Json @[1;91mid(length: 10)[0m
+        [1;94m12 | [0m  id Json [1;91m@id(length: 10)[0m
         [1;94m   | [0m
     "#]];
 
@@ -907,7 +907,7 @@ fn length_argument_does_not_work_with_datetime() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id DateTime @[1;91mid(length: 10)[0m
+        [1;94m12 | [0m  id DateTime [1;91m@id(length: 10)[0m
         [1;94m   | [0m
     "#]];
 
@@ -930,7 +930,7 @@ fn length_argument_does_not_work_with_boolean() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Boolean @[1;91mid(length: 10)[0m
+        [1;94m12 | [0m  id Boolean [1;91m@id(length: 10)[0m
         [1;94m   | [0m
     "#]];
 
@@ -953,7 +953,7 @@ fn length_argument_does_not_work_with_float() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Float @[1;91mid(length: 10)[0m
+        [1;94m12 | [0m  id Float [1;91m@id(length: 10)[0m
         [1;94m   | [0m
     "#]];
 
@@ -976,7 +976,7 @@ fn length_argument_does_not_work_with_bigint() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id BigInt @[1;91mid(length: 10)[0m
+        [1;94m12 | [0m  id BigInt [1;91m@id(length: 10)[0m
         [1;94m   | [0m
     "#]];
 
@@ -999,7 +999,7 @@ fn length_argument_does_not_work_with_int() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Int @[1;91mid(length: 10)[0m
+        [1;94m12 | [0m  id Int [1;91m@id(length: 10)[0m
         [1;94m   | [0m
     "#]];
 
@@ -1031,7 +1031,7 @@ fn empty_fields_must_error() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m          name        String @db.VarChar(255)
-        [1;94m15 | [0m          @@[1;91mid([])[0m
+        [1;94m15 | [0m          [1;91m@@id([])[0m
         [1;94m   | [0m
     "#]];
 
@@ -1083,7 +1083,7 @@ fn compound_ids_are_not_allowed_on_mongo() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mid([id, id2])[0m
+        [1;94m15 | [0m  [1;91m@@id([id, id2])[0m
         [1;94m   | [0m
     "#]];
 
@@ -1106,7 +1106,7 @@ fn mongodb_no_unique_index_for_id() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel User {
-        [1;94m12 | [0m  id String @[1;91munique[0m @id @map("_id") @test.ObjectId
+        [1;94m12 | [0m  id String [1;91m@unique [0m@id @map("_id") @test.ObjectId
         [1;94m   | [0m
     "#]];
 
@@ -1131,7 +1131,7 @@ fn mongodb_no_unique_index_for_id_model_attribute() {
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m
-        [1;94m14 | [0m  @@[1;91munique([id])[0m
+        [1;94m14 | [0m  [1;91m@@unique([id])[0m
         [1;94m   | [0m
     "#]];
 

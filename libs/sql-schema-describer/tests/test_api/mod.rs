@@ -1,4 +1,5 @@
 pub use expect_test::expect;
+pub use indoc::{formatdoc, indoc};
 pub use quaint::{prelude::Queryable, single::Quaint};
 pub use test_macros::test_connector;
 pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
@@ -7,7 +8,7 @@ use barrel::Migration;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{
     postgres::Circumstances,
-    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     ColumnTypeFamily, DescriberError, ForeignKeyAction, SqlSchema, SqlSchemaDescriberBackend,
 };
 use std::future::Future;
@@ -190,7 +191,11 @@ impl TableAssertion<'_> {
             fk: self
                 .table
                 .foreign_keys()
-                .find(|fk| fk.constrained_column_names() == cols)
+                .find(|fk| {
+                    let constrained_columns = fk.constrained_columns();
+                    constrained_columns.len() == cols.len()
+                        && constrained_columns.zip(cols).all(|(a, b)| a.name() == *b)
+                })
                 .unwrap(),
         };
 
@@ -210,7 +215,7 @@ impl TableAssertion<'_> {
             .indexes()
             .find(|i| {
                 let lengths_match = i.columns().len() == columns.len();
-                let columns_match = i.columns().zip(columns.iter()).all(|(a, b)| a.get().name() == *b);
+                let columns_match = i.columns().zip(columns.iter()).all(|(a, b)| a.as_column().name() == *b);
 
                 lengths_match && columns_match
             })
@@ -226,8 +231,7 @@ impl TableAssertion<'_> {
             .table
             .primary_key()
             .unwrap()
-            .columns
-            .iter()
+            .columns()
             .map(|c| c.name())
             .collect::<Vec<_>>();
 
@@ -249,7 +253,7 @@ impl ColumnAssertion<'_> {
 
     pub fn assert_full_data_type(&self, full_data_type: &str) -> &Self {
         assert_eq!(
-            self.column.column().tpe.full_data_type,
+            self.column.column_type().full_data_type,
             full_data_type,
             "assert_full_data_type() for {}",
             self.column.name()
@@ -300,12 +304,12 @@ impl IndexAssertion<'_> {
     }
 
     pub fn assert_is_unique(&self) -> &Self {
-        assert!(self.index.index_type().is_unique());
+        assert!(self.index.is_unique());
         self
     }
 
     pub fn assert_is_not_unique(&self) -> &Self {
-        assert!(!self.index.index_type().is_unique());
+        assert!(!self.index.is_unique());
         self
     }
 }
@@ -317,12 +321,16 @@ pub struct ForeignKeyAssertion<'a> {
 impl<'a> ForeignKeyAssertion<'a> {
     pub fn assert_references(&self, table: &str, columns: &[&str]) -> &Self {
         assert_eq!(self.fk.referenced_table().name(), table);
-        assert_eq!(self.fk.referenced_column_names(), columns);
+        let referenced_columns = self.fk.referenced_columns();
+        assert_eq!(referenced_columns.len(), columns.len());
+        for (a, b) in referenced_columns.zip(columns.iter()) {
+            assert_eq!(a.name(), *b);
+        }
         self
     }
 
     pub fn assert_on_delete(&self, expected: ForeignKeyAction) -> &Self {
-        assert_eq!(self.fk.on_delete_action(), &expected);
+        assert_eq!(self.fk.on_delete_action(), expected);
         self
     }
 }

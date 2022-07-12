@@ -77,7 +77,7 @@ fn multiple_unnamed_arguments_must_error() {
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m
-        [1;94m 6 | [0m  @@[1;91munique(firstName,lastName)[0m
+        [1;94m 6 | [0m  [1;91m@@unique(firstName,lastName)[0m
         [1;94m   | [0m
     "#]];
 
@@ -107,7 +107,7 @@ fn multi_field_unique_indexes_on_relation_fields_must_error_and_give_nice_error_
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m
-        [1;94m 6 | [0m  @@[1;91munique([identification])[0m
+        [1;94m 6 | [0m  [1;91m@@unique([identification])[0m
         [1;94m   | [0m
     "#]];
 
@@ -137,7 +137,7 @@ fn multi_field_unique_indexes_on_relation_fields_must_error_and_give_nice_error_
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m  user User
-        [1;94m10 | [0m  @@[1;91munique([user])[0m
+        [1;94m10 | [0m  [1;91m@@unique([user])[0m
         [1;94m   | [0m
     "#]];
 
@@ -165,7 +165,7 @@ fn single_field_unique_on_relation_fields_must_error_nicely_with_one_underlying_
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m  identificationId Int
-        [1;94m 4 | [0m  identification Identification @relation(fields: [identificationId], references:[id]) @[1;91munique[0m
+        [1;94m 4 | [0m  identification Identification @relation(fields: [identificationId], references:[id]) [1;91m@unique[0m
         [1;94m   | [0m
     "#]];
 
@@ -196,7 +196,7 @@ fn single_field_unique_on_relation_fields_must_error_nicely_with_many_underlying
           [1;94m-->[0m  [4mschema.prisma:5[0m
         [1;94m   | [0m
         [1;94m 4 | [0m  identificationId2 Int
-        [1;94m 5 | [0m  identification Identification @relation(fields: [identificationId1, identificationId2], references:[id1, id2]) @[1;91munique[0m
+        [1;94m 5 | [0m  identification Identification @relation(fields: [identificationId1, identificationId2], references:[id1, id2]) [1;91m@unique[0m
         [1;94m   | [0m
     "#]];
 
@@ -246,7 +246,7 @@ fn must_error_when_unknown_fields_are_used() {
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m
-        [1;94m 4 | [0m  @@[1;91munique([foo,bar])[0m
+        [1;94m 4 | [0m  [1;91m@@unique([foo,bar])[0m
         [1;94m   | [0m
     "#]];
 
@@ -271,7 +271,7 @@ fn must_error_when_using_the_same_field_multiple_times() {
           [1;94m-->[0m  [4mschema.prisma:5[0m
         [1;94m   | [0m
         [1;94m 4 | [0m
-        [1;94m 5 | [0m  @@[1;91munique([email, email])[0m
+        [1;94m 5 | [0m  [1;91m@@unique([email, email])[0m
         [1;94m   | [0m
     "#]];
 
@@ -301,7 +301,7 @@ fn invalid_name_for_compound_unique_must_error() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91munique([name, identification], name: "Test.User")[0m
+        [1;94m10 | [0m  [1;91m@@unique([name, identification], name: "Test.User")[0m
         [1;94m   | [0m
     "#]];
 
@@ -336,13 +336,13 @@ fn mapping_unique_with_a_name_that_is_too_long_should_error() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  @@[1;91munique([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
+        [1;94m10 | [0m  [1;91m@@unique([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError validating model "User1": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell' specified in the `map` argument for the `@unique` constraint is too long for your chosen provider. The maximum allowed length is 64 bytes.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0mmodel User1 {
-        [1;94m14 | [0m  name           String @[1;91munique(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")[0m            
+        [1;94m14 | [0m  name           String [1;91m@unique(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")[0m            
         [1;94m   | [0m
     "#]];
 
@@ -432,13 +432,13 @@ fn duplicate_implicit_names_should_error() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel User {
-        [1;94m12 | [0m  used           Int @[1;91munique[0m
+        [1;94m12 | [0m  used           Int [1;91m@unique[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@@unique": The given constraint name `User_used_key` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m
-        [1;94m14 | [0m  @@[1;91munique([used])[0m
+        [1;94m14 | [0m  [1;91m@@unique([used])[0m
         [1;94m   | [0m
     "#]];
 

@@ -1,17 +1,17 @@
 [
   {
-    "title": "Make referenced field(s) unique",
+    "title": "Make referencing fields unique",
     "kind": "quickfix",
     "diagnostics": [
       {
         "range": {
           "start": {
-            "line": 13,
+            "line": 8,
             "character": 2
           },
           "end": {
-            "line": 13,
-            "character": 10
+            "line": 8,
+            "character": 55
           }
         },
         "severity": 1,
@@ -24,12 +24,12 @@
           {
             "range": {
               "start": {
-                "line": 13,
-                "character": 11
+                "line": 7,
+                "character": 9
               },
               "end": {
-                "line": 13,
-                "character": 11
+                "line": 7,
+                "character": 9
               }
             },
             "newText": " @unique"

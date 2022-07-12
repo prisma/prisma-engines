@@ -5,7 +5,7 @@ use crate::warning::DatamodelWarning;
 ///
 /// This is used to accumulate multiple errors and warnings during validation.
 /// It is used to not error out early and instead show multiple errors at once.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Diagnostics {
     errors: Vec<DatamodelError>,
     warnings: Vec<DatamodelWarning>,
@@ -19,16 +19,16 @@ impl Diagnostics {
         }
     }
 
-    pub fn errors(&self) -> &[DatamodelError] {
-        &self.errors
-    }
-
     pub fn warnings(&self) -> &[DatamodelWarning] {
         &self.warnings
     }
 
-    pub fn warnings_mut(&mut self) -> &mut Vec<DatamodelWarning> {
-        &mut self.warnings
+    pub fn into_warnings(self) -> Vec<DatamodelWarning> {
+        self.warnings
+    }
+
+    pub fn errors(&self) -> &[DatamodelError] {
+        &self.errors
     }
 
     pub fn push_error(&mut self, err: DatamodelError) {
@@ -44,15 +44,9 @@ impl Diagnostics {
         !self.errors.is_empty()
     }
 
-    /// Appends all errors and warnings from another collection to this collection.
-    pub fn append(&mut self, err_and_warn: &mut Diagnostics) {
-        self.errors.append(&mut err_and_warn.errors);
-        self.warnings.append(&mut err_and_warn.warnings)
-    }
-
-    pub fn to_result(&self) -> Result<(), Diagnostics> {
+    pub fn to_result(&mut self) -> Result<(), Diagnostics> {
         if self.has_errors() {
-            Err(self.clone())
+            Err(std::mem::take(self))
         } else {
             Ok(())
         }
@@ -67,13 +61,6 @@ impl Diagnostics {
         }
 
         String::from_utf8_lossy(&message).into_owned()
-    }
-}
-
-impl std::fmt::Display for Diagnostics {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let msg: Vec<String> = self.errors.iter().map(|e| e.to_string()).collect();
-        f.write_str(&msg.join("\n"))
     }
 }
 

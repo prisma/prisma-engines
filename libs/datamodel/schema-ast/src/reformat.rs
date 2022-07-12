@@ -1,326 +1,229 @@
 use crate::{
     parser::{PrismaDatamodelParser, Rule},
-    renderer::{get_sort_index_of_attribute, LineWriteable, Renderer, TableFormat},
+    renderer::{LineWriteable, Renderer, TableFormat},
 };
 use pest::Parser;
+use std::iter::Peekable;
 
 type Pair<'a> = pest::iterators::Pair<'a, Rule>;
 
-/// Reformat the AST to a string, standardizing alignment and indentation.
+/// Reformat a PSL string.
 pub fn reformat(input: &str, indent_width: usize) -> Option<String> {
     let mut ast = PrismaDatamodelParser::parse(Rule::schema, input).ok()?;
-    let mut target_string = String::with_capacity(input.len());
-    let mut renderer = Renderer::new(&mut target_string, indent_width);
+    let mut renderer = Renderer::new(indent_width);
+    renderer.stream.reserve(input.len() / 2);
     reformat_top(&mut renderer, ast.next().unwrap());
 
     // all schemas must end with a newline
-    if !target_string.ends_with('\n') {
-        target_string.push('\n');
+    if !renderer.stream.ends_with('\n') {
+        renderer.stream.push('\n');
     }
 
-    Some(target_string)
+    Some(renderer.stream)
 }
 
-fn reformat_top(target: &mut Renderer<'_>, pair: Pair<'_>) {
-    let mut seen_at_least_one_top_level_element = false;
+fn reformat_top(target: &mut Renderer, pair: Pair<'_>) {
+    let mut pairs = pair.into_inner().peekable();
+    eat_empty_lines(&mut pairs);
 
-    for current in pair.into_inner() {
+    while let Some(current) = pairs.next() {
         match current.as_rule() {
-            Rule::WHITESPACE => {}
-            Rule::doc_comment | Rule::doc_comment_and_new_line => {}
-            _ => {}
-        };
-
-        // new line handling outside of blocks:
-        // * fold multiple new lines between blocks into one
-        // * all new lines before the first block get removed
-        if is_top_level_element(&current) {
-            // separate top level elements with new lines
-            if seen_at_least_one_top_level_element {
-                target.write("\n");
+            Rule::model_declaration | Rule::enum_declaration | Rule::config_block => {
+                reformat_block_element(current, target)
             }
-            seen_at_least_one_top_level_element = true;
-        }
-
-        match current.as_rule() {
-            Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                comment(current.as_str(), target);
-            }
-            Rule::model_declaration => {
-                let keyword = current
-                    .clone()
-                    .into_inner()
-                    .find(|pair| matches!(pair.as_rule(), Rule::TYPE_KEYWORD | Rule::MODEL_KEYWORD))
-                    .expect("Expected model or type keyword");
-
-                match keyword.as_rule() {
-                    Rule::TYPE_KEYWORD => reformat_composite_type(current, target),
-                    Rule::MODEL_KEYWORD => reformat_model(current, target),
-                    _ => unreachable!(),
-                };
-            }
-            Rule::enum_declaration => reformat_enum(current, target),
-            Rule::config_block => reformat_config_block(current, target),
             Rule::comment_block => {
-                for comment_token in current.into_inner() {
-                    comment(comment_token.as_str(), target);
+                let mut table = Default::default();
+                reformat_comment_block(current, &mut table);
+                table.render(target);
+            }
+            Rule::empty_lines => {
+                match pairs.peek().map(|b| b.as_rule()) {
+                    None | Some(Rule::EOI) => (), // skip the last empty lines
+                    _ => target.end_line(),
                 }
+            }
+            Rule::CATCH_ALL | Rule::BLOCK_LEVEL_CATCH_ALL | Rule::arbitrary_block => {
+                target.write(current.as_str());
             }
             Rule::EOI => {}
-            Rule::NEWLINE => {} // Do not render user provided newlines. We have a strong opinionation about new lines on the top level.
-            _ => reformat_generic_pair(current, target),
+            _ => unreachable(&current),
         }
     }
-
-    // FLUSH IT. Otherwise pending new lines do not get rendered.
-    target.write("");
 }
 
-fn reformat_config_block(pair: Pair<'_>, target: &mut Renderer<'_>) {
-    let keyword = pair
-        .clone()
-        .into_inner()
-        .find(|p| [Rule::GENERATOR_KEYWORD, Rule::DATASOURCE_KEYWORD].contains(&p.as_rule()))
-        .map(|tok| tok.as_str())
-        .unwrap();
-
-    reformat_block_element(
-        keyword,
-        target,
-        pair,
-        &(|table, _, pair| match pair.as_rule() {
-            Rule::key_value => reformat_key_value(pair, table),
-            _ => reformat_generic_pair(pair, table),
-        }),
-    );
-}
-
-fn reformat_key_value(pair: Pair<'_>, target: &mut TableFormat) {
+fn reformat_key_value(pair: Pair<'_>, table: &mut TableFormat) {
+    table.start_new_line();
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
-                target.write(current.as_str());
-                target.write("=");
-            }
+            Rule::identifier => table.column_locked_writer_for(0).write(current.as_str()),
             Rule::expression => {
-                reformat_expression(current, &mut target.column_locked_writer_for(2));
+                let mut writer = table.column_locked_writer_for(1);
+                writer.write("= ");
+                reformat_expression(current, &mut writer);
             }
-            Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                panic!("Comments inside config key/value not supported yet.")
-            }
-            _ => reformat_generic_pair(current, target),
+            Rule::trailing_comment => table.append_suffix_to_current_row(current.as_str()),
+            _ => unreachable(&current),
         }
     }
 }
 
-fn reformat_model(pair: Pair<'_>, target: &mut Renderer<'_>) {
-    reformat_block_element(
-        "model",
-        target,
-        pair,
-        &(|table, renderer, pair| {
-            match pair.as_rule() {
-                Rule::block_level_attribute => {
-                    // model level attributes reset the table. -> .render() does that
-                    table.render(renderer);
-                    let attribute = pair.into_inner().next().unwrap();
-                    reformat_attribute(attribute, "@@", renderer);
+fn reformat_block_element(pair: Pair<'_>, renderer: &mut Renderer) {
+    let mut table = TableFormat::default();
+    let mut attributes: Vec<(Option<Pair<'_>>, Pair<'_>)> = Vec::new(); // (Option<doc_comment>, attribute)
+    let mut pending_block_comment = None; // comment before an attribute
+    let mut pairs = pair.into_inner().peekable();
+    let block_type = pairs.next().unwrap().as_str();
+
+    loop {
+        let ate_empty_lines = eat_empty_lines(&mut pairs);
+
+        // Decide what to do with the empty lines.
+        if ate_empty_lines {
+            match pairs.peek().map(|pair| pair.as_rule()) {
+                Some(Rule::BLOCK_CLOSE) | Some(Rule::block_attribute) | Some(Rule::comment_block) => {
+                    // Reformat away the empty lines at the end of blocks and before attributes (we
+                    // re-add them later).
                 }
-                Rule::field_declaration => reformat_field(pair, table),
-                _ => reformat_generic_pair(pair, table),
-            }
-        }),
-    );
-}
-
-fn reformat_composite_type(pair: Pair<'_>, target: &mut Renderer<'_>) {
-    reformat_block_element(
-        "type",
-        target,
-        pair,
-        &(|table, renderer, pair| {
-            match pair.as_rule() {
-                Rule::block_level_attribute => {
-                    // model level attributes reset the table. -> .render() does that
+                Some(_) => {
+                    // Reset the table layout on an empty line.
                     table.render(renderer);
-                    let attribute = pair.into_inner().next().unwrap();
-                    reformat_attribute(attribute, "@@", renderer);
+                    table = TableFormat::default();
+                    table.start_new_line();
                 }
-                Rule::field_declaration => reformat_field(pair, table),
-                _ => reformat_generic_pair(pair, table),
+                _ => (),
             }
-        }),
-    );
-}
+        }
 
-fn reformat_block_element(
-    block_type: &str,
-    renderer: &mut Renderer<'_>,
-    pair: Pair<'_>,
-    the_fn: &(dyn Fn(&mut TableFormat, &mut Renderer<'_>, Pair<'_>)),
-) {
-    let mut table = TableFormat::new();
-    let mut block_has_opened = false;
+        let current = match pairs.next() {
+            Some(current) => current,
+            None => return,
+        };
 
-    // sort attributes
-    let mut attributes = extract_and_sort_attributes(pair.clone(), false);
-
-    // used to add a new line between fields and block attributes if there isn't one already
-    let mut last_line_was_empty = false;
-
-    for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::MODEL_KEYWORD | Rule::TYPE_KEYWORD | Rule::GENERATOR_KEYWORD | Rule::DATASOURCE_KEYWORD => (),
             Rule::BLOCK_OPEN => {
-                block_has_opened = true;
+                // Reformat away the empty lines at the beginning of the block.
+                eat_empty_lines(&mut pairs);
             }
             Rule::BLOCK_CLOSE => {
-                // New line between fields and attributes
-                // only if there isn't already a new line in between
-                if !attributes.is_empty() && !last_line_was_empty {
-                    table.render(renderer);
-                    table = TableFormat::new();
-                    renderer.end_line();
+                // Flush current table.
+                table.render(renderer);
+                table = Default::default();
+
+                // We are going to render the block attributes: new line.
+                if !attributes.is_empty() {
+                    table.start_new_line();
                 }
 
-                for pair in attributes.drain(..) {
-                    the_fn(&mut table, renderer, pair);
-                    // New line after each block attribute
-                    table.render(renderer);
-                    table = TableFormat::new();
-                    renderer.maybe_end_line();
+                sort_attributes(&mut attributes[..]);
+
+                for (comment, pair) in attributes.drain(..) {
+                    if let Some(comment) = comment {
+                        reformat_comment_block(comment, &mut table);
+                    }
+                    reformat_block_attribute(pair, &mut table);
                 }
+
+                table.render(renderer);
+                renderer.indent_down();
+                renderer.write("}");
+                renderer.end_line();
             }
 
-            Rule::block_level_attribute => {}
-
-            Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
-                // Begin.
+            Rule::identifier => {
                 let block_name = current.as_str();
-                renderer.write(&format!("{} {} {{", block_type, block_name));
+                renderer.write(block_type);
+                renderer.write(" ");
+                renderer.write(block_name);
+                renderer.write(" {");
                 renderer.end_line();
                 renderer.indent_up();
             }
-            Rule::comment_block => {
-                for current in current.into_inner() {
-                    if block_has_opened {
-                        comment(current.as_str(), &mut table.interleave_writer())
-                    } else {
-                        comment(current.as_str(), renderer)
-                    }
-                }
-            }
-            Rule::doc_comment | Rule::comment_and_new_line | Rule::doc_comment_and_new_line => {
-                if block_has_opened {
-                    comment(current.as_str(), &mut table.interleave_writer())
-                } else {
-                    comment(current.as_str(), renderer)
-                }
-            }
-            Rule::NEWLINE => {
-                if block_has_opened {
-                    last_line_was_empty = renderer.line_empty();
 
-                    // do not render newlines before the block
-                    // Reset the table layout on a newline.
-                    table.render(renderer);
-                    table = TableFormat::new();
-                    renderer.end_line();
+            Rule::comment_block => {
+                if pairs.peek().map(|pair| pair.as_rule()) == Some(Rule::block_attribute) {
+                    pending_block_comment = Some(current.clone()); // move it with the attribute
+                } else {
+                    if ate_empty_lines {
+                        table.render(renderer);
+                        table = Default::default();
+                        table.start_new_line();
+                    }
+                    reformat_comment_block(current, &mut table);
                 }
             }
-            Rule::BLOCK_LEVEL_CATCH_ALL => {
-                table.interleave(strip_new_line(current.as_str()));
+
+            Rule::field_declaration => reformat_field(current, &mut table),
+            Rule::key_value => reformat_key_value(current, &mut table),
+            Rule::enum_value_declaration => reformat_enum_entry(current, &mut table),
+            Rule::block_attribute => attributes.push((pending_block_comment.take(), current)),
+            Rule::CATCH_ALL | Rule::BLOCK_LEVEL_CATCH_ALL => {
+                table.interleave(current.as_str().trim_end_matches('\n'));
             }
-            _ => the_fn(&mut table, renderer, current),
+            _ => unreachable(&current),
         }
     }
-
-    // End.
-    table.render(renderer);
-    renderer.indent_down();
-    renderer.write("}");
-    renderer.maybe_end_line();
 }
 
-fn reformat_enum(pair: Pair<'_>, target: &mut Renderer<'_>) {
-    reformat_block_element(
-        "enum",
-        target,
-        pair,
-        &(|table, target, pair| {
-            //
-            match pair.as_rule() {
-                Rule::block_level_attribute => {
-                    let attribute = pair.into_inner().next().unwrap();
-                    table.render(target);
-                    reformat_attribute(attribute, "@@", target);
-                    table.end_line();
-                }
-                Rule::enum_value_declaration => reformat_enum_entry(pair, table),
-                _ => reformat_generic_pair(pair, table),
-            }
-        }),
-    );
-}
-
-fn reformat_enum_entry(pair: Pair<'_>, target: &mut TableFormat) {
+fn reformat_block_attribute(pair: Pair<'_>, table: &mut TableFormat) {
+    debug_assert!(pair.as_rule() == Rule::block_attribute);
+    table.start_new_line();
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::non_empty_identifier => target.write(current.as_str()),
-            Rule::attribute => reformat_attribute(current, "@", &mut target.column_locked_writer_for(2)),
-            Rule::doc_comment | Rule::comment => target.append_suffix_to_current_row(current.as_str()),
-            _ => reformat_generic_pair(current, target),
+            Rule::path => {
+                let mut writer = table.column_locked_writer_for(0);
+                writer.write("@@");
+                writer.write(current.as_str());
+            }
+            Rule::arguments_list => reformat_arguments_list(current, &mut table.column_locked_writer_for(0)),
+            Rule::trailing_comment => table.append_suffix_to_current_row(current.as_str()),
+            _ => unreachable(&current),
         }
     }
 }
 
-fn extract_and_sort_attributes(pair: Pair<'_>, is_field_attribute: bool) -> Vec<Pair<'_>> {
-    // get indices of attributes and store in separate Vector
-    let mut attributes = Vec::new();
-    for pair in pair.into_inner() {
-        if is_field_attribute {
-            if let Rule::attribute = pair.as_rule() {
-                attributes.push(pair)
+fn reformat_enum_entry(pair: Pair<'_>, table: &mut TableFormat) {
+    for current in pair.into_inner() {
+        match current.as_rule() {
+            Rule::identifier => {
+                table.start_new_line();
+                table.column_locked_writer_for(0).write(current.as_str())
             }
-        } else if let Rule::block_level_attribute = pair.as_rule() {
-            attributes.push(pair)
+            Rule::field_attribute => {
+                let mut writer = table.column_locked_writer_for(1);
+                writer.write("@");
+                reformat_function_call(current, &mut writer)
+            }
+            Rule::trailing_comment => table.append_suffix_to_current_row(current.as_str()),
+            Rule::comment_block => reformat_comment_block(current, table),
+            _ => unreachable(&current),
         }
     }
+}
 
-    // sort attributes
-    attributes.sort_by(|a, b| {
-        let sort_index_a = get_sort_index_of_attribute(is_field_attribute, a.as_str());
-        let sort_index_b = get_sort_index_of_attribute(is_field_attribute, b.as_str());
+fn sort_attributes(attributes: &mut [(Option<Pair<'_>>, Pair<'_>)]) {
+    attributes.sort_by(|(_, a), (_, b)| {
+        let sort_index_a = get_sort_index_of_attribute(a.clone());
+        let sort_index_b = get_sort_index_of_attribute(b.clone());
         sort_index_a.cmp(&sort_index_b)
     });
-    attributes
 }
 
-fn reformat_field(pair: Pair<'_>, target: &mut TableFormat) {
-    // extract and sort attributes
-    let attributes = extract_and_sort_attributes(pair.clone(), true);
+fn reformat_field(pair: Pair<'_>, table: &mut TableFormat) {
+    let mut attributes = Vec::new();
 
-    // iterate through tokens and reorder attributes
-    let mut attributes_count = 0;
-    let inner_pairs_with_sorted_attributes = pair.into_inner().map(|p| match p.as_rule() {
-        Rule::attribute => {
-            attributes_count += 1;
-            attributes[attributes_count - 1].clone()
-        }
-        _ => p,
-    });
-
-    // Write existing attributes first.
-    for current in inner_pairs_with_sorted_attributes {
+    for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
-                target.write(current.as_str());
+            Rule::identifier => {
+                table.start_new_line();
+                table
+                    .column_locked_writer_for(FIELD_NAME_COLUMN)
+                    .write(current.as_str());
             }
             Rule::field_type => {
-                let mut writer = target.column_locked_writer_for(1);
+                let mut writer = table.column_locked_writer_for(FIELD_TYPE_COLUMN);
                 reformat_field_type(current, &mut writer);
             }
-            // This is Prisma 1 thing, we should not render them. Example:
+            // This is a Prisma 1 thing, we should not render them. Example:
             //
             // ```no_run
             // model Site {
@@ -329,17 +232,24 @@ fn reformat_field(pair: Pair<'_>, target: &mut TableFormat) {
             // }
             // ```
             Rule::LEGACY_COLON => {}
-            Rule::attribute => reformat_attribute(current, "@", &mut target.column_locked_writer_for(2)),
-            // This is a comment at the end of a field.
-            Rule::doc_comment | Rule::comment => target.append_suffix_to_current_row(current.as_str()),
-            // This is a comment before the field declaration. Hence it must be interlevaed.
-            Rule::doc_comment_and_new_line => comment(current.as_str(), &mut target.interleave_writer()),
-            Rule::NEWLINE => {} // we do the new lines ourselves
-            _ => reformat_generic_pair(current, target),
+            Rule::trailing_comment => table.append_suffix_to_current_row(current.as_str()),
+            Rule::field_attribute => {
+                attributes.push((None, current));
+            }
+            _ => unreachable(&current),
         }
     }
 
-    target.maybe_end_line();
+    let mut attributes_writer = table.column_locked_writer_for(FIELD_ATTRIBUTES_COLUMN);
+    sort_attributes(&mut attributes[..]);
+    let mut attributes = attributes.into_iter().peekable();
+    while let Some((_, attribute)) = attributes.next() {
+        attributes_writer.write("@");
+        reformat_function_call(attribute, &mut attributes_writer);
+        if attributes.peek().is_some() {
+            attributes_writer.write(" ");
+        }
+    }
 }
 
 fn reformat_field_type(pair: Pair<'_>, target: &mut dyn LineWriteable) {
@@ -362,7 +272,7 @@ fn reformat_field_type(pair: Pair<'_>, target: &mut dyn LineWriteable) {
                 target.write(get_identifier(current));
                 target.write("[]?");
             }
-            _ => unreachable!(),
+            _ => unreachable(&current),
         }
     }
 }
@@ -379,32 +289,10 @@ fn get_identifier(pair: Pair<'_>) -> &str {
             assert!(ident_token.as_rule() == Rule::base_type);
             ident_token.as_str()
         }
-        _ => unreachable!("Get identified failed. Unexpected input: {:#?}", pair),
+        _ => unreachable(&pair),
     };
 
     ident_token
-}
-
-fn reformat_attribute(pair: Pair<'_>, owl: &str, target: &mut dyn LineWriteable) {
-    let rule = pair.as_rule();
-    assert!(rule == Rule::attribute);
-    for current in pair.into_inner() {
-        match current.as_rule() {
-            Rule::attribute_name => {
-                if !target.line_empty() {
-                    target.write(" ");
-                }
-                target.write(owl);
-                target.write(current.as_str());
-            }
-            Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                panic!("Comments inside attributes not supported yet.")
-            }
-            Rule::arguments_list => reformat_arguments_list(current, target),
-            Rule::NEWLINE => (), // skip
-            _ => reformat_generic_pair(current, target),
-        }
-    }
 }
 
 fn reformat_arguments_list(pair: Pair<'_>, target: &mut dyn LineWriteable) {
@@ -436,7 +324,7 @@ fn reformat_arguments_list(pair: Pair<'_>, target: &mut dyn LineWriteable) {
                 reformat_attribute_arg(current, target);
             }
             Rule::trailing_comma => (), // skip it
-            _ => reformat_generic_pair(current, target),
+            _ => unreachable(&current),
         };
     }
 
@@ -446,16 +334,13 @@ fn reformat_arguments_list(pair: Pair<'_>, target: &mut dyn LineWriteable) {
 fn reformat_attribute_arg(pair: Pair<'_>, target: &mut dyn LineWriteable) {
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::argument_name => {
+            Rule::identifier => {
                 target.write(current.as_str());
                 target.write(": ");
             }
             Rule::expression => reformat_expression(current, target),
-            Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                panic!("Comments inside attribute argument not supported yet.")
-            }
             Rule::trailing_comma => (), // skip it
-            _ => reformat_generic_pair(current, target),
+            _ => unreachable(&current),
         };
     }
 }
@@ -465,13 +350,10 @@ fn reformat_expression(pair: Pair<'_>, target: &mut dyn LineWriteable) {
         match current.as_rule() {
             Rule::numeric_literal => target.write(current.as_str()),
             Rule::string_literal => target.write(current.as_str()),
-            Rule::constant_literal => target.write(current.as_str()),
-            Rule::function => reformat_function_expression(current, target),
+            Rule::path => target.write(current.as_str()),
+            Rule::function_call => reformat_function_call(current, target),
             Rule::array_expression => reformat_array_expression(current, target),
-            Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                panic!("Comments inside expressions not supported yet.")
-            }
-            _ => reformat_generic_pair(current, target),
+            _ => unreachable(&current),
         }
     }
 }
@@ -489,69 +371,84 @@ fn reformat_array_expression(pair: Pair<'_>, target: &mut dyn LineWriteable) {
                 reformat_expression(current, target);
                 expr_count += 1;
             }
-            Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                panic!("Comments inside expressions not supported yet.")
-            }
-            _ => reformat_generic_pair(current, target),
+            _ => unreachable(&current),
         }
     }
 
     target.write("]");
 }
 
-fn reformat_function_expression(pair: Pair<'_>, target: &mut dyn LineWriteable) {
+fn reformat_function_call(pair: Pair<'_>, target: &mut dyn LineWriteable) {
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::function_name => {
-                target.write(current.as_str());
-            }
+            Rule::path => target.write(current.as_str()),
             Rule::arguments_list => reformat_arguments_list(current, target),
-            _ => reformat_generic_pair(current, target),
+            _ => unreachable(&current),
         }
     }
 }
 
-fn reformat_generic_pair(pair: Pair<'_>, target: &mut dyn LineWriteable) {
-    match pair.as_rule() {
-        Rule::NEWLINE => target.end_line(),
-        Rule::comment_block => {
-            for pair in pair.into_inner() {
-                reformat_generic_pair(pair, target)
+#[track_caller]
+fn unreachable(pair: &Pair<'_>) -> ! {
+    unreachable!("Encountered impossible declaration during formatting: {pair:?}")
+}
+
+fn reformat_comment_block(pair: Pair<'_>, table: &mut TableFormat) {
+    assert!(pair.as_rule() == Rule::comment_block);
+    for current in pair.into_inner() {
+        match current.as_rule() {
+            Rule::comment | Rule::doc_comment => {
+                table.start_new_line();
+                let prefix = if current.as_rule() == Rule::doc_comment {
+                    "///"
+                } else {
+                    "//"
+                };
+
+                table.append_suffix_to_current_row(prefix);
+                for inner in current.into_inner() {
+                    match inner.as_rule() {
+                        Rule::doc_content => table.append_suffix_to_current_row(inner.as_str()),
+                        _ => unreachable!(),
+                    }
+                }
             }
+            _ => unreachable!(),
         }
-        Rule::doc_comment_and_new_line | Rule::doc_comment | Rule::comment_and_new_line | Rule::comment => {
-            comment(pair.as_str(), target)
-        }
-        Rule::WHITESPACE => {} // we are very opinionated about whitespace and hence ignore user input
-        Rule::CATCH_ALL | Rule::BLOCK_LEVEL_CATCH_ALL => {
-            target.write(pair.as_str());
-        }
-        _ => unreachable!(
-            "Encountered impossible declaration during formatting: {:?}",
-            pair.clone().tokens()
-        ),
     }
 }
 
-fn comment(comment_text: &str, target: &mut dyn LineWriteable) {
-    let trimmed = strip_new_line(comment_text);
-    let trimmed = trimmed.trim();
-
-    target.write(trimmed);
-    target.end_line();
-}
-
-fn strip_new_line(str: &str) -> &str {
-    if str.ends_with('\n') {
-        &str[0..str.len() - 1] // slice away line break.
-    } else {
-        str
+/// Returns `true` if at least one empty line was eaten.
+fn eat_empty_lines<'a>(pairs: &mut Peekable<impl Iterator<Item = Pair<'a>>>) -> bool {
+    match pairs.peek().map(|p| p.as_rule()) {
+        Some(Rule::empty_lines) => {
+            pairs.next(); // eat it
+            true
+        }
+        _ => false,
     }
 }
 
-fn is_top_level_element(pair: &Pair<'_>) -> bool {
-    matches!(
-        pair.as_rule(),
-        Rule::model_declaration | Rule::enum_declaration | Rule::config_block | Rule::type_alias | Rule::comment_block
-    )
+const FIELD_NAME_COLUMN: usize = 0;
+const FIELD_TYPE_COLUMN: usize = 1;
+const FIELD_ATTRIBUTES_COLUMN: usize = 2;
+
+fn get_sort_index_of_attribute(attribute: Pair<'_>) -> usize {
+    let path = attribute.into_inner().next().unwrap();
+    debug_assert_eq!(path.as_rule(), Rule::path);
+    let path = path.as_str();
+    let correct_order: &[&str] = &[
+        "id",
+        "unique",
+        "default",
+        "updatedAt",
+        "index",
+        "fulltext",
+        "map",
+        "relation",
+        "ignore",
+    ];
+
+    let pos = correct_order.iter().position(|p| path == *p);
+    pos.unwrap_or(usize::MAX)
 }

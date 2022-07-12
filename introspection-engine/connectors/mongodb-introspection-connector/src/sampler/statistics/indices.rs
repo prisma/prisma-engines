@@ -216,13 +216,10 @@ fn add_missing_types_from_index(
                 .iter()
                 .find(|f| f.database_name.as_deref() == Some(field_name) || f.name == field_name);
 
-            next_type = match cf {
-                Some(_) if i + 1 == path_length => None,
-                Some(cf) => {
-                    let type_name = cf.r#type.as_composite_type().unwrap();
-                    Some(type_name.to_string())
-                }
-                None => {
+            next_type = match (cf, cf.and_then(|cf| cf.r#type.as_composite_type())) {
+                (Some(_), _) if i + 1 == path_length => None,
+                (Some(_), Some(type_name)) => Some(type_name.to_string()),
+                (None, _) | (_, None) => {
                     let docs = String::from("Field referred in an index, but found no data to define the type.");
 
                     let (field_name, database_name) = match super::sanitize_string(field_name) {
@@ -248,10 +245,7 @@ fn add_missing_types_from_index(
                     } else {
                         unknown_fields.push((Name::CompositeType(type_name.clone()), field_name.clone()));
 
-                        (
-                            dml::CompositeTypeFieldType::Scalar(dml::ScalarType::Json, None, None),
-                            None,
-                        )
+                        (dml::CompositeTypeFieldType::Scalar(dml::ScalarType::Json, None), None)
                     };
 
                     let ct = types.get_mut(&type_name).unwrap();

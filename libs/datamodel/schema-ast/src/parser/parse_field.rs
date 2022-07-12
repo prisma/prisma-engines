@@ -1,36 +1,44 @@
 use super::{
-    helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
+    helpers::{parsing_catch_all, Pair},
     parse_attribute::parse_attribute,
     parse_comments::*,
     parse_types::parse_field_type,
     Rule,
 };
 use crate::ast::*;
-use diagnostics::DatamodelError;
+use diagnostics::{DatamodelError, Diagnostics};
 
 pub(crate) fn parse_field(
     model_name: &str,
-    token: &Token<'_>,
-    diagnostics: &mut diagnostics::Diagnostics,
+    pair: Pair<'_>,
+    block_comment: Option<Pair<'_>>,
+    diagnostics: &mut Diagnostics,
 ) -> Result<Field, DatamodelError> {
+    let pair_span = pair.as_span();
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = Vec::new();
     let mut field_type: Option<(FieldArity, FieldType)> = None;
-    let mut comments: Vec<String> = Vec::new();
+    let mut comment: Option<Comment> = block_comment.and_then(parse_comment_block);
 
-    for current in token.relevant_children() {
+    for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::field_type => field_type = Some(parse_field_type(&current, diagnostics)?),
+            Rule::identifier => name = Some(current.into()),
+            Rule::field_type => field_type = Some(parse_field_type(current, diagnostics)?),
             Rule::LEGACY_COLON => {
                 return Err(DatamodelError::new_legacy_parser_error(
                     "Field declarations don't require a `:`.",
                     current.as_span().into(),
                 ))
             }
-            Rule::attribute => attributes.push(parse_attribute(&current, diagnostics)),
-            Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-            Rule::doc_comment => comments.push(parse_doc_comment(&current)),
+            Rule::field_attribute => attributes.push(parse_attribute(current, diagnostics)),
+            Rule::trailing_comment => {
+                comment = match (comment, parse_trailing_comment(current)) {
+                    (c, None) | (None, c) => c,
+                    (Some(existing), Some(new)) => Some(Comment {
+                        text: [existing.text, new.text].join("\n"),
+                    }),
+                };
+            }
             _ => parsing_catch_all(&current, "field"),
         }
     }
@@ -41,14 +49,13 @@ pub(crate) fn parse_field(
             name,
             arity,
             attributes,
-            documentation: doc_comments_to_string(&comments),
-            span: Span::from(token.as_span()),
-            is_commented_out: false,
+            documentation: comment,
+            span: Span::from(pair_span),
         }),
         _ => Err(DatamodelError::new_model_validation_error(
             "This field declaration is invalid. It is either missing a name or a type.",
             model_name,
-            token.as_span().into(),
+            pair_span.into(),
         )),
     }
 }

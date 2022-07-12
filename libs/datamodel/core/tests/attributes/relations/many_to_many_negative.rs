@@ -156,7 +156,7 @@ fn embedded_many_to_many_must_define_references_on_both_sides() {
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  as    A[]   @[1;91mrelation(fields: [a_ids])[0m
+        [1;94m20 | [0m  as    A[]   [1;91m@relation(fields: [a_ids])[0m
         [1;94m   | [0m
     "#]];
 
@@ -182,7 +182,7 @@ fn embedded_many_to_many_must_define_references_on_both_sides() {
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  bs    B[]   @[1;91mrelation(fields: [b_ids])[0m
+        [1;94m14 | [0m  bs    B[]   [1;91m@relation(fields: [b_ids])[0m
         [1;94m   | [0m
     "#]];
 
@@ -208,13 +208,13 @@ fn embedded_many_to_many_must_define_references_on_both_sides() {
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  bs    B[]   @[1;91mrelation(fields: [b_ids])[0m
+        [1;94m14 | [0m  bs    B[]   [1;91m@relation(fields: [b_ids])[0m
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": The `references` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  as    A[]   @[1;91mrelation(fields: [a_ids])[0m
+        [1;94m20 | [0m  as    A[]   [1;91m@relation(fields: [a_ids])[0m
         [1;94m   | [0m
     "#]];
 
@@ -348,7 +348,7 @@ fn embedded_many_to_many_must_define_fields_on_both_sides() {
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m  a_ids Int[]
-        [1;94m20 | [0m  as    A[]   @[1;91mrelation(references: [id])[0m
+        [1;94m20 | [0m  as    A[]   [1;91m@relation(references: [id])[0m
         [1;94m   | [0m
     "#]];
 
@@ -374,7 +374,7 @@ fn embedded_many_to_many_must_define_fields_on_both_sides() {
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  bs    B[]   @[1;91mrelation(references: [id])[0m
+        [1;94m14 | [0m  bs    B[]   [1;91m@relation(references: [id])[0m
         [1;94m   | [0m
     "#]];
 
@@ -659,7 +659,7 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_type() {
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids Int[]
-        [1;94m14 | [0m  bs    B[]   @[1;91mrelation(fields: [b_ids], references: [id])[0m
+        [1;94m14 | [0m  bs    B[]   [1;91m@relation(fields: [b_ids], references: [id])[0m
         [1;94m   | [0m
     "#]];
 
@@ -725,7 +725,7 @@ fn embedded_many_to_many_fields_must_be_an_array_of_correct_native_type() {
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b_ids String[] @test.ObjectId
-        [1;94m14 | [0m  bs    B[]      @[1;91mrelation(fields: [b_ids], references: [id])[0m
+        [1;94m14 | [0m  bs    B[]      [1;91m@relation(fields: [b_ids], references: [id])[0m
         [1;94m   | [0m
     "#]];
 

@@ -79,6 +79,8 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         (Some(DefaultKind::Value(PrismaValue::DateTime(_))), Some(_))
         | (Some(_), Some(DefaultKind::Value(PrismaValue::DateTime(_)))) => true, // can't diff these in at present
 
+        (Some(DefaultKind::Value(PrismaValue::Int(i))), Some(DefaultKind::Value(PrismaValue::BigInt(j))))
+        | (Some(DefaultKind::Value(PrismaValue::BigInt(i))), Some(DefaultKind::Value(PrismaValue::Int(j)))) => i == j,
         (Some(DefaultKind::Value(prev)), Some(DefaultKind::Value(next))) => (prev == next) && names_match,
         (Some(DefaultKind::Value(_)), Some(DefaultKind::Now)) => false,
         (Some(DefaultKind::Value(_)), None) => false,

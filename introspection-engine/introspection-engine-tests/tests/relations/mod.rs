@@ -322,7 +322,7 @@ async fn a_prisma_many_to_many_relation(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mysql, Mssql, CockroachDb))]
+#[test_connector(exclude(Mysql, Mssql, CockroachDb, Sqlite))]
 async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -370,7 +370,7 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mysql, Sqlite, CockroachDb))]
+#[test_connector(exclude(Mysql, Sqlite, CockroachDb, Mssql))]
 async fn a_self_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -625,7 +625,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
     Ok(())
 }
 
-#[test_connector(exclude(Vitess, CockroachDb))]
+#[test_connector(exclude(Vitess, CockroachDb, Sqlite))]
 async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

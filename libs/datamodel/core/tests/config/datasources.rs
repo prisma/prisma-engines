@@ -2,6 +2,23 @@ use crate::common::*;
 use indoc::indoc;
 
 #[test]
+fn missing_native_type_should_still_allow_config_parsing() {
+    let schema = indoc! { r#"
+        datasource db {
+            provider = "postgresql"
+            url  = env("DATABASE_URL")
+        }
+
+        model A {
+            id Int @id
+            val Int @db.
+        }
+    "#};
+
+    parse_configuration(schema);
+}
+
+#[test]
 fn serialize_builtin_sources_to_dmmf() {
     std::env::set_var("pg2", "postgresql://localhost/postgres2");
 

@@ -124,6 +124,14 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
 ];
 
 impl Connector for PostgresDatamodelConnector {
+    fn is_provider(&self, name: &str) -> bool {
+        ["postgresql", "postgres"].contains(&name)
+    }
+
+    fn provider_name(&self) -> &'static str {
+        "postgresql"
+    }
+
     fn name(&self) -> &str {
         "Postgres"
     }

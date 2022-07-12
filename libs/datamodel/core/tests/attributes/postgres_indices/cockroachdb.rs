@@ -130,7 +130,7 @@ fn jsonb_column_must_be_the_last_in_index() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91mindex([a, b], type: Gin)[0m
+        [1;94m16 | [0m  [1;91m@@index([a, b], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -156,7 +156,7 @@ fn custom_ops_not_supported() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: JsonbOps)], type: Gin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: JsonbOps)], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -182,7 +182,7 @@ fn raw_ops_not_supported() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: raw("jsonb_ops"))], type: Gin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: raw("jsonb_ops"))], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 
@@ -208,7 +208,7 @@ fn wrong_field_type() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a], type: Gin)[0m
+        [1;94m15 | [0m  [1;91m@@index([a], type: Gin)[0m
         [1;94m   | [0m
     "#]];
 

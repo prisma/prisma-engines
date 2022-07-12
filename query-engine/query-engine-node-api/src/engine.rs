@@ -5,7 +5,7 @@ use prisma_models::InternalDataModelBuilder;
 use query_core::{
     executor,
     schema::{QuerySchema, QuerySchemaRenderer},
-    schema_builder, MetricFormat, MetricRegistry, QueryExecutor, TxId,
+    schema_builder, set_parent_context_from_json_str, MetricFormat, MetricRegistry, QueryExecutor, TxId,
 };
 use request_handlers::{GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde::{Deserialize, Serialize};
@@ -18,7 +18,7 @@ use std::{
     sync::Arc,
 };
 use tokio::sync::RwLock;
-use tracing::instrument::WithSubscriber;
+use tracing::{instrument::WithSubscriber, Instrument};
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
 
@@ -294,15 +294,18 @@ impl QueryEngine {
             let engine = inner.as_engine()?;
 
             let query = serde_json::from_str(&body)?;
-            let trace: HashMap<String, String> = serde_json::from_str(&trace)?;
 
             let dispatcher = self.logger.dispatcher();
 
             async move {
-                let trace_id = trace.get("traceparent").map(String::from);
-                let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
+                let span = tracing::info_span!("prisma:query_builder", user_facing = true);
+                let trace_id = set_parent_context_from_json_str(&span, trace);
 
-                let response = handler.handle(query, tx_id.map(TxId::from), trace_id).await;
+                let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
+                let response = handler
+                    .handle(query, tx_id.map(TxId::from), trace_id)
+                    .instrument(span)
+                    .await;
 
                 Ok(serde_json::to_string(&response)?)
             }
@@ -314,7 +317,7 @@ impl QueryEngine {
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[napi]
-    pub async fn start_transaction(&self, input: String) -> napi::Result<String> {
+    pub async fn start_transaction(&self, input: String, trace: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
@@ -322,10 +325,14 @@ impl QueryEngine {
             let dispatcher = self.logger.dispatcher();
 
             async move {
+                let span = tracing::info_span!("prisma:itx_runner", user_facing = true, itx_id = "");
+                set_parent_context_from_json_str(&span, trace);
+
                 let input: TxInput = serde_json::from_str(&input)?;
                 match engine
                     .executor()
                     .start_tx(engine.query_schema().clone(), input.max_wait, input.timeout)
+                    .instrument(span)
                     .await
                 {
                     Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
@@ -340,7 +347,7 @@ impl QueryEngine {
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
     #[napi]
-    pub async fn commit_transaction(&self, tx_id: String) -> napi::Result<String> {
+    pub async fn commit_transaction(&self, tx_id: String, _trace: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
@@ -361,7 +368,7 @@ impl QueryEngine {
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[napi]
-    pub async fn rollback_transaction(&self, tx_id: String) -> napi::Result<String> {
+    pub async fn rollback_transaction(&self, tx_id: String, _trace: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;

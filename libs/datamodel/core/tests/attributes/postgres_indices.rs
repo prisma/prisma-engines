@@ -50,7 +50,7 @@ fn hash_index_disallows_ops() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int4MinMaxOps)], type: Hash)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Int4MinMaxOps)], type: Hash)[0m
         [1;94m   | [0m
     "#]];
 
@@ -76,7 +76,7 @@ fn btree_index_disallows_ops() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(ops: Int4MinMaxOps)], type: BTree)[0m
+        [1;94m15 | [0m  [1;91m@@index([a(ops: Int4MinMaxOps)], type: BTree)[0m
         [1;94m   | [0m
     "#]];
 
@@ -140,7 +140,7 @@ fn disallows_unique_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id String @[1;91munique(length: 30)[0m @test.VarChar(255)
+        [1;94m12 | [0m  id String [1;91m@unique(length: 30)[0m @test.VarChar(255)
         [1;94m   | [0m
     "#]];
 
@@ -165,7 +165,7 @@ fn disallows_compound_unique_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m  b String
-        [1;94m14 | [0m  @@[1;91munique([a(length: 10), b(length: 30)])[0m
+        [1;94m14 | [0m  [1;91m@@unique([a(length: 10), b(length: 30)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -191,7 +191,7 @@ fn disallows_index_length_prefix() {
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m
-        [1;94m15 | [0m  @@[1;91mindex([a(length: 10)])[0m
+        [1;94m15 | [0m  [1;91m@@index([a(length: 10)])[0m
         [1;94m   | [0m
     "#]];
 
@@ -218,7 +218,7 @@ fn operator_classes_not_allowed_with_unique() {
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0m
-        [1;94m16 | [0m  @@[1;91munique([a(ops: raw("foo")), b(ops: raw("bar"))])[0m
+        [1;94m16 | [0m  [1;91m@@unique([a(ops: raw("foo")), b(ops: raw("bar"))])[0m
         [1;94m   | [0m
     "#]];
 

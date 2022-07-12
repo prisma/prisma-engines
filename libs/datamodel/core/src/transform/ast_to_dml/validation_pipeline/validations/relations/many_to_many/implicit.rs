@@ -1,10 +1,8 @@
-use datamodel_connector::{ConnectorCapability, DatamodelError};
-use itertools::Itertools;
-use parser_database::walkers::ImplicitManyToManyRelationWalker;
-
 use crate::transform::ast_to_dml::validation_pipeline::{
     context::Context, validations::relations::RELATION_ATTRIBUTE_NAME,
 };
+use datamodel_connector::{ConnectorCapability, DatamodelError};
+use parser_database::walkers::ImplicitManyToManyRelationWalker;
 
 /// Our weird many-to-many requirement.
 pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_>, ctx: &mut Context<'_>) {
@@ -29,10 +27,10 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
 
         if !relation_field.references_singular_id_field() {
             ctx.push_error(DatamodelError::new_validation_error(
-            format!(
+            &format!(
                 "Implicit many-to-many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",
                 &relation_field.related_model().name(),
-                relation_field.referenced_fields().into_iter().flatten().map(|f| f.name()).join(", ")
+                relation_field.referenced_fields().into_iter().flatten().map(|f| f.name()).collect::<Vec<_>>().join(", ")
             ),
             relation_field.ast_field().span)
         );
@@ -50,10 +48,8 @@ pub(crate) fn validate_no_referential_actions(relation: ImplicitManyToManyRelati
     });
 
     for span in referential_action_spans {
-        ctx.push_error(DatamodelError::new_validation_error(
-            "Referential actions on implicit many-to-many relations are not supported".to_owned(),
-            span,
-        ));
+        let msg = "Referential actions on implicit many-to-many relations are not supported";
+        ctx.push_error(DatamodelError::new_validation_error(msg, span));
     }
 }
 
@@ -76,7 +72,7 @@ pub(crate) fn supports_implicit_relations(relation: ImplicitManyToManyRelationWa
     );
 
     for span in spans {
-        ctx.push_error(DatamodelError::new_validation_error(msg.clone(), span));
+        ctx.push_error(DatamodelError::new_validation_error(&msg, span));
     }
 }
 

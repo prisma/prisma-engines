@@ -38,8 +38,6 @@ pub struct Field {
     pub documentation: Option<Comment>,
     /// The location of this field in the text representation.
     pub span: Span,
-    /// The location of this field in the text representation.
-    pub is_commented_out: bool,
 }
 
 impl Field {
@@ -90,10 +88,6 @@ impl WithAttributes for Field {
 impl WithDocumentation for Field {
     fn documentation(&self) -> &Option<Comment> {
         &self.documentation
-    }
-
-    fn is_commented_out(&self) -> bool {
-        self.is_commented_out
     }
 }
 

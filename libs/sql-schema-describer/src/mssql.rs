@@ -1,8 +1,11 @@
+//! SQL server schema description.
+
 use crate::{
     getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
-    DescriberError, DescriberErrorKind, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType,
-    PrimaryKey, PrimaryKeyColumn, Procedure, SQLSortOrder, SqlMetadata, SqlSchema, UserDefinedType, View,
+    DescriberError, DescriberErrorKind, DescriberResult, ForeignKeyAction, IndexColumn, Procedure, SQLSortOrder,
+    SqlMetadata, SqlSchema, UserDefinedType, View,
 };
+use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use indoc::indoc;
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
@@ -10,8 +13,7 @@ use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use quaint::prelude::Queryable;
 use regex::Regex;
-use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto};
-use tracing::{debug, trace};
+use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto};
 
 /// Matches a default value in the schema, that is not a string.
 ///
@@ -63,40 +65,36 @@ pub struct SqlSchemaDescriber<'a> {
 
 #[derive(Default)]
 pub struct MssqlSchemaExt {
-    pub clustered_indexes: Vec<IndexId>,
-    pub constraints: Vec<IndexId>,
-    pub nonclustered_primary_keys: Vec<TableId>,
+    pub index_bits: HashMap<IndexId, BitFlags<IndexBits>>,
 }
 
-const DEFAULT_REF: &MssqlSchemaExt = &MssqlSchemaExt {
-    clustered_indexes: Vec::new(),
-    constraints: Vec::new(),
-    nonclustered_primary_keys: Vec::new(),
-};
-
-impl<'a> Default for &'a MssqlSchemaExt {
-    fn default() -> Self {
-        DEFAULT_REF
-    }
+#[enumflags2::bitflags]
+#[repr(u8)]
+#[derive(Clone, Copy)]
+pub enum IndexBits {
+    Clustered = 0b1,
+    Constraint = 0b10,
 }
 
 impl MssqlSchemaExt {
-    pub fn pk_is_clustered(&self, table_id: TableId) -> bool {
-        self.nonclustered_primary_keys.binary_search(&table_id).is_err()
+    pub fn index_is_clustered(&self, id: IndexId) -> bool {
+        self.index_bits
+            .get(&id)
+            .map(|b| b.contains(IndexBits::Clustered))
+            .unwrap_or(false)
     }
 
-    pub fn index_is_clustered(&self, index_id: IndexId) -> bool {
-        self.clustered_indexes.binary_search(&index_id).is_ok()
-    }
-
-    pub fn index_is_a_constraint(&self, index_id: IndexId) -> bool {
-        self.constraints.binary_search(&index_id).is_ok()
+    pub fn index_is_a_constraint(&self, id: IndexId) -> bool {
+        self.index_bits
+            .get(&id)
+            .map(|b| b.contains(IndexBits::Constraint))
+            .unwrap_or(false)
     }
 }
 
 impl std::fmt::Debug for SqlSchemaDescriber<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct(type_name::<SqlSchemaDescriber>()).finish()
+        f.debug_struct(type_name::<SqlSchemaDescriber<'_>>()).finish()
     }
 }
 
@@ -126,12 +124,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         sql_schema.columns = self.get_all_columns(&table_names, schema).await?;
         self.get_all_indices(schema, &mut mssql_ext, &table_names, &mut sql_schema)
             .await?;
-        sql_schema.foreign_keys = self.get_foreign_keys(schema, &table_names).await?;
-
-        // Sort the vectors we will use for binary search.
-        sql_schema.foreign_keys.sort_by_key(|(table_id, _)| *table_id);
-        mssql_ext.clustered_indexes.sort();
-        mssql_ext.nonclustered_primary_keys.sort();
+        self.get_foreign_keys(schema, &table_names, &mut sql_schema).await?;
 
         sql_schema.views = self.get_views(schema).await?;
         sql_schema.procedures = self.get_procedures(schema).await?;
@@ -158,12 +151,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_databases(&self) -> DescriberResult<Vec<String>> {
         let sql = "SELECT name FROM sys.schemas";
         let rows = self.conn.query_raw(sql, &[]).await?;
-
-        let names = rows.into_iter().map(|row| row.get_expect_string("name")).collect();
-
-        trace!("Found schema names: {:?}", names);
-
-        Ok(names)
+        Ok(rows.into_iter().map(|row| row.get_expect_string("name")).collect())
     }
 
     async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
@@ -172,7 +160,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             FROM sys.objects
             WHERE SCHEMA_NAME(schema_id) = @P1
                 AND is_ms_shipped = 0
-                AND type = 'P';
+                AND type = 'P'
+            ORDER BY name;
         "#;
 
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
@@ -194,12 +183,12 @@ impl<'a> SqlSchemaDescriber<'a> {
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<IndexMap<String, TableId>> {
         let select = r#"
-            SELECT t.name AS table_name
-            FROM sys.tables t
-            WHERE SCHEMA_NAME(t.schema_id) = @P1
-            AND t.is_ms_shipped = 0
-            AND t.type = 'U'
-            ORDER BY t.name asc;
+            SELECT tbl.name AS table_name
+            FROM sys.tables tbl
+            WHERE SCHEMA_NAME(tbl.schema_id) = @P1
+            AND tbl.is_ms_shipped = 0
+            AND tbl.type = 'U'
+            ORDER BY tbl.name;
         "#;
 
         let rows = self.conn.query_raw(select, &[schema.into()]).await?;
@@ -211,8 +200,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             let id = sql_schema.push_table(name);
             map.insert(cloned_name, id);
         }
-
-        trace!("Found table names: {:?}", map);
 
         Ok(map)
     }
@@ -275,15 +262,13 @@ impl<'a> SqlSchemaDescriber<'a> {
                     INNER JOIN sys.types typ ON c.user_type_id = typ.user_type_id
             WHERE OBJECT_SCHEMA_NAME(c.object_id) = @P1
             AND t.is_ms_shipped = 0
-            ORDER BY COLUMNPROPERTY(c.object_id, c.name, 'ordinal');
+            ORDER BY table_name, COLUMNPROPERTY(c.object_id, c.name, 'ordinal');
         "#};
 
         let mut columns = Vec::new();
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         for col in rows {
-            debug!("Got column: {:?}", col);
-
             let table_name = col.get_expect_string("table_name");
             let table_id = if let Some(table_id) = table_ids.get(&table_name) {
                 *table_id
@@ -386,8 +371,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             ));
         }
 
-        columns.sort_by_key(|(table_id, _)| *table_id);
-
         Ok(columns)
     }
 
@@ -427,17 +410,15 @@ impl<'a> SqlSchemaDescriber<'a> {
                     'CLUSTERED COLUMNSTORE',
                     'NONCLUSTERED COLUMNSTORE'
                 )
-            ORDER BY index_name, seq_in_index
+            ORDER BY table_name, index_name, seq_in_index
         "#};
 
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let mut current_index: Option<IndexId> = None;
 
         for row in rows {
-            trace!("Got index row: {:#?}", row);
-
             let table_name = row.get_expect_string("table_name");
             let table_id = table_ids[table_name.as_str()];
-            let table = &mut sql_schema[table_id];
             let index_name = row.get_expect_string("index_name");
 
             let sort_order = match row.get_expect_bool("is_descending") {
@@ -448,79 +429,46 @@ impl<'a> SqlSchemaDescriber<'a> {
             let clustered = row.get_expect_string("clustering").starts_with("CLUSTERED");
 
             let column_name = row.get("column_name").and_then(|x| x.to_string()).unwrap();
+            let column_id = if let Some(col) = sql_schema.walk(table_id).column(&column_name) {
+                col.id
+            } else {
+                continue;
+            };
             // Multi-column indices will return more than one row (with different column_name values).
             // We cannot assume that one row corresponds to one index.
             let seq_in_index = row.get_expect_i64("seq_in_index");
-            let pos = seq_in_index - 1;
             let is_unique = row.get_expect_bool("is_unique");
             let is_unique_constraint = row.get_expect_bool("is_unique_constraint");
-
             let is_pk = row.get_expect_bool("is_primary_key");
 
-            if is_pk {
-                debug!("Column '{}' is part of the primary key", column_name);
-
-                match &mut table.primary_key {
-                    Some(pk) => {
-                        if pk.columns.len() < (pos + 1) as usize {
-                            pk.columns.resize((pos + 1) as usize, PrimaryKeyColumn::default());
-                        }
-
-                        pk.columns[pos as usize] = PrimaryKeyColumn::new(column_name);
-                        pk.columns[pos as usize].set_sort_order(sort_order);
-
-                        debug!(
-                            "The primary key has already been created, added column to it: {:?}",
-                            pk.columns
-                        );
-                    }
-                    None => {
-                        debug!("Instantiating primary key");
-
-                        let mut column = PrimaryKeyColumn::new(column_name);
-                        column.set_sort_order(sort_order);
-
-                        if !clustered {
-                            mssql_ext.nonclustered_primary_keys.push(table_id);
-                        }
-
-                        table.primary_key.replace(PrimaryKey {
-                            columns: vec![column],
-                            constraint_name: Some(index_name),
-                        });
-                    }
+            if seq_in_index == 1 {
+                // new index!
+                let id = if is_pk {
+                    sql_schema.push_primary_key(table_id, index_name)
+                } else if is_unique {
+                    sql_schema.push_unique_constraint(table_id, index_name)
+                } else {
+                    sql_schema.push_index(table_id, index_name)
                 };
-            } else if table.indices.iter().any(|index| index.name == index_name) {
-                let index = table.indices.iter_mut().find(|idx| idx.name == index_name).unwrap();
-                let mut column = IndexColumn::new(column_name);
-                column.set_sort_order(sort_order);
 
-                index.columns.push(column);
-            } else {
-                let mut column = IndexColumn::new(column_name);
-                column.set_sort_order(sort_order);
-
+                let mut bits = BitFlags::empty();
                 if clustered {
-                    mssql_ext
-                        .clustered_indexes
-                        .push(IndexId(table_id, table.indices.len() as u32));
+                    bits |= IndexBits::Clustered;
                 }
-
                 if is_unique_constraint {
-                    mssql_ext
-                        .constraints
-                        .push(IndexId(table_id, table.indices.len() as u32));
+                    bits |= IndexBits::Constraint;
                 }
+                mssql_ext.index_bits.insert(id, bits);
 
-                table.indices.push(Index {
-                    name: index_name,
-                    columns: vec![column],
-                    tpe: match is_unique {
-                        true => IndexType::Unique,
-                        false => IndexType::Normal,
-                    },
-                });
-            }
+                current_index = Some(id);
+            };
+
+            sql_schema.push_index_column(IndexColumn {
+                index_id: current_index.unwrap(),
+                column_id,
+                sort_order: Some(sort_order),
+                length: None,
+            });
         }
 
         Ok(())
@@ -611,11 +559,8 @@ impl<'a> SqlSchemaDescriber<'a> {
         &self,
         schema: &str,
         table_ids: &IndexMap<String, TableId>,
-    ) -> DescriberResult<Vec<(TableId, ForeignKey)>> {
-        // Foreign keys covering multiple columns will return multiple rows, which we need to
-        // merge.
-        let mut map: BTreeMap<(TableId, String), ForeignKey> = BTreeMap::new();
-
+        sql_schema: &mut SqlSchema,
+    ) -> DescriberResult<()> {
         let sql = indoc! {r#"
             SELECT OBJECT_NAME(fkc.constraint_object_id) AS constraint_name,
                 parent_table.name                       AS table_name,
@@ -643,20 +588,30 @@ impl<'a> SqlSchemaDescriber<'a> {
             WHERE parent_table.is_ms_shipped = 0
             AND referenced_table.is_ms_shipped = 0
             AND OBJECT_SCHEMA_NAME(fkc.parent_object_id) = @P1
-            ORDER BY ordinal_position
+            ORDER BY table_name, constraint_name, ordinal_position
         "#};
 
+        fn get_ids(
+            table_name: &str,
+            column_name: &str,
+            referenced_table_name: &str,
+            referenced_column_name: &str,
+            table_ids: &IndexMap<String, TableId>,
+            sql_schema: &SqlSchema,
+        ) -> Option<(TableId, ColumnId, TableId, ColumnId)> {
+            let table_id = *table_ids.get(table_name)?;
+            let referenced_table_id = *table_ids.get(referenced_table_name)?;
+            let column_id = sql_schema.walk(table_id).column(column_name)?.id;
+            let referenced_column_id = sql_schema.walk(referenced_table_id).column(referenced_column_name)?.id;
+
+            Some((table_id, column_id, referenced_table_id, referenced_column_id))
+        }
+
         let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let mut current_fk: Option<(String, ForeignKeyId)> = None;
 
         for row in result_set.into_iter() {
-            debug!("Got description FK row {:#?}", row);
-
             let table_name = row.get_expect_string("table_name");
-            let table_id = if let Some(table_id) = table_ids.get(&table_name) {
-                *table_id
-            } else {
-                continue;
-            };
             let constraint_name = row.get_expect_string("constraint_name");
             let column = row.get_expect_string("column_name");
             let referenced_schema_name = row.get_expect_string("referenced_schema_name");
@@ -665,18 +620,24 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             if schema != referenced_schema_name {
                 return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
-                    from: format!("{}.{}", schema, table_name),
-                    to: format!("{}.{}", referenced_schema_name, referenced_table),
+                    from: format!("{schema}.{table_name}"),
+                    to: format!("{referenced_schema_name}.{referenced_table}"),
                     constraint: constraint_name,
                 }));
             }
 
-            let referenced_table_id = if let Some(id) = table_ids.get(&referenced_table) {
-                *id
+            let (table_id, column_id, referenced_table_id, referenced_column_id) = if let Some(ids) = get_ids(
+                &table_name,
+                &column,
+                &referenced_table,
+                &referenced_column,
+                table_ids,
+                sql_schema,
+            ) {
+                ids
             } else {
                 continue;
             };
-            let ord_pos = row.get_expect_i64("ordinal_position");
 
             let on_delete_action = match row.get_expect_i64("delete_referential_action") {
                 0 => ForeignKeyAction::NoAction,
@@ -694,40 +655,25 @@ impl<'a> SqlSchemaDescriber<'a> {
                 s => panic!("Unrecognized on delete action '{}'", s),
             };
 
-            let fk = map
-                .entry((table_id, constraint_name.clone()))
-                .or_insert_with(|| ForeignKey {
-                    constraint_name: Some(constraint_name.clone()),
-                    columns: Vec::new(),
-                    referenced_table: referenced_table_id,
-                    referenced_columns: Vec::new(),
-                    on_delete_action,
-                    on_update_action,
-                });
+            match &current_fk {
+                Some((current_constraint_name, _)) if *current_constraint_name == constraint_name => (),
+                None | Some(_) => {
+                    let fkid = sql_schema.push_foreign_key(
+                        Some(constraint_name.clone()),
+                        [table_id, referenced_table_id],
+                        [on_delete_action, on_update_action],
+                    );
 
-            let pos = ord_pos as usize - 1;
-
-            if fk.columns.len() <= pos {
-                fk.columns.resize(pos + 1, "".to_string());
+                    current_fk = Some((constraint_name, fkid));
+                }
             }
 
-            fk.columns[pos] = column;
-
-            if fk.referenced_columns.len() <= pos {
-                fk.referenced_columns.resize(pos + 1, "".to_string());
+            if let Some((_, fkid)) = current_fk {
+                sql_schema.push_foreign_key_column(fkid, [column_id, referenced_column_id]);
             }
-
-            fk.referenced_columns[pos] = referenced_column;
         }
 
-        let mut fks: Vec<_> = map
-            .into_iter()
-            .map(|((table_id, _constraint_name), fk)| (table_id, fk))
-            .collect();
-
-        fks.sort_by_cached_key(|(table_id, fk)| (*table_id, fk.columns.to_owned()));
-
-        Ok(fks)
+        Ok(())
     }
 
     fn get_column_type(

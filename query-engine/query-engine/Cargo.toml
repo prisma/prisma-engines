@@ -36,11 +36,11 @@ thiserror = "1.0"
 url = "2.1"
 hyper = { version = "0.14", features = ["server", "http1", "http2", "runtime"] }
 tracing = "0.1"
-tracing-opentelemetry = "0.16"
+tracing-opentelemetry = "0.17.3"
 tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
 tracing-futures = "0.2"
-opentelemetry = { version = "0.16", features = ["rt-tokio"] }
-opentelemetry-otlp = { version = "0.9", features = ["tls", "tls-roots"] }
+opentelemetry = { version = "0.17.0", features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.10", features = ["tls", "tls-roots"] }
 
 rand = "0.8"
 tonic = { version = "0.4", default-features = false }

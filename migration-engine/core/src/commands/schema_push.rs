@@ -1,7 +1,8 @@
 use crate::{json_rpc::types::*, parse_schema, CoreResult};
-use datamodel::schema_ast::source_file::SourceFile;
+use datamodel::parser_database::SourceFile;
 use migration_connector::{ConnectorError, DiffTarget, MigrationConnector};
 use std::sync::Arc;
+use tracing_futures::Instrument;
 
 /// Command to bring the local database in sync with the prisma schema, without
 /// interacting with the migrations directory nor the migrations table.
@@ -18,9 +19,11 @@ pub async fn schema_push(
 
     let from = connector
         .database_schema_from_diff_target(DiffTarget::Database, None)
+        .instrument(tracing::debug_span!("Calculate `from`"))
         .await?;
     let to = connector
         .database_schema_from_diff_target(DiffTarget::Datamodel(source), None)
+        .instrument(tracing::debug_span!("Calculate `to`"))
         .await?;
     let database_migration = connector.diff(from, to)?;
 

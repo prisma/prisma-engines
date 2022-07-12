@@ -4,12 +4,10 @@ mod sqlite;
 mod vitess;
 
 use barrel::types;
-use expect_test::expect;
 use indoc::{formatdoc, indoc};
 use introspection_engine_tests::{assert_eq_json, test_api::*};
 use quaint::prelude::Queryable;
 use serde_json::json;
-use test_macros::test_connector;
 
 #[test_connector(exclude(CockroachDb))]
 async fn mapped_model_name(api: &TestApi) -> TestResult {
@@ -715,7 +713,7 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mysql, Mssql, CockroachDb))]
+#[test_connector(exclude(Mysql, Mssql, CockroachDb, Sqlite))]
 async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1068,14 +1066,14 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
           id           Int         @id @default(autoincrement())
           user_id      Int         @unique
           user_id2     Int         @unique
-          custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
           custom_User2 Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
         }
 
         model Custom_User {
           id           Int   @id @default(autoincrement())
-          custom_Post  Post? @relation("CustomRelationName")
           custom_Post2 Post? @relation("AnotherCustomRelationName")
+          custom_Post  Post? @relation("CustomRelationName")
 
           @@map("User")
         }
@@ -1374,25 +1372,25 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
         }
     "#};
 
-    let final_dm = indoc! {r#"
+    let final_dm = expect![[r#"
         model B {
-            id              Int @id @default(autoincrement())
-            custom_A        A[]
-            special_A       A[] @relation("AToB2")
+          id        Int @id @default(autoincrement())
+          custom_A  A[]
+          special_A A[] @relation("AToB2")
         }
 
         model A {
-            id              Int @id @default(autoincrement())
-            custom_B        B[]
-            special_B       B[] @relation("AToB2")
+          id        Int @id @default(autoincrement())
+          custom_B  B[]
+          special_B B[] @relation("AToB2")
         }
 
         model Unrelated {
-            id Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    api.expect_re_introspected_datamodel(input_dm, final_dm).await;
 
     Ok(())
 }
@@ -1511,24 +1509,22 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> T
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn custom_repro(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("tag", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("name", types::text().unique(true));
-            });
+    let sql = r#"
+        CREATE TABLE "tag" (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE
+        );
 
-            migration.create_table("Post", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("tag_id", types::integer().nullable(false));
-                t.add_foreign_key(&["tag_id"], "tag", &["id"]);
-            });
+        CREATE TABLE "Post" (
+            id SERIAL PRIMARY KEY,
+            tag_id INTEGER NOT NULL REFERENCES tag(id)
+        );
 
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await?;
+        CREATE TABLE "Unrelated" (
+            id SERIAL PRIMARY KEY
+        );
+    "#;
+    api.raw_cmd(sql).await;
 
     let input_dm = indoc! {r#"
         model Post{
@@ -1632,7 +1628,7 @@ async fn re_introspecting_ignore(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Vitess, CockroachDb))]
+#[test_connector(exclude(Vitess, CockroachDb, Sqlite))]
 async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestApi) -> TestResult {
     // We do not have enough information to correctly assign which field should point to column A in the
     // join table and which one to B

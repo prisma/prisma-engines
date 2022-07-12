@@ -316,15 +316,15 @@ async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi
           user_age                                     Int?
           other_user_id                                Int?
           other_user_age                               Int?
-          User_Post_other_user_id_other_user_ageToUser User? @relation("Post_other_user_id_other_user_ageToUser", fields: [other_user_id, other_user_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction, map: "Post_fk2")
           User_Post_user_id_user_ageToUser             User? @relation("Post_user_id_user_ageToUser", fields: [user_id, user_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction, map: "Post_fk1")
+          User_Post_other_user_id_other_user_ageToUser User? @relation("Post_other_user_id_other_user_ageToUser", fields: [other_user_id, other_user_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction, map: "Post_fk2")
         }
 
         model User {
           id                                           Int    @id @default(autoincrement())
           age                                          Int
-          Post_Post_other_user_id_other_user_ageToUser Post[] @relation("Post_other_user_id_other_user_ageToUser")
           Post_Post_user_id_user_ageToUser             Post[] @relation("Post_user_id_user_ageToUser")
+          Post_Post_other_user_id_other_user_ageToUser Post[] @relation("Post_other_user_id_other_user_ageToUser")
 
           @@unique([id, age], map: "user_unique")
         }

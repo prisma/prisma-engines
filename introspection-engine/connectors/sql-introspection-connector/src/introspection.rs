@@ -45,18 +45,27 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
             .filter(|(idx, left)| {
                 let mut already_visited = table.foreign_keys().take(*idx);
                 already_visited.any(|right| {
-                    left.referenced_table().id == right.referenced_table().id
-                        && left.constrained_column_names() == right.constrained_column_names()
+                    let (left_constrained, right_constrained) =
+                        (left.constrained_columns(), right.constrained_columns());
+                    left_constrained.len() == right_constrained.len()
+                        && left_constrained
+                            .zip(right_constrained)
+                            .all(|(left, right)| left.id == right.id)
+                        && left
+                            .referenced_columns()
+                            .zip(right.referenced_columns())
+                            .all(|(left, right)| left.id == right.id)
                 })
             })
             .map(|(_, fk)| fk.id)
             .collect();
+
         for foreign_key in table
             .foreign_keys()
             .filter(|fk| !duplicated_foreign_keys.contains(&fk.id))
         {
             version_check.has_inline_relations(table);
-            version_check.uses_on_delete(foreign_key.foreign_key(), table);
+            version_check.uses_on_delete(foreign_key);
 
             let mut relation_field = calculate_relation_field(foreign_key, &m2m_tables, &duplicated_foreign_keys);
 
@@ -66,20 +75,21 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
         }
 
         for index in table.indexes() {
-            model.add_index(calculate_index(index, ctx));
+            if let Some(index) = calculate_index(index, ctx) {
+                model.add_index(index);
+            }
         }
 
         if let Some(pk) = table.primary_key() {
-            let clustered = primary_key_is_clustered(table.id, ctx);
+            let clustered = primary_key_is_clustered(pk.id, ctx);
 
             model.primary_key = Some(PrimaryKeyDefinition {
                 name: None,
-                db_name: pk.constraint_name.clone(),
+                db_name: Some(pk.name().to_owned()),
                 fields: pk
-                    .columns
-                    .iter()
+                    .columns()
                     .map(|c| {
-                        let sort_order = c.sort_order.map(|sort| match sort {
+                        let sort_order = c.sort_order().map(|sort| match sort {
                             SQLSortOrder::Asc => SortOrder::Asc,
                             SQLSortOrder::Desc => SortOrder::Desc,
                         });
@@ -87,11 +97,11 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
                         PrimaryKeyField {
                             name: c.name().to_string(),
                             sort_order,
-                            length: c.length,
+                            length: c.length(),
                         }
                     })
                     .collect(),
-                defined_on_field: pk.columns.len() == 1,
+                defined_on_field: pk.columns().len() == 1,
                 clustered,
             });
         }

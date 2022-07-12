@@ -4,6 +4,7 @@ pub mod error;
 pub mod logger;
 pub mod opt;
 pub mod server;
+pub mod tracer;
 
 use error::PrismaError;
 

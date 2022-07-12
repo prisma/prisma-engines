@@ -12,7 +12,7 @@ use once_cell::sync::Lazy;
 use regex::RegexSet;
 use sql_schema_describer::{
     postgres::PostgresSchemaExt,
-    walkers::{ColumnWalker, IndexWalker, SqlSchemaExt},
+    walkers::{ColumnWalker, IndexWalker},
 };
 
 /// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.
@@ -21,6 +21,7 @@ static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
         // PostGIS. Reference: https://postgis.net/docs/manual-1.4/ch04.html#id418599
         "(?i)^spatial_ref_sys$",
         "(?i)^geometry_columns$",
+        "(?i)^geography_columns$",
     ])
     .unwrap()
 });
@@ -92,19 +93,16 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             return;
         }
 
-        let schemas: Pair<(&SqlDatabaseSchema, &PostgresSchemaExt)> = db.schemas().map(|schema| {
-            (
-                schema,
-                schema.describer_schema.downcast_connector_data().unwrap_or_default(),
-            )
-        });
+        let schemas: Pair<(&SqlDatabaseSchema, &PostgresSchemaExt)> = db
+            .schemas()
+            .map(|schema| (schema, schema.describer_schema.downcast_connector_data()));
 
         let sequence_pairs = db
             .all_column_pairs()
             .map(|cols| {
                 schemas
-                    .combine(cols)
-                    .map(|((schema, ext), (_table_id, column_id))| (schema.walk_column(column_id), ext))
+                    .zip(cols)
+                    .map(|((schema, ext), column_id)| (schema.walk(column_id), ext))
             })
             .filter_map(|cols| {
                 cols.map(|(col, ext)| {
@@ -153,8 +151,8 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         let columns_previous = a.columns();
         let columns_next = b.columns();
 
-        let pg_ext_previous: &PostgresSchemaExt = a.schema.downcast_connector_data().unwrap_or_default();
-        let pg_ext_next: &PostgresSchemaExt = b.schema.downcast_connector_data().unwrap_or_default();
+        let pg_ext_previous: &PostgresSchemaExt = a.schema.downcast_connector_data();
+        let pg_ext_next: &PostgresSchemaExt = b.schema.downcast_connector_data();
 
         let previous_algo = pg_ext_previous.index_algorithm(a.id);
         let next_algo = pg_ext_next.index_algorithm(b.id);
@@ -162,8 +160,8 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         columns_previous.len() == columns_next.len()
             && previous_algo == next_algo
             && columns_previous.zip(columns_next).all(|(col_a, col_b)| {
-                let a_class = pg_ext_previous.get_opclass(col_a.index_field_id());
-                let b_class = pg_ext_next.get_opclass(col_b.index_field_id());
+                let a_class = pg_ext_previous.get_opclass(col_a.id);
+                let b_class = pg_ext_next.get_opclass(col_b.id);
                 let a_kind = a_class.map(|c| &c.kind);
                 let b_kind = b_class.map(|c| &c.kind);
                 let a_is_default = a_class.map(|c| c.is_default).unwrap_or(false);
@@ -616,7 +614,7 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
 fn push_alter_enum_previous_usages_as_default(db: &DifferDatabase<'_>, alter_enum: &mut AlterEnum) {
     let mut previous_usages_as_default: Vec<(_, Option<_>)> = Vec::new();
 
-    let enum_names = db.schemas().enums(alter_enum.id).map(|enm| enm.name());
+    let enum_names = db.schemas().walk(alter_enum.id).map(|enm| enm.name());
 
     for table in db.dropped_tables() {
         for column in table

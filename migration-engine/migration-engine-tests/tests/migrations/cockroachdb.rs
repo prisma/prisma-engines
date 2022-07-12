@@ -1,7 +1,8 @@
 /// Test cockroachdb failure modes
 mod failure_modes;
 
-use datamodel::dml::ReferentialAction;
+use datamodel::{dml::ReferentialAction, parser_database::SourceFile};
+use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
 use prisma_value::PrismaValue;
 use quaint::prelude::Insert;
@@ -1229,4 +1230,101 @@ fn sequence_with_multiple_models_works(api: TestApi) {
 
     api.schema_push(schema).send().assert_green();
     api.schema_push(schema).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(CockroachDb))]
+fn bigint_defaults_work(api: TestApi) {
+    let schema = r#"
+        datasource mypg {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model foo {
+          id  String @id
+          bar BigInt @default(0)
+        }
+    "#;
+    let sql = expect![[r#"
+        -- CreateTable
+        CREATE TABLE "foo" (
+            "id" STRING NOT NULL,
+            "bar" INT8 NOT NULL DEFAULT 0,
+
+            CONSTRAINT "foo_pkey" PRIMARY KEY ("id")
+        );
+    "#]];
+    api.expect_sql_for_schema(schema, &sql);
+
+    api.schema_push(schema).send().assert_green();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(CockroachDb))]
+fn schema_from_introspection_docs_works(api: TestApi) {
+    let sql = r#"
+        CREATE TABLE "User" (
+          id INT8 PRIMARY KEY DEFAULT unique_rowid(),
+          name STRING(255),
+          email STRING(255) UNIQUE NOT NULL
+        );
+
+        CREATE TABLE "Post" (
+          id INT8 PRIMARY KEY DEFAULT unique_rowid(),
+          title STRING(255) UNIQUE NOT NULL,
+          "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
+          content STRING,
+          published BOOLEAN NOT NULL DEFAULT false,
+          "authorId" INT8 NOT NULL,
+          FOREIGN KEY ("authorId") REFERENCES "User"(id)
+        );
+
+        CREATE TABLE "Profile" (
+          id INT8 PRIMARY KEY DEFAULT unique_rowid(),
+          bio STRING,
+          "userId" INT8 UNIQUE NOT NULL,
+          FOREIGN KEY ("userId") REFERENCES "User"(id)
+        );
+    "#;
+    let introspected_schema = r#"
+        datasource crdb {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model Post {
+          id        BigInt   @id @default(autoincrement())
+          title     String   @unique @crdb.String(255)
+          createdAt DateTime @default(now()) @crdb.Timestamp(6)
+          content   String?
+          published Boolean  @default(false)
+          authorId  BigInt
+          User      User     @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        }
+
+        model Profile {
+          id     BigInt  @id @default(autoincrement())
+          bio    String?
+          userId BigInt  @unique
+          User   User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        }
+
+        model User {
+          id      BigInt   @id @default(autoincrement())
+          name    String?  @crdb.String(255)
+          email   String   @unique @crdb.String(255)
+          Post    Post[]
+          Profile Profile?
+        }
+    "#;
+
+    api.raw_cmd(sql);
+
+    let migration = api.connector_diff(
+        DiffTarget::Database,
+        DiffTarget::Datamodel(SourceFile::new_static(introspected_schema)),
+    );
+
+    let expected = expect!["-- This is an empty migration."];
+    expected.assert_eq(&migration);
 }

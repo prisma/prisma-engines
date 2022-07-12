@@ -1985,3 +1985,46 @@ fn composite_type_index_without_corresponding_data_should_not_crash() {
 
     expected.assert_eq(res.datamodel());
 }
+
+#[test]
+fn composite_type_index_with_non_composite_fields_in_the_middle_should_not_crash() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection::<mongodb::bson::Document>("A");
+
+        let model = IndexModel::builder().keys(doc! { "a.b.c": 1 }).build();
+        collection.create_index(model, None).await?;
+
+        let docs = vec![doc! { "a": { "b": 1, "d": { "c": 1 } } }];
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type AA {
+          b Int
+          d AaD
+          /// Field referred in an index, but found no data to define the type.
+          b AaB?
+        }
+
+        type AaB {
+          /// Field referred in an index, but found no data to define the type.
+          c Json?
+        }
+
+        type AaD {
+          c Int
+        }
+
+        model A {
+          id String @id @default(auto()) @map("_id") @db.ObjectId
+          a  AA
+
+          @@index([a.b.c], map: "a.b.c_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}

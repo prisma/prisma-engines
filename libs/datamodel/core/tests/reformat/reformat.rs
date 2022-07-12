@@ -283,8 +283,8 @@ fn end_of_line_comments_must_not_influence_table_layout_in_enums() {
 
     let expected = expect![[r#"
         enum Foo {
-          ONE  @map("short") // COMMENT 1
-          TWO  @map("a_very_long_name") // COMMENT 2
+          ONE @map("short") // COMMENT 1
+          TWO @map("a_very_long_name") // COMMENT 2
         }
     "#]];
 
@@ -420,8 +420,8 @@ fn test_floating_doc_comments_1() {
         model a {
           one Int
           two Int
-          // bs  b[] @relation(references: [a])
 
+          // bs  b[] @relation(references: [a])
           @@id([one, two])
         }
 
@@ -480,12 +480,12 @@ fn reformatting_enums_must_work() {
 
     let expected = expect![[r#"
         enum Colors {
-          RED    @map("rett")
+          RED   @map("rett")
           BLUE
           GREEN
 
           // comment
-          ORANGE_AND_KIND_OF_RED  @map("super_color")
+          ORANGE_AND_KIND_OF_RED @map("super_color")
 
           @@map("the_colors")
         }
@@ -629,7 +629,7 @@ fn incomplete_field_definitions_in_a_model_must_not_get_removed() {
 }
 
 #[test]
-fn new_lines_inside_block_above_field_must_stay() {
+fn new_lines_inside_block_above_field_must_go_away() {
     let input = indoc! {r#"
         model Post {
 
@@ -642,10 +642,6 @@ fn new_lines_inside_block_above_field_must_stay() {
 
     let expected = expect![[r#"
         model Post {
-
-
-
-
           id Int @id @default(autoincrement())
         }
     "#]];
@@ -654,7 +650,7 @@ fn new_lines_inside_block_above_field_must_stay() {
 }
 
 #[test]
-fn new_lines_inside_block_below_field_must_stay() {
+fn new_lines_inside_block_below_field_must_go_away() {
     let input = indoc! {r#"
         model Post {
           id Int @id @default(autoincrement())
@@ -668,10 +664,6 @@ fn new_lines_inside_block_below_field_must_stay() {
     let expected = expect![[r#"
         model Post {
           id Int @id @default(autoincrement())
-
-
-
-
         }
     "#]];
 
@@ -679,7 +671,7 @@ fn new_lines_inside_block_below_field_must_stay() {
 }
 
 #[test]
-fn new_lines_inside_block_in_between_fields_must_stay() {
+fn new_lines_inside_block_in_between_fields_must_go_away() {
     let input = indoc! {r#"
         model Post {
           id Int @id @default(autoincrement())
@@ -694,9 +686,7 @@ fn new_lines_inside_block_in_between_fields_must_stay() {
         model Post {
           id Int @id @default(autoincrement())
 
-
           input String
-
         }
     "#]];
 
@@ -809,7 +799,6 @@ fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one
         }
     "#};
 
-    // TODO: the formatting of the type alias is not nice
     let expected = expect![[r#"
         model Post {
           id Int @id
@@ -907,6 +896,7 @@ fn incomplete_last_line_must_not_stop_reformatting() {
         model User {
           id Int @id
         }
+
         model Bl
     "#]];
 
@@ -1449,4 +1439,63 @@ fn attribute_arguments_reformatting_is_idempotent() {
     let reformatted = reformat(schema);
     expected.assert_eq(&reformatted);
     assert_eq!(reformatted, reformat(&reformatted)); // it's idempotent
+}
+
+#[test]
+fn block_attribute_comments_are_preserved() {
+    let schema = r#"
+        model MyModel {
+          // Example Comment
+          field1 Int // Comment Field 1
+          field2 Int // Comment Field 2
+          field3 Int // Comment Field 3
+
+          // This comment should stay here.
+          @@unique([field1, field2]) // younique
+
+          // This one must stay too.
+          @@unique([field1, field3]) // there too
+        }
+
+        type YourType {
+          // Example Comment
+          field1 Int // Comment Field 1
+          field2 Int // Comment Field 2
+          field3 Int // Comment Field 3
+
+          // This comment should stay here.
+          @@unique([field1, field2]) // younique
+
+          // This one must stay too.
+          @@unique([field1, field3]) // there too
+        }
+    "#;
+
+    let expected = expect![[r#"
+        model MyModel {
+          // Example Comment
+          field1 Int // Comment Field 1
+          field2 Int // Comment Field 2
+          field3 Int // Comment Field 3
+
+          // This comment should stay here.
+          @@unique([field1, field2]) // younique
+          // This one must stay too.
+          @@unique([field1, field3]) // there too
+        }
+
+        type YourType {
+          // Example Comment
+          field1 Int // Comment Field 1
+          field2 Int // Comment Field 2
+          field3 Int // Comment Field 3
+
+          // This comment should stay here.
+          @@unique([field1, field2]) // younique
+          // This one must stay too.
+          @@unique([field1, field3]) // there too
+        }
+    "#]];
+
+    expected.assert_eq(&reformat(schema));
 }

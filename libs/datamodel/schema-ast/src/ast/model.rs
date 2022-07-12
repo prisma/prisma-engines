@@ -68,8 +68,6 @@ pub struct Model {
     pub documentation: Option<Comment>,
     /// The location of this model in the text representation.
     pub span: Span,
-    /// Should this be commented out.
-    pub commented_out: bool,
 }
 
 impl Model {
@@ -78,14 +76,6 @@ impl Model {
             .iter()
             .enumerate()
             .map(|(idx, field)| (FieldId(idx as u32), field))
-    }
-
-    pub fn find_field(&self, name: &str) -> Option<&Field> {
-        self.fields.iter().find(|ast_field| ast_field.name.name == name)
-    }
-
-    pub fn find_field_bang(&self, name: &str) -> &Field {
-        self.find_field(name).unwrap()
     }
 }
 
@@ -110,9 +100,5 @@ impl WithAttributes for Model {
 impl WithDocumentation for Model {
     fn documentation(&self) -> &Option<Comment> {
         &self.documentation
-    }
-
-    fn is_commented_out(&self) -> bool {
-        self.commented_out
     }
 }
