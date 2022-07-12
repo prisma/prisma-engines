@@ -1,3 +1,5 @@
+//! SQL server schema description.
+
 use crate::{
     getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
     DescriberError, DescriberErrorKind, DescriberResult, ForeignKeyAction, IndexColumn, Procedure, SQLSortOrder,
@@ -92,7 +94,7 @@ impl MssqlSchemaExt {
 
 impl std::fmt::Debug for SqlSchemaDescriber<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct(type_name::<SqlSchemaDescriber>()).finish()
+        f.debug_struct(type_name::<SqlSchemaDescriber<'_>>()).finish()
     }
 }
 

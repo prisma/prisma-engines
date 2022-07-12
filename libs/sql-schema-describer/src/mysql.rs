@@ -1,3 +1,5 @@
+//! MySQL schema description.
+
 use crate::{getters::Getter, parsers::Parser, *};
 use bigdecimal::ToPrimitive;
 use indexmap::IndexMap;
@@ -521,7 +523,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         full_data_type: &str,
         precision: Precision,
         arity: ColumnArity,
-        default: Option<&Value>,
+        default: Option<&Value<'_>>,
     ) -> (ColumnType, Option<Enum>) {
         static UNSIGNEDNESS_RE: Lazy<Regex> = Lazy::new(|| Regex::new("(?i)unsigned$").unwrap());
         let is_tinyint1 = || Self::extract_precision(full_data_type) == Some(1);
@@ -669,7 +671,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         static MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
         static MARIADB_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(.*)'"#).unwrap());
 
-        let maybe_unquoted: Cow<str> = if matches!(flavour, Flavour::MariaDb) {
+        let maybe_unquoted: Cow<'_, str> = if matches!(flavour, Flavour::MariaDb) {
             let unquoted = MARIADB_DEFAULT_QUOTE_UNESCAPE_RE
                 .captures(&default)
                 .and_then(|cap| cap.get(1).map(|x| x.as_str()))

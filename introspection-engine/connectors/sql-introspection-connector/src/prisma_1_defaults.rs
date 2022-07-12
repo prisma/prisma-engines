@@ -3,7 +3,7 @@ use crate::SqlFamilyTrait;
 use datamodel::dml::{self, Datamodel, ValueGenerator};
 use introspection_connector::{IntrospectionContext, Version, Warning};
 use native_types::{MySqlType, PostgresType};
-use sql_schema_describer::{SqlSchema, SqlSchemaExt};
+use sql_schema_describer::SqlSchema;
 
 pub fn add_prisma_1_id_defaults(
     version: &Version,

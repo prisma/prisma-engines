@@ -351,8 +351,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()> {
-        let url =
-            MssqlUrl::new(&connector_params.connection_string).map_err(|err| ConnectorError::url_parse_error(err))?;
+        let url = MssqlUrl::new(&connector_params.connection_string).map_err(ConnectorError::url_parse_error)?;
         let params = Params { connector_params, url };
         self.state.set_params(params);
         Ok(())

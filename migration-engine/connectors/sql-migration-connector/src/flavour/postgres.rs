@@ -377,10 +377,10 @@ impl SqlFlavour for PostgresFlavour {
         let mut url: Url = connector_params
             .connection_string
             .parse()
-            .map_err(|err| ConnectorError::url_parse_error(err))?;
+            .map_err(ConnectorError::url_parse_error)?;
         disable_postgres_statement_cache(&mut url)?;
         let connection_string = url.to_string();
-        let url = PostgresUrl::new(url).map_err(|err| ConnectorError::url_parse_error(err))?;
+        let url = PostgresUrl::new(url).map_err(ConnectorError::url_parse_error)?;
         connector_params.connection_string = connection_string;
         let params = Params { connector_params, url };
         self.state.set_params(params);

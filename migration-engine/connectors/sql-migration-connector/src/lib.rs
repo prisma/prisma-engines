@@ -1,8 +1,6 @@
 //! The SQL migration connector.
 
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
-#![allow(clippy::trivial_regex)] // these will grow
-#![allow(clippy::redundant_closure)] // too eager, sometimes wrong
 #![allow(clippy::ptr_arg)] // remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
 mod apply_migration;
@@ -23,7 +21,7 @@ use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFla
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
-use sql_schema_describer::{self as describer, walkers::SqlSchemaExt};
+use sql_schema_describer as sql;
 use std::sync::Arc;
 
 /// The top-level SQL migration connector.
@@ -78,7 +76,7 @@ impl SqlMigrationConnector {
     }
 
     /// Made public for tests.
-    pub fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<describer::SqlSchema>> {
+    pub fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<sql::SqlSchema>> {
         self.flavour.describe_schema()
     }
 

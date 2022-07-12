@@ -9,14 +9,6 @@ use crate::{
 use serde::de::DeserializeOwned;
 use std::ops::Range;
 
-/// Traverse all the columns in the schema.
-pub fn walk_columns(schema: &SqlSchema) -> impl Iterator<Item = ColumnWalker<'_>> {
-    (0..schema.columns.len()).map(|idx| ColumnWalker {
-        schema,
-        id: ColumnId(idx as u32),
-    })
-}
-
 /// A generic reference to a schema item. It holds a reference to the schema so it can offer a
 /// convenient API based on the Id type.
 #[derive(Clone, Copy)]
@@ -177,9 +169,9 @@ impl<'a> ColumnWalker<'a> {
 #[derive(Clone, Copy)]
 pub struct ViewWalker<'a> {
     /// The schema the view is contained in.
-    schema: &'a SqlSchema,
+    pub(crate) schema: &'a SqlSchema,
     /// The index of the view in the schema.
-    view_index: usize,
+    pub(crate) view_index: usize,
 }
 
 impl<'a> ViewWalker<'a> {
@@ -211,8 +203,8 @@ impl<'a> ViewWalker<'a> {
 /// Traverse a user-defined type
 #[derive(Clone, Copy)]
 pub struct UserDefinedTypeWalker<'a> {
-    schema: &'a SqlSchema,
-    udt_index: usize,
+    pub(crate) schema: &'a SqlSchema,
+    pub(crate) udt_index: usize,
 }
 
 impl<'a> UserDefinedTypeWalker<'a> {
@@ -482,39 +474,6 @@ impl<'a> EnumWalker<'a> {
     /// The values of the enum
     pub fn values(self) -> &'a [String] {
         &self.get().values
-    }
-}
-
-/// Extension methods for the traversal of a SqlSchema.
-pub trait SqlSchemaExt {
-    /// Find a table by name.
-    fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>>;
-
-    /// Find a view by index.
-    fn view_walker_at(&self, index: usize) -> ViewWalker<'_>;
-
-    /// Find a user-defined type by index.
-    fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_>;
-}
-
-impl SqlSchemaExt for SqlSchema {
-    fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
-        let table_idx = self.tables.iter().position(|table| table.name == name)?;
-        Some(self.walk(TableId(table_idx as u32)))
-    }
-
-    fn view_walker_at(&self, index: usize) -> ViewWalker<'_> {
-        ViewWalker {
-            view_index: index,
-            schema: self,
-        }
-    }
-
-    fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_> {
-        UserDefinedTypeWalker {
-            udt_index: index,
-            schema: self,
-        }
     }
 }
 

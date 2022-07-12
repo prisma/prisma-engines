@@ -8,7 +8,7 @@ use barrel::Migration;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{
     postgres::Circumstances,
-    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     ColumnTypeFamily, DescriberError, ForeignKeyAction, SqlSchema, SqlSchemaDescriberBackend,
 };
 use std::future::Future;
