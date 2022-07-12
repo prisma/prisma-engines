@@ -1029,7 +1029,7 @@
         <span class="comment">// many-to-many relation tables, but we used not to (we did not provide a constraint</span>
         <span class="comment">// names), and we do not want to cause new migrations on upgrade, we ignore the foreign</span>
         <span class="comment">// keys of implicit many-to-many relation tables for renamings.</span>
-        <span class="kw">if</span> <span class="ident">fk</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="ident">is_prisma_implicit_m2m_fk</span>(<span class="ident">fk</span>)).<span class="ident">into_tuple</span>() <span class="op">==</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>) {
+        <span class="kw">if</span> <span class="ident">fk</span>.<span class="ident">map</span>(<span class="ident">is_prisma_implicit_m2m_fk</span>).<span class="ident">into_tuple</span>() <span class="op">==</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>) {
             <span class="kw">return</span>;
         }
 

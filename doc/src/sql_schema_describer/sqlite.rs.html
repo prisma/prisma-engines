@@ -550,6 +550,7 @@
 <span id="545">545</span>
 <span id="546">546</span>
 <span id="547">547</span>
+<span id="548">548</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQLite description.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -571,7 +572,7 @@
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">SqlSchemaDescriber</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">SqlSchemaDescriber</span><span class="op">&gt;</span>()).<span class="ident">finish</span>()
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">SqlSchemaDescriber</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>()).<span class="ident">finish</span>()
     }
 }
 
@@ -929,7 +930,8 @@
         <span class="kw">if</span> <span class="ident">pk_cols</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
             <span class="kw">let</span> <span class="ident">pk_col_id</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">pk_cols</span>.<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">pk_col</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">schema</span>.<span class="ident">columns</span>[<span class="ident">pk_col_id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>];
-            <span class="kw">if</span> <span class="ident">pk_col</span>.<span class="number">1</span>.<span class="ident">tpe</span>.<span class="ident">full_data_type</span>.<span class="ident">contains</span>(<span class="string">&quot;int&quot;</span>) {
+            <span class="comment">// See https://www.sqlite.org/lang_createtable.html for the exact logic.</span>
+            <span class="kw">if</span> <span class="ident">pk_col</span>.<span class="number">1</span>.<span class="ident">tpe</span>.<span class="ident">full_data_type</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;INTEGER&quot;</span>) {
                 <span class="ident">pk_col</span>.<span class="number">1</span>.<span class="ident">auto_increment</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="ident">pk_col</span>.<span class="number">1</span>.<span class="ident">tpe</span>.<span class="ident">arity</span> <span class="op">=</span> <span class="ident">ColumnArity::Required</span>;
             }

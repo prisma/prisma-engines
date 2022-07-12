@@ -845,7 +845,7 @@
     <span class="prelude-val">None</span>
 }
 
-<span class="kw">fn</span> <span class="ident">parse_datetime_default</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_datetime_default</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parser</span>.<span class="ident">peek_token</span>()<span class="question-mark">?</span> {
         <span class="ident">Token::Identifier</span> =&gt; {
             <span class="kw">let</span> <span class="ident">func_name</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">expect</span>(<span class="ident">Token::Identifier</span>)<span class="question-mark">?</span>;
@@ -869,7 +869,7 @@
     <span class="ident">value</span>
 }
 
-<span class="kw">fn</span> <span class="ident">parse_enum_default</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_enum_default</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">parser</span>.<span class="ident">peek_token</span>()<span class="question-mark">?</span> {
         <span class="ident">Token::Identifier</span> =&gt; {
             <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">expect</span>(<span class="ident">Token::Identifier</span>)<span class="question-mark">?</span>;
@@ -1148,7 +1148,7 @@
     <span class="prelude-val">Some</span>(<span class="ident">value</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">parse_bool_default</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_bool_default</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">expect</span>(<span class="ident">Token::Identifier</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">bool_value</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;t&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;true&quot;</span>) {
@@ -1247,7 +1247,7 @@
 
 <span class="doccomment">/// Some(()) on valid cast or absence of cast. None if we can&#39;t make sense of the input.</span>
 <span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">fn</span> <span class="ident">eat_cast</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">eat_cast</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">parser</span>.<span class="ident">peek_token</span>() {
         <span class="prelude-val">Some</span>(<span class="ident">Token::CastOperator</span>) =&gt; {
             <span class="ident">parser</span>.<span class="ident">expect</span>(<span class="ident">Token::CastOperator</span>)<span class="question-mark">?</span>;

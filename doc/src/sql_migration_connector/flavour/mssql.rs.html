@@ -556,7 +556,6 @@
 <span id="551">551</span>
 <span id="552">552</span>
 <span id="553">553</span>
-<span id="554">554</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">shadow_db</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">flavour::normalize_sql_schema</span>, <span class="ident">SqlFlavour</span>};
@@ -910,8 +909,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">set_params</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">connector_params</span>: <span class="ident">ConnectorParams</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span>
-            <span class="ident">MssqlUrl::new</span>(<span class="kw-2">&amp;</span><span class="ident">connector_params</span>.<span class="ident">connection_string</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ConnectorError::url_parse_error</span>(<span class="ident">err</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">MssqlUrl::new</span>(<span class="kw-2">&amp;</span><span class="ident">connector_params</span>.<span class="ident">connection_string</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">Params</span> { <span class="ident">connector_params</span>, <span class="ident">url</span> };
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">set_params</span>(<span class="ident">params</span>);
         <span class="prelude-val">Ok</span>(())

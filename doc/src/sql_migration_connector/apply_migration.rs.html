@@ -181,7 +181,7 @@
     <span class="ident">SqlFlavour</span>, <span class="ident">SqlMigrationConnector</span>,
 };
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorResult</span>, <span class="ident">DestructiveChangeDiagnostics</span>, <span class="ident">Migration</span>};
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">walkers::SqlSchemaExt</span>, <span class="ident">SqlSchema</span>};
+<span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
 
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">flavour</span>, <span class="ident">migration</span>))]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migration</span>(

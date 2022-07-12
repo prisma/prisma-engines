@@ -351,13 +351,9 @@
 <span id="346">346</span>
 <span id="347">347</span>
 <span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::trivial_regex</span>)]</span> <span class="comment">// these will grow</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure</span>)]</span> <span class="comment">// too eager, sometimes wrong</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span> <span class="comment">// remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped</span>
 
 <span class="kw">mod</span> <span class="ident">apply_migration</span>;
@@ -378,7 +374,7 @@
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">migrations_directory::MigrationDirectory</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">pair::Pair</span>;
 <span class="kw">use</span> <span class="ident">sql_migration</span>::{<span class="ident">DropUserDefinedType</span>, <span class="ident">DropView</span>, <span class="ident">SqlMigration</span>, <span class="ident">SqlMigrationStep</span>};
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">describer</span>, <span class="ident">walkers::SqlSchemaExt</span>};
+<span class="kw">use</span> <span class="ident">sql_schema_describer</span> <span class="kw">as</span> <span class="ident">sql</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="doccomment">/// The top-level SQL migration connector.</span>
@@ -433,7 +429,7 @@
     }
 
     <span class="doccomment">/// Made public for tests.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">describer::SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">sql::SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">describe_schema</span>()
     }
 

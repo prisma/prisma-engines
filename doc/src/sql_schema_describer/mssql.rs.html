@@ -775,7 +775,11 @@
 <span id="770">770</span>
 <span id="771">771</span>
 <span id="772">772</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+<span id="773">773</span>
+<span id="774">774</span>
+</pre><pre class="rust"><code><span class="doccomment">//! SQL server schema description.</span>
+
+<span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">getters::Getter</span>, <span class="ident">ids</span>::<span class="kw-2">*</span>, <span class="ident">parsers::Parser</span>, <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultValue</span>,
     <span class="ident">DescriberError</span>, <span class="ident">DescriberErrorKind</span>, <span class="ident">DescriberResult</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">IndexColumn</span>, <span class="ident">Procedure</span>, <span class="ident">SQLSortOrder</span>,
     <span class="ident">SqlMetadata</span>, <span class="ident">SqlSchema</span>, <span class="ident">UserDefinedType</span>, <span class="ident">View</span>,
@@ -869,7 +873,7 @@
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">SqlSchemaDescriber</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">SqlSchemaDescriber</span><span class="op">&gt;</span>()).<span class="ident">finish</span>()
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">SqlSchemaDescriber</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>()).<span class="ident">finish</span>()
     }
 }
 
